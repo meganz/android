@@ -10,21 +10,21 @@ fun Long.name(): String? = MegaApplication.getInstance().megaApi.getNodeByHandle
 
 fun randomResult() = Random.nextBoolean()
 
-fun updateSQL(syncPair: SyncPair) =
-    "UPDATE $TABLE_SYNC_PAIRS SET " +
-            "$KEY_SYNC_NAME = '${encrypt(syncPair.name)}', " +
-            "$KEY_SYNC_PAIR_TYPE = ${syncPair.syncType}, " +
-            "$KEY_SYNC_LOCAL_PATH = '${encrypt(syncPair.localFolderPath)}', " +
-            "$KEY_SYNC_CLOUD_PATH = '${encrypt(syncPair.targetFolderPath)}', " +
-            "$KEY_SYNC_CLOUD_HANDLE = '${encrypt(syncPair.targetFodlerHanlde.toString())}', " +
-            "$KEY_SYNC_EX = '${encrypt(Boolean.toString(syncPair.isExcludeSubFolders))}', " +
-            "$KEY_SYNC_DEL = '${encrypt(Boolean.toString(syncPair.isDeleteEmptySubFolders))}', " +
-            "$KEY_SYNC_START_TIME = '${encrypt(syncPair.startTimestamp.toString())}', " +
-            "$KEY_SYNC_LAST_SYNC_TIME = '${encrypt(syncPair.lastFinishTimestamp.toString())}', " +
-            "$KEY_SYNC_PAIR_STATE = ${syncPair.state}, " +
-            "$KEY_SYNC_PAIR_SUB_STATE = ${syncPair.subState}, " +
-            "$KEY_SYNC_EXTRA_DATA = '${encrypt(syncPair.extraData)}', " +
-            "$KEY_SYNC_OUTDATED = '${encrypt(Boolean.toString(syncPair.outdated))}'" +
-            "WHERE $KEY_SYNC_ID = '${encrypt(syncPair.syncId.toString())}'"
+fun updateSQL(backup: Backup) =
+    "UPDATE $TABLE_BACKUPS SET " +
+            "$KEY_BACKUP_NAME = '${encrypt(backup.name)}', " +
+            "$KEY_BACKUP_TYPE = ${backup.backupType}, " +
+            "$KEY_BACKUP_LOCAL_FOLDER = '${encrypt(backup.localFolder)}', " +
+            "$KEY_BACKUP_TARGET_NODE_PATH = '${encrypt(backup.targetFolderPath)}', " +
+            "$KEY_BACKUP_TARGET_NODE = '${encrypt(backup.targetNode.toString())}', " +
+            "$KEY_BACKUP_EX = '${encrypt(Boolean.toString(backup.isExcludeSubFolders))}', " +
+            "$KEY_BACKUP_DEL = '${encrypt(Boolean.toString(backup.isDeleteEmptySubFolders))}', " +
+            "$KEY_BACKUP_START_TIME = '${encrypt(backup.startTimestamp.toString())}', " +
+            "$KEY_BACKUP_LAST_TIME = '${encrypt(backup.lastFinishTimestamp.toString())}', " +
+            "$KEY_BACKUP_STATE = ${backup.state}, " +
+            "$KEY_BACKUP_SUB_STATE = ${backup.subState}, " +
+            "$KEY_BACKUP_EXTRA_DATA = '${encrypt(backup.extraData)}', " +
+            "$KEY_BACKUP_OUTDATED = '${encrypt(Boolean.toString(backup.outdated))}'" +
+            "WHERE $KEY_BACKUP_ID = '${encrypt(backup.backupId.toString())}'"
 
-fun deleteSQL(id: Long) = "DELETE FROM $TABLE_SYNC_PAIRS WHERE $KEY_SYNC_ID = '${encrypt(id.toString())}'"
+fun deleteSQL(id: Long) = "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"

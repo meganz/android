@@ -4,15 +4,15 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.sync.SyncListener
-import mega.privacy.android.app.sync.cusync.callback.DeleteBackupCallback
+import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
-import mega.privacy.android.app.sync.cusync.callback.UpdateSyncCallback
-import mega.privacy.android.app.sync.mock.*
+import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 
 
 class CuSyncManager {
@@ -21,13 +21,20 @@ class CuSyncManager {
 
     private val megaApiJava: MegaApiAndroid = megaApplication.megaApi
 
-    private val listener = SyncListener(megaApplication)
-
     private val databaseHandler: DatabaseHandler = DatabaseHandler.getDbHandler(megaApplication)
+
+    companion object {
+        const val TYPE_BACKUP_PRIMARY = 0
+        const val TYPE_BACKUP_SECONDARY = 1
+        const val NAME_PRIMARY = "camera uploads"
+        const val NAME_SECONDARY = "media uploads"
+        const val NAME_OTHER = "other sync"
+        const val DEVICE_ID = "Ash's phone"
+    }
 
     fun setPrimaryBackup() =
         setBackup(
-            SYNC_TYPE_PRIMARY,
+            TYPE_BACKUP_PRIMARY,
             databaseHandler.preferences?.camSyncHandle?.toLong(),
             databaseHandler.preferences?.camSyncLocalPath
         )
@@ -35,7 +42,7 @@ class CuSyncManager {
 
     fun setSecondaryBackup() =
         setBackup(
-            SYNC_TYPE_SECONDARY,
+            TYPE_BACKUP_SECONDARY,
             databaseHandler.preferences?.megaHandleSecondaryFolder?.toLong(),
             databaseHandler.preferences?.localPathSecondaryFolder
         )
@@ -43,36 +50,42 @@ class CuSyncManager {
 
     private fun setBackup(
         backupType: Int,
-        targetHandle: Long?,
-        localFolderPath: String?,
-        state: Int? = 0,
-        subState: Int? = 0,
-        extraData: String? = INVALID_NON_NULL_VALUE
+        targetNode: Long?,
+        localFolder: String?,
+        state: Int = MegaApiJava.STATE_PENDING,
+        subState: Int = MegaApiJava.STATE_PENDING,
+        extraData: String = ""
     ) {
-        if (isInvalid(targetHandle?.toString())) {
-            logWarning("Target handle is invalid, value: $targetHandle")
+        if (isInvalid(targetNode?.toString())) {
+            logWarning("Target handle is invalid, value: $targetNode")
             return
         }
 
-        if (isInvalid(localFolderPath)) {
-            logWarning("Local path is invalid, value: $localFolderPath")
+        if (isInvalid(localFolder)) {
+            logWarning("Local path is invalid, value: $localFolder")
             return
         }
 
-        listener.callback = SetBackupCallback()
-        val name = when (backupType) {
-            SYNC_TYPE_PRIMARY -> NAME_PRIMARY
-            SYNC_TYPE_SECONDARY -> NAME_SECONDARY
-            else -> NAME_OTHER
-        }
-
-        // TODO SDK call
-        setBackupMock(backupType, targetHandle!!, localFolderPath!!, name, listener)
+        megaApiJava.setBackup(
+            backupType,
+            targetNode!!,
+            localFolder,
+            DEVICE_ID,
+            state,
+            subState,
+            extraData,
+            SyncListener(SetBackupCallback(), megaApplication)
+        )
     }
 
-    fun updatePrimaryTargetHandle(newHandle: Long?) {
+    fun updatePrimaryTargetNode(newTargetNode: Long?) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
             logDebug("CU is not enabled.")
+            return
+        }
+
+        if (isInvalid(newTargetNode?.toString())) {
+            logWarning("Invalid target node, value: $newTargetNode")
             return
         }
 
@@ -80,13 +93,29 @@ class CuSyncManager {
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
-            updateBackup(cuSync.syncId, newHandle, cuSync.localFolderPath)
+            cuSync.apply {
+                updateBackup(
+                    backupId,
+                    backupType,
+                    newTargetNode!!,
+                    localFolder,
+                    deviceId,
+                    state,
+                    subState,
+                    extraData
+                )
+            }
         }
     }
 
-    fun updateSecondaryTargetHandle(newHandle: Long?) {
+    fun updateSecondaryTargetNode(newTargetNode: Long?) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
             logDebug("MU is not enabled.")
+            return
+        }
+
+        if (isInvalid(newTargetNode?.toString())) {
+            logWarning("Invalid target node, value: $newTargetNode")
             return
         }
 
@@ -94,13 +123,29 @@ class CuSyncManager {
         if (muSync == null) {
             setSecondaryBackup()
         } else {
-            updateBackup(muSync.syncId, newHandle, muSync.localFolderPath)
+            muSync.apply {
+                updateBackup(
+                    backupId,
+                    backupType,
+                    newTargetNode!!,
+                    localFolder,
+                    deviceId,
+                    state,
+                    subState,
+                    extraData
+                )
+            }
         }
     }
 
-    fun updatePrimaryLocalPath(newPath: String?) {
+    fun updatePrimaryLocalFolder(newLocalFolder: String?) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
             logDebug("CU is not enabled.")
+            return
+        }
+
+        if (isInvalid(newLocalFolder)) {
+            logWarning("New local path is invalid, value: $newLocalFolder")
             return
         }
 
@@ -108,13 +153,29 @@ class CuSyncManager {
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
-            updateBackup(cuSync.syncId, cuSync.targetFodlerHanlde, newPath)
+            cuSync.apply {
+                updateBackup(
+                    backupId,
+                    backupType,
+                    targetNode,
+                    newLocalFolder!!,
+                    deviceId,
+                    state,
+                    subState,
+                    extraData
+                )
+            }
         }
     }
 
-    fun updateSecondaryLocalPath(newPath: String?) {
+    fun updateSecondaryLocalFolder(newLocalFolder: String?) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
-            logDebug("MU is not enabled.")
+            logDebug("MU is not enabled, no need to update.")
+            return
+        }
+
+        if (isInvalid(newLocalFolder)) {
+            logWarning("New local path is invalid, value: $newLocalFolder")
             return
         }
 
@@ -122,48 +183,60 @@ class CuSyncManager {
         if (muSync == null) {
             setSecondaryBackup()
         } else {
-            updateBackup(muSync.syncId, muSync.targetFodlerHanlde, newPath)
+            muSync.apply {
+                updateBackup(
+                    backupId,
+                    backupType,
+                    targetNode,
+                    newLocalFolder!!,
+                    deviceId,
+                    state,
+                    subState,
+                    extraData
+                )
+            }
         }
     }
 
     private fun updateBackup(
-        backupId: Long?,
-        targetHandle: Long?,
-        localFolderPath: String?
+        backupId: Long,
+        backupType: Int,
+        targetNode: Long,
+        localFolder: String,
+        deviceId: String,
+        state: Int,
+        subState: Int,
+        extraData: String
     ) {
-        if (isInvalid(backupId?.toString())) {
+        if (isInvalid(backupId.toString())) {
             logWarning("Invalid sync id, value: $backupId")
             return
         }
 
-        if (isInvalid(targetHandle?.toString())) {
-            logWarning("Invalid target handle, value: $targetHandle")
-            return
-        }
-
-        if (isInvalid(localFolderPath)) {
-            logWarning("New local path is invalid, value: $localFolderPath")
-            return
-        }
-
-        listener.callback = UpdateSyncCallback()
-        // TODO SDK call
-        updateBackupMock(backupId!!, targetHandle!!, localFolderPath!!, listener)
+        megaApiJava.updateBackup(
+            backupId,
+            backupType,
+            targetNode,
+            localFolder,
+            deviceId,
+            state,
+            subState,
+            extraData,
+            SyncListener(UpdateBackupCallback(), megaApplication)
+        )
     }
 
     fun deletePrimaryBackup() {
-        deleteBackup(databaseHandler.cuSyncPair?.syncId)
+        removeBackup(databaseHandler.cuSyncPair?.backupId)
     }
 
     fun deleteSecondaryBackup() {
-        deleteBackup(databaseHandler.muSyncPair?.syncId)
+        removeBackup(databaseHandler.muSyncPair?.backupId)
     }
 
-    private fun deleteBackup(id: Long?) {
-        listener.callback = DeleteBackupCallback()
-        // TODO SDK call
+    private fun removeBackup(id: Long?) {
         id?.let {
-            deleteBackupMock(id, listener)
+            megaApiJava.removeBackup(id, SyncListener(RemoveBackupCallback(), megaApplication))
         }
     }
 

@@ -1717,7 +1717,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 				localCameraUploadFolderSDCard.setSummary(pickedDir.getName());
 
 				// Update sync when primary local folder changed.
-                syncManager.updatePrimaryLocalPath(pickedDir.getName());
+                syncManager.updatePrimaryLocalFolder(pickedDir.getName());
 			}
 			else{
 				logWarning("pickedDirNAme NULL");
@@ -1755,7 +1755,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
             rescheduleCameraUpload(context);
 
             // Update sync when primary local folder changed.
-            syncManager.updatePrimaryLocalPath(cameraPath);
+            syncManager.updatePrimaryLocalFolder(cameraPath);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
@@ -1773,7 +1773,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			rescheduleCameraUpload(context);
 
             // Update sync when secondary local folder changed.
-            syncManager.updateSecondaryLocalPath(secondaryPath);
+            syncManager.updateSecondaryLocalFolder(secondaryPath);
 		}
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Secondary folder to sync

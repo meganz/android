@@ -5,28 +5,25 @@ import mega.privacy.android.app.sync.mock.MockListener
 import mega.privacy.android.app.sync.mock.RequestType
 import mega.privacy.android.app.sync.mock.SyncEventResult
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 
 
-class SyncListener(context: Context) : MockListener {
+class SyncListener(
+    private val callback: SyncEventCallback,
+    context: Context
+) : BaseListener(context) {
 
-    var callback: SyncEventCallback? = null
+    override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+        if (callback.requestType() != request?.type) return
 
-    override fun onFinish(result: SyncEventResult, errorCode: Int) {
-        val requestType = when (result.requestType) {
-            RequestType.REQUEST_TYPE_UPDATE -> "UPDATE"
-            RequestType.REQUEST_TYPE_SET -> "SET"
-            RequestType.REQUEST_TYPE_DELETE -> "DELETE"
-        }
-
-        if (result.requestType.value == callback?.requestType()) {
-            if (errorCode == MegaError.API_OK) {
-                logDebug("Request $requestType successfully.")
-                callback?.onSuccess(result, null, null, null)
-            } else {
-                logDebug("Request $requestType failed.")
-                callback?.onFail(result, null)
-            }
+        if (e?.errorCode == MegaError.API_OK) {
+            logDebug("Request ${request.type} successfully.")
+            callback.onSuccess(api, request, e)
+        } else {
+            logDebug("Request ${request.type} failed.")
+            callback.onFail(request, null)
         }
     }
 }

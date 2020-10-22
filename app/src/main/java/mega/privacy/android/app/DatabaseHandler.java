@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,18 +21,17 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
-import mega.privacy.android.app.sync.SyncPair;
+import mega.privacy.android.app.sync.Backup;
 import mega.privacy.android.app.sync.ToolsKt;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.sync.mock.SyncMockKt.SYNC_TYPE_PRIMARY;
-import static mega.privacy.android.app.sync.mock.SyncMockKt.SYNC_TYPE_SECONDARY;
+import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_PRIMARY;
+import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_SECONDARY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -55,7 +53,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle";
 	private static final String TABLE_SYNC_RECORDS = "syncrecords";
 	private static final String TABLE_MEGA_CONTACTS = "megacontacts";
-    public static final String TABLE_SYNC_PAIRS = "syncpairs";
+    public static final String TABLE_BACKUPS = "backups";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -236,35 +234,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_MEGA_CONTACTS_EMAIL + " TEXT,"
             + KEY_MEGA_CONTACTS_PHONE_NUMBER + " TEXT)";
 
-    public static final String KEY_SYNC_ID = "syncid";
-    public static final String KEY_SYNC_NAME = "syncname";
-    public static final String KEY_SYNC_PAIR_TYPE = "synctype";
-    public static final String KEY_SYNC_LOCAL_PATH = "localfolderpath";
-    public static final String KEY_SYNC_CLOUD_PATH = "cloudfolderpath";
-    public static final String KEY_SYNC_CLOUD_HANDLE = "cloudfolderhandle";
-    public static final String KEY_SYNC_EX = "excludesubolders";
-    public static final String KEY_SYNC_DEL = "deleteemptysubolders";
-    public static final String KEY_SYNC_START_TIME = "starttimestamp";
-    public static final String KEY_SYNC_LAST_SYNC_TIME = "lastsynctimestamp";
-    public static final String KEY_SYNC_PAIR_STATE = "state";
-    public static final String KEY_SYNC_PAIR_SUB_STATE = "substate";
-    public static final String KEY_SYNC_EXTRA_DATA = "extradata";
-    public static final String KEY_SYNC_OUTDATED = "outdated";
-    private static final String CREATE_SYNC_PAIRS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_SYNC_PAIRS + "("
-            + KEY_SYNC_ID + " TEXT PRIMARY KEY, "
-            + KEY_SYNC_NAME + " TEXT,"
-            + KEY_SYNC_PAIR_TYPE + " INTEGER,"
-            + KEY_SYNC_LOCAL_PATH + " TEXT,"
-            + KEY_SYNC_CLOUD_PATH + " TEXT,"
-            + KEY_SYNC_CLOUD_HANDLE + " TEXT,"
-            + KEY_SYNC_EX + " BOOLEAN,"
-            + KEY_SYNC_DEL + " BOOLEAN,"
-            + KEY_SYNC_START_TIME + " TEXT,"
-            + KEY_SYNC_LAST_SYNC_TIME + " TEXT,"
-            + KEY_SYNC_PAIR_STATE + " INTEGER,"
-            + KEY_SYNC_PAIR_SUB_STATE + " INTEGER,"
-            + KEY_SYNC_EXTRA_DATA + " TEXT,"
-            + KEY_SYNC_OUTDATED + " BOOLEAN)";
+    public static final String KEY_BACKUP_ID = "backup_id";
+    public static final String KEY_BACKUP_TYPE = "backup_type";
+    public static final String KEY_BACKUP_TARGET_NODE = "target_node";
+    public static final String KEY_BACKUP_LOCAL_FOLDER = "local_folder";
+    public static final String KEY_BACKUP_DEVICE_ID = "device_id";
+    public static final String KEY_BACKUP_STATE = "state";
+    public static final String KEY_BACKUP_SUB_STATE = "sub_state";
+    public static final String KEY_BACKUP_EXTRA_DATA = "extra_data";
+    public static final String KEY_BACKUP_START_TIME = "start_timestamp";
+    public static final String KEY_BACKUP_LAST_TIME = "last_sync_timestamp";
+    public static final String KEY_BACKUP_TARGET_NODE_PATH = "target_folder_path";
+    public static final String KEY_BACKUP_EX = "exclude_subolders";
+    public static final String KEY_BACKUP_DEL = "delete_empty_subolders";
+    public static final String KEY_BACKUP_NAME = "backup_name";
+    public static final String KEY_BACKUP_OUTDATED = "outdated";
+
+    private static final String CREATE_BACKUP_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BACKUPS + "("
+            + KEY_BACKUP_ID + " TEXT PRIMARY KEY, "
+            + KEY_BACKUP_TYPE + " INTEGER,"
+            + KEY_BACKUP_TARGET_NODE + " TEXT,"
+            + KEY_BACKUP_LOCAL_FOLDER + " TEXT,"
+            + KEY_BACKUP_DEVICE_ID + " TEXT,"
+            + KEY_BACKUP_STATE + " INTEGER,"
+            + KEY_BACKUP_SUB_STATE + " INTEGER,"
+            + KEY_BACKUP_EXTRA_DATA + " TEXT,"
+            + KEY_BACKUP_START_TIME + " TEXT,"
+            + KEY_BACKUP_LAST_TIME + " TEXT,"
+            + KEY_BACKUP_TARGET_NODE_PATH + " TEXT,"
+            + KEY_BACKUP_EX + " BOOLEAN,"
+            + KEY_BACKUP_DEL + " BOOLEAN,"
+            + KEY_BACKUP_NAME + " TEXT,"
+            + KEY_BACKUP_OUTDATED + " BOOLEAN)";
 
     private static DatabaseHandler instance;
 
@@ -429,7 +430,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
 
-        db.execSQL(CREATE_SYNC_PAIRS_TABLE);
+        db.execSQL(CREATE_BACKUP_TABLE);
 	}
 
 	@Override
@@ -839,7 +840,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
         if (oldVersion <= 57) {
-            db.execSQL(CREATE_SYNC_PAIRS_TABLE);
+            db.execSQL(CREATE_BACKUP_TABLE);
         }
 	}
 
@@ -2979,7 +2980,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 
         logDebug("Set new primary handle: " + handle);
-        new CuSyncManager().updatePrimaryTargetHandle(handle);
+        new CuSyncManager().updatePrimaryTargetNode(handle);
 	}
 
 	public void setSecondaryFolderHandle (long handle){
@@ -2999,7 +3000,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 
         logDebug("Set new secondary handle: " + handle);
-        new CuSyncManager().updateSecondaryTargetHandle(handle);
+        new CuSyncManager().updateSecondaryTargetNode(handle);
 	}
 
 	public void setCamSyncLocalPath (String localPath){
@@ -4088,47 +4089,47 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public boolean saveSyncPair(SyncPair syncPair) {
+    public boolean saveSyncPair(Backup backup) {
         ContentValues values = new ContentValues();
-        values.put(KEY_SYNC_ID, encrypt(Long.toString(syncPair.getSyncId())));
-        values.put(KEY_SYNC_NAME, encrypt(syncPair.getName()));
-        values.put(KEY_SYNC_PAIR_TYPE, syncPair.getSyncType());
-        values.put(KEY_SYNC_LOCAL_PATH, encrypt(syncPair.getLocalFolderPath()));
-        values.put(KEY_SYNC_CLOUD_PATH, encrypt(syncPair.getTargetFolderPath()));
-        values.put(KEY_SYNC_CLOUD_HANDLE, encrypt(Long.toString(syncPair.getTargetFodlerHanlde())));
-        values.put(KEY_SYNC_EX, encrypt(Boolean.toString(syncPair.isExcludeSubFolders())));
-        values.put(KEY_SYNC_DEL, encrypt(Boolean.toString(syncPair.isDeleteEmptySubFolders())));
-        values.put(KEY_SYNC_START_TIME, encrypt(Long.toString(syncPair.getStartTimestamp())));
-        values.put(KEY_SYNC_LAST_SYNC_TIME, encrypt(Long.toString(syncPair.getLastFinishTimestamp())));
-        values.put(KEY_SYNC_PAIR_STATE, syncPair.getState());
-        values.put(KEY_SYNC_PAIR_SUB_STATE, syncPair.getSubState());
-        values.put(KEY_SYNC_EXTRA_DATA, syncPair.getExtraData());
+        values.put(KEY_BACKUP_ID, encrypt(Long.toString(backup.getBackupId())));
+        values.put(KEY_BACKUP_TYPE, backup.getBackupType());
+        values.put(KEY_BACKUP_TARGET_NODE, encrypt(Long.toString(backup.getTargetNode())));
+        values.put(KEY_BACKUP_LOCAL_FOLDER, encrypt(backup.getLocalFolder()));
+        values.put(KEY_BACKUP_DEVICE_ID, encrypt(backup.getDeviceId()));
+        values.put(KEY_BACKUP_STATE,backup.getState());
+        values.put(KEY_BACKUP_SUB_STATE, backup.getSubState());
+        values.put(KEY_BACKUP_EXTRA_DATA, encrypt(backup.getExtraData()));
+        values.put(KEY_BACKUP_START_TIME, encrypt(Long.toString(backup.getStartTimestamp())));
+        values.put(KEY_BACKUP_LAST_TIME, encrypt(Long.toString(backup.getLastFinishTimestamp())));
+        values.put(KEY_BACKUP_TARGET_NODE_PATH, encrypt(backup.getTargetFolderPath()));
+        values.put(KEY_BACKUP_EX, encrypt(Boolean.toString(backup.isExcludeSubFolders())));
+        values.put(KEY_BACKUP_DEL, encrypt(Boolean.toString(backup.isDeleteEmptySubFolders())));
         // Default value is false.
-        values.put(KEY_SYNC_OUTDATED, encrypt(Boolean.toString(false)));
-        long result = db.insertOrThrow(TABLE_SYNC_PAIRS, null, values);
+        values.put(KEY_BACKUP_OUTDATED, encrypt(Boolean.toString(false)));
+        long result = db.insertOrThrow(TABLE_BACKUPS, null, values);
         if(result != -1) {
-            logDebug("Save sync pair " + syncPair + " successfully, row id is: " + result);
+            logDebug("Save sync pair " + backup + " successfully, row id is: " + result);
             return true;
         } else {
-            logError("Save sync pair " + syncPair + " failed");
+            logError("Save sync pair " + backup + " failed");
             return false;
         }
     }
 
-    public SyncPair getCuSyncPair() {
-	    return getSyncPairByType(SYNC_TYPE_PRIMARY);
+    public Backup getCuSyncPair() {
+        return getSyncPairByType(TYPE_BACKUP_PRIMARY);
     }
 
-    public SyncPair getMuSyncPair() {
-        return getSyncPairByType(SYNC_TYPE_SECONDARY);
+    public Backup getMuSyncPair() {
+        return getSyncPairByType(TYPE_BACKUP_SECONDARY);
     }
 
-    private SyncPair getSyncPairByType(int type){
-        String selectQuery = "SELECT * FROM " + TABLE_SYNC_PAIRS + " WHERE " + KEY_SYNC_PAIR_TYPE + " = " + type +
-                " AND " + KEY_SYNC_OUTDATED + " = '" + decrypt(Boolean.FALSE.toString()) + "'";
+    private Backup getSyncPairByType(int type) {
+        String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_TYPE + " = " + type +
+                " AND " + KEY_BACKUP_OUTDATED + " = '" + decrypt(Boolean.FALSE.toString()) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
-            SyncPair pair = fromCursor(cursor);
+            Backup pair = fromCursor(cursor);
             cursor.close();
             return pair;
         } else {
@@ -4137,16 +4138,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void setSyncPairAsOutdated(long id) {
-	    SyncPair syncPair = getSyncPairBySyncId(id);
-        syncPair.setOutdated(true);
-	    updateSync(syncPair);
+        Backup backup = getSyncPairBySyncId(id);
+        backup.setOutdated(true);
+        updateSync(backup);
     }
 
-    public SyncPair getSyncPairBySyncId(long id) {
-        String selectQuery = "SELECT * FROM " + TABLE_SYNC_PAIRS + " WHERE " + KEY_SYNC_ID + " = '" + encrypt(Long.toString(id)) + "'";
+    public Backup getSyncPairBySyncId(long id) {
+        String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_ID + " = '" + encrypt(Long.toString(id)) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor != null && cursor.moveToFirst()){
-            SyncPair pair = fromCursor(cursor);
+        if (cursor != null && cursor.moveToFirst()) {
+            Backup pair = fromCursor(cursor);
             cursor.close();
             return pair;
         } else {
@@ -4154,10 +4155,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public List<SyncPair> getAllSyncPairs() {
-        String selectQuery = "SELECT * FROM " + TABLE_SYNC_PAIRS;
+    public List<Backup> getAllSyncPairs() {
+        String selectQuery = "SELECT * FROM " + TABLE_BACKUPS;
         Cursor cursor = db.rawQuery(selectQuery, null);
-        List<SyncPair> list = new ArrayList<>();
+        List<Backup> list = new ArrayList<>();
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 list.add(fromCursor(cursor));
@@ -4167,35 +4168,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return list;
     }
 
-    private SyncPair fromCursor(Cursor cursor) {
-        return new SyncPair(
-                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_ID)))),
-                decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_NAME))),
-                cursor.getInt(cursor.getColumnIndex(KEY_SYNC_PAIR_TYPE)),
-                decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_LOCAL_PATH))),
-                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_CLOUD_HANDLE)))),
-                decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_CLOUD_PATH))),
-                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_EX)))),
-                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_DEL)))),
-                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_START_TIME)))),
-                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_LAST_SYNC_TIME)))),
-                cursor.getInt(cursor.getColumnIndex(KEY_SYNC_PAIR_STATE)),
-                cursor.getInt(cursor.getColumnIndex(KEY_SYNC_PAIR_SUB_STATE)),
-                decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_EXTRA_DATA))),
-                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_SYNC_OUTDATED))))
+    private Backup fromCursor(Cursor cursor) {
+        return new Backup(
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_ID)))),
+                cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_TYPE)),
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_TARGET_NODE)))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LOCAL_FOLDER))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_DEVICE_ID))),
+                cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_STATE)),
+                cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_SUB_STATE)),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EXTRA_DATA))),
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_START_TIME)))),
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LAST_TIME)))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_TARGET_NODE_PATH))),
+                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EX)))),
+                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_DEL)))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_NAME))),
+                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_OUTDATED))))
         );
     }
 
     public void deleteSyncPairById(long id) {
-	    db.execSQL(ToolsKt.deleteSQL(id));
+        db.execSQL(ToolsKt.deleteSQL(id));
     }
 
-    public void updateSync(SyncPair syncPair) {
-        db.execSQL(ToolsKt.updateSQL(syncPair));
+    public void updateSync(Backup backup) {
+        db.execSQL(ToolsKt.updateSQL(backup));
     }
 
-    public void clearSyncPairs(){
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SYNC_PAIRS);
+    public void clearBackups() {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BACKUPS);
         onCreate(db);
     }
 }
