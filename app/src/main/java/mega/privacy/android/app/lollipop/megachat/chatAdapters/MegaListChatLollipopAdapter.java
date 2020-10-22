@@ -215,7 +215,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
 				} else {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.itemLayout.setBackground(null);
 					setUserAvatar(holder, userHandleEncoded);
 				}
 
@@ -249,7 +249,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
 				} else {
-					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.itemLayout.setBackground(null);
 					createGroupChatAvatar(holder, getTitleChat(chat));
 				}
 			}
@@ -590,19 +590,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				break;
 			}
 			case 1:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_1));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_1);
 				break;
 			}
 			case 2:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_2));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_2);
 				break;
 			}
 			case 3:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_3));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_3);
 				break;
 			}
 			default:{
-				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackground(context.getResources().getDrawable(R.drawable.ic_unread_4));
+				((ViewHolderNormalChatList)holder).circlePendingMessages.setBackgroundResource(R.drawable.bg_unread_4);
 				break;
 			}
 		}

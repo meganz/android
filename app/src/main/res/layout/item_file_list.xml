@@ -136,7 +136,7 @@
             android:id="@+id/file_list_filesize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBody2"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
             android:maxLines="1"
             app:emojiSize="14sp"
             android:layout_toRightOf="@id/file_list_versions_icon"/>

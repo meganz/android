@@ -4,7 +4,7 @@
     android:id="@+id/main_relative_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    >
 
     <RelativeLayout
         android:id="@+id/content_layout_chat_explorer"
@@ -69,7 +69,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/contact_invite"
                         android:textAllCaps="true"
-                        android:textColor="@color/accentColor"
+                        android:textColor="?attr/colorSecondary"
                         android:visibility="gone" />
                 </RelativeLayout>
                 <FrameLayout
@@ -87,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="60dp"
                             android:fontFamily="Roboto"
-                            android:textColor="#8A000000"
+                            android:textColor="?android:attr/textColorSecondary"
                             android:layout_marginStart="72dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
@@ -138,14 +138,6 @@
                     </RelativeLayout>
                 </FrameLayout>
             </LinearLayout>
-            <View
-                android:id="@+id/invitation_banner_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/black_12_alpha"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_alignParentBottom="true"/>
         </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
