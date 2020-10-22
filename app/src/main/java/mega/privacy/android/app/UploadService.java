@@ -34,6 +34,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -227,6 +228,32 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	private synchronized void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
+
+        if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+            ArrayList<MegaTransfer> transfers = megaApi.getTransfers(MegaTransfer.TYPE_UPLOAD);
+
+            for (MegaTransfer transfer : transfers) {
+                String data = transfer.getAppData();
+                if (transfer.isFolderTransfer()) {
+                    totalFolderUploads++;
+                    mapProgressFolderTransfers.put(transfer.getTag(), transfer);
+                } else if (data == null || (!data.contains(UPLOAD_APP_DATA_CHAT) && !data.contains(CU_UPLOAD))) {
+                    totalFileUploads++;
+                    mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                }
+            }
+
+            if (totalFolderUploads > 0) {
+                updateProgressNotification(true);
+            }
+
+            if (totalFileUploads > 0) {
+                updateProgressNotification(false);
+            }
+
+            uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+            return;
+        }
 
 		String action = intent.getAction();
 		logDebug("Action is " + action);

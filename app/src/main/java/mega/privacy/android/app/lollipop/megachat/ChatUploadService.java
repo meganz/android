@@ -244,6 +244,21 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	protected void onHandleIntent(final Intent intent) {
 		if (intent == null) return;
 
+		if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+			ArrayList<MegaTransfer> transfers = megaApi.getTransfers(MegaTransfer.TYPE_UPLOAD);
+
+			for (MegaTransfer transfer : transfers) {
+				String data = transfer.getAppData();
+				if (data != null && data.contains(UPLOAD_APP_DATA_CHAT)) {
+					mapProgressTransfers.put(transfer.getTag(), transfer);
+				}
+			}
+
+			transfersCount = totalUploads = mapProgressTransfers.size();
+			updateProgressNotification();
+			return;
+		}
+
 		ArrayList<PendingMessageSingle> pendingMessageSingles = new ArrayList<>();
 		parentNode = MegaNode.unserialize(intent.getStringExtra(EXTRA_PARENT_NODE));
 		if (intent.hasExtra(EXTRA_NAME_EDITED)) {

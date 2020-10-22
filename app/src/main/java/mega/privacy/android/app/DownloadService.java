@@ -273,6 +273,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         logDebug("onHandleIntent");
 	    this.intent = intent;
 
+	    if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+			ArrayList<MegaTransfer> transfers = megaApi.getTransfers(MegaTransfer.TYPE_UPLOAD);
+
+			for (MegaTransfer transfer : transfers) {
+				String appData = transfer.getAppData();
+				if (appData == null || !appData.contains(EXTRA_VOICE_CLIP)) {
+					transfersCount++;
+				}
+			}
+
+			updateProgressNotification();
+			megaApi.addTransferListener(this);
+	    	return;
+		}
+
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
         boolean isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
