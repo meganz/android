@@ -1945,6 +1945,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
+
+        if (getCall() == null)
+            return;
+
         application.setSpeakerStatus(callChat.getChatid(), isVideoCall);
         megaChatApi.answerChatCall(chatId, isVideoCall, this);
     }
@@ -2841,11 +2845,17 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         int keyCode = event.getKeyCode();
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                app.muteOrUnmute(false);
-                return true;
+                if(app.isAIncomingCallRining()){
+                    app.muteOrUnmute(false);
+                }
+                return false;
+
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                app.muteOrUnmute(true);
-                return true;
+                if(app.isAIncomingCallRining()){
+                    app.muteOrUnmute(true);
+                }
+                return false;
+
             default:
                 return super.dispatchKeyEvent(event);
         }

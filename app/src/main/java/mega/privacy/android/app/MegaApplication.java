@@ -175,6 +175,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isLoggingRunning = false;
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
+	private static boolean isSpeakerOn = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -588,6 +589,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 
 			if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
+				int type = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_TYPE);
+				if(type != 2)
+					return;
+
 				int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
 				if (newVolume != INVALID_VOLUME) {
 					rtcAudioManagerRingInCall.checkVolume(newVolume);
@@ -595,6 +600,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		}
 	};
+
+	public boolean isAIncomingCallRining() {
+		return rtcAudioManagerRingInCall != null;
+	}
 
 	public void muteOrUnmute(boolean mute){
 		if (rtcAudioManagerRingInCall != null) {
@@ -1496,6 +1505,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
 				filterScreen.addAction(Intent.ACTION_USER_PRESENT);
 				registerReceiver(screenOnOffReceiver, filterScreen);
+
 				registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
 				registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
@@ -1513,7 +1523,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     /**
      * Remove the incoming call AppRTCAudioManager.
      */
-    private void removeRTCAudioManagerRingIn() {
+    public void removeRTCAudioManagerRingIn() {
         if (rtcAudioManagerRingInCall == null)
             return;
 
@@ -1834,5 +1844,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public static boolean isSpeakerOn() {
+		return isSpeakerOn;
+	}
+
+	public static void setSpeakerOn(boolean isSpeakerOn) {
+		MegaApplication.isSpeakerOn = isSpeakerOn;
 	}
 }

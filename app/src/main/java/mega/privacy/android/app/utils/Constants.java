@@ -481,6 +481,7 @@ public class Constants {
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
+    public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
