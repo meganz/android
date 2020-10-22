@@ -12,7 +12,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="start"
             android:orientation="vertical">
 
             <LinearLayout
@@ -24,8 +24,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
                     android:layout_marginBottom="46dp"
                     android:orientation="vertical">
 
@@ -33,7 +33,7 @@
                         android:id="@+id/create_account_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="left"
+                        android:layout_gravity="start"
                         android:layout_marginTop="17dp"
                         android:text="@string/create_account_title"
                         android:textAppearance="?attr/textAppearanceHeadline6" />
@@ -65,8 +65,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignBottom="@+id/create_account_name_text_layout"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="?attr/colorError" />
 
@@ -99,8 +99,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignBottom="@+id/create_account_last_name_text_layout"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="?attr/colorError" />
 
@@ -133,8 +133,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignBottom="@+id/create_account_email_text_layout"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="?attr/colorError" />
 
@@ -169,8 +169,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignBottom="@+id/create_account_password_text_layout"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="?attr/colorError" />
 
@@ -192,8 +192,8 @@
                                     android:id="@+id/shape_passwd_first"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginEnd="5dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/passwd_very_weak" />
 
@@ -201,8 +201,8 @@
                                     android:id="@+id/shape_passwd_second"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginEnd="5dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/shape_password" />
 
@@ -210,8 +210,8 @@
                                     android:id="@+id/shape_passwd_third"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginEnd="5dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/shape_password" />
 
@@ -219,8 +219,8 @@
                                     android:id="@+id/shape_passwd_fourth"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginEnd="5dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/shape_password" />
 
@@ -228,8 +228,8 @@
                                     android:id="@+id/shape_passwd_fifth"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginLeft="5dp"
-                                    android:layout_marginRight="5dp"
+                                    android:layout_marginStart="5dp"
+                                    android:layout_marginEnd="5dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/shape_password" />
 
@@ -239,7 +239,7 @@
                                 android:id="@+id/password_type"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp"
+                                android:layout_marginStart="5dp"
                                 android:layout_marginTop="8dp"
                                 android:text="@string/pass_very_weak"
                                 android:textColor="@color/login_warning"
@@ -249,7 +249,7 @@
                                 android:id="@+id/password_advice_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginLeft="5dp"
+                                android:layout_marginStart="5dp"
                                 android:layout_marginTop="6dp"
                                 android:text="@string/passwd_weak"
                                 android:textColor="@color/name_my_account"
@@ -288,11 +288,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignBottom="@+id/create_account_password_text_confirm_layout"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="2dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="2dp"
                             android:src="@drawable/ic_input_warning"
                             android:tint="?attr/colorError" />
-
+app/src/main/res/layout/fragment_create_account.xml
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -372,7 +372,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginRight="16dp"
+                    android:layout_marginEnd="16dp"
                     android:singleLine="false"
                     android:textAppearance="@style/TextAppearance.Mega.Caption2"
                     tools:text="term of service" />
@@ -419,4 +419,3 @@
     </RelativeLayout>
 
 </RelativeLayout>
-<!--    style="@style/ProgressIndicator.Linear"-->

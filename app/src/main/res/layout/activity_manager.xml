@@ -1,19 +1,14 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<!--    android:fitsSystemWindows="true"-->
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-      >
+        android:layout_below="@id/toolbar">
 
         <LinearLayout
             android:id="@+id/fragment_layout"
@@ -26,26 +21,24 @@
                 android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:elevation="0dp"
-                >
+                app:elevation="0dp">
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
+                    style="@style/MEGAToolBar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="?attr/actionBarSize"
                     app:subtitleTextAppearance="@style/ToolbarSubtitle"
-                    app:titleTextAppearance="@style/ToolbarTitle"
-                    style="@style/MEGAToolBar"
-                    />
+                    app:titleTextAppearance="@style/ToolbarTitle" />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_contacts"
                     style="@style/MyCustomTabLayout"
-                    android:layout_marginStart="@dimen/standard_margin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="@dimen/standard_margin" />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_shares"
@@ -132,7 +125,7 @@
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
                 android:layout_above="@+id/bottom_navigation_view"
-                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_margin="16dp"
                 android:elevation="@dimen/elevation_low"
                 android:src="@drawable/ic_add_white"
@@ -141,13 +134,12 @@
 
             <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
                 android:id="@+id/bottom_navigation_view"
+                style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_alignParentBottom="true"
                 app:itemIconTint="@drawable/bottom_navigation_item_tint"
-                app:menu="@menu/bottom_navigation_items"
-                style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
-                />
+                app:menu="@menu/bottom_navigation_items" />
 
         </RelativeLayout>
 
@@ -175,7 +167,7 @@
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
             android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="200dp"
             android:src="@drawable/ic_add_white"
             android:visibility="invisible"
@@ -188,7 +180,7 @@
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
             android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="140dp"
             android:src="@drawable/ic_add_white"
             android:visibility="invisible"
@@ -201,7 +193,7 @@
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
             android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="80dp"
             android:src="@drawable/ic_chat"
             android:tint="@color/white"
@@ -227,8 +219,7 @@
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        >
+        android:layout_gravity="start">
 
         <ScrollView
             android:layout_width="match_parent"

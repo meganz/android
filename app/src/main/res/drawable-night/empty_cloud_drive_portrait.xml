@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_empty_cloud_drive"
-    android:alpha="0.16">
-</bitmap>
+    android:alpha="0.16"
+    android:src="@drawable/ic_empty_cloud_drive" />

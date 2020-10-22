@@ -2,116 +2,104 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
-  <ScrollView
-      android:id="@+id/cam_sync_scroll_view"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      >
+    <ScrollView
+        android:id="@+id/cam_sync_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:src="@drawable/camera_upload" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="29dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_weight="5"
+                    android:text="@string/camera_uploads_upload_videos"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/upload_videos_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="end" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="32dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_weight="5"
+                    android:text="@string/camera_uploads_cellular_connection"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/cellular_connection_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="end" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:gravity="end"
+        android:orientation="horizontal">
 
-      <ImageView
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginBottom="32dp"
-          android:src="@drawable/camera_upload"
-          />
-
-      <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginBottom="29dp"
-          android:layout_marginEnd="8dp"
-          android:layout_marginStart="16dp"
-          android:orientation="horizontal"
-          >
-
-        <TextView
-            android:layout_width="0dp"
+        <Button
+            android:id="@+id/cam_sync_button_skip"
+            style="@style/Button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:layout_weight="5"
-            android:text="@string/camera_uploads_upload_videos"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"
-            />
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/white"
+            android:text="@string/general_skip"
+            android:textColor="@color/dark_grey" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/upload_videos_switch"
-            android:layout_width="0dp"
+        <Button
+            android:id="@+id/cam_sync_button_ok"
+            style="@style/Button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_weight="1"
-            android:gravity="end"
-            />
-      </LinearLayout>
-
-      <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginBottom="32dp"
-          android:layout_marginEnd="8dp"
-          android:layout_marginStart="16dp"
-          android:orientation="horizontal"
-          >
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:layout_weight="5"
-            android:text="@string/camera_uploads_cellular_connection"
-            android:textColor="@color/name_my_account"
-            android:textSize="16sp"
-            />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/cellular_connection_switch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_weight="1"
-            android:gravity="end"
-            />
-      </LinearLayout>
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/general_ok" />
     </LinearLayout>
-  </ScrollView>
-
-  <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="end"
-      android:orientation="horizontal"
-      >
-
-    <Button
-        android:id="@+id/cam_sync_button_skip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="6dp"
-        android:text="@string/general_skip"
-        style="@style/Button"
-        android:backgroundTint="@color/white"
-        android:textColor="@color/dark_grey"
-        />
-
-    <Button
-        android:id="@+id/cam_sync_button_ok"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="6dp"
-        android:text="@string/general_ok"
-        style="@style/Button"
-        />
-  </LinearLayout>
 </LinearLayout>

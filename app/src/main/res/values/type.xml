@@ -35,6 +35,7 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="android:letterSpacing">0.017857143</item>
     </style>
+
     <style name="TextAppearance.Mega.Body2.Primary" parent="TextAppearance.Mega.Body2">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
@@ -48,12 +49,15 @@
     <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:letterSpacing">0.009375</item>
     </style>
+
     <style name="TextAppearance.Mega.Body1.Red" parent="TextAppearance.Mega.Body1">
         <item name="android:textColor">@color/color_primary_red</item>
     </style>
+
     <style name="TextAppearance.Mega.Body1.Secondary" parent="TextAppearance.Mega.Body1">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
+
     <style name="TextAppearance.Mega.Body1.Medium" parent="TextAppearance.Mega.Body1">
         <!-- Fake Roboto Medium. -->
         <item name="fontFamily">sans-serif-medium</item>

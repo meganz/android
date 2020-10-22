@@ -2,92 +2,92 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <item
-      android:id="@+id/full_image_viewer_get_link"
-      android:icon="@drawable/link_ic_white"
-      android:orderInCategory="115"
-      android:title="@string/context_get_link_menu"
-      android:visible="true"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/full_image_viewer_get_link"
+        android:icon="@drawable/link_ic_white"
+        android:orderInCategory="115"
+        android:title="@string/context_get_link_menu"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/full_image_viewer_remove_link"
-      android:icon="@drawable/ic_remove_link_w"
-      android:orderInCategory="115"
-      android:title="@string/context_remove_link_menu"
-      android:visible="false"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/full_image_viewer_remove_link"
+        android:icon="@drawable/ic_remove_link_w"
+        android:orderInCategory="115"
+        android:title="@string/context_remove_link_menu"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/full_image_viewer_share"
-      android:icon="@drawable/ic_social_share_white"
-      android:orderInCategory="110"
-      android:title="@string/general_share"
-      android:visible="true"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/full_image_viewer_share"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/full_image_viewer_chat"
-      android:icon="@drawable/ic_send_to_contact"
-      android:orderInCategory="110"
-      android:title="@string/general_share"
-      android:visible="true"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/full_image_viewer_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/full_image_viewer_properties"
-      android:icon="@drawable/info_ic_white"
-      android:orderInCategory="105"
-      android:title="@string/general_file_info"
-      android:visible="true"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/full_image_viewer_properties"
+        android:icon="@drawable/info_ic_white"
+        android:orderInCategory="105"
+        android:title="@string/general_file_info"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/full_image_viewer_download"
-      android:icon="@drawable/ic_download_white"
-      android:orderInCategory="100"
-      android:title="@string/general_save_to_device"
-      android:visible="true"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/full_image_viewer_download"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="100"
+        android:title="@string/general_save_to_device"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/full_image_viewer_rename"
-      android:orderInCategory="100"
-      android:title="@string/context_rename"
-      android:visible="true"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/full_image_viewer_rename"
+        android:orderInCategory="100"
+        android:title="@string/context_rename"
+        android:visible="true"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/full_image_viewer_move"
-      android:orderInCategory="105"
-      android:title="@string/context_move"
-      android:visible="true"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/full_image_viewer_move"
+        android:orderInCategory="105"
+        android:title="@string/context_move"
+        android:visible="true"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/full_image_viewer_copy"
-      android:orderInCategory="110"
-      android:title="@string/context_copy"
-      android:visible="true"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/full_image_viewer_copy"
+        android:orderInCategory="110"
+        android:title="@string/context_copy"
+        android:visible="true"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/full_image_viewer_move_to_trash"
-      android:orderInCategory="115"
-      android:title="@string/context_move_to_trash"
-      android:visible="true"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/full_image_viewer_move_to_trash"
+        android:orderInCategory="115"
+        android:title="@string/context_move_to_trash"
+        android:visible="true"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/full_image_viewer_remove"
-      android:orderInCategory="115"
-      android:title="@string/context_remove"
-      android:visible="false"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/full_image_viewer_remove"
+        android:orderInCategory="115"
+        android:title="@string/context_remove"
+        android:visible="false"
+        app:showAsAction="never" />
 </menu>

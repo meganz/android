@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="left">
+    android:layout_gravity="start">
 
     <CheckBox
         android:id="@+id/chk_top"
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/chk_top"
         android:layout_marginTop="4dp"
-        android:layout_toRightOf="@+id/chk_top"
+        android:layout_toEndOf="@+id/chk_top"
         android:singleLine="false"
         android:textAppearance="@style/TextAppearance.Mega.Caption2" />
 </RelativeLayout>

@@ -2,60 +2,60 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <item
-      android:id="@+id/cab_menu_call_chat"
-      android:enabled="true"
-      android:icon="@drawable/ic_phone_white"
-      android:orderInCategory="100"
-      android:title="@string/call_button"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_menu_call_chat"
+        android:enabled="true"
+        android:icon="@drawable/ic_phone_white"
+        android:orderInCategory="100"
+        android:title="@string/call_button"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/cab_menu_video_chat"
-      android:enabled="true"
-      android:icon="@drawable/ic_videocam_white"
-      android:orderInCategory="105"
-      android:title="@string/video_button"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_menu_video_chat"
+        android:enabled="true"
+        android:icon="@drawable/ic_videocam_white"
+        android:orderInCategory="105"
+        android:title="@string/video_button"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 
-  <item
-      android:id="@+id/cab_menu_select_messages"
-      android:orderInCategory="110"
-      android:title="@string/general_select"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_select_messages"
+        android:orderInCategory="110"
+        android:title="@string/general_select"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_invite_chat"
-      android:orderInCategory="120"
-      android:title="@string/add_participants_menu_item"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_invite_chat"
+        android:orderInCategory="120"
+        android:title="@string/add_participants_menu_item"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_contact_info_chat"
-      android:orderInCategory="125"
-      android:title="@string/contact_properties_activity"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_contact_info_chat"
+        android:orderInCategory="125"
+        android:title="@string/contact_properties_activity"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_clear_history_chat"
-      android:orderInCategory="125"
-      android:title="@string/general_clear"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_clear_history_chat"
+        android:orderInCategory="125"
+        android:title="@string/general_clear"
+        app:showAsAction="never" />
 
 
-  <item
-      android:id="@+id/cab_menu_archive_chat"
-      android:orderInCategory="125"
-      android:title="@string/general_archive"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_archive_chat"
+        android:orderInCategory="125"
+        android:title="@string/general_archive"
+        app:showAsAction="never" />
 
-  <item
-      android:id="@+id/cab_menu_leave_chat"
-      android:orderInCategory="125"
-      android:title="@string/general_leave"
-      app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_leave_chat"
+        android:orderInCategory="125"
+        android:title="@string/general_leave"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_mute_chat"

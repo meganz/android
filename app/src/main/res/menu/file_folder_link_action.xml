@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <item
-      android:id="@+id/share_link"
-      android:icon="@drawable/ic_social_share_white"
-      android:orderInCategory="110"
-      android:title="@string/general_share"
-      android:visible="true"
-      app:iconTint="?attr/colorControlNormal"
-      app:showAsAction="always" />
+    <item
+        android:id="@+id/share_link"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        android:visible="true"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="always" />
 </menu>

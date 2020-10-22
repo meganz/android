@@ -1,40 +1,40 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-		xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-	<item
-			android:id="@+id/cab_menu_select_all"
-			android:orderInCategory="110"
-			android:title="@string/action_select_all"
-			app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="110"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
 
-	<item
-			android:id="@+id/cab_menu_unselect_all"
-			android:orderInCategory="110"
-			android:title="@string/action_unselect_all"
-			app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="110"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
 
-	<item
-			android:id="@+id/action_download_versions"
-			android:icon="@drawable/ic_download_white"
-			android:orderInCategory="115"
-			android:title="@string/general_save_to_device"
-			app:iconTint="?attr/colorSecondary"
-			app:showAsAction="always" />
+    <item
+        android:id="@+id/action_download_versions"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="115"
+        android:title="@string/general_save_to_device"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
-	<item
-			android:id="@+id/action_revert_version"
-			android:icon="@drawable/ic_restore_black_24dp"
-			android:orderInCategory="120"
-			android:title="@string/general_revert"
-			app:iconTint="?attr/colorSecondary"
-			app:showAsAction="always" />
+    <item
+        android:id="@+id/action_revert_version"
+        android:icon="@drawable/ic_restore_black_24dp"
+        android:orderInCategory="120"
+        android:title="@string/general_revert"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
-	<item
-			android:id="@+id/action_delete_versions"
-			android:icon="@drawable/ic_close_white"
-			android:orderInCategory="120"
-			android:title="@string/context_remove"
-			app:iconTint="?attr/colorSecondary"
-			app:showAsAction="always" />
+    <item
+        android:id="@+id/action_delete_versions"
+        android:icon="@drawable/ic_close_white"
+        android:orderInCategory="120"
+        android:title="@string/context_remove"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
 
 </menu>

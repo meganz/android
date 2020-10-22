@@ -104,4 +104,5 @@
         android:paddingEnd="16dp"
         android:text="@string/sort_by_smallest_size"
         android:textAppearance="@style/TextAppearance.Mega.Body1" />
+
 </LinearLayout>

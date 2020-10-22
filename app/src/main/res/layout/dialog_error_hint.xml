@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- This is an Alert dialog custom pane contains error hint
+<?xml version="1.0" encoding="utf-8"?><!-- This is an Alert dialog custom pane contains error hint
     Do not redefine title/message(top pane) and buttons (bottom pane)
     as they are already defined by Google default and reusable -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,18 +12,17 @@
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
         android:layout_marginTop="30dp"
         android:singleLine="true"
-        />
+        android:textSize="16sp" />
 
     <RelativeLayout
         android:id="@+id/error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/text"
-        android:layout_marginTop="-6dp"
         android:layout_marginStart="4dp"
+        android:layout_marginTop="-6dp"
         android:layout_marginEnd="4dp"
         android:visibility="gone">
 
@@ -32,18 +30,18 @@
             android:id="@+id/error_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:layout_centerVertical="true"
             android:textColor="?attr/colorError"
-            android:layout_centerVertical="true"/>
+            android:textSize="12sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:layout_gravity="end"
             android:src="@drawable/ic_input_warning"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            app:tint="?attr/colorError"/>
+            app:tint="?attr/colorError" />
 
     </RelativeLayout>
 </RelativeLayout>
