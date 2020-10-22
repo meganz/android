@@ -3998,6 +3998,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (adapter == null) {
                 createAdapter();
             } else {
+                //Increment header position
+                index++;
                 adapter.addMessage(messages, index);
                 mLayoutManager.scrollToPositionWithOffset(index, scaleHeightPx(infoToShow == AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL ? 50 : 20, getOutMetrics()));
             }
