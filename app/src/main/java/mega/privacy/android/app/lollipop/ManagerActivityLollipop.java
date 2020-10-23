@@ -1486,13 +1486,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     logDebug("Purchase " + sku + " is being processed or in unknown state.");
                     message = getString(R.string.message_user_payment_pending);
                 }
-                showAlert(this, message, null);
             } else {
                 //down grade case
                 logDebug("Downgrade, the new subscription takes effect when the old one expires.");
                 message = getString(R.string.message_user_purchased_subscription_down_grade);
-                showAlert(this, message, null);
             }
+            showAlert(this, message, null);
             drawerItem = DrawerItem.CLOUD_DRIVE;
             selectDrawerItemLollipop(drawerItem);
         } else {
@@ -1506,7 +1505,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		int temp = -1;
 		Purchase max = null;
 		for (Purchase purchase : purchases) {
-			logDebug(purchase.getSku() + " (JSON): " + purchase.getOriginalJson());
+			if(!mBillingManager.isPurchaseBelongToCurrentAccount(purchase)) continue;
+
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -1532,7 +1532,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
 		}
 
-        if(max != null && mBillingManager.isPayloadValid(max.getDeveloperPayload())){
+        if(max != null ){
+            logDebug("Set current max subscription: " + max);
             myAccountInfo.setActiveGooglePlaySubscription(max);
         }
 
