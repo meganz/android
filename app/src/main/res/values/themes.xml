@@ -16,15 +16,17 @@
         <!-- e.g. The action bar color of the "select folder" screen -->
         <item name="colorPrimaryVariant">@color/red_600</item>
         <!-- e.g. A variant color of the FAB -->
-<!--        <item name="colorSecondaryVariant"></item>-->
+        <!--        <item name="colorSecondaryVariant"></item>-->
 
-        <!--colorBackground appears behind scrollable content and is used for the default window-->
-        <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
-        <!--and menus. colorError is used to indicate an error state for components such as-->
-        <!--text fields.-->
-        <item name="android:colorBackground">@color/white</item>
+        <!--colorBackground appears behind scrollable content and is used for the default window
+            background(default: @color/white). -->
+        <!--        <item name="android:colorBackground">@color/white</item>-->
+        <!-- colorSurface is mapped to the surface of components
+        such as cards, sheets and menus. -->
         <!-- e.g. the color of the bottom sheet, overflow menu(with some auto-alpha?) -->
         <item name="colorSurface">@color/white</item>
+        <!-- colorError is used to indicate an error state for
+        components such as text fields. -->
         <!-- e.g. the color of the invalid email address hint -->
         <item name="colorError">@color/red_900</item>
 
@@ -34,9 +36,9 @@
         <item name="colorOnPrimary">@color/grey_alpha_087</item>
         <!-- e.g. the color of the "+" icon on the FAB -->
         <item name="colorOnSecondary">@color/white</item>
-<!--        <item name="colorOnSurface"></item>-->
-<!--        <item name="colorOnError"></item>-->
-<!--        <item name="colorOnBackground"></item>-->
+        <!--        <item name="colorOnSurface"></item>-->
+        <!--        <item name="colorOnError"></item>-->
+        <!--        <item name="colorOnBackground"></item>-->
 
         <!-- The color applied to icons/controls in their normal state -->
         <!-- e.g. The overflow menu item (3 dotes) automatically use this color
@@ -84,7 +86,7 @@
         <item name="indicatorColor">?attr/colorSecondary</item>
         <item name="trackColor">@color/grey_alpha_012</item>
 
-<!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
+        <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->
         <!--<item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>-->
         <!--<item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>-->

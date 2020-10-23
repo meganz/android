@@ -2375,8 +2375,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
         megaApi.getAccountAchievements(this);
 
-		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.badge_background,
-				R.color.badge_big_background, R.color.badge_text_color);
+		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.red_390_red_300,
+				R.color.white_dark_grey, R.color.white_dark_grey);
 
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);
 		// Navi button Chat

@@ -560,7 +560,7 @@
     textColorPrimary is the color of the user-input text. ColorError is the color of error text
     textColorHint is the hint color when the field is empty and NOT focused. -->
     <style name="TextInputLayout" parent="Widget.Design.TextInputLayout">
-        <item name="colorControlNormal">@color/textinputlayout_underline_unfocused</item>
+        <item name="colorControlNormal">@color/grey_012_white_012</item>
     </style>
 
     <style name="TextInputLayout.Password">

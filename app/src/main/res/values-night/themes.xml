@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
-    <style name="Theme.Mega" parent="Theme.Mega.Night" >
-    </style>
+    <style name="Theme.Mega" parent="Theme.Mega.Night"></style>
 
-    <style name="Theme.Mega.Night" parent="Base.Theme.Mega" >
+    <style name="Theme.Mega.Night" parent="Base.Theme.Mega">
         <!--Material color attributes (light theme) -->
         <!--colorPrimary colors map to components and elements, such as app bars and buttons. -->
         <!--colorSecondary colors are most often used as accents on components, such as FABs and -->
@@ -16,17 +15,18 @@
         <!-- e.g. The action bar color of the "select folder" screen -->
         <item name="colorPrimaryVariant">@color/dark_grey</item>
         <!-- e.g. A variant color of the FAB -->
-        <!--        <item name="colorSecondaryVariant"></item>-->
+        <!-- <item name="colorSecondaryVariant"></item>-->
 
-        <!--colorBackground appears behind scrollable content and is used for the default window-->
-        <!--background. colorSurface is mapped to the surface of components such as cards, sheets-->
-        <!--and menus. colorError is used to indicate an error state for components such as-->
-        <!--text fields.-->
-        <item name="android:colorBackground">@color/dark_grey</item>
+        <!--colorBackground appears behind scrollable content and is used for the default window background. -->
+        <!--        <item name="android:colorBackground">@color/dark_grey</item>-->
+
+        <!-- colorSurface is mapped to the surface of components such as cards, sheets and menus. -->
         <!-- e.g. the color of the bottom sheet, overflow menu (Set elevation or use the default elevation
           would automatically add a white overlay surface with default opacity. see:
            https://material.io/design/color/dark-theme.html#properties-->
         <item name="colorSurface">@color/dark_grey</item>
+
+        <!-- colorError is used to indicate an error state for components such as text fields.-->
         <!-- e.g. the color of the invalid email address hint -->
         <item name="colorError">@color/red_400</item>
 

@@ -257,23 +257,23 @@
     <color name="red_600_alpha_038">#60F30C14</color>
     <color name="red_300_alpha_038">#60F46762</color>
 
-    <!-- ============ Color names by purpose ============== -->
+    <!-- ============ Color pair: light and dark, for reusability ========= -->
 
-    <!-- Entire screen background -->
-    <color name="background">@color/white</color>
-
-    <color name="textinputlayout_underline_unfocused">@color/grey_alpha_012</color>
-
+    <!-- The underline color of TextInputLayout when unfocused -->
+    <color name="grey_012_white_012">@color/grey_alpha_012</color>
     <!-- The "eye" icon -->
-    <color name="password_visible_icon">@color/grey_alpha_012</color>
+    <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
     <!-- Notification badge -->
-    <color name="badge_background">@color/red_390</color>
-    <color name="badge_background_secondary">@color/white</color>
-    <color name="badge_big_background">@color/white</color>
-    <color name="badge_big_background_secondary">@color/red_600</color>
-    <color name="badge_text_color">@color/white</color>
-    <color name="badge_text_color_secondary">@color/red_390</color>
+    <color name="red_390_red_300">@color/red_390</color>
+    <color name="white_red_300">@color/white</color>
+    <color name="white_dark_grey">@color/white</color>
+    <color name="red_600_dark_grey">@color/red_600</color>
+    <color name="red_390_dark_grey">@color/red_390</color>
+
+    <!-- ============ Color names by purpose ============== -->
+
+    <!-- Notification badge -->
 
     <!-- password strength -->
     <color name="pass_weak">#FFD300</color>

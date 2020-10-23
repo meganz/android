@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">@color/dark_grey</color>
+    <!-- The underline color of TextInputLayout when unfocused -->
+    <color name="grey_012_white_012">@color/white_alpha_012</color>
+    <!-- The "eye" icon -->
+    <color name="grey_012_white_038">@color/white_alpha_038</color>
+
+    <!-- Notification badge -->
+    <color name="red_390_red_300">@color/red_300</color>
+    <color name="white_red_300">@color/red_300</color>
+    <color name="white_dark_grey">@color/dark_grey</color>
+    <color name="red_600_dark_grey">@color/dark_grey</color>
+    <color name="red_390_dark_grey">@color/dark_grey</color>
 
     <color name="name_my_account">@color/white_alpha_087</color>
     <color name="mail_my_account">@color/white_alpha_054</color>
@@ -12,17 +22,6 @@
     <color name="pass_medium">#4EB64E</color>
     <color name="pass_good">#9FF4A1</color>
     <color name="pass_strong">#5BB5DE</color>
-
-    <color name="textinputlayout_underline_unfocused">@color/white_alpha_012</color>
-
-    <color name="password_visible_icon">@color/white_alpha_038</color>
-
-    <color name="badge_background">@color/red_300</color>
-    <color name="badge_background_secondary">@color/red_300</color>
-    <color name="badge_big_background">@color/dark_grey</color>
-    <color name="badge_big_background_secondary">@color/dark_grey</color>
-    <color name="badge_text_color">@color/dark_grey</color>
-    <color name="badge_text_color_secondary">@color/dark_grey</color>
 
     <color name="list_item_divider">@color/white_alpha_012</color>
 
