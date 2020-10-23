@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -27,8 +28,8 @@ class PsaViewModel(
             return
         }
 
-        if (psa.value != null) {
-            _psa.value = psa.value
+        if (_psa.value != null) {
+            _psa.notifyObserver()
             return
         }
 
@@ -69,13 +70,3 @@ class PsaViewModel(
         const val GET_PSA_MIN_INTERVAL_MS = 3600_000
     }
 }
-
-data class Psa(
-    val id: Int,
-    val title: String,
-    val text: String,
-    val imageUrl: String?,
-    val positiveText: String?,
-    val positiveLink: String?,
-    val url: String?
-)

@@ -4848,32 +4848,32 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
         checkBeforeShow();
 
-		psaViewModel.checkPsa();
+        psaViewModel.checkPsa();
     }
 
     private void observePsa() {
-		psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
-				.get(PsaViewModel.class);
-		psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
+                .get(PsaViewModel.class);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
 
-		psaViewModel.getPsa().observe(this, this::showPsa);
-	}
+        psaViewModel.getPsa().observe(this, this::showPsa);
+    }
 
-	private void showPsa(Psa psa) {
-    	if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
-    		return;
-		}
+    private void showPsa(Psa psa) {
+        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+            return;
+        }
 
-    	if (!TextUtils.isEmpty(psa.getUrl())) {
-			Intent intent = new Intent(this, WebViewActivityLollipop.class);
-			intent.setData(Uri.parse(psa.getUrl()));
-			startActivity(intent);
-			psaViewModel.dismissPsa(psa.getId());
-    		return;
-		}
+        if (!TextUtils.isEmpty(psa.getUrl())) {
+            Intent intent = new Intent(this, WebViewActivityLollipop.class);
+            intent.setData(Uri.parse(psa.getUrl()));
+            startActivity(intent);
+            psaViewModel.dismissPsa(psa.getId());
+            return;
+        }
 
-		psaViewHolder.bind(psa);
-	}
+        psaViewHolder.bind(psa);
+    }
 
     public void checkBeforeShow() {
         //This account hasn't verified a phone number and first login.
