@@ -242,6 +242,7 @@
     -->
     <string name="cancel_transfer_confirmation">¿Eliminar esta transferencia?</string>
     <string name="cancel_all_transfer_confirmation">¿Eliminar todas las transferencias?</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Mi nube</string>
     <string name="section_recents" context="Label to reference a recents section">Recientes</string>
@@ -618,7 +619,6 @@
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
-    <!--<string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>-->
     <string name="overquota_alert_text" context="Dialog text overquota error">Has agotado la cuota de almacenamiento. ¿Quieres ampliar tu cuenta?</string>
 
     <!--
@@ -677,7 +677,7 @@
     <!--
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
     -->
-    <string name="menu_cancel_all_transfers" context="menu item">Eliminar todas las transferencias</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Cancelar todas las transferencias</string>
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Hacer foto</string>
 
@@ -749,6 +749,9 @@
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Almacenamiento interno</item>
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Almacenamiento externo</item>
     </string-array>
+
+    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</string>
+    <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">External storage</string>
 
     <string-array name="add_contact_array">
         <item context="title of the dialog shown when sending or sharing a folder">Introduce la dirección de correo electrónico del usuario</item>
@@ -1184,6 +1187,24 @@
 
     <string name="general_mute" context="button">Silenciar</string>
     <string name="general_unmute" context="button">Activar sonido</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">On</string>
+
+    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
+    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">Until tomorrow morning</string>
+    <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Until this morning</string>
+    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn it back on</string>
+
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notificaciones</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Sonido mensajes</string>
@@ -1275,6 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] ha abandonado el chat de grupo[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Mensaje no enviado. Toca para ver las opciones</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1440,6 +1462,7 @@
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pausar todas las transferencias</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Reanudar todas las transferencias</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Limpiar transferencias completadas</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">¿Quieres pausar la transferencia?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">¿Quieres reanudar la transferencia?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Reanudar</string>
@@ -1451,6 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">En pausa</string>
     <string name="transfer_queued" context="Possible state of a transfer">En cola</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1537,6 +1563,7 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Cuota de transferencia insuficiente</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Tus transferencias en cola superan la cuota de transferencia disponible para tu dirección IP y por lo tanto podrían interrumpirse.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Descubre nuestros planes</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Seguir sin una cuenta</string>
@@ -1630,6 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Solo lectura</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Lectura y Escritura</string>
 
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
     <string name="attachment_uploading_state_uploading">Subiendo&#8230;</string>
     <string name="attachment_uploading_state_error">No se ha podido enviar</string>
 
@@ -1901,6 +1929,11 @@
     <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
     <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
     <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
+    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/s</string>
+    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/s</string>
+    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/s</string>
+    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/s</string>
+    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/s</string>
     <string name="label_mega_byte" context="Size in megabytes.">MB</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -2457,7 +2490,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participantes</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s y %2$d más</string>
+    <string name="custom_subtitle_of_group_chat" context="">%1$s y %2$d más</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
 
@@ -2512,6 +2545,7 @@
 
     <string name="label_today" context="label today">Hoy</string>
     <string name="label_yesterday" context="label yesterday">Ayer</string>
+    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No hay [/B][A]archivos compartidos[/A][B].[/B]</string>
 
@@ -2745,7 +2779,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo ha ido mal</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Ponte en contacto con el administrador de tu cuenta Business para resolver el problema y activar tu cuenta.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Sujeto a uso comercial legítimo</string>
-    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Almacenamiento[/A] ILIMITADO **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Almacenamiento[/A] AMPLIABLE **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">[A]Cuota de transferencia[/A] ILIMITADA **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Cuando cierres sesión, los archivos de la sección Sin conexión se eliminarán de tu dispositivo.</string>
@@ -2796,9 +2830,24 @@
     <string name="download_location" context="Download location label">Destino de descarga</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">¿Guardar siempre en esta ubicación?</string>
 
+    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+
     <string name="file_provider_title" context="Title of the File Provider activity">Adjuntar desde&#8230;</string>
+
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creado el %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Seleccionar mensajes</string>
+
+    <string name="storage_root_label" context="Storage root label">Storage root</string>
+
+    <string name="failed_label" context="Label describing some action failed">Failed</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
+    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Almacenamiento lleno</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">¡Tus datos están en riesgo!</string>
@@ -2807,14 +2856,15 @@
         <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">Te hemos contactado por email a %1$s el %2$s y el %3$s pero sigues teniendo %4$s archivos que ocupan %5$s en tu cuenta de MEGA, lo cual requiere una cuenta %6$s.</item>
     </plurals>
     <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">Te hemos contactado por email a %1$s pero sigues teniendo %2$s archivos que ocupan %3$s en tu cuenta de MEGA, lo cual requiere una cuenta %4$s.</string>
-    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]Te quedan[M]%s[/M] para ampliar la cuenta[/B]. Después de eso, tus datos estarán sujetos a eliminación.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]Tienes que ampliar tu cuenta[/B]. Actualmente, tus datos están sujetos a eliminación.</string>
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Debe actuar de inmediato para conservar tus datos.[/B]</string>
 
     <plurals name="label_time_in_days_full">
         <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 día</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d días</item>
     </plurals>
+
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
     <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
     <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
@@ -2847,6 +2897,13 @@
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Este numero de teléfono se desvinculará de tu cuenta. Si quisieras añadir un número de teléfono en el futuro, tendrás que verificarlo.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Ver</string>
+
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenciales de %s</string>
 
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
+    <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
+    <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
+
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
 </resources>
