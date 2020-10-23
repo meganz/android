@@ -4233,7 +4233,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private Backup getBackupByType(int type) {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_TYPE + " = " + type +
-                " AND " + KEY_BACKUP_OUTDATED + " = '" + decrypt(Boolean.FALSE.toString()) + "'";
+                " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
             Backup pair = fromCursor(cursor);
@@ -4246,8 +4246,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void setBackupAsOutdated(long id) {
         Backup backup = getBackupById(id);
-        backup.setOutdated(true);
-        updateBackup(backup);
+        if(backup != null) {
+            backup.setOutdated(true);
+            updateBackup(backup);
+        }
     }
 
     public Backup getBackupById(long id) {

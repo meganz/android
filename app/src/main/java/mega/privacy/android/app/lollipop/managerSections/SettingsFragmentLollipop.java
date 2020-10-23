@@ -768,19 +768,22 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 	private void checkMediaUploadsPath() {
 		localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 
-		if (isTextEmpty(localSecondaryFolderPath) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
+		if (isTextEmpty(localSecondaryFolderPath) || localSecondaryFolderPath.equals(INVALID_NON_NULL_VALUE) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
 			logWarning("Secondary ON: invalid localSecondaryFolderPath");
 			localSecondaryFolderPath = getString(R.string.settings_empty_folder);
 			Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
 			if (!isFileAvailable(new File(localSecondaryFolderPath))) {
-				dbH.setSecondaryFolderPath(INVALID_PATH);
+				dbH.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
 			}
 		} else if (isExternalSDCardMU) {
 			Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
 			String pickedDirName = getSDCardDirName(uri);
 			if (pickedDirName!= null) {
 				localSecondaryFolderPath = pickedDirName;
-			}
+			} else {
+			    localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+                dbH.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
+            }
 		}
 	}
 
