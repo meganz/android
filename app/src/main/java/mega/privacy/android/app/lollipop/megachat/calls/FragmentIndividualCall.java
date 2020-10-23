@@ -128,10 +128,8 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
 
         /*Avatar*/
         Bitmap bitmap = getImageAvatarCall(chatRoom, peerid);
-        if (bitmap != null) {
-            avatarImage.setImageBitmap(bitmap != null ? bitmap :
-                    getDefaultAvatarCall(context, chatRoom, peerid));
-        }
+        avatarImage.setImageBitmap(bitmap != null ? bitmap :
+                getDefaultAvatarCall(context, chatRoom, peerid));
     }
 
     /**
