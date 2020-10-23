@@ -34,7 +34,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GiphyActivity : PinActivityLollipop(), GiphyInterface {
+class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
 
     companion object {
         private const val NUM_COLUMNS_PORTRAIT = 2
@@ -63,7 +63,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     private var searchMenuItem: MenuItem? = null
 
     private var currentQuery: String? = null
-    private var queryOffset = DEFAULT_LIMIT
+    private var queryOffset = 0
     private var isEndOfList = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -254,7 +254,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
 
     private fun resetQueryValues() {
         binding.giphyEndList.visibility = GONE
-        queryOffset = DEFAULT_LIMIT
+        queryOffset = 0
         isEndOfList = false
     }
 
@@ -333,7 +333,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
     private fun updateAdapter(gifsData: ArrayList<Data>?, isChangeOfType: Boolean) {
         when {
             giphyAdapter == null -> {
-                giphyAdapter = GiphyAdapter(gifsData, this@GiphyActivity)
+                giphyAdapter = GiphyAdapter(gifsData, this@GiphyPickerActivity)
                 binding.giphyList.adapter = giphyAdapter
                 binding.giphyListView.visibility = VISIBLE
             }
@@ -375,7 +375,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                hideKeyboard(this@GiphyActivity)
+                hideKeyboard(this@GiphyPickerActivity)
                 return true
             }
 
@@ -407,7 +407,7 @@ class GiphyActivity : PinActivityLollipop(), GiphyInterface {
 
     override fun openGifViewer(gifData: GifData?) {
         startActivityForResult(
-            Intent(this@GiphyActivity, GiphyViewerActivity::class.java)
+            Intent(this@GiphyPickerActivity, GiphyViewerActivity::class.java)
                 .putExtra(GIF_DATA, gifData),
             REQUEST_CODE_PICK_GIF
         )

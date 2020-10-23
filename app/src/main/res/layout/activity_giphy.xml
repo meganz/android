@@ -18,7 +18,7 @@
         app:popupTheme="@style/Theme.Megaactionbar"
         app:titleMarginStart="32dp"
         app:titleTextAppearance="@style/LightToolbarTitle"
-        tools:context=".activities.GiphyActivity" />
+        tools:context=".activities.GiphyPickerActivity" />
 
     <RelativeLayout
         android:layout_width="match_parent"

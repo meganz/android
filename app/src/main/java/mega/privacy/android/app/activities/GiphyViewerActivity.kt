@@ -1,11 +1,10 @@
 package mega.privacy.android.app.activities
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.GiphyActivity.Companion.GIF_DATA
+import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.GifData

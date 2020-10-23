@@ -110,7 +110,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 
-import static mega.privacy.android.app.activities.GiphyActivity.GIF_DATA;
+import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat.getFormattedText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;

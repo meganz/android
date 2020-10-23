@@ -87,7 +87,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.activities.GiphyActivity;
+import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
@@ -163,7 +163,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.activities.GiphyActivity.GIF_DATA;
+import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
@@ -3683,7 +3683,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.rl_gif_chat:
             case R.id.gif_chat:
                 startActivityForResult(
-                        new Intent(this, GiphyActivity.class), REQUEST_CODE_PICK_GIF);
+                        new Intent(this, GiphyPickerActivity.class), REQUEST_CODE_PICK_GIF);
                 break;
 
             case R.id.toolbar_chat:{
