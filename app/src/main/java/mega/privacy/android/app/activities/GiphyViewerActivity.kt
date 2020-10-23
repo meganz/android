@@ -11,6 +11,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
+import mega.privacy.android.app.utils.GiphyUtil.Companion.getOriginalGiphySrc
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
 class GiphyViewerActivity : PinActivityLollipop() {
@@ -38,7 +39,7 @@ class GiphyViewerActivity : PinActivityLollipop() {
         gifData = intent.getParcelableExtra(GIF_DATA)
         updateGifDimensionsView()
 
-        loadGif(binding.gifImage, binding.gifProgressBar, false, null, Uri.parse(gifData?.webpUrl))
+        loadGif(binding.gifImage, binding.gifProgressBar, false, null, getOriginalGiphySrc(gifData?.webpUrl ?: null))
     }
 
     /**

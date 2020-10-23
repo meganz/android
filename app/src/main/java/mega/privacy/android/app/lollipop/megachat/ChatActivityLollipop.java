@@ -158,7 +158,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
@@ -170,15 +169,13 @@ import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.services.GiphyService.BASE_URL;
-import static mega.privacy.android.app.services.GiphyService.GIPHY_URL;
-import static mega.privacy.android.app.services.GiphyService.TEST_URL;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.GiphyUtil.getGiphySrc;
 import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -3900,22 +3897,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         AndroidMegaChatMessage androidMsgSent = new AndroidMegaChatMessage(giphyMessage);
         sendMessageToUI(androidMsgSent);
-    }
-
-    /**
-     * Modifies the original src of a Giphy by replacing the endpoint to GIPHY_URL.
-     *
-     * @param originalSrc   Original src of a Giphy with the original endpoint.
-     * @return The final src with GIPHY_URL.
-     */
-    private String getGiphySrc(String originalSrc) {
-        if (originalSrc.contains(BASE_URL)) {
-            return originalSrc.replace(BASE_URL, GIPHY_URL);
-        } else if (originalSrc.contains(TEST_URL)) {
-            return originalSrc.replace(TEST_URL, GIPHY_URL);
-        }
-
-        return originalSrc;
     }
 
     public void hideNewMessagesLayout(){

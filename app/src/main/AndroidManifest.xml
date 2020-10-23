@@ -487,7 +487,7 @@
         <activity
             android:name="mega.privacy.android.app.activities.GiphyViewerActivity"
             android:theme="@style/Theme.Giphy"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTop">
         </activity>
 
         <service
