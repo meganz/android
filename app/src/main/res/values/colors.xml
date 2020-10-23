@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="pressed_mega">#CCcc0000</color>
+    <color name="pressed_mega">#CCcc0000</color>
     <color name="text_tab_alpha">#99ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
     <color name="separator_grey">#10000000</color>
@@ -17,7 +17,7 @@
     <color name="navigation_drawer_text">#d2d2d2</color>
     <color name="navigation_drawer_background_odd">#292929</color>
     <color name="navigation_drawer_background">#222222</color>
-    <color name="color_navigation_drawer_selected">#1AFFFFFF</color> 
+    <color name="color_navigation_drawer_selected">#1AFFFFFF</color>
     <color name="file_list_first_row">#000000</color>
     <color name="file_list_second_row">#848484</color>
     <color name="file_list_selected_row">#1A000000</color>
@@ -34,18 +34,18 @@
     <color name="photo_sync_month_text">#787878</color>
     <color name="switch_selector_layout">#555555</color>
     <color name="color_default_avatar_phone">#777777</color>
- 	<color name="content_text_folder">#80333333</color>
- 	<color name="content_text_background">#f4f4f4</color>
- 	<color name="adapters_background">#333333</color>
- 	<color name="file_properties_bottom">#292929</color>
+    <color name="content_text_folder">#80333333</color>
+    <color name="content_text_background">#f4f4f4</color>
+    <color name="adapters_background">#333333</color>
+    <color name="file_properties_bottom">#292929</color>
 
     <color name="new_background_fragment">#F7F7F7</color>
 
- 	<color name="lollipop_primary_color">#d90007</color>
- 	<color name="lollipop_dark_primary_color">#b4070c</color>
- 	<color name="lollipop_dark_primary_color_file_properties">#2284b1</color>
-    
- <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
+    <color name="lollipop_primary_color">#d90007</color>
+    <color name="lollipop_dark_primary_color">#b4070c</color>
+    <color name="lollipop_dark_primary_color_file_properties">#2284b1</color>
+
+    <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>-->
 
     <color name="black_12_alpha">#1F000000</color>
 
@@ -61,24 +61,24 @@
 
     <color name="mail_my_account">#8a000000</color>
     <color name="forgot_pass_text">#91000000</color>
-        
+
     <color name="tab_pressed">#ee0008</color>
 
     <color name="transparent_black">#80000000</color>
     <color name="transparent_mega">#80db0605</color>
-    
+
     <color name="delimiterColor">#e6e6e6</color>
     <color name="contactSelected">#1A00BFA5</color>
     <color name="accentColor">#FF00BFA5</color>
     <color name="accentColorTransparent">#5900BFA5</color>
     <color name="accentColorLight">#9900BFA5</color>
     <color name="accentColorDark">#FF009884</color>
-    <color name="textGrey">#6d6f70</color> 
+    <color name="textGrey">#6d6f70</color>
 
     <color name="filePropertiesToolBar">#2284b1</color>
 
-	<color name="tour_bar_grey">#dddddd</color>
-	<color name="tour_bar_red">#cc0000</color>
+    <color name="tour_bar_grey">#dddddd</color>
+    <color name="tour_bar_red">#cc0000</color>
 
     <color name="small_letter_upgrade_account">#8a333333</color>
 
@@ -133,7 +133,7 @@
     <color name="disable_fab_chat_call">#444444</color>
     <color name="disable_fab_invite_contact">#A9E3D8</color>
 
-	<color name="disabled_radio_button_label">#FF8C8F90</color>
+    <color name="disabled_radio_button_label">#FF8C8F90</color>
 
     <color name="color_background_versions">#FFF2F2F2</color>
 
@@ -257,9 +257,12 @@
     <color name="red_600_alpha_038">#60F30C14</color>
     <color name="red_300_alpha_038">#60F46762</color>
 
-    <!-- ============ Color pair: light and dark, for reusability ========= -->
+    <!-- ============ Color pair: light_dark, for reusability ========= -->
 
-    <!-- The underline color of TextInputLayout when unfocused -->
+    <color name="black_white">@color/black</color>
+
+    <!-- The list item divider.
+         The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/grey_alpha_012</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
@@ -271,21 +274,16 @@
     <color name="red_600_dark_grey">@color/red_600</color>
     <color name="red_390_dark_grey">@color/red_390</color>
 
-    <!-- ============ Color names by purpose ============== -->
-
-    <!-- Notification badge -->
-
+    <!-- ============ Color names by purpose (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
     <color name="pass_weak">#FFD300</color>
     <color name="pass_medium">#31B500</color>
     <color name="pass_good">#13E03C</color>
     <color name="pass_strong">#2BA6DE</color>
 
-    <!-- The divider between List view items -->
-    <color name="list_item_divider">@color/grey_alpha_012</color>
-
-    <!-- solid black/white text color -->
-    <color name="text_color_primary_solid">@color/black</color>
+    <!-- Colors for empty content hint text. Use non-alpha colors, for
+      <font color=""> doesn't support alpha -->
+    <color name="empty_hint_text_normal_color">#999999</color>
 
     <color name="color_secondary_night_grey">@color/teal_300</color>
     <color name="color_primary_red">@color/red_600</color>
@@ -305,9 +303,6 @@
     <color name="grid_item_bg_stoke_color">@color/grey_alpha_012</color>
     <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>
     <color name="grid_item_selected_bg_solid_color">?android:attr/colorBackground</color>
-
-    <!-- empty hint view related colors -->
-    <color name="empty_hint_text_normal_color">#999999</color>
 
     <color name="business_color">#2BA6DE</color>
 

@@ -417,7 +417,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -442,7 +442,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -522,7 +522,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -547,7 +547,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -639,7 +639,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+									+ ColorUtils.getColorHexString(context, R.color.black_white)
 									+ "\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
 							textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -665,7 +665,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 						try{
 							textToShow = textToShow.replace("[A]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+									+ ColorUtils.getColorHexString(context, R.color.black_white)
 									+ "\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
 							textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -1114,7 +1114,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -1139,7 +1139,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
 						textToShow = textToShow.replace("[A]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.text_color_primary_solid)
+								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"

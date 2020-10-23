@@ -149,7 +149,7 @@
                     android:layout_alignBottom="@id/choose_account_free_layout_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@color/list_item_divider"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
 
             </RelativeLayout>
@@ -282,7 +282,7 @@
                     android:layout_alignBottom="@id/choose_account_prolite_layout_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@color/list_item_divider"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
             </RelativeLayout>
             <!-- End PRO LITE -->
@@ -412,7 +412,7 @@
                     android:layout_alignBottom="@id/choose_account_pro_i_layout_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@color/list_item_divider"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
             </RelativeLayout>
             <!-- END PRO I -->
@@ -542,7 +542,7 @@
                     android:layout_alignBottom="@id/choose_account_pro_ii_layout_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@color/list_item_divider"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
             </RelativeLayout>
             <!--END PRO II-->
@@ -672,7 +672,7 @@
                     android:layout_alignBottom="@id/choose_account_pro_iii_layout_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@color/list_item_divider"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
             </RelativeLayout>
             <!--END PRO III-->
@@ -769,7 +769,7 @@
                                         android:id="@+id/storage_business"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textColor="@color/text_color_primary_solid"
+                                        android:textColor="@color/black_white"
                                         android:textSize="15sp" />
                                 </RelativeLayout>
                             </TableRow>
@@ -787,7 +787,7 @@
                                         android:id="@+id/bandwidth_business"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textColor="@color/text_color_primary_solid"
+                                        android:textColor="@color/black_white"
                                         android:textSize="15sp" />
                                 </RelativeLayout>
                             </TableRow>
@@ -802,7 +802,7 @@
                     android:layout_alignBottom="@id/choose_account_business_layout_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@color/list_item_divider"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
 
             </RelativeLayout>

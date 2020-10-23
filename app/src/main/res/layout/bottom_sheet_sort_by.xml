@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/list_item_divider" />
+        android:background="@color/grey_012_white_012" />
 
     <TextView
         android:id="@+id/sort_by_name_desc"
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/list_item_divider" />
+        android:background="@color/grey_012_white_012" />
 
     <TextView
         android:id="@+id/sort_by_newest_date"
@@ -61,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/list_item_divider" />
+        android:background="@color/grey_012_white_012" />
 
     <TextView
         android:id="@+id/sort_by_oldest_date"
@@ -77,7 +77,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/list_item_divider" />
+        android:background="@color/grey_012_white_012" />
 
     <TextView
         android:id="@+id/sort_by_largest_size"
@@ -93,7 +93,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/list_item_divider" />
+        android:background="@color/grey_012_white_012" />
 
     <TextView
         android:id="@+id/sort_by_smallest_size"

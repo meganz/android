@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="60dp"
-            android:background="@color/list_item_divider" />
+            android:background="@color/grey_012_white_012" />
 
         <RelativeLayout
             android:id="@+id/external_storage_layout"
@@ -122,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginStart="60dp"
-            android:background="@color/list_item_divider" />
+            android:background="@color/grey_012_white_012" />
 
     </LinearLayout>
 

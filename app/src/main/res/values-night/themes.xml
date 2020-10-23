@@ -54,7 +54,7 @@
         <item name="android:textColorSecondary">@color/white_alpha_054</item>
 
         <!-- Used by the hint text color of TextInputLayout -->
-        <item name="textColorHint">@color/white_alpha_054</item>
+        <item name="textColorHint">@color/white_alpha_038</item>
 
         <!-- workaround for action mode elevation overlay: we need hide normal toolbar when
              enter action mode, or use a non-transparent background to cover it,

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="black_white">@color/white</color>
+
     <!-- The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/white_alpha_012</color>
     <!-- The "eye" icon -->
@@ -12,20 +14,21 @@
     <color name="red_600_dark_grey">@color/dark_grey</color>
     <color name="red_390_dark_grey">@color/dark_grey</color>
 
-    <color name="name_my_account">@color/white_alpha_087</color>
-    <color name="mail_my_account">@color/white_alpha_054</color>
-    <color name="background_create_account">@color/dark_grey</color>
-    <color name="new_multiselect_color">@android:color/transparent</color>
-
     <!-- password strength -->
     <color name="pass_weak">#F5F595</color>
     <color name="pass_medium">#4EB64E</color>
     <color name="pass_good">#9FF4A1</color>
     <color name="pass_strong">#5BB5DE</color>
 
-    <color name="list_item_divider">@color/white_alpha_012</color>
+    <!-- Colors for empty content hint text. Use non-alpha colors, for
+     <font color=""> doesn't support alpha -->
+    <color name="empty_hint_text_normal_color">#A0A0A0</color>
 
-    <color name="text_color_primary_solid">@color/white</color>
+    <color name="name_my_account">@color/white_alpha_087</color>
+    <color name="mail_my_account">@color/white_alpha_054</color>
+    <color name="background_create_account">@color/dark_grey</color>
+    <color name="new_multiselect_color">@android:color/transparent</color>
+
     <color name="color_secondary_night_grey">@color/dark_grey</color>
     <color name="color_primary_red">@color/red_300</color>
     <color name="color_primary_alpha_060">@color/white_alpha_060</color>
@@ -35,7 +38,6 @@
     <color name="grid_item_bg_solid_color">@color/white_alpha_005</color>
     <color name="grid_item_selected_bg_solid_color">@color/white_alpha_005</color>
 
-    <color name="empty_hint_text_normal_color">#A0A0A0</color>
 
 
     <color name="business_color">#7ABEDD</color>

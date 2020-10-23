@@ -430,7 +430,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		String textToShow = getString(R.string.file_browser_empty_folder_new);
 		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'"
-					+ ColorUtils.getColorHexString(this, R.color.text_color_primary_solid)
+					+ ColorUtils.getColorHexString(this, R.color.black_white)
 					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'"

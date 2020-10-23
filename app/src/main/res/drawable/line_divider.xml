@@ -7,6 +7,6 @@
         android:height="1dp" />
  
 <!--    <solid android:color="@color/grid_item_separator" />-->
-    <solid android:color="@color/list_item_divider" />
+    <solid android:color="@color/grey_012_white_012" />
 
 </shape>
