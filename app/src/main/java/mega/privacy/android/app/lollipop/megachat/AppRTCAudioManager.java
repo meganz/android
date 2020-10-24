@@ -155,9 +155,7 @@ public class AppRTCAudioManager {
         // The proximity sensor should only be activated when there are exactly two available audio devices.
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             boolean isNear = proximitySensor.sensorReportsNearState();
-
             if (isNear) {
-                logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
                 if ((apprtcContext instanceof MegaApplication && isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
@@ -165,7 +163,6 @@ public class AppRTCAudioManager {
                     selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
             } else {
-                logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
                 if ((apprtcContext instanceof MegaApplication && isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
@@ -552,7 +549,7 @@ public class AppRTCAudioManager {
             return;
         }
 
-        typeStatus = INVALID_STATE_CALL;
+        typeStatus = INVALID_CALL_STATUS;
         amState = AudioManagerState.UNINITIALIZED;
 
         unregisterReceiver(wiredHeadsetReceiver);
