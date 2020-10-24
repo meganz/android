@@ -1191,12 +1191,12 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
         firstTime = false;
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
-        firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+        firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
     }
 
     @Override

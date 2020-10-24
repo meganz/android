@@ -249,7 +249,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_leave"
-                    android:textColor="@color/login_warning"
+                    android:textColor="@color/red_600_red_300"
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>

@@ -124,7 +124,7 @@
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
                 android:src="@drawable/ic_input_warning"
-                app:tint="@color/login_warning"
+                app:tint="@color/red_600_red_300"
                 android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}" />
 
             <ImageView

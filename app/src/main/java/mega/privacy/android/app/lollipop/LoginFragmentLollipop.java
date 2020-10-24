@@ -1117,12 +1117,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         isErrorShown = true;
         pinError.setVisibility(View.VISIBLE);
         closeCancelDialog();
-        firstPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        secondPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
-        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        firstPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
     }
 
     void permitVerify(){
@@ -2357,7 +2357,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         error_icon.setLayoutParams(params_icon);
 
-        error_icon.setColorFilter(ContextCompat.getColor(context, R.color.login_warning));
+        error_icon.setColorFilter(ContextCompat.getColor(context, R.color.red_600_red_300));
 
         final TextView textError = new TextView(context);
         error_layout.addView(textError);
@@ -2369,7 +2369,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
         textError.setLayoutParams(params_text_error);
 
-        textError.setTextColor(ContextCompat.getColor(context, R.color.login_warning));
+        textError.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
         error_layout.setVisibility(View.GONE);
 
@@ -2413,7 +2413,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (emailError != null) {
                         logWarning("Mail incorrect");
 //                        input.setError(emailError);
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(emailError);
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2493,7 +2493,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (emailError != null) {
                     logWarning("Mail incorrect");
 //                    input.setError(emailError);
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(emailError);
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();

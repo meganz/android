@@ -664,7 +664,7 @@
                     android:paddingBottom="2dp"
                     android:src="@drawable/leave_share_ic"
                     android:visibility="visible"
-                    app:tint="@color/color_primary_red" />
+                    app:tint="@color/red_600_red_300" />
 
                 <TextView
                     android:id="@+id/option_leave_share_text"
@@ -694,7 +694,7 @@
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_rubbish_bin"
                     android:visibility="visible"
-                    app:tint="@color/color_primary_red" />
+                    app:tint="@color/red_600_red_300" />
 
                 <TextView
                     android:id="@+id/option_rubbish_bin_text"
@@ -724,7 +724,7 @@
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible"
-                    app:tint="@color/color_primary_red" />
+                    app:tint="@color/red_600_red_300" />
 
                 <TextView
                     android:id="@+id/option_remove_text"

@@ -65,7 +65,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/attachment_upload_panel_photo"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1" />
+                    android:textAppearance="?attr/textAppearanceBody1" />
             </LinearLayout>
 
             <LinearLayout
@@ -95,7 +95,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/upload_to_filesystem"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1" />
+                    android:textAppearance="?attr/textAppearanceBody1" />
             </LinearLayout>
 
             <LinearLayout
@@ -131,7 +131,7 @@
                     android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1" />
+                    android:textAppearance="?attr/textAppearanceBody1" />
             </LinearLayout>
 
             <LinearLayout
@@ -161,7 +161,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/menu_take_picture"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1" />
+                    android:textAppearance="?attr/textAppearanceBody1" />
             </LinearLayout>
 
             <LinearLayout
@@ -199,7 +199,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/action_create_folder"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1" />
+                    android:textAppearance="?attr/textAppearanceBody1" />
             </LinearLayout>
         </LinearLayout>
 

@@ -27,7 +27,7 @@
             android:background="@android:color/transparent"
             android:layout_centerInParent="true"
             android:fontFamily="roboto"
-            android:textColor="@color/delete_account"
+            android:textColor="@color/red_600_red_300"
             android:textSize="14sp"
             android:textStyle="bold" />
     </RelativeLayout>

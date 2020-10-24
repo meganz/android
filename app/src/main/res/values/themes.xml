@@ -35,7 +35,7 @@
         <!-- e.g. the color of the title text on the action bar -->
         <item name="colorOnPrimary">@color/grey_alpha_087</item>
         <!-- e.g. the color of the "+" icon on the FAB -->
-        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOnSecondary">@color/white_alpha_087</item>
         <!--        <item name="colorOnSurface"></item>-->
         <!--        <item name="colorOnError"></item>-->
         <!--        <item name="colorOnBackground"></item>-->
@@ -79,8 +79,9 @@
         <item name="textInputStyle">@style/TextInputLayout</item>
 
         <!-- This Material style has a min width and height for enlarging the clickable area of checkbox.
-             It uses textColorSecondary as colorControlNormal that complies with Invision design -->
-        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox</item>
+             It uses textColorSecondary as colorControlNormal that complies with Invision design.
+              Default is Widget.MaterialComponents.CompoundButton.CheckBox-->
+<!--        <item name="checkboxStyle"></item>-->
 
         <!-- Progress indicator -->
         <item name="indicatorColor">?attr/colorSecondary</item>
@@ -91,12 +92,18 @@
         <!--<item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>-->
         <!--<item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>-->
         <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
+        <!-- In material design, typically for the title of the action bar -->
         <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
         <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
+        <!-- In material design, for the NavigationView itemTextAppearance -->
         <item name="textAppearanceSubtitle2">@style/TextAppearance.Mega.Subtitle2</item>
+        <!-- In material design, for the CheckedTextView -->
         <item name="textAppearanceBody1">@style/TextAppearance.Mega.Body1</item>
-        <item name="textAppearanceBody2">@style/TextAppearance.Mega.Body2</item>
-        <!--<item name="textAppearanceButton">@style/TextAppearance.MyTheme.Button</item>-->
+        <!-- In material design, Alert Dialog, Snack bar, Chip text. Default value is
+         TextAppearance.MaterialComponents.Body2 which conform to Invision design-->
+<!--        <item name="textAppearanceBody2">@style/TextAppearance.Mega.Body2</item>-->
+        <item name="textAppearanceButton">@style/TextAppearance.Mega.Button</item>
+        <!-- In material design, TextInputLayout hint,error,helper text, BNV item text, etc. -->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
         <!--<item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>-->
     </style>

@@ -723,12 +723,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		isFirstTime = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 	}
 
 	void permitVerify(){
@@ -871,7 +871,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			fifthShape.setBackground(ContextCompat.getDrawable(this, R.drawable.shape_password));
 
 			passwdType.setText(getString(R.string.pass_very_weak));
-			passwdType.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+			passwdType.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 			passwdAdvice.setText(getString(R.string.passwd_weak));
 

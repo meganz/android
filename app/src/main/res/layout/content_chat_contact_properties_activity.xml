@@ -516,7 +516,7 @@
                 android:layout_toRightOf="@id/chat_contact_properties_remove_contact_icon"
                 android:text="@string/title_properties_remove_contact"
                 android:textSize="16dp"
-                android:textColor="@color/login_warning"/>
+                android:textColor="@color/red_600_red_300"/>
 
         </RelativeLayout>
 

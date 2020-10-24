@@ -71,13 +71,13 @@
 						android:id="@+id/login_email_text_error_icon"
 						android:layout_alignParentRight="true"
 						android:src="@drawable/ic_input_warning"
-						android:tint="@color/login_warning"/>
+						android:tint="@color/red_600_red_300"/>
 
 					<TextView
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:id="@+id/login_email_text_error_text"
-						android:textColor="@color/login_warning"
+						android:textColor="@color/red_600_red_300"
 						android:layout_toLeftOf="@id/login_email_text_error_icon"
 						android:layout_alignParentLeft="true"
 						android:text="@string/invalid_email_to_invite"

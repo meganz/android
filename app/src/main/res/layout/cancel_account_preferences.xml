@@ -10,6 +10,6 @@
         android:text="@string/settings_advanced_features_cancel_account"
         android:textSize="16sp"
         android:layout_margin="16dp"
-        android:textColor="@color/delete_account"/>
+        android:textColor="@color/red_600_red_300"/>
 
 </LinearLayout>

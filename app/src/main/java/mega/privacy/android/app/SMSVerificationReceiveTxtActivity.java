@@ -584,12 +584,12 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         logDebug("showError");
         firstTime = false;
         isErrorShown = true;
-        firstPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        secondPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
-        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.login_warning));
+        firstPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        secondPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
+        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.red_600_red_300));
         pinError.setVisibility(View.VISIBLE);
         if (errorMessage != null) {
             logWarning("Error message is: " + errorMessage);

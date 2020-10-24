@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <corners android:radius="0dp" />
-    <solid android:color="@color/delete_account" />
+    <solid android:color="@color/red_600_red_300" />
     <padding
         android:bottom="0dp"
         android:left="0dp"

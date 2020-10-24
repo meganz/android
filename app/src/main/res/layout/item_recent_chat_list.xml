@@ -64,7 +64,7 @@
                 android:layout_marginStart="16dp"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body1"
+                android:textAppearance="?attr/textAppearanceBody1"
                 app:emojiSize="14sp"
                 tools:text="User name" />
 
@@ -171,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:paddingBottom="1dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2" />
+                    android:textAppearance="?attr/textAppearanceBody2" />
             </RelativeLayout>
 
         </RelativeLayout>

@@ -12,7 +12,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
         android:text="@string/action_sort_by"
-        android:textAppearance="@style/TextAppearance.Mega.Body1" />
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <TextView
         android:id="@+id/sort_by_name_asc"
@@ -21,7 +21,7 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        android:textAppearance="?attr/textAppearanceBody1"
         tools:text="Name     Ascending"
         tools:textColor="?attr/colorSecondary" />
 
@@ -38,7 +38,7 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        android:textAppearance="?attr/textAppearanceBody1"
         tools:text="Name     Descending" />
 
     <View
@@ -55,7 +55,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_newest_date"
-        android:textAppearance="@style/TextAppearance.Mega.Body1" />
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <View
         android:layout_width="match_parent"
@@ -71,7 +71,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_oldest_date"
-        android:textAppearance="@style/TextAppearance.Mega.Body1" />
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <View
         android:layout_width="match_parent"
@@ -87,7 +87,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_largest_size"
-        android:textAppearance="@style/TextAppearance.Mega.Body1" />
+        android:textAppearance="?attr/textAppearanceBody1" />
 
     <View
         android:layout_width="match_parent"
@@ -103,6 +103,6 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_smallest_size"
-        android:textAppearance="@style/TextAppearance.Mega.Body1" />
+        android:textAppearance="?attr/textAppearanceBody1" />
 
 </LinearLayout>

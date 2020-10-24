@@ -130,7 +130,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             passwordReminderCloseButton.setVisibility(View.VISIBLE);
             dialogTest.setText(R.string.remember_pwd_dialog_text_logout);
             passwordReminderDismissButton.setText(R.string.proceed_to_logout);
-            passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+            passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             testPasswordDismissButton.setVisibility(View.GONE);
             proceedToLogout.setVisibility(View.VISIBLE);
         }
@@ -254,9 +254,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
             passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error);
             icon = ContextCompat.getDrawable(this, R.drawable.ic_input_warning);
-            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP));
+            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP));
             passwordErrorImage.setImageDrawable(icon);
-            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             if (counter == 3) {
                 Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
                 intent.putExtra("logout", isLogout());

@@ -53,7 +53,7 @@
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/white"
         android:text="@string/settings_camera_upload_turn_on"
-        android:textColor="@color/color_secondary_night_grey"
+        android:textColor="@color/teal_300_dark_grey"
         android:visibility="gone"
         tools:visibility="visible" />
 </FrameLayout>

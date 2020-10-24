@@ -257,7 +257,7 @@
     <color name="red_600_alpha_038">#60F30C14</color>
     <color name="red_300_alpha_038">#60F46762</color>
 
-    <!-- ============ Color pair: light_dark, for reusability ========= -->
+    <!-- ======================== Color pair: light_dark, for reusability ================== -->
 
     <color name="black_white">@color/black</color>
 
@@ -274,6 +274,12 @@
     <color name="red_600_dark_grey">@color/red_600</color>
     <color name="red_390_dark_grey">@color/red_390</color>
 
+    <!-- Turn on camera uploads -->
+    <color name="teal_300_dark_grey">@color/teal_300</color>
+
+    <!-- Primary red, log -->
+    <color name="red_600_red_300">@color/red_600</color>
+
     <!-- ============ Color names by purpose (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
     <color name="pass_weak">#FFD300</color>
@@ -285,15 +291,8 @@
       <font color=""> doesn't support alpha -->
     <color name="empty_hint_text_normal_color">#999999</color>
 
-    <color name="color_secondary_night_grey">@color/teal_300</color>
-    <color name="color_primary_red">@color/red_600</color>
     <color name="color_primary_alpha_060">@color/grey_alpha_060</color>
     <color name="color_primary_alpha_038">@color/grey_alpha_038</color>
-
-    <!-- at first, #FF333A should be replaced by red_600, but since these 2 colors are used so
-     widely in the project, to avoid too many changes, let's just keep them. -->
-    <color name="delete_account">@color/color_primary_red</color>
-    <color name="login_warning">@color/color_primary_red</color>
 
     <!-- These colors are also used so widely in the project, to avoid too many changes,
      let's just keep them. -->

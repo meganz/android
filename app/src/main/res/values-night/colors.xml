@@ -24,13 +24,18 @@
      <font color=""> doesn't support alpha -->
     <color name="empty_hint_text_normal_color">#A0A0A0</color>
 
+    <!-- Turn on camera uploads -->
+    <color name="teal_300_dark_grey">@color/dark_grey</color>
+
+    <!-- Primary red -->
+    <color name="red_600_red_300">@color/red_300</color>
+
+
     <color name="name_my_account">@color/white_alpha_087</color>
     <color name="mail_my_account">@color/white_alpha_054</color>
     <color name="background_create_account">@color/dark_grey</color>
     <color name="new_multiselect_color">@android:color/transparent</color>
 
-    <color name="color_secondary_night_grey">@color/dark_grey</color>
-    <color name="color_primary_red">@color/red_300</color>
     <color name="color_primary_alpha_060">@color/white_alpha_060</color>
     <color name="color_primary_alpha_038">@color/white_alpha_038</color>
 

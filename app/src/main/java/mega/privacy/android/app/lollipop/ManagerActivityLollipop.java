@@ -4389,7 +4389,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_icon_firtName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_firtName.setLayoutParams(params_icon_firtName);
 
-		error_icon_firtName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_firtName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_firtName = new TextView(ManagerActivityLollipop.this);
 		error_layout_firtName.addView(textError_firtName);
@@ -4401,7 +4401,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_text_error_firtName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_firtName.setLayoutParams(params_text_error_firtName);
 
-		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_firtName.setVisibility(View.GONE);
 
@@ -4422,7 +4422,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_icon_lastName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_lastName.setLayoutParams(params_icon_lastName);
 
-		error_icon_lastName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_lastName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_lastName = new TextView(ManagerActivityLollipop.this);
 		error_layout_lastName.addView(textError_lastName);
@@ -4434,7 +4434,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_text_error_lastName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_lastName.setLayoutParams(params_text_error_lastName);
 
-		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_lastName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_lastName.setVisibility(View.GONE);
 
@@ -4455,7 +4455,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_icon_email.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_email.setLayoutParams(params_icon_email);
 
-		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
 		error_layout_email.addView(textError_email);
@@ -4467,7 +4467,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_text_error_email.setMargins(scaleWidthPx(3, outMetrics), 0,scaleWidthPx(20, outMetrics),0);
 		textError_email.setLayoutParams(params_text_error_email);
 
-		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_email.setVisibility(View.GONE);
 
@@ -4483,19 +4483,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						emailError = comparedToCurrentEmail(value, managerActivity);
 					}
 					if (emailError != null) {
-						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 						inputMail.requestFocus();
 					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
 						logWarning("First name input is empty");
-						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError_firtName.setText(R.string.error_enter_username);
 						error_layout_firtName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
 						logWarning("Last name input is empty");
-						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                         textError_lastName.setText(R.string.error_enter_userlastname);
 						error_layout_lastName.setVisibility(View.VISIBLE);
 						inputLastName.requestFocus();
@@ -4638,21 +4638,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					emailError = comparedToCurrentEmail(value, managerActivity);
 				}
 				if (emailError != null) {
-					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					inputMail.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 					inputMail.requestFocus();
 				}
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					logWarning("Input is empty");
-					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                     textError_firtName.setText(R.string.error_enter_username);
 					error_layout_firtName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
 					logWarning("Input is empty");
-					inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					inputLastName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
                     textError_lastName.setText(R.string.error_enter_userlastname);
 					error_layout_lastName.setVisibility(View.VISIBLE);
 					inputLastName.requestFocus();
@@ -8405,7 +8405,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon.setLayoutParams(params_icon);
 
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError = new TextView(ManagerActivityLollipop.this);
 		error_layout.addView(textError);
@@ -8417,7 +8417,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError.setLayoutParams(params_text_error);
 
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout.setVisibility(View.GONE);
 
@@ -8452,7 +8452,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -8460,7 +8460,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}else{
 						boolean result=matches(regex, value);
 						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
 							error_layout.setVisibility(View.VISIBLE);
 							input.requestFocus();
@@ -8502,7 +8502,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				String value = input.getText().toString().trim();
 
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
@@ -8510,7 +8510,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else{
 					boolean result=matches(regex, value);
 					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -9300,12 +9300,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		isFirstTime2fa = false;
 		isErrorShown = true;
 		pinError.setVisibility(View.VISIBLE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.login_warning));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 	}
 
 	void permitVerify(int type){
@@ -10446,7 +10446,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		error_icon_email.setLayoutParams(params_icon);
 
-		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
 		error_layout_email.addView(textError_email);
@@ -10459,7 +10459,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
 		textError_email.setLayoutParams(params_text_error);
 
-		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
+		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
 		error_layout_email.setVisibility(View.GONE);
 
@@ -10500,7 +10500,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					String emailError = getEmailError(value, managerActivity);
 					if (emailError != null) {
 //                        input.setError(emailError);
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 						textError_email.setText(emailError);
 						error_layout_email.setVisibility(View.VISIBLE);
 					} else {
@@ -10548,7 +10548,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				String emailError = getEmailError(value, managerActivity);
 				if (emailError != null) {
 //					input.setError(emailError);
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
 					textError_email.setText(emailError);
 					error_layout_email.setVisibility(View.VISIBLE);
 				} else {
@@ -15958,7 +15958,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		try {
 			if (enable) {
 				textToShow = textToShow.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(this, R.color.color_primary_red)
+						+ ColorUtils.getColorHexString(this, R.color.red_600_red_300)
 						+ "\'>");
 			}
 			else {

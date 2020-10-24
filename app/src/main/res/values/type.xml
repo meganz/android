@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- On boarding screen, text title in the carousel -->
+    <!-- Button text, Medium, bold, 14sp, 0px, textColorPrimary, AllCaps=true -->
+    <style name="TextAppearance.Mega.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- On boarding screen, text title in the carousel, Regular, 22sp, 0px, textColorPrimary, AllCaps=false-->
     <style name="TextAppearance.Mega.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textSize">22sp</item>
     </style>
 
-    <!-- Normal text body, Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
-    <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textSize">16sp</item>
-        <item name="android:letterSpacing">0</item>
-    </style>
-
     <!-- Normal text caption, Roboto regular, 12sp, 0px, textColorPrimary, AllCaps=false -->
-    <style name="TextAppearance.Mega.Caption2" parent="TextAppearance.MaterialComponents.Caption">
+    <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:letterSpacing">0</item>
     </style>
@@ -40,26 +39,28 @@
         <item name="android:letterSpacing">0.009375</item>
     </style>
 
-    <style name="TextAppearance.Mega.Body1.Red" parent="TextAppearance.Mega.Body1">
-        <item name="android:textColor">@color/color_primary_red</item>
+    <style name="TextAppearance.Mega.Body1.Red">
+        <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
-    <style name="TextAppearance.Mega.Body1.Secondary" parent="TextAppearance.Mega.Body1">
+    <style name="TextAppearance.Mega.Body1.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
-    <style name="TextAppearance.Mega.Body1.Medium" parent="TextAppearance.Mega.Body1">
+    <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
+    <style name="TextAppearance.Mega.Body1.Secondary.Variant1">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body1.Medium">
         <!-- Fake Roboto Medium. -->
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <!--List view item file info, Regular, 14sp, 0.25px, textColorPrimary-->
-    <style name="TextAppearance.Mega.Body2" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:letterSpacing">0.017857143</item>
-    </style>
-
-    <style name="TextAppearance.Mega.Body2.Secondary" parent="TextAppearance.Mega.Body2">
+    <!-- TextAppearance.Mega.Body2 is using the system default TextAppearance.MaterialComponents.Body2 -->
+    <!-- Regular, 14sp, 0.25px, textColorSecondary-->
+    <style name="TextAppearance.Mega.Body2.Secondary" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
@@ -67,7 +68,6 @@
     <style name="TextAppearance.Mega.Body3" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/color_primary_alpha_060</item>
-        <item name="android:letterSpacing">0.017857143</item>
     </style>
 
     <!-- Medium, 14sp, textColorPrimary -->
@@ -87,7 +87,7 @@
     </style>
 
     <style name="TextAppearance.InputHint.VeryWeak">
-        <item name="android:textColor">@color/color_primary_red</item>
+        <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
     <style name="TextAppearance.InputHint.Weak">

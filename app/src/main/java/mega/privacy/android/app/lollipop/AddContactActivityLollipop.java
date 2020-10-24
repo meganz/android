@@ -2014,7 +2014,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             typeContactEditText.setLayoutParams(params);
         }
         mailError.setVisibility(View.VISIBLE);
-        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
         Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
         background.setColorFilter(porterDuffColorFilter);
         typeContactEditText.setBackground(background);

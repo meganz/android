@@ -339,7 +339,7 @@
             android:layout_marginLeft="32dp"
             android:layout_toRightOf="@id/chat_group_contact_properties_leave_icon"
             android:text="@string/title_properties_chat_leave_chat"
-            android:textColor="@color/login_warning"
+            android:textColor="@color/red_600_red_300"
             android:textSize="16dp" />
 
     </RelativeLayout>

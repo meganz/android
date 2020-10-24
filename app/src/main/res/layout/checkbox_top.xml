@@ -18,5 +18,5 @@
         android:layout_marginTop="4dp"
         android:layout_toEndOf="@+id/chk_top"
         android:singleLine="false"
-        android:textAppearance="@style/TextAppearance.Mega.Caption2" />
+        android:textAppearance="?attr/textAppearanceCaption" />
 </RelativeLayout>

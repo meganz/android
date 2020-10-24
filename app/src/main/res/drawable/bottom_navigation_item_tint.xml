@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/color_primary_red" android:state_checked="true" />
+    <item android:color="@color/red_600_red_300" android:state_checked="true" />
     <item android:color="@color/color_primary_alpha_038" android:state_enabled="false" />
     <item android:color="?android:attr/textColorSecondary" />
 </selector>

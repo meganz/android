@@ -491,7 +491,7 @@
                     android:textSize="12sp"
                     android:layout_marginBottom="40dp"
                     android:text="@string/pin_error_2fa"
-                    android:textColor="@color/login_warning"
+                    android:textColor="@color/red_600_red_300"
                     android:fontFamily="roboto"
                     android:layout_below="@+id/six_pin_2fa_layout"
                     android:layout_centerHorizontal="true"
