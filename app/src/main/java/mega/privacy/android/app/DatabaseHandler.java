@@ -4195,7 +4195,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public boolean saveSyncPair(Backup backup) {
+    public boolean saveBackup(Backup backup) {
         ContentValues values = new ContentValues();
         values.put(KEY_BACKUP_ID, encrypt(Long.toString(backup.getBackupId())));
         values.put(KEY_BACKUP_TYPE, backup.getBackupType());
@@ -4236,9 +4236,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
-            Backup pair = fromCursor(cursor);
+            Backup backup = fromCursor(cursor);
             cursor.close();
-            return pair;
+            return backup;
         } else {
             return null;
         }

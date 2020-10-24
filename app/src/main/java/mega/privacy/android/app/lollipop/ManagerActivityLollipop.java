@@ -111,7 +111,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1376,6 +1375,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     };
 
+    private BroadcastReceiver reEnableCameraUploadsPreferenceReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE.equals(intent.getAction())) {
+                if (getSettingsFragment() != null) {
+                    sttFLol.reEnableCameraUploadsPreference();
+                }
+            }
+        }
+    };
+
     public void launchPayment(String productId) {
         //start purchase/subscription flow
         SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
@@ -2073,6 +2084,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
         // Need to use LocalBroadcastManager, otherwise, receiver cannot receive event.
         LocalBroadcastManager.getInstance(this).registerReceiver(updateCUSettingsReceiver, filter);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(reEnableCameraUploadsPreferenceReceiver, new IntentFilter(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE));
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -4705,6 +4718,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		unregisterReceiver(transferFinishReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraUploadLauncherReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(updateCUSettingsReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(reEnableCameraUploadsPreferenceReceiver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();

@@ -418,7 +418,7 @@ public class AccountController {
         }
 
         if (CameraUploadUtil.isSecondaryEnabled()) {
-            manager.removePrimaryBackup();
+            manager.removeSecondaryBackup();
         }
 
         if (dbH.getPreferences() != null){

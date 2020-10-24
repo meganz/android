@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Objects;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
@@ -279,6 +280,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		useHttpsOnly.setOnPreferenceClickListener(this);
 
 		cameraUploadOn = findPreference(KEY_CAMERA_UPLOAD_ON);
+		cameraUploadOn.setEnabled(true);
 		cameraUploadOn.setOnPreferenceClickListener(this);
 
 		cameraUploadHow = (ListPreference) findPreference(KEY_CAMERA_UPLOAD_HOW_TO);
@@ -2244,7 +2246,15 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		cameraUploadCategory.addPreference(keepFileNames);
 		cameraUploadCategory.addPreference(megaCameraFolder);
 		cameraUploadCategory.addPreference(secondaryMediaFolderOn);
+		// To prevent user switch on/off rapidly. After set backup, will be re-enabled.
+        cameraUploadOn.setEnabled(false);
 	}
+
+    public void reEnableCameraUploadsPreference() {
+        if (cameraUploadOn != null) {
+            cameraUploadOn.setEnabled(true);
+        }
+    }
 
 	/**
 	 * This method is to do the setting process
