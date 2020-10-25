@@ -36,7 +36,6 @@
     <color name="background_create_account">@color/dark_grey</color>
     <color name="new_multiselect_color">@android:color/transparent</color>
 
-    <color name="color_primary_alpha_060">@color/white_alpha_060</color>
     <color name="color_primary_alpha_038">@color/white_alpha_038</color>
 
     <color name="grid_item_bg_stoke_color">@color/white_alpha_012</color>

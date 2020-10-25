@@ -94,8 +94,9 @@
         <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
         <!-- In material design, typically for the title of the action bar -->
         <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
+        <!-- textAppearanceSubtitle1, Invision design is default value -->
         <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
-        <!-- In material design, for the NavigationView itemTextAppearance -->
+        <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
         <item name="textAppearanceSubtitle2">@style/TextAppearance.Mega.Subtitle2</item>
         <!-- In material design, for the CheckedTextView -->
         <item name="textAppearanceBody1">@style/TextAppearance.Mega.Body1</item>

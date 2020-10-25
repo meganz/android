@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Button text, Medium, bold, 14sp, 0px, textColorPrimary, AllCaps=true -->
-    <style name="TextAppearance.Mega.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="android:letterSpacing">0</item>
-    </style>
+    <!-- ================== Headline ====================== -->
 
     <!-- On boarding screen, text title in the carousel, Regular, 22sp, 0px, textColorPrimary, AllCaps=false-->
     <style name="TextAppearance.Mega.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textSize">22sp</item>
     </style>
 
-    <!-- Normal text caption, Roboto regular, 12sp, 0px, textColorPrimary, AllCaps=false -->
-    <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:letterSpacing">0</item>
-    </style>
-
-    <!-- Title on action bar, Medium, bold, 16sp, 0.2px, textColorPrimary-->
+    <!-- In material design, typically for the title of the action bar -->
+    <!-- Medium, bold, 16sp, 0.2px, textColorPrimary-->
     <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:letterSpacing">0.0125</item>
-        <item name="textStyle">normal</item>
     </style>
 
-    <!-- Medium, bold, 14sp, 0px, textColorPrimary-->
+    <!-- ================== Subtitle ====================== -->
+
+    <!-- In material design, typically for AlertDialog title, Popup menu, AutoCompleteTextView,
+     TextInputEditText, Action bar subtitle -->
+    <!-- Regular, normal, 16sp, 0.2px, textColorPrimary, Invision design is system default value  -->
+<!--    <style name="TextAppearance.Mega.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">-->
+<!--    </style>-->
+
+    <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
+    <!-- Medium, bold, 14sp, 0.25px, textColorPrimary-->
     <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="android:letterSpacing">0</item>
+        <item name="android:letterSpacing">0.017857143</item>
     </style>
 
-    <!-- Regular, 14sp, -0.05px, textColorPrimary-->
-    <style name="ListView.Header.Item" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:letterSpacing">-0.003571429</item>
-    </style>
+    <!-- ================== Body1 ====================== -->
 
+    <!-- In material design, for the CheckedTextView -->
     <!-- Regular, 16sp, 0.15px, textColorPrimary-->
     <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:letterSpacing">0.009375</item>
@@ -48,7 +45,7 @@
     </style>
 
     <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
-    <style name="TextAppearance.Mega.Body1.Secondary.Variant1">
+    <style name="TextAppearance.Mega.Body1.Secondary.Variant">
         <item name="android:letterSpacing">0</item>
     </style>
 
@@ -58,26 +55,45 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
+    <!-- ================== Body2 ====================== -->
+
+    <!-- In material design, Alert Dialog, Snack bar, Chip text. Default value is
+       TextAppearance.MaterialComponents.Body2 which conform to Invision design-->
     <!-- TextAppearance.Mega.Body2 is using the system default TextAppearance.MaterialComponents.Body2 -->
+
     <!-- Regular, 14sp, 0.25px, textColorSecondary-->
     <style name="TextAppearance.Mega.Body2.Secondary" parent="TextAppearance.MaterialComponents.Body2">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
-    <!-- Regular, 12sp, 0.25px, 0.6 alpha black/white -->
-    <style name="TextAppearance.Mega.Body3" parent="TextAppearance.MaterialComponents.Body2">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/color_primary_alpha_060</item>
+    <!-- Regular, 14sp, -0.05px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Body2.Variant" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:letterSpacing">-0.003571429</item>
     </style>
 
-    <!-- Medium, 14sp, textColorPrimary -->
-    <style name="Drawer.Item" parent="TextAppearance.MaterialComponents.Body2">
-        <!-- Fake Roboto Medium. -->
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+    <!-- ================== Button ====================== -->
+
+    <!-- Medium, bold, 14sp, 0px, textColorPrimary, AllCaps=true -->
+    <style name="TextAppearance.Mega.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:letterSpacing">0</item>
     </style>
 
-    <!-- Password strength hint text -->
+    <!-- ================== Caption ====================== -->
+
+    <!-- In material design, TextInputLayout hint,error,helper text; BNV item text, etc. -->
+    <!-- Normal text caption, Roboto regular, 12sp, 0px, textColorPrimary, AllCaps=false -->
+    <style name="TextAppearance.Mega.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <!-- Regular, 12sp, 0.25px -->
+    <style name="TextAppearance.Mega.Caption.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:letterSpacing">0.020833333</item>
+    </style>
+
+    <!-- ======== Password strength hint text ============ -->
     <style name="TextAppearance.InputHint" parent="TextAppearance.Design.Error">
         <item name="android:textSize">12sp</item>
     </style>

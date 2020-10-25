@@ -5,8 +5,7 @@
     android:id="@+id/navigation_drawer_account_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_weight="1"
-    >
+    android:layout_weight="1">
 
     <LinearLayout
         android:id="@+id/sections_layout"
@@ -21,14 +20,12 @@
             android:id="@+id/navigation_drawer_account_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+            android:orientation="vertical">
 
             <FrameLayout
                 android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
                 android:layout_width="48dp"
-                android:layout_height="48dp"
-                >
+                android:layout_height="48dp">
 
                 <mega.privacy.android.app.components.RoundedImageView
                     android:id="@+id/navigation_drawer_user_account_picture_profile"
@@ -52,11 +49,10 @@
                 android:id="@+id/navigation_drawer_account_information"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <mega.privacy.android.app.components.twemoji.EmojiTextView
                     android:id="@+id/navigation_drawer_account_information_display_name"
@@ -66,8 +62,7 @@
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="20sp"
                     app:emojiSize="18sp"
-                    tools:text="User Name"
-                    />
+                    tools:text="User Name" />
 
                 <TextView
                     android:id="@+id/navigation_drawer_account_information_email"
@@ -76,8 +71,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    tools:text="email@domain.com"
-                    />
+                    tools:text="email@domain.com" />
 
                 <TextView
                     android:id="@+id/business_label"
@@ -97,8 +91,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone"
-                tools:visibility="visible"
-                >
+                tools:visibility="visible">
 
                 <ProgressBar
                     android:id="@+id/manager_used_space_bar"
@@ -112,10 +105,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="9dp"
-                    android:textAppearance="@style/Drawer.Item"
+                    android:textAppearance="?attr/textAppearanceSubtitle2"
                     android:textSize="13sp"
-                    tools:text="25 GB of 50 GB used"
-                    />
+                    tools:text="25 GB of 50 GB used" />
             </LinearLayout>
 
         </LinearLayout>
@@ -123,8 +115,7 @@
         <FrameLayout
             android:id="@+id/my_account_section"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/drawer_item_height"
-            >
+            android:layout_height="@dimen/drawer_item_height">
 
             <TextView
                 android:id="@+id/my_account_section_text"
@@ -133,8 +124,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/section_account"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
             <View
                 android:layout_width="match_parent"
@@ -157,8 +147,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/section_contacts"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
 
             <View
@@ -174,8 +163,7 @@
             android:id="@+id/inbox_section"
             android:layout_width="match_parent"
             android:layout_height="@dimen/drawer_item_height"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/inbox_section_text"
@@ -184,8 +172,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/section_inbox"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
 
             <View
@@ -209,8 +196,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/title_properties_chat_contact_notifications"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
             <View
                 android:layout_width="match_parent"
@@ -233,16 +219,14 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/section_transfers"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_gravity="bottom"
                 android:layout_marginTop="16dp"
-                android:background="@color/grey_012_white_012"
-                />
+                android:background="@color/grey_012_white_012" />
         </FrameLayout>
 
         <FrameLayout
@@ -256,8 +240,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/section_saved_for_offline_new"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
 
             <View
@@ -281,8 +264,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="@string/action_settings"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
 
             <View
@@ -307,8 +289,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="start|center_vertical"
                 android:text="Switch theme"
-                android:textAppearance="@style/Drawer.Item"
-                />
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
             <View
                 android:id="@+id/theme_separator"
@@ -322,17 +303,16 @@
 
         <Button
             android:id="@+id/upgrade_navigation_view"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginStart="1dp"
             android:layout_marginTop="14dp"
             android:layout_marginBottom="14dp"
-            style="@style/Button"
-            android:text="@string/my_account_upgrade_pro"
-            android:textColor="@color/drawer_upgrade_button_text_color_selector"
             android:backgroundTint="@color/drawer_upgrade_button_background_selector"
-            />
+            android:text="@string/my_account_upgrade_pro"
+            android:textColor="@color/drawer_upgrade_button_text_color_selector" />
 
     </LinearLayout>
 
@@ -374,8 +354,7 @@
                 android:text="@string/add_phone_number_label"
                 android:textAllCaps="true"
                 android:textColor="@color/drawer_add_phone_number_button_stroke"
-                android:textSize="14sp"
-                />
+                android:textSize="14sp" />
 
         </LinearLayout>
 

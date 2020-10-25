@@ -274,10 +274,10 @@
     <color name="red_600_dark_grey">@color/red_600</color>
     <color name="red_390_dark_grey">@color/red_390</color>
 
-    <!-- Turn on camera uploads -->
+    <!-- Turn on camera uploads button text -->
     <color name="teal_300_dark_grey">@color/teal_300</color>
 
-    <!-- Primary red, log -->
+    <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 
     <!-- ============ Color names by purpose (Not the standard colors in Mega palette) ============== -->
@@ -287,11 +287,10 @@
     <color name="pass_good">#13E03C</color>
     <color name="pass_strong">#2BA6DE</color>
 
-    <!-- Colors for empty content hint text. Use non-alpha colors, for
+    <!-- Colors for empty content hint text. Must be non-alpha colors, for
       <font color=""> doesn't support alpha -->
     <color name="empty_hint_text_normal_color">#999999</color>
 
-    <color name="color_primary_alpha_060">@color/grey_alpha_060</color>
     <color name="color_primary_alpha_038">@color/grey_alpha_038</color>
 
     <!-- These colors are also used so widely in the project, to avoid too many changes,

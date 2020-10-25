@@ -191,7 +191,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body3"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary"
                 tools:text="last message time" />
 
             <LinearLayout

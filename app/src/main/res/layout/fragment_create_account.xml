@@ -255,8 +255,7 @@
                                 android:layout_marginStart="5dp"
                                 android:layout_marginTop="6dp"
                                 android:text="@string/passwd_weak"
-                                android:textColor="@color/name_my_account"
-                                android:textSize="14sp" />
+                                style="@style/TextAppearance.Mega.Caption" />
 
                         </LinearLayout>
 

@@ -39,7 +39,7 @@
             android:layout_marginEnd="24dp"
             android:fontFamily="Roboto"
             android:text="@string/confirm_email_explanation"
-            android:textAppearance="@style/TextAppearance.Mega.Body1.Secondary.Variant1"
+            android:textAppearance="@style/TextAppearance.Mega.Body1.Secondary.Variant"
             android:textColor="@color/name_my_account" />
 
         <RelativeLayout
