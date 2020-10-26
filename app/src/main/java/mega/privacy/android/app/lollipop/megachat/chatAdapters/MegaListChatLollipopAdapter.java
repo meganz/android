@@ -433,7 +433,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public String formatStringDuration(int duration) {
 
 		if (duration > 0) {
-			int hours = duration / 3600;
+			int hours = duration /
+					3600;
 			int minutes = (duration % 3600) / 60;
 			int seconds = duration % 60;
 
@@ -1041,6 +1042,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			notifyItemChanged(position);
 			return;
 		}
+
 		if (chat.isCallInProgress() && megaChatApi != null && megaChatApi.getNumCalls() != 0) {
 			MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
 			if (call != null && isStatusConnected(context, chat.getChatId())) {
@@ -1080,6 +1082,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				return;
 			}
 		}
+
 		((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 		((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
 		((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(View.GONE);

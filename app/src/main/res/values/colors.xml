@@ -150,6 +150,8 @@
 
     <color name="turn_on_notifications_background">#FF00A38C</color>
     <color name="turn_on_notifications_statusbar">#FF008270</color>
+    <color name="call_on_hold_banner">#60008270</color>
+
     <color name="turn_on_notifications_text">#B3000000</color>
 
 
@@ -212,8 +214,7 @@
     <color name="reconnecting_bar">#FFF5A623</color>
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
-
+    <color name="border_avatar_call">#4DFFFFFF</color>
     <color name="over_quota_yellow">#FFFFB42B</color>
-
     <color name="background_own_reaction_added">#0F00BFA5</color>
 </resources>
