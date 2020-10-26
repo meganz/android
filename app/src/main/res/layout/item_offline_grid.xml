@@ -87,7 +87,7 @@
 		<View
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
-			android:background="@color/divider_upgrade_account"
+			android:background="@color/black_12_alpha"
 			android:layout_below="@+id/file_grid_thumbnail_layout_for_file"/>
 		<RelativeLayout
 			android:id="@+id/offline_grid_bottom_container"

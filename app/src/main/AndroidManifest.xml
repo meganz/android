@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly">
-
-    <uses-sdk android:minSdkVersion="21"
-        tools:ignore="GradleOverrides" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
@@ -41,6 +37,8 @@
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 
@@ -248,7 +246,7 @@
             android:name="mega.privacy.android.app.lollipop.FileStorageActivityLollipop"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar">
         </activity>
 
         <activity
@@ -495,6 +493,11 @@
 
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name="mega.privacy.android.app.notifications.DownloadNotificationIntentService"
             android:exported="false" >
         </service>
 

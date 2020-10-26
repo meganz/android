@@ -3,27 +3,21 @@ package mega.privacy.android.app.modalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.io.File;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -47,14 +41,9 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                     nonContactEmail = email;
                 }
             }
-        } else {
-            if (context instanceof FileContactListActivityLollipop) {
-                share = ((FileContactListActivityLollipop) context).getSelectedShare();
-                contact = ((FileContactListActivityLollipop) context).getSelectedContact();
-            } else if (context instanceof FileInfoActivityLollipop) {
-                share = ((FileInfoActivityLollipop) context).getSelectedShare();
-                contact = ((FileInfoActivityLollipop) context).getSelectedContact();
-            }
+        } else if (context instanceof FileContactListActivityLollipop) {
+            share = ((FileContactListActivityLollipop) context).getSelectedShare();
+            contact = ((FileContactListActivityLollipop) context).getSelectedContact();
 
             if (contact == null) {
                 nonContactEmail = share.getUser();
@@ -66,6 +55,15 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
+
+        if (context instanceof FileInfoActivityLollipop) {
+            share = ((FileInfoActivityLollipop) context).getSelectedShare();
+            contact = ((FileInfoActivityLollipop) context).getSelectedContact();
+
+            if (contact == null) {
+                nonContactEmail = share.getUser();
+            }
+        }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
 
@@ -123,7 +121,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
                 titleMailContactPanel.append(" " + getString(R.string.pending_outshare_indicator));
             }
         } else {
-            titleMailContactPanel.setText(contact.getEmail());
+            titleMailContactPanel.setText(contact != null ? contact.getEmail() : nonContactEmail);
         }
 
         dialog.setContentView(contentView);

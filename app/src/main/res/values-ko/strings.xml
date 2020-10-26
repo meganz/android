@@ -89,7 +89,6 @@
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
 
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
@@ -363,6 +362,11 @@
         <item context="Message when a download finishes. Singular 1 file" quantity="one">업로드 완료</item>
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d개의 업로드 완료됨</item>
     </plurals>
+
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">폴더가 비어있습니다.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">폴더들이 비어있습니다.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -488,7 +492,7 @@
     <string name="context_no_copied" context="error message">오류. 복사되지 않았습니다</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">대상 폴더를 선택하세요</string>
     <string name="context_correctly_moved" context="success message when moving a node">올바르게 이동되었습니다</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d개의 항목이 성공적으로 이동되었습니다</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d개의 항목이 성공적으로 이동되었습니다.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d개의 항목이 이동되지 않았습니다</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">휴지통으로 잘 이동되었습니다</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d개의 항목이 휴지통으로 이동되었습니다</string>
@@ -506,7 +510,8 @@
     <string name="context_no_removed" context="error message">오류. MEGA에서 삭제되지 않았습니다</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d개의 항목이 MEGA에서 제거되었습니다</string>
     <string name="number_no_removed" context="error message when moving a node">%d개의 항목이 제거되지 않았습니다</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d개의 폴더에서 성공적으로 떠났습니다</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d개의 폴더에서 성공적으로 떠났습니다.</string>
+    <string name="share_left" context="Message shown when a share has been left">공유 떠남</string>
     <string name="number_no_leaved" context="error message when moving a node">%d개의 폴더에서 성공적으로 떠나지 못했습니다</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">%d개의 연락처에게 파일이 잘 전송되었습니다</string>
     <string name="number_no_sent" context="error message when sending multiple files">%d개의 연락처에게 파일이 전송되지 않았습니다</string>
@@ -720,6 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">계정을 인증하세요</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">당신의 계정은 잠재적 남용을 방지하기 위해 일시적으로 잠겼습니다. 계정을 해제하려면 전화번호를 인증하세요.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">국가</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">국가</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">당신의 전화번호</string>
     <string name="general_back_button" context="Button label - go to previous page">뒤로</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">나중에</string>
@@ -889,7 +895,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">주소 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">주소 2 (선택적)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">도시</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">주 / 지방</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">주/지방</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">국가</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">우편번호</string>
 
@@ -1109,6 +1115,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">대화 [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">보관함</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1543,7 +1550,6 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">들여오기</string>
     <string name="save_for_offline" context="Menu option to choose save to Offline section">오프라인용으로 저장</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">클라우드 드라이브에 추가</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">오프라인용으로 저장</string>
 
     <string name="general_view_contacts" context="Menu option">연락처 보기</string>
 
@@ -1667,7 +1673,6 @@
     <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">이 폴더를 휴지통으로 이동하시겠습니까? 보조 미디어 업로드가 해제됩니다.</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">휴지통으로 옮길까요?</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">MEGA에서 삭제할까요?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">폴더를 떠나면, 다시 볼 수 없습니다.</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">업로드 중&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">대화 알림</string>
@@ -1722,6 +1727,11 @@
     <plurals name="context_share_folders">
         <item context="menu item" quantity="one">폴더 공유</item>
         <item context="menu items" quantity="other">폴더 공유</item>
+    </plurals>
+
+    <plurals name="confirmation_leave_share_folder">
+        <item context="Confirmation message before leaving an incoming shared folder" quantity="one">폴더를 떠나면, 다시 볼 수 없습니다.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">이 폴더들을 떠나면, 다시는 볼 수 없습니다.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">공유된 폴더 없음</string>
@@ -2014,6 +2024,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">요청이 너무 많습니다. 기다려주세요.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">로그인 과정 취소중. 잠시만 기다리세요&#8230;</string>
 
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">지원하지 않는 파일 유형.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">오류. 파일이 손상되었거나 존재하지 않습니다.</string>
 
 
@@ -2101,6 +2112,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">컨텐츠 미리보기</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">스트리밍을 실행할 수 없고 파일이 다운로드되지 않았습니다</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">네트워크 연결이 없어서 파일을 열 수 없습니다.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
 
     <plurals name="error_forwarding_messages">
@@ -2199,7 +2211,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">연락처 %s은(는) 이미 추가되어 있습니다.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">%s와(과) 공유할까요?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">새 단체 대화</string>
-    <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">연락처 추가</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">연락처 보내기</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">로그아웃됨</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">당신의 계정은 활성화되었습니다. 로그인 하세요.</string>
@@ -2250,7 +2262,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]중 %2$s 사용됨[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">테스트 서버로 변경할까요?</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">테스트 서버로 변경하시겠습니까? 당신의 계정이 복구할 수 없는 문제를 겪을 수 있습니다.</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">테스트 서버로 변경하시겠습니까? 당신의 계정이 복구할 수 없는 문제를 겪을 수 있습니다.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">카메라를 열까요?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">카메라를 열면, 현재 통화에서의 영상 전송이 일시정지됩니다.</string>
@@ -2267,7 +2279,7 @@
 	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">최소 크기는 %1$s이며 최대 크기는 %2$s입니다.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">다음 날짜보다 오래된 파일 삭제</string>
-    <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d일</string>
+    <string name="settings_rb_scheduler_select_days_subtitle" context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics">%d일</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">다음보다 크기가 클 때 알림</string>
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">압축할 비디오가 다음보다 크면</string>
@@ -2280,6 +2292,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">암호화 키 순환 활성화</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">키 순환은 100명 이상의 참여자가 있는 대화에서는 해제됩니다.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">참여자 수가 제한을 초과하였기 때문이 이 대화를 비밀 대화로 전환할 수 없습니다.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 만들었습니다.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A]님이[B] 대화 링크를 제거하였습니다.[/B]</string>
@@ -2443,6 +2457,8 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">참가자 %d명</item>
     </plurals>
 
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s 그리고 %2$d개 더</string>
+
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">이 대화의 링크를 생성하기 전, 설명을 입력해야합니다:</string>
 
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">클립보드에 대화 링크를 복사하였습니다</string>
@@ -2502,7 +2518,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s님이 통화에 참여하셨습니다</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s님이 통화에서 떠났습니다</string>
 
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">참여자 수 제한을 초과하였기 때문에 통화를 시작할 수 없습니다.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">이 통화가 최대 참가자 수에 도달했기 때문에 참여할 수 없습니다.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">단체 대화의 최대 참여자 수에 도달하였기 때문에 이 통화에 참여할 수 없습니다.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">이 통화의 최대 영상 사용 참가자 수에 도달했기 때문에 영상을 활성화할 수 없습니다.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">오류. 파일을 열 수 없습니다.</string>
@@ -2565,7 +2583,6 @@
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">파일 준비중</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">메시지로 전송</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">오류. 파일이 선택한 대화에 전송되지 않았습니다.</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[B]항목[/B] [A]없음[/A]</string>
 
     <string name="delete_versions" context="Action delete all file versions">이전 파일 기록 삭제</string>
     <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">이전 버전을 삭제할까요?</string>
@@ -2711,7 +2728,8 @@
     <string name="user_label" context="Business user role">이용자</string>
     <string name="status_label" context="General label to show the status of something or someone">상태</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">활성</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">유예 기간</string>
+    <string name="payment_required_label" context="Business account status. Payment is overdue, but the account still active in grace period">결제 필요</string>
+    <string name="payment_overdue_label" context="Business expired account Overdue payment page header.">결제 기한 초과</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">이용자 관리는 데스크톱 웹 브라우저에서만 가능합니다.</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">사용량</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">저장소 사용량 상세 정보</string>
@@ -2727,7 +2745,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">무제한 [A]저장소[/A] **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">무제한 [A]저장소[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">무제한 [A]전송 할당량[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
@@ -2760,6 +2778,7 @@
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">별명 제거됨</string>
     <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">별명을 추가하던 중 오류 발생</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">별명</string>
+    <string name="phonenumber_title" context="Text related to verified phone number. Used as title or cell description.">전화번호</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">다시 연결중</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">돌아왔습니다.</string>
@@ -2781,6 +2800,25 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%s에 생성된 대화</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">메시지 선택</string>
 
+    <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">저장소 가득 참</string>
+    <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">당신의 데이터가 위기상황입니다!</string>
+    <plurals name="over_disk_quota_paywall_text">
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">우리가 %2$s에 %1$s(으)로 이메일을 발송하여 연락하였지만, 아직도 당신의 MEGA 계정에 %4$s를 차지하는 %3$s개의 파일이 존재하며, 이는 %5$s 요금제를 필요로 합니다.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">우리가 %2$s과 %3$s에 %1$s(으)로 이메일을 발송하여 연락하였지만, 아직도 당신의 MEGA 계정에 %4$s를 차지하는 %5$s개의 파일이 존재하며, 이는 %6$s 요금제를 필요로 합니다.</item>
+    </plurals>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">우리가 %1$s(으)로 이메일을 발송하여 연락하였지만, 아직도 당신의 MEGA 계정에 %3$s를 차지하는 %2$s개의 파일이 존재하며, 이는 %4$s 요금제를 필요로 합니다.</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]데이터를 지키려면 즉시 조치하세요.[/B]</string>
+
+    <plurals name="label_time_in_days_full">
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1일</item>
+        <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d일</item>
+    </plurals>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%d시간</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%d분</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%d초</string>
+
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">자격증명 인증중</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">인증되지 않음</string>
     <string name="label_verified" context="Action indicating something was verified.">확인됨</string>
@@ -2788,11 +2826,25 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">현실에서 가장 확실한 방법은 직접 만나는 것입니다. 만약 증명된 OTR이나 PGP 같은 이미 증명된 다른 방법이 있다면, 그것을 사용해도 좋습니다.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">당신의 자격증명</string>
     <string name="action_reset" context="Button to reset credentials">재설정</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">자격증명 업데이트중. 나중에 다시 시도하세요.</string>
+
+    <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">참여하는 중&#8230;</string>
+    <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">떠나는 중&#8230;</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">전화번호를 제거할까요?</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">전화번호가 성공적으로 삭제되었습니다.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">전화 번호 삭제 실패</string>
+
+    <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">재설정하려고 시도한 계정이 차단되었습니다.</string>
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">계정이 막혔습니다. support&#64;mega.nz로 연락하세요</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">당신의 계정은 관리자에 의해 정지되었습니다. 자세한 사항은 비즈니스 계정 관리자에게 연락하세요.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">당신의 계정이 관리자에 의해 삭제되었습니다. 자세한 사항은 당신의 비즈니스 계정 관리자에게 문의하세요.</string>
+
+    <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">수정</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">휴대전화 번호 수정</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">휴대전화 번호 제거</string>
+    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">이 행동은 현재 전화 번호를 삭제하고 새 전화번호를 계정과 연결하는 과정을 시작합니다.</string>
+    <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">이것은 당신의 계정에 연결된 전화번호를 삭제합니다. 만약 나중에 전화번호를 추가하려면 전화번호를 인증해야합니다.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">보기</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s님의 자격증명</string>

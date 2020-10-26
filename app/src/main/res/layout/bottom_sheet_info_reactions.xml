@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/general_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@null">
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScroll"
+            android:layout_width="wrap_content"
+            android:layout_height="62dp"
+            android:animateLayoutChanges="true"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/info_reactions_tabs"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:orientation="horizontal"
+                android:clipToPadding="true"
+                android:paddingStart="16dp"/>
+        </HorizontalScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/horizontalScroll"
+        android:background="@color/black_12_alpha" />
+
+        <RelativeLayout
+            android:id="@+id/info_reactions_divider"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_below="@id/horizontalScroll"
+            android:background="@color/chat_background"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp">
+            <TextView
+                android:id="@+id/short_code_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/mail_my_account"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:textSize="12sp"/>
+        </RelativeLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/info_reactions_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/info_reactions_divider" />
+</RelativeLayout>

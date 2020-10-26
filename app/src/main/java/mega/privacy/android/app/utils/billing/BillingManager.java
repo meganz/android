@@ -16,6 +16,8 @@
 package mega.privacy.android.app.utils.billing;
 
 import android.app.Activity;
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -53,7 +55,7 @@ import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
  */
 public class BillingManager implements PurchasesUpdatedListener {
 
-    private String payload;
+    private String megaAccountHandle;
     private BillingClient mBillingClient;
     private boolean mIsServiceConnected;
     private final BillingUpdatesListener mBillingUpdatesListener;
@@ -104,12 +106,12 @@ public class BillingManager implements PurchasesUpdatedListener {
      *
      * @param activity The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
-     * @param pl Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
+     * @param handle Current MEGA account's hanlde as account id. {@link MegaUser#getHandle()}
      */
-    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener, String pl) {
+    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener, String handle) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
-        payload = pl;
+        megaAccountHandle = handle;
 
         //must enable pending purchases to use billing library
         mBillingClient = BillingClient.newBuilder(mActivity).enablePendingPurchases().setListener(this).build();
@@ -117,15 +119,12 @@ public class BillingManager implements PurchasesUpdatedListener {
         // Start setup. This is asynchronous and the specified listener will be called
         // once setup completes.
         // It also starts to report all the new purchases through onPurchasesUpdated() callback.
-        startServiceConnection(new Runnable() {
-            @Override
-            public void run() {
-                logInfo("service connected, query purchases");
-                // Notifying the listener that billing client is ready
-                mBillingUpdatesListener.onBillingClientSetupFinished();
-                // IAB is fully set up. Now, let's get an inventory of stuff we own.
-                queryPurchases();
-            }
+        startServiceConnection(() -> {
+            logInfo("service connected, query purchases");
+            // Notifying the listener that billing client is ready
+            mBillingUpdatesListener.onBillingClientSetupFinished();
+            // IAB is fully set up. Now, let's get an inventory of stuff we own.
+            queryPurchases();
         });
     }
 
@@ -134,6 +133,22 @@ public class BillingManager implements PurchasesUpdatedListener {
      */
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
+        // Check all the purchases to see if there's any purchase belongs to current MEGA account.
+        boolean hasMyChange = false;
+        if(purchases != null && purchases.size() > 0) {
+            for(Purchase purchase: purchases) {
+                if(isPurchaseBelongToCurrentAccount(purchase)) {
+                    logDebug("Has my purchase.");
+                    hasMyChange = true;
+                    break;
+                }
+            }
+        }
+
+        // If no updated purchase belongs to current MEGA account, return.
+        // When downgrade, purchases is null too, still need to handle.
+        if(!hasMyChange && purchases != null) return;
+
         int resultCode = billingResult.getResponseCode();
         logDebug("Purchases updated, response code is " + resultCode);
         if (resultCode == BillingResponseCode.OK) {
@@ -156,17 +171,32 @@ public class BillingManager implements PurchasesUpdatedListener {
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? IMMEDIATE_WITH_TIME_PRORATION : DEFERRED;
         logDebug("prorationMode is " + prorationMode);
-        Runnable purchaseFlowRequest = new Runnable() {
-            @Override
-            public void run() {
-                BillingFlowParams purchaseParams = BillingFlowParams
-                        .newBuilder()
-                        .setSkuDetails(skuDetails)
-                        .setOldSku(oldSku, purchaseToken)
-                        .setReplaceSkusProrationMode(prorationMode)
-                        .build();
-                mBillingClient.launchBillingFlow(mActivity, purchaseParams);
+        Runnable purchaseFlowRequest = () -> {
+            BillingFlowParams.Builder builder = BillingFlowParams
+                    .newBuilder()
+                    .setSkuDetails(skuDetails)
+                    // Set MEGA account id here.
+                    .setObfuscatedAccountId(megaAccountHandle)
+                    .setReplaceSkusProrationMode(prorationMode);
+
+            // setOldSku requires non-null parameters.
+            if(oldSku != null && purchaseToken != null) {
+                builder.setOldSku(oldSku, purchaseToken);
             }
+
+            BillingFlowParams purchaseParams = builder.build();
+
+            /*
+                If do a full login, ManagerActivity's mIntent will be set as null.
+                Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
+                otherwise billing library crashes internally.
+                @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")
+             */
+            if(mActivity.getIntent() == null) {
+                mActivity.setIntent(new Intent());
+            }
+
+            mBillingClient.launchBillingFlow(mActivity, purchaseParams);
         };
 
         executeServiceRequest(purchaseFlowRequest);
@@ -194,14 +224,11 @@ public class BillingManager implements PurchasesUpdatedListener {
     public void querySkuDetailsAsync(@SkuType String itemType, List<String> skuList, SkuDetailsResponseListener listener) {
         logDebug("querySkuDetailsAsync type is " + itemType);
         // Creating a runnable from the request to use it inside our connection retry policy below
-        Runnable queryRequest = new Runnable() {
-            @Override
-            public void run() {
-                // Query the purchase async
-                SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-                params.setSkusList(skuList).setType(itemType);
-                mBillingClient.querySkuDetailsAsync(params.build(), listener);
-            }
+        Runnable queryRequest = () -> {
+            // Query the purchase async
+            SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+            params.setSkusList(skuList).setType(itemType);
+            mBillingClient.querySkuDetailsAsync(params.build(), listener);
         };
 
         executeServiceRequest(queryRequest);
@@ -232,45 +259,54 @@ public class BillingManager implements PurchasesUpdatedListener {
             return;
         }
 
+        if(!isPurchaseBelongToCurrentAccount(purchase)) {
+            logWarning("Not belong to current MEGA account.");
+            return;
+        }
+
         if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
             // Acknowledge the purchase if it hasn't already been acknowledged.
             if (!purchase.isAcknowledged()) {
-                AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
-                    @Override
-                    public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
-                        if (billingResult.getResponseCode() == BillingResponseCode.OK) {
-                            logInfo("purchase acknowledged");
-                        } else {
-                            logWarning("purchase acknowledge failed, " + billingResult.getDebugMessage());
-                        }
+                AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = billingResult -> {
+                    if (billingResult.getResponseCode() == BillingResponseCode.OK) {
+                        logInfo("purchase acknowledged");
+                    } else {
+                        logWarning("purchase acknowledge failed, " + billingResult.getDebugMessage());
                     }
                 };
                 AcknowledgePurchaseParams acknowledgePurchaseParams =
                         AcknowledgePurchaseParams.newBuilder()
                                 .setPurchaseToken(purchase.getPurchaseToken())
-                                .setDeveloperPayload(payload)
                                 .build();
                 mBillingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
             }
         }
 
-        if (isPayloadValid(purchase.getDeveloperPayload())) {
-            logDebug("new purchase added, " + purchase.getOriginalJson());
-            mPurchases.add(purchase);
-        } else {
-            logWarning("Invalid DeveloperPayload");
-        }
+        logDebug("new purchase added, " + purchase.getOriginalJson());
+        mPurchases.add(purchase);
     }
 
     /**
-     * Check if the payload of a purchase is valid(the purchase belongs to current open MEGA account).
+     * Check if the purchase belongs to current open MEGA account.
      *
-     * @param pl Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
-     * @return If the payload is valid.
+     * @param purchase The purchase to check. Need to check both payload and account id.
+     * @return true if the purchase belongs to current MEGA account, otherwise false.
      */
-    public boolean isPayloadValid(String pl) {
-        //backward compatibility - old version does not have payload so just let it go
-        return TextUtil.isTextEmpty(pl) || payload.equals(pl);
+    public boolean isPurchaseBelongToCurrentAccount(Purchase purchase) {
+        String payload = purchase.getDeveloperPayload();
+        String id = purchase.getAccountIdentifiers() == null ? null : purchase.getAccountIdentifiers().getObfuscatedAccountId();
+
+        if(!TextUtil.isTextEmpty(payload) && megaAccountHandle.equals(payload)) {
+            // Old version, only has payload set, so need to make sure payload is the same.
+            logDebug("Old version, purchase has valid payload.");
+            return true;
+        } else if(!TextUtil.isTextEmpty(id) && megaAccountHandle.equals(id) ) {
+            // New version, check account id.
+            logDebug("Purchase has valid account id.");
+            return true;
+        }
+        logWarning("The purchase doesn't belong to the current MEGA account.");
+        return false;
     }
 
     /**
@@ -314,37 +350,34 @@ public class BillingManager implements PurchasesUpdatedListener {
      * a listener
      */
     private void queryPurchases() {
-        Runnable queryToExecute = new Runnable() {
-            @Override
-            public void run() {
-                PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
-                List<Purchase> purchasesList = purchasesResult.getPurchasesList();
-                if (purchasesList == null) {
-                    logWarning("getPurchasesList() for in-app products returned NULL, using an empty list.");
-                    purchasesList = new ArrayList<>();
-                }
-
-                // If there are subscriptions supported, we add subscription rows as well
-                if (areSubscriptionsSupported()) {
-                    PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
-                    if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
-                        purchasesList.addAll(subscriptionResult.getPurchasesList());
-                    }
-                }
-
-                // Verify all available purchases
-                List<Purchase> list = new ArrayList<>();
-                for (Purchase purchase : purchasesList) {
-                    if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-                        list.add(purchase);
-                        logDebug("Purchase added, " + purchase.getOriginalJson());
-                    }
-                }
-
-                PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
-                logDebug("Final purchase result is " + finalResult.getBillingResult());
-                onQueryPurchasesFinished(finalResult);
+        Runnable queryToExecute = () -> {
+            PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
+            List<Purchase> purchasesList = purchasesResult.getPurchasesList();
+            if (purchasesList == null) {
+                logWarning("getPurchasesList() for in-app products returned NULL, using an empty list.");
+                purchasesList = new ArrayList<>();
             }
+
+            // If there are subscriptions supported, we add subscription rows as well
+            if (areSubscriptionsSupported()) {
+                PurchasesResult subscriptionResult = mBillingClient.queryPurchases(SkuType.SUBS);
+                if (subscriptionResult.getResponseCode() == BillingResponseCode.OK) {
+                    purchasesList.addAll(subscriptionResult.getPurchasesList());
+                }
+            }
+
+            // Verify all available purchases
+            List<Purchase> list = new ArrayList<>();
+            for (Purchase purchase : purchasesList) {
+                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature()) && isPurchaseBelongToCurrentAccount(purchase)) {
+                    list.add(purchase);
+                    logDebug("Purchase added, " + purchase.getOriginalJson());
+                }
+            }
+
+            PurchasesResult finalResult = new PurchasesResult(purchasesResult.getBillingResult(), list);
+            logDebug("Final purchase result is " + finalResult.getBillingResult());
+            onQueryPurchasesFinished(finalResult);
         };
 
         executeServiceRequest(queryToExecute);
@@ -357,6 +390,7 @@ public class BillingManager implements PurchasesUpdatedListener {
      */
     private void startServiceConnection(final Runnable executeOnSuccess) {
         mBillingClient.startConnection(new BillingClientStateListener() {
+
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
                 logDebug("Response code is: " + billingResult.getResponseCode());
@@ -406,10 +440,6 @@ public class BillingManager implements PurchasesUpdatedListener {
             logWarning("Purchase failed to valid signature", e);
             return false;
         }
-    }
-
-    public String getPayload() {
-        return payload;
     }
 }
 

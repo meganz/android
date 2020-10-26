@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
   		<item android:color="@color/lollipop_primary_color" android:state_checked="true" />
-		<item android:color="@color/divider_upgrade_account" android:state_enabled="false" />
+		<item android:color="@color/black_12_alpha" android:state_enabled="false" />
   		<item android:color="#66000000" android:state_pressed="true" />
   		<item android:color="@color/black"/>
 </selector>

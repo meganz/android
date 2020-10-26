@@ -70,7 +70,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OFFLINE_SEARCH_QUERY;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -124,13 +124,13 @@ public class OfflineFragmentLollipop extends RotatableFragment{
 	public void onResume(){
 		super.onResume();
 		IntentFilter filter = new IntentFilter(REFRESH_OFFLINE_FILE_LIST);
-		LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver, filter);
+		context.registerReceiver(receiver, filter);
 	}
 
 	@Override
 	public void onPause(){
 		super.onPause();
-		LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+		context.unregisterReceiver(receiver);
 	}
 
 	@Override

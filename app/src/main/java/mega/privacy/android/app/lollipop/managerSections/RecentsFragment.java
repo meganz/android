@@ -56,7 +56,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -483,6 +483,14 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             if (screenPosition != null) {
                 intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
+                int[] screenPositionForSwipeDismiss = new int[] {
+                        screenPosition[0] + screenPosition[2] / 2,
+                        screenPosition[1] + screenPosition[3] / 2,
+                        screenPosition[2],
+                        screenPosition[3]
+                };
+                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS, screenPositionForSwipeDismiss);
+
             }
             intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
             if (isMedia) {
@@ -492,7 +500,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 intent.putExtra(IS_PLAYLIST, false);
             }
 
-            if (isLocalFile(context, node, megaApi, localPath)) {
+            if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);
@@ -507,7 +515,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
             intent = new Intent(Intent.ACTION_VIEW);
 
-            if (isLocalFile(context, node, megaApi, localPath)) {
+            if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath);
             }
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
@@ -518,7 +526,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
             }
 
-            if (isLocalFile(context, node, megaApi, localPath)) {
+            if (isLocalFile(node, megaApi, localPath)) {
                 paramsSetSuccessfully = setLocalIntentParams(context, node, intent, localPath, false);
             } else {
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent);

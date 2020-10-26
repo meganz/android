@@ -89,7 +89,6 @@
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">Move to rubbish bin?</string>
 
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
 
     <string name="confirmation_alert" context="confirmation message before removing a file">Please confirm</string>
     -->
@@ -363,6 +362,11 @@
         <item context="Message when a download finishes. Singular 1 file" quantity="one">アップロードが完了しました</item>
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d個のアップロードが完了しました</item>
     </plurals>
+
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">フォルダが空です</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">フォルダが空です</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -488,7 +492,7 @@
     <string name="context_no_copied" context="error message">エラー発生。コピーできていません。</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">目的のフォルダを選択してください</string>
     <string name="context_correctly_moved" context="success message when moving a node">移動成功です。</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d アイテム移動成功</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d個の項目が正常に移動しました。</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d項目が正常に送信されませんでした。</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">ごみ箱に正常に移動しました</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d項目がごみ箱に正常に移動しました</string>
@@ -506,7 +510,8 @@
     <string name="context_no_removed" context="error message">エラー発生。MEGA から削除されていません。</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d個の項目がMEGAから成功に削除されました。</string>
     <string name="number_no_removed" context="error message when moving a node">%d項目が正常に削除されませんでした</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%dフォルダが正常に残りました</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d個のフォルダが正常に残りました。</string>
+    <string name="share_left" context="Message shown when a share has been left">共有から出ました</string>
     <string name="number_no_leaved" context="error message when moving a node">%d個のフォルダはうまく残りませんでした</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">%d件の連絡先にファイルが正常に送信されました</string>
     <string name="number_no_sent" context="error message when sending multiple files">%d件の連絡先にファイルが送信されませんでした</string>
@@ -720,6 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">アカウントを検証する</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">不正使用の可能性があるため、あなたのアカウントは一時的にロックされています。アカウントのロックを解除するには、電話番号を検証してください。</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">国</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">地域</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">あなたの電話番号</string>
     <string name="general_back_button" context="Button label - go to previous page">戻る</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">今はやめます</string>
@@ -889,7 +895,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">アドレス1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">住所２（オプション）</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">市</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">州/県</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">都道府県</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">国</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">郵便番号</string>
 
@@ -1109,6 +1115,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">チャット [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">アーカイブ</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1543,7 +1550,6 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">インポート</string>
     <string name="save_for_offline" context="Menu option to choose save to Offline section">オフラインで保存</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">クラウドドライブに追加する</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">オフラインで保存</string>
 
     <string name="general_view_contacts" context="Menu option">連絡先を表示</string>
 
@@ -1667,7 +1673,6 @@
     <string name="confirmation_move_mu_folder_to_rubbish" context="Confirmation message before removing MU folder">このフォルダをごみ箱に移動してもよろしいですか？　これによりセカンダリメディアアップロードが無効になります。</string>
     <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">ゴミ箱に移しますか？</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">MEGAから削除しますか？</string>
-    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">当該フォルダから去ると、再度それを見ることはできません。</string>
     <string name="attachment_uploading_state" context="label to indicate the state of an upload in chat">アップロードしているのは&#8230;</string>
 
     <string name="title_properties_contact_notifications_for_chat" context="Title of the section to enable notifications in the Contact Properties screen">チャット通知</string>
@@ -1722,6 +1727,11 @@
     <plurals name="context_share_folders">
         <item context="menu item" quantity="one">フォルダを共有する</item>
         <item context="menu items" quantity="other">フォルダを共有する</item>
+    </plurals>
+
+    <plurals name="confirmation_leave_share_folder">
+        <item context="Confirmation message before leaving an incoming shared folder" quantity="one">当該フォルダから去ると、再度それを見ることはできません。</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">これらのフォルダから去ると、再度それを見ることはできません。</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">共有フォルダなし</string>
@@ -2014,6 +2024,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">要求が多すぎます。お待ちください。</string>
     <string name="login_in_progress" context="message when previous login is being canceled">ログイン処理をキャンセルしています。お待ちください&#8230;</string>
 
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">サポートされていないファイル形式です。</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">エラー。ファイルが破損しているか、存在しません。</string>
 
 
@@ -2101,6 +2112,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">コンテンツプレビュー</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">ストリーミングを実行できず、ファイルがダウンロードされていません</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">ネットワークに接続されていないため、ファイルを開くことができませんでした。</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">ファイルはすでにオフライン用に保存されています</string>
 
     <plurals name="error_forwarding_messages">
@@ -2199,7 +2211,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">すでにこの連絡先%sさんを追加しています。</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">%sさんと共有しますか？　</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">新しいグループチャット</string>
-    <string name="add_contacts" context="Label shown when the user wants to add contacts into a chat conversation">知り合いを追加</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">連絡先を送信</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">ログアウト済み</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">あなたのアカウントは有効になっています。ログインしてください。</string>
@@ -2250,7 +2262,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]/ %2$s 使用[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">テストサーバーに変更しますか？　</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">テストサーバーに変更してもよろしいですか？　アカウントに回復不能な問題が発生する可能性があります</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">テストサーバーに変更してもよろしいですか？　アカウントに回復不能な問題が発生する可能性があります。</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">カメラを開きますか？　</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">カメラを開くと、あなたの動画送信は現在の通話で一時停止されます。</string>
@@ -2267,7 +2279,7 @@
 	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">最小サイズは%1$sで、最大サイズは%2$sです。</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">ファイル失効日は</string>
-    <string name="settings_rb_scheduler_select_days_subtitle" context="Subtitle of Rubbish bin scheduler option in settings to show the number of days set up to the rubbish bin scheduler">%d日</string>
+    <string name="settings_rb_scheduler_select_days_subtitle" context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics">%d日</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">以下のサイズを超えたら通知を受けます：</string>
 
 	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">圧縮する動画が以下より大きい場合：</string>
@@ -2280,6 +2292,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">暗号化キーローテーションを有効にする</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">キーローテーションは、100人を超える参加者との会話では無効になっています。</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">参加者の制限を超えたため、このチャットを非公開に変えられません。</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]さんがチャットリンクを作成しました。[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B]さんがチャットリンクを削除しました。[/B]</string>
@@ -2443,6 +2457,8 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d人の参加者</item>
     </plurals>
 
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">あと%1$s%2$d</string>
+
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">このチャット用のリンクを作成する前に、説明を設定する必要があります。</string>
 
     <string name="chat_link_copied_clipboard" context="success alert when the user copy a chat link to the clipboard">チャットリンクをクリップボードにコピーしました</string>
@@ -2502,7 +2518,9 @@
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$sさんが通話に参加しました</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$sさんが通話から抜けました</string>
 
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">参加者の制限を超えたため、通話を開始できません。</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">最大参加者数に達したため、この通話に参加できません。</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">グループがチャットの最大参加者数に達しているため、この通話に参加できません。</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">この通話はビデオを使用している最大参加者数に達したため、ビデオを有効にできません。</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">エラー。ファイルが開けません。</string>
@@ -2565,7 +2583,6 @@
     <string name="preparing_chats" context="Alert shown when some content is sharing with chats and they are processing">ファイル準備中</string>
     <string name="sent_as_message" context="Label indicating some content has been sent as message">メッセージとして送信されました。</string>
     <string name="error_sent_as_message" context="Error message when the attachment cannot be sent to any of the selected chats">エラー。ファイルは選択されたチャットのいずれにも送信されていません</string>
-    <string name="chat_explorer_empty" context="Message shown when the user has no items to show in chat explorer">[A][/A][B]項目がありません[/B]</string>
 
     <string name="delete_versions" context="Action delete all file versions">以前のバージョンを削除</string>
     <string name="title_delete_version_history" context="Title of the dialog shown when it wants to delete the version history of a file">以前のバージョンを削除しますか？</string>
@@ -2711,7 +2728,8 @@
     <string name="user_label" context="Business user role">ユーザー</string>
     <string name="status_label" context="General label to show the status of something or someone">ステータス</string>
     <string name="active_label" context="State to indicate something is active (business status account for instance)">ログイン有効</string>
-    <string name="grace_label" context="State to indicate a business account is in grace period">猶予期間</string>
+    <string name="payment_required_label" context="Business account status. Payment is overdue, but the account still active in grace period">お支払いが必要です</string>
+    <string name="payment_overdue_label" context="Business expired account Overdue payment page header.">支払い延滞</string>
     <string name="business_management_alert" context="Alert shown to an admin user of a business account in My Account section">ユーザー管理は、デスクトップウェブブラウザからのみご利用いただけます。</string>
     <string name="tab_my_account_usage" context="Title of the usage tab in My Account Section">ご利用内容</string>
     <string name="usage_storage_details_label" context="Title of usage storage details section in Storage">ストレージ使用状況詳細</string>
@@ -2727,7 +2745,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">ちょと、うまく行かなかったようです。</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">あなたのビジネスアカウント管理者に連絡して問題を解決し、あなたのアカウントを有効にしてください。</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 本物のビジネス目的用。</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">無制限[A]ストレージ[/A] **</string>
+    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">無制限[A]ストレージ[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">無制限[A]転送容量[/A] **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">ログアウトすると、あなたのオフラインセクションのファイルはお使いの端末から削除されます。</string>
@@ -2760,6 +2778,7 @@
     <string name="snackbar_nickname_removed" context="Label showing that a nickname has been added">ニックネームを削除しました</string>
     <string name="error_snackbar_nickname_added" context="Label showing that a nickname has not been added">ニックネームを追加しようとしたときにエラーが発生しました</string>
     <string name="nickname_title" context="title of a dialog to edit or remove the nickname">ニックネーム</string>
+    <string name="phonenumber_title" context="Text related to verified phone number. Used as title or cell description.">電話番号</string>
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">再接続中</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">戻りました。</string>
@@ -2781,6 +2800,25 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%sに作成されたチャット</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">メッセージを選択</string>
 
+    <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">ストレージがいっぱい</string>
+    <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">あなたのデータは危険にさらされています！</string>
+    <plurals name="over_disk_quota_paywall_text">
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">%2$sに%1$sにメールでご連絡いたしましたが、あなたのMEGAアカウントで%3$sファイルが%4$sを占有しているため、%5$sがご必要です。</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">%2$sと%3$sに%1$sにメールでご連絡いたしましたが、あなたのMEGAアカウントで%5$sファイルが%4$sを占有しているため、%6$sがご必要です。</item>
+    </plurals>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">%1$sにメールでご連絡いたしましたが、あなたのMEGAアカウントで%2$sファイルが%3$sを占有しているため、%4$sがご必要です。</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]すぐに行動してデータを保存する必要があります。[/B]</string>
+
+    <plurals name="label_time_in_days_full">
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1日</item>
+        <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d日</item>
+    </plurals>
+    <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%d時間</string>
+    <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%d分</string>
+    <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%d秒</string>
+
     <string name="label_verify_credentials" context="Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials.">本人確認証明</string>
     <string name="label_not_verified" context="Label to indicate that contact’s credentials are not verified.">検証されていません</string>
     <string name="label_verified" context="Action indicating something was verified.">照合済み</string>
@@ -2788,11 +2826,25 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">実際に顔を合わせるのが一番いい方法です。すでに認証済みのOTRやPGRがあれば、それを使うのも良いでしょう。</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">本人確認</string>
     <string name="action_reset" context="Button to reset credentials">リセット</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">資格情報を更新しています。後でもう一度お試しください。</string>
+
+    <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">参加中&#8230;</string>
+    <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">退席中&#8230;</string>
 
     <string name="remove_phone_number" context="Text in the confirmation dialog for removing the associated phone number of current account.">あなたの電話番号を削除しますか？</string>
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">お使いの電話番号が正常に削除されました。</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">電話番号を削除できませんでした。</string>
+
+    <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">リセットしようとしているアカウントは封鎖されています。</string>
+    <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">あなたのアカウントはブロックされています。support&#64;mega.nzへ連絡して下さい。</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">あなたのアカウントはあなたの管理者によって無効にされています。詳細については、あなたのビジネスアカウント管理者にお問い合わせください。</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">あなたのアカウントはあなたの管理者によって削除されました。詳細については、あなたのビジネスアカウント管理者にお問い合わせください。</string>
+
+    <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">変更</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">電話番号を変更</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">電話番号を削除</string>
+    <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">この操作により、現在の電話番号が削除され、新しい電話番号をアカウントに関連付けるプロセスが開始されます。</string>
+    <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">これにより、関連付けられている電話番号がアカウントから削除されます。後で電話番号を追加する場合は、電話番号を検証する必要があります。</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">確認</string>
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%sさんの資格情報</string>
