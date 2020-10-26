@@ -1,4 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat.calls;
+
 import mega.privacy.android.app.lollipop.listeners.GroupCallListener;
 
 public class InfoPeerGroupCall {
@@ -6,16 +7,18 @@ public class InfoPeerGroupCall {
     private long peerId;
     private long clientId;
     private String name;
+    private String email;
     private boolean videoOn;
     private boolean audioOn;
     private boolean greenLayer;
     private GroupCallListener listener;
     private boolean goodQuality;
 
-    public InfoPeerGroupCall(long peerId, long clientId, String name) {
+    public InfoPeerGroupCall(long peerId, long clientId, String name, String email) {
         this.peerId = peerId;
         this.clientId = clientId;
         this.name = name;
+        this.email = email;
         this.videoOn = false;
         this.audioOn = false;
         this.greenLayer = false;
@@ -23,11 +26,12 @@ public class InfoPeerGroupCall {
         this.listener = null;
     }
 
-    public InfoPeerGroupCall(long peerId, long clientId, String name, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
+    public InfoPeerGroupCall(long peerId, long clientId, String name, String email, boolean videoOn, boolean audioOn, boolean greenLayer, boolean goodQuality, GroupCallListener listener) {
 
         this.peerId = peerId;
         this.clientId = clientId;
         this.name = name;
+        this.email = email;
         this.videoOn = videoOn;
         this.audioOn = audioOn;
         this.greenLayer = greenLayer;
@@ -57,6 +61,14 @@ public class InfoPeerGroupCall {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public boolean isVideoOn() {
