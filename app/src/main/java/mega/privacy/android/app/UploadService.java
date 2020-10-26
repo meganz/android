@@ -246,21 +246,22 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
 
                 if (transfer.isFolderTransfer()) {
-                    totalFolderUploads++;
                     mapProgressFolderTransfers.put(transfer.getTag(), transfer);
                 } else {
-                    totalFileUploads++;
                     mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 }
             }
 
-            if (totalFolderUploads > 0) {
+            if (mapProgressFolderTransfers.size() > 0) {
                 updateProgressNotification(true);
             }
 
-            if (totalFileUploads > 0) {
+            if (mapProgressFileTransfers.size() > 0) {
                 updateProgressNotification(false);
             }
+
+            totalFolderUploads = mapProgressFolderTransfers.size();
+            totalFileUploads = mapProgressFileTransfers.size();
 
             uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
             return;
