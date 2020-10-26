@@ -92,6 +92,8 @@
                     android:textSize="14sp" />
             </RelativeLayout>
 
+            <include layout="@layout/transfer_over_quota_banner"/>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -104,7 +106,6 @@
                     android:layout_centerInParent="true"
                     android:choiceMode="multipleChoice"
                     android:columnWidth ="172dp"
-
                     android:paddingRight="4dp"
                     android:paddingLeft="4dp"/>
 

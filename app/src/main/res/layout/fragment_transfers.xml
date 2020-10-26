@@ -8,11 +8,18 @@
 	<androidx.recyclerview.widget.RecyclerView
         android:id="@+id/transfers_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:layout_below="@id/separator"
+        android:layout_height="match_parent"
+		android:layout_above="@+id/get_more_quota_view"
         android:choiceMode="multipleChoice"/>
-    
-    <ImageView
+
+	<include
+		layout="@layout/get_more_quota_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:visibility="gone"/>
+
+	<ImageView
 	    android:id="@+id/transfers_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"

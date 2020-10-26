@@ -57,7 +57,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -151,6 +150,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.ARRAY_OFFLINE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
@@ -162,13 +162,13 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHand
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static android.graphics.Color.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
@@ -396,12 +396,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         audioVideoPlayerLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
-
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+        registerReceiver(chatCallUpdateReceiver, new IntentFilter(ACTION_CALL_STATUS_UPDATE));
+        registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         downloadLocationDefaultPath = getDownloadLocation();
 
@@ -761,14 +758,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
 
-                logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
-                if(megaApi.getBandwidthOverquotaDelay()>0){
-                    if(alertDialogTransferOverquota==null){
-                        showTransferOverquotaDialog();
-                    }
-                    else if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
+                if (isOnTransferOverQuota()) {
+                    showGeneralTransferOverQuotaWarning();
                 }
             }
         }
@@ -1460,7 +1451,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public void updateScrollPosition(){
@@ -1517,7 +1508,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public void setImageDragVisibility(int visibility){
@@ -3187,8 +3178,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
             }
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, (adapterType == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
@@ -3421,9 +3410,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             handler.removeCallbacksAndMessages(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(receiver);
+        unregisterReceiver(receiverToFinish);
+        unregisterReceiver(chatCallUpdateReceiver);
 
         DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
@@ -3586,15 +3575,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
             if (e.getValue() != 0) {
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
-                }
+                showGeneralTransferOverQuotaWarning();
             }
         } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
             showTakenDownAlert(this);
@@ -3604,68 +3585,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
         return false;
-    }
-
-
-    public void showTransferOverquotaDialog(){
-        logDebug("showTransferOverquotaDialog");
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-        dialogBuilder.setView(dialogView);
-
-        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-        title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-        icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
-
-        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-
-        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-        paymentButton.setText(getString(R.string.action_upgrade_account));
-
-        alertDialogTransferOverquota = dialogBuilder.create();
-
-        alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                transferOverquota = true;
-                showActionStatusBar();
-            }
-        });
-
-        continueButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-            }
-
-        });
-
-        paymentButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-                showUpgradeAccount();
-            }
-        });
-
-        alertDialogTransferOverquota.setCancelable(false);
-        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-        alertDialogTransferOverquota.show();
-    }
-
-    public void showUpgradeAccount(){
-        logDebug("showUpgradeAccount");
-        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
-        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
-        startActivity(upgradeIntent);
     }
 
     @Override
@@ -3694,8 +3613,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 handler.removeCallbacksAndMessages(null);
             }
 
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+            unregisterReceiver(receiver);
+            unregisterReceiver(receiverToFinish);
 
             setImageDragVisibility(View.VISIBLE);
         }

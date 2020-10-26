@@ -79,7 +79,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:textSize="16dp"
-                    android:textColor="@color/divider_upgrade_account"
+                    android:textColor="@color/black_12_alpha"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -193,7 +193,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="16dp"
                     android:textSize="16dp"
-                    android:textColor="@color/divider_upgrade_account"
+                    android:textColor="@color/black_12_alpha"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -252,7 +252,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="16dp"
                     android:textSize="16dp"
-                    android:textColor="@color/divider_upgrade_account"
+                    android:textColor="@color/black_12_alpha"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>

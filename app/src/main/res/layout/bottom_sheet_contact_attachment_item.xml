@@ -79,11 +79,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/contact_title_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/chat_sliding_panel_separator" />
-
+        android:orientation="vertical"
+        android:background="@color/chat_sliding_panel_separator"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -95,85 +96,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/forward_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/forward_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_forward_grey"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/forward_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/forward_menu_item"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/select_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/chat_sliding_panel_separator"
-                android:orientation="vertical" />
-
-            <LinearLayout
-                android:id="@+id/select_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/option_select_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_select_modal"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_select_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/general_select"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/view_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/chat_sliding_panel_separator"
-                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/option_view_layout"
@@ -307,45 +229,6 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/delete_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/chat_sliding_panel_separator"
-                android:orientation="vertical" />
-
-            <LinearLayout
-                android:id="@+id/delete_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/delete_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_clear_white"
-                    android:tint="@color/dark_primary_color"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/delete_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/context_remove"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp" />
-            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

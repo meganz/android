@@ -43,6 +43,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
+                MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
+            }
+
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
                 api.getMyChatFilesFolder(new GetAttrUserListener(megaApplication, true));
             }
@@ -83,7 +87,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+        MegaApplication.getInstance().sendBroadcast(intent);
 
         api.getPaymentMethods(null);
         api.getAccountDetails(null);
@@ -127,6 +131,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onEvent(MegaApiJava api, MegaEvent event) {
         logDebug("Event received: " + event.getText());
 
+        if (megaApplication == null) {
+            megaApplication = MegaApplication.getInstance();
+        }
+
         switch (event.getType()) {
             case MegaEvent.EVENT_STORAGE:
                 logDebug("EVENT_STORAGE: " + event.getNumber());
@@ -143,7 +151,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
                     intent.setAction(ACTION_STORAGE_STATE_CHANGED);
                     intent.putExtra(EXTRA_STORAGE_STATE, state);
-                    LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                    megaApplication.sendBroadcast(intent);
                 }
                 break;
 

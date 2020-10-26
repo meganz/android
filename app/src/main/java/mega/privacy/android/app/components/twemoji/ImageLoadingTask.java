@@ -10,11 +10,11 @@ import java.lang.ref.WeakReference;
 
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 
-final class ImageLoadingTask extends AsyncTask<Emoji, Void, Drawable> {
+public final class ImageLoadingTask extends AsyncTask<Emoji, Void, Drawable> {
   private final WeakReference<ImageView> imageViewReference;
   private final WeakReference<Context> contextReference;
 
-  ImageLoadingTask(final ImageView imageView) {
+  public ImageLoadingTask(final ImageView imageView) {
     imageViewReference = new WeakReference<>(imageView);
     contextReference = new WeakReference<>(imageView.getContext());
   }
