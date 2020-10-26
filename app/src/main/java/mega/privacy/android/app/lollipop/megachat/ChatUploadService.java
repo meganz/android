@@ -249,6 +249,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
 			MegaTransferData transferData = megaApi.getTransferData(null);
 			int uploadsInProgress = transferData.getNumUploads();
+			int voiceClipsInProgress = 0;
 
 			for (int i = 0; i < uploadsInProgress; i++) {
 				MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
@@ -257,12 +258,16 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 
 				String data = transfer.getAppData();
-				if (!isTextEmpty(data) && data.contains(UPLOAD_APP_DATA_CHAT) && !data.contains(EXTRA_VOICE_CLIP)) {
+				if (!isTextEmpty(data) && data.contains(UPLOAD_APP_DATA_CHAT)) {
 					mapProgressTransfers.put(transfer.getTag(), transfer);
+
+					if (data.contains(EXTRA_VOICE_CLIP)) {
+						voiceClipsInProgress++;
+					}
 				}
 			}
 
-			transfersCount = totalUploads = mapProgressTransfers.size();
+			transfersCount = totalUploads = mapProgressTransfers.size() - voiceClipsInProgress;
 			if (totalUploads > 0) {
 				updateProgressNotification();
 			}
