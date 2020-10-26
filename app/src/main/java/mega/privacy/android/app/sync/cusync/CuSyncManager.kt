@@ -13,7 +13,7 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-
+import nz.mega.sdk.MegaError
 
 class CuSyncManager {
 
@@ -29,7 +29,6 @@ class CuSyncManager {
         const val NAME_PRIMARY = "camera uploads"
         const val NAME_SECONDARY = "media uploads"
         const val NAME_OTHER = "other sync"
-        const val DEVICE_ID = "Ash's phone"
     }
 
     fun setPrimaryBackup() =
@@ -52,8 +51,8 @@ class CuSyncManager {
         backupType: Int,
         targetNode: Long?,
         localFolder: String?,
-        state: Int = MegaApiJava.STATE_PENDING,
-        subState: Int = MegaApiJava.STATE_PENDING,
+        state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+        subState: Int = MegaError.API_OK,
         extraData: String = ""
     ) {
         if (isInvalid(targetNode?.toString())) {
@@ -70,7 +69,8 @@ class CuSyncManager {
             backupType,
             targetNode!!,
             localFolder,
-            DEVICE_ID,
+            // Sync nickname – by default the design uses local folder name
+            localFolder,
             state,
             subState,
             extraData,

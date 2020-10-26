@@ -1,7 +1,7 @@
 package mega.privacy.android.app.sync
 
 import nz.mega.sdk.MegaApiJava
-
+import nz.mega.sdk.MegaError
 
 data class Backup(
     var backupId: Long,
@@ -9,8 +9,8 @@ data class Backup(
     var targetNode: Long,
     var localFolder: String,
     var deviceId: String,
-    var state: Int = MegaApiJava.STATE_PENDING,
-    var subState: Int = MegaApiJava.STATE_PENDING,
+    var state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+    var subState: Int = MegaError.API_OK,
     var extraData: String = "",
     @ClientOnly var startTimestamp: Long = 0L,
     @ClientOnly var lastFinishTimestamp: Long = 0L,
