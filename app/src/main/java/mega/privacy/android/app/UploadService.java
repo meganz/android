@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
@@ -230,14 +231,24 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		logDebug("onHandleIntent");
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
-            ArrayList<MegaTransfer> transfers = megaApi.getTransfers(MegaTransfer.TYPE_UPLOAD);
+            MegaTransferData transferData = megaApi.getTransferData(null);
+            int uploadsInProgress = transferData.getNumUploads();
 
-            for (MegaTransfer transfer : transfers) {
+            for (int i = 0; i < uploadsInProgress; i++) {
+                MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+                if (transfer == null) {
+                    continue;
+                }
+
                 String data = transfer.getAppData();
+                if (!isTextEmpty(data) && (data.contains(UPLOAD_APP_DATA_CHAT) || data.contains(CU_UPLOAD))) {
+                    continue;
+                }
+
                 if (transfer.isFolderTransfer()) {
                     totalFolderUploads++;
                     mapProgressFolderTransfers.put(transfer.getTag(), transfer);
-                } else if (data == null || (!data.contains(UPLOAD_APP_DATA_CHAT) && !data.contains(CU_UPLOAD))) {
+                } else {
                     totalFileUploads++;
                     mapProgressFileTransfers.put(transfer.getTag(), transfer);
                 }

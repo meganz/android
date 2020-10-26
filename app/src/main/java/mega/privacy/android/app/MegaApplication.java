@@ -1665,13 +1665,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		new Handler().postDelayed(() -> {
 			if (megaApi.getNumPendingDownloads() > 0) {
-				Intent downloadService = new Intent(getInstance(), DownloadService.class);
-				startService(downloadService);
+				startService(new Intent(getInstance(), DownloadService.class)
+						.putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true));
 			}
 
 			if (megaApi.getNumPendingUploads() > 0) {
-				startService(new Intent(getInstance(), UploadService.class));
-				startService(new Intent(getInstance(), ChatUploadService.class));
+				startService(new Intent(getInstance(), UploadService.class)
+						.putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true));
+				startService(new Intent(getInstance(), ChatUploadService.class)
+						.putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true));
 			}
 		}, 5000);
 	}

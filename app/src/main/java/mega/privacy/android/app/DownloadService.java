@@ -68,6 +68,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
@@ -269,23 +270,31 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		return (value != null) && (value.contains(EXTRA_VOICE_CLIP));
 	}
 
-    protected void onHandleIntent(final Intent intent) {
-        logDebug("onHandleIntent");
-	    this.intent = intent;
+	protected void onHandleIntent(final Intent intent) {
+		logDebug("onHandleIntent");
+		this.intent = intent;
 
-	    if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
-			ArrayList<MegaTransfer> transfers = megaApi.getTransfers(MegaTransfer.TYPE_UPLOAD);
+		if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+			megaApi.addTransferListener(this);
+			MegaTransferData transferData = megaApi.getTransferData(null);
+			int uploadsInProgress = transferData.getNumDownloads();
 
-			for (MegaTransfer transfer : transfers) {
-				String appData = transfer.getAppData();
-				if (appData == null || !appData.contains(EXTRA_VOICE_CLIP)) {
+			for (int i = 0; i < uploadsInProgress; i++) {
+				MegaTransfer transfer = megaApi.getTransferByTag(transferData.getDownloadTag(i));
+				if (transfer == null) {
+					continue;
+				}
+
+				String data = transfer.getAppData();
+				if (isTextEmpty(data) || !data.contains(EXTRA_VOICE_CLIP)) {
 					transfersCount++;
 				}
 			}
 
-			updateProgressNotification();
-			megaApi.addTransferListener(this);
-	    	return;
+			if (transfersCount > 0) {
+				updateProgressNotification();
+			}
+			return;
 		}
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);

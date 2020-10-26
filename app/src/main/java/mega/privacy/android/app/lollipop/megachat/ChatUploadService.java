@@ -55,6 +55,7 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
@@ -67,6 +68,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -245,17 +247,25 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (intent == null) return;
 
 		if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
-			ArrayList<MegaTransfer> transfers = megaApi.getTransfers(MegaTransfer.TYPE_UPLOAD);
+			MegaTransferData transferData = megaApi.getTransferData(null);
+			int uploadsInProgress = transferData.getNumUploads();
 
-			for (MegaTransfer transfer : transfers) {
+			for (int i = 0; i < uploadsInProgress; i++) {
+				MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+				if (transfer == null) {
+					continue;
+				}
+
 				String data = transfer.getAppData();
-				if (data != null && data.contains(UPLOAD_APP_DATA_CHAT)) {
+				if (!isTextEmpty(data) && data.contains(UPLOAD_APP_DATA_CHAT) && !data.contains(EXTRA_VOICE_CLIP)) {
 					mapProgressTransfers.put(transfer.getTag(), transfer);
 				}
 			}
 
 			transfersCount = totalUploads = mapProgressTransfers.size();
-			updateProgressNotification();
+			if (totalUploads > 0) {
+				updateProgressNotification();
+			}
 			return;
 		}
 
