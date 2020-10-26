@@ -1,16 +1,22 @@
 package mega.privacy.android.app.components.transferWidget;
 
 import android.content.Intent;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_RESTART_SERVICE;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
@@ -152,6 +158,43 @@ public class TransfersManagement {
         completedTransfer.setId(id);
         app.sendBroadcast(new Intent(BROADCAST_ACTION_TRANSFER_FINISH)
                 .putExtra(COMPLETED_TRANSFER, completedTransfer));
+    }
+
+    public static void enableTransfersResumption() {
+        MegaApplication app = MegaApplication.getInstance();
+        MegaApiJava megaApi = app.getMegaApi();
+
+        megaApi.enableTransferResumption();
+
+        new Handler().postDelayed(() -> {
+            if (megaApi.getNumPendingDownloads() > 0) {
+                Intent downloadServiceIntent = new Intent(app, DownloadService.class)
+                        .putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true);
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                        && !app.isActivityVisible()) {
+                    app.startForegroundService(downloadServiceIntent);
+                } else {
+                    app.startService(downloadServiceIntent);
+                }
+            }
+
+            if (megaApi.getNumPendingUploads() > 0) {
+                Intent uploadServiceIntent = new Intent(app, UploadService.class)
+                        .putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true);
+                Intent chatUploadServiceIntent = new Intent(app, ChatUploadService.class)
+                        .putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true);
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                        && !app.isActivityVisible()) {
+                    app.startForegroundService(uploadServiceIntent);
+                    app.startForegroundService(chatUploadServiceIntent);
+                } else {
+                    app.startService(uploadServiceIntent);
+                    app.startService(chatUploadServiceIntent);
+                }
+            }
+        }, 5000);
     }
 
     /**

@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -32,7 +31,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
@@ -61,7 +59,6 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
-import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import nz.mega.sdk.MegaAccountSession;
@@ -322,7 +319,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
                     megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
 
 					//Login transfers resumption
-					enableTransfersResumption();
+					TransfersManagement.enableTransfersResumption();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -657,7 +654,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         transfersManagement = new TransfersManagement();
 
         //Logout transfers resumption
-		enableTransfersResumption();
+		TransfersManagement.enableTransfersResumption();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1658,24 +1655,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		} catch (Exception e) {
 			logError("EXCEPTION", e);
 		}
-	}
-
-	private void enableTransfersResumption() {
-		megaApi.enableTransferResumption();
-
-		new Handler().postDelayed(() -> {
-			if (megaApi.getNumPendingDownloads() > 0) {
-				startService(new Intent(getInstance(), DownloadService.class)
-						.putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true));
-			}
-
-			if (megaApi.getNumPendingUploads() > 0) {
-				startService(new Intent(getInstance(), UploadService.class)
-						.putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true));
-				startService(new Intent(getInstance(), ChatUploadService.class)
-						.putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true));
-			}
-		}, 5000);
 	}
 
 	public static boolean isShowRichLinkWarning() {
