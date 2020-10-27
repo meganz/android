@@ -987,13 +987,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(fromContacts){
 					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 					intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 					this.startActivity(intentOpenChat);
 				}
 				else{
 					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 					intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 					intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intentOpenChat);
 				}
@@ -1056,7 +1056,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				logDebug("Open chat with id: " + chatId);
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intentToChat.putExtra("CHAT_ID", chatId);
+				intentToChat.putExtra(CHAT_ID, chatId);
 				if(text!=null){
 					intentToChat.putExtra("showSnackbar", text);
 				}
@@ -1919,14 +1919,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(fromContacts){
 					Intent intent = new Intent(this, ChatActivityLollipop.class);
 					intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intent.putExtra("CHAT_ID", request.getChatHandle());
+					intent.putExtra(CHAT_ID, request.getChatHandle());
 					this.startActivity(intent);
 					finish();
 				}
 				else{
 					Intent intent = new Intent(this, ChatActivityLollipop.class);
 					intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intent.putExtra("CHAT_ID", request.getChatHandle());
+					intent.putExtra(CHAT_ID, request.getChatHandle());
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intent);
 					finish();

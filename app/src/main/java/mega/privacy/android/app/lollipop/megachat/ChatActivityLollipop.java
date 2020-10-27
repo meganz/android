@@ -1296,7 +1296,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         setJoiningOrLeaving(getString(R.string.joining_label));
                     }
                 } else {
-                    long newIdChat = newIntent.getLongExtra("CHAT_ID", -1);
+                    long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 
                     if(idChat != newIdChat){
                         megaChatApi.closeChatRoom(idChat, this);
@@ -7293,7 +7293,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("There is already a chat, open it!");
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
             this.startActivity(intentOpenChat);
         }
     }
@@ -7483,7 +7483,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("Open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
                 intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-                intent.putExtra("CHAT_ID", request.getChatHandle());
+                intent.putExtra(CHAT_ID, request.getChatHandle());
                 this.startActivity(intent);
                 finish();
             }
@@ -7841,7 +7841,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     return;
                 }else{
-                    long newidChat = intent.getLongExtra("CHAT_ID", -1);
+                    long newidChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
                     if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
                         cleanBuffers();
                     }
@@ -8151,7 +8151,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
                 intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentOpenChat.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-                intentOpenChat.putExtra("CHAT_ID", chatHandle);
+                intentOpenChat.putExtra(CHAT_ID, chatHandle);
                 if(text!=null){
                     intentOpenChat.putExtra("showSnackbar", text);
                 }

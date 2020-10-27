@@ -943,7 +943,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			log("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 			this.startActivity(intentOpenChat);
 		}
 	}*/

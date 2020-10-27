@@ -304,7 +304,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					intent.setAction(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
 					if (chatListItems.size() == 1) {
-						intent.putExtra("CHAT_ID", chatListItems.get(0).getChatId());
+						intent.putExtra(CHAT_ID, chatListItems.get(0).getChatId());
 					}
 					startActivity(intent);
 				}
@@ -2703,7 +2703,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-						intent.putExtra("CHAT_ID", idChat);
+						intent.putExtra(CHAT_ID, idChat);
 						startActivity(intent);
 					}
 				}

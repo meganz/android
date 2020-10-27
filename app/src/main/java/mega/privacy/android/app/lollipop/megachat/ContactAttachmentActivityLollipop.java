@@ -428,7 +428,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			logDebug("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 			finish();
 //			intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intentOpenChat);
@@ -467,7 +467,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 				logDebug("Open new chat");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
 				intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intent.putExtra("CHAT_ID", request.getChatHandle());
+				intent.putExtra(CHAT_ID, request.getChatHandle());
 				finish();
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				this.startActivity(intent);
