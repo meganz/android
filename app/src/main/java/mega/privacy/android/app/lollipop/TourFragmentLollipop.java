@@ -59,15 +59,19 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     public static TourFragmentLollipop newInstance(@Nullable String recoveryKeyUrl, @Nullable String parkAccountUrl) {
         TourFragmentLollipop fragment = new TourFragmentLollipop();
         Bundle arguments = new Bundle();
+
         if (!TextUtils.isEmpty(recoveryKeyUrl)) {
             arguments.putString(EXTRA_RECOVERY_KEY_URL, recoveryKeyUrl);
         }
+
         if (!TextUtils.isEmpty(parkAccountUrl)) {
             arguments.putString(EXTRA_PARK_ACCOUNT_URL, parkAccountUrl);
         }
+
         if (!arguments.isEmpty()) {
             fragment.setArguments(arguments);
         }
+
         return fragment;
     }
 
@@ -207,6 +211,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 logDebug("Link to resetPass: " + recoveryKeyUrl);
                 showRecoveryKeyDialog(recoveryKeyUrl);
             }
+
             if (!TextUtils.isEmpty(parkAccountUrl)) {
                 logDebug("Link to parkAccount: " + parkAccountUrl);
                 showParkAccountDialog(parkAccountUrl);
