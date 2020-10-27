@@ -1369,7 +1369,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         int errorCode = newIntent.getIntExtra("PUBLIC_LINK", 1);
                         if (savedInstanceState == null) {
-                            text = newIntent.getStringExtra("showSnackbar");
+                            text = newIntent.getStringExtra(SHOW_SNACKBAR);
                             if (text == null) {
                                 if (errorCode != 1) {
                                     if (errorCode == MegaChatError.ERROR_OK) {
@@ -8130,42 +8130,27 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void openChatAfterForward(long chatHandle, String text){
-        logDebug("openChatAfterForward");
-
+    public void openChatAfterForward(long chatHandle, String text) {
         removeProgressDialog();
 
-        if(chatHandle==idChat){
-            logDebug("Chat already opened");
-
+        if (chatHandle == idChat || chatHandle == MEGACHAT_INVALID_HANDLE) {
             disableMultiselection();
 
-            if(text!=null){
-                showSnackbar(SNACKBAR_TYPE, text, -1);
+            if (text != null) {
+                showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE);
             }
-        }
-        else{
-            if(chatHandle!=-1){
-                logDebug("Open chat to forward messages");
 
-                Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
-                intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentOpenChat.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-                intentOpenChat.putExtra(CHAT_ID, chatHandle);
-                if(text!=null){
-                    intentOpenChat.putExtra("showSnackbar", text);
-                }
-                startActivity(intentOpenChat);
-                closeChat(true);
-                finish();
-            }
-            else{
-                disableMultiselection();
-                if(text!=null){
-                    showSnackbar(SNACKBAR_TYPE, text, -1);
-                }
-            }
+            return;
         }
+
+        Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+        intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
+        intentOpenChat.putExtra(CHAT_ID, chatHandle);
+        intentOpenChat.putExtra(SHOW_SNACKBAR, text);
+
+        closeChat(true);
+        onNewIntent(intentOpenChat);
     }
 
     public void markAsSeen(MegaChatMessage msg) {
