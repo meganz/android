@@ -32,7 +32,7 @@ open class SetBackupCallback : SyncEventCallback {
                 extraData = text
             )
             LogUtil.logDebug("Save back $backup to local cache.")
-            getDatabase().saveSyncPair(backup)
+            getDatabase().saveBackup(backup)
         }
     }
 

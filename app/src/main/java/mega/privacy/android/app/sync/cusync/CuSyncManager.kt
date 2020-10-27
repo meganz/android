@@ -15,7 +15,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-
+import nz.mega.sdk.MegaError
 
 class CuSyncManager {
 
@@ -51,7 +51,7 @@ class CuSyncManager {
         targetNode: Long?,
         localFolder: String?,
         state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
-        subState: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+        subState: Int = MegaError.API_OK,
         extraData: String = ""
     ) {
         if (isInvalid(targetNode?.toString())) {
