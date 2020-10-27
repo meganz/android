@@ -11,7 +11,7 @@ data class Backup(
     var backupName: String,
     var state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
     var subState: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
-    var extraData: String = "",
+    var extraData: String = "null",
     @ClientOnly var startTimestamp: Long = 0L,
     @ClientOnly var lastFinishTimestamp: Long = 0L,
     @ClientOnly var targetFolderPath: String? = "null",

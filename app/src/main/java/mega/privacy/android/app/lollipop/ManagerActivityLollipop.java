@@ -2073,8 +2073,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
-        // Need to use LocalBroadcastManager, otherwise, receiver cannot receive event.
-        LocalBroadcastManager.getInstance(this).registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+        registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
 		registerTransfersReceiver();
 
@@ -2082,10 +2081,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
-        // Need to use LocalBroadcastManager, otherwise, receiver cannot receive event.
-        LocalBroadcastManager.getInstance(this).registerReceiver(updateCUSettingsReceiver, filter);
+        registerReceiver(updateCUSettingsReceiver, filter);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(reEnableCameraUploadsPreferenceReceiver, new IntentFilter(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE));
+        registerReceiver(reEnableCameraUploadsPreferenceReceiver, new IntentFilter(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE));
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);

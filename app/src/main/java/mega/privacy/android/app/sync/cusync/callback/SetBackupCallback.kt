@@ -1,7 +1,6 @@
 package mega.privacy.android.app.sync.cusync.callback
 
 import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.SettingsConstants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
 import mega.privacy.android.app.sync.Backup
@@ -42,7 +41,6 @@ open class SetBackupCallback : SyncEventCallback {
         reEnableCameraUploadsPreference()
     }
 
-    private fun reEnableCameraUploadsPreference() =
-        LocalBroadcastManager.getInstance(MegaApplication.getInstance())
-            .sendBroadcast(Intent(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE))
+    private fun reEnableCameraUploadsPreference() = MegaApplication.getInstance()
+        .sendBroadcast(Intent(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE))
 }
