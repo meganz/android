@@ -101,7 +101,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		//MEGA DROP link
 		if (matchRegexs(url, MEGA_DROP_LINK_REGEXS)) {
-			logDebug("Open business invite link");
+			logDebug("Open MEGAdrop link");
 			openWebLink(url);
 			return;
 		}
