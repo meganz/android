@@ -90,7 +90,7 @@
                     android:layout_marginEnd="4dp"
                     android:background="@null"
                     android:src="@drawable/ongoing_call_green_item"
-                    app:tint="@color/color_primary_alpha_038" />
+                    app:tint="@color/grey_038_white_038" />
 
                 <ImageView
                     android:id="@+id/recent_chat_list_private_icon"
@@ -99,7 +99,7 @@
                     android:layout_gravity="center_vertical"
                     android:background="@null"
                     android:src="@drawable/ic_private_chat"
-                    app:tint="@color/color_primary_alpha_038" />
+                    app:tint="@color/grey_038_white_038" />
 
                 <ImageView
                     android:id="@+id/recent_chat_list_mute_icon"
@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:src="@drawable/ic_mute_list"
-                    app:tint="@color/color_primary_alpha_038" />
+                    app:tint="@color/grey_038_white_038" />
             </LinearLayout>
 
         </LinearLayout>
@@ -209,7 +209,7 @@
                     android:layout_marginStart="12dp"
                     android:src="@drawable/ic_video_small"
                     android:visibility="gone"
-                    app:tint="@color/color_primary_alpha_038" />
+                    app:tint="@color/grey_038_white_038" />
 
                 <ImageView
                     android:id="@+id/recent_chat_list_micro_off"
@@ -218,7 +218,7 @@
                     android:layout_marginStart="12dp"
                     android:src="@drawable/ic_mic_off_small"
                     android:visibility="gone"
-                    app:tint="@color/color_primary_alpha_038" />
+                    app:tint="@color/grey_038_white_038" />
             </LinearLayout>
 
         </LinearLayout>

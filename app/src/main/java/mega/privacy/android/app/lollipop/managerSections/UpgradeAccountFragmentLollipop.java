@@ -2,8 +2,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.fragment.app.Fragment;
@@ -522,22 +520,22 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 			switch (account){
 				case PRO_LITE:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_orange));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.orange_upgrade_account));
 					paymentTitle.setText(getString(R.string.lite_account));
 					break;
 				}
 				case PRO_I:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_red));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_390));
 					paymentTitle.setText(getString(R.string.pro1_account));
 					break;
 				}
 				case PRO_II:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_red));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_390));
 					paymentTitle.setText(getString(R.string.pro2_account));
 					break;
 				}
 				case PRO_III:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.upgrade_red));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_390));
 					paymentTitle.setText(getString(R.string.pro3_account));
 					break;
 				}

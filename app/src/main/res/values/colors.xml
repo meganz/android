@@ -222,6 +222,7 @@
     not the values from Material design. Some colors cannot be found in the table (e.g. red_390),
      The "390" is simply deduced from the relative color saturation against red_400 -->
     <color name="white">#FFFFFF</color>
+
     <color name="white_alpha_005">#0CFFFFFF</color>
     <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
@@ -261,7 +262,7 @@
 
     <color name="black_white">@color/black</color>
 
-    <!-- The list item divider.
+    <!-- The list item divider; Stroke color (Grid item border color);
          The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/grey_alpha_012</color>
     <!-- The "eye" icon -->
@@ -280,42 +281,36 @@
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 
-    <!-- ============ Color names by purpose (Not the standard colors in Mega palette) ============== -->
+    <!-- Solid color. e.g. Grid item background -->
+    <color name="white_white_005">?android:attr/colorBackground</color>
+
+    <!-- Drawer item disabled text color  -->
+    <color name="grey_038_white_038">?android:attr/textColorHint</color>
+
+    <!-- ============ Color named by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
-    <color name="pass_weak">#FFD300</color>
-    <color name="pass_medium">#31B500</color>
-    <color name="pass_good">#13E03C</color>
-    <color name="pass_strong">#2BA6DE</color>
+    <color name="yellow_password_weak">#FFD300</color>
+    <color name="green_password_medium">#31B500</color>
+    <color name="green_password_good">#13E03C</color>
+    <color name="blue_password_strong">#2BA6DE</color>
 
     <!-- Colors for empty content hint text. Must be non-alpha colors, for
       <font color=""> doesn't support alpha -->
-    <color name="empty_hint_text_normal_color">#999999</color>
-
-    <color name="color_primary_alpha_038">@color/grey_alpha_038</color>
+    <color name="grey_empty_hint_text_normal">#999999</color>
 
     <!-- These colors are also used so widely in the project, to avoid too many changes,
-     let's just keep them. -->
+     let's just keep them. (Need to be replaced by textColorPrimary) -->
     <color name="name_my_account">@color/grey_alpha_087</color>
 
-    <!-- grid item background related colors -->
-    <color name="grid_item_bg_stoke_color">@color/grey_alpha_012</color>
-    <color name="grid_item_bg_solid_color">?android:attr/colorBackground</color>
-    <color name="grid_item_selected_bg_solid_color">?android:attr/colorBackground</color>
-
-    <color name="business_color">#2BA6DE</color>
-
-    <color name="progress_bar_normal_background">@color/grey_alpha_015</color>
+    <color name="blue_business">#2BA6DE</color>
 
     <!-- app drawer related related colors -->
-    <color name="drawer_item_text_color_disabled">@color/grey_alpha_033</color>
-    <color name="drawer_add_phone_number_background">#F9F9F9</color>
-    <color name="drawer_add_phone_number_button_stroke">@color/teal_300</color>
-    <color name="drawer_notification_count_color_disabled">@color/red_600_alpha_038</color>
+    <color name="white_drawer_add_phone_number_background">#F9F9F9</color>
+    <color name="teal_drawer_add_phone_number_button_stroke">@color/teal_300</color>
 
     <!-- choose & upgrade related colors -->
-    <color name="free_account">#2BB200</color>
-    <color name="upgrade_orange">#FFA500</color>
-    <color name="upgrade_red">@color/red_390</color>
+    <color name="green_free_account">#2BB200</color>
+    <color name="orange_upgrade_account">#FFA500</color>
 
     <!-- reference ?attr/colorPrimary in AppBottomSheetDialogTheme doesn't work,
      need define a separate color -->

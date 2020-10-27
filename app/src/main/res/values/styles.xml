@@ -537,18 +537,20 @@
 
     <!-- Contained button, inherited elevation: 2dp, TextAppearance=?attr/textAppearanceButton  -->
     <style name="Button" parent="Widget.MaterialComponents.Button">
-        <item name="android:backgroundTint">?attr/colorSecondary</item>
-        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:backgroundTint">@color/btn_bg_color_selector</item>
+        <item name="android:textColor">@color/btn_text_color_selector</item>
     </style>
 
     <!-- Text button -->
     <style name="BorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:textColor">@color/text_btn_text_color_selector</item>
     </style>
 
     <!-- Outlined button -->
-    <!-- TODO: style -->
-
+    <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">?attr/colorSecondary</item>
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
 
     <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
     colorControlActivated is the floating label, underline and cursor colors, when focused. If we

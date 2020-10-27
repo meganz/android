@@ -12438,7 +12438,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	void disableNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(false);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
 		}
 
 		if (inboxSection != null){
@@ -12450,7 +12450,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(hasChildren){
 					inboxSection.setEnabled(false);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
 				}
 				else{
 					inboxSection.setVisibility(View.GONE);
@@ -12474,7 +12474,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 			}
 
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
 		}
 
 		if (notificationsSection != null) {
@@ -12492,7 +12492,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				setFormattedNotificationsTitleSection(unread, false);
 			}
 
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.drawer_item_text_color_disabled));
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
 		}
 
 		if (upgradeAccount != null) {
@@ -15963,7 +15963,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			else {
 				textToShow = textToShow.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(this, R.color.drawer_notification_count_color_disabled)
+						+ ColorUtils.getColorHexString(this, R.color.red_600_alpha_038)
 						+ "\'>");
 			}
 			textToShow = textToShow.replace("[/A]", "</font>");

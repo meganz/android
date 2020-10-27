@@ -15,14 +15,14 @@
     <color name="red_390_dark_grey">@color/dark_grey</color>
 
     <!-- password strength -->
-    <color name="pass_weak">#F5F595</color>
-    <color name="pass_medium">#4EB64E</color>
-    <color name="pass_good">#9FF4A1</color>
-    <color name="pass_strong">#5BB5DE</color>
+    <color name="yellow_password_weak">#F5F595</color>
+    <color name="green_password_medium">#4EB64E</color>
+    <color name="green_password_good">#9FF4A1</color>
+    <color name="blue_password_strong">#5BB5DE</color>
 
     <!-- Colors for empty content hint text. Use non-alpha colors, for
      <font color=""> doesn't support alpha -->
-    <color name="empty_hint_text_normal_color">#A0A0A0</color>
+    <color name="grey_empty_hint_text_normal">#A0A0A0</color>
 
     <!-- Turn on camera uploads -->
     <color name="teal_300_dark_grey">@color/dark_grey</color>
@@ -30,33 +30,21 @@
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_300</color>
 
+    <!-- Solid color. e.g. Grid item background -->
+    <color name="white_white_005">@color/white_alpha_005</color>
 
     <color name="name_my_account">@color/white_alpha_087</color>
     <color name="mail_my_account">@color/white_alpha_054</color>
     <color name="background_create_account">@color/dark_grey</color>
     <color name="new_multiselect_color">@android:color/transparent</color>
 
-    <color name="color_primary_alpha_038">@color/white_alpha_038</color>
-
-    <color name="grid_item_bg_stoke_color">@color/white_alpha_012</color>
-    <color name="grid_item_bg_solid_color">@color/white_alpha_005</color>
-    <color name="grid_item_selected_bg_solid_color">@color/white_alpha_005</color>
+    <color name="blue_business">#7ABEDD</color>
 
 
+    <color name="white_drawer_add_phone_number_background">@color/white_alpha_087</color>
+    <color name="teal_drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
 
-    <color name="business_color">#7ABEDD</color>
-
-    <color name="progress_bar_normal_background">@color/white_alpha_023</color>
-
-    <color name="drawer_item_text_color_disabled">@color/white_alpha_033</color>
-
-    <color name="drawer_add_phone_number_background">@color/white_alpha_087</color>
-    <color name="drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
-    <color name="drawer_notification_count_color_disabled">@color/red_300_alpha_038</color>
-
-    <color name="free_account">#8CD670</color>
-    <color name="upgrade_orange">#FFA500</color>
-    <color name="upgrade_red">@color/red_300</color>
+    <color name="green_free_account">#8CD670</color>
 
     <color name="bottom_sheet_navigation_bar_color">@android:color/black</color>
 </resources>

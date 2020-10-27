@@ -23,9 +23,9 @@
 <!--    </style>-->
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
-    <!-- Medium, bold, 14sp, 0.25px, textColorPrimary-->
+    <!-- Medium, bold, 14sp, 0px, textColorPrimary-->
     <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="android:letterSpacing">0.017857143</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <!-- ================== Body1 ====================== -->
@@ -107,19 +107,19 @@
     </style>
 
     <style name="TextAppearance.InputHint.Weak">
-        <item name="android:textColor">@color/pass_weak</item>
+        <item name="android:textColor">@color/yellow_password_weak</item>
     </style>
 
     <style name="TextAppearance.InputHint.Medium">
-        <item name="android:textColor">@color/pass_medium</item>
+        <item name="android:textColor">@color/green_password_medium</item>
     </style>
 
     <style name="TextAppearance.InputHint.Good">
-        <item name="android:textColor">@color/pass_good</item>
+        <item name="android:textColor">@color/green_password_good</item>
     </style>
 
     <style name="TextAppearance.InputHint.Strong">
-        <item name="android:textColor">@color/pass_strong</item>
+        <item name="android:textColor">@color/blue_password_strong</item>
     </style>
 
 </resources>

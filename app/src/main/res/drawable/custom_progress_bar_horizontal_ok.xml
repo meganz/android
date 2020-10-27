@@ -4,8 +4,8 @@
         <shape>
             <gradient
                 android:angle="90"
-                android:endColor="@color/progress_bar_normal_background"
-                android:startColor="@color/progress_bar_normal_background" />
+                android:endColor="?attr/trackColor"
+                android:startColor="?attr/trackColor" />
         </shape>
     </item>
     <item android:id="@android:id/secondaryProgress">

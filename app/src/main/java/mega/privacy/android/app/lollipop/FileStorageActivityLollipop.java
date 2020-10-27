@@ -434,7 +434,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'"
-					+ ColorUtils.getColorHexString(this, R.color.empty_hint_text_normal_color)
+					+ ColorUtils.getColorHexString(this, R.color.grey_empty_hint_text_normal)
 					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		} catch (Exception e) {

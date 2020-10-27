@@ -1083,7 +1083,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+							+ ColorUtils.getColorHexString(context, R.color.grey_empty_hint_text_normal)
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
@@ -1109,7 +1109,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+							+ ColorUtils.getColorHexString(context, R.color.grey_empty_hint_text_normal)
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
@@ -1409,7 +1409,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
+								+ ColorUtils.getColorHexString(context, R.color.grey_empty_hint_text_normal)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
