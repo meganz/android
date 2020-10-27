@@ -120,7 +120,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
             if (intent.getAction().equals(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)) {
@@ -138,7 +138,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         @Override
         public void onReceive(Context context, Intent intent) {
             logDebug("Network broadcast received!");
-            if (intent != null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
             int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);

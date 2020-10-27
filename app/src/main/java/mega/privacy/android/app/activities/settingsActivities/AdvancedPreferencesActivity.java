@@ -24,7 +24,7 @@ public class AdvancedPreferencesActivity extends PreferencesBaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             logDebug("Network broadcast received!");
-            if (intent != null || intent.getAction() == null || sttAdvanced == null)
+            if (intent == null || intent.getAction() == null || sttAdvanced == null)
                 return;
 
             int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
