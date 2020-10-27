@@ -397,12 +397,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         audioVideoPlayerLollipop = this;
 
+        registerReceiver(chatCallUpdateReceiver, new IntentFilter(ACTION_CALL_STATUS_UPDATE));
         registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
         registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
-
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        registerReceiver(chatCallUpdateReceiver, filter);
 
         downloadLocationDefaultPath = getDownloadLocation();
 

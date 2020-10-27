@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -931,5 +932,31 @@ public class ChatUtil {
         return isContact(userHandle)
                 ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
                 : MegaChatApi.STATUS_INVALID;
+    }
+
+    /**
+     * Method for obtaining the contact status bitmap.
+     *
+     * @param userStatus The contact status.
+     * @return The final bitmap.
+     */
+    public static Bitmap getStatusBitmap(int userStatus) {
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_online);
+
+            case MegaChatApi.STATUS_AWAY:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_away);
+
+            case MegaChatApi.STATUS_BUSY:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_busy);
+
+            case MegaChatApi.STATUS_OFFLINE:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_offline);
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                return null;
+        }
     }
 }

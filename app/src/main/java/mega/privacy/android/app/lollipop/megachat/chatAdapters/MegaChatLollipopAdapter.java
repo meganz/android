@@ -1991,7 +1991,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (chatRoom != null && chatRoom.isGroup()) {
                     holder.nameContactText.setVisibility(View.VISIBLE);
                 }
-
                 textToShow = context.getResources().getString(R.string.call_started_messages);
 
             }else{
