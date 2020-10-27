@@ -10,11 +10,11 @@
         android:icon="@drawable/ic_forward_white"/>
 
     <item
-        android:id="@+id/chat_cab_menu_download"
+        android:id="@+id/chat_cab_menu_share"
         android:orderInCategory="105"
-        android:title="@string/context_download"
+        android:title="@string/general_share"
         MEGA:showAsAction="always"
-        android:icon="@drawable/ic_download_white"/>
+        android:icon="@drawable/ic_social_share_white"/>
 
     <item
         android:id="@+id/chat_cab_menu_import"
@@ -24,11 +24,34 @@
         android:icon="@drawable/ic_import_to_cloud_white"/>
 
     <item
+        android:id="@+id/chat_cab_menu_download"
+        android:orderInCategory="105"
+        android:title="@string/context_download"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_download_white"/>
+
+    <item
         android:id="@+id/chat_cab_menu_offline"
         android:orderInCategory="105"
         android:title="@string/save_for_offline"
         MEGA:showAsAction="always"
         android:icon="@drawable/ic_b_save_offline"/>
+
+    <item
+        android:id="@+id/chat_cab_menu_invite"
+        android:orderInCategory="105"
+        android:title="@string/contact_invite"
+        MEGA:showAsAction="always"
+        android:tint="@color/white"
+        android:icon="@drawable/ic_add_contact_chat"/>
+
+    <item
+        android:id="@+id/chat_cab_menu_start_conversation"
+        android:orderInCategory="105"
+        android:title="@string/context_send_message"
+        MEGA:showAsAction="always"
+        android:tint="@color/white"
+        android:icon="@drawable/ic_send_message_modal"/>
 
     <item
         android:id="@+id/chat_cab_menu_edit"

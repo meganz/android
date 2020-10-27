@@ -11,11 +11,14 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareNodeFromChat;
 
 public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
@@ -93,6 +96,28 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                         }
                         else{
                             chatC.forwardMessages(messagesSelected, chatId);
+                        }
+                    }else if(actionListener == MULTIPLE_IMPORT_CONTACT_MESSAGES){
+                        if(error<=0 && context instanceof ChatActivityLollipop){
+                            MegaChatMessage megaChatMessage = messagesSelected.get(0);
+                            int typeMessage = megaChatMessage.getType();
+
+                            if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                                MegaNodeList nodeList = megaChatMessage.getMegaNodeList();
+
+                                if (nodeList == null || nodeList.size() == 0) {
+                                    logWarning("Error: nodeList is NULL or empty");
+                                    return;
+                                }
+
+                                MegaNode node = nodeList.get(0);
+                                if (node == null) {
+                                    logWarning("Node is NULL");
+                                    return;
+                                }
+
+                                shareNodeFromChat(context, node, megaChatMessage.getMsgId(), chatId);
+                            }
                         }
                     }
                     break;

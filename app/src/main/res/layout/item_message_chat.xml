@@ -428,25 +428,11 @@
                 </RelativeLayout>
 
                 <!--forward rich links-->
-                <RelativeLayout
+                <ImageView
                     android:id="@+id/forward_own_rich_links"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/forward_circle"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@+id/url_own_message_layout">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitXY"
-                        android:background="@null"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
-                </RelativeLayout>
+                    style="@style/ForwardIcon"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/url_own_message_layout" />
                 <!--End Rich links-->
 
                 <!-- Send a voice clip-->
@@ -682,25 +668,11 @@
                     </RelativeLayout>
 
                     <!--forward icon location message-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_own_location"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toLeftOf="@+id/own_main_item_location_rl">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
+                        style="@style/ForwardIcon"
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@+id/own_main_item_location_rl" />
 
                 </RelativeLayout>
                 <!-- End location-->
@@ -828,25 +800,12 @@
                     </RelativeLayout>
 
                     <!--forward icon with preview portrait-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_own_preview_portrait"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toLeftOf="@+id/preview_frame_portrait_rl">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
+                        style="@style/ForwardIcon"
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@+id/preview_frame_portrait_rl" />
+
                 </RelativeLayout>
 
                 <!-- own elements landscape -->
@@ -973,25 +932,11 @@
                     </RelativeLayout>
 
                     <!--forward icon with preview landscape-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_own_preview_landscape"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toLeftOf="@+id/preview_frame_landscape_rl">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
+                        style="@style/ForwardIcon"
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@+id/preview_frame_landscape_rl" />
 
                 </RelativeLayout>
 
@@ -1061,26 +1006,11 @@
                 </RelativeLayout>
 
                 <!--forward file-->
-                <RelativeLayout
+                <ImageView
                     android:id="@+id/forward_own_file"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/forward_circle"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@+id/content_own_message_file_layout">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitXY"
-                        android:background="@null"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
-                </RelativeLayout>
-
+                    style="@style/ForwardIcon"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/content_own_message_file_layout" />
                 <!--End RelativeLayout file-->
 
                 <!-- send a contact-->
@@ -1171,25 +1101,11 @@
                 </RelativeLayout>
 
                 <!--forward contact-->
-                <RelativeLayout
+                <ImageView
                     android:id="@+id/forward_own_contact"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/forward_circle"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@+id/content_own_message_contact_layout">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitXY"
-                        android:background="@null"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
-                </RelativeLayout>
+                    style="@style/ForwardIcon"
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/content_own_message_contact_layout" />
 
             </RelativeLayout>
             <!--End RelativeLayout own content message-->
@@ -1551,26 +1467,11 @@
                 </RelativeLayout>
 
                 <!--forward rich links-->
-                <RelativeLayout
+                <ImageView
                     android:id="@+id/forward_contact_rich_links"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/forward_circle"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
-                    android:layout_toRightOf="@+id/url_contact_message_layout">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:adjustViewBounds="true"
-                        android:layout_gravity="center"
-                        android:scaleType="fitXY"
-                        android:background="@null"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
-                </RelativeLayout>
-                <!--end contact's rich links-->
+                    style="@style/ForwardIcon"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/url_contact_message_layout" />
 
                 <!--Received a voice clip-->
                 <RelativeLayout
@@ -1727,25 +1628,11 @@
                     </RelativeLayout>
 
                     <!--forward icon location message-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_contact_location"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@id/contact_main_item_location">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
+                        style="@style/ForwardIcon"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/contact_main_item_location" />
                 </RelativeLayout>
                 <!-- End location-->
 
@@ -1819,30 +1706,13 @@
                             android:layout_alignParentLeft="true"/>
 
                     </RelativeLayout>
+
                     <!--forward preview portrait-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_contact_preview_portrait"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@+id/content_contact_message_portrait">
-                        <!--android:background="@drawable/forward_circle"-->
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
-
-                    <!--End contact elements portrait-->
+                        style="@style/ForwardIcon"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/content_contact_message_portrait" />
 
                     <!-- contact elements landscape -->
                     <RelativeLayout
@@ -1908,25 +1778,11 @@
                     </RelativeLayout>
 
                     <!--forward preview landscape-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_contact_preview_landscape"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@+id/content_contact_message_landscape">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
+                        style="@style/ForwardIcon"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/content_contact_message_landscape" />
 
                     <!--End contact elements landscape-->
 
@@ -1985,25 +1841,12 @@
                     </RelativeLayout>
 
                     <!--forward file-->
-                    <RelativeLayout
+                    <ImageView
                         android:id="@+id/forward_contact_file"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/forward_circle"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@+id/content_contact_message_file">
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
-                            android:layout_gravity="center"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
-                    </RelativeLayout>
+                        style="@style/ForwardIcon"
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/content_contact_message_file" />
+
                 </RelativeLayout>
                 <!--End RelativeLayout file-->
 
@@ -2081,26 +1924,14 @@
                     </RelativeLayout>
 
                 </RelativeLayout>
+
                 <!--forward contact-->
-                <RelativeLayout
+                <ImageView
                     android:id="@+id/forward_contact_contact"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/forward_circle"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
-                    android:layout_toRightOf="@+id/content_contact_message_contact_layout">
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:adjustViewBounds="true"
-                        android:layout_gravity="center"
-                        android:scaleType="fitXY"
-                        android:background="@null"
-                        android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
-                </RelativeLayout>
+                    style="@style/ForwardIcon"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/content_contact_message_contact_layout" />
+
                 <!--End RelativeLayout contact-->
 
             </RelativeLayout>

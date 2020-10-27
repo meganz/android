@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -85,7 +86,7 @@
                 <RelativeLayout
                     android:id="@+id/forward_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="start"
                     android:visibility="gone">
 
@@ -131,7 +132,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
                         android:src="@drawable/ic_rename_white"
-                        android:tint="@color/mail_my_account"
+                        app:tint="@color/mail_my_account"
                         android:visibility="visible" />
 
                     <TextView
@@ -167,7 +168,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
                         android:src="@drawable/ic_copy_white"
-                        android:tint="@color/mail_my_account"
+                        app:tint="@color/mail_my_account"
                         android:visibility="visible" />
 
                     <TextView
@@ -203,9 +204,9 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
                         android:alpha="0.54"
-                        android:tint="@color/black"
                         android:src="@drawable/ic_social_share_white"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:tint="@color/black" />
 
                     <TextView
                         android:layout_width="wrap_content"

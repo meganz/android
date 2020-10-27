@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -933,6 +934,18 @@ public class ChatUtil {
         return isContact(userHandle)
                 ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
                 : MegaChatApi.STATUS_INVALID;
+    }
+
+    /**
+     * Method to know if a message is of the geolocation type.
+     *
+     * @param msg The MegaChatMessage.
+     * @return True if it is. False, if not
+     */
+    public static boolean isGeolocation(MegaChatMessage msg) {
+        return (msg.getType() == MegaChatMessage.TYPE_CONTAINS_META) &&
+                (msg.getContainsMeta() != null &&
+                        msg.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION);
     }
 
     /**

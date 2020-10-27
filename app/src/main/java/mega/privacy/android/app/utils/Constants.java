@@ -95,6 +95,7 @@ public class Constants {
     public static final int MULTIPLE_CHAT_IMPORT = 10;
     public static final int MULTIPLE_FORWARD_MESSAGES = 11;
     public static final int MULTIPLE_CHANGE_PERMISSION = 12;
+    public static final int MULTIPLE_IMPORT_CONTACT_MESSAGES = 13;
 
     public static final int MULTIPLE_RESTORED_FROM_RUBBISH = MULTIPLE_FORWARD_MESSAGES + 1;
 
