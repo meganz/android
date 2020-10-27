@@ -77,7 +77,6 @@ import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -305,7 +304,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         bannerDivider.setVisibility(View.GONE);
-                        appBarLayout.setElevation(px2dp(4, outMetrics));
+                        appBarLayout.setElevation(dp2px(4, outMetrics));
                     } else {
                         bannerDivider.setVisibility(View.VISIBLE);
                         appBarLayout.setElevation(0);

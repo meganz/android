@@ -31,7 +31,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -91,7 +90,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
-import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -581,8 +579,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
             RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
             RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
-            params1.setMargins(0, 0, 0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params2.setMargins(0,0,0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
+            params1.setMargins(0, 0, 0, mega.privacy.android.app.utils.Util.dp2px(5, outMetrics));
+            params2.setMargins(0,0,0, mega.privacy.android.app.utils.Util.dp2px(5, outMetrics));
             params3.addRule(RelativeLayout.ABOVE, containerControls.getId());
             exoPlayerName.setLayoutParams(params1);
             controlsButtonsLayout.setLayoutParams(params2);

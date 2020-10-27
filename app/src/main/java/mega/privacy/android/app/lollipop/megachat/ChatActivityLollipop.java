@@ -94,7 +94,6 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.components.twemoji.listeners.OnPlaceButtonListener;
 import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
@@ -156,7 +155,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
-import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
@@ -172,7 +170,6 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -181,8 +178,6 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -900,8 +895,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pickAttachButton = findViewById(R.id.pick_attach_chat);
 
         keyboardHeight = getOutMetrics().heightPixels / 2 - getActionBarHeight(this, getResources());
-        marginBottomDeactivated = px2dp(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
-        marginBottomActivated = px2dp(MARGIN_BUTTON_ACTIVATED, getOutMetrics());
+        marginBottomDeactivated = dp2px(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
+        marginBottomActivated = dp2px(MARGIN_BUTTON_ACTIVATED, getOutMetrics());
 
         callInProgressLayout = findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
@@ -959,7 +954,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         bubbleLayout.setBackground(myBubble);
         bubbleLayout.setVisibility(View.GONE);
         bubbleText = findViewById(R.id.bubble_text);
-        bubbleText.setMaxWidth(px2dp(MAX_WIDTH_BUBBLE, getOutMetrics()));
+        bubbleText.setMaxWidth(dp2px(MAX_WIDTH_BUBBLE, getOutMetrics()));
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
         showInputText();
@@ -1392,7 +1387,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             maxWidth = HINT_LAND;
         }
-        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, textChat.getPaint(), px2dp(maxWidth, getOutMetrics()), typeEllipsize);
+        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, textChat.getPaint(), dp2px(maxWidth, getOutMetrics()), typeEllipsize);
         return textF;
     }
 
@@ -2709,7 +2704,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             value = MARGIN_BUTTON_DEACTIVATED;
             if(recordButtonState == RECORD_BUTTON_DEACTIVATED) {
                 logDebug("DESACTIVATED");
-                marginRight = px2dp(14, getOutMetrics());
+                marginRight = dp2px(14, getOutMetrics());
             }
         }
         else if(recordButtonState == RECORD_BUTTON_ACTIVATED) {
@@ -2724,8 +2719,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
-        params.height = px2dp(value, getOutMetrics());
-        params.width = px2dp(value, getOutMetrics());
+        params.height = dp2px(value, getOutMetrics());
+        params.width = dp2px(value, getOutMetrics());
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         params.setMargins(0, 0, marginRight, marginBottom);

@@ -82,8 +82,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 this.thumbnailMedia.setImageBitmap(image);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
-                params.width = params.height = px2dp(36, outMetrics);
-                int margin = px2dp(18, outMetrics);
+                params.width = params.height = dp2px(36, outMetrics);
+                int margin = dp2px(18, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
 
                 this.thumbnailList.setLayoutParams(params);
@@ -170,7 +170,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             } else {
                 size = outMetrics.widthPixels / 6;
             }
-            size -= px2dp(2, outMetrics);
+            size -= dp2px(2, outMetrics);
 
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
@@ -190,8 +190,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 holder.setImageThumbnail(thumbnail);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-                params.width = params.height = px2dp(48, outMetrics);
-                int margin = px2dp(12, outMetrics);
+                params.width = params.height = dp2px(48, outMetrics);
+                int margin = dp2px(12, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
                 holder.thumbnailList.setLayoutParams(params);
                 holder.thumbnailList.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());

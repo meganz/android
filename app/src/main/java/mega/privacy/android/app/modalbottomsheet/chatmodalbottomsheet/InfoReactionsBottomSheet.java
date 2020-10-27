@@ -165,8 +165,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
 
     private int getTotalHeight(){
         int numOptions = (int) getMaxUsers();
-        int heightChild = px2dp(HEIGHT_USERS, outMetrics);
-        int peekHeight = px2dp(HEIGHT_HEADER, outMetrics);
+        int heightChild = dp2px(HEIGHT_USERS, outMetrics);
+        int peekHeight = dp2px(HEIGHT_HEADER, outMetrics);
         return peekHeight + heightChild * numOptions;
     }
 
@@ -185,8 +185,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
                 return possibleHeight;
             }
 
-            int heightChild = px2dp(HEIGHT_USERS, outMetrics);
-            int peekHeight = px2dp(HEIGHT_HEADER, outMetrics);
+            int heightChild = dp2px(HEIGHT_USERS, outMetrics);
+            int peekHeight = dp2px(HEIGHT_HEADER, outMetrics);
             int halfHeightChild = heightChild / 2;
 
             for (int i = 1; i <= numOptions; i++) {
@@ -286,7 +286,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             if (separator.getParent() != null) {
                 ((ViewGroup) separator.getParent()).removeView(separator);
             }
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(px2dp(52, outMetrics), px2dp(2, outMetrics));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dp2px(52, outMetrics), dp2px(2, outMetrics));
             lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             reactionTabs.get(i).addView(separator, lp);
         }

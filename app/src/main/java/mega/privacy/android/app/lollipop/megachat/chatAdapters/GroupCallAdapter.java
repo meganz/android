@@ -565,7 +565,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 paramsAvatarImage.height = scaleWidthPx(88, outMetrics);
                 holder.avatarImage.setLayoutParams(paramsAvatarImage);
                 holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
-                holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_SMALL, outMetrics));
+                holder.avatarInitialLetter.setEmojiSize(dp2px(EMOJI_AVATAR_CALL_SMALL, outMetrics));
             }else{
                 RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
                 paramsMicroAvatar.height = scaleWidthPx(15, outMetrics);
@@ -580,7 +580,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                 paramsAvatarImage.height = scaleWidthPx(60, outMetrics);
                 holder.avatarImage.setLayoutParams(paramsAvatarImage);
                 holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f);
-                holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
+                holder.avatarInitialLetter.setEmojiSize(dp2px(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
 
             }
             if(peer.isAudioOn()){
@@ -833,7 +833,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         paramsAvatarImage.height = scaleWidthPx(88, outMetrics);
                         holder.avatarImage.setLayoutParams(paramsAvatarImage);
                         holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 50f);
-                        holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_AVATAR_CALL_SMALL, outMetrics));
+                        holder.avatarInitialLetter.setEmojiSize(dp2px(EMOJI_AVATAR_CALL_SMALL, outMetrics));
 
                     }else{
                         RelativeLayout.LayoutParams paramsMicroAvatar = new RelativeLayout.LayoutParams(holder.microAvatar.getLayoutParams());
@@ -849,7 +849,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                         paramsAvatarImage.height = scaleWidthPx(60, outMetrics);
                         holder.avatarImage.setLayoutParams(paramsAvatarImage);
                         holder.avatarInitialLetter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f);
-                        holder.avatarInitialLetter.setEmojiSize(px2dp(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
+                        holder.avatarInitialLetter.setEmojiSize(dp2px(EMOJI_SIZE_EXTRA_HIGH, outMetrics));
                     }
 
                 }else{

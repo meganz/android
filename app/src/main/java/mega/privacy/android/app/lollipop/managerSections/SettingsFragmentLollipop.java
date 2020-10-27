@@ -6,11 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.Settings;
+
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -46,7 +45,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
@@ -72,7 +70,6 @@ import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.BUSINESS_CU_FRAGMENT_SETTINGS;
 import static mega.privacy.android.app.MegaPreferences.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.FragmentTag.*;
-import static mega.privacy.android.app.utils.ChatUtil.getGeneralNotification;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -2276,7 +2273,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(px2dp(margin, outMetrics), px2dp(margin, outMetrics), px2dp(margin, outMetrics), 0);
+        params.setMargins(dp2px(margin, outMetrics), dp2px(margin, outMetrics), dp2px(margin, outMetrics), 0);
 
         queueSizeInput = new EditText(context);
         queueSizeInput.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -2310,7 +2307,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         });
 
         params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(px2dp(margin+5, outMetrics), px2dp(0, outMetrics), px2dp(margin, outMetrics), 0);
+        params.setMargins(dp2px(margin+5, outMetrics), dp2px(0, outMetrics), dp2px(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
         text.setText(getString(R.string.settings_compression_queue_subtitle,

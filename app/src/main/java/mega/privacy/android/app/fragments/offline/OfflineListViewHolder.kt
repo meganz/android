@@ -9,7 +9,7 @@ import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemListBinding
-import mega.privacy.android.app.utils.Util.px2dp
+import mega.privacy.android.app.utils.Util.dp2px
 
 class OfflineListViewHolder(
     private val binding: OfflineItemListBinding,
@@ -51,13 +51,13 @@ class OfflineListViewHolder(
         val param = binding.thumbnail.layoutParams as FrameLayout.LayoutParams
 
         if (node.thumbnail == null || node.selected) {
-            param.width = px2dp(LARGE_IMAGE_WIDTH, res)
+            param.width = dp2px(LARGE_IMAGE_WIDTH, res)
             param.height = param.width
-            param.marginStart = px2dp(LARGE_IMAGE_MARGIN_LEFT, res)
+            param.marginStart = dp2px(LARGE_IMAGE_MARGIN_LEFT, res)
         } else {
-            param.width = px2dp(SMALL_IMAGE_WIDTH, res)
+            param.width = dp2px(SMALL_IMAGE_WIDTH, res)
             param.height = param.width
-            param.marginStart = px2dp(SMALL_IMAGE_MARGIN_LEFT, res)
+            param.marginStart = dp2px(SMALL_IMAGE_MARGIN_LEFT, res)
         }
 
         binding.thumbnail.layoutParams = param

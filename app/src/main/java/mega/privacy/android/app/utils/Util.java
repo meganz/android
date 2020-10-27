@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -437,22 +436,14 @@ public class Util {
 	/**
 	 * Convert dp to px.
 	 *
-	 * Note: the name of this function is wrong since the beginning, we should rename it in
-	 * the future.
-	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
 	 * @return corresponding px value
 	 */
-	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
+	public static int dp2px(float dp, DisplayMetrics outMetrics) {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 
-	public static int dp2px (float dp, DisplayMetrics outMetrics) {
-		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
-	}
-	
 	/*
 	 * AES encryption
 	 */
@@ -1413,7 +1404,7 @@ public class Util {
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: px2dp(24, context.getResources().getDisplayMetrics());
+				: dp2px(24, context.getResources().getDisplayMetrics());
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
@@ -1809,7 +1800,7 @@ public class Util {
 	 * @param outMetrics	DisplayMetrics of the current device.
 	 */
 	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
-		float elevation = px2dp(4, outMetrics);
+		float elevation = dp2px(4, outMetrics);
 
 		if (withElevation) {
 			aB.setElevation(elevation);

@@ -79,7 +79,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -602,11 +602,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             if (!enabled) {
                 FrameLayout.LayoutParams params =
                         (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
+                params.bottomMargin = dp2px(48, outMetrics);
                 mBinding.cuList.setLayoutParams(params);
 
                 params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
+                params.bottomMargin = dp2px(48, outMetrics);
                 mBinding.scroller.setLayoutParams(params);
             }
         });

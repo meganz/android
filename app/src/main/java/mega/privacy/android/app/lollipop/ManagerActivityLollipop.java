@@ -2456,7 +2456,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
 
         nVDisplayName = findViewById(R.id.navigation_drawer_account_information_display_name);
-        nVDisplayName.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        nVDisplayName.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
 
 		nVEmail = (TextView) findViewById(R.id.navigation_drawer_account_information_email);
         nVPictureProfile = (RoundedImageView) findViewById(R.id.navigation_drawer_user_account_picture_profile);
@@ -6199,7 +6199,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bNV.setVisibility(View.VISIBLE);
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-		params.setMargins(0, 0, 0, px2dp(56, outMetrics));
+		params.setMargins(0, 0, 0, dp2px(56, outMetrics));
 		fragmentLayout.setLayoutParams(params);
 	}
 
@@ -15902,13 +15902,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void changeActionBarElevation(boolean withElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			if (withElevation) {
-				abL.setElevation(px2dp(4, outMetrics));
+				abL.setElevation(dp2px(4, outMetrics));
 				if (elevation > 0) {
 					elevation = 0;
 					abL.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							abL.setElevation(px2dp(4, outMetrics));
+							abL.setElevation(dp2px(4, outMetrics));
 						}
 					}, 100);
 				}
@@ -16202,7 +16202,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			fragmentLayout.setLayoutParams(params);
 			bNV.animate().translationY(220).setDuration(400L).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
 		} else if (!hide && bNV.getVisibility() == View.GONE) {
-			params.setMargins(0, 0, 0, px2dp(56, outMetrics));
+			params.setMargins(0, 0, 0, dp2px(56, outMetrics));
 			bNV.setVisibility(View.VISIBLE);
 			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
 		}

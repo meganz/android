@@ -480,12 +480,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                             )
                             val thumbnail = itemView.findViewById<ImageView>(R.id.thumbnail)
                             val param = thumbnail.layoutParams as FrameLayout.LayoutParams
-                            param.width = Util.px2dp(
+                            param.width = Util.dp2px(
                                 OfflineListViewHolder.LARGE_IMAGE_WIDTH,
                                 resources.displayMetrics
                             )
                             param.height = param.width
-                            param.marginStart = Util.px2dp(
+                            param.marginStart = Util.dp2px(
                                 OfflineListViewHolder.LARGE_IMAGE_MARGIN_LEFT,
                                 resources.displayMetrics
                             )

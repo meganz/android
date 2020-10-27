@@ -747,7 +747,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     private void setRecyclerView() {
-        recyclerView.setPadding(0, 0, 0, px2dp(MARGIN_BOTTOM_LIST, outMetrics));
+        recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

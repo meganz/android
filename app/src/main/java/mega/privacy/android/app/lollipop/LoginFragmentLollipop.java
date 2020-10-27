@@ -1748,7 +1748,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 firstRequestUpdate = false;
             }
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
             if (request.getTotalBytes() > 0){
                 double progressValue = 100.0 * request.getTransferredBytes() / request.getTotalBytes();
                 if ((progressValue > 99) || (progressValue < 0)){
@@ -1946,7 +1946,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //			loginProgressBar.setVisibility(View.GONE);
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivityLollipop.isFetchingNodes = true;
             disableLoginButton();
