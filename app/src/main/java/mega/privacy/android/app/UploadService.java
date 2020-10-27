@@ -24,7 +24,6 @@ import android.os.PowerManager.WakeLock;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -34,7 +33,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -230,8 +228,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private synchronized void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
 
-        if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+        if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
             MegaTransferData transferData = megaApi.getTransferData(null);
+            if (transferData == null) {
+                return;
+            }
+
             int uploadsInProgress = transferData.getNumUploads();
 
             for (int i = 0; i < uploadsInProgress; i++) {
@@ -252,18 +254,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
             }
 
-            if (mapProgressFolderTransfers.size() > 0) {
+            totalFolderUploads = mapProgressFolderTransfers.size();
+            totalFileUploads = mapProgressFileTransfers.size();
+            uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+
+            if (totalFolderUploads > 0) {
                 updateProgressNotification(true);
             }
 
-            if (mapProgressFileTransfers.size() > 0) {
+            if (totalFileUploads > 0) {
                 updateProgressNotification(false);
             }
 
-            totalFolderUploads = mapProgressFolderTransfers.size();
-            totalFileUploads = mapProgressFileTransfers.size();
-
-            uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
             return;
         }
 

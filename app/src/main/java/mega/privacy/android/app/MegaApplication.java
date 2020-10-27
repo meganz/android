@@ -653,7 +653,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
 
-        //Logout transfers resumption
+		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
 
 		boolean staging = false;

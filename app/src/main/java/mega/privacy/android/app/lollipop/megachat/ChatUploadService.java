@@ -22,7 +22,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.widget.RemoteViews;
 
 import com.shockwave.pdfium.PdfDocument;
@@ -246,8 +246,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	protected void onHandleIntent(final Intent intent) {
 		if (intent == null) return;
 
-		if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
 			MegaTransferData transferData = megaApi.getTransferData(null);
+			if (transferData == null) {
+				return;
+			}
+
 			int uploadsInProgress = transferData.getNumUploads();
 			int voiceClipsInProgress = 0;
 
@@ -268,9 +272,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			transfersCount = totalUploads = mapProgressTransfers.size() - voiceClipsInProgress;
+
 			if (totalUploads > 0) {
 				updateProgressNotification();
 			}
+
 			return;
 		}
 

@@ -26,7 +26,7 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.widget.RemoteViews;
 
 import io.reactivex.rxjava3.core.Single;
@@ -274,9 +274,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logDebug("onHandleIntent");
 		this.intent = intent;
 
-		if (intent.getBooleanExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, false)) {
+		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
 			megaApi.addTransferListener(this);
 			MegaTransferData transferData = megaApi.getTransferData(null);
+			if (transferData == null) {
+				return;
+			}
+
 			int uploadsInProgress = transferData.getNumDownloads();
 
 			for (int i = 0; i < uploadsInProgress; i++) {
@@ -294,6 +298,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (transfersCount > 0) {
 				updateProgressNotification();
 			}
+
 			return;
 		}
 

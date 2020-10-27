@@ -16,13 +16,15 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_RESTART_SERVICE;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
 public class TransfersManagement {
     private static final long INVALID_VALUE = -1;
     private static final int WAIT_TIME_TO_SHOW_WARNING = 60000;
+    private static final int WAIT_TIME_TO_RESTART_SERVICES = 5000;
 
     private long transferOverQuotaTimestamp;
     private boolean hasNotToBeShowDueToTransferOverQuota;
@@ -160,6 +162,13 @@ public class TransfersManagement {
                 .putExtra(COMPLETED_TRANSFER, completedTransfer));
     }
 
+    /**
+     * Enables transfers resumption.
+     * Before start to check if there are pending transfers, it has to wait a time
+     * WAIT_TIME_TO_RESTART_SERVICES. This time is for the transfer resumption to be enabled
+     * since there is no possibility to listen any response of the request to know when it finishes.
+     *
+     */
     public static void enableTransfersResumption() {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
@@ -167,34 +176,38 @@ public class TransfersManagement {
         megaApi.enableTransferResumption();
 
         new Handler().postDelayed(() -> {
-            if (megaApi.getNumPendingDownloads() > 0) {
-                Intent downloadServiceIntent = new Intent(app, DownloadService.class)
-                        .putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true);
+            try {
+                if (megaApi.getNumPendingDownloads() > 0) {
+                    Intent downloadServiceIntent = new Intent(app, DownloadService.class)
+                            .setAction(ACTION_RESTART_SERVICE);
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
-                        && !app.isActivityVisible()) {
-                    app.startForegroundService(downloadServiceIntent);
-                } else {
-                    app.startService(downloadServiceIntent);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                            && !app.isActivityVisible()) {
+                        app.startForegroundService(downloadServiceIntent);
+                    } else {
+                        app.startService(downloadServiceIntent);
+                    }
                 }
-            }
 
-            if (megaApi.getNumPendingUploads() > 0) {
-                Intent uploadServiceIntent = new Intent(app, UploadService.class)
-                        .putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true);
-                Intent chatUploadServiceIntent = new Intent(app, ChatUploadService.class)
-                        .putExtra(INTENT_EXTRA_KEY_RESTART_SERVICE, true);
+                if (megaApi.getNumPendingUploads() > 0) {
+                    Intent uploadServiceIntent = new Intent(app, UploadService.class)
+                            .setAction(ACTION_RESTART_SERVICE);
+                    Intent chatUploadServiceIntent = new Intent(app, ChatUploadService.class)
+                            .setAction(ACTION_RESTART_SERVICE);
 
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
-                        && !app.isActivityVisible()) {
-                    app.startForegroundService(uploadServiceIntent);
-                    app.startForegroundService(chatUploadServiceIntent);
-                } else {
-                    app.startService(uploadServiceIntent);
-                    app.startService(chatUploadServiceIntent);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                            && !app.isActivityVisible()) {
+                        app.startForegroundService(uploadServiceIntent);
+                        app.startForegroundService(chatUploadServiceIntent);
+                    } else {
+                        app.startService(uploadServiceIntent);
+                        app.startService(chatUploadServiceIntent);
+                    }
                 }
+            } catch (Exception e) {
+                logWarning("Exception checking pending transfers", e);
             }
-        }, 5000);
+        }, WAIT_TIME_TO_RESTART_SERVICES);
     }
 
     /**
