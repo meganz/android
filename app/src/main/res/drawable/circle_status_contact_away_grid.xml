@@ -7,5 +7,5 @@
         android:color="@color/white"
         />
     <solid
-        android:color="@color/orange_upgrade_account"/>
+        android:color="@color/lite_account"/>
 </shape>

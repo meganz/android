@@ -36,7 +36,7 @@
                         android:layout_gravity="start"
                         android:layout_marginTop="17dp"
                         android:text="@string/create_account_title"
-                        android:textAppearance="?attr/textAppearanceHeadline6" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -351,7 +351,6 @@ app/src/main/res/layout/fragment_create_account.xml
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background_create_account"
             android:orientation="vertical">
 
             <LinearLayout

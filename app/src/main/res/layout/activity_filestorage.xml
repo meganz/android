@@ -7,11 +7,9 @@
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_filestorage"
-        style="@style/MEGAToolBar"
+        style="@style/Toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:subtitleTextAppearance="@style/ToolbarSubtitle"
-        app:titleTextAppearance="@style/ToolbarTitle" />
+        android:layout_height="?attr/actionBarSize" />
 
     <TextView
         android:id="@+id/file_storage_content_text"
@@ -82,7 +80,7 @@
                 android:layout_marginEnd="21dp"
                 android:layout_toEndOf="@id/internal_extorage_image"
                 android:text="@string/internal_storage_label"
-                android:textAppearance="@style/TextAppearance.Mega.Body1.Medium" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
 
         </RelativeLayout>
 
@@ -114,7 +112,7 @@
                 android:layout_marginEnd="21dp"
                 android:layout_toEndOf="@id/external_extorage_image"
                 android:text="@string/external_storage_label"
-                android:textAppearance="@style/TextAppearance.Mega.Body1.Medium" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
 
         </RelativeLayout>
 

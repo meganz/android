@@ -139,13 +139,13 @@
          will have some green on it, and expand all its attrs here doesn't have this issue,
          and the elevation overlay works fine too. -->
     <!-- <style name="MEGAToolBar" parent="@style/Widget.MaterialComponents.Toolbar.Surface"> -->
-    <style name="MEGAToolBar">
-        <item name="android:background">?attr/colorSurface</item>
-        <item name="titleTextColor">@color/material_on_surface_emphasis_high_type</item>
-        <item name="subtitleTextColor">@color/material_on_surface_emphasis_medium</item>
-        <item name="colorControlNormal">@color/material_on_surface_emphasis_medium</item>
-        <item name="actionMenuTextColor">@color/material_on_surface_emphasis_medium</item>
-    </style>
+<!--    <style name="MEGAToolBar">-->
+<!--        <item name="android:background">?attr/colorSurface</item>-->
+<!--        <item name="titleTextColor">@color/material_on_surface_emphasis_high_type</item>-->
+<!--        <item name="subtitleTextColor">@color/material_on_surface_emphasis_medium</item>-->
+<!--        <item name="colorControlNormal">@color/material_on_surface_emphasis_medium</item>-->
+<!--        <item name="actionMenuTextColor">@color/material_on_surface_emphasis_medium</item>-->
+<!--    </style>-->
 
     <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.DayNight">
         <item name="colorControlNormal">?attr/colorSecondary</item>
@@ -567,6 +567,11 @@
         <item name="endIconMode">password_toggle</item>
         <item name="endIconDrawable">@drawable/ic_b_see</item>
         <item name="endIconTint">@color/password_color_toggle</item>
+    </style>
+
+    <!-- Action bar title -->
+    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium</item>
     </style>
 
     <style name="MEGABottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">

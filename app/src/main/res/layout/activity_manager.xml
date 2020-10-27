@@ -25,12 +25,10 @@
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
-                    style="@style/MEGAToolBar"
+                    style="@style/Toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="?attr/actionBarSize"
-                    app:subtitleTextAppearance="@style/ToolbarSubtitle"
-                    app:titleTextAppearance="@style/ToolbarTitle" />
+                    android:minHeight="?attr/actionBarSize" />
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_contacts"

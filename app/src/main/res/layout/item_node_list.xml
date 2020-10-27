@@ -74,7 +74,7 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.node.name}"
-            android:textAppearance="?attr/textAppearanceBody1"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@+id/thumbnail"

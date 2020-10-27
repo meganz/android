@@ -65,7 +65,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/image_free"
                                 android:textAllCaps="true"
-                                android:textColor="@color/green_free_account"
+                                android:textColor="@color/free_account"
                                 android:textSize="18sp"
                                 tools:text="free" />
                         </RelativeLayout>
@@ -196,7 +196,7 @@
                                 android:layout_below="@+id/image_lite"
                                 android:text="@string/lite_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/orange_upgrade_account"
+                                android:textColor="@color/lite_account"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -327,7 +327,7 @@
                                 android:layout_below="@+id/image_pro_i"
                                 android:text="@string/pro1_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/red_390"
+                                android:textColor="@color/pro_account"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -457,7 +457,7 @@
                                 android:layout_below="@+id/image_pro_ii"
                                 android:text="@string/pro2_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/red_390"
+                                android:textColor="@color/pro_account"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -587,7 +587,7 @@
                                 android:layout_below="@+id/image_pro_iii"
                                 android:text="@string/pro3_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/red_390"
+                                android:textColor="@color/pro_account"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -717,7 +717,7 @@
                                 android:layout_below="@+id/image_business"
                                 android:text="@string/business_label"
                                 android:textAllCaps="true"
-                                android:textColor="@color/blue_business"
+                                android:textColor="@color/password_strong"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>

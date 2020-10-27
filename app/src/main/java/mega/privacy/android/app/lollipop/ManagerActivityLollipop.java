@@ -227,7 +227,6 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.ViewExtensionsKt;
 import mega.privacy.android.app.utils.TimeUtils;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
@@ -2375,7 +2374,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
         megaApi.getAccountAchievements(this);
 
-		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.red_390_red_300,
+		badgeDrawable = new BadgeDrawerArrowDrawable(managerActivity, R.color.pro_account,
 				R.color.white_dark_grey, R.color.white_dark_grey);
 
 		BottomNavigationMenuView menuView = (BottomNavigationMenuView) bNV.getChildAt(0);

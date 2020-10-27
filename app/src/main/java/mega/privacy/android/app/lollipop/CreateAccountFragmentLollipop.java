@@ -354,14 +354,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_weak));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.yellow_password_weak));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.password_weak));
 
             passwdAdvice.setText(getString(R.string.passwd_weak));
 
             passwdValid = true;
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak);
-            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.yellow_password_weak);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.password_weak);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_medium));
@@ -371,14 +371,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_medium));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.green_password_medium));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.password_medium));
 
             passwdAdvice.setText(getString(R.string.passwd_medium));
 
             passwdValid = true;
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
-            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.green_password_medium);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.password_medium);
         }
         else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_good));
@@ -388,14 +388,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.shape_password));
 
             passwdType.setText(getString(R.string.pass_good));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.green_password_good));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.password_good));
 
             passwdAdvice.setText(getString(R.string.passwd_good));
 
             passwdValid = true;
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good);
-            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.green_password_good);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.password_good);
         }
         else {
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
@@ -405,14 +405,14 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             fifthShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_strong));
 
             passwdType.setText(getString(R.string.pass_strong));
-            passwdType.setTextColor(ContextCompat.getColor(context, R.color.blue_password_strong));
+            passwdType.setTextColor(ContextCompat.getColor(context, R.color.password_strong));
 
             passwdAdvice.setText(getString(R.string.passwd_strong));
 
             passwdValid = true;
 
             userPasswordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong);
-            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.blue_password_strong);
+            ColorUtils.setEditTextUnderlineColor(userPassword, R.color.password_strong);
         }
 
         userPasswordError.setVisibility(View.GONE);

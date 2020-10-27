@@ -674,7 +674,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/alert_leave_share"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -704,7 +704,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_move_to_trash"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -734,7 +734,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_remove"
-                    android:textAppearance="@style/TextAppearance.Mega.Body1.Red" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
         </LinearLayout>

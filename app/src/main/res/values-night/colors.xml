@@ -8,21 +8,20 @@
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
     <!-- Notification badge -->
-    <color name="red_390_red_300">@color/red_300</color>
     <color name="white_red_300">@color/red_300</color>
     <color name="white_dark_grey">@color/dark_grey</color>
     <color name="red_600_dark_grey">@color/dark_grey</color>
-    <color name="red_390_dark_grey">@color/dark_grey</color>
+    <color name="badge_in_chat">@color/dark_grey</color>
 
     <!-- password strength -->
-    <color name="yellow_password_weak">#F5F595</color>
-    <color name="green_password_medium">#4EB64E</color>
-    <color name="green_password_good">#9FF4A1</color>
-    <color name="blue_password_strong">#5BB5DE</color>
+    <color name="password_weak">#F5F595</color>
+    <color name="password_medium">#4EB64E</color>
+    <color name="password_good">#9FF4A1</color>
+    <color name="password_strong">#5BB5DE</color>
 
     <!-- Colors for empty content hint text. Use non-alpha colors, for
      <font color=""> doesn't support alpha -->
-    <color name="grey_empty_hint_text_normal">#A0A0A0</color>
+    <color name="empty_hint_text_normal">#A0A0A0</color>
 
     <!-- Turn on camera uploads -->
     <color name="teal_300_dark_grey">@color/dark_grey</color>
@@ -35,16 +34,16 @@
 
     <color name="name_my_account">@color/white_alpha_087</color>
     <color name="mail_my_account">@color/white_alpha_054</color>
-    <color name="background_create_account">@color/dark_grey</color>
     <color name="new_multiselect_color">@android:color/transparent</color>
 
-    <color name="blue_business">#7ABEDD</color>
 
 
-    <color name="white_drawer_add_phone_number_background">@color/white_alpha_087</color>
-    <color name="teal_drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
+    <color name="drawer_add_phone_number_background">@color/white_alpha_087</color>
+    <color name="drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
 
-    <color name="green_free_account">#8CD670</color>
+    <!-- choose & upgrade related colors -->
+    <color name="free_account">#8CD670</color>
+    <color name="pro_account">@color/red_300</color>
 
     <color name="bottom_sheet_navigation_bar_color">@android:color/black</color>
 </resources>

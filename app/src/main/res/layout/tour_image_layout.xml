@@ -31,7 +31,7 @@
         android:layout_marginTop="8dp"
         android:layout_alignTop="@+id/invisible_view"
         android:lineSpacingExtra="5sp"
-        android:textAppearance="@style/TextAppearance.Mega.Body1.Secondary.Variant"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant"
         android:textSize="15sp"
         android:gravity="center"/>
 

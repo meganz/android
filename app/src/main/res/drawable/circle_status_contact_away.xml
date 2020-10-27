@@ -2,5 +2,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <solid
-        android:color="@color/orange_upgrade_account"/>
+        android:color="@color/lite_account"/>
 </shape>

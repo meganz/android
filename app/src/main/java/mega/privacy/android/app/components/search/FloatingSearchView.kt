@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -232,7 +231,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun initDrawables() {
-        menuBtnDrawable = BadgeDrawerArrowDrawable(context, R.color.red_390_red_300,
+        menuBtnDrawable = BadgeDrawerArrowDrawable(context, R.color.pro_account,
             R.color.white_dark_grey, R.color.white_dark_grey)
         menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot)
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
