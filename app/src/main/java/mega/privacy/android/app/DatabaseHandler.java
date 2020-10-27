@@ -250,7 +250,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String KEY_BACKUP_TYPE = "backup_type";
     public static final String KEY_BACKUP_TARGET_NODE = "target_node";
     public static final String KEY_BACKUP_LOCAL_FOLDER = "local_folder";
-    public static final String KEY_BACKUP_DEVICE_ID = "device_id";
+    public static final String KEY_BACKUP_NAME = "backup_name";
     public static final String KEY_BACKUP_STATE = "state";
     public static final String KEY_BACKUP_SUB_STATE = "sub_state";
     public static final String KEY_BACKUP_EXTRA_DATA = "extra_data";
@@ -259,7 +259,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String KEY_BACKUP_TARGET_NODE_PATH = "target_folder_path";
     public static final String KEY_BACKUP_EX = "exclude_subolders";
     public static final String KEY_BACKUP_DEL = "delete_empty_subolders";
-    public static final String KEY_BACKUP_NAME = "backup_name";
     public static final String KEY_BACKUP_OUTDATED = "outdated";
 
     private static final String CREATE_BACKUP_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BACKUPS + "("
@@ -267,7 +266,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_BACKUP_TYPE + " INTEGER,"
             + KEY_BACKUP_TARGET_NODE + " TEXT,"
             + KEY_BACKUP_LOCAL_FOLDER + " TEXT,"
-            + KEY_BACKUP_DEVICE_ID + " TEXT,"
+            + KEY_BACKUP_NAME + " TEXT,"
             + KEY_BACKUP_STATE + " INTEGER,"
             + KEY_BACKUP_SUB_STATE + " INTEGER,"
             + KEY_BACKUP_EXTRA_DATA + " TEXT,"
@@ -276,7 +275,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_BACKUP_TARGET_NODE_PATH + " TEXT,"
             + KEY_BACKUP_EX + " BOOLEAN,"
             + KEY_BACKUP_DEL + " BOOLEAN,"
-            + KEY_BACKUP_NAME + " TEXT,"
             + KEY_BACKUP_OUTDATED + " BOOLEAN)";
 
     private static DatabaseHandler instance;
@@ -4201,7 +4199,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_BACKUP_TYPE, backup.getBackupType());
         values.put(KEY_BACKUP_TARGET_NODE, encrypt(Long.toString(backup.getTargetNode())));
         values.put(KEY_BACKUP_LOCAL_FOLDER, encrypt(backup.getLocalFolder()));
-        values.put(KEY_BACKUP_DEVICE_ID, encrypt(backup.getDeviceId()));
+        values.put(KEY_BACKUP_NAME, encrypt(backup.getBackupName()));
         values.put(KEY_BACKUP_STATE,backup.getState());
         values.put(KEY_BACKUP_SUB_STATE, backup.getSubState());
         values.put(KEY_BACKUP_EXTRA_DATA, encrypt(backup.getExtraData()));
@@ -4210,7 +4208,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_BACKUP_TARGET_NODE_PATH, encrypt(backup.getTargetFolderPath()));
         values.put(KEY_BACKUP_EX, encrypt(Boolean.toString(backup.isExcludeSubFolders())));
         values.put(KEY_BACKUP_DEL, encrypt(Boolean.toString(backup.isDeleteEmptySubFolders())));
-        values.put(KEY_BACKUP_NAME, encrypt(backup.getName()));
         // Default value is false.
         values.put(KEY_BACKUP_OUTDATED, encrypt(Boolean.toString(false)));
         long result = db.insertOrThrow(TABLE_BACKUPS, null, values);
@@ -4283,7 +4280,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_TYPE)),
                 Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_TARGET_NODE)))),
                 decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LOCAL_FOLDER))),
-                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_DEVICE_ID))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_NAME))),
                 cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_STATE)),
                 cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_SUB_STATE)),
                 decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EXTRA_DATA))),
@@ -4292,7 +4289,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_TARGET_NODE_PATH))),
                 Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EX)))),
                 Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_DEL)))),
-                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_NAME))),
                 Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_OUTDATED))))
         );
     }

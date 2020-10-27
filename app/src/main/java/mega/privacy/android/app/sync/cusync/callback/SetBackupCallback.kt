@@ -6,11 +6,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.SettingsConstants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.sync.SyncEventCallback
-import mega.privacy.android.app.sync.cusync.CuSyncManager.Companion.NAME_OTHER
-import mega.privacy.android.app.sync.cusync.CuSyncManager.Companion.NAME_PRIMARY
-import mega.privacy.android.app.sync.cusync.CuSyncManager.Companion.NAME_SECONDARY
-import mega.privacy.android.app.sync.cusync.CuSyncManager.Companion.TYPE_BACKUP_PRIMARY
-import mega.privacy.android.app.sync.cusync.CuSyncManager.Companion.TYPE_BACKUP_SECONDARY
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -26,23 +21,16 @@ open class SetBackupCallback : SyncEventCallback {
         request: MegaRequest?,
         error: MegaError?
     ) {
-        val backupName = when (request?.totalBytes?.toInt()) {
-            TYPE_BACKUP_PRIMARY -> NAME_PRIMARY
-            TYPE_BACKUP_SECONDARY -> NAME_SECONDARY
-            else -> NAME_OTHER
-        }
-
         request?.apply {
             val backup = Backup(
                 backupId = parentHandle,
                 backupType = totalBytes.toInt(),
                 targetNode = nodeHandle,
                 localFolder = file,
-                deviceId = name,
+                backupName = name,
                 state = access,
                 subState = numDetails,
-                extraData = text,
-                name = backupName
+                extraData = text
             )
             LogUtil.logDebug("Save back $backup to local cache.")
             getDatabase().saveSyncPair(backup)

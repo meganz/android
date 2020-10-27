@@ -12,7 +12,7 @@ fun randomResult() = Random.nextBoolean()
 
 fun updateSQL(backup: Backup) =
     "UPDATE $TABLE_BACKUPS SET " +
-            "$KEY_BACKUP_NAME = '${encrypt(backup.name)}', " +
+            "$KEY_BACKUP_NAME = '${encrypt(backup.backupName)}', " +
             "$KEY_BACKUP_TYPE = ${backup.backupType}, " +
             "$KEY_BACKUP_LOCAL_FOLDER = '${encrypt(backup.localFolder)}', " +
             "$KEY_BACKUP_TARGET_NODE_PATH = '${encrypt(backup.targetFolderPath)}', " +

@@ -2,6 +2,7 @@ package mega.privacy.android.app.sync.cusync
 
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.sync.SyncListener
 import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
@@ -10,6 +11,7 @@ import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -24,12 +26,8 @@ class CuSyncManager {
     private val databaseHandler: DatabaseHandler = DatabaseHandler.getDbHandler(megaApplication)
 
     companion object {
-        const val TYPE_BACKUP_PRIMARY = 0
-        const val TYPE_BACKUP_SECONDARY = 1
-        const val NAME_PRIMARY = "camera uploads"
-        const val NAME_SECONDARY = "media uploads"
-        const val NAME_OTHER = "other sync"
-        const val DEVICE_ID = "Ash's phone"
+        const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
+        const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
     }
 
     fun setPrimaryBackup() =
@@ -52,8 +50,8 @@ class CuSyncManager {
         backupType: Int,
         targetNode: Long?,
         localFolder: String?,
-        state: Int = MegaApiJava.STATE_PENDING,
-        subState: Int = MegaApiJava.STATE_PENDING,
+        state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+        subState: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
         extraData: String = ""
     ) {
         if (isInvalid(targetNode?.toString())) {
@@ -66,11 +64,17 @@ class CuSyncManager {
             return
         }
 
+        // Same as localized CU/MU folder name.
+        val backupName = if(backupType == TYPE_BACKUP_PRIMARY)
+            StringResourcesUtils.getString(R.string.section_photo_sync)
+        else
+            StringResourcesUtils.getString(R.string.section_secondary_media_uploads)
+
         megaApiJava.setBackup(
             backupType,
             targetNode!!,
             localFolder,
-            DEVICE_ID,
+            backupName,
             state,
             subState,
             extraData,
@@ -78,13 +82,13 @@ class CuSyncManager {
         )
     }
 
-    fun updatePrimaryTargetNode(newTargetNode: Long?) {
+    fun updatePrimaryTargetNode(newTargetNode: Long) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
             logDebug("CU is not enabled.")
             return
         }
 
-        if (isInvalid(newTargetNode?.toString())) {
+        if (isInvalid(newTargetNode.toString())) {
             logWarning("Invalid target node, value: $newTargetNode")
             return
         }
@@ -97,9 +101,9 @@ class CuSyncManager {
                 updateBackup(
                     backupId,
                     backupType,
-                    newTargetNode!!,
+                    newTargetNode,
                     localFolder,
-                    deviceId,
+                    backupName,
                     state,
                     subState,
                     extraData
@@ -108,13 +112,13 @@ class CuSyncManager {
         }
     }
 
-    fun updateSecondaryTargetNode(newTargetNode: Long?) {
+    fun updateSecondaryTargetNode(newTargetNode: Long) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
             logDebug("MU is not enabled.")
             return
         }
 
-        if (isInvalid(newTargetNode?.toString())) {
+        if (isInvalid(newTargetNode.toString())) {
             logWarning("Invalid target node, value: $newTargetNode")
             return
         }
@@ -127,9 +131,9 @@ class CuSyncManager {
                 updateBackup(
                     backupId,
                     backupType,
-                    newTargetNode!!,
+                    newTargetNode,
                     localFolder,
-                    deviceId,
+                    backupName,
                     state,
                     subState,
                     extraData
@@ -159,7 +163,7 @@ class CuSyncManager {
                     backupType,
                     targetNode,
                     newLocalFolder!!,
-                    deviceId,
+                    backupName,
                     state,
                     subState,
                     extraData
@@ -189,7 +193,7 @@ class CuSyncManager {
                     backupType,
                     targetNode,
                     newLocalFolder!!,
-                    deviceId,
+                    backupName,
                     state,
                     subState,
                     extraData

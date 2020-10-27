@@ -8,16 +8,15 @@ data class Backup(
     var backupType: Int,
     var targetNode: Long,
     var localFolder: String,
-    var deviceId: String,
-    var state: Int = MegaApiJava.STATE_PENDING,
-    var subState: Int = MegaApiJava.STATE_PENDING,
+    var backupName: String,
+    var state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+    var subState: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
     var extraData: String = "",
     @ClientOnly var startTimestamp: Long = 0L,
     @ClientOnly var lastFinishTimestamp: Long = 0L,
     @ClientOnly var targetFolderPath: String? = "null",
     @ClientOnly var isExcludeSubFolders: Boolean = false,
     @ClientOnly var isDeleteEmptySubFolders: Boolean = false,
-    @ClientOnly var name: String = "null",
     @ClientOnly var outdated: Boolean = false
 ) {
 
@@ -26,6 +25,6 @@ data class Backup(
     annotation class ClientOnly
 
     override fun toString(): String {
-        return "Backup(backupId=$backupId, backupType=$backupType, targetNode=$targetNode(${targetNode.name()}), localFolder='$localFolder', name='$name', outdated=$outdated)"
+        return "Backup(backupId=$backupId, backupType=$backupType, targetNode=$targetNode(${targetNode.name()}), localFolder='$localFolder', backupName='$backupName', outdated=$outdated)"
     }
 }
