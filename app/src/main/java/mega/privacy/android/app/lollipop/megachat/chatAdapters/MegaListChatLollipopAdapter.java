@@ -1027,7 +1027,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	}
 
 	/**
-	 * Method for displaying the appropriate string when there is a call in a chat-
+	 * Method for displaying the appropriate string when there is a call in a chat.
 	 *
 	 * @param position Int with the position of the chat.
 	 * @param holder   The ViewHolderChatList.
