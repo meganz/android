@@ -471,12 +471,14 @@ public class ChatUtil {
         if (!(context instanceof ChatActivityLollipop))
             return;
 
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
         if (isMyOwnReaction(chatId, messageId, reaction)) {
             if (!isFromKeyboard) {
-                MegaApplication.getInstance().getMegaChatApi().delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+                megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
             }
         } else {
-            MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+            megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         }
     }
 

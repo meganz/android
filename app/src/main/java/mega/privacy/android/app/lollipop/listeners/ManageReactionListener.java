@@ -9,6 +9,8 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 
+import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_USER;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class ManageReactionListener extends ChatBaseListener {
@@ -44,7 +46,7 @@ public class ManageReactionListener extends ChatBaseListener {
 
             case MegaChatError.ERROR_TOOMANY:
                 long numberOfError = request.getNumber();
-                if (context instanceof ChatActivityLollipop && (numberOfError == 1 || numberOfError == -1)) {
+                if (context instanceof ChatActivityLollipop && (numberOfError == REACTION_ERROR_TYPE_USER || numberOfError == REACTION_ERROR_TYPE_MESSAGE)) {
                     ((ChatActivityLollipop) context).createLimitReactionsAlertDialog(numberOfError);
                 }
                 break;

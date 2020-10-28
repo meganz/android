@@ -246,7 +246,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         if (numUsers > 0 && emoji != null) {
             reactionImage.setEmoji(emoji, true);
             reactionText.setText(numUsers + "");
-            reactionText.setTextColor(ContextCompat.getColor(context, isMyOwnReaction(chatId, messageId, reaction) ? R.color.accentColor : R.color.mail_my_account));
+            reactionText.setTextColor(ContextCompat.getColor(context,
+                    isMyOwnReaction(chatId, messageId, reaction)
+                            ? R.color.accentColor
+                            : R.color.mail_my_account));
             parent.addView(button);
             return button;
         }
