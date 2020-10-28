@@ -88,6 +88,7 @@
         <item name="trackColor">@color/grey_alpha_012</item>
 
         <item name="toolbarStyle">@style/Toolbar</item>
+        <item name="materialAlertDialogTheme">@style/MaterialAlertDialog</item>
 
         <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->

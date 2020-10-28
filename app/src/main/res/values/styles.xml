@@ -570,7 +570,7 @@
     </style>
 
     <!-- Action bar title -->
-    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar">
+    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
         <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium</item>
     </style>
 
@@ -586,29 +586,28 @@
         <item name="android:background">@drawable/background_bottomsheet_round_top</item>
     </style>
 
-
-    <style name="MEGAMaterialAlertDialogStyle" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
-        <item name="materialAlertDialogTitleTextStyle">@style/MEGAAlertDialogTitleStyle</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/MEGAAlertDialogBodyStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/MEGANegativeButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/MEGAPositiveButtonStyle</item>
+    <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/AlertDialogTitle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/AlertDialogBody</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
     </style>
 
-    <style name="MEGAAlertDialogTitleStyle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
-        <!-- Fake Roboto Medium. -->
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-
-    <style name="MEGAAlertDialogBodyStyle" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+    <style name="AlertDialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="MEGANegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="AlertDialogBody" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Secondary</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
-    <style name="MEGAPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 </resources>

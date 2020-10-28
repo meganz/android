@@ -35,13 +35,6 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
-    <!-- Medium, 14sp, 0px, textColorPrimary-->
-    <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
-        <item name="android:letterSpacing">0</item>
-        <item name="android:textStyle">normal</item>
-    </style>
-
     <style name="TextAppearance.Mega.Subtitle1.Red">
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
@@ -58,6 +51,13 @@
     <style name="TextAppearance.Mega.Subtitle1.Medium">
         <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
+    <!-- Medium, 14sp, 0px, textColorPrimary-->
+    <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <!-- ================== Body1 ====================== -->

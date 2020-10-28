@@ -31,7 +31,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
@@ -149,7 +148,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
@@ -3473,8 +3471,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     		return;
 		}
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_business_grace_alert, null);
 
@@ -3513,8 +3510,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             return;
         }
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.section_photo_sync)
                 .setMessage(R.string.camera_uploads_business_alert)
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
@@ -4035,8 +4031,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
                     String text = getString(R.string.cam_sync_cancel_sync);
 
-					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-							R.style.MEGAMaterialAlertDialogStyle);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
                     builder.setMessage(text);
 
                     builder.setPositiveButton(getString(R.string.general_yes),
@@ -5272,8 +5267,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		try {
 			builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
 					.setNegativeButton(R.string.general_cancel, dialogClickListener);
@@ -6384,8 +6378,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug ("newAccount: "+newAccount);
 		newAccount = false;
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_enable_2fa_create_account, null);
 		builder.setView(v);
@@ -7298,8 +7291,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						}
 						else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 							logWarning("Not permissions to upload");
-							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-									R.style.MEGAMaterialAlertDialogStyle);
+							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 							builder.setMessage(getString(R.string.no_permissions_upload));
 							builder.setCancelable(false).setPositiveButton(R.string.general_ok, new DialogInterface.OnClickListener() {
 								   public void onClick(DialogInterface dialog, int id) {
@@ -8209,8 +8201,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8254,8 +8245,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		final long [] hashesC = hashes;
 		final long sizeC=size;
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8299,8 +8289,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		final long sizeC = size;
 		final ChatController chatC = new ChatController(this);
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8609,8 +8598,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					setMoveToRubbish(true);
 
-					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-							R.style.MEGAMaterialAlertDialogStyle);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					if (getPrimaryFolderHandle() == handle ) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
 					} else if (getSecondaryFolderHandle() == handle ) {
@@ -8627,8 +8615,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 					setMoveToRubbish(false);
 
-					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-							R.style.MEGAMaterialAlertDialogStyle);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
 
 					builder.setPositiveButton(R.string.context_remove, dialogClickListener);
@@ -8808,8 +8795,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.delete_account));
 
 		builder.setMessage(getResources().getString(R.string.delete_account_text));
@@ -9448,8 +9434,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void showOpenLinkDialog() {
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		LayoutInflater inflater = getLayoutInflater();
 		View v = inflater.inflate(R.layout.dialog_error_hint, null);
 		builder.setView(v).setPositiveButton(R.string.context_open_link, null)
@@ -9622,8 +9607,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 
-		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 		final CharSequence[] items = {getString(R.string.online_status), getString(R.string.away_status), getString(R.string.busy_status), getString(R.string.offline_status)};
 		int statusToShow = megaChatApi.getOnlineStatus();
 		switch(statusToShow){
@@ -9694,8 +9678,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		    }
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 
@@ -9787,8 +9770,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return false;
 		});
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setView(v)
 				.setTitle(getString(R.string.menu_new_folder))
 				.setPositiveButton(getString(R.string.general_create),
@@ -10282,8 +10264,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.context_clear_rubbish));
 		builder.setMessage(getString(R.string.clear_rubbish_confirmation));
 		builder.setPositiveButton(getString(R.string.general_clear),
@@ -10300,8 +10281,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showConfirmationClearAllVersions(){
 		logDebug("showConfirmationClearAllVersions");
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.settings_file_management_delete_versions));
 		builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
 
@@ -10319,8 +10299,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void showPanelSetPinLock(){
 		logDebug("showPanelSetPinLock");
 
-		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
 
 		getSettingsFragment();
@@ -10577,8 +10556,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
@@ -10604,8 +10582,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, c.size());
 		builder.setTitle(title);
 		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, c.size());
@@ -10631,8 +10608,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String message= getResources().getString(R.string.confirmation_delete_contact_request,r.getTargetEmail());
 		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -10657,8 +10633,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		};
 
 		String message="";
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		if(r.size()==1){
 			message= getResources().getString(R.string.confirmation_delete_contact_request,r.get(0).getTargetEmail());
 		}else{
@@ -10676,8 +10651,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(getString(R.string.alert_remove_several_shares, shares.size()))
 				.setPositiveButton(R.string.general_remove, (dialog, which) -> nC.removeSeveralFolderShares(shares))
 				.setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
@@ -10685,8 +10659,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showConfirmationRemoveAllSharingContacts (final ArrayList<MegaShare> shareList, final MegaNode n){
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		int size = shareList.size();
 		String message = getResources().getQuantityString(R.plurals.confirmation_remove_outgoing_shares, size, size);
 
@@ -10723,8 +10696,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			message = getResources().getQuantityString(R.plurals.remove_links_warning_text, nodes.size());
 		}
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		MegaNode finalNode = node;
 		builder.setMessage(message)
 				.setPositiveButton(R.string.general_remove, (dialog, which) -> {
@@ -10763,8 +10735,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10790,8 +10761,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10828,8 +10798,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
 		String message= getResources().getString(R.string.confirmation_leave_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -10858,8 +10827,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String message= getResources().getString(R.string.confirmation_clear_group_chat);
 		builder.setTitle(R.string.title_confirmation_clear_group_chat);
 		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -10887,8 +10855,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String message= getResources().getString(R.string.email_verification_text_change_pass);
 		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -10917,8 +10884,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
 		String message= getResources().getString(R.string.text_reset_pass_logged_in);
 		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
@@ -11572,8 +11538,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setTitle(R.string.confirmation_close_sessions_title);
 
@@ -11618,8 +11583,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -11651,8 +11615,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -11701,8 +11664,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		};
 
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 
 		builder.setMessage(R.string.confirmation_delete_avatar).setPositiveButton(R.string.context_delete, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -11904,8 +11866,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			final ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
 			final long folderHandle = intent.getLongExtra("SELECT", 0);
 
-			MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this,
-					R.style.MEGAMaterialAlertDialogStyle);
+			MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 			dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 			final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -11938,8 +11899,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				//One file to share
 				final long nodeHandle = intent.getLongExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE, -1);
 
-				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this,
-						R.style.MEGAMaterialAlertDialogStyle);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
@@ -11954,8 +11914,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				//Several folders to share
 				final long[] nodeHandles = intent.getLongArrayExtra(AddContactActivityLollipop.EXTRA_NODE_HANDLE);
 
-				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this,
-						R.style.MEGAMaterialAlertDialogStyle);
+				MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -14972,8 +14931,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * Shows a warning to ensure if it is sure of remove all completed transfers.
 	 */
 	public void showConfirmationClearCompletedTransfers() {
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers))
 				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
 					dbH.emptyCompletedTransfers();
@@ -14995,8 +14953,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param mT	the transfer to cancel
 	 */
 	public void showConfirmationCancelTransfer(final MegaTransfer mT) {
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(R.string.cancel_transfer_confirmation)
 				.setPositiveButton(R.string.general_cancel, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
 				.setNegativeButton(R.string.general_dismiss, null);
@@ -15009,8 +14966,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * Shows a warning to ensure if it is sure of cancel all transfers.
 	 */
 	public void showConfirmationCancelAllTransfers() {
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
 				.setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
@@ -16548,8 +16504,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
      * Shows a "transfer over quota" warning.
      */
 	public void showTransfersTransferOverQuotaWarning() {
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this,
-				R.style.MEGAMaterialAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		int messageResource = R.string.warning_transfer_over_quota;
 
 		transferOverQuotaWarning = builder.setTitle(R.string.label_transfer_over_quota)

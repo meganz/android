@@ -23,7 +23,7 @@ public class AskForDisplayOverDialog {
     public AskForDisplayOverDialog(final Context context) {
         this.context = context;
 
-        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.MEGAMaterialAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
         dialogBuilder.setView(R.layout.ask_for_display_over_dialog_layout);
         dialogBuilder.setPositiveButton(R.string.general_allow, (dialog, which) -> {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + context.getPackageName()));

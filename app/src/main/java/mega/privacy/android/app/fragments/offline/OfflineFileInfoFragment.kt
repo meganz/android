@@ -140,7 +140,7 @@ class OfflineFileInfoFragment : Fragment() {
     }
 
     private fun removeFromOffline(node: MegaOffline, onConfirmed: () -> Unit) {
-        MaterialAlertDialogBuilder(requireContext(), R.style.MEGAMaterialAlertDialogStyle)
+        MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
             .setPositiveButton(R.string.general_remove) { _, _ ->
                 NodeController(requireContext()).deleteOffline(node)
