@@ -87,7 +87,10 @@
         <item name="indicatorColor">?attr/colorSecondary</item>
         <item name="trackColor">@color/grey_alpha_012</item>
 
+        <!-- Toolbar -->
         <item name="toolbarStyle">@style/Toolbar</item>
+
+        <!-- Alert Dialog -->
         <item name="materialAlertDialogTheme">@style/MaterialAlertDialog</item>
 
         <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->

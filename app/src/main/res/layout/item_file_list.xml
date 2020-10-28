@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/file_list_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="72dp"
@@ -82,8 +82,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            />
+            android:textAppearance="?attr/textAppearanceSubtitle1" />
 
         <ImageView
             android:id="@+id/file_list_public_link"
@@ -136,10 +135,10 @@
             android:id="@+id/file_list_filesize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+            android:layout_toRightOf="@id/file_list_versions_icon"
             android:maxLines="1"
-            app:emojiSize="14sp"
-            android:layout_toRightOf="@id/file_list_versions_icon"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+            app:emojiSize="14sp" />
     </RelativeLayout>
 
 </RelativeLayout>
