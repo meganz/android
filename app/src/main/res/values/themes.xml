@@ -58,7 +58,7 @@
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
 
         <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/MEGABottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
@@ -87,13 +87,15 @@
         <item name="indicatorColor">?attr/colorSecondary</item>
         <item name="trackColor">@color/grey_alpha_012</item>
 
+        <item name="toolbarStyle">@style/Toolbar</item>
+
         <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->
         <!--<item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>-->
         <!--<item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>-->
         <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
         <!-- In material design, typically for the title of the action bar -->
-<!--        <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>-->
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
         <!-- textAppearanceSubtitle1, Invision design is default value -->
         <!--<item name="textAppearanceSubtitle1">@style/TextAppearance.MyTheme.Subtitle1</item>-->
         <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->

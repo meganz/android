@@ -281,7 +281,7 @@
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">?android:attr/colorBackground</color>
 
-    <!-- Drawer item disabled text color  -->
+    <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
     <!-- Same to textColorPrimary -->

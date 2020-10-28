@@ -59,7 +59,7 @@
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/MEGABottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
@@ -574,18 +574,18 @@
         <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium</item>
     </style>
 
-    <style name="MEGABottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/MEGAModalStyle</item>
+    <!-- BottomSheet Dialog -->
+    <style name="BottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetModal</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-
-        <!-- reference ?attr/colorPrimary doesn't work, need define a separate color -->
-        <item name="android:navigationBarColor">@color/bottom_sheet_navigation_bar_color</item>
+        <item name="android:navigationBarColor">?android:attr/colorBackground</item>
     </style>
 
-    <style name="MEGAModalStyle" parent="Widget.Design.BottomSheet.Modal">
+    <style name="BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/background_bottomsheet_round_top</item>
     </style>
+
 
     <style name="MEGAMaterialAlertDialogStyle" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="materialAlertDialogTitleTextStyle">@style/MEGAAlertDialogTitleStyle</item>

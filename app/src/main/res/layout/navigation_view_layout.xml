@@ -59,8 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="20sp"
+                    android:textAppearance="@style/TextAppearance.Mega.Headline6"
                     app:emojiSize="18sp"
                     tools:text="User Name" />
 
@@ -70,7 +69,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                     tools:text="email@domain.com" />
 
                 <TextView
