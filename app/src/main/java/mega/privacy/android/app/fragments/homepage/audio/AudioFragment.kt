@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -104,6 +105,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.setImageResource(
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                R.drawable.ic_zero_data_recents_portrait
+            } else {
+                R.drawable.ic_zero_data_recents_landscape
+            }
+        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
