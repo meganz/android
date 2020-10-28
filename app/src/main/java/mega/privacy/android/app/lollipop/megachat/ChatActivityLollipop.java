@@ -473,7 +473,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean isAskingForMyChatFiles;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
-    private boolean isImportOption = false;
+    private boolean isImportOption;
 
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -497,14 +497,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void handleStoredData() {
 
         if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
-            forwardMessages(preservedMessagesSelected);
+            forwardMessages(preservedMessagesSelected, false);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
-            if(isImportOption){
-                chatC.proceedWithImport(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat);
-            }else{
-                chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat);
-            }
+            chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, isImportOption
+                            ? MULTIPLE_IMPORT_CONTACT_MESSAGES
+                            : MULTIPLE_FORWARD_MESSAGES);
+
             isForwardingFromNC = false;
             preservedMsgSelected = null;
             preservedMsgToImport = null;
@@ -3097,7 +3096,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected){
+    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, boolean isImportOptionChosen){
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return;
@@ -3108,7 +3107,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("Forwarding message is on going");
             return;
         }
-        isImportOption = false;
+
+        isImportOption = isImportOptionChosen;
         isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
         checkIfIsNeededToAskForMyChatFilesFolder();
@@ -3117,13 +3117,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void proceedWithAction() {
         if (isForwardingMessage) {
             stopReproductions();
-            if(isImportOption){
-                chatC.prepareAndroidMessagesToImport(preservedMessagesSelected, idChat);
-            }else{
-                chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat);
-
-            }
-
+            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat, isImportOption);
         } else {
             startUploadService();
         }
@@ -3336,24 +3330,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
-    }
-
-    public void importNodeToMyChatFiles(ArrayList<AndroidMegaChatMessage> messages){
-
-        if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-            showOverDiskQuotaPaywallWarning();
-            return;
-        }
-
-        if (isForwardingMessage) {
-            logDebug("Importing message is on going");
-            return;
-        }
-
-        isImportOption = true;
-        isForwardingMessage = true;
-        storedUnhandledData(messages);
-        checkIfIsNeededToAskForMyChatFilesFolder();
     }
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles){
@@ -4258,7 +4234,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 case R.id.chat_cab_menu_forward:
                     logDebug("Forward message");
-                    forwardMessages(messagesSelected);
+                    forwardMessages(messagesSelected, false);
                     break;
 
                 case R.id.chat_cab_menu_copy:
@@ -9308,7 +9284,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     private void checkIfIsNeededToAskForMyChatFilesFolder() {
-
         if (existsMyChatFilesFolder()) {
             setMyChatFilesFolder(getMyChatFilesFolder());
 

@@ -810,7 +810,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	@Override
 	public void handleStoredData() {
-		chatC.proceedWithForward(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId);
+		chatC.proceedWithForward(myChatFilesFolder, preservedMessagesSelected, preservedMessagesToImport, chatId, MULTIPLE_FORWARD_MESSAGES);
 		preservedMessagesSelected = null;
 		preservedMessagesToImport = null;
 	}
@@ -1067,7 +1067,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected){
 		logDebug("forwardMessages");
-		chatC.prepareMessagesToForward(messagesSelected, chatId);
+		chatC.prepareMessagesToForward(messagesSelected, chatId, false);
 	}
 
 	@Override

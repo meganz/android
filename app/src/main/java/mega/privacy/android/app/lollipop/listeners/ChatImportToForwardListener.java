@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -18,7 +19,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.shareNodeFromChat;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
 
 public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
@@ -98,26 +99,15 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                             chatC.forwardMessages(messagesSelected, chatId);
                         }
                     }else if(actionListener == MULTIPLE_IMPORT_CONTACT_MESSAGES){
-                        if(error<=0 && context instanceof ChatActivityLollipop){
-                            MegaChatMessage megaChatMessage = messagesSelected.get(0);
-                            int typeMessage = megaChatMessage.getType();
-
-                            if (typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                                MegaNodeList nodeList = megaChatMessage.getMegaNodeList();
-
-                                if (nodeList == null || nodeList.size() == 0) {
-                                    logWarning("Error: nodeList is NULL or empty");
-                                    return;
-                                }
-
-                                MegaNode node = nodeList.get(0);
-                                if (node == null) {
-                                    logWarning("Node is NULL");
-                                    return;
-                                }
-
-                                shareNodeFromChat(context, node, megaChatMessage.getMsgId(), chatId);
+                        if (error <= 0 && context instanceof ChatActivityLollipop &&
+                                messagesSelected.get(0).getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                            MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(request.getNodeHandle());
+                            if (node == null) {
+                                logWarning("Node is NULL");
+                                return;
                             }
+
+                            shareNode(context, node);
                         }
                     }
                     break;

@@ -385,7 +385,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.forward_layout:
-                ((ChatActivityLollipop) context).forwardMessages(messagesSelected);
+                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, false);
                 break;
 
             case R.id.edit_layout:

@@ -1601,7 +1601,6 @@ public class ChatController {
         for (int i = 0; i < messages.size(); i++) {
             longArray[i] = messages.get(i).getMsgId();
         }
-        logDebug("********** putExtra= "+longArray);
 
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
@@ -1625,7 +1624,7 @@ public class ChatController {
 
         if(context instanceof  ChatActivityLollipop){
             if(needShareNode){
-                ((ChatActivityLollipop) context).importNodeToMyChatFiles(messages);
+                ((ChatActivityLollipop) context).forwardMessages(messages, needShareNode);
             }else{
                 ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
             }
@@ -1642,59 +1641,24 @@ public class ChatController {
 
         if(m!=null){
             messagesSelected.add(m);
-            prepareMessagesToForward(messagesSelected, idChat);
+            prepareMessagesToForward(messagesSelected, idChat, false);
         }
         else{
             logError("Message null");
         }
     }
 
-
-    public void prepareAndroidMessagesToImport(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
+    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat, boolean isImportOption){
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
 
         for(int i = 0; i<androidMessagesSelected.size(); i++){
             messagesSelected.add(androidMessagesSelected.get(i).getMessage());
         }
 
-        prepareMessagesToImport(messagesSelected, idChat);
+        prepareMessagesToForward(messagesSelected, idChat, isImportOption);
     }
 
-    public void prepareMessagesToImport(ArrayList<MegaChatMessage> messagesSelected, long idChat){
-        logDebug("Number of messages: " + messagesSelected.size() + ",Chat ID: " + idChat);
-
-        ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
-        long[] idMessages = new long[messagesSelected.size()];
-        for(int i=0; i<messagesSelected.size();i++){
-            idMessages[i] = messagesSelected.get(i).getMsgId();
-
-            logDebug("Type of message: "+ messagesSelected.get(i).getType());
-            if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)){
-                if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
-                    messagesToImport.add(messagesSelected.get(i));
-                }
-            }
-        }
-
-        if(context instanceof ChatActivityLollipop){
-            if(!messagesToImport.isEmpty()){
-                ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
-                ((ChatActivityLollipop) context).handleStoredData();
-            }
-        }
-
-    }
-
-    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat){
-        ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
-
-        for(int i = 0; i<androidMessagesSelected.size(); i++){
-            messagesSelected.add(androidMessagesSelected.get(i).getMessage());
-        }
-        prepareMessagesToForward(messagesSelected, idChat);
-    }
-
-    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat){
+    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat, boolean isImportOption){
         logDebug("Number of messages: " + messagesSelected.size() + ",Chat ID: " + idChat);
         ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
         long[] idMessages = new long[messagesSelected.size()];
@@ -1711,7 +1675,9 @@ public class ChatController {
         }
 
         if(messagesToImport.isEmpty()){
-            forwardMessages(messagesSelected, idChat);
+            if(!isImportOption) {
+                forwardMessages(messagesSelected, idChat);
+            }
         }
         else{
             if (context instanceof ChatActivityLollipop) {
@@ -1729,42 +1695,8 @@ public class ChatController {
         }
     }
 
-    public void proceedWithImport(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat) {
-        ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_IMPORT_CONTACT_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
-        int errors = 0;
-
-        for(int j=0; j<messagesToImport.size();j++){
-            MegaChatMessage message = messagesToImport.get(j);
-
-            if(message!=null){
-
-                MegaNodeList nodeList = message.getMegaNodeList();
-
-                for(int i=0;i<nodeList.size();i++){
-                    MegaNode document = nodeList.get(i);
-                    if (document != null) {
-                        logDebug("DOCUMENT: " + document.getHandle());
-                        document = authorizeNodeIfPreview(document, megaChatApi.getChatRoom(idChat));
-                        megaApi.copyNode(document, myChatFilesFolder, listener);
-                    }
-                    else{
-                        logWarning("DOCUMENT: null");
-                    }
-                }
-            }
-            else{
-                logWarning("MESSAGE is null");
-                errors++;
-            }
-        }
-
-        if (errors > 0) {
-            showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
-        }
-    }
-
-    public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat) {
-        ChatImportToForwardListener listener = new ChatImportToForwardListener(MULTIPLE_FORWARD_MESSAGES, messagesSelected, messagesToImport.size(), context, this, idChat);
+    public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat, int action) {
+        ChatImportToForwardListener listener = new ChatImportToForwardListener(action, messagesSelected, messagesToImport.size(), context, this, idChat);
         int errors = 0;
 
         for(int j=0; j<messagesToImport.size();j++){

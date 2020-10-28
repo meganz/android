@@ -4,7 +4,7 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import android.content.Intent;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -12,6 +12,7 @@ import nz.mega.sdk.MegaRequest;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaError.*;
 import static nz.mega.sdk.MegaRequest.*;
 
@@ -26,6 +27,8 @@ public class ExportListener extends BaseListener {
     private int numberExport;
     private int pendingExport;
     private StringBuilder exportedLinks;
+    private long messageId = MEGACHAT_INVALID_HANDLE;
+    private long chatId = MEGACHAT_INVALID_HANDLE;
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -37,6 +40,20 @@ public class ExportListener extends BaseListener {
         super(context);
 
         this.shareIntent = shareIntent;
+    }
+
+    /**
+     * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
+     *
+     * @param context     current Context
+     * @param shareIntent Intent to share the content
+     */
+    public ExportListener(Context context, Intent shareIntent, long messageId, long chatId){
+        super(context);
+
+        this.shareIntent = shareIntent;
+        this.messageId = messageId;
+        this.chatId = chatId;
     }
 
     /**
@@ -123,6 +140,11 @@ public class ExportListener extends BaseListener {
             }
         } else {
             logError("Error exporting node: " + e.getErrorString());
+
+            if (messageId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
+                ChatController chatC = new ChatController(context);
+                chatC.importNode(messageId, chatId, true);
+            }
         }
     }
 }

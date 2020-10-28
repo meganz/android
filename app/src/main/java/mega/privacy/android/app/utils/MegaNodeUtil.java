@@ -28,7 +28,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -43,6 +42,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class MegaNodeUtil {
@@ -258,19 +258,10 @@ public class MegaNodeUtil {
      * @param node      node to share.
      */
     public static void shareNode(Context context, MegaNode node) {
-        if (shouldContinueWithoutError(context, "sharing node", node)) {
-            String path = getLocalFile(context, node.getName(), node.getSize());
-            if (!isTextEmpty(path) && !node.isFolder()) {
-                shareFile(context, new File(path));
-            } else if (node.isExported()) {
-                startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
-            } else {
-                MegaApplication.getInstance().getMegaApi().exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
-            }
-        }
+        shareNodeFromChat(context, node, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE);
     }
 
-    public static void shareNodeFromChat(Context context, MegaNode node, long messageId, long chatId){
+    public static void shareNodeFromChat(Context context, MegaNode node, long messageId, long chatId) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
             if (!isTextEmpty(path) && !node.isFolder()) {
@@ -278,8 +269,12 @@ public class MegaNodeUtil {
             } else if (node.isExported()) {
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
             } else {
-                ChatController chatC = new ChatController(context);
-                chatC.importNode(messageId, chatId, true);
+                MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+                if (messageId == MEGACHAT_INVALID_HANDLE || chatId == MEGACHAT_INVALID_HANDLE) {
+                    megaApi.exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
+                } else {
+                    megaApi.exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), messageId, chatId));
+                }
             }
         }
     }
