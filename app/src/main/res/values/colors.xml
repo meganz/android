@@ -50,6 +50,7 @@
     <color name="green_free_account">#31B404</color>
 
     <color name="black_12_alpha">#1F000000</color>
+    <color name="black_54_alpha">#89000000</color>
 
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>

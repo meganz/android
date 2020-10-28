@@ -55,9 +55,11 @@
             android:id="@+id/list_mode_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:layout_marginEnd="12dp"
             android:onClick="@{() -> sortByHeaderViewModel.switchListGrid()}"
-            android:src="@{sortByHeaderViewModel.isList ? @drawable/ic_thumbnail_view : @drawable/ic_list_view}"
+            android:src="@{sortByHeaderViewModel.isList ? @drawable/ic_grid_view_new : @drawable/ic_list_view_new}"
+            app:tint="@color/black_54_alpha"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
