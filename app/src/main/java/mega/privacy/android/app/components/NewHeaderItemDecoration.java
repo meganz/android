@@ -58,7 +58,7 @@ public class NewHeaderItemDecoration extends RecyclerView.ItemDecoration {
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
         mTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,TEXT_SIZE,mContext.getResources().getDisplayMetrics()));
-        mTextPaint.setColor(mContext.getResources().getColor(R.color.name_my_account));
+        mTextPaint.setColor(mContext.getResources().getColor(R.color.grey_087_white_087));
         Paint.FontMetrics fm = mTextPaint.getFontMetrics();
         mTextHeight = fm.bottom - fm.top;
         mTextBaselineOffset = fm.bottom;

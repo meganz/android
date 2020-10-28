@@ -162,7 +162,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 }
             }
 
-            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
+            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.grey_054_white_054));
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
         }else{
             holder.moreReactionsLayout.setVisibility(View.GONE);

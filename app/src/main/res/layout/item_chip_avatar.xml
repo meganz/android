@@ -44,7 +44,7 @@
         android:maxLines="1"
         android:maxWidth="60dp"
         android:gravity="center"
-        android:textColor="@color/mail_my_account"
+        android:textColor="?android:attr/textColorSecondary"
         android:fontFamily="roboto"
         android:layout_below="@+id/chip_layout"/>
 

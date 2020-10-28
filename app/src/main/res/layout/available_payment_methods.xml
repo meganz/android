@@ -39,7 +39,7 @@
                 android:text="@string/select_payment_method"
                 android:textSize="16sp"
                 android:layout_marginLeft="16dp"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:layout_gravity="left"
                 android:layout_marginBottom="15dp"/>
         </RelativeLayout>
@@ -175,7 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="22dp"
                 android:layout_marginLeft="16dp"
@@ -199,7 +199,7 @@
                     android:buttonTint="@color/accentColor"
                     android:textSize="18sp"
                     android:layout_marginBottom="28dp"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
 
                 <RadioButton android:id="@+id/billed_yearly"
                     android:layout_width="match_parent"
@@ -208,7 +208,7 @@
                     android:checked="true"
                     android:buttonTint="@color/accentColor"
                     android:textSize="18sp"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
             </RadioGroup>
         </LinearLayout>
 

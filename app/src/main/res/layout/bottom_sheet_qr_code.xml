@@ -65,7 +65,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/save_cloud_drive"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -96,7 +96,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/save_file_system"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 

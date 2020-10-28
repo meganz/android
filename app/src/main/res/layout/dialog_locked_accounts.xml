@@ -19,7 +19,7 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/locked_accounts_label"
             android:textSize="20sp"
-            android:textColor="@color/name_my_account"
+            android:textColor="?android:attr/textColorPrimary"
             android:fontFamily="sans-serif-light"
             android:textStyle="bold"/>
 

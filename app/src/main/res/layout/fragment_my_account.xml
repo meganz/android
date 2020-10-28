@@ -33,7 +33,7 @@
 					android:text="@string/business_management_alert"
 					android:gravity="center_vertical"
 					android:textSize="14sp"
-					android:textColor="@color/mail_my_account"
+					android:textColor="?android:attr/textColorSecondary"
 					android:layout_marginLeft="16dp"
 					android:layout_marginRight="16dp"/>
 
@@ -77,7 +77,7 @@
 								android:ellipsize="end"
 								android:maxLines="1"
 								android:singleLine="true"
-								android:textColor="@color/name_my_account"
+								android:textColor="?android:attr/textColorPrimary"
 								android:textSize="16sp"
 								rounded:emojiSize="14sp"
 								android:fontFamily="sans-serif-light"
@@ -100,7 +100,7 @@
 							android:ellipsize="end"
 							android:maxLines="1"
 							android:singleLine="true"
-							android:textColor="@color/mail_my_account"
+							android:textColor="?android:attr/textColorSecondary"
 							android:textSize="14sp"/>
 
 						<TextView
@@ -187,7 +187,7 @@
 							android:maxLines="1"
 							android:singleLine="true"
 							android:text="@string/achievements_title"
-							android:textColor="@color/name_my_account"
+							android:textColor="?android:attr/textColorPrimary"
 							android:textSize="14sp"
 							android:fontFamily="sans-serif-light"
 							android:textStyle="bold"/>
@@ -233,7 +233,7 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:textSize="14sp"
-							android:textColor="@color/mail_my_account"
+							android:textColor="?android:attr/textColorSecondary"
 							android:text="@string/account_label"/>
 
 						<TextView
@@ -242,7 +242,7 @@
 							android:layout_height="wrap_content"
 							android:layout_weight="1"
 							android:textSize="16sp"
-							android:textColor="@color/name_my_account"
+							android:textColor="?android:attr/textColorPrimary"
 							android:fontFamily="sans-serif-light"
 							android:textStyle="bold"
 							android:layout_marginTop="8dp"/>
@@ -299,7 +299,7 @@
 						android:layout_weight="1"
 						android:layout_gravity="center_vertical"
 						android:textSize="14sp"
-						android:textColor="@color/mail_my_account"/>
+						android:textColor="?android:attr/textColorSecondary"/>
 
 					<TextView
 						android:id="@+id/expiry_renew_date"
@@ -309,7 +309,7 @@
 						android:layout_gravity="center_vertical"
 						android:gravity="right"
 						android:textSize="16sp"
-						android:textColor="@color/mail_my_account"/>
+						android:textColor="?android:attr/textColorSecondary"/>
 
 				</LinearLayout>
 
@@ -337,7 +337,7 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:textSize="14sp"
-							android:textColor="@color/mail_my_account"
+							android:textColor="?android:attr/textColorSecondary"
 							android:text="@string/account_label"
 							android:layout_marginTop="14sp"/>
 
@@ -354,7 +354,7 @@
 								android:layout_height="wrap_content"
 								android:layout_weight="1"
 								android:textSize="16sp"
-								android:textColor="@color/name_my_account"
+								android:textColor="?android:attr/textColorPrimary"
 								android:text="@string/business_label"
 								android:fontFamily="sans-serif-light"
 								android:textStyle="bold"/>
@@ -399,7 +399,7 @@
 								android:layout_height="wrap_content"
 								android:layout_weight="1"
 								android:textSize="14sp"
-								android:textColor="@color/mail_my_account"
+								android:textColor="?android:attr/textColorSecondary"
 								android:text="@string/status_label"/>
 
 							<TextView
@@ -408,7 +408,7 @@
 								android:layout_height="wrap_content"
 								android:layout_weight="1"
 								android:textSize="14sp"
-								android:textColor="@color/mail_my_account"
+								android:textColor="?android:attr/textColorSecondary"
 								android:text="@string/renews_on"
 								android:gravity="right"/>
 
@@ -485,7 +485,7 @@
 					android:paddingRight="16dp"
 					android:paddingTop="10dp"
 					android:text="@string/my_account_change_password"
-					android:textColor="@color/name_my_account"/>
+					android:textColor="?android:attr/textColorPrimary"/>
 
 				<LinearLayout
 					android:id="@+id/my_account_type_buttons_separator"
@@ -518,13 +518,13 @@
 							android:layout_marginBottom="4dp"
 							android:text="@string/my_account_connections"
 							android:textSize="14sp"
-							android:textColor="@color/mail_my_account"/>
+							android:textColor="?android:attr/textColorSecondary"/>
 
 						<TextView
 							android:id="@+id/my_account_connections"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:textColor="@color/name_my_account"
+							android:textColor="?android:attr/textColorPrimary"
 							android:textSize="15sp"/>
 
 					</LinearLayout>
@@ -570,14 +570,14 @@
 							android:layout_height="wrap_content"
 							android:layout_marginBottom="4dp"
 							android:text="@string/my_account_last_session"
-							android:textColor="@color/mail_my_account"
+							android:textColor="?android:attr/textColorSecondary"
 							android:textSize="14sp"/>
 
 						<TextView
 							android:id="@+id/my_account_last_session"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:textColor="@color/name_my_account"
+							android:textColor="?android:attr/textColorPrimary"
 							android:textSize="15sp"/>
 
 					</LinearLayout>
@@ -605,7 +605,7 @@
 								android:paddingRight="16dp"
 								android:paddingTop="10dp"
 								android:text="@string/action_logout"
-								android:textColor="@color/name_my_account"/>
+								android:textColor="?android:attr/textColorPrimary"/>
 
 						</RelativeLayout>
 

@@ -84,7 +84,7 @@ class OfflineFileInfoFragment : Fragment() {
                     binding.collapseToolbar.setCollapsedTitleTextColor(
                         ContextCompat.getColor(
                             requireContext(),
-                            R.color.name_my_account
+                            R.color.grey_087_white_087
                         )
                     )
 

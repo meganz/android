@@ -5426,19 +5426,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch (tabSelected) {
 			case OUTGOING_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.grey_054_white_054));
 				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.grey_054_white_054));
 				break;
 			case LINKS_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.grey_054_white_054));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.grey_054_white_054));
 				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.link_ic, R.color.dark_primary_color));
 				break;
 			default:
 				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.grey_054_white_054));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.grey_054_white_054));
 
 		}
 	}
@@ -8216,7 +8216,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CheckBox dontShowAgain = new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, android.R.attr.textColorSecondary));
+		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, R.color.grey_054_white_054));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -8261,7 +8261,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, android.R.attr.textColorSecondary));
+		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, R.color.grey_054_white_054));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -8306,7 +8306,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, android.R.attr.textColorSecondary));
+		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, R.color.grey_054_white_054));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -9286,12 +9286,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
 	}
 
 	void verifyShowError(){

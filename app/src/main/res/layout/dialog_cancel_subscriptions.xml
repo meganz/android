@@ -9,7 +9,7 @@
 		android:layout_height="wrap_content"
 		android:gravity="left"
 		android:textSize="18sp"
-		android:textColor="@color/name_my_account"
+		android:textColor="?android:attr/textColorPrimary"
 		android:textAllCaps="true"
 		android:fontFamily="sans-serif-light"
 		android:textStyle="bold"
@@ -22,7 +22,7 @@
 		android:text="@string/dialog_cancel_subscriptions"
 		android:layout_below="@+id/dialog_cancel_title"
 		android:layout_marginTop="20dp"
-		android:textColor="@color/mail_my_account"
+		android:textColor="?android:attr/textColorSecondary"
 		android:textSize="16sp"/>
 
 	<EditText
@@ -36,7 +36,7 @@
 		android:scrollHorizontally="false"
 		android:theme="@style/ColorControlStyle"
 		android:textSize="14sp"
-		android:textColor="@color/name_my_account"
+		android:textColor="?android:attr/textColorPrimary"
 		android:layout_marginTop="15dp"/>
 
 </RelativeLayout>

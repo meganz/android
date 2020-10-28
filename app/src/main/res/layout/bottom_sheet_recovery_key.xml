@@ -66,7 +66,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_option_print"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -103,7 +103,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/option_copy_to_clipboard"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -133,7 +133,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/option_save_on_filesystem"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 

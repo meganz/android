@@ -18,7 +18,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_marginTop="24dp"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:layout_gravity="center_horizontal"/>
 
             <ImageView
@@ -37,7 +37,7 @@
                 android:layout_marginTop="30dp"
                 android:textSize="16sp"
                 android:gravity="center_horizontal"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:layout_gravity="center_horizontal"/>
 
             <Button

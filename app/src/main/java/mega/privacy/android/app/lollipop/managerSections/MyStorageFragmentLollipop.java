@@ -160,7 +160,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
 			totalUsedSpace.setText(getString(R.string.recovering_info));
-			totalUsedSpace.setTextColor(getResources().getColor(R.color.name_my_account));
+			totalUsedSpace.setTextColor(getResources().getColor(R.color.grey_087_white_087));
 			totalUsedSpace.setTypeface(normalTypeface);
 		}
 		else{
@@ -208,11 +208,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
-			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white_087));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else if(myAccountInfo.getUsedTransferFormatted().trim().length()<=0){
 			transferQuotaUsedText.setText(getString(R.string.recovering_info));
-			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.name_my_account));
+			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.grey_087_white_087));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else{
 			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.accentColor));

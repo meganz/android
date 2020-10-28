@@ -18,7 +18,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="25dp"
                 android:text="@string/add_phone_number_label"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textStyle="bold"
                 android:textSize="18sp"/>
             <ImageView

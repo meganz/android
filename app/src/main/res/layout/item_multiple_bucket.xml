@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:singleLine="true"
                 android:ellipsize="middle"/>
 
@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:singleLine="true"
                 android:ellipsize="middle"/>
 

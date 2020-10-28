@@ -711,12 +711,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
 	}
 
 	void verifyShowError(){

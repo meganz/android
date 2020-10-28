@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:textSize="18sp"
-        android:textColor="@color/mail_my_account"/>
+        android:textColor="?android:attr/textColorSecondary"/>
 
     <TextView
         android:id="@+id/accept_contact_mail"
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="34dp"
         android:textSize="16sp"
-        android:textColor="@color/mail_my_account"/>
+        android:textColor="?android:attr/textColorSecondary"/>
 
     <Button
         android:id="@+id/accept_contact_invite"

@@ -2,6 +2,15 @@
 <resources>
     <color name="black_white">@color/white</color>
 
+    <!-- Drawer item disabled text color  -->
+    <color name="grey_038_white_038">@color/white_alpha_038</color>
+
+    <!-- Same to textColorPrimary -->
+    <color name="grey_087_white_087">@color/white_alpha_087</color>
+
+    <!-- Same to textColorSecondary -->
+    <color name="grey_054_white_054">@color/white_alpha_054</color>
+
     <!-- The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/white_alpha_012</color>
     <!-- The "eye" icon -->
@@ -32,11 +41,7 @@
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">@color/white_alpha_005</color>
 
-    <color name="name_my_account">@color/white_alpha_087</color>
-    <color name="mail_my_account">@color/white_alpha_054</color>
     <color name="new_multiselect_color">@android:color/transparent</color>
-
-
 
     <color name="drawer_add_phone_number_background">@color/white_alpha_087</color>
     <color name="drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>

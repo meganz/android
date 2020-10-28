@@ -74,7 +74,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="15dp"
                         android:text="@string/forward_menu_item"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -113,7 +113,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="15dp"
                         android:text="@string/general_select"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="16sp"/>
                 </LinearLayout>
 
@@ -151,7 +151,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="15dp"
                         android:text="@string/title_edit_profile_info"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -181,7 +181,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="15dp"
                         android:text="@string/context_copy"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="16sp" />
                 </LinearLayout>
 

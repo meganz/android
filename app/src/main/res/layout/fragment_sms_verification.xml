@@ -45,7 +45,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:text="@string/add_phone_number_label"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="22sp" />
 
                 <TextView
@@ -56,7 +56,7 @@
                     android:layout_marginLeft="24dp"
                     android:layout_marginRight="24dp"
                     android:gravity="center"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="16sp" />
 
                 <View

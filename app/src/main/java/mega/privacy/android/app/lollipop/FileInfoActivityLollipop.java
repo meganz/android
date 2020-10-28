@@ -827,7 +827,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
                     offlineSwitch.setOnClickListener(this);
-                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
                 }else{
                     offlineSwitch.setEnabled(false);
                     availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
@@ -1145,7 +1145,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         }
                     });
 
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
                     collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
                     collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
                 }

@@ -208,7 +208,7 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:text="@string/explain_confirm_2fa"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp" />
 
                 <LinearLayout
@@ -228,7 +228,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
@@ -240,7 +240,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
@@ -252,7 +252,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
@@ -264,7 +264,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
@@ -276,7 +276,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
 
@@ -288,7 +288,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
                         android:theme="@style/ColorControlStyle" />
                 </LinearLayout>

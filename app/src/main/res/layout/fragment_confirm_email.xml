@@ -40,7 +40,7 @@
             android:fontFamily="Roboto"
             android:text="@string/confirm_email_explanation"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant"
-            android:textColor="@color/name_my_account" />
+            android:textColor="?android:attr/textColorPrimary" />
 
         <RelativeLayout
             android:id="@+id/email_content"
@@ -90,7 +90,7 @@
             android:layout_marginEnd="24dp"
             android:singleLine="false"
             android:text="@string/confirm_email_misspelled"
-            android:textColor="@color/mail_my_account"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="14sp" />
 
         <LinearLayout

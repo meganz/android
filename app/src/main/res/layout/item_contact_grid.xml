@@ -78,7 +78,7 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="6dp"
-				android:textColor="@color/name_my_account"
+				android:textColor="?android:attr/textColorPrimary"
 				android:textSize="15sp"
 				app:emojiSize="13sp"
 				android:maxLines="1"

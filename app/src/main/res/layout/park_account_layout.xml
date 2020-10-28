@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/park_account_title"
-        android:textColor="@color/name_my_account"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="20sp"/>
 
     <TextView

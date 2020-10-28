@@ -62,7 +62,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginLeft="16dp"
                     android:text="@string/title_2fa"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="18sp"
                     android:fontFamily="roboto"
                     android:textAlignment="center"
@@ -83,7 +83,7 @@
                     android:layout_marginBottom="32dp"
                     android:textSize="16sp"
                     android:fontFamily="roboto"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
 
                 <Button
                     android:id="@+id/button_enable_2fa"
@@ -127,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/explain_qr_seed_2fa_1"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
@@ -138,7 +138,7 @@
                     android:id="@+id/explain_qr_seed_2fa_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="14sp"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
@@ -197,7 +197,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -207,7 +207,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -217,7 +217,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -227,7 +227,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -237,7 +237,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                     </TableRow>
@@ -256,7 +256,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -266,7 +266,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -276,7 +276,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -286,7 +286,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -296,7 +296,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                     </TableRow>
@@ -319,7 +319,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -329,7 +329,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -339,7 +339,7 @@
                             android:textSize="18sp"
                             android:gravity="center"
                             android:layout_gravity="center"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="?android:attr/textColorPrimary"
                             android:fontFamily="roboto"/>
 
                         <TextView
@@ -393,7 +393,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/explain_confirm_2fa"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
@@ -417,7 +417,7 @@
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
                         android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
@@ -429,7 +429,7 @@
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
                         android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
@@ -441,7 +441,7 @@
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
                         android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
@@ -453,7 +453,7 @@
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
                         android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
@@ -465,7 +465,7 @@
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
                         android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
@@ -477,7 +477,7 @@
                         android:layout_height="fill_parent"
                         android:layout_gravity="left"
                         android:textSize="32sp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
@@ -539,7 +539,7 @@
                     android:layout_marginRight="16dp"
                     android:layout_marginLeft="16dp"
                     android:text="@string/title_2fa_enabled"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="18sp"
                     android:fontFamily="roboto"
                     android:textAlignment="center"
@@ -561,7 +561,7 @@
                     android:layout_marginBottom="20dp"
                     android:textSize="16sp"
                     android:fontFamily="roboto"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="?android:attr/textColorSecondary"/>
 
             </RelativeLayout>
 
@@ -577,7 +577,7 @@
                 android:textSize="16sp"
                 android:fontFamily="roboto"
                 android:text="@string/recommendation_2fa_enabled"
-                android:textColor="@color/name_my_account"/>
+                android:textColor="?android:attr/textColorPrimary"/>
             
             <LinearLayout
                 android:id="@+id/container_rk_2fa"
@@ -600,7 +600,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:textSize="16sp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:fontFamily="roboto"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="25dp"/>

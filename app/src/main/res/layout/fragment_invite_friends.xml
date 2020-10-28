@@ -36,7 +36,7 @@
                 android:fontFamily="sans-serif"
                 android:gravity="center_horizontal"
                 android:lineSpacingMultiplier="1.2"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <Button

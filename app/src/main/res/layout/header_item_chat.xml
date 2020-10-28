@@ -45,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mega_info_empty_screen"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
 
                 <TextView
@@ -53,7 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mega_info_empty_screen"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="14sp"
                     android:layout_below="@+id/mega_title"/>
 
@@ -93,7 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mega_confidentiality_empty_screen"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
 
                 <TextView
@@ -101,7 +101,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mega_confidentiality_empty_screen"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="14sp"
                     android:layout_below="@+id/confidentiality_title"/>
 
@@ -140,7 +140,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mega_authenticity_empty_screen"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
 
                 <TextView
@@ -148,7 +148,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/mega_authenticity_empty_screen"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="14sp"
                     android:layout_below="@+id/authenticity_title"/>
 

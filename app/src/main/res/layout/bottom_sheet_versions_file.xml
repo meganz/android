@@ -46,14 +46,14 @@
                 android:singleLine="true"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/versions_file_info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/versions_file_name_text"
                 android:textSize="14sp"
@@ -129,7 +129,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -167,7 +167,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_revert"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 

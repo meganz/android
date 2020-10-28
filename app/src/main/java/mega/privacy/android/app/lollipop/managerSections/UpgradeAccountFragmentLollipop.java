@@ -1205,7 +1205,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 		//Set account details
 		if (myAccountInfo.getAccountType() < 0 || myAccountInfo.getAccountType() > 4) {
 			textMyAccount.setText(getString(R.string.recovering_info));
-			textMyAccount.setTextColor(ContextCompat.getColor(context,R.color.mail_my_account));
+			textMyAccount.setTextColor(ContextCompat.getColor(context,R.color.grey_054_white_054));
 		} else {
 			switch (myAccountInfo.getAccountType()) {
 

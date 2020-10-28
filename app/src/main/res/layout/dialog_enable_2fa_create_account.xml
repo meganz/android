@@ -20,7 +20,7 @@
             android:fontFamily="roboto"
             android:gravity="center"
             android:text="@string/title_enable_2fa"
-            android:textColor="@color/name_my_account"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp" />
 
         <ImageView
@@ -38,7 +38,7 @@
             android:fontFamily="roboto"
             android:gravity="center"
             android:text="@string/two_factor_authentication_explain"
-            android:textColor="@color/mail_my_account"
+            android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp" />
 
         <Button

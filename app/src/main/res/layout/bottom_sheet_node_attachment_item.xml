@@ -43,14 +43,14 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:ellipsize="middle"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/node_attachment_info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:layout_below="@+id/node_attachment_name_text"
                 android:textSize="14sp"
                 android:singleLine="true"
@@ -125,7 +125,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_view"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -155,7 +155,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/add_to_cloud_node_chat"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -186,7 +186,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -218,7 +218,7 @@
                     android:layout_marginLeft="18dp"
                     android:layout_weight="5"
                     android:text="@string/file_properties_available_offline"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16sp"/>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial

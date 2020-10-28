@@ -32,7 +32,7 @@
             android:paddingBottom="16dp"
             android:layout_above="@+id/subtitle_permissions"
             android:textSize="22sp"
-            android:textColor="@color/name_my_account"
+            android:textColor="?android:attr/textColorPrimary"
             android:gravity="center"/>
 
         <View
@@ -49,7 +49,7 @@
             android:layout_marginRight="24dp"
             android:layout_alignTop="@+id/invisible_view"
             android:textSize="16sp"
-            android:textColor="@color/mail_my_account"
+            android:textColor="?android:attr/textColorSecondary"
             android:gravity="center"/>
         <TextView
             android:id="@+id/subtitle_explanation"
@@ -62,7 +62,7 @@
             android:text="@string/allow_access_contact_explanation"
             android:textSize="14sp"
             android:visibility="gone"
-            android:textColor="@color/mail_my_account"
+            android:textColor="?android:attr/textColorSecondary"
             android:gravity="center"/>
 
     </RelativeLayout>

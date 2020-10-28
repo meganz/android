@@ -57,7 +57,7 @@
                         android:lineSpacingExtra="0.3dp"
                         android:text="@string/see_local_contacts_on_mega"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/name_my_account"/>
+                        android:textColor="?android:attr/textColorPrimary"/>
                     <TextView
                         android:id="@+id/more_contacts_title"
                         android:layout_width="wrap_content"
@@ -173,7 +173,7 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:maxWidth="300dp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="16sp" />
 
                 <TextView

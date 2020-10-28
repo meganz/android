@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:layout_marginRight="52dp"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp"
                 app:emojiSize="14sp"/>
 
@@ -44,7 +44,7 @@
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:layout_marginRight="52dp"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <TextView
@@ -107,7 +107,7 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:layout_centerHorizontal="true"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="12sp" />
                 </RelativeLayout>
 
@@ -143,7 +143,7 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:layout_centerHorizontal="true"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="12sp" />
                 </RelativeLayout>
 
@@ -177,7 +177,7 @@
                         android:layout_below="@id/chat_contact_properties_video_icon"
                         android:text="@string/video_button"
                         android:layout_centerHorizontal="true"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="?android:attr/textColorPrimary"
                         android:textSize="12sp"
                         android:maxLines="1"
                         android:ellipsize="end"/>
@@ -209,7 +209,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="left|center_vertical"
                 android:text="@string/title_incoming_shares_explorer"
-                android:textColor="@color/name_my_account"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp" />
 
             <Button
@@ -262,7 +262,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="?android:attr/textColorPrimary"
                     android:text="@string/title_properties_chat_notifications_contact"
                     android:textSize="16sp" />
 
@@ -329,7 +329,7 @@
                 android:layout_toRightOf="@id/chat_contact_properties_share_contact_icon"
                 android:text="@string/title_properties_chat_share_contact"
                 android:textSize="16dp"
-                android:textColor="@color/name_my_account"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
         </RelativeLayout>
 
@@ -371,7 +371,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/label_verify_credentials"
                     android:textSize="16sp"
-                    android:textColor="@color/name_my_account"/>
+                    android:textColor="?android:attr/textColorPrimary"/>
 
                 <RelativeLayout
                     android:id="@+id/chat_contact_properties_verify_credentials_info_layout"
@@ -438,7 +438,7 @@
                 android:layout_toRightOf="@id/chat_contact_properties_chat_files_shared_icon"
                 android:text="@string/title_chat_shared_files_info"
                 android:textSize="16dp"
-                android:textColor="@color/name_my_account"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
         </RelativeLayout>
 
@@ -478,7 +478,7 @@
                 android:layout_toRightOf="@id/chat_contact_properties_clear_icon"
                 android:text="@string/title_properties_chat_clear"
                 android:textSize="16dp"
-                android:textColor="@color/name_my_account"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
         </RelativeLayout>
 

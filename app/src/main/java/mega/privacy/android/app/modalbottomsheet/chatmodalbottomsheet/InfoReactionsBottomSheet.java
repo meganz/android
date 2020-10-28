@@ -255,7 +255,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             }
 
             reactionText.setText(numUsers + "");
-            reactionText.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
+            reactionText.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.grey_054_white_054));
             parent.addView(button);
             return button;
         }

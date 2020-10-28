@@ -52,7 +52,7 @@
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
                 android:paddingBottom="8dp"
-                android:textColor="@color/mail_my_account"
+                android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
         </LinearLayout>
 

@@ -320,7 +320,7 @@
                                 android:layout_marginRight="21dp"
                                 android:layout_marginBottom="14dp"
                                 android:textSize="16dp"
-                                android:textColor="@color/name_my_account"/>
+                                android:textColor="?android:attr/textColorPrimary"/>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -526,7 +526,7 @@
                                     android:ellipsize="end"
                                     android:textSize="14dp"
                                     android:gravity="right"
-                                    android:textColor="@color/mail_my_account"
+                                    android:textColor="?android:attr/textColorSecondary"
                                     android:layout_column="0"/>
                             </RelativeLayout>
 
@@ -642,7 +642,7 @@
                                 android:layout_alignParentRight="true"
                                 android:layout_marginRight="12dp"
                                 android:gravity="right"
-                                android:textColor="@color/mail_my_account"
+                                android:textColor="?android:attr/textColorSecondary"
                                 android:textSize="14dp"/>
                         </RelativeLayout>
                     </LinearLayout>
@@ -762,7 +762,7 @@
                                     android:ellipsize="end"
                                     android:textSize="14dp"
                                     android:gravity="right"
-                                    android:textColor="@color/mail_my_account"
+                                    android:textColor="?android:attr/textColorSecondary"
                                     android:layout_column="0"/>
                             </RelativeLayout>
 
@@ -896,7 +896,7 @@
                                     android:ellipsize="end"
                                     android:textSize="14dp"
                                     android:gravity="right"
-                                    android:textColor="@color/mail_my_account"
+                                    android:textColor="?android:attr/textColorSecondary"
                                     android:layout_column="0"/>
                             </RelativeLayout>
 
