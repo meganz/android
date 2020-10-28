@@ -9448,8 +9448,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      */
     public void createLimitReactionsAlertDialog(long typeError) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        dialogBuilder.setMessage(getString(typeError == REACTION_ERROR_TYPE_USER ? R.string.limit_reaction_per_user
-                : R.string.limit_reaction_per_message))
+        dialogBuilder.setMessage(typeError == REACTION_ERROR_TYPE_USER
+                ? getString(R.string.limit_reaction_per_user, MAX_REACTIONS_PER_USER)
+                : getString(R.string.limit_reaction_per_message, MAX_REACTIONS_PER_MESSAGE))
                 .setOnDismissListener(dialog -> {
                     errorReactionsDialogIsShown = false;
                     typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;

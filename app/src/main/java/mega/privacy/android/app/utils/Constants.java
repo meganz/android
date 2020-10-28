@@ -413,6 +413,9 @@ public class Constants {
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
     public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
 
+    public static final int MAX_REACTIONS_PER_USER = 24;
+    public static final int MAX_REACTIONS_PER_MESSAGE = 50;
+
     public static final int REACTION_ERROR_TYPE_MESSAGE = -1;
     public static final int REACTION_ERROR_DEFAULT_VALUE = 0;
     public static final int REACTION_ERROR_TYPE_USER = 1;
