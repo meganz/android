@@ -20,18 +20,12 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.Shader.TileMode;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.provider.ContactsContract;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavOptions;
@@ -68,6 +62,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -145,7 +140,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
@@ -216,6 +210,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -4271,42 +4266,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setProfileAvatar() {
 		logDebug("setProfileAvatar");
-		File avatar = buildAvatarFile(this, megaApi.getMyEmail() + ".jpg");
-		Bitmap imBitmap;
-		if (isFileAvailable(avatar) && avatar.length() > 0) {
-			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inJustDecodeBounds = true;
-			BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-
-			// Calculate inSampleSize
-			options.inSampleSize = calculateInSampleSize(options, 250, 250);
-
-			// Decode bitmap with inSampleSize set
-			options.inJustDecodeBounds = false;
-
-			imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-			if (imBitmap == null) {
-				avatar.delete();
-				megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
-			} else {
-				Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-				BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
-				Paint paint = new Paint();
-				paint.setShader(shader);
-
-				Canvas c = new Canvas(circleBitmap);
-				int radius;
-				if (imBitmap.getWidth() < imBitmap.getHeight())
-					radius = imBitmap.getWidth() / 2;
-				else
-					radius = imBitmap.getHeight() / 2;
-
-				c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
-				nVPictureProfile.setImageBitmap(circleBitmap);
-			}
+		Pair<Boolean, Bitmap> circleAvatar = AvatarUtil.getCircleAvatar(this, megaApi.getMyEmail());
+		if (circleAvatar.first) {
+			nVPictureProfile.setImageBitmap(circleAvatar.second);
 		} else {
-			megaApi.getUserAvatar(megaApi.getMyUser(), buildAvatarFile(this, megaApi.getMyEmail() + ".jpg").getAbsolutePath(), this);
+			megaApi.getUserAvatar(megaApi.getMyUser(),
+					buildAvatarFile(this, megaApi.getMyEmail() + JPG_EXTENSION).getAbsolutePath(),
+					this);
 		}
 	}
 
@@ -4317,47 +4283,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void setOfflineAvatar(String email, long myHandle, String name){
 		logDebug("setOfflineAvatar");
-
-		File avatar = buildAvatarFile(this, email + ".jpg");
-		Bitmap imBitmap = null;
-		if (isFileAvailable(avatar)) {
-			if (avatar.length() > 0) {
-				BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;
-				BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-
-				// Calculate inSampleSize
-				options.inSampleSize = calculateInSampleSize(options, 250, 250);
-
-				// Decode bitmap with inSampleSize set
-				options.inJustDecodeBounds = false;
-
-				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-				if (imBitmap != null) {
-					Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-					BitmapShader shader = new BitmapShader(imBitmap, TileMode.CLAMP, TileMode.CLAMP);
-					Paint paint = new Paint();
-					paint.setShader(shader);
-
-					Canvas c = new Canvas(circleBitmap);
-					int radius;
-					if (imBitmap.getWidth() < imBitmap.getHeight())
-						radius = imBitmap.getWidth() / 2;
-					else
-						radius = imBitmap.getHeight() / 2;
-
-					c.drawCircle(imBitmap.getWidth() / 2, imBitmap.getHeight() / 2, radius, paint);
-					if (nVPictureProfile != null){
-						nVPictureProfile.setImageBitmap(circleBitmap);
-					}
-					return;
-				}
-			}
+		if (nVPictureProfile == null) {
+			return;
 		}
 
-		if (nVPictureProfile != null){
-			nVPictureProfile.setImageBitmap(getDefaultAvatar(getColorAvatar(myHandle), name, AVATAR_SIZE, true));
+		Pair<Boolean, Bitmap> circleAvatar = AvatarUtil.getCircleAvatar(this, email);
+		if (circleAvatar.first) {
+			nVPictureProfile.setImageBitmap(circleAvatar.second);
+		} else {
+			nVPictureProfile.setImageBitmap(
+					getDefaultAvatar(getColorAvatar(myHandle), name, AVATAR_SIZE, true));
 		}
 	}
 
