@@ -748,15 +748,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
     /**
      * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
      */
-    private void initCuSync() {
-	    if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuBackup() == null) {
-	        new CuSyncManager().setPrimaryBackup();
-        }
+	private void initCuSync() {
+		if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuBackup() == null) {
+			CuSyncManager.INSTANCE.setPrimaryBackup();
+		}
 
-        if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuBackup() == null) {
-            new CuSyncManager().setSecondaryBackup();
-        }
-    }
+		if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuBackup() == null) {
+			CuSyncManager.INSTANCE.setSecondaryBackup();
+		}
+	}
 
 	public void askForFullAccountInfo(){
 		logDebug("askForFullAccountInfo");

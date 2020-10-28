@@ -3001,12 +3001,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 
-        CuSyncManager syncManager = new CuSyncManager();
-        if (enabled) {
-            syncManager.setPrimaryBackup();
-        } else {
-            syncManager.removePrimaryBackup();
-        }
+		if (enabled) {
+			CuSyncManager.INSTANCE.setPrimaryBackup();
+		} else {
+			CuSyncManager.INSTANCE.removePrimaryBackup();
+		}
 	}
 
 	public void setSecondaryUploadEnabled (boolean enabled){
@@ -3024,12 +3023,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 
-        CuSyncManager syncManager = new CuSyncManager();
-        if (enabled) {
-            syncManager.setSecondaryBackup();
-        } else {
-            syncManager.removeSecondaryBackup();
-        }
+		if (enabled) {
+			CuSyncManager.INSTANCE.setSecondaryBackup();
+		} else {
+			CuSyncManager.INSTANCE.removeSecondaryBackup();
+		}
 	}
 
 	public void setCamSyncHandle (long handle){
@@ -3047,8 +3045,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 
-        logDebug("Set new primary handle: " + handle);
-        new CuSyncManager().updatePrimaryTargetNode(handle);
+		logDebug("Set new primary handle: " + handle);
+		CuSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
 	}
 
 	public void setSecondaryFolderHandle (long handle){
@@ -3067,8 +3065,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 
-        logDebug("Set new secondary handle: " + handle);
-        new CuSyncManager().updateSecondaryTargetNode(handle);
+		logDebug("Set new secondary handle: " + handle);
+		CuSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
 	}
 
 	public void setCamSyncLocalPath (String localPath){

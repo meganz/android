@@ -412,13 +412,12 @@ public class AccountController {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         dbH.clearCredentials();
 
-        CuSyncManager manager = new CuSyncManager();
         if (CameraUploadUtil.isPrimaryEnabled()) {
-            manager.removePrimaryBackup();
+            CuSyncManager.INSTANCE.removePrimaryBackup();
         }
 
         if (CameraUploadUtil.isSecondaryEnabled()) {
-            manager.removeSecondaryBackup();
+            CuSyncManager.INSTANCE.removeSecondaryBackup();
         }
 
         if (dbH.getPreferences() != null){

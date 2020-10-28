@@ -51,6 +51,7 @@ import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -264,6 +265,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         getAttrUserListener = null;
         setAttrUserListener = null;
         createFolderListener = null;
+
+        CuSyncManager.INSTANCE.stopActiveHeartbeat();
     }
 
     @Nullable
@@ -623,6 +626,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private void startParallelUpload(List<SyncRecord> finalList, boolean isCompressedVideo) {
+        CuSyncManager.INSTANCE.startActiveHeartbeat(finalList);
+
         for (SyncRecord file : finalList) {
             if (!running) break;
 
@@ -1540,6 +1545,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 record = dbH.findSyncRecordByLocalPath(path, isSecondary);
             }
             if (record != null) {
+                CuSyncManager.INSTANCE.onUploadSuccess(node, record);
+
                 String originalFingerprint = record.getOriginFingerprint();
                 megaApi.setOriginalFingerprint(node, originalFingerprint, this);
                 megaApi.setNodeCoordinates(node, record.getLatitude(), record.getLongitude(), null);

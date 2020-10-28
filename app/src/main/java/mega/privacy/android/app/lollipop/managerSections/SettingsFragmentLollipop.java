@@ -213,8 +213,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
     AlertDialog compressionQueueSizeDialog;
     private EditText queueSizeInput;
 
-    private CuSyncManager syncManager = new CuSyncManager();
-
     private SetAttrUserListener setAttrUserListener;
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -1579,8 +1577,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			resetCUTimestampsAndCache();
             rescheduleCameraUpload(context);
 
-            // Update sync when primary local folder changed.
-            syncManager.updatePrimaryLocalFolder(cameraPath);
+			// Update sync when primary local folder changed.
+			CuSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
 		}
 		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Local folder to sync
@@ -1599,8 +1597,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 			dbH.setSecVideoSyncTimeStamp(0);
 			rescheduleCameraUpload(context);
 
-            // Update sync when secondary local folder changed.
-            syncManager.updateSecondaryLocalFolder(secondaryPath);
+			// Update sync when secondary local folder changed.
+			CuSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
 		}
 		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
 			//Secondary folder to sync

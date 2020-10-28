@@ -1,8 +1,12 @@
 package mega.privacy.android.app.sync.cusync
 
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.jobservices.SyncRecord
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.sync.SyncListener
 import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
@@ -11,24 +15,41 @@ import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
+import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import java.io.File
+import java.util.concurrent.TimeUnit.SECONDS
 
-class CuSyncManager {
+object CuSyncManager {
+
+    const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
+    const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
+    const val NAME_PRIMARY = "camera uploads"
+    const val NAME_SECONDARY = "media uploads"
+    const val NAME_OTHER = "other sync"
+    const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
+    const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 * 60
 
     private val megaApplication: MegaApplication = MegaApplication.getInstance()
 
-    private val megaApiJava: MegaApiAndroid = megaApplication.megaApi
+    private val megaApi: MegaApiAndroid = megaApplication.megaApi
 
     private val databaseHandler: DatabaseHandler = DatabaseHandler.getDbHandler(megaApplication)
 
-    companion object {
-        const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
-        const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
-    }
+    private var activeHeartbeatTask: Disposable? = null
+
+    private var cuPendingUploads = 0
+    private var cuUploadedBytes = 0L
+    private var cuLastActionTimestampSeconds = 0L
+    private var cuLastUploadedHandle = INVALID_HANDLE
+
+    private var muPendingUploads = 0
+    private var muUploadedBytes = 0L
+    private var muLastActionTimestampSeconds = 0L
+    private var muLastUploadedHandle = INVALID_HANDLE
 
     fun setPrimaryBackup() =
         setBackup(
@@ -65,12 +86,12 @@ class CuSyncManager {
         }
 
         // Same as localized CU/MU folder name.
-        val backupName = if(backupType == TYPE_BACKUP_PRIMARY)
+        val backupName = if (backupType == TYPE_BACKUP_PRIMARY)
             StringResourcesUtils.getString(R.string.section_photo_sync)
         else
             StringResourcesUtils.getString(R.string.section_secondary_media_uploads)
 
-        megaApiJava.setBackup(
+        megaApi.setBackup(
             backupType,
             targetNode!!,
             localFolder,
@@ -217,7 +238,7 @@ class CuSyncManager {
             return
         }
 
-        megaApiJava.updateBackup(
+        megaApi.updateBackup(
             backupId,
             backupType,
             targetNode,
@@ -240,10 +261,128 @@ class CuSyncManager {
 
     private fun removeBackup(id: Long?) {
         id?.let {
-            megaApiJava.removeBackup(id, SyncListener(RemoveBackupCallback(), megaApplication))
+            megaApi.removeBackup(id, SyncListener(RemoveBackupCallback(), megaApplication))
         }
     }
 
     private fun isInvalid(value: String?) =
         TextUtil.isTextEmpty(value) || INVALID_NON_NULL_VALUE == value
+
+    fun startActiveHeartbeat(records: List<SyncRecord>) {
+        if (records.isEmpty()) {
+            return
+        }
+
+        cuPendingUploads = 0
+        var cuTotalUploadBytes = 0L
+        muPendingUploads = 0
+        var muTotalUploadBytes = 0L
+
+        for (record in records) {
+            val bytes = File(record.localPath).length()
+            if (record.isSecondary) {
+                muPendingUploads++
+                muTotalUploadBytes += bytes
+            } else {
+                cuPendingUploads++
+                cuTotalUploadBytes += bytes
+            }
+        }
+
+        if (CameraUploadUtil.isPrimaryEnabled()) {
+            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+        }
+        if (CameraUploadUtil.isSecondaryEnabled()) {
+            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+        }
+
+        activeHeartbeatTask = Observable.interval(0L, ACTIVE_HEARTBEAT_INTERVAL_SECONDS, SECONDS)
+            .subscribe({
+                val cuBackup = databaseHandler.cuBackup
+                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null
+                    && cuTotalUploadBytes != 0L
+                ) {
+                    megaApi.sendBackupHeartbeat(
+                        cuBackup.backupId, MegaApiJava.CU_SYNC_STATUS_SYNCING,
+                        (cuUploadedBytes / cuTotalUploadBytes.toFloat() * 100).toInt(),
+                        cuPendingUploads, 0, cuLastActionTimestampSeconds, cuLastUploadedHandle,
+                        null
+                    )
+                }
+
+                val muBackup = databaseHandler.muBackup
+                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null
+                    && muTotalUploadBytes != 0L
+                ) {
+                    megaApi.sendBackupHeartbeat(
+                        muBackup.backupId, MegaApiJava.CU_SYNC_STATUS_SYNCING,
+                        (muUploadedBytes / muTotalUploadBytes.toFloat() * 100).toInt(),
+                        muPendingUploads, 0, muLastActionTimestampSeconds, muLastUploadedHandle,
+                        null
+                    )
+                }
+            }, logErr("CuSyncManager startActiveHeartbeat"))
+    }
+
+    fun onUploadSuccess(node: MegaNode, record: SyncRecord) {
+        val bytes = File(record.localPath).length()
+        if (record.isSecondary) {
+            muPendingUploads--
+            muUploadedBytes += bytes
+            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+            muLastUploadedHandle = node.handle
+        } else {
+            cuPendingUploads--
+            cuUploadedBytes += bytes
+            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+            cuLastUploadedHandle = node.handle
+        }
+    }
+
+    fun stopActiveHeartbeat() {
+        activeHeartbeatTask?.dispose()
+        activeHeartbeatTask = null
+        cuPendingUploads = 0
+        cuUploadedBytes = 0
+        muPendingUploads = 0
+        muUploadedBytes = 0
+    }
+
+    fun doInactiveHeartbeat(onFinish: () -> Unit) {
+        val cuBackup = databaseHandler.cuBackup
+        if (cuBackup != null) {
+            val status = if (CameraUploadUtil.isPrimaryEnabled()) {
+                MegaApiJava.CU_SYNC_STATUS_UPTODATE
+            } else {
+                MegaApiJava.CU_SYNC_STATUS_INACTIVE
+            }
+            megaApi.sendBackupHeartbeat(
+                cuBackup.backupId, status, 0, 0, 0, cuLastActionTimestampSeconds,
+                cuLastUploadedHandle, createOnFinishListener(onFinish)
+            )
+        }
+
+        val muBackup = databaseHandler.muBackup
+        if (muBackup != null) {
+            val status = if (CameraUploadUtil.isSecondaryEnabled()) {
+                MegaApiJava.CU_SYNC_STATUS_UPTODATE
+            } else {
+                MegaApiJava.CU_SYNC_STATUS_INACTIVE
+            }
+            megaApi.sendBackupHeartbeat(
+                muBackup.backupId, status, 0, 0, 0, muLastActionTimestampSeconds,
+                muLastUploadedHandle, createOnFinishListener(onFinish)
+            )
+        }
+    }
+
+    private fun createOnFinishListener(onFinish: () -> Unit): MegaRequestListenerInterface {
+        return object : BaseListener(null) {
+            override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+                onFinish()
+            }
+        }
+    }
+
+    fun isActive() = activeHeartbeatTask != null
 }
