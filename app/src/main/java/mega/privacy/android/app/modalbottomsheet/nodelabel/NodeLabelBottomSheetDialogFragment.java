@@ -1,22 +1,31 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
-import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
 
-public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
+public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
+
+    private static final float MINIMUM_HEIGHT_PERCENTAGE = 0.7f;
 
     private BottomSheetNodeLabelBinding binding;
     private MegaNode node = null;
@@ -33,16 +42,26 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = BottomSheetNodeLabelBinding.inflate(inflater, container, false);
+        node = getMegaApi().getNodeByHandle(getArguments().getLong(HANDLE));
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        node = megaApi.getNodeByHandle(getArguments().getLong(HANDLE));
-
         showCurrentNodeLabel();
-
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
+
+        getDialog().setOnShowListener(dialog -> {
+                    BottomSheetBehavior<FrameLayout> behavior = ((BottomSheetDialog) dialog).getBehavior();
+                    behavior.setSkipCollapsed(true);
+
+                    if (view.getMeasuredHeight() < getRequiredScreenHeight()) {
+                        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    } else {
+                        behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+                    }
+                }
+        );
     }
 
     private void showCurrentNodeLabel() {
@@ -81,31 +100,41 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     private void updateNodeLabel(int checkedId) {
         switch (checkedId) {
             case R.id.radio_label_red:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_RED);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_RED);
                 break;
             case R.id.radio_label_orange:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
                 break;
             case R.id.radio_label_yellow:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
                 break;
             case R.id.radio_label_green:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
                 break;
             case R.id.radio_label_blue:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
                 break;
             case R.id.radio_label_purple:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
                 break;
             case R.id.radio_label_grey:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREY);
+                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_GREY);
                 break;
             case R.id.radio_remove:
-                megaApi.resetNodeLabel(node);
+                getMegaApi().resetNodeLabel(node);
                 break;
         }
 
         dismiss();
+    }
+
+    private float getRequiredScreenHeight() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.heightPixels * MINIMUM_HEIGHT_PERCENTAGE;
+    }
+
+    private MegaApiAndroid getMegaApi() {
+        return MegaApplication.getInstance().getMegaApi();
     }
 }
