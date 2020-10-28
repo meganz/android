@@ -243,14 +243,7 @@
         android:layout_gravity="start"
         android:background="#ffffff">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-            <include layout="@layout/navigation_view_layout"/>
-
-        </ScrollView>
+        <include layout="@layout/navigation_view_layout"/>
 
     </com.google.android.material.navigation.NavigationView>
 
