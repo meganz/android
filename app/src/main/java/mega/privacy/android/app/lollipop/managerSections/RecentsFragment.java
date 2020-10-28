@@ -134,9 +134,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         RelativeLayout.LayoutParams params;
         int size;
         if (isScreenInPortrait(context)) {
-            size = px2dp(200, outMetrics);
+            size = dp2px(200, outMetrics);
         } else {
-            size = px2dp(100, outMetrics);
+            size = dp2px(100, outMetrics);
         }
         params = new RelativeLayout.LayoutParams(size, size);
         params.addRule(RelativeLayout.CENTER_HORIZONTAL);

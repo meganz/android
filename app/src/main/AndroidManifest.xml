@@ -37,6 +37,8 @@
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 
@@ -364,8 +366,8 @@
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.InfoScreens"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"

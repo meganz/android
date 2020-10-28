@@ -16,6 +16,10 @@
         android:layout_marginBottom="8dp"
         android:orientation="vertical" >
 
+        <include layout="@layout/item_call_in_progress_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
         <!-- CONTACT INFO LAYOUT -->
 
         <LinearLayout

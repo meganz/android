@@ -2,6 +2,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_return_call"
+        android:icon="@drawable/ic_call_menu"
+        android:orderInCategory="80"
+        android:title="@string/call_in_progress_layout"
+        android:visible="false"
+        app:actionLayout="@layout/layout_menu_return_call"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/cab_menu_share_folder"
         android:icon="@drawable/ic_share_white"
         android:orderInCategory="110"
@@ -9,7 +18,6 @@
         android:visible="true"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
-
 
     <item
         android:id="@+id/cab_menu_send_file"

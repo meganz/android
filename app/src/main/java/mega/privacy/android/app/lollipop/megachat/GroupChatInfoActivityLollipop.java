@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,16 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
+
 import android.graphics.Bitmap;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
+
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -92,7 +87,6 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
@@ -633,7 +627,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        input.setEmojiSize(px2dp(EMOJI_SIZE, getOutMetrics()));
+        input.setEmojiSize(dp2px(EMOJI_SIZE, getOutMetrics()));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 

@@ -86,7 +86,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
         location.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
         RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
-        params.rightMargin = px2dp(5, context.getResources().getDisplayMetrics());
+        params.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 
         switch (transfer.getState()) {
             case STATE_COMPLETED:
@@ -137,7 +137,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
             if (thumb != null) {
                 RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) thumbnail.getLayoutParams();
-                params1.height = params1.width = px2dp(36, outMetrics);
+                params1.height = params1.width = dp2px(36, outMetrics);
                 params1.setMargins(54, 0, 18, 0);
                 thumbnail.setLayoutParams(params1);
 

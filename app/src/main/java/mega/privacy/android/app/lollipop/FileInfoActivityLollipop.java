@@ -24,7 +24,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -594,7 +593,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
         Rect rect = new Rect();
         getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
-        params.setMargins(px2dp(16, outMetrics), px2dp(90, outMetrics) + rect.top, 0, px2dp(14, outMetrics));
+        params.setMargins(dp2px(16, outMetrics), dp2px(90, outMetrics) + rect.top, 0, dp2px(14, outMetrics));
         iconToolbarLayout.setLayoutParams(params);
 
         imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
@@ -626,11 +625,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
         ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
         if(!isScreenInPortrait(this)){
-            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
-            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
+            ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_LAND, outMetrics));
+            ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
         }else{
-            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
-            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
+            ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_PORT, outMetrics));
+            ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
         }
         ownerLayout.setVisibility(View.GONE);
 

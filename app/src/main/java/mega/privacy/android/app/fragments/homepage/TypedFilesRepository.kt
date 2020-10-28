@@ -50,13 +50,15 @@ class TypedFilesRepository @Inject constructor(
 
             // Update LiveData must in main thread
             withContext(Dispatchers.Main) {
-                _fileNodeItems.value = ArrayList<NodeItem>(fileNodesMap.values)
+                emitFiles()
             }
         }
     }
 
     fun emitFiles() {
-        _fileNodeItems.value = ArrayList<NodeItem>(fileNodesMap.values)
+        synchronized(this) {
+            _fileNodeItems.value = ArrayList(fileNodesMap.values)
+        }
     }
 
     /**
@@ -64,9 +66,11 @@ class TypedFilesRepository @Inject constructor(
      * Restore these values in event of querying the raw data again
      */
     private fun saveAndClearData() {
-        savedFileNodesMap.clear()
-        fileNodesMap.toMap(savedFileNodesMap)
-        fileNodesMap.clear()
+        synchronized(this) {
+            savedFileNodesMap.clear()
+            fileNodesMap.toMap(savedFileNodesMap)
+            fileNodesMap.clear()
+        }
     }
 
     private fun getThumbnail(node: MegaNode): File? {
@@ -134,8 +138,17 @@ class TypedFilesRepository @Inject constructor(
             ) {
                 lastModifyDate = modifyDate
                 // RandomUUID() can ensure non-repetitive values in practical purpose
-                fileNodesMap[UUID.randomUUID()] =
-                    PhotoNodeItem(PhotoNodeItem.TYPE_TITLE, -1, null, -1, dateString, null, false)
+                synchronized(this) {
+                    fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
+                        PhotoNodeItem.TYPE_TITLE,
+                        -1,
+                        null,
+                        -1,
+                        dateString,
+                        null,
+                        false
+                    )
+                }
             }
 
             val selected = savedFileNodesMap[node.handle]?.selected ?: false
@@ -162,7 +175,9 @@ class TypedFilesRepository @Inject constructor(
                 )
             }
 
-            fileNodesMap[node.handle] = nodeItem
+            synchronized(this) {
+                fileNodesMap[node.handle] = nodeItem
+            }
         }
     }
 

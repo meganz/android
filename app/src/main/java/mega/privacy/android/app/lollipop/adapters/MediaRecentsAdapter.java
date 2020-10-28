@@ -113,7 +113,7 @@ public class MediaRecentsAdapter extends RecyclerView.Adapter<MediaRecentsAdapte
         }
 
         if (thumbnail != null) {
-            holder.setImage(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumbnail, Util.px2dp(1, outMetrics)));
+            holder.setImage(ThumbnailUtilsLollipop.getRoundedBitmap(context, thumbnail, Util.dp2px(1, outMetrics)));
         }
 
         if (MimeTypeList.typeForName(node.getName()).isVideo()) {

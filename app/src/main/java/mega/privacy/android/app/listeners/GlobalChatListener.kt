@@ -12,6 +12,7 @@ import nz.mega.sdk.MegaChatPresenceConfig
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
+        application.onChatListItemUpdate(api, item)
     }
 
     override fun onChatInitStateUpdate(api: MegaChatApiJava?, newState: Int) {

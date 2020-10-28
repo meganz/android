@@ -77,7 +77,6 @@ import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -701,7 +700,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.call_in_progress_layout: {
                 logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    returnCall(context);
+                    returnActiveCall(context);
                 }
                 break;
             }
@@ -1599,7 +1598,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("REQUEST_CAMERA -> returnTheCall");
-                        returnCall(context);
+                        returnActiveCall(context);
                     }
                 }
                 break;
@@ -1608,7 +1607,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
-                        returnCall(context);
+                        returnActiveCall(context);
                     }
                 }
                 break;

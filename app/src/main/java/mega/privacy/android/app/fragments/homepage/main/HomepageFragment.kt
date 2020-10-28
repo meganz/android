@@ -95,6 +95,8 @@ class HomepageFragment : Fragment() {
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
+        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
+
         return rootView
     }
 

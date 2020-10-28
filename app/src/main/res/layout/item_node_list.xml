@@ -67,7 +67,7 @@
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="16dp"
@@ -79,7 +79,7 @@
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@+id/thumbnail"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_default="wrap"
+            app:layout_constrainedWidth="true"
             tools:text="2020-05-25 22.30.21.jpg" />
 
         <ImageView

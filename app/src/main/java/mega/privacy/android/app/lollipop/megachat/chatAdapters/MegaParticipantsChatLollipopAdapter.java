@@ -25,7 +25,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
@@ -35,10 +34,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -183,9 +180,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.avatarImageView = v.findViewById(R.id.chat_group_properties_thumbnail);
                 holderHeader.infoTitleChatText = v.findViewById(R.id.chat_group_contact_properties_info_title);
                 if (isScreenInPortrait(groupChatInfoActivity)) {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
+                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
                 } else {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
+                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
                 }
 
                 holderHeader.editImageView = v.findViewById(R.id.chat_group_contact_properties_edit_icon);
