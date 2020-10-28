@@ -1152,6 +1152,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		}
 
 		logDebug("levels == -1");
+		resetSelectedItems();
 		((ManagerActivityLollipop) context).showFabButton();
 		return 0;
 	}
