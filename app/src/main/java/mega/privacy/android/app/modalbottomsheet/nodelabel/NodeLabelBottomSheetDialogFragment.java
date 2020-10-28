@@ -25,7 +25,8 @@ import static mega.privacy.android.app.utils.Constants.HANDLE;
 
 public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
-    private static final float MINIMUM_HEIGHT_PERCENTAGE = 0.7f;
+    private static final float HALF_EXPANDED_RATIO = 0.7f;
+    private static final float HALF_EXPANDED_RATIO_OFFSET = 0.01f;
 
     private BottomSheetNodeLabelBinding binding;
     private MegaNode node = null;
@@ -52,13 +53,23 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
         getDialog().setOnShowListener(dialog -> {
+                    float halfExpandedRatio;
+                    float displayHeight = getDisplayHeight();
+
+                    if (view.getMeasuredHeight() < displayHeight * HALF_EXPANDED_RATIO) {
+                        halfExpandedRatio = (view.getMeasuredHeight() / displayHeight) - HALF_EXPANDED_RATIO_OFFSET;
+                    } else {
+                        halfExpandedRatio = HALF_EXPANDED_RATIO;
+                    }
+
                     BottomSheetBehavior<FrameLayout> behavior = ((BottomSheetDialog) dialog).getBehavior();
                     behavior.setSkipCollapsed(true);
+                    behavior.setHalfExpandedRatio(halfExpandedRatio);
 
-                    if (view.getMeasuredHeight() < getRequiredScreenHeight()) {
-                        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    } else {
+                    if (behavior.getState() != BottomSheetBehavior.STATE_HALF_EXPANDED) {
                         behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
+                    } else {
+                        view.requestLayout();
                     }
                 }
         );
@@ -128,10 +139,10 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         dismiss();
     }
 
-    private float getRequiredScreenHeight() {
+    private float getDisplayHeight() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        return displayMetrics.heightPixels * MINIMUM_HEIGHT_PERCENTAGE;
+        return displayMetrics.heightPixels;
     }
 
     private MegaApiAndroid getMegaApi() {
