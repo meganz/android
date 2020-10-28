@@ -295,6 +295,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
+			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).setTextSubmitted();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
