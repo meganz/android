@@ -163,6 +163,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionOpenFolder.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
+        LinearLayout viewInFolder = contentView.findViewById(R.id.view_in_folder_layout);
+        if (mMode == MODE6) {
+            viewInFolder.setVisibility(View.VISIBLE);
+            viewInFolder.setOnClickListener(this);
+        }
+
         int counterSave = 2;
         int counterShares = 6;
         int counterModify = 4;
@@ -974,6 +980,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.option_link_layout:
                 ((ManagerActivityLollipop) context).showGetLinkActivity(node.getHandle());
+                break;
+
+            case R.id.view_in_folder_layout:
+                ((ManagerActivityLollipop) context).viewNodeInFolder(node);
                 break;
 
             case R.id.option_remove_link_layout:

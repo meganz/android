@@ -16525,28 +16525,38 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				return;
 			}
 
-			MegaNode parentNode = getRootParentNode(node);
-			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
-				parentHandleBrowser = node.getParentHandle();
-				refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
-				selectDrawerItemLollipop(drawerItem = DrawerItem.CLOUD_DRIVE);
-			} else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
-				parentHandleRubbish = node.getParentHandle();
-				refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
-				selectDrawerItemLollipop(drawerItem = DrawerItem.RUBBISH_BIN);
-			} else if (parentNode.isInShare()) {
-				parentHandleIncoming = node.getParentHandle();
-				deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node), this);
-				refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-				indexShares = INCOMING_TAB;
-				if (viewPagerShares != null) {
-					viewPagerShares.setCurrentItem(indexShares);
-					if (sharesPageAdapter != null) {
-						sharesPageAdapter.notifyDataSetChanged();
-					}
+			viewNodeInFolder(node);
+		}
+	}
+
+	/**
+	 * Opens the location of a node.
+	 *
+	 * @param node	the node to open its location
+	 */
+	public void viewNodeInFolder(MegaNode node) {
+		MegaNode parentNode = getRootParentNode(node);
+		if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
+			parentHandleBrowser = node.getParentHandle();
+			refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
+			selectDrawerItemLollipop(DrawerItem.CLOUD_DRIVE);
+		} else if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()) {
+			parentHandleRubbish = node.getParentHandle();
+			refreshFragment(FragmentTag.RUBBISH_BIN.getTag());
+			selectDrawerItemLollipop(DrawerItem.RUBBISH_BIN);
+		} else if (parentNode.isInShare()) {
+			parentHandleIncoming = node.getParentHandle();
+			deepBrowserTreeIncoming = calculateDeepBrowserTreeIncoming(megaApi.getParentNode(node),
+					this);
+			refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
+			indexShares = INCOMING_TAB;
+			if (viewPagerShares != null) {
+				viewPagerShares.setCurrentItem(indexShares);
+				if (sharesPageAdapter != null) {
+					sharesPageAdapter.notifyDataSetChanged();
 				}
-				selectDrawerItemLollipop(drawerItem = DrawerItem.SHARED_ITEMS);
 			}
+			selectDrawerItemLollipop(DrawerItem.SHARED_ITEMS);
 		}
 	}
 
