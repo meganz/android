@@ -101,6 +101,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
+    }
+
     private fun setupEmptyHint() {
         binding.emptyHint.emptyHintImage.setImageResource(
             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -159,12 +165,18 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         sortByHeaderViewModel.listGridChangeEvent.observe(
             viewLifecycleOwner,
             EventObserver { isList ->
-                switchListGridView(isList)
+                if (isList != viewModel.isList) {
+                    // change adapter will cause lose scroll position,
+                    // to avoid that, we only change adapter when the list/grid view
+                    // really change.
+                    switchListGridView(isList)
+                }
                 viewModel.refreshUi()
             })
     }
 
     private fun switchListGridView(isList: Boolean) {
+        viewModel.isList = isList
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
@@ -343,7 +355,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
 
@@ -351,11 +363,18 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
 
         switchListGridView(sortByHeaderViewModel.isList)
+    }
+
+    private fun autoScrollToTop() {
+        if (!viewModel.skipNextAutoScroll) {
+            listView.layoutManager?.scrollToPosition(0)
+        }
+        viewModel.skipNextAutoScroll = false
     }
 
     override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()

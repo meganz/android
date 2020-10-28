@@ -302,7 +302,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                if (!viewModel.skipNextAutoScroll) {
+                    listView.layoutManager?.scrollToPosition(0)
+                }
+                viewModel.skipNextAutoScroll = false
             }
         })
 
@@ -398,6 +401,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 draggingPhotoHandle = node.handle
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
     }
 
     override fun onDestroy() {

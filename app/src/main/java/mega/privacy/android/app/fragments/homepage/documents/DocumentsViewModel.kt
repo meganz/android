@@ -18,6 +18,8 @@ class DocumentsViewModel @ViewModelInject constructor(
     private var _query = MutableLiveData<String>()
 
     private var order: Int = ORDER_DEFAULT_ASC
+    var isList = true
+    var skipNextAutoScroll = false
     var searchMode = false
     var searchQuery = ""
 

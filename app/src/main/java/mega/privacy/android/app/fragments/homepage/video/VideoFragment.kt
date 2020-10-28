@@ -114,6 +114,12 @@ class VideoFragment : Fragment(), HomepageSearchable {
             getString(R.string.homepage_empty_hint_video).toUpperCase(Locale.ROOT)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(VideoFragment::class.java)
@@ -165,21 +171,29 @@ class VideoFragment : Fragment(), HomepageSearchable {
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
         gridAdapter =
             NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
 
         switchListGridView(sortByHeaderViewModel.isList)
     }
 
+    private fun autoScrollToTop() {
+        if (!viewModel.skipNextAutoScroll) {
+            listView.layoutManager?.scrollToPosition(0)
+        }
+        viewModel.skipNextAutoScroll = false
+    }
+
     private fun switchListGridView(isList: Boolean) {
+        viewModel.isList = isList
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
@@ -348,7 +362,12 @@ class VideoFragment : Fragment(), HomepageSearchable {
         sortByHeaderViewModel.listGridChangeEvent.observe(
             viewLifecycleOwner,
             EventObserver { isList ->
-                switchListGridView(isList)
+                if (isList != viewModel.isList) {
+                    // change adapter will cause lose scroll position,
+                    // to avoid that, we only change adapter when the list/grid view
+                    // really change.
+                    switchListGridView(isList)
+                }
                 viewModel.refreshUi()
             })
     }

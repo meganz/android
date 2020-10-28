@@ -17,6 +17,7 @@ class PhotosViewModel @ViewModelInject constructor(
 
     var searchMode = false
     var searchQuery = ""
+    var skipNextAutoScroll = false
 
     private var forceUpdate = false
     private var ignoredFirstNodesChange = false

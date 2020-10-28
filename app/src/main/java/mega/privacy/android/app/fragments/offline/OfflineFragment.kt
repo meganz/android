@@ -223,7 +223,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         adapter?.setHasStableIds(true)
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                scrollToPosition(0)
+                if (!viewModel.skipNextAutoScroll) {
+                    scrollToPosition(0)
+                }
             }
         })
 
@@ -303,7 +305,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.emptyHint.isVisible = nodes.isEmpty()
 
             adapter?.submitList(nodes) {
-                scrollToPosition(autoScrollPos)
+                if (!viewModel.skipNextAutoScroll) {
+                    scrollToPosition(autoScrollPos)
+                }
+                viewModel.skipNextAutoScroll = false
             }
 
             listDivider?.setDrawAllDividers(viewModel.searchMode())
@@ -800,6 +805,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
 
         setViewModelDisplayParam(viewModel.path)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
     }
 
     override fun onDestroy() {
