@@ -55,7 +55,6 @@ import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
  */
 public class BillingManager implements PurchasesUpdatedListener {
 
-    private String megaAccountHandle;
     private BillingClient mBillingClient;
     private boolean mIsServiceConnected;
     private final BillingUpdatesListener mBillingUpdatesListener;
@@ -106,12 +105,10 @@ public class BillingManager implements PurchasesUpdatedListener {
      *
      * @param activity The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
-     * @param handle Current MEGA account's hanlde as account id. {@link MegaUser#getHandle()}
      */
-    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener, String handle) {
+    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
-        megaAccountHandle = handle;
 
         //must enable pending purchases to use billing library
         mBillingClient = BillingClient.newBuilder(mActivity).enablePendingPurchases().setListener(this).build();
@@ -133,22 +130,6 @@ public class BillingManager implements PurchasesUpdatedListener {
      */
     @Override
     public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
-        // Check all the purchases to see if there's any purchase belongs to current MEGA account.
-        boolean hasMyChange = false;
-        if(purchases != null && purchases.size() > 0) {
-            for(Purchase purchase: purchases) {
-                if(isPurchaseBelongToCurrentAccount(purchase)) {
-                    logDebug("Has my purchase.");
-                    hasMyChange = true;
-                    break;
-                }
-            }
-        }
-
-        // If no updated purchase belongs to current MEGA account, return.
-        // When downgrade, purchases is null too, still need to handle.
-        if(!hasMyChange && purchases != null) return;
-
         int resultCode = billingResult.getResponseCode();
         logDebug("Purchases updated, response code is " + resultCode);
         if (resultCode == BillingResponseCode.OK) {
@@ -175,8 +156,6 @@ public class BillingManager implements PurchasesUpdatedListener {
             BillingFlowParams.Builder builder = BillingFlowParams
                     .newBuilder()
                     .setSkuDetails(skuDetails)
-                    // Set MEGA account id here.
-                    .setObfuscatedAccountId(megaAccountHandle)
                     .setReplaceSkusProrationMode(prorationMode);
 
             // setOldSku requires non-null parameters.
@@ -259,11 +238,6 @@ public class BillingManager implements PurchasesUpdatedListener {
             return;
         }
 
-        if(!isPurchaseBelongToCurrentAccount(purchase)) {
-            logWarning("Not belong to current MEGA account.");
-            return;
-        }
-
         if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
             // Acknowledge the purchase if it hasn't already been acknowledged.
             if (!purchase.isAcknowledged()) {
@@ -284,29 +258,6 @@ public class BillingManager implements PurchasesUpdatedListener {
 
         logDebug("new purchase added, " + purchase.getOriginalJson());
         mPurchases.add(purchase);
-    }
-
-    /**
-     * Check if the purchase belongs to current open MEGA account.
-     *
-     * @param purchase The purchase to check. Need to check both payload and account id.
-     * @return true if the purchase belongs to current MEGA account, otherwise false.
-     */
-    public boolean isPurchaseBelongToCurrentAccount(Purchase purchase) {
-        String payload = purchase.getDeveloperPayload();
-        String id = purchase.getAccountIdentifiers() == null ? null : purchase.getAccountIdentifiers().getObfuscatedAccountId();
-
-        if(!TextUtil.isTextEmpty(payload) && megaAccountHandle.equals(payload)) {
-            // Old version, only has payload set, so need to make sure payload is the same.
-            logDebug("Old version, purchase has valid payload.");
-            return true;
-        } else if(!TextUtil.isTextEmpty(id) && megaAccountHandle.equals(id) ) {
-            // New version, check account id.
-            logDebug("Purchase has valid account id.");
-            return true;
-        }
-        logWarning("The purchase doesn't belong to the current MEGA account.");
-        return false;
     }
 
     /**

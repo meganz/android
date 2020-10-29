@@ -1427,14 +1427,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
 	}
 
-	public void initGooglePlayPayments() {
-		//make sure user logged in
-		MegaUser user = megaApi.getMyUser();
-		if (user != null) {
-			String payload = String.valueOf(user.getHandle());
-			mBillingManager = new BillingManager(this, this, payload);
-		}
-	}
+    public void initGooglePlayPayments() {
+        mBillingManager = new BillingManager(this, this);
+    }
 
 	@Override
 	public void onBillingClientSetupFinished() {
@@ -1493,8 +1488,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		int temp = -1;
 		Purchase max = null;
 		for (Purchase purchase : purchases) {
-			if(!mBillingManager.isPurchaseBelongToCurrentAccount(purchase)) continue;
-
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
