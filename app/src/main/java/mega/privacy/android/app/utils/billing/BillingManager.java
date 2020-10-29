@@ -320,7 +320,7 @@ public class BillingManager implements PurchasesUpdatedListener {
             // Verify all available purchases
             List<Purchase> list = new ArrayList<>();
             for (Purchase purchase : purchasesList) {
-                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature()) && isPurchaseBelongToCurrentAccount(purchase)) {
+                if (purchase != null && verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
                     list.add(purchase);
                     logDebug("Purchase added, " + purchase.getOriginalJson());
                 }
