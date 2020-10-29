@@ -1539,98 +1539,79 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return idMessage;
 	}
 
-	private void startChatUploadService () {
-		logDebug("Launch chat upload with files " + filePreparedInfos.size());
-
-		filesChecked = 0;
-		long[] attachNodeHandles;
-		Intent intent = new Intent(this, ChatUploadService.class);
-
-		if (chatListItems != null && !chatListItems.isEmpty()) {
-			long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
-			HashMap<String, String> filesToUploadFingerPrint= new HashMap<>();
-			if (attachNodes != null && !attachNodes.isEmpty()) {
-//			There are exists files
-				if (uploadInfos != null && uploadInfos.size() > 0) {
-//					There are exist files and files for upload
-					attachNodeHandles = new long[attachNodes.size()];
-					for (int i=0; i<attachNodes.size(); i++) {
-						attachNodeHandles[i] = attachNodes.get(i).getHandle();
-					}
-
-					long[] attachIdChats = new long[chatListItems.size()];
-					for (int i=0; i<chatListItems.size(); i++) {
-						attachIdChats[i] = chatListItems.get(i).getChatId();
-					}
-					intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
-					intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles);
-
-					int pos = 0;
-					for (ShareInfo info : uploadInfos) {
-						long timestamp = System.currentTimeMillis()/1000;
-						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-						filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
-						for(MegaChatRoom item : chatListItems){
-							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
-							pos++;
-                        }
-                    }
-                    intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
-                    intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
-					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
-					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
-					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
-					startService(intent);
-
-					openManagerAndFinish();
-				}
-				else {
-//					All files exists, not necessary start ChatUploadService
-					pendingToAttach = attachNodes.size() * chatListItems.size();
-					for (MegaNode node : attachNodes) {
-						for (MegaChatRoom item : chatListItems) {
-							megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
-						}
-					}
-				}
-			}
-			else {
-//			All files for upload
-				int pos = 0;
-				for (ShareInfo info : filePreparedInfos) {
-					long timestamp = System.currentTimeMillis()/1000;
-					String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-					if (fingerprint == null) {
-						logWarning("Error, fingerprint == NULL is not possible to access file for some reason");
-						continue;
-					}
-					filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
-					for(MegaChatRoom item : chatListItems){
-						idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
-						pos++;
-					}
-				}
-
-				long[] attachIdChats = new long[chatListItems.size()];
-				for (int i=0; i<chatListItems.size(); i++) {
-					attachIdChats[i] = chatListItems.get(i).getChatId();
-				}
-				intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
-                intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
-				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
-				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
-				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
-				intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
-				startService(intent);
-
-				openManagerAndFinish();
-			}
-		}
-		else{
+	private void startChatUploadService() {
+		if (chatListItems == null || chatListItems.isEmpty()) {
+			logWarning("ERROR null chats to upload");
 			filePreparedInfos = null;
-			logWarning("ERROR null files to upload");
 			openManagerAndFinish();
 		}
+
+		logDebug("Launch chat upload with files " + filePreparedInfos.size());
+
+		boolean notEmptyAttachedNodes = attachNodes != null && !attachNodes.isEmpty();
+		boolean notEmptyUploadInfo = uploadInfos != null && !uploadInfos.isEmpty();
+		filesChecked = 0;
+
+		if (notEmptyAttachedNodes && !notEmptyUploadInfo) {
+			// All files exists, not necessary start ChatUploadService
+			pendingToAttach = attachNodes.size() * chatListItems.size();
+			for (MegaNode node : attachNodes) {
+				for (MegaChatRoom item : chatListItems) {
+					megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
+				}
+			}
+
+			return;
+		}
+
+		Intent intent = new Intent(this, ChatUploadService.class);
+
+		if (notEmptyAttachedNodes) {
+			// There are exist files and files for upload
+			long[] attachNodeHandles = new long[attachNodes.size()];
+
+			for (int i = 0; i < attachNodes.size(); i++) {
+				attachNodeHandles[i] = attachNodes.get(i).getHandle();
+			}
+
+			intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles);
+		}
+
+		long[] attachIdChats = new long[chatListItems.size()];
+		for (int i = 0; i < chatListItems.size(); i++) {
+			attachIdChats[i] = chatListItems.get(i).getChatId();
+		}
+		intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
+
+		List<ShareInfo> infoToShare = notEmptyUploadInfo ? uploadInfos : filePreparedInfos;
+		long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
+		HashMap<String, String> filesToUploadFingerPrint = new HashMap<>();
+		int pos = 0;
+
+		for (ShareInfo info : infoToShare) {
+			long timestamp = System.currentTimeMillis() / 1000;
+			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+			if (fingerprint == null) {
+				logWarning("Error, fingerprint == NULL is not possible to access file for some reason");
+				continue;
+			}
+
+			filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
+
+			for (MegaChatRoom item : chatListItems) {
+				idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+				pos++;
+			}
+		}
+
+		intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
+		intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+		intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
+		intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+		intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
+		startService(intent);
+
+		openManagerAndFinish();
 	}
 
 	private void openManagerAndFinish() {
