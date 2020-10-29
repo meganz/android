@@ -348,7 +348,8 @@
         android:id="@+id/divider_leave_layout"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@color/black_12_alpha" />
 
     <!-- MAKE PRIVATE LAYOUT -->
@@ -363,26 +364,25 @@
             android:id="@+id/chat_group_contact_properties_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_margin="16dp"
-            android:fontFamily="sans-serif-light"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/make_chat_private_option"
             android:textAllCaps="true"
             android:textColor="@color/accentColor"
-            android:textSize="14dp"
-            android:textStyle="bold" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/chat_group_contact_properties_private_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="11dp"
             android:text="@string/make_chat_private_option_text"
             android:textColor="@color/mail_my_account"
-            android:textSize="14dp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -390,7 +390,8 @@
         android:id="@+id/divider_private_layout"
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@color/black_12_alpha" />
 
     <!-- Title Observer LAYOUT -->
