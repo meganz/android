@@ -402,9 +402,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 
-                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
-                        groupChatInfoActivity.getString(R.string.inactive_chat) :
-                        groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
+                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants()
+                        ? groupChatInfoActivity.getString(R.string.inactive_chat)
+                        : groupChatInfoActivity.getResources().getQuantityString(R.plurals.subtitle_of_group_chat,
+                        (int) participantsCount, (int) participantsCount));
 
                 if (getChat().getNumPreviewers() < 1) {
                     holderHeader.observersSeparator.setVisibility(View.GONE);
