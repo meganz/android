@@ -78,8 +78,6 @@ import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraActio
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
-import static mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVALID_NON_NULL_VALUE;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
 import static mega.privacy.android.app.utils.ImageProcessor.*;
 import static mega.privacy.android.app.utils.JobUtil.*;

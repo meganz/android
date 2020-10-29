@@ -20,8 +20,8 @@ class SyncListener(
             logDebug("Request ${request.type} successfully.")
             callback.onSuccess(api, request, e)
         } else {
-            logDebug("Request ${request.type} failed.")
-            callback.onFail(request, null)
+            logDebug("Request ${request.type} failed. ${e?.errorString}: ${e?.errorCode}")
+            callback.onFail(request, e)
         }
     }
 }

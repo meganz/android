@@ -33,6 +33,7 @@ open class SetBackupCallback : SyncEventCallback {
             )
             LogUtil.logDebug("Save back $backup to local cache.")
             getDatabase().saveBackup(backup)
+            reEnableCameraUploadsPreference()
         }
     }
 

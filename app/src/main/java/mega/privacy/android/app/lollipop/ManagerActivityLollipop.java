@@ -4714,9 +4714,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraUploadLauncherReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateCUSettingsReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(reEnableCameraUploadsPreferenceReceiver);
+        unregisterReceiver(cameraUploadLauncherReceiver);
+        unregisterReceiver(updateCUSettingsReceiver);
+        unregisterReceiver(reEnableCameraUploadsPreferenceReceiver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();

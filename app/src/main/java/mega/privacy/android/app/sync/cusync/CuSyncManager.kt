@@ -7,12 +7,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.jobservices.SyncRecord
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.sync.SyncListener
 import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
+import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -27,10 +27,7 @@ object CuSyncManager {
 
     const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
     const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
-    const val NAME_PRIMARY = "camera uploads"
-    const val NAME_SECONDARY = "media uploads"
-    const val NAME_OTHER = "other sync"
-    const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
+    private const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
     const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 * 60
 
     private val megaApplication: MegaApplication = MegaApplication.getInstance()
@@ -73,7 +70,7 @@ object CuSyncManager {
         localFolder: String?,
         state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
         subState: Int = MegaError.API_OK,
-        extraData: String = ""
+        extraData: String = INVALID_NON_NULL_VALUE
     ) {
         if (isInvalid(targetNode?.toString())) {
             logWarning("Target handle is invalid, value: $targetNode")
@@ -279,6 +276,8 @@ object CuSyncManager {
         var muTotalUploadBytes = 0L
 
         for (record in records) {
+            if (record.isCopyOnly) continue
+
             val bytes = File(record.localPath).length()
             if (record.isSecondary) {
                 muPendingUploads++
@@ -299,25 +298,29 @@ object CuSyncManager {
         activeHeartbeatTask = Observable.interval(0L, ACTIVE_HEARTBEAT_INTERVAL_SECONDS, SECONDS)
             .subscribe({
                 val cuBackup = databaseHandler.cuBackup
-                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null
-                    && cuTotalUploadBytes != 0L
-                ) {
+                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null && cuTotalUploadBytes != 0L) {
                     megaApi.sendBackupHeartbeat(
-                        cuBackup.backupId, MegaApiJava.CU_SYNC_STATUS_SYNCING,
+                        cuBackup.backupId,
+                        MegaApiJava.CU_SYNC_STATUS_SYNCING,
                         (cuUploadedBytes / cuTotalUploadBytes.toFloat() * 100).toInt(),
-                        cuPendingUploads, 0, cuLastActionTimestampSeconds, cuLastUploadedHandle,
+                        cuPendingUploads,
+                        0,
+                        cuLastActionTimestampSeconds,
+                        cuLastUploadedHandle,
                         null
                     )
                 }
 
                 val muBackup = databaseHandler.muBackup
-                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null
-                    && muTotalUploadBytes != 0L
-                ) {
+                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null && muTotalUploadBytes != 0L) {
                     megaApi.sendBackupHeartbeat(
-                        muBackup.backupId, MegaApiJava.CU_SYNC_STATUS_SYNCING,
+                        muBackup.backupId,
+                        MegaApiJava.CU_SYNC_STATUS_SYNCING,
                         (muUploadedBytes / muTotalUploadBytes.toFloat() * 100).toInt(),
-                        muPendingUploads, 0, muLastActionTimestampSeconds, muLastUploadedHandle,
+                        muPendingUploads,
+                        0,
+                        muLastActionTimestampSeconds,
+                        muLastUploadedHandle,
                         null
                     )
                 }
