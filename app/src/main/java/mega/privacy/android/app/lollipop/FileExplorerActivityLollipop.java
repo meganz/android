@@ -1610,6 +1610,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						pos++;
 					}
 				}
+
+				long[] attachIdChats = new long[chatListItems.size()];
+				for (int i=0; i<chatListItems.size(); i++) {
+					attachIdChats[i] = chatListItems.get(i).getChatId();
+				}
+				intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
                 intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
 				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
 				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
