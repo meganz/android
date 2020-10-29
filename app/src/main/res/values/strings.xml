@@ -378,6 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
+    <string name="context_delete_link" context="Delete a link label">Delete link</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get Link</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->

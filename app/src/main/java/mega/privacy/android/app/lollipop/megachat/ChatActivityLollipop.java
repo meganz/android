@@ -1563,7 +1563,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             String chatLink = getIntent().getStringExtra(CHAT_LINK_EXTRA);
 
             if (!isTextEmpty(chatLink) && !isShareLinkDialogDismissed) {
-                showShareChatLinkDialog(this, chatRoom, chatLink, true);
+                showShareChatLinkDialog(this, chatRoom, chatLink);
             } else {
                 showSnackbar(SNACKBAR_TYPE, textSnackbar, MEGACHAT_INVALID_HANDLE);
             }

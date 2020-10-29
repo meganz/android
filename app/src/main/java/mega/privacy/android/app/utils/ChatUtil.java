@@ -128,7 +128,7 @@ public class ChatUtil {
         return getMaxAllowed(text) != text.length() || getRealLength(text) == MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
     }
 
-    public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink, boolean isCreatingChat) {
+    public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
 
@@ -147,16 +147,12 @@ public class ChatUtil {
         TextView chatLinkText = v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
-        final boolean isModerator = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR;
-
         Button copyButton = v.findViewById(R.id.copy_button);
         copyButton.setOnClickListener(v12 -> {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
             clipboard.setPrimaryClip(clip);
-            if (context instanceof GroupChatInfoActivityLollipop) {
-                ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
-            } else if (context instanceof ChatActivityLollipop) {
+            if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
 
             }
@@ -171,18 +167,6 @@ public class ChatUtil {
             context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
             dismissShareChatLinkDialog(context, shareLinkDialog);
         });
-
-        Button deleteButton = v.findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(v14 -> {
-            showConfirmationRemoveChatLink(context);
-            dismissShareChatLinkDialog(context, shareLinkDialog);
-        });
-
-        if (isModerator && !isCreatingChat) {
-            deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            deleteButton.setVisibility(View.GONE);
-        }
 
         Button dismissButton = v.findViewById(R.id.dismiss_button);
         dismissButton.setOnClickListener(v15 -> dismissShareChatLinkDialog(context, shareLinkDialog));
@@ -208,31 +192,15 @@ public class ChatUtil {
     }
 
     public static void showConfirmationRemoveChatLink(final Context context) {
-        logDebug("showConfirmationRemoveChatLink");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).removeChatLink();
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).removeChatLink();
-                        }
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        builder.setTitle(R.string.action_delete_link);
-        builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.action_delete_link)
+                .setMessage(R.string.context_remove_chat_link_warning_text)
+                .setPositiveButton(R.string.delete_button, (dialog, which) -> {
+                    if (context instanceof GroupChatInfoActivityLollipop) {
+                        ((GroupChatInfoActivityLollipop) context).removeChatLink();
+                    }
+                })
+                .setNegativeButton(R.string.general_cancel, null).show();
     }
 
     public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {

@@ -83,19 +83,9 @@
             android:textSize="14sp" />
 
         <Button
-            android:id="@+id/delete_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
-            android:layout_below="@+id/share_button"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="12dp"
-            android:text="@string/context_delete"
-            android:textColor="@color/dark_primary_color"
-            android:textSize="14sp" />
-
-        <Button
             android:id="@+id/dismiss_button"
             style="@style/TransparentBackgroundButtonWithoutBorder"
-            android:layout_below="@+id/delete_button"
+            android:layout_below="@+id/share_button"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="14dp"
