@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
@@ -16,7 +15,6 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
@@ -311,6 +309,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				else {
 					showSnackbar(getString(R.string.files_send_to_chat_error));
 				}
+
 				finishFileExplorer();
 			}
 		}
@@ -1545,7 +1544,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		filesChecked = 0;
 		long[] attachNodeHandles;
-		ArrayList<Long> pendMsgArray = new ArrayList<>();
 		Intent intent = new Intent(this, ChatUploadService.class);
 
 		if (chatListItems != null && !chatListItems.isEmpty()) {
@@ -1584,7 +1582,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
 					startService(intent);
 
-					finishFileExplorer();
+					openManagerAndFinish();
 				}
 				else {
 //					All files exists, not necessary start ChatUploadService
@@ -1619,14 +1617,22 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
 				startService(intent);
 
-				finishFileExplorer();
+				openManagerAndFinish();
 			}
 		}
 		else{
 			filePreparedInfos = null;
 			logWarning("ERROR null files to upload");
-			finishActivity();
+			openManagerAndFinish();
 		}
+	}
+
+	private void openManagerAndFinish() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+
+		finish();
 	}
 
 	private void finishFileExplorer () {
