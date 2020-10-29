@@ -108,7 +108,16 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment implemen
         addPreferencesFromResource(R.xml.preferences_cu);
 
         cameraUploadOnOff = findPreference(KEY_CAMERA_UPLOAD_ON_OFF);
-        cameraUploadOnOff.setOnPreferenceClickListener(this);
+        cameraUploadOnOff.setOnPreferenceChangeListener((preference, newValue) -> {
+            if (isOffline(context)) {
+                return false;
+            }
+
+            dbH.setCamSyncTimeStamp(0);
+            cameraUpload = !cameraUpload;
+            refreshCameraUploadsSettings();
+            return false;
+        });
 
         cameraUploadHow = findPreference(KEY_CAMERA_UPLOAD_HOW_TO);
         cameraUploadHow.setOnPreferenceChangeListener(this);
@@ -417,7 +426,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment implemen
         if (prefs != null) {
             cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
-
         if (cuEnabled) {
             disableCameraUpload();
         } else {
@@ -450,16 +458,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment implemen
         }
         Intent intent;
         switch (preference.getKey()) {
-            case KEY_CAMERA_UPLOAD_ON_OFF:
-                if (cameraUpload && isOffline(context)) {
-                    return false;
-                }
-
-                dbH.setCamSyncTimeStamp(0);
-                cameraUpload = !cameraUpload;
-                refreshCameraUploadsSettings();
-                break;
-
             case KEY_CAMERA_UPLOAD_INCLUDE_GPS:
                 includeGPS = cameraUploadIncludeGPS.isChecked();
                 dbH.setRemoveGPS(!includeGPS);

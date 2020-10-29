@@ -82,7 +82,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                     sttCameraUploads.disableMediaUploadUIProcess();
                     break;
             }
-
         }
     };
 
