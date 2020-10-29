@@ -857,7 +857,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                    Query chat link
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = request.getText();
-                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink, false);
                         return;
                     } else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
                         logError("The chatroom isn't grupal or public");
@@ -881,7 +881,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                    Create chat link
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = request.getText();
-                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink, false);
                     } else {
                         logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
