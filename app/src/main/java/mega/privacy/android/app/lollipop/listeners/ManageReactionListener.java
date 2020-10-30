@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
-
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
@@ -11,6 +9,8 @@ import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaHandleList;
 
+import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_MESSAGE;
+import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_USER;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
 public class ManageReactionListener extends ChatBaseListener {
@@ -39,9 +39,15 @@ public class ManageReactionListener extends ChatBaseListener {
                 break;
 
             case MegaError.API_EEXIST:
-                if (hasReactionBeenAdded && !MegaApplication.isIsReactionFromKeyboard()) {
+                if (hasReactionBeenAdded) {
                     logDebug("This reaction is already added in this message, so it should be removed");
-                    api.delReaction(request.getChatHandle(), api.getMessage(chatId, msgId).getMsgId(), reaction, ManageReactionListener.this);
+                }
+                break;
+
+            case MegaChatError.ERROR_TOOMANY:
+                long numberOfError = request.getNumber();
+                if (context instanceof ChatActivityLollipop && (numberOfError == REACTION_ERROR_TYPE_USER || numberOfError == REACTION_ERROR_TYPE_MESSAGE)) {
+                    ((ChatActivityLollipop) context).createLimitReactionsAlertDialog(numberOfError);
                 }
                 break;
         }

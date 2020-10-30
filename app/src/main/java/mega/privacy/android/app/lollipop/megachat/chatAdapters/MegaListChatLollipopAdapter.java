@@ -74,6 +74,13 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_DESTROYED;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_RECONNECTING;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_REQUEST_SENT;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_RING_IN;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
@@ -300,6 +307,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				holder.itemLayout.setOnClickListener(this);
 				holder.itemLayout.setOnLongClickListener(this);
 			}
+
 			updateLastCallMessage(position, holder, chat);
 		}
 		else if(itemType == ITEM_VIEW_TYPE_ARCHIVED_CHATS) {
@@ -1018,6 +1026,13 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 	}
 
+	/**
+	 * Method for displaying the appropriate string when there is a call in a chat.
+	 *
+	 * @param position Int with the position of the chat.
+	 * @param holder   The ViewHolderChatList.
+	 * @param chat     The chat.
+	 */
 	private void updateLastCallMessage(int position, ViewHolderChatList holder, MegaChatListItem chat) {
 		if (holder == null) {
 			holder = (ViewHolderChatList) listFragment.findViewHolderForAdapterPosition(position);
@@ -1031,40 +1046,39 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if (chat.isCallInProgress() && megaChatApi != null && megaChatApi.getNumCalls() != 0) {
 			MegaChatCall call = megaChatApi.getChatCall(chat.getChatId());
 			if (call != null && isStatusConnected(context, chat.getChatId())) {
-				if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT || call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED ||
-						call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
-					((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
-					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-					((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
-					((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(View.GONE);
-					((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
+				int callStatus = call.getStatus();
+				((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
+				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+				((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
 
-					if (call.getStatus() != MegaChatCall.CALL_STATUS_RING_IN) {
-						if (chat.isGroup()) {
+				switch (callStatus) {
+					case CALL_STATUS_USER_NO_PRESENT:
+					case CALL_STATUS_DESTROYED:
+					case CALL_STATUS_RING_IN:
+						((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(View.GONE);
+						((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
+						if (callStatus == CALL_STATUS_RING_IN) {
+							((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
+							((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.notification_subtitle_incoming));
+						} else {
 							((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.VISIBLE);
 							((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.ongoing_call_messages));
-						} else {
-							((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
-							((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.title_notification_call_in_progress));
 						}
-					} else {
+						break;
+
+					case CALL_STATUS_REQUEST_SENT:
+					case CALL_STATUS_IN_PROGRESS:
+					case CALL_STATUS_JOINING:
+					case CALL_STATUS_RECONNECTING:
 						((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
-						((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(R.string.outgoing_call_starting));
-					}
-
-				} else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT ||
-						call.getStatus() == MegaChatCall.CALL_STATUS_JOINING || call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
-
-					((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
-					((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
-					((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(call.isOnHold() ||
-							isSessionOnHold(chat.getChatId()) ? R.string.call_on_hold : R.string.call_started_messages));
-					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
-					((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
-
-					((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(call.hasLocalAudio() ? View.GONE : View.VISIBLE);
-					((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(call.hasLocalVideo() ? View.VISIBLE : View.GONE);
+						((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(callStatus == CALL_STATUS_REQUEST_SENT ?
+								R.string.outgoing_call_starting :
+								R.string.call_started_messages));
+						((ViewHolderNormalChatList) holder).iconMyAudioOff.setVisibility(call.hasLocalAudio() ? View.GONE : View.VISIBLE);
+						((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(call.hasLocalVideo() ? View.VISIBLE : View.GONE);
+						break;
 				}
+
 				return;
 			}
 		}
