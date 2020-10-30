@@ -834,8 +834,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         closeChatFilter.addAction(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS);
         registerReceiver(closeChatReceiver, closeChatFilter);
 
-        changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
-
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         setContentView(R.layout.activity_chat);
@@ -2202,12 +2200,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             checkSelectOption();
             callMenuItem.setEnabled(false);
-            callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.white_50_opacity));
+            callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
             if (chatRoom.isGroup()) {
                 videoMenuItem.setVisible(false);
             }else{
                 videoMenuItem.setEnabled(false);
-                videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.white_50_opacity));
+                videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_087_white_087));
             }
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
@@ -2223,14 +2221,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
                     if (!chatRoom.isGroup() || chatRoom.getPeerCount() > 0) {
                         callMenuItem.setEnabled(true);
-                        callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.background_chat));
+                        callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
                     }
 
                     if (chatRoom.isGroup()) {
                         videoMenuItem.setVisible(false);
                     } else {
                         videoMenuItem.setEnabled(true);
-                        videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.background_chat));
+                        videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_087_white_087));
                     }
                 }
 

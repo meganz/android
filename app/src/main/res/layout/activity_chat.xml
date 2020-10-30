@@ -19,16 +19,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:minHeight="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:titleTextAppearance="@style/ToolbarTitle.Secondary"
                 tools:context=".lollipop.megachat.ChatActivityLollipop">
 
                 <LinearLayout
@@ -160,7 +156,7 @@
 
                 </LinearLayout>
 
-            </androidx.appcompat.widget.Toolbar>
+            </com.google.android.material.appbar.MaterialToolbar>
 
             <RelativeLayout
                 android:id="@+id/writing_container_layout_chat_layout"

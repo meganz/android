@@ -43,6 +43,11 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
+    <!-- Action mode title text -->
+    <style name="TextAppearance.Mega.Subtitle1.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
     <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
     <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant">
         <item name="android:letterSpacing">0</item>
