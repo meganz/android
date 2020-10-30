@@ -12,19 +12,19 @@ class RemoveBackupCallback : SyncEventCallback {
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_REMOVE
 
     override fun onSuccess(
-        api: MegaApiJava?,
-        request: MegaRequest?,
-        error: MegaError?
+        api: MegaApiJava,
+        request: MegaRequest,
+        error: MegaError
     ) {
-        request?.let {
+        request.let {
             getDatabase().deleteBackupById(it.parentHandle)
             logDebug("Successful callback: delete ${it.parentHandle}.")
         }
     }
 
-    override fun onFail(request: MegaRequest?, error: MegaError?) {
-        logDebug("Delete sync with id ${request?.parentHandle} failed.")
-        request?.let {
+    override fun onFail(request: MegaRequest, error: MegaError) {
+        logDebug("Delete sync with id ${request.parentHandle} failed.")
+        request.let {
             getDatabase().setBackupAsOutdated(request.parentHandle)
         }
     }

@@ -12,13 +12,13 @@ interface SyncEventCallback {
     fun requestType(): Int
 
     fun onSuccess(
-        api: MegaApiJava?,
-        request: MegaRequest?,
-        error: MegaError?
+        api: MegaApiJava,
+        request: MegaRequest,
+        error: MegaError
     )
 
-    fun onFail(request: MegaRequest?, error: MegaError?) {
-        logDebug("${requestType()} failed: ${error?.errorCode}: ${error?.errorString}")
+    fun onFail(request: MegaRequest, error: MegaError) {
+        logDebug("${requestType()} failed: ${error.errorCode}: ${error.errorString}")
 //        stopRunningCameraUploadService(MegaApplication.getInstance())
     }
 

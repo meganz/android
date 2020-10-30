@@ -12,11 +12,11 @@ class UpdateBackupCallback: SyncEventCallback {
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_PUT
 
     override fun onSuccess(
-        api: MegaApiJava?,
-        request: MegaRequest?,
-        error: MegaError?
+        api: MegaApiJava,
+        request: MegaRequest,
+        error: MegaError
     ) {
-        request?.let {
+        request.let {
             val backup = getDatabase().getBackupById(it.parentHandle)
 
             if (backup != null && !backup.outdated) {

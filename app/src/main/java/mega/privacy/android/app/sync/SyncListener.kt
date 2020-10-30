@@ -13,10 +13,10 @@ class SyncListener(
     context: Context
 ) : BaseListener(context) {
 
-    override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
-        if (callback.requestType() != request?.type) return
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        if (callback.requestType() != request.type) return
 
-        if (e?.errorCode == MegaError.API_OK) {
+        if (e.errorCode == MegaError.API_OK) {
             logDebug("Request ${request.type} successfully.")
             callback.onSuccess(api, request, e)
         } else {
