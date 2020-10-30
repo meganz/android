@@ -27,6 +27,8 @@ object CuSyncManager {
 
     const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
     const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
+    private const val PROGRESS_INVALID = -1
+    private const val PROGRESS_FINISHED = 100
     private const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
     const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 * 60
 
@@ -276,7 +278,9 @@ object CuSyncManager {
         var muTotalUploadBytes = 0L
 
         for (record in records) {
-            if (record.isCopyOnly) continue
+            if (record.isCopyOnly) {
+                continue
+            }
 
             val bytes = File(record.localPath).length()
             if (record.isSecondary) {
@@ -342,6 +346,26 @@ object CuSyncManager {
         }
     }
 
+    fun reportUploadFinish() {
+        val cuBackup = databaseHandler.cuBackup
+        if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
+            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+            megaApi.sendBackupHeartbeat(
+                cuBackup.backupId, MegaApiJava.CU_SYNC_STATUS_SYNCING, PROGRESS_FINISHED, 0, 0,
+                cuLastActionTimestampSeconds, cuLastUploadedHandle, null
+            )
+        }
+
+        val muBackup = databaseHandler.muBackup
+        if (muBackup != null && muLastUploadedHandle != INVALID_HANDLE) {
+            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+            megaApi.sendBackupHeartbeat(
+                muBackup.backupId, MegaApiJava.CU_SYNC_STATUS_SYNCING, PROGRESS_FINISHED, 0, 0,
+                muLastActionTimestampSeconds, muLastUploadedHandle, null
+            )
+        }
+    }
+
     fun stopActiveHeartbeat() {
         activeHeartbeatTask?.dispose()
         activeHeartbeatTask = null
@@ -353,28 +377,18 @@ object CuSyncManager {
 
     fun doInactiveHeartbeat(onFinish: () -> Unit) {
         val cuBackup = databaseHandler.cuBackup
-        if (cuBackup != null) {
-            val status = if (CameraUploadUtil.isPrimaryEnabled()) {
-                MegaApiJava.CU_SYNC_STATUS_UPTODATE
-            } else {
-                MegaApiJava.CU_SYNC_STATUS_INACTIVE
-            }
+        if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
             megaApi.sendBackupHeartbeat(
-                cuBackup.backupId, status, 0, 0, 0, cuLastActionTimestampSeconds,
-                cuLastUploadedHandle, createOnFinishListener(onFinish)
+                cuBackup.backupId, MegaApiJava.CU_SYNC_STATUS_UPTODATE, PROGRESS_INVALID, 0, 0,
+                0, cuLastUploadedHandle, createOnFinishListener(onFinish)
             )
         }
 
         val muBackup = databaseHandler.muBackup
-        if (muBackup != null) {
-            val status = if (CameraUploadUtil.isSecondaryEnabled()) {
-                MegaApiJava.CU_SYNC_STATUS_UPTODATE
-            } else {
-                MegaApiJava.CU_SYNC_STATUS_INACTIVE
-            }
+        if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
             megaApi.sendBackupHeartbeat(
-                muBackup.backupId, status, 0, 0, 0, muLastActionTimestampSeconds,
-                muLastUploadedHandle, createOnFinishListener(onFinish)
+                muBackup.backupId, MegaApiJava.CU_SYNC_STATUS_UPTODATE, PROGRESS_INVALID, 0, 0,
+                0, muLastUploadedHandle, createOnFinishListener(onFinish)
             )
         }
     }

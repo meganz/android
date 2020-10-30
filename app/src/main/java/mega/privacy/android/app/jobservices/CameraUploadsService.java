@@ -817,6 +817,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         totalUploaded = 0;
         totalToUpload = 0;
 
+        CuSyncManager.INSTANCE.reportUploadFinish();
+
         finish();
     }
 
