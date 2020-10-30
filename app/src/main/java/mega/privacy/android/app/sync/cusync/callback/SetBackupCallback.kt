@@ -1,10 +1,8 @@
 package mega.privacy.android.app.sync.cusync.callback
 
-import android.content.Intent
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.constants.SettingsConstants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.sync.SyncEventCallback
+import mega.privacy.android.app.sync.cusync.CuSyncManager
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -16,11 +14,11 @@ open class SetBackupCallback : SyncEventCallback {
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_PUT
 
     override fun onSuccess(
-        api: MegaApiJava?,
-        request: MegaRequest?,
-        error: MegaError?
+        api: MegaApiJava,
+        request: MegaRequest,
+        error: MegaError
     ) {
-        request?.apply {
+        request.apply {
             val backup = Backup(
                 backupId = parentHandle,
                 backupType = totalBytes.toInt(),
@@ -33,15 +31,12 @@ open class SetBackupCallback : SyncEventCallback {
             )
             LogUtil.logDebug("Save back $backup to local cache.")
             getDatabase().saveBackup(backup)
-            reEnableCameraUploadsPreference()
+            CuSyncManager.reEnableCameraUploadsPreference(totalBytes.toInt())
         }
     }
 
-    override fun onFail(request: MegaRequest?, error: MegaError?) {
+    override fun onFail(request: MegaRequest, error: MegaError) {
         super.onFail(request, error)
-        reEnableCameraUploadsPreference()
+        CuSyncManager.reEnableCameraUploadsPreference(request.totalBytes.toInt())
     }
-
-    private fun reEnableCameraUploadsPreference() = MegaApplication.getInstance()
-        .sendBroadcast(Intent(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE))
 }

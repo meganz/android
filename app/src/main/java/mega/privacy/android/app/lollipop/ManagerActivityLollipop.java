@@ -1381,7 +1381,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         public void onReceive(Context context, Intent intent) {
             if (intent != null && ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE.equals(intent.getAction())) {
                 if (getSettingsFragment() != null) {
-                    sttFLol.reEnableCameraUploadsPreference();
+                    sttFLol.reEnableCameraUploadsPreference(intent.getIntExtra(KEY_REENABLE_WHICH_PREFERENCE, 0));
                 }
             }
         }

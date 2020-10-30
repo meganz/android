@@ -1,10 +1,13 @@
 package mega.privacy.android.app.sync.cusync
 
+import android.content.Intent
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.SettingsConstants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
+import mega.privacy.android.app.constants.SettingsConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.jobservices.SyncRecord
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.sync.SyncListener
@@ -76,11 +79,13 @@ object CuSyncManager {
     ) {
         if (isInvalid(targetNode?.toString())) {
             logWarning("Target handle is invalid, value: $targetNode")
+            reEnableCameraUploadsPreference(backupType)
             return
         }
 
         if (isInvalid(localFolder)) {
             logWarning("Local path is invalid, value: $localFolder")
+            reEnableCameraUploadsPreference(backupType)
             return
         }
 
@@ -402,4 +407,7 @@ object CuSyncManager {
     }
 
     fun isActive() = activeHeartbeatTask != null
+
+    fun reEnableCameraUploadsPreference(which: Int) = MegaApplication.getInstance()
+        .sendBroadcast(Intent(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE).putExtra(KEY_REENABLE_WHICH_PREFERENCE, which))
 }

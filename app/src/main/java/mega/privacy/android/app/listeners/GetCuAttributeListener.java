@@ -97,10 +97,7 @@ public class GetCuAttributeListener extends BaseListener {
                 JobUtil.stopRunningCameraUploadService(context);
             }
 
-            //notify manager activity to update UI
-            if (!(context instanceof MegaApplication)) {
-                forceUpdateCameraUploadFolderIcon(isSecondary, handle);
-            }
+            forceUpdateCameraUploadFolderIcon(isSecondary, handle);
         }
         if (!shouldCUStop && context instanceof CameraUploadsService) {
             // The unique process run within shoudRun method in CameraUploadsService

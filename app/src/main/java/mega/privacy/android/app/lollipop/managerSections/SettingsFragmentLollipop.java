@@ -301,6 +301,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 		megaCameraFolder.setOnPreferenceClickListener(this);
 
 		secondaryMediaFolderOn = findPreference(KEY_SECONDARY_MEDIA_FOLDER_ON);
+        secondaryMediaFolderOn.setEnabled(true);
 		secondaryMediaFolderOn.setOnPreferenceClickListener(this);
 
 		localSecondaryFolder= findPreference(KEY_LOCAL_SECONDARY_MEDIA_FOLDER);
@@ -1193,6 +1194,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
 
                 restoreSecondaryTimestampsAndSyncRecordProcess();
                 dbH.setSecondaryUploadEnabled(true);
+                // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
+                secondaryMediaFolderOn.setEnabled(false);
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));
 				//Check MEGA folder
 				if(handleSecondaryMediaFolder!=null){
@@ -2240,9 +2243,16 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment implements Pr
         cameraUploadOn.setEnabled(false);
 	}
 
-    public void reEnableCameraUploadsPreference() {
-        if (cameraUploadOn != null) {
-            cameraUploadOn.setEnabled(true);
+    public void reEnableCameraUploadsPreference(int which) {
+        switch (which) {
+            case CuSyncManager.TYPE_BACKUP_PRIMARY:
+                if (cameraUploadOn != null) {
+                    cameraUploadOn.setEnabled(true);
+                }
+            case CuSyncManager.TYPE_BACKUP_SECONDARY:
+                if (secondaryMediaFolderOn != null) {
+                    secondaryMediaFolderOn.setEnabled(true);
+                }
         }
     }
 
