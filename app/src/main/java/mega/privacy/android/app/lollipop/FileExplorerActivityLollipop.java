@@ -1539,11 +1539,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return idMessage;
 	}
 
+	/**
+	 * Checks if should start ChatUploadService to share the content or only attach it.
+	 * If the ChatUploadService has to start, it also checks if the content is already
+	 * available on Cloud to avoid start upload existing files.
+	 */
 	private void startChatUploadService() {
 		if (chatListItems == null || chatListItems.isEmpty()) {
 			logWarning("ERROR null chats to upload");
 			filePreparedInfos = null;
 			openManagerAndFinish();
+			return;
 		}
 
 		logDebug("Launch chat upload with files " + filePreparedInfos.size());
