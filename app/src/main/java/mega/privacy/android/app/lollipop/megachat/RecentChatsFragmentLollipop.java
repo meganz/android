@@ -300,10 +300,14 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 } else {
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         appBarLayout.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
-                        ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                        if (isDarkMode(context)) {
+                            ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                        }
                     } else {
                         appBarLayout.setElevation(0);
-                        ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                        if (isDarkMode(context)) {
+                            ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                        }
                     }
                 }
             } else if (context instanceof ArchivedChatsActivity) {

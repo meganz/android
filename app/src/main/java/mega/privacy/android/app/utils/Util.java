@@ -1809,4 +1809,9 @@ public class Util {
 		return LocalDate.from(
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
+
+	public static boolean isDarkMode(Context context) {
+		int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+		return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+	}
 }

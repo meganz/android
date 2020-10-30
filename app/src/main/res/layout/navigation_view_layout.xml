@@ -303,8 +303,6 @@
         <Button
             android:id="@+id/upgrade_navigation_view"
             style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_marginStart="1dp"
             android:layout_marginTop="14dp"

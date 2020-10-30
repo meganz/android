@@ -15858,8 +15858,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void doSetActionBarElevation(float elevation) {
-		toolbar.setElevation(elevation);
-		abL.setElevation(elevation);
+		if (Util.isDarkMode(this)) {
+			toolbar.setElevation(elevation);
+		} else {
+			abL.setElevation(elevation);
+		}
 	}
 
 	public long getParentHandleInbox() {

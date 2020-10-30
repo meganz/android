@@ -105,15 +105,11 @@
             <Button
                 android:id="@+id/confirm_email_new_email_resend"
                 style="@style/Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="@string/confirm_email_misspelled_resend" />
 
             <Button
                 android:id="@+id/confirm_email_cancel"
                 style="?attr/borderlessButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/general_cancel" />
         </LinearLayout>

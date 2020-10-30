@@ -50,27 +50,21 @@
                 <Button
                     android:id="@+id/sv_btn_horizontal_not_now"
                     style="@style/Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginRight="20dp"
                     android:background="@android:color/transparent"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:textAllCaps="true"
                     android:text="@string/verify_account_not_now_button"/>
                 <Button
                     android:id="@+id/sv_btn_horizontal_add"
                     style="@style/Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginLeft="22dp"
                     android:layout_marginRight="24dp"
                     android:background="@android:color/transparent"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:stateListAnimator="@null"
-                    android:textAllCaps="true"
                     android:text="@string/general_add"/>
             </LinearLayout>
         </LinearLayout>

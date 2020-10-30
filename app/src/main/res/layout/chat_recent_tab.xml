@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_relative_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/content_layout_chat_explorer"
@@ -16,48 +15,56 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <LinearLayout
                 android:id="@+id/invite_banner_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="36dp">
+
                     <ImageView
                         android:id="@+id/collapse_btn"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="16dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/ic_collapse_acc"/>
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="16dp"
+                        android:src="@drawable/ic_collapse_acc"
+                        app:tint="?attr/colorSecondary" />
+
                     <ImageView
                         android:id="@+id/close_btn"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="16dp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="16dp"
                         android:src="@drawable/close_banner"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        app:tint="?android:attr/textColorPrimary" />
+
                     <TextView
                         android:id="@+id/invite_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="start|center_vertical"
                         android:layout_marginStart="32dp"
                         android:layout_marginEnd="52dp"
                         android:layout_toEndOf="@+id/collapse_btn"
                         android:fontFamily="Roboto"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
                         android:lineSpacingExtra="0.3dp"
                         android:text="@string/see_local_contacts_on_mega"
-                        android:layout_centerVertical="true"
-                        android:textColor="?android:attr/textColorPrimary"/>
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
                     <TextView
                         android:id="@+id/more_contacts_title"
                         android:layout_width="wrap_content"
@@ -72,56 +79,48 @@
                         android:textColor="?attr/colorSecondary"
                         android:visibility="gone" />
                 </RelativeLayout>
+
                 <FrameLayout
                     android:id="@+id/contacts_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
+
                     <RelativeLayout
                         android:id="@+id/request_permission_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="gone">
+
                         <TextView
                             android:id="@+id/request_permission_message"
                             android:layout_width="wrap_content"
                             android:layout_height="60dp"
-                            android:fontFamily="Roboto"
-                            android:textColor="?android:attr/textColorSecondary"
                             android:layout_marginStart="72dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
+                            android:fontFamily="Roboto"
                             android:text="@string/grant_mega_access_contacts"
-                            android:textSize="14sp"/>
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textSize="14sp" />
 
                         <Button
                             android:id="@+id/dismiss_button"
-                            style="@style/AccentBorderBackgroundBorderlessButton"
-                            android:background="@null"
-                            android:layout_height="36dp"
+                            style="@style/BorderlessButton"
                             android:layout_below="@id/request_permission_message"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="122dp"
                             android:layout_marginBottom="16dp"
-                            android:paddingTop="0dp"
-                            android:paddingBottom="0dp"
-                            android:minWidth="82dp"
-                            android:text="@string/general_dismiss"
-                            android:textSize="14sp" />
+                            android:text="@string/general_dismiss" />
 
                         <Button
                             android:id="@+id/allow_button"
-                            style="@style/AccentBorderBackgroundBorderlessButton"
-                            android:layout_height="36dp"
+                            style="@style/OutlinedButton"
                             android:layout_below="@id/request_permission_message"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
-                            android:paddingTop="0dp"
-                            android:paddingBottom="0dp"
-                            android:minWidth="82dp"
-                            android:text="@string/general_allow"
-                            android:textSize="14sp" />
+                            android:text="@string/general_allow" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -133,8 +132,8 @@
                             android:id="@+id/contacts_list"
                             android:layout_width="wrap_content"
                             android:layout_height="88dp"
-                            android:layout_marginEnd="12dp"
-                            android:layout_centerVertical="true" />
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="12dp" />
                     </RelativeLayout>
                 </FrameLayout>
             </LinearLayout>
@@ -187,18 +186,10 @@
 
                 <Button
                     android:id="@+id/invite_button"
-                    style="@style/AccentBorderBackgroundBorderlessButton"
-                    android:layout_height="wrap_content"
+                    style="@style/BorderlessButton"
                     android:layout_below="@+id/empty_text_chat_recent"
                     android:layout_centerHorizontal="true"
-                    android:layout_gravity="center_horizontal"
-                    android:minWidth="96dp"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="10dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="10dp"
-                    android:textSize="16sp"
-                    />
+                    android:layout_gravity="center_horizontal" />
             </RelativeLayout>
         </ScrollView>
 
@@ -220,11 +211,11 @@
 
                 <mega.privacy.android.app.components.scrollBar.FastScroller
                     android:id="@+id/fastscroll_chat"
-                    android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
-                    android:gravity="right"/>
+                    android:gravity="right"
+                    android:orientation="vertical" />
             </RelativeLayout>
 
         </LinearLayout>
@@ -237,6 +228,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </RelativeLayout>

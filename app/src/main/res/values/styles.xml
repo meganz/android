@@ -537,17 +537,23 @@
 
     <!-- Contained button, inherited elevation: 2dp, TextAppearance=?attr/textAppearanceButton  -->
     <style name="Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/btn_bg_color_selector</item>
         <item name="android:textColor">@color/btn_text_color_selector</item>
     </style>
 
     <!-- Text button -->
     <style name="BorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text_btn_text_color_selector</item>
     </style>
 
     <!-- Outlined button -->
     <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="strokeColor">?attr/colorSecondary</item>
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>

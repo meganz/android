@@ -83,8 +83,6 @@
         <Button
             android:id="@+id/cam_sync_button_skip"
             style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
@@ -95,8 +93,6 @@
         <Button
             android:id="@+id/cam_sync_button_ok"
             style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"

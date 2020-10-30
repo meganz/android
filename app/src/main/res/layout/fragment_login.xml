@@ -107,8 +107,6 @@
                 <Button
                     android:id="@+id/button_login_login"
                     style="@style/Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="10dp"
@@ -146,8 +144,6 @@
                 <TextView
                     android:id="@+id/button_forgot_pass"
                     style="@style/BorderlessButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:paddingLeft="3dp"
                     android:layout_marginBottom="18dp"
                     tools:text="FORGET YOUR PASSWORD?" />
@@ -172,8 +168,6 @@
                 <TextView
                     android:id="@+id/button_create_account_login"
                     style="@style/BorderlessButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp" />
 
             </LinearLayout>
