@@ -81,7 +81,7 @@
                 android:id="@+id/button_register_tour"
                 android:text="@string/create_account"
                 android:layout_marginLeft="16dp"
-                style="@style/Button"/>
+                style="@style/Widget.Mega.Button"/>
 
         </LinearLayout>
 

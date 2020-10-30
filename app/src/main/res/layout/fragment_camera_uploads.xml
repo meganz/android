@@ -46,7 +46,7 @@
 
     <Button
         android:id="@+id/turn_on_cu_button"
-        style="@style/Button"
+        style="@style/Widget.Mega.Button"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/white"

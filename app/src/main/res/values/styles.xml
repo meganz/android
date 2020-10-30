@@ -48,8 +48,8 @@
         <item name="android:actionModeBackground">@color/accentColor</item>
         <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="actionModeStyle">@style/ActionMode</item>
-        <item name="android:actionModeStyle">@style/ActionMode</item>
+        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
         <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
         <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
         <item name="elevation">0dp</item>
@@ -59,7 +59,7 @@
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>
     </style>
 
     <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
@@ -84,8 +84,8 @@
         <item name="android:actionModeBackground">@color/accentColor</item>
         <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="actionModeStyle">@style/ActionMode</item>
-        <item name="android:actionModeStyle">@style/ActionMode</item>
+        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
         <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
         <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
 
@@ -122,8 +122,8 @@
         <item name="android:actionModeBackground">@color/accentColor</item>
         <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="actionModeStyle">@style/ActionMode</item>
-        <item name="android:actionModeStyle">@style/ActionMode</item>
+        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
+        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
         <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
         <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
         <item name="elevation">0dp</item>
@@ -524,7 +524,7 @@
     <!-- =================== Dark mode refactor start ======================= -->
 
     <!-- Contained button, inherited elevation: 2dp, TextAppearance=?attr/textAppearanceButton  -->
-    <style name="Button" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.Mega.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:backgroundTint">@color/btn_bg_color_selector</item>
@@ -532,14 +532,14 @@
     </style>
 
     <!-- Text button -->
-    <style name="BorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="Widget.Mega.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text_btn_text_color_selector</item>
     </style>
 
     <!-- Outlined button -->
-    <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="Widget.Mega.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="strokeColor">?attr/colorSecondary</item>
@@ -553,60 +553,60 @@
     it will use textColorSecondary itself.
     textColorPrimary is the color of the user-input text. ColorError is the color of error text
     textColorHint is the hint color when the field is empty and NOT focused. -->
-    <style name="TextInputLayout" parent="Widget.Design.TextInputLayout">
+    <style name="Widget.Mega.TextInputLayout" parent="Widget.Design.TextInputLayout">
         <item name="colorControlNormal">@color/grey_012_white_012</item>
     </style>
 
-    <style name="TextInputLayout.Password">
+    <style name="Widget.Mega.TextInputLayout.Password">
         <item name="endIconMode">password_toggle</item>
         <item name="endIconDrawable">@drawable/ic_b_see</item>
         <item name="endIconTint">@color/password_color_toggle</item>
     </style>
 
     <!-- Action bar title -->
-    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
+    <style name="Widget.Mega.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
         <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium</item>
     </style>
 
     <!-- BottomSheet Dialog -->
-    <style name="BottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/BottomSheetModal</item>
+    <style name="Theme.Mega.BottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Mega.BottomSheetModal</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">?android:attr/colorBackground</item>
     </style>
 
-    <style name="BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
+    <style name="Widget.Mega.BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/background_bottomsheet_round_top</item>
     </style>
 
-    <style name="MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="materialAlertDialogTitleTextStyle">@style/AlertDialogTitle</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/AlertDialogBody</item>
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeButton</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveButton</item>
+    <style name="ThemeOverlay.Mega.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.Mega.Title.Text</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.Mega.Body.Text</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Mega.NegativeButton.Dialog</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Mega.PositiveButton.Dialog</item>
     </style>
 
-    <style name="AlertDialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+    <style name="MaterialAlertDialog.Mega.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="AlertDialogBody" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+    <style name="MaterialAlertDialog.Mega.Body.Text" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Secondary</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
-    <style name="NegativeButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="Widget.Mega.NegativeButton.Dialog" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
-    <style name="PositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+    <style name="Widget.Mega.PositiveButton.Dialog" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
     <!-- Action mode-->
-    <style name="ActionMode" parent="@style/Widget.AppCompat.ActionMode">
+    <style name="Widget.Mega.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="colorControlNormal">?attr/colorSecondary</item>
         <item name="titleTextStyle">@style/TextAppearance.Mega.Subtitle1.AccentColor</item>
     </style>

@@ -82,7 +82,7 @@
 
         <Button
             android:id="@+id/cam_sync_button_skip"
-            style="@style/Button"
+            style="@style/Widget.Mega.Button"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
@@ -92,7 +92,7 @@
 
         <Button
             android:id="@+id/cam_sync_button_ok"
-            style="@style/Button"
+            style="@style/Widget.Mega.Button"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"

@@ -53,20 +53,20 @@
 
         <item name="actionModeBackground">?attr/colorPrimary</item>
         <item name="actionModeCloseDrawable">@drawable/action_mode_close</item>
-        <item name="actionModeStyle">@style/ActionMode</item>
+        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
 
         <!-- Action bar only used in Action mode (overlap the tool bar), thus only need to set action mode style -->
 <!--        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>-->
 <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
 
         <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
 
-        <item name="borderlessButtonStyle">@style/BorderlessButton</item>
+        <item name="borderlessButtonStyle">@style/Widget.Mega.Button.TextButton</item>
 
         <!-- Headline text color. Title on action bar, menu item text automatically use it -->
         <item name="android:textColorPrimary">@color/grey_alpha_087</item>
@@ -78,7 +78,7 @@
 
         <!-- Besides the global style, the TextInputLayout should apply android:theme to make its
           child view TextInputEditText to have the correct underline color -->
-        <item name="textInputStyle">@style/TextInputLayout</item>
+        <item name="textInputStyle">@style/Widget.Mega.TextInputLayout</item>
 
         <!-- This Material style has a min width and height for enlarging the clickable area of checkbox.
              It uses textColorSecondary as colorControlNormal that complies with Invision design.
@@ -90,10 +90,10 @@
         <item name="trackColor">@color/grey_alpha_012</item>
 
         <!-- Toolbar -->
-        <item name="toolbarStyle">@style/Toolbar</item>
+        <item name="toolbarStyle">@style/Widget.Mega.Toolbar</item>
 
         <!-- Alert Dialog -->
-        <item name="materialAlertDialogTheme">@style/MaterialAlertDialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
 
         <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->

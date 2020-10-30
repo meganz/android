@@ -106,7 +106,7 @@
 
                         <Button
                             android:id="@+id/dismiss_button"
-                            style="@style/BorderlessButton"
+                            style="@style/Widget.Mega.Button.TextButton"
                             android:layout_below="@id/request_permission_message"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="122dp"
@@ -115,7 +115,7 @@
 
                         <Button
                             android:id="@+id/allow_button"
-                            style="@style/OutlinedButton"
+                            style="@style/Widget.Mega.Button.OutlinedButton"
                             android:layout_below="@id/request_permission_message"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="16dp"
@@ -186,7 +186,7 @@
 
                 <Button
                     android:id="@+id/invite_button"
-                    style="@style/BorderlessButton"
+                    style="@style/Widget.Mega.Button.TextButton"
                     android:layout_below="@+id/empty_text_chat_recent"
                     android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal" />

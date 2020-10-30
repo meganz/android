@@ -48,7 +48,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="7dp"
                             android:hint="@string/first_name_text"
-                            android:theme="@style/TextInputLayout"
+                            android:theme="@style/Widget.Mega.TextInputLayout"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -83,7 +83,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/lastname_text"
-                            android:theme="@style/TextInputLayout"
+                            android:theme="@style/Widget.Mega.TextInputLayout"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -118,7 +118,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/email_text"
-                            android:theme="@style/TextInputLayout"
+                            android:theme="@style/Widget.Mega.TextInputLayout"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -149,12 +149,12 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_layout"
-                            style="@style/TextInputLayout.Password"
+                            style="@style/Widget.Mega.TextInputLayout.Password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/password_text"
-                            android:theme="@style/TextInputLayout.Password"
+                            android:theme="@style/Widget.Mega.TextInputLayout.Password"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -267,12 +267,12 @@
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/create_account_password_text_confirm_layout"
-                            style="@style/TextInputLayout.Password"
+                            style="@style/Widget.Mega.TextInputLayout.Password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:hint="@string/confirm_password_text"
-                            android:theme="@style/TextInputLayout.Password"
+                            android:theme="@style/Widget.Mega.TextInputLayout.Password"
                             app:errorEnabled="true">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -398,7 +398,7 @@ app/src/main/res/layout/fragment_create_account.xml
 
                 <Button
                     android:id="@+id/button_create_account_create"
-                    style="@style/Button"
+                    style="@style/Widget.Mega.Button"
                     android:layout_gravity="center_vertical"
                     tools:text="create account" />
 
