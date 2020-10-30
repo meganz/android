@@ -4874,6 +4874,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         psaViewModel.checkPsa();
     }
 
+    /**
+	 * Observe LiveData for PSA, and show PSA view when get it.
+	 */
     private void observePsa() {
         psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
                 .get(PsaViewModel.class);
@@ -4882,6 +4885,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         psaViewModel.getPsa().observe(this, this::showPsa);
     }
 
+	/**
+	 * Show PSA view.
+	 *
+	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
+	 * directly. Otherwise, show the normal PSA view.
+	 *
+	 * @param psa the PSA to show
+	 */
     private void showPsa(Psa psa) {
         if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
             return;

@@ -8,6 +8,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop
 
+/**
+ * The view holder for normal PSA view, implementing the display logic of PSA.
+ */
 class PsaViewHolder(
     psaLayout: View,
     private val viewModel: PsaViewModel
@@ -15,6 +18,11 @@ class PsaViewHolder(
     private val binding = PsaLayoutBinding.bind(psaLayout)
     private var bound = false
 
+    /**
+     * Bind view for the PSA.
+     *
+     * @param psa the PSA to display
+     */
     fun bind(psa: Psa) {
         bound = true
         binding.root.visibility = View.VISIBLE
@@ -44,10 +52,20 @@ class PsaViewHolder(
         }
     }
 
+    /**
+     * Toggle visibility of the PSA view.
+     *
+     * @param shouldShow if the PSA view should be visible
+     */
     fun toggleVisible(shouldShow: Boolean) {
         binding.root.visibility = if (shouldShow && bound) View.VISIBLE else View.GONE
     }
 
+    /**
+     * Hide PSA view and dismiss it in server.
+     *
+     * @param id the id of the PSA
+     */
     private fun dismissPsa(id: Int) {
         viewModel.dismissPsa(id)
         binding.root.visibility = View.GONE
