@@ -17,10 +17,7 @@
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
     <!-- Notification badge -->
-    <color name="white_red_300">@color/red_300</color>
     <color name="white_dark_grey">@color/dark_grey</color>
-    <color name="red_600_dark_grey">@color/dark_grey</color>
-    <color name="badge_in_chat">@color/dark_grey</color>
 
     <!-- password strength -->
     <color name="password_weak">#F5F595</color>

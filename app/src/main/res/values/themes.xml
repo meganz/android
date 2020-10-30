@@ -49,8 +49,8 @@
         colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="windowActionModeOverlay">true</item>
 
+        <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">?attr/colorPrimary</item>
         <item name="actionModeCloseDrawable">@drawable/action_mode_close</item>
         <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>

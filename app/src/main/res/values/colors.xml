@@ -270,11 +270,9 @@
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
     <!-- Notification badge -->
-    <color name="white_red_300">@color/white</color>
     <color name="white_dark_grey">@color/white</color>
-    <color name="red_600_dark_grey">@color/red_600</color>
 
-    <!-- Turn on camera uploads button text -->
+    <!-- Turn on camera uploads button text, action mode bar color -->
     <color name="teal_300_dark_grey">@color/teal_300</color>
 
     <!-- Primary red -->
@@ -311,9 +309,6 @@
     <color name="free_account">#2BB200</color>
     <color name="lite_account">#FFA500</color>
     <color name="pro_account">#F0373A</color>
-
-    <!-- Notification badge -->
-    <color name="badge_in_chat">@color/pro_account</color>
 
     <!-- reference ?attr/colorPrimary in AppBottomSheetDialogTheme doesn't work,
      need define a separate color -->

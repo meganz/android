@@ -65,6 +65,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -324,6 +325,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			checkScroll();
+
+			Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
+					R.color.teal_300_dark_grey);
 			return true;
 		}
 
@@ -335,6 +339,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 			checkScroll();
+
+			Util.resetStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow());
 		}
 
 		@Override
