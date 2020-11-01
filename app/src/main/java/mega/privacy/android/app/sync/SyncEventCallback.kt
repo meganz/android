@@ -17,9 +17,12 @@ interface SyncEventCallback {
         error: MegaError
     )
 
-    fun onFail(request: MegaRequest, error: MegaError) {
-        logDebug("${requestType()} failed: ${error.errorCode}: ${error.errorString}")
-//        stopRunningCameraUploadService(MegaApplication.getInstance())
+    fun onFail(
+        api: MegaApiJava,
+        request: MegaRequest,
+        error: MegaError
+    ) {
+        // default empty implementation
     }
 
     fun getDatabase(): DatabaseHandler = DatabaseHandler.getDbHandler(MegaApplication.getInstance())

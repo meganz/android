@@ -3,7 +3,7 @@ package mega.privacy.android.app.sync.cusync.callback
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.sync.SyncEventCallback
 import mega.privacy.android.app.sync.cusync.CuSyncManager
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -29,14 +29,14 @@ open class SetBackupCallback : SyncEventCallback {
                 subState = numDetails,
                 extraData = text
             )
-            LogUtil.logDebug("Save back $backup to local cache.")
+            logDebug("Save back $backup to local cache.")
             getDatabase().saveBackup(backup)
             CuSyncManager.reEnableCameraUploadsPreference(totalBytes.toInt())
         }
     }
 
-    override fun onFail(request: MegaRequest, error: MegaError) {
-        super.onFail(request, error)
+    override fun onFail(api: MegaApiJava, request: MegaRequest, error: MegaError) {
+        super.onFail(api, request, error)
         CuSyncManager.reEnableCameraUploadsPreference(request.totalBytes.toInt())
     }
 }

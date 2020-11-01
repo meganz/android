@@ -3,6 +3,7 @@ package mega.privacy.android.app.sync
 import android.content.Context
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -17,11 +18,11 @@ class SyncListener(
         if (callback.requestType() != request.type) return
 
         if (e.errorCode == MegaError.API_OK) {
-            logDebug("Request ${request.type} successfully.")
+            logDebug("Request ${request.type}: ${request.requestString} successfully.")
             callback.onSuccess(api, request, e)
         } else {
-            logDebug("Request ${request.type} failed. ${e?.errorString}: ${e?.errorCode}")
-            callback.onFail(request, e)
+            logWarning("Request ${request.type}: ${request.requestString} failed, ${e.errorString}: ${e.errorCode}")
+            callback.onFail(api, request, e)
         }
     }
 }

@@ -232,7 +232,7 @@ object CuSyncManager {
         backupType: Int,
         targetNode: Long,
         localFolder: String,
-        deviceId: String,
+        backupName: String,
         state: Int,
         subState: Int,
         extraData: String
@@ -247,7 +247,7 @@ object CuSyncManager {
             backupType,
             targetNode,
             localFolder,
-            deviceId,
+            backupName,
             state,
             subState,
             extraData,
