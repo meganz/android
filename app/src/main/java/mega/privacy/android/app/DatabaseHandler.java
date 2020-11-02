@@ -262,7 +262,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String KEY_BACKUP_OUTDATED = "outdated";
 
     private static final String CREATE_BACKUP_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BACKUPS + "("
-            + KEY_BACKUP_ID + " TEXT PRIMARY KEY, "
+            + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_BACKUP_ID + " TEXT, "
             + KEY_BACKUP_TYPE + " INTEGER,"
             + KEY_BACKUP_TARGET_NODE + " TEXT,"
             + KEY_BACKUP_LOCAL_FOLDER + " TEXT,"
@@ -4228,7 +4229,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private Backup getBackupByType(int type) {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_TYPE + " = " + type +
-                " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "'";
+                " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "' ORDER BY " + KEY_ID + " DESC";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
             Backup backup = fromCursor(cursor);
