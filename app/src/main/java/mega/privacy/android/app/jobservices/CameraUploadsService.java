@@ -1408,6 +1408,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 String fingerPrint = node.getFingerprint();
                 boolean isSecondary = node.getParentHandle() == secondaryUploadHandle;
                 dbH.deleteSyncRecordByFingerprint(fingerPrint, fingerPrint, isSecondary);
+                CuSyncManager.INSTANCE.onUploadSuccess(node, isSecondary, node.getSize());
             }
             updateUpload();
         }
@@ -1545,7 +1546,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                 record = dbH.findSyncRecordByLocalPath(path, isSecondary);
             }
             if (record != null) {
-                CuSyncManager.INSTANCE.onUploadSuccess(node, record);
+                CuSyncManager.INSTANCE.onUploadSuccess(node, record.isSecondary(), transfer.getTransferredBytes());
 
                 String originalFingerprint = record.getOriginFingerprint();
                 megaApi.setOriginalFingerprint(node, originalFingerprint, this);

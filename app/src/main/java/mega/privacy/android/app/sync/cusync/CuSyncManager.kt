@@ -283,10 +283,6 @@ object CuSyncManager {
         var muTotalUploadBytes = 0L
 
         for (record in records) {
-            if (record.isCopyOnly) {
-                continue
-            }
-
             val bytes = File(record.localPath).length()
             if (record.isSecondary) {
                 muPendingUploads++
@@ -336,9 +332,8 @@ object CuSyncManager {
             }, logErr("CuSyncManager startActiveHeartbeat"))
     }
 
-    fun onUploadSuccess(node: MegaNode, record: SyncRecord) {
-        val bytes = File(record.localPath).length()
-        if (record.isSecondary) {
+    fun onUploadSuccess(node: MegaNode, isSecondary: Boolean, bytes: Long) {
+        if (isSecondary) {
             muPendingUploads--
             muUploadedBytes += bytes
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
