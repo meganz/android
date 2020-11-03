@@ -4190,18 +4190,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 case R.id.chat_cab_menu_share:
                     finishMultiselectionMode();
-                    MegaNodeList nodeList = messagesSelected.get(0).getMessage().getMegaNodeList();
-                    if (nodeList == null || nodeList.size() == 0) {
-                        logWarning("Error: nodeList is NULL or empty");
-                        break;
-                    }
-
-                    MegaNode node = nodeList.get(0);
-                    if (node == null) {
-                        logWarning("Node is NULL");
-                        break;
-                    }
-                    shareNode(chatActivity, node);
+                    shareChatMessages(chatActivity, messagesSelected, idChat);
                     break;
 
                 case R.id.chat_cab_menu_invite:
@@ -4284,7 +4273,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     }
                     chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom);
                     break;
-
             }
             return false;
         }
@@ -4389,7 +4377,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             importIcon.setVisible(false);
 
                         }else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                            logDebug("TYPE_NODE_ATTACHMENT selected");
                             menu.findItem(R.id.chat_cab_menu_share).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -4514,6 +4501,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         boolean isRemoved = false;
                         boolean allNodeNonContacts = true;
                         boolean allNodeContacts = true;
+
                         menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                         menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
@@ -4592,6 +4580,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         else {
                             if (allNodeAttachments && isOnline(chatActivity)) {
                                 menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
+                                menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                 if (chatC.isInAnonymousMode()) {
                                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
                                     importIcon.setVisible(false);

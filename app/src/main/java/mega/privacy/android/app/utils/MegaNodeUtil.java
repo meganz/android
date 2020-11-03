@@ -29,10 +29,13 @@ import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
@@ -261,6 +264,18 @@ public class MegaNodeUtil {
         shareNodeFromChat(context, node, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE);
     }
 
+    public static void shareNodes(){
+
+    }
+
+    /**
+     * Method for sharing a node from the chat room.
+     *
+     * @param context   Context of Activity.
+     * @param node      The node.
+     * @param messageId The msg ID.
+     * @param chatId    The chat ID.
+     */
     public static void shareNodeFromChat(Context context, MegaNode node, long messageId, long chatId) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
@@ -279,26 +294,54 @@ public class MegaNodeUtil {
         }
     }
 
-    /**
-     * Share multiple nodes out of MEGA app.
-     *
-     * If a folder is involved, we will share links of all nodes.
-     *
-     * Other apps can't handle the mixture of link and file, so if there is any file that is not
-     * downloaded, we will share links of all files.
-     *
-     * @param context the context where nodes are shared
-     * @param nodes nodes to share
-     */
-    public static void shareNodes(Context context, List<MegaNode> nodes) {
+    public static void shareChatMessages(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, long chatId){
+       ArrayList<MegaNode> listNodes = new ArrayList<>();
+
+       if(messagesSelected.isEmpty()){
+            return;
+       }
+
+        if(messagesSelected.size() == 1){
+           MegaNodeList nodeList = messagesSelected.get(0).getMessage().getMegaNodeList();
+           if(nodeList == null || nodeList.size() == 0)
+               return;
+
+           MegaNode node = nodeList.get(0);
+           if (node == null)
+               return;
+
+           shareNodeFromChat(context, node, messagesSelected.get(0).getMessage().getMsgId(), chatId);
+
+       }else{
+           for(AndroidMegaChatMessage androidMessage : messagesSelected){
+               MegaNodeList nodeList = androidMessage.getMessage().getMegaNodeList();
+               if(nodeList == null || nodeList.size() == 0) continue;
+
+               MegaNode node = nodeList.get(0);
+               if (node == null) continue;
+
+               listNodes.add(node);
+           }
+           if(listNodes.isEmpty())
+               return;
+
+            shareNodesFromChat(context, messagesSelected, listNodes, chatId );
+
+        }
+    }
+
+    public static void shareNodesFromChat(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, List<MegaNode> nodes, long chatId) {
+        logDebug("shareNodes:: size "+nodes.size());
+
         if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
             return;
         }
+
         List<File> downloadedFiles = new ArrayList<>();
         boolean allDownloadedFiles = true;
         for (MegaNode node : nodes) {
             String path = node.isFolder() ? null
-                : getLocalFile(context, node.getName(), node.getSize());
+                    : getLocalFile(context, node.getName(), node.getSize());
             if (isTextEmpty(path)) {
                 allDownloadedFiles = false;
                 break;
@@ -318,23 +361,54 @@ public class MegaNodeUtil {
                 notExportedNodes++;
             } else {
                 links.append(node.getPublicLink())
-                    .append("\n\n");
+                        .append("\n\n");
             }
         }
         if (notExportedNodes == 0) {
+
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
-                links.toString());
+                    links.toString());
             return;
         }
 
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
-            new Intent(android.content.Intent.ACTION_SEND));
-        for (MegaNode node : nodes) {
-            if (!node.isExported()) {
+        if(messagesSelected == null || chatId == MEGACHAT_INVALID_HANDLE){
+            ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
+                    new Intent(android.content.Intent.ACTION_SEND));
+            for (MegaNode node : nodes) {
+                if (!node.isExported()) {
+                    megaApi.exportNode(node, exportListener);
+                }
+            }
+        }else{
+            ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
+                    new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
+            for(AndroidMegaChatMessage androidMessage : messagesSelected){
+                MegaNodeList nodeList = androidMessage.getMessage().getMegaNodeList();
+                if(nodeList == null || nodeList.size() == 0) continue;
+
+                MegaNode node = nodeList.get(0);
+                if (node == null) continue;
+
                 megaApi.exportNode(node, exportListener);
             }
         }
+    }
+
+
+    /**
+     * Share multiple nodes out of MEGA app.
+     *
+     * If a folder is involved, we will share links of all nodes.
+     *
+     * Other apps can't handle the mixture of link and file, so if there is any file that is not
+     * downloaded, we will share links of all files.
+     *
+     * @param context the context where nodes are shared
+     * @param nodes nodes to share
+     */
+    public static void shareNodes(Context context, List<MegaNode> nodes) {
+        shareNodesFromChat(context, null, nodes, MEGACHAT_INVALID_HANDLE);
     }
 
     /**

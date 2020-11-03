@@ -4,7 +4,11 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import android.content.Intent;
+
+import java.util.ArrayList;
+
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -29,6 +33,7 @@ public class ExportListener extends BaseListener {
     private StringBuilder exportedLinks;
     private long messageId = MEGACHAT_INVALID_HANDLE;
     private long chatId = MEGACHAT_INVALID_HANDLE;
+    private ArrayList<AndroidMegaChatMessage> messages;
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -68,6 +73,26 @@ public class ExportListener extends BaseListener {
 
         this.removeExport = removeExport;
         this.numberRemove = this.pendingRemove = numberRemove;
+    }
+
+    /**
+     * Constructor used for the purpose of export multiple nodes, then combine links with
+     * already exported nodes, then share those links.
+     *
+     * @param context       current Context
+     * @param numberExport  number of nodes to remove the link
+     * @param exportedLinks links of already exported nodes
+     * @param shareIntent Intent to share the content
+     */
+    public ExportListener(Context context, int numberExport, StringBuilder exportedLinks,
+                          Intent shareIntent, ArrayList<AndroidMegaChatMessage> messages, long chatId) {
+        super(context);
+        this.numberExport = numberExport;
+        this.pendingExport = numberExport;
+        this.exportedLinks = exportedLinks;
+        this.shareIntent = shareIntent;
+        this.chatId = chatId;
+        this.messages = messages;
     }
 
     /**
