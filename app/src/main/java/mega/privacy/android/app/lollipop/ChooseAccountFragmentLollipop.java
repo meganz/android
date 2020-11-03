@@ -179,7 +179,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         proLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout);
         proLiteLayout.setOnClickListener(this);
         titleProLite = (TextView) v.findViewById(R.id.choose_account_prolite_title_text);
-        titleProLite.setText(getString(R.string.lite_account).toUpperCase());
+        titleProLite.setText(getString(R.string.lite_account));
         monthSectionProLite = (TextView) v.findViewById(R.id.month_lite);
         storageSectionProLite = (TextView) v.findViewById(R.id.storage_lite);
         bandwidthSectionProLite = (TextView) v.findViewById(R.id.bandwidth_lite);
@@ -189,7 +189,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro1Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_i_layout);
         pro1Layout.setOnClickListener(this);
         titlePro1 = (TextView) v.findViewById(R.id.choose_account_pro_i_title_text);
-        titlePro1.setText(getString(R.string.pro1_account).toUpperCase());
+        titlePro1.setText(getString(R.string.pro1_account));
         monthSectionPro1 = (TextView) v.findViewById(R.id.month_pro_i);
         storageSectionPro1 = (TextView) v.findViewById(R.id.storage_pro_i);
         bandwidthSectionPro1 = (TextView) v.findViewById(R.id.bandwidth_pro_i);
@@ -200,7 +200,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro2Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_ii_layout);
         pro2Layout.setOnClickListener(this);
         titlePro2 = (TextView) v.findViewById(R.id.choose_account_pro_ii_title_text);
-        titlePro2.setText(getString(R.string.pro2_account).toUpperCase());
+        titlePro2.setText(getString(R.string.pro2_account));
         monthSectionPro2 = (TextView) v.findViewById(R.id.month_pro_ii);
         storageSectionPro2 = (TextView) v.findViewById(R.id.storage_pro_ii);
         bandwidthSectionPro2 = (TextView) v.findViewById(R.id.bandwidth_pro_ii);
@@ -210,7 +210,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro3Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_iii_layout);
         pro3Layout.setOnClickListener(this);
         titlePro3 = (TextView) v.findViewById(R.id.choose_account_pro_iii_title_text);
-        titlePro3.setText(getString(R.string.pro3_account).toUpperCase());
+        titlePro3.setText(getString(R.string.pro3_account));
         monthSectionPro3 = (TextView) v.findViewById(R.id.month_pro_iii);
         storageSectionPro3 = (TextView) v.findViewById(R.id.storage_pro_iii);
         bandwidthSectionPro3 = (TextView) v.findViewById(R.id.bandwidth_pro_iii);
@@ -375,7 +375,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         storageSectionFree.setText(resultFreeStorage);
 
-        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
+        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith)+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
         try{
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'#000000\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
