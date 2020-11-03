@@ -1213,7 +1213,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 1: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro1_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro1_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -1225,7 +1225,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 2: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro2_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro2_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -1237,7 +1237,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 3: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro3_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro3_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -1249,7 +1249,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 4: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.lite_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.lite_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ffa500\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
