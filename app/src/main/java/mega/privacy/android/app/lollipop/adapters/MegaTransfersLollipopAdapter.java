@@ -221,7 +221,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				case STATE_QUEUED:
 					if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
 							|| (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
-						holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
+						holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
 
 						if (transferType == TYPE_DOWNLOAD) {
 							holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));

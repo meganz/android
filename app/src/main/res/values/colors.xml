@@ -216,6 +216,7 @@
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
     <color name="border_avatar_call">#4DFFFFFF</color>
-    <color name="over_quota_yellow">#FFFFB42B</color>
     <color name="background_own_reaction_added">#0F00BFA5</color>
+
+    <color name="error_color">#C70000</color>
 </resources>
