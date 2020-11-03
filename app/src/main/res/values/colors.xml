@@ -207,6 +207,7 @@
     <color name="business_color">#2BA6DE</color>
 
     <color name="black_40_alpha">#66000000</color>
+    <color name="black_54_alpha">#89000000</color>
 
     <color name="red_alert">#FF6464</color>
     <color name="status_bar_red_alert">#CF4949</color>

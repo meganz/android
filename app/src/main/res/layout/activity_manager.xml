@@ -149,8 +149,18 @@
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white"
-                android:layout_above="@+id/bottom_navigation_view"
+                android:layout_above="@id/psa_layout"
                 android:layout_alignParentRight="true"/>
+
+            <include
+                android:id="@+id/psa_layout"
+                layout="@layout/psa_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/bottom_navigation_view"
+                android:visibility="gone"
+                tools:visibility="visible"
+                />
 
             <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
                 android:id="@+id/bottom_navigation_view"
