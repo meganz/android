@@ -372,7 +372,8 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						case BUSINESS: {
 							textToShow = getPriceString(df, account, true);
-							String unlimitedSpace = getString(R.string.unlimited_space);
+                            // The initial amount of storage space for business account is 15TB
+							String unlimitedSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
 							String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
 
 							try{
