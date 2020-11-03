@@ -169,6 +169,9 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+/**
+ * Note: this class is only used to play video, audio will be played by AudioPlayerActivity.
+ */
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
@@ -855,8 +858,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     mediaOffList = new ArrayList<>();
                     int mediaPosition = -1;
                     for (int i=0;i<offList.size();i++){
-                        if ((MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported())
-                                || (MimeTypeList.typeForName(offList.get(i).getName()).isAudio() && !MimeTypeList.typeForName(offList.get(i).getName()).isAudioNotSupported())){
+                        if (MimeTypeList.typeForName(offList.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(offList.get(i).getName()).isVideoNotSupported()) {
                             mediaOffList.add(offList.get(i));
                             mediaPosition++;
                             if (i == currentPosition){
@@ -913,8 +915,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             }
                         });
                         for (int i=0; i<zipFiles.size();i++) {
-                            if (zipFiles.get(i).isFile() && (MimeTypeList.typeForName(zipFiles.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(zipFiles.get(i).getName()).isVideoNotSupported())
-                                    || (MimeTypeList.typeForName(zipFiles.get(i).getName()).isAudio() && !MimeTypeList.typeForName(zipFiles.get(i).getName()).isAudioNotSupported())) {
+                            if (zipFiles.get(i).isFile() && (MimeTypeList.typeForName(zipFiles.get(i).getName()).isVideoReproducible() && !MimeTypeList.typeForName(zipFiles.get(i).getName()).isVideoNotSupported())) {
                                 zipMediaFiles.add(zipFiles.get(i));
                             }
                         }
@@ -961,10 +962,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 } else {
                     if (parentNodeHandle == -1) {
                         switch (adapterType) {
-                            case FILE_BROWSER_ADAPTER: {
-                                parentNode = megaApi.getRootNode();
-                                break;
-                            }
                             case RUBBISH_BIN_ADAPTER: {
                                 parentNode = megaApi.getRubbishNode();
                                 break;
@@ -973,6 +970,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                                 parentNode = megaApi.getInboxNode();
                                 break;
                             }
+                            case FILE_BROWSER_ADAPTER:
                             default: {
                                 parentNode = megaApi.getRootNode();
                                 break;
@@ -1013,8 +1011,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     MegaNode n = nodes.get(i);
                     if (isNodeTakenDown(n)) continue;
 
-                    if ((MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported())
-                            || (MimeTypeList.typeForName(n.getName()).isAudio() && !MimeTypeList.typeForName(n.getName()).isAudioNotSupported())) {
+                    if (MimeTypeList.typeForName(n.getName()).isVideoReproducible() && !MimeTypeList.typeForName(n.getName()).isVideoNotSupported()) {
                         mediaHandles.add(n.getHandle());
                         if (i == currentPosition) {
                             currentPosition = mediaNumber;
