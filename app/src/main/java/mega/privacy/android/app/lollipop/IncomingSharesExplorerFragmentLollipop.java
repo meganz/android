@@ -112,7 +112,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private SearchNodesTask searchNodesTask;
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
-    private boolean hasWritePermissions = true;
+	private boolean hasWritePermissions = true;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -505,24 +505,13 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	}
 
     private void checkWritePermissions() {
-		logDebug("findDisabledNodes");
+        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+        int accessLevel = megaApi.getAccess(parentNode);
 
-        for (MegaNode node : nodes) {
-            int accessLevel = megaApi.getAccess(node);
-            if (selectFile) {
-                if (accessLevel != MegaShare.ACCESS_FULL) {
-                    hasWritePermissions = false;
-                    break;
-                }
-            } else if (accessLevel == MegaShare.ACCESS_READ) {
-                hasWritePermissions = false;
-                break;
-            }
-            hasWritePermissions = true;
-        }
+        hasWritePermissions = accessLevel != MegaShare.ACCESS_READ && accessLevel != MegaShare.ACCESS_UNKNOWN;
 
-        activateButton(false);
-	}
+        activateButton(hasWritePermissions);
+    }
 
 	@Override
     public void onAttach(Activity activity) {
