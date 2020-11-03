@@ -210,8 +210,6 @@
 
     <color name="pressed_color">#E7E7E7</color>
 
-    <color name="homepage_background">#EEF2F1</color>
-
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
 
@@ -313,4 +311,6 @@
     <!-- reference ?attr/colorPrimary in AppBottomSheetDialogTheme doesn't work,
      need define a separate color -->
     <color name="bottom_sheet_navigation_bar_color">@android:color/white</color>
+
+    <color name="homepage_background">#EEF2F1</color>
 </resources>

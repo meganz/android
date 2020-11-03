@@ -48,4 +48,6 @@
     <color name="pro_account">@color/red_300</color>
 
     <color name="bottom_sheet_navigation_bar_color">@android:color/black</color>
+
+    <color name="homepage_background">@color/dark_grey</color>
 </resources>

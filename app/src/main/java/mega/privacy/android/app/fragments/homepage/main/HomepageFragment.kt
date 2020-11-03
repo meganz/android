@@ -25,6 +25,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
+import kotlinx.android.synthetic.main.homepage_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
@@ -33,6 +34,7 @@ import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -215,13 +217,13 @@ class HomepageFragment : Fragment() {
     }
 
     private fun setupBottomSheetUI() {
-        viewPager = rootView.findViewById(R.id.view_pager)
+        viewPager = rootView.view_pager
         val adapter = BottomSheetPagerAdapter(this)
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount
         viewPager.adapter = adapter
         // Attach the view pager to the tab layout
-        tabLayout = rootView.findViewById(R.id.tabs)
+        tabLayout = rootView.tab_layout
         val mediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = getTabTitle(position)
         }
@@ -252,6 +254,24 @@ class HomepageFragment : Fragment() {
                 changeTabElevation(it.second)
             }
         }
+
+        setupBottomSheetBackground()
+    }
+
+    /**
+     * Set bottom sheet background for the elevation effect according to Invision
+     */
+    private fun setupBottomSheetBackground() {
+        val elevationPx = Util.dp2px(BOTTOM_SHEET_ELEVATION, resources.displayMetrics).toFloat()
+        val cornerSizePx = Util.dp2px(BOTTOM_SHEET_CORNER_SIZE, resources.displayMetrics).toFloat()
+
+        viewDataBinding.root.homepage_bottom_sheet.background =
+            ColorUtils.getShapeDrawableForElevation(
+                requireContext(),
+                elevationPx,
+                cornerSizePx
+            )
+        viewPager.setBackgroundColor(ColorUtils.getColorForElevation(requireContext(), elevationPx))
     }
 
     private fun setupMask() {
@@ -534,5 +554,7 @@ class HomepageFragment : Fragment() {
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
         private const val KEY_CONTACT_TYPE = "contactType"
         private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
+        private const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
+        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
     }
 }

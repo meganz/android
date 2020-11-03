@@ -6,18 +6,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_cardview_white_top"
-        android:elevation="@dimen/elevation_low"
         android:orientation="vertical"
         app:layout_behavior="@string/homepage_bottom_sheet_behavior"
         tools:viewBindingIgnore="true">
 
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabs"
-            style="@style/HomepageBottomTabLayout"
-            android:background="@drawable/bg_cardview_white_top"
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize" />
+            android:layout_height="?attr/actionBarSize"
+            style="@style/HomepageBottomTabLayout" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
@@ -25,3 +22,6 @@
             android:layout_height="match_parent" />
     </LinearLayout>
 </layout>
+
+
+<!--    style="@style/Widget.MaterialComponents.TabLayout.PrimarySurface"-->

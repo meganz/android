@@ -167,6 +167,8 @@ dependencies {
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
+    implementation 'com.jaeger.statusbarutil:library:1.5.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

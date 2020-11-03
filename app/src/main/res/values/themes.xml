@@ -14,7 +14,7 @@
         <!-- e.g. the background color of the FAB -->
         <item name="colorSecondary">@color/teal_300</item>
         <!-- e.g. The action bar color of the "select folder" screen -->
-        <item name="colorPrimaryVariant">@color/red_600</item>
+        <item name="colorPrimaryVariant">@color/white</item>
         <!-- e.g. A variant color of the FAB -->
         <!--        <item name="colorSecondaryVariant"></item>-->
 
@@ -49,6 +49,7 @@
         colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
 
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">?attr/colorPrimary</item>

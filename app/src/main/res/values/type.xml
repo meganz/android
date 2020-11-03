@@ -10,7 +10,6 @@
     <!-- In material design, typically for the title of the action bar (but Mega app uses Subtitle1 as action bar title)
          The account name uses the default style of Headline6-->
     <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
-        <item name="fontFamily">sans-serif</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">normal</item>
     </style>
@@ -31,7 +30,6 @@
     <!-- Mainly for Toolbar title -->
     <!-- Medium, 16sp, 0.15px, textColorPrimary, AllCaps=true -->
     <style name="TextAppearance.Mega.Subtitle1.AllCaps.Medium">
-        <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
@@ -54,7 +52,6 @@
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Medium">
-        <item name="fontFamily">sans-serif-medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 

@@ -325,9 +325,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
 			checkScroll();
-
-			Util.changeStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow(),
-					R.color.teal_300_dark_grey);
 			return true;
 		}
 
@@ -339,8 +336,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
 			checkScroll();
-
-			Util.resetStatusBarColor(context, ((ManagerActivityLollipop) context).getWindow());
 		}
 
 		@Override

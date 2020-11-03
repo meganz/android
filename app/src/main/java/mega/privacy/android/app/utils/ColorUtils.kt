@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
+import android.util.DisplayMetrics
 import android.widget.EditText
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -11,6 +12,9 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.appcompat.widget.DrawableUtils
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.elevation.ElevationOverlayProvider
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
 
 object ColorUtils {
@@ -89,4 +93,34 @@ object ColorUtils {
     fun getThemeColorHexString(context: Context, @AttrRes attr: Int): String {
         return String.format("#%06X", context.themeColor(attr) and 0xFFFFFF)
     }
+
+    /**
+     * Get a MaterialShapeDrawable for the background of an sheet/dialog component, in the light of
+     * its elevation and corner size
+     *
+     * @param context
+     * @param elevation elevation in px
+     * @param cornerSize rounded corner size in px
+     */
+    @JvmStatic
+    fun getShapeDrawableForElevation(
+        context: Context,
+        elevation: Float = 0f,
+        cornerSize: Float = 0f
+    ): MaterialShapeDrawable {
+        val colorInt = getColorForElevation(context, elevation)
+        val shapeAppearanceModel = ShapeAppearanceModel.builder().setTopLeftCornerSize(cornerSize)
+            .setTopRightCornerSize(cornerSize).build()
+        val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+
+        shapeDrawable.setTint(colorInt)
+
+        return shapeDrawable
+    }
+
+    @JvmStatic
+    fun getColorForElevation(context: Context, elevation: Float) =
+        ElevationOverlayProvider(context).compositeOverlayWithThemeSurfaceColorIfNeeded(
+            elevation
+        )
 }

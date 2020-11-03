@@ -60,7 +60,7 @@
              enter action mode, or use a non-transparent background to cover it,
              while non-transparent background will break MaterialToolbar's overlay,
              so let's set a similar non-transparent background for action mode. -->
-        <item name="actionModeBackground">@drawable/action_mode_backgroud_dark</item>
+        <item name="actionModeBackground">@drawable/action_mode_background_dark</item>
 
         <!-- Progress indicator -->
         <item name="trackColor">@color/white_alpha_023</item>
