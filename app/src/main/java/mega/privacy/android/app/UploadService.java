@@ -228,63 +228,60 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private synchronized void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
 
-        if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
-            MegaTransferData transferData = megaApi.getTransferData(null);
-            if (transferData == null) {
-                return;
-            }
+        String action = intent.getAction();
+        logDebug("Action is " + action);
+        if (action != null) {
+            switch (action) {
+                case ACTION_OVERQUOTA_STORAGE:
+                    isOverquota = 1;
+                    break;
 
-            int uploadsInProgress = transferData.getNumUploads();
+                case ACTION_STORAGE_STATE_CHANGED:
+                    isOverquota = 0;
+                    break;
 
-            for (int i = 0; i < uploadsInProgress; i++) {
-                MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
-                if (transfer == null) {
-                    continue;
-                }
+                case ACTION_RESTART_SERVICE:
+                    MegaTransferData transferData = megaApi.getTransferData(null);
+                    if (transferData == null) {
+                        return;
+                    }
 
-                String data = transfer.getAppData();
-                if (!isTextEmpty(data) && (data.contains(UPLOAD_APP_DATA_CHAT) || data.contains(CU_UPLOAD))) {
-                    continue;
-                }
+                    int uploadsInProgress = transferData.getNumUploads();
 
-                if (transfer.isFolderTransfer()) {
-                    mapProgressFolderTransfers.put(transfer.getTag(), transfer);
-                } else {
-                    mapProgressFileTransfers.put(transfer.getTag(), transfer);
-                }
-            }
+                    for (int i = 0; i < uploadsInProgress; i++) {
+                        MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+                        if (transfer == null) {
+                            continue;
+                        }
 
-            totalFolderUploads = mapProgressFolderTransfers.size();
-            totalFileUploads = mapProgressFileTransfers.size();
-            uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+                        String data = transfer.getAppData();
+                        if (!isTextEmpty(data) && (data.contains(UPLOAD_APP_DATA_CHAT) || data.contains(CU_UPLOAD))) {
+                            continue;
+                        }
 
-            if (totalFolderUploads > 0) {
-                updateProgressNotification(true);
+                        if (transfer.isFolderTransfer()) {
+                            mapProgressFolderTransfers.put(transfer.getTag(), transfer);
+                        } else {
+                            mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                        }
+                    }
+
+                    totalFolderUploads = mapProgressFolderTransfers.size();
+                    totalFileUploads = mapProgressFileTransfers.size();
+                    uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+                    break;
             }
 
             if (totalFileUploads > 0) {
                 updateProgressNotification(false);
             }
 
-            return;
-        }
-
-		String action = intent.getAction();
-		logDebug("Action is " + action);
-		if(action != null){
-            if (ACTION_OVERQUOTA_STORAGE.equals(action)) {
-                isOverquota = 1;
-            }else if(ACTION_STORAGE_STATE_CHANGED.equals(action)){
-                isOverquota = 0;
-            }
-            if (totalFileUploads > 0) {
-                updateProgressNotification(false);
-            }
             if (totalFolderUploads > 0) {
                 updateProgressNotification(true);
             }
+
             return;
-        }else {
+        } else {
             isOverquota = 0;
         }
 
