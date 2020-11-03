@@ -151,22 +151,6 @@
         <item name="colorControlNormal">?attr/colorSecondary</item>
     </style>
 
-    <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/dark_primary_color</item>
-        <item name="tabIndicatorHeight">2dp</item>
-        <item name="tabBackground">@color/white</item>
-        <item name="tabSelectedTextColor">@color/dark_primary_color</item>
-        <item name="tabPaddingStart">12dp</item>
-        <item name="tabPaddingEnd">12dp</item>
-        <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
-        <item name="tabMaxWidth">0dp</item>
-        <item name="tabGravity">fill</item>
-    </style>
-
-    <style name="HomepageBottomTabLayout" parent="MyCustomTabLayout">
-        <item name="tabBackground">@android:color/transparent</item>
-    </style>
-
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
@@ -610,4 +594,15 @@
         <item name="colorControlNormal">?attr/colorSecondary</item>
         <item name="titleTextStyle">@style/TextAppearance.Mega.Subtitle1.AccentColor</item>
     </style>
+
+    <!-- Tab layout -->
+    <style name="Widget.Mega.TabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/red_600_red_300</item>
+        <item name="tabIndicatorHeight">2dp</item>
+        <item name="tabSelectedTextColor">@color/red_600_red_300</item>
+        <item name="tabTextAppearance">@style/TextAppearance.Mega.Tab</item>
+        <item name="tabMaxWidth">0dp</item>
+    </style>
+
 </resources>
+<!--<item name="tabIconTint">?android:attr/textColorSecondary</item>-->

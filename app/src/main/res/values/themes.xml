@@ -48,8 +48,8 @@
         <!-- You can also set colorControlActivated
         colorControlHighlight & colorSwitchThumbNormal. -->
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">false</item>
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+<!--        <item name="android:windowTranslucentStatus">false</item>-->
 
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">?attr/colorPrimary</item>
@@ -63,8 +63,8 @@
         <item name="preferenceTheme">@style/PreferenceStyle</item>
         <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>
 
-        <item name="android:fitsSystemWindows">true</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+<!--        <item name="android:fitsSystemWindows">true</item>-->
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
 
         <item name="borderlessButtonStyle">@style/Widget.Mega.Button.TextButton</item>

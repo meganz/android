@@ -139,4 +139,12 @@
         <item name="android:textColor">@color/password_strong</item>
     </style>
 
+    <!-- Tab Layout -->
+    <style name="TextAppearance.Mega.Tab" parent="TextAppearance.Design.Tab">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="textAllCaps">false</item>
+        <item name="android:letterSpacing">0.017857143</item>
+    </style>
 </resources>

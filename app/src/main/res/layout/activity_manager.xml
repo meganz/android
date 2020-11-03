@@ -36,7 +36,7 @@
 
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/sliding_tabs_contacts"
-                        style="@style/MyCustomTabLayout"
+                        style="@style/Widget.Mega.TabLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
@@ -44,19 +44,19 @@
 
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/sliding_tabs_shares"
-                        style="@style/MyCustomTabLayout"
+                        style="@style/Widget.Mega.TabLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/sliding_tabs_my_account"
-                        style="@style/MyCustomTabLayout"
+                        style="@style/Widget.Mega.TabLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/sliding_tabs_transfers"
-                        style="@style/MyCustomTabLayout"
+                        style="@style/Widget.Mega.TabLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </com.google.android.material.appbar.AppBarLayout>
