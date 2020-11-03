@@ -49,11 +49,16 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
 
-    private static FileManagementPreferencesActivity activity = null;
+    private static final int MINIMUM_DAY = 6;
+    private static final int MAXIMUM_DAY = 31;
+    private static final int DAYS_USER_FREE = 30;
+    private static final int DAYS_USER_PRO = 90;
+
     private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog generalDialog;
+
 
     private BroadcastReceiver cacheSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -154,7 +159,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = this;
 
         aB.setTitle(getString(R.string.settings_file_management_category).toUpperCase());
 
@@ -202,7 +206,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
 
         builder.setPositiveButton(getString(R.string.general_clear),
                 (dialog, whichButton) -> {
-                    NodeController nC = new NodeController(activity);
+                    NodeController nC = new NodeController(this);
                     nC.cleanRubbishBin();
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -220,7 +224,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
 
         builder.setPositiveButton(getString(R.string.context_delete),
                 (dialog, whichButton) -> {
-                    NodeController nC = new NodeController(activity);
+                    NodeController nC = new NodeController(this);
                     nC.clearAllVersions();
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -269,6 +273,47 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
     }
 
     /**
+     * Method for controlling the selected option on the RbSchedulerValueDialog.
+     *
+     * @param value The value.
+     * @param input The EditText.
+     */
+    private void controlOptionOfRbSchedulerValueDialog(String value, final EditText input) {
+        if (value.length() == 0) {
+            return;
+        }
+
+        try {
+            int daysCount = Integer.parseInt(value);
+            if (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                if (daysCount > MINIMUM_DAY) {
+                    setRBSchedulerValue(value);
+                    newFolderDialog.dismiss();
+                } else {
+                    clearInputText(input);
+                }
+            } else if (daysCount > MINIMUM_DAY && daysCount < MAXIMUM_DAY) {
+                setRBSchedulerValue(value);
+                newFolderDialog.dismiss();
+            } else {
+                clearInputText(input);
+            }
+        } catch (Exception e) {
+            clearInputText(input);
+        }
+    }
+
+    /**
+     * Method for resetting the EditText values
+     *
+     * @param input The EditText.
+     */
+    private void clearInputText(final EditText input) {
+        input.setText("");
+        input.requestFocus();
+    }
+
+    /**
      * Show Rubbish bin scheduler value dialog.
      */
     public void showRbSchedulerValueDialog(final boolean isEnabling) {
@@ -289,33 +334,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                String value = v.getText().toString().trim();
-                if (value.length() == 0) {
-                    return true;
-                }
-
-                try {
-                    int daysCount = Integer.parseInt(value);
-                    if (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                        if (daysCount > 6) {
-                            setRBSchedulerValue(value);
-                            newFolderDialog.dismiss();
-                        } else {
-                            input.setText("");
-                            input.requestFocus();
-                        }
-                    } else if (daysCount > 6 && daysCount < 31) {
-                        setRBSchedulerValue(value);
-                        newFolderDialog.dismiss();
-                    } else {
-                        input.setText("");
-                        input.requestFocus();
-                    }
-                } catch (Exception e) {
-                    input.setText("");
-                    input.requestFocus();
-                }
-
+                controlOptionOfRbSchedulerValueDialog(v.getText().toString().trim(), input);
                 return true;
             }
             return false;
@@ -358,34 +377,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         newFolderDialog.show();
 
         newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String value = input.getText().toString().trim();
-            if (value.length() == 0) {
-                return;
-            }
-
-            try {
-                int daysCount = Integer.parseInt(value);
-                if (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                    if (daysCount > 6) {
-                        setRBSchedulerValue(value);
-                        newFolderDialog.dismiss();
-                    } else {
-                        input.setText("");
-                        input.requestFocus();
-                    }
-                } else {
-                    if (daysCount > 6 && daysCount < 31) {
-                        setRBSchedulerValue(value);
-                        newFolderDialog.dismiss();
-                    } else {
-                        input.setText("");
-                        input.requestFocus();
-                    }
-                }
-            } catch (Exception e) {
-                input.setText("");
-                input.requestFocus();
-            }
+            controlOptionOfRbSchedulerValueDialog(input.getText().toString().trim(), input);
         });
     }
 
@@ -393,7 +385,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
     protected void onPostResume() {
         logDebug("onPostResume");
         super.onPostResume();
-        activity = this;
     }
 
     @Override
@@ -411,13 +402,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         switch (request.getType()) {
             case MegaRequest.TYPE_CLEAN_RUBBISH_BIN:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    Util.showSnackbar(activity, getString(R.string.rubbish_bin_emptied));
+                    Util.showSnackbar(this, getString(R.string.rubbish_bin_emptied));
                     resetAccountDetailsTimeStamp();
                     if (sttFileManagment != null) {
                         sttFileManagment.resetRubbishInfo();
                     }
                 } else {
-                    Util.showSnackbar(activity, getString(R.string.rubbish_bin_no_emptied));
+                    Util.showSnackbar(this, getString(R.string.rubbish_bin_no_emptied));
                 }
                 break;
 
@@ -428,11 +419,11 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                             sttFileManagment.updateRBScheduler(request.getNumber());
                         }
                     } else {
-                        Util.showSnackbar(activity, getString(R.string.error_general_nodes));
+                        Util.showSnackbar(this, getString(R.string.error_general_nodes));
                     }
                 }
                 if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
-                    MegaApplication.setDisableFileVersions(Boolean.valueOf(request.getText()));
+                    MegaApplication.setDisableFileVersions(Boolean.parseBoolean(request.getText()));
 
                     if (e.getErrorCode() != MegaError.API_OK) {
                         logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
@@ -449,7 +440,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                 if (request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME && sttFileManagment != null) {
                     if (e.getErrorCode() == MegaError.API_ENOENT) {
                         sttFileManagment.updateRBScheduler(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE ?
-                                30 : 90);
+                                DAYS_USER_FREE : DAYS_USER_PRO);
                     } else {
                         sttFileManagment.updateRBScheduler(request.getNumber());
                     }
@@ -463,12 +454,12 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
 
             case MegaRequest.TYPE_REMOVE_VERSIONS:
                 if (e.getErrorCode() == MegaError.API_OK){
-                    Util.showSnackbar(activity, getString(R.string.success_delete_versions));
+                    Util.showSnackbar(this, getString(R.string.success_delete_versions));
                     if(sttFileManagment != null) {
                         sttFileManagment.resetVersionsInfo();
                     }
                 } else{
-                    Util.showSnackbar(activity, getString(R.string.error_delete_versions));
+                    Util.showSnackbar(this, getString(R.string.error_delete_versions));
                 }
                 break;
 
@@ -514,8 +505,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
                             }
                         }
                     }
-                } else {
-                    continue;
                 }
             }
         }

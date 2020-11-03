@@ -170,7 +170,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             case KEY_CHAT_STATUS:
                 statusChatListPreference.setSummary(statusChatListPreference.getEntry());
                 newStatus = Integer.parseInt((String) newValue);
-                megaChatApi.setOnlineStatus(newStatus, (ChatPreferencesActivity) context);
+                megaChatApi.setOnlineStatus(newStatus);
                 break;
 
             case KEY_CHAT_SEND_ORIGINALS:
@@ -268,22 +268,19 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
             if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_OFFLINE) {
                 getPreferenceScreen().removePreference(chatPersistenceCheck);
             }
+        } else if (statusConfig.isPersist()) {
+            getPreferenceScreen().removePreference(autoAwaySwitch);
+            getPreferenceScreen().removePreference(chatAutoAwayPreference);
         } else {
-            //I'm online
-            if (statusConfig.isPersist()) {
-                getPreferenceScreen().removePreference(autoAwaySwitch);
-                getPreferenceScreen().removePreference(chatAutoAwayPreference);
+            getPreferenceScreen().addPreference(autoAwaySwitch);
+            if (statusConfig.isAutoawayEnabled()) {
+                int timeout = (int) statusConfig.getAutoawayTimeout() / 60;
+                autoAwaySwitch.setChecked(true);
+                getPreferenceScreen().addPreference(chatAutoAwayPreference);
+                chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, timeout));
             } else {
-                getPreferenceScreen().addPreference(autoAwaySwitch);
-                if (statusConfig.isAutoawayEnabled()) {
-                    int timeout = (int) statusConfig.getAutoawayTimeout() / 60;
-                    autoAwaySwitch.setChecked(true);
-                    getPreferenceScreen().addPreference(chatAutoAwayPreference);
-                    chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, timeout));
-                } else {
-                    autoAwaySwitch.setChecked(false);
-                    getPreferenceScreen().removePreference(chatAutoAwayPreference);
-                }
+                autoAwaySwitch.setChecked(false);
+                getPreferenceScreen().removePreference(chatAutoAwayPreference);
             }
         }
 
@@ -299,10 +296,6 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         final ListView lv = v.findViewById(android.R.id.list);
-        if (lv != null) {
-            lv.setPadding(0, 0, 0, 0);
-        }
-
         setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
         return v;
     }

@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
-
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
 import static mega.privacy.android.app.utils.LogUtil.*;

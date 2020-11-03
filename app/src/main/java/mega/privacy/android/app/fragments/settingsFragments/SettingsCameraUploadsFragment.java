@@ -162,7 +162,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment implemen
             cameraUpload = false;
             charging = true;
             fileNames = false;
-
         } else {
             cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
 

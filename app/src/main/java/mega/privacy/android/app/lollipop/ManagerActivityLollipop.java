@@ -1339,7 +1339,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent != null && intent.getAction() != null && (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING) || intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE)) && getSettingsFragment() != null) {
+			if (intent != null && intent.getAction() != null && getSettingsFragment() != null
+					&& (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
+					|| intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE))) {
 				sttFLol.refreshCameraUploadsSettings();
 			}
 		}

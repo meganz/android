@@ -302,11 +302,6 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment impleme
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        final ListView lv = v.findViewById(android.R.id.list);
-        if (lv != null) {
-            lv.setPadding(0, 0, 0, 0);
-        }
-
         rubbishFileManagement.setEnabled(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
         return v;
     }

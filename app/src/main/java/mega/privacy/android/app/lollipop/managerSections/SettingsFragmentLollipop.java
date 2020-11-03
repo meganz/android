@@ -207,19 +207,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        final ListView lv = v.findViewById(android.R.id.list);
-        if (lv != null) {
-            lv.setPadding(0, 0, 0, 0);
-        }
-
         setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
         return v;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        this.context = context;
     }
 
     @Override
@@ -317,11 +306,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                     if (!MegaApplication.isShowInfoChatMessages()) {
                         MegaApplication.setShowInfoChatMessages(true);
                         numberOfClicksAppVersion = 0;
-                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is enabled", MEGACHAT_INVALID_HANDLE);
+                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.show_info_chat_msg_enabled), MEGACHAT_INVALID_HANDLE);
                     } else {
                         MegaApplication.setShowInfoChatMessages(false);
                         numberOfClicksAppVersion = 0;
-                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, "Action to show info of chat messages is disabled", MEGACHAT_INVALID_HANDLE);
+                        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.show_info_chat_msg_disabled), MEGACHAT_INVALID_HANDLE);
                     }
                 }
                 break;
@@ -359,10 +348,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_CANCEL_ACCOUNT:
                 ((ManagerActivityLollipop) context).askConfirmationDeleteAccount();
                 break;
-
-            case KEY_STORAGE_DOWNLOAD_LOCATION:
-                startActivity(new Intent(context, DownloadPreferencesActivity.class));
-                break;
         }
 
         if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) != 0) {
@@ -392,11 +377,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             cameraUploadsPreference.setEnabled(false);
         }
         super.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     /**

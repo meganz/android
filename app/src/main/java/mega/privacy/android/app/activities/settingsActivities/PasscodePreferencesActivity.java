@@ -61,13 +61,13 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
 
         dialogBuilder.setOnKeyListener((arg0, keyCode, event) -> {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                dissmissDialog();
+                dismissDialog();
             }
             return true;
         });
 
         dialogBuilder.setOnCancelListener(
-                dialog -> dissmissDialog()
+                dialog -> dismissDialog()
         );
 
         setPinDialog = dialogBuilder.create();
@@ -75,7 +75,7 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
         setPinDialog.show();
     }
 
-    private void dissmissDialog() {
+    private void dismissDialog() {
         setPinDialog.dismiss();
         sttPasscodeLock.cancelSetPinLock();
     }

@@ -49,7 +49,7 @@ import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatListenerInterface {
+public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatListenerInterface {
 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
@@ -165,7 +165,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     }
 
     /**
-     * Method for displaying the AutoAwayValu dialogue.
+     * Method for displaying the AutoAwayValue dialogue.
      */
     public void showAutoAwayValueDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -174,20 +174,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         builder.setView(v);
 
         final EditText input = v.findViewById(R.id.autoaway_edittext);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
         input.setOnEditorActionListener((v1, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 String value = validateAutoAway(v1.getText());
@@ -230,9 +216,8 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
      * @return The result string.
      */
     private String validateAutoAway(CharSequence value) {
-        int timeout;
         try {
-            timeout = Integer.parseInt(value.toString().trim());
+            int timeout = Integer.parseInt(value.toString().trim());
             if (timeout <= 0) {
                 timeout = 1;
             } else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
@@ -275,7 +260,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         logDebug("Enable Last Green: " + enable);
 
         if (megaChatApi != null) {
-            megaChatApi.setLastGreenVisible(enable, this);
+            megaChatApi.setLastGreenVisible(enable, null);
         }
     }
 
@@ -284,15 +269,9 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         if (users != null) {
             for (int i = 0; i < users.size(); i++) {
                 MegaUser user = users.get(i);
-                if (user != null) {
-                    if (user.isOwnChange() > 0) {
-                        if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)) {
-                            megaApi.shouldShowRichLinkWarning(this);
-                            megaApi.isRichPreviewsEnabled(this);
-                        }
-                    }
-                } else {
-                    continue;
+                if (user != null && user.isOwnChange() > 0 && user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)) {
+                    megaApi.shouldShowRichLinkWarning(this);
+                    megaApi.isRichPreviewsEnabled(this);
                 }
             }
         }
@@ -326,31 +305,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     @Override
     public void onEvent(MegaApiJava api, MegaEvent event) {
 
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        if (request.getType() == MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE: " + request.getFlag());
-            } else {
-                logError("MegaChatRequest.TYPE_SET_LAST_GREEN_VISIBLE:error: " + e.getErrorType());
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
     }
 
     @Override
