@@ -165,7 +165,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
@@ -538,12 +538,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
-        }
-        else{
-            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
-        }
+        exoPlayerName.setMaxWidth(scaleWidthPx(300, outMetrics));
 
         if (fileName == null) {
             fileName = getFileName(uri);
@@ -571,17 +566,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         containerControls = (RelativeLayout) findViewById(R.id.container_exo_controls);
         controlsButtonsLayout = (RelativeLayout) findViewById(R.id.container_control_buttons);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
-            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
-            RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
-            params1.setMargins(0, 0, 0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params2.setMargins(0,0,0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params3.addRule(RelativeLayout.ABOVE, containerControls.getId());
-            exoPlayerName.setLayoutParams(params1);
-            controlsButtonsLayout.setLayoutParams(params2);
-            audioContainer.setLayoutParams(params3);
-        }
+        setControllerLayoutParam();
 
         previousButton = (ImageButton) findViewById(R.id.exo_prev);
         previousButton.setOnTouchListener(this);
@@ -826,6 +811,37 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             if (fromChat) {
                 fromChatSavedInstance = true;
             }
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        setControllerLayoutParam();
+    }
+
+    private void setControllerLayoutParam() {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
+            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
+            RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
+            params1.setMargins(0, 0, 0, px2dp(5, outMetrics));
+            params2.setMargins(0, 0, 0, px2dp(5, outMetrics));
+            params3.addRule(RelativeLayout.ABOVE, containerControls.getId());
+            exoPlayerName.setLayoutParams(params1);
+            controlsButtonsLayout.setLayoutParams(params2);
+            audioContainer.setLayoutParams(params3);
+        } else {
+            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
+            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
+            RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
+            params1.setMargins(0, px2dp(16, outMetrics), 0, px2dp(14, outMetrics));
+            params2.setMargins(0, px2dp(14, outMetrics), 0, px2dp(20, outMetrics));
+            params3.removeRule(RelativeLayout.ABOVE);
+            exoPlayerName.setLayoutParams(params1);
+            controlsButtonsLayout.setLayoutParams(params2);
+            audioContainer.setLayoutParams(params3);
         }
     }
 
@@ -1927,7 +1943,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         shareMenuItem = menu.findItem(R.id.full_video_viewer_share);
         downloadMenuItem = menu.findItem(R.id.full_video_viewer_download);
         chatMenuItem = menu.findItem(R.id.full_video_viewer_chat);
-        chatMenuItem.setIcon(mega.privacy.android.app.utils.Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
+        chatMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
         propertiesMenuItem = menu.findItem(R.id.full_video_viewer_properties);
         getlinkMenuItem = menu.findItem(R.id.full_video_viewer_get_link);
         renameMenuItem = menu.findItem(R.id.full_video_viewer_rename);
@@ -1939,7 +1955,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         loopMenuItem = menu.findItem(R.id.full_video_viewer_loop);
         importMenuItem = menu.findItem(R.id.chat_full_video_viewer_import);
         saveForOfflineMenuItem = menu.findItem(R.id.chat_full_video_viewer_save_for_offline);
-        saveForOfflineMenuItem.setIcon(mega.privacy.android.app.utils.Util.mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
+        saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_full_video_viewer_remove);
 
         if (nC == null) {
@@ -2513,7 +2529,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
          LinearLayout confirmationLayout = new LinearLayout(this);
          confirmationLayout.setOrientation(LinearLayout.VERTICAL);
          LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-         params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+         params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
          final CheckBox dontShowAgain =new CheckBox(this);
          dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
@@ -2523,7 +2539,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
          builder.setView(confirmationLayout);
 
-         builder.setMessage(getString(R.string.alert_larger_file, mega.privacy.android.app.utils.Util.getSizeString(sizeC)));
+         builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
          builder.setPositiveButton(getString(R.string.general_save_to_device),
                  new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -2721,8 +2737,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
-        //	    layout.setLayoutParams(params);
+        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
@@ -2765,7 +2780,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         layout.addView(input, params);
 
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), 0, mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
 
         final RelativeLayout error_layout = new RelativeLayout(AudioVideoPlayerLollipop.this);
         layout.addView(error_layout, params1);
@@ -2787,7 +2802,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
         params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
         textError.setLayoutParams(params_text_error);
 
         textError.setTextColor(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.login_warning));
@@ -2947,7 +2962,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
         TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
 
-        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(25, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(10, outMetrics), 0);
+        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(10, outMetrics), 0);
 
         url.setVisibility(View.GONE);
         key.setVisibility(View.GONE);
@@ -2961,8 +2976,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         display.getMetrics(outMetrics);
         float density = getResources().getDisplayMetrics().density;
 
-        float scaleW = mega.privacy.android.app.utils.Util.getScaleW(outMetrics, density);
-        float scaleH = mega.privacy.android.app.utils.Util.getScaleH(outMetrics, density);
+        float scaleW = getScaleW(outMetrics, density);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
         }else{
@@ -3717,15 +3731,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
         logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
-//		handleToDownload = handle;
-        String externalPath = mega.privacy.android.app.utils.Util.getExternalCardPath();
+        String externalPath = getExternalCardPath();
 
         if(externalPath!=null){
             logDebug("ExternalPath for advancedDevices: " + externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
                 logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -3772,7 +3784,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
@@ -3784,7 +3796,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
 //				builder.setTitle(getString(R.string.confirmation_required));
 
-        builder.setMessage(getString(R.string.alert_larger_file, mega.privacy.android.app.utils.Util.getSizeString(sizeC)));
+        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
         builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -3836,7 +3848,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
 
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
