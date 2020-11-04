@@ -48,6 +48,8 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -146,10 +148,14 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace("[A]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.black_white)
+                    + "\'>");
+            textToShow = textToShow.replace("[/A]","</font>");
+            textToShow = textToShow.replace("[B]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+                    + "\'>");
+            textToShow = textToShow.replace("[/B]","</font>");
         } catch (Exception e) {
         }
         Spanned result = null;

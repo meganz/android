@@ -21,7 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:src="@drawable/ic_zero_data_recents" />
+                android:src="@drawable/empty_zero_data_recents" />
 
             <TextView
                 android:id="@+id/empty_text_recents"
@@ -32,10 +32,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginRight="20dp"
-                android:fontFamily="sans-serif"
-
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
         </RelativeLayout>
 
         <FrameLayout

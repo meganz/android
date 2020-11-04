@@ -1077,7 +1077,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
                 } else {
                     emptyImageView.setImageResource(R.drawable.empty_cloud_drive_portrait);
                 }
-                String textToShow = context.getString(R.string.context_empty_cloud_drive);
+                String textToShow = context.getString(R.string.context_empty_cloud_drive).toUpperCase();
                 try {
                     textToShow = textToShow.replace("[A]","<font color=\'"
 							+ ColorUtils.getColorHexString(context, R.color.black_white)
@@ -1376,16 +1376,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					} else {
 						emptyImageView.setImageResource(R.drawable.empty_cloud_drive_portrait);
 					}
-					String textToShow = context.getString(R.string.context_empty_cloud_drive);
+					String textToShow = context.getString(R.string.context_empty_cloud_drive).toUpperCase();
 					try {
 						textToShow = textToShow.replace("[A]","<font color=\'"
 								+ ColorUtils.getColorHexString(context, R.color.black_white)
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
-						textToShow = textToShow.replace("[B]","<font color="
-								//+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal_color)
-								+ "rgba(0,0,0,0.87)"
-								+ ">");
+						textToShow = textToShow.replace("[B]","<font color=\'"
+								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
 					}
