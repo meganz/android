@@ -99,6 +99,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			return;
 		}
 
+		//MEGA DROP link
+		if (matchRegexs(url, MEGA_DROP_LINK_REGEXS)) {
+			logDebug("Open MEGAdrop link");
+			openWebLink(url);
+			return;
+		}
+
 		// File link
 		if (matchRegexs(url, FILE_LINK_REGEXS)) {
 			logDebug("Open link url");
@@ -393,12 +400,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 				}
 				return;
 			}
-		}
-
-		//MEGA DROP link
-		if (matchRegexs(url, MEGA_DROP_LINK_REGEXS)) { //https://mega.nz/megadrop
-			setError(getString(R.string.error_MEGAdrop_not_supported));
-			return;
 		}
 
 		// Browser open the link which does not require app to handle

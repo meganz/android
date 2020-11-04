@@ -18,7 +18,6 @@ package mega.privacy.android.app.utils.billing;
 
 import android.text.TextUtils;
 import android.util.Base64;
-import com.android.billingclient.util.BillingHelper;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -54,7 +53,6 @@ public class Security {
             String signature) throws IOException {
         if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey)
                 || TextUtils.isEmpty(signature)) {
-            BillingHelper.logWarn(TAG, "Purchase verification failed: missing data.");
             logWarning("Purchase verification failed: missing data.");
             return false;
         }
@@ -81,11 +79,9 @@ public class Security {
             throw new RuntimeException(e);
         } catch (InvalidKeySpecException e) {
             String msg = "Invalid key specification: " + e;
-            BillingHelper.logWarn(TAG, msg);
             logWarning(msg, e);
             throw new IOException(msg);
         } catch (IllegalArgumentException e) {
-            BillingHelper.logWarn(TAG, e.getMessage());
             logWarning(e.getMessage(), e);
             throw new IOException(e.getMessage());
         }
@@ -105,7 +101,6 @@ public class Security {
         try {
             signatureBytes = Base64.decode(signature, Base64.DEFAULT);
         } catch (IllegalArgumentException e) {
-            BillingHelper.logWarn(TAG, "Base64 decoding failed.");
             logWarning("Base64 decoding failed.", e);
             return false;
         }
@@ -114,7 +109,6 @@ public class Security {
             signatureAlgorithm.initVerify(publicKey);
             signatureAlgorithm.update(signedData.getBytes());
             if (!signatureAlgorithm.verify(signatureBytes)) {
-                BillingHelper.logWarn(TAG, "Signature verification failed.");
                 logWarning("Signature verification failed.");
                 return false;
             }
@@ -124,10 +118,8 @@ public class Security {
             logError("RSA is unavailable.", e);
             throw new RuntimeException(e);
         } catch (InvalidKeyException e) {
-            BillingHelper.logWarn(TAG, "Invalid key specification.");
             logWarning("Invalid key specification.", e);
         } catch (SignatureException e) {
-            BillingHelper.logWarn(TAG, "Signature exception.");
             logWarning("Signature exception.", e);
         }
         return false;
