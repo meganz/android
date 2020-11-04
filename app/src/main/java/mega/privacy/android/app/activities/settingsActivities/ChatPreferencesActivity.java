@@ -1,13 +1,10 @@
 package mega.privacy.android.app.activities.settingsActivities;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,28 +14,8 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AlertDialog;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatListItem;
-import nz.mega.sdk.MegaChatListenerInterface;
-import nz.mega.sdk.MegaChatPresenceConfig;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
@@ -49,12 +26,12 @@ import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class ChatPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatListenerInterface {
+public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
 
-    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             logDebug("Network broadcast received!");
@@ -71,7 +48,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         }
     };
 
-    private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttChat == null)
@@ -83,7 +60,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         }
     };
 
-    private BroadcastReceiver richLinksUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver richLinksUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttChat == null)
@@ -95,7 +72,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         }
     };
 
-    private BroadcastReceiver statusUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver statusUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttChat == null)
@@ -124,44 +101,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
                 new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
         registerReceiver(chatRoomMuteUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
-    }
-
-    @Override
-    public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-    }
-
-    @Override
-    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-    }
-
-    @Override
-    public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-    }
-
-    @Override
-    public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-        if (config != null) {
-            if (config.isPending()) {
-                logDebug("Config is pending - do not update UI");
-            } else if (sttChat != null) {
-                sttChat.updatePresenceConfigChat(false);
-            }
-        } else {
-            logWarning("Config is null");
-        }
-    }
-
-    @Override
-    public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-    }
-
-    @Override
-    public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
     }
 
     /**
@@ -240,14 +179,32 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     private void setAutoAwayValue(String value, boolean cancelled) {
         logDebug("Value: " + value);
         if (cancelled) {
-            if (sttChat != null) {
-                sttChat.updatePresenceConfigChat(cancelled);
-            }
+            needUpdatePresence(cancelled);
         } else {
             int timeout = Integer.parseInt(value);
             if (megaChatApi != null) {
                 megaChatApi.setPresenceAutoaway(true, timeout * 60);
             }
+        }
+    }
+
+    /**
+     * Method required to update presence.
+     *
+     * @param cancelled If it is cancelled
+     */
+    public void needUpdatePresence(boolean cancelled) {
+        if (sttChat != null) {
+            sttChat.updatePresenceConfigChat(cancelled);
+        }
+    }
+
+    /**
+     * Method required to update Rich links config.
+     */
+    public void needUpdateRichLinks() {
+        if (sttChat != null) {
+            sttChat.updateEnabledRichLinks();
         }
     }
 
@@ -265,87 +222,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
     }
 
     @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-        if (users != null) {
-            for (int i = 0; i < users.size(); i++) {
-                MegaUser user = users.get(i);
-                if (user != null && user.isOwnChange() > 0 && user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS)) {
-                    megaApi.shouldShowRichLinkWarning(this);
-                    megaApi.isRichPreviewsEnabled(this);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-
-    }
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @SuppressLint("NewApi")
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-            if (e.getErrorCode() != MegaError.API_OK && sttChat != null) {
-                sttChat.updateEnabledRichLinks();
-            }
-        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER && request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-            if (e.getErrorCode() == MegaError.API_ENOENT) {
-                logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
-            }
-            if (request.getNumDetails() == 1) {
-                MegaApplication.setShowRichLinkWarning(request.getFlag());
-                MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
-            } else if (request.getNumDetails() == 0) {
-                MegaApplication.setEnabledRichLinks(request.getFlag());
-                if (sttChat != null) {
-                    sttChat.updateEnabledRichLinks();
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(networkReceiver);
@@ -353,6 +229,4 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity implements 
         unregisterReceiver(statusUpdateReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
     }
-
-
 }

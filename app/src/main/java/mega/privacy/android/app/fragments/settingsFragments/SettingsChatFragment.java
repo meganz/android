@@ -16,6 +16,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.listeners.SettingsListener;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaPushNotificationSettings;
@@ -28,7 +29,7 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.isOffline;
 import static mega.privacy.android.app.utils.Util.isOnline;
 
-public class SettingsChatFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsChatFragment extends SettingsBaseFragment {
 
     private MegaChatPresenceConfig statusConfig;
     private Preference chatNotificationsPreference;
@@ -149,7 +150,7 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
                 break;
 
             case KEY_CHAT_RICH_LINK:
-                megaApi.enableRichPreviews(richLinksSwitch.isChecked(), (ChatPreferencesActivity) context);
+                megaApi.enableRichPreviews(richLinksSwitch.isChecked(), new SettingsListener(((ChatPreferencesActivity) context)));
                 break;
         }
 
@@ -295,7 +296,6 @@ public class SettingsChatFragment extends SettingsBaseFragment implements Prefer
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
-        final ListView lv = v.findViewById(android.R.id.list);
         setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
         return v;
     }

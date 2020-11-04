@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -39,9 +38,7 @@ public class SettingsBaseFragment extends PreferenceFragmentCompat implements Pr
     }
 
     @Override
-    public void onCreatePreferences(Bundle bundle, String s) {
-
-    }
+    public void onCreatePreferences(Bundle bundle, String s) { }
 
     @Override
     public boolean onPreferenceClick(Preference preference) {

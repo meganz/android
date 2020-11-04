@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -13,18 +12,17 @@ import androidx.preference.SwitchPreferenceCompat;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
+import mega.privacy.android.app.listeners.SettingsListener;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.tasks.ClearCacheTask;
-import mega.privacy.android.app.lollipop.tasks.ClearOfflineTask;
-import mega.privacy.android.app.lollipop.tasks.GetCacheSizeTask;
-import mega.privacy.android.app.lollipop.tasks.GetOfflineSizeTask;
+import mega.privacy.android.app.lollipop.tasks.ManageCacheTask;
+import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
 import nz.mega.sdk.MegaAccountDetails;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class SettingsFileManagementFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
     private final static String INITIAL_VALUE = "0";
     private Preference offlineFileManagement;
@@ -66,7 +64,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment impleme
         autoPlaySwitch.setChecked(prefs.isAutoPlayEnabled());
 
         if (megaApi.serverSideRubbishBinAutopurgeEnabled()) {
-            megaApi.getRubbishBinAutopurgePeriod((FileManagementPreferencesActivity) context);
+            megaApi.getRubbishBinAutopurgePeriod(new SettingsListener(context));
             getPreferenceScreen().addPreference(enableRbSchedulerSwitch);
             getPreferenceScreen().addPreference(daysRbSchedulerPreference);
             daysRbSchedulerPreference.setOnPreferenceClickListener(this);
@@ -96,7 +94,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment impleme
         taskGetSizeCache();
         taskGetSizeOffline();
 
-        megaApi.getFileVersionsOption((FileManagementPreferencesActivity) context);
+        megaApi.getFileVersionsOption(new SettingsListener(context));
     }
 
     @Override
@@ -104,12 +102,12 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment impleme
 
         switch (preference.getKey()) {
             case KEY_OFFLINE:
-                ClearOfflineTask clearOfflineTask = new ClearOfflineTask(context);
+                ManageOfflineTask clearOfflineTask = new ManageOfflineTask(context, true);
                 clearOfflineTask.execute();
                 break;
 
             case KEY_CACHE:
-                ClearCacheTask clearCacheTask = new ClearCacheTask(context);
+                ManageCacheTask clearCacheTask = new ManageCacheTask(context, true);
                 clearCacheTask.execute();
                 break;
 
@@ -150,7 +148,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment impleme
                 if (isOffline(context))
                     return false;
 
-                megaApi.setFileVersionsOption(!enableVersionsSwitch.isChecked(), (FileManagementPreferencesActivity) context);
+                megaApi.setFileVersionsOption(!enableVersionsSwitch.isChecked(), new SettingsListener(context));
                 break;
 
             case KEY_CLEAR_VERSIONS:
@@ -233,12 +231,12 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment impleme
     }
 
     public void taskGetSizeCache() {
-        GetCacheSizeTask getCacheSizeTask = new GetCacheSizeTask(context);
+        ManageCacheTask getCacheSizeTask = new ManageCacheTask(context, false);
         getCacheSizeTask.execute();
     }
 
     public void taskGetSizeOffline() {
-        GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(context);
+        ManageOfflineTask getOfflineSizeTask = new ManageOfflineTask(context, false);
         getOfflineSizeTask.execute();
     }
 

@@ -21,38 +21,22 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
-import java.util.ArrayList;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
+import mega.privacy.android.app.listeners.SettingsListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaEvent;
-import nz.mega.sdk.MegaGlobalListenerInterface;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
-import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileManagementPreferencesActivity extends PreferencesBaseActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface {
+public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
     private static final int MINIMUM_DAY = 6;
     private static final int MAXIMUM_DAY = 31;
-    private static final int DAYS_USER_FREE = 30;
-    private static final int DAYS_USER_PRO = 90;
 
     private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
@@ -60,7 +44,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
     private AlertDialog generalDialog;
 
 
-    private BroadcastReceiver cacheSizeUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver cacheSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
@@ -73,7 +57,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver setVersionInfoReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver setVersionInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
@@ -85,7 +69,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver resetVersionInfoReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver resetVersionInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
@@ -97,7 +81,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver offlineSizeUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver offlineSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
@@ -110,7 +94,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
@@ -122,7 +106,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
@@ -139,7 +123,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         }
     };
 
-    private BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             logDebug("Network broadcast received!");
@@ -181,7 +165,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         registerReceiver(setVersionInfoReceiver,
                 new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
         registerReceiver(resetVersionInfoReceiver,
-                new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
+                new IntentFilter(ACTION_RESET_VERSION_INFO_SETTING));
     }
 
     @Override
@@ -268,7 +252,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         int intValue = Integer.parseInt(value);
 
         if (megaApi != null) {
-            megaApi.setRubbishBinAutopurgePeriod(intValue, this);
+            megaApi.setRubbishBinAutopurgePeriod(intValue, new SettingsListener(this));
         }
     }
 
@@ -311,6 +295,33 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
     private void clearInputText(final EditText input) {
         input.setText("");
         input.requestFocus();
+    }
+
+    /**
+     * Method required to reset the rubbish bin info.
+     */
+    public void resetRubbishInfo() {
+        if (sttFileManagment != null) {
+            sttFileManagment.resetRubbishInfo();
+        }
+    }
+
+    /**
+     * Method for updating rubbish bin Scheduler.
+     */
+    public void updateRBScheduler(long daysCount) {
+        if (sttFileManagment != null) {
+            sttFileManagment.updateRBScheduler(daysCount);
+        }
+    }
+
+    /**
+     * Method for enable or disable the file versions.
+     */
+    public void updateEnabledFileVersions() {
+        if (sttFileManagment != null) {
+            sttFileManagment.updateEnabledFileVersions();
+        }
     }
 
     /**
@@ -367,8 +378,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
 
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) -> {
-            if (isEnabling && sttFileManagment != null) {
-                sttFileManagment.updateRBScheduler(0);
+            if (isEnabling) {
+                updateRBScheduler(0);
             }
         });
         builder.setView(layout);
@@ -379,164 +390,5 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity i
         newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             controlOptionOfRbSchedulerValueDialog(input.getText().toString().trim(), input);
         });
-    }
-
-    @Override
-    protected void onPostResume() {
-        logDebug("onPostResume");
-        super.onPostResume();
-    }
-
-    @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        switch (request.getType()) {
-            case MegaRequest.TYPE_CLEAN_RUBBISH_BIN:
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Util.showSnackbar(this, getString(R.string.rubbish_bin_emptied));
-                    resetAccountDetailsTimeStamp();
-                    if (sttFileManagment != null) {
-                        sttFileManagment.resetRubbishInfo();
-                    }
-                } else {
-                    Util.showSnackbar(this, getString(R.string.rubbish_bin_no_emptied));
-                }
-                break;
-
-            case MegaRequest.TYPE_SET_ATTR_USER:
-                if (request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME) {
-                    if (e.getErrorCode() == MegaError.API_OK) {
-                        if (sttFileManagment != null) {
-                            sttFileManagment.updateRBScheduler(request.getNumber());
-                        }
-                    } else {
-                        Util.showSnackbar(this, getString(R.string.error_general_nodes));
-                    }
-                }
-                if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS) {
-                    MegaApplication.setDisableFileVersions(Boolean.parseBoolean(request.getText()));
-
-                    if (e.getErrorCode() != MegaError.API_OK) {
-                        logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-                        if (sttFileManagment != null) {
-                            sttFileManagment.updateEnabledFileVersions();
-                        }
-                    } else {
-                        logDebug("File versioning attribute changed correctly");
-                    }
-                }
-                break;
-
-            case MegaRequest.TYPE_GET_ATTR_USER:
-                if (request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME && sttFileManagment != null) {
-                    if (e.getErrorCode() == MegaError.API_ENOENT) {
-                        sttFileManagment.updateRBScheduler(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE ?
-                                DAYS_USER_FREE : DAYS_USER_PRO);
-                    } else {
-                        sttFileManagment.updateRBScheduler(request.getNumber());
-                    }
-                }
-
-                if (request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS && sttFileManagment != null) {
-                    MegaApplication.setDisableFileVersions(request.getFlag());
-                    sttFileManagment.updateEnabledFileVersions();
-                }
-                break;
-
-            case MegaRequest.TYPE_REMOVE_VERSIONS:
-                if (e.getErrorCode() == MegaError.API_OK){
-                    Util.showSnackbar(this, getString(R.string.success_delete_versions));
-                    if(sttFileManagment != null) {
-                        sttFileManagment.resetVersionsInfo();
-                    }
-                } else{
-                    Util.showSnackbar(this, getString(R.string.error_delete_versions));
-                }
-                break;
-
-            case MegaRequest.TYPE_FOLDER_INFO:
-                if (sttFileManagment != null) {
-                    sttFileManagment.setVersionsInfo();
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
-
-    }
-
-    @Override
-    public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-        logDebug("onUsersUpdateLollipop");
-
-        if (users != null) {
-            logDebug("users.size(): " + users.size());
-            for (int i = 0; i < users.size(); i++) {
-                MegaUser user = users.get(i);
-
-                if (user != null) {
-                    // 0 if the change is external.
-                    // >0 if the change is the result of an explicit request
-                    // -1 if the change is the result of an implicit request made by the SDK internally
-
-                    if (user.isOwnChange() > 0) {
-                        logDebug("isOwnChange!!!: " + user.getEmail());
-                    } else {
-                        logDebug("Changes: " + user.getChanges());
-
-                        if (megaApi.getMyUser() != null && user.getHandle() == megaApi.getMyUser().getHandle()) {
-                            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
-                                megaApi.getRubbishBinAutopurgePeriod(this);
-                            }
-
-                            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
-                                megaApi.getFileVersionsOption(this);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
-
-    }
-
-    @Override
-    public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodeList) {
-
-    }
-
-    @Override
-    public void onReloadNeeded(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onAccountUpdate(MegaApiJava api) {
-
-    }
-
-    @Override
-    public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-
-    }
-
-    @Override
-    public void onEvent(MegaApiJava api, MegaEvent event) {
-
     }
 }

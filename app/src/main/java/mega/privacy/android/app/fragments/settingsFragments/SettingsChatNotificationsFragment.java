@@ -29,7 +29,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 
-public class SettingsChatNotificationsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsChatNotificationsFragment extends SettingsBaseFragment {
 
     private ChatSettings chatSettings;
     private SwitchPreferenceCompat chatNotificationsSwitch;

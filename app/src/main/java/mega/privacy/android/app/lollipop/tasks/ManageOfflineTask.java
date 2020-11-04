@@ -9,35 +9,40 @@ import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.OfflineUtils.clearOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineSize;
 
-/*
-	 * Background task to clear offline files
-	 */
-public class ClearOfflineTask extends AsyncTask<String, Void, String> {
-    Context context;
-    DatabaseHandler dbH;
+/**
+ * Background task to calculate the size of offline folder or to clear offline files.
+ */
+public class ManageOfflineTask extends AsyncTask<String, Void, String> {
 
-    public ClearOfflineTask(Context context){
+    private Context context;
+    private DatabaseHandler dbH;
+    private boolean isClearOption;
 
+    public ManageOfflineTask(Context context, boolean isClearOption) {
         this.context = context;
+        this.isClearOption = isClearOption;
         dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
     }
 
     @Override
     protected String doInBackground(String... params) {
-        logDebug("doInBackground-Async Task ClearOfflineTask");
+        logDebug("doInBackground-Async Task ManageOfflineTask");
 
-        clearOffline(context);
-        dbH.clearOffline();
-        String size = getOfflineSize(context);
-        return size;
+        if (isClearOption) {
+            clearOffline(context);
+            dbH.clearOffline();
+        }
+
+        return getOfflineSize(context);
     }
 
     @Override
     protected void onPostExecute(String size) {
-        logDebug("ClearOfflineTask::onPostExecute");
+        logDebug("ManageOfflineTask::onPostExecute");
         Intent intent = new Intent(ACTION_UPDATE_OFFLINE_SIZE_SETTING);
         intent.putExtra(OFFLINE_SIZE, size);
         MegaApplication.getInstance().sendBroadcast(intent);
