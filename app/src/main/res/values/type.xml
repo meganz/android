@@ -11,6 +11,7 @@
          The account name uses the default style of Headline6-->
     <style name="TextAppearance.Mega.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
         <item name="android:textStyle">normal</item>
     </style>
 
@@ -31,6 +32,7 @@
     <!-- Medium, 16sp, 0.15px, textColorPrimary, AllCaps=true -->
     <style name="TextAppearance.Mega.Subtitle1.AllCaps.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Red">
@@ -53,6 +55,7 @@
 
     <style name="TextAppearance.Mega.Subtitle1.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
