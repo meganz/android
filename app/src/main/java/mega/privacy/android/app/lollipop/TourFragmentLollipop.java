@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -33,17 +34,18 @@ import mega.privacy.android.app.components.LoopViewPager;
 import mega.privacy.android.app.utils.TextUtil;
 
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class TourFragmentLollipop extends Fragment implements View.OnClickListener{
 
     private static final String EXTRA_RECOVERY_KEY_URL = "EXTRA_RECOVERY_KEY_URL";
+    private static final String EXTRA_PARK_ACCOUNT_URL = "EXTRA_PARK_ACCOUNT_URL";
 
-    Context context;
+    private Context context;
     private TourImageAdapter adapter;
     private LoopViewPager viewPager;
     private ImageView firstItem;
@@ -54,13 +56,22 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private Button bLogin;
     private ScrollView baseContainer;
 
-    public static TourFragmentLollipop newInstance(@Nullable String recoveryKeyUrl) {
+    public static TourFragmentLollipop newInstance(@Nullable String recoveryKeyUrl, @Nullable String parkAccountUrl) {
         TourFragmentLollipop fragment = new TourFragmentLollipop();
-        if (recoveryKeyUrl != null && !recoveryKeyUrl.isEmpty()) {
-            Bundle arguments = new Bundle();
+        Bundle arguments = new Bundle();
+
+        if (!TextUtils.isEmpty(recoveryKeyUrl)) {
             arguments.putString(EXTRA_RECOVERY_KEY_URL, recoveryKeyUrl);
+        }
+
+        if (!TextUtils.isEmpty(parkAccountUrl)) {
+            arguments.putString(EXTRA_PARK_ACCOUNT_URL, parkAccountUrl);
+        }
+
+        if (!arguments.isEmpty()) {
             fragment.setArguments(arguments);
         }
+
         return fragment;
     }
 
@@ -194,24 +205,28 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null) {
             String recoveryKeyUrl = getArguments().getString(EXTRA_RECOVERY_KEY_URL, null);
-            if (recoveryKeyUrl != null) {
+            String parkAccountUrl = getArguments().getString(EXTRA_PARK_ACCOUNT_URL, null);
+
+            if (!TextUtils.isEmpty(recoveryKeyUrl)) {
                 logDebug("Link to resetPass: " + recoveryKeyUrl);
                 showRecoveryKeyDialog(recoveryKeyUrl);
+            }
+
+            if (!TextUtils.isEmpty(parkAccountUrl)) {
+                logDebug("Link to parkAccount: " + parkAccountUrl);
+                showParkAccountDialog(parkAccountUrl);
             }
         }
     }
 
     public void showRecoveryKeyDialog(String recoveryKeyUrl) {
-        logDebug("link: " + recoveryKeyUrl);
+        AlertDialog dialog = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+                .setView(R.layout.dialog_recovery_key).setTitle(R.string.title_dialog_insert_MK)
+                .setMessage(R.string.text_dialog_insert_MK)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
 
-        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
-        dialogBuilder.setView(R.layout.dialog_recovery_key);
-        dialogBuilder.setTitle(R.string.title_dialog_insert_MK);
-        dialogBuilder.setMessage(R.string.text_dialog_insert_MK);
-        dialogBuilder.setPositiveButton(R.string.general_ok, null);
-        dialogBuilder.setNegativeButton(android.R.string.cancel, null);
-
-        AlertDialog dialog = dialogBuilder.create();
         dialog.show();
 
         TextInputLayout editInputLayout = dialog.findViewById(R.id.input_recovery_key);
@@ -223,7 +238,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                     editInputLayout.setError(getString(R.string.invalid_string));
                     view.requestFocus();
                 } else {
-                    startChangePasswordActivity(recoveryKeyUrl, key.trim());
+                    startChangePasswordActivity(Uri.parse(recoveryKeyUrl), key.trim());
                     dialog.dismiss();
                 }
             } else {
@@ -238,17 +253,33 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 editInputLayout.setError(getString(R.string.invalid_string));
                 editText.requestFocus();
             } else {
-                startChangePasswordActivity(recoveryKeyUrl, key.trim());
+                startChangePasswordActivity(Uri.parse(recoveryKeyUrl), key.trim());
                 dialog.dismiss();
             }
         });
     }
 
-    private void startChangePasswordActivity(String recoveryKeyUrl, String key) {
+    public void showParkAccountDialog(String parkAccountUrl) {
+        new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
+                .setTitle(R.string.park_account_dialog_title)
+                .setMessage(R.string.park_account_text_last_step)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.park_account_button, (dialog, which) ->
+                        startChangePasswordActivity(Uri.parse(parkAccountUrl), null)
+                )
+                .create()
+                .show();
+    }
+
+    private void startChangePasswordActivity(Uri dataUri, @Nullable String key) {
         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-        intent.setAction(ACTION_RESET_PASS_FROM_LINK);
-        intent.setData(Uri.parse(recoveryKeyUrl));
-        intent.putExtra("MK", key);
+        intent.setData(dataUri);
+        if (key != null) {
+            intent.putExtra("MK", key);
+            intent.setAction(ACTION_RESET_PASS_FROM_LINK);
+        } else {
+            intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
+        }
         startActivity(intent);
     }
 
