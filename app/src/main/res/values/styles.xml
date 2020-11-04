@@ -602,7 +602,7 @@
         <item name="tabSelectedTextColor">@color/red_600_red_300</item>
         <item name="tabTextAppearance">@style/TextAppearance.Mega.Tab</item>
         <item name="tabMaxWidth">0dp</item>
+        <item name="tabIconTint">@color/grey_054_white_054</item>
     </style>
 
 </resources>
-<!--<item name="tabIconTint">?android:attr/textColorSecondary</item>-->

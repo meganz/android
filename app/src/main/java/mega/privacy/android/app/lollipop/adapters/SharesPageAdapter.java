@@ -78,6 +78,8 @@ public class SharesPageAdapter extends FragmentStatePagerAdapter {
         return null;
     }
 
+
+
     @Override
     public int getCount() {
         return PAGE_COUNT;
