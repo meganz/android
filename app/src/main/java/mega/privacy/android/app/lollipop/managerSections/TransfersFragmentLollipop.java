@@ -5,19 +5,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+
 import java.util.ArrayList;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
+import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
+import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class TransfersFragmentLollipop extends TransfersBaseFragment {
+public class TransfersFragmentLollipop extends TransfersBaseFragment implements MegaTransfersLollipopAdapter.SelectModeInterface, TransfersActionBarCallBack.TransfersActionInterface {
 
 	private MegaTransfersLollipopAdapter adapter;
 
@@ -26,6 +33,8 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 	public static TransfersFragmentLollipop newInstance() {
 		return new TransfersFragmentLollipop();
 	}
+
+	private ActionMode actionMode;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,7 +59,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 
 		setTransfers();
 
-		adapter = new MegaTransfersLollipopAdapter(context, tL, listView);
+		adapter = new MegaTransfersLollipopAdapter(context, tL, listView, this);
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
@@ -169,5 +178,93 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 	 */
 	public boolean isEmpty() {
 		return tL.isEmpty();
+	}
+
+	@Override
+	public void checkScroll() {
+		managerActivity.changeActionBarElevation((listView != null && listView.canScrollVertically(-1))
+				|| (adapter != null && adapter.isMultipleSelect()));
+	}
+
+	@Override
+	public void destroyActionMode() {
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
+
+	@Override
+	protected RotatableAdapter getAdapter() {
+		return adapter;
+	}
+
+	@Override
+	public void activateActionMode() {
+		if (adapter != null && !adapter.isMultipleSelect()) {
+			adapter.setMultipleSelect(true);
+			actionMode = ((AppCompatActivity) context).startSupportActionMode(new TransfersActionBarCallBack(this));
+		}
+	}
+
+	@Override
+	public void multipleItemClick(int position) {
+		adapter.toggleSelection(position);
+	}
+
+	@Override
+	public void reselectUnHandledSingleItem(int position) {
+
+	}
+
+	@Override
+	protected void updateActionModeTitle() {
+		if (actionMode == null || getActivity() == null || adapter == null) {
+			logWarning("RETURN: null values");
+			return;
+		}
+
+		long count = adapter.getSelectedItemsCount();
+		String title = count == 0 ? getString(R.string.title_select_transfers) : count + "";
+		actionMode.setTitle(title.toUpperCase());
+		actionMode.invalidate();
+	}
+
+	@Override
+	public void onCreateActionMode() {
+		managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
+		checkScroll();
+	}
+
+	@Override
+	public void onDestroyActionMode() {
+		managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
+		checkScroll();
+	}
+
+	@Override
+	public void cancelTransfers() {
+
+	}
+
+	@Override
+	public void selectAll() {
+
+	}
+
+	@Override
+	public void clearSelections() {
+		if (adapter != null) {
+			adapter.clearSelections();
+		}
+	}
+
+	@Override
+	public int getSelectedTransfers() {
+		return adapter == null ? 0 : adapter.getSelectedItemsCount();
+	}
+
+	@Override
+	public boolean areAllTransfersSelected() {
+		return adapter != null && adapter.getSelectedItemsCount() == adapter.getItemCount();
 	}
 }

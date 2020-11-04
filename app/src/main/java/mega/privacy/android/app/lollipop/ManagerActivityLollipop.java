@@ -691,6 +691,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 //	private MenuItem pauseRestartTransfersItem;
 	private MenuItem createFolderMenuItem;
 	private MenuItem importLinkMenuItem;
+	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
 	private MenuItem thumbViewMenuItem;
@@ -6608,6 +6609,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
 		importLinkMenuItem = menu.findItem(R.id.action_import_link);
+		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		thumbViewMenuItem = menu.findItem(R.id.action_grid);
@@ -6842,7 +6844,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         } else {
                             pauseTransfersMenuIcon.setVisible(true);
                         }
+
 						cancelAllTransfersMenuItem.setVisible(true);
+					    enableSelectMenuItem.setVisible(true);
 					} else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersInProgressAdded() && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
 						retryTransfers.setVisible(thereAreFailedOrCancelledTransfers());
@@ -7482,6 +7486,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.action_menu_retry_transfers:
 				retryAllTransfers();
+				return true;
+
+			case R.id.action_enable_select:
+				if (isTransfersInProgressAdded()) {
+					tFLol.activateActionMode();
+				}
 				return true;
 
             default:{

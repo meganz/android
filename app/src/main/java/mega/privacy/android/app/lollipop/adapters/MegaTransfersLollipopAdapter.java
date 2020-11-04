@@ -9,16 +9,20 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -31,6 +35,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.THUMB_ROUND_PIXEL;
@@ -39,7 +44,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
 
-public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTransfersLollipopAdapter.ViewHolderTransfer> implements OnClickListener {
+public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTransfersLollipopAdapter.ViewHolderTransfer> implements OnClickListener, RotatableAdapter {
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -49,12 +54,15 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	private ArrayList<MegaTransfer> tL;
 	private RecyclerView listFragment;
 
+	private SelectModeInterface selectModeInterface;
 	private boolean multipleSelect;
+	private SparseBooleanArray selectedItems;
 
-	public MegaTransfersLollipopAdapter(Context _context, ArrayList<MegaTransfer> _transfers, RecyclerView _listView) {
+	public MegaTransfersLollipopAdapter(Context _context, ArrayList<MegaTransfer> _transfers, RecyclerView _listView, SelectModeInterface selectModeInterface) {
 		this.context = _context;
 		this.tL = _transfers;
 		this.listFragment = _listView;
+		this.selectModeInterface = selectModeInterface;
 
 		if (megaApi == null) {
 			megaApi = MegaApplication.getInstance().getMegaApi();
@@ -356,4 +364,143 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			notifyDataSetChanged();
 		}
 	}
+
+	public void hideMultipleSelect() {
+    	setMultipleSelect(false);
+    	selectModeInterface.destroyActionMode();
+	}
+
+	public void clearSelections() {
+		if (tL == null) {
+			return;
+		}
+
+		for (int i = 0; i < tL.size(); i++) {
+			if (isItemChecked(i)) {
+				toggleSelection(i);
+			}
+		}
+	}
+
+	/**
+	 * Checks if the current position is selected.
+	 * If it is, deselects it. If not, selects it.
+	 *
+	 * @param pos	Position to check.
+	 * @return True if the position is selected, false otherwise.
+	 */
+	private boolean putOrDeletePosition(int pos) {
+		if (selectedItems.get(pos, false)) {
+			selectedItems.delete(pos);
+			return true;
+		} else {
+			selectedItems.put(pos, true);
+			return false;
+		}
+	}
+
+	public void toggleSelection(int pos) {
+		startAnimation(pos, putOrDeletePosition(pos));
+	}
+
+	private void startAnimation(final int pos, final boolean delete) {
+		MegaNodeAdapter.ViewHolderBrowserList view = (MegaNodeAdapter.ViewHolderBrowserList) listFragment.findViewHolderForLayoutPosition(pos);
+		if (view != null) {
+			Animation flipAnimation = AnimationUtils.loadAnimation(context, R.anim.multiselect_flip);
+			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
+				@Override
+				public void onAnimationStart(Animation animation) {
+					if (!delete) {
+						notifyItemChanged(pos);
+					}
+				}
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					hideMultipleSelect();
+					if (delete) {
+						notifyItemChanged(pos);
+					}
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+
+				}
+			});
+			view.imageView.startAnimation(flipAnimation);
+		} else {
+			logDebug("View is null - not animation");
+			hideMultipleSelect();
+			notifyItemChanged(pos);
+		}
+	}
+
+	private boolean isItemChecked(int position) {
+		return selectedItems.get(position);
+	}
+
+	public ArrayList<MegaTransfer> getSelectedTransfers() {
+    	if (selectedItems == null) {
+    		return null;
+		}
+
+    	ArrayList<MegaTransfer> selectedTransfers = new ArrayList<>();
+
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (!selectedItems.valueAt(i)) {
+				continue;
+			}
+
+			MegaTransfer transfer = tL.get(i);
+			if (transfer != null) {
+				selectedTransfers.add(transfer);
+			}
+		}
+
+    	return selectedTransfers;
+	}
+
+	public int getSelectedItemsCount() {
+		if (selectedItems == null) {
+			return 0;
+		}
+
+		return selectedItems.size();
+	}
+
+	@Override
+	public List<Integer> getSelectedItems() {
+		if (selectedItems == null) {
+			return null;
+		}
+
+		List<Integer> items = new ArrayList<>(selectedItems.size());
+
+		for (int i = 0; i < selectedItems.size(); i++) {
+			items.add(selectedItems.keyAt(i));
+		}
+
+		return items;
+	}
+
+	@Override
+	public int getFolderCount() {
+		return 0;
+	}
+
+	@Override
+	public int getPlaceholderCount() {
+		return 0;
+	}
+
+	@Override
+	public int getUnhandledItem() {
+		return INVALID_POSITION;
+	}
+
+	public interface SelectModeInterface {
+		void destroyActionMode();
+	}
+
 }

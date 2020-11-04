@@ -2925,4 +2925,5 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 
+    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
 </resources>
