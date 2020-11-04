@@ -666,25 +666,25 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShowBusinessMonth = getString(R.string.type_month, textMonth);
                 // The initial amount of storage space for business account is 15TB
-                String unlimitedSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
-                String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
+                String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
+                String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
 
                 try{
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[A]", "<font color=\'#2ba6de\'>");
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[/A]", "</font>");
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[B]", "<font color=\'#2ba6de\'>");
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[/B]", "</font>");
-                    unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
-                    unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
+                    businessStorageSpace = businessStorageSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
+                    businessTransferQuota = businessTransferQuota.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
                 }catch (Exception e){
                     logError("NullPointerException happens when getting the storage string", e);
                 }
 
                 monthSectionBusiness.setText(getSpannedHtmlText(textToShowBusinessMonth));
-                storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
-                bandwidhtSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
+                storageSectionBusiness.setText(getSpannedHtmlText(businessStorageSpace));
+                bandwidhtSectionBusiness.setText(getSpannedHtmlText(businessTransferQuota));
             }
             accounts.add(account);
         }
