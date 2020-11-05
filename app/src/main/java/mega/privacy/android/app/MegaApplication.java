@@ -91,6 +91,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static android.media.AudioManager.STREAM_RING;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -179,7 +180,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean wasLocalVideoEnable = false;
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
-	private static boolean isSpeakerOn = false;
+	public static boolean isSpeakerOn = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -604,7 +605,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
 				int type = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_TYPE);
-				if(type != 2)
+				if(type != STREAM_RING)
 					return;
 
 				int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
@@ -615,7 +616,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	public boolean isAIncomingCallRining() {
+	public boolean isAnIncomingCallRinging() {
 		return rtcAudioManagerRingInCall != null;
 	}
 
@@ -1976,13 +1977,5 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
-	}
-
-	public static boolean isSpeakerOn() {
-		return isSpeakerOn;
-	}
-
-	public static void setSpeakerOn(boolean isSpeakerOn) {
-		MegaApplication.isSpeakerOn = isSpeakerOn;
 	}
 }

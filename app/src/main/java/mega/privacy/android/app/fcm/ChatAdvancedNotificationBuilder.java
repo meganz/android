@@ -584,13 +584,9 @@ public final class ChatAdvancedNotificationBuilder {
     private Bitmap setUserAvatar(MegaChatRoom chat){
         logDebug("Chat ID: " + chat.getChatId());
         if(!chat.isGroup()) {
-            File avatar = buildAvatarFile(context, chatC.getParticipantEmail(chat.getPeerHandle(0)) + ".jpg");
-            if (isFileAvailable(avatar) && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap != null)
-                    return getCircleBitmap(bitmap);
-            }
+            Bitmap bitmap = getImageAvatarCall(chat, chat.getPeerHandle(0));
+            if (bitmap != null)
+                return getCircleBitmap(bitmap);
         }
         return createDefaultAvatar(chat);
     }
@@ -938,20 +934,29 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create a channel for android Oreo or higher
-            NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("");
-            channel.enableLights(true);
-            if(!shouldVibrate) {
+            String channelId = shouldVibrate ? notificationChannelIdIncomingCall :
+                    NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
+
+            String channelName = shouldVibrate ? notificationChannelNameIncomingCall :
+                    NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+            if (shouldVibrate) {
+                channel.setVibrationPattern(patternIncomingCall);
+            }else{
                 channel.setVibrationPattern(new long[]{ 0L });
             }
-            channel.enableVibration(true);
+            channel.enableLights(true);
+            channel.enableVibration(shouldVibrate);
+            channel.setDescription("");
 
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
 
             notificationManager.createNotificationChannel(channel);
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
+
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, channelId);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -967,15 +972,9 @@ public final class ChatAdvancedNotificationBuilder {
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
-            if(shouldVibrate){
-                notificationBuilderO.setVibrate(patternIncomingCall);
-            }
-
-
             notifyCall(notificationId, notificationBuilderO.build());
 
         } else {
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -987,9 +986,9 @@ public final class ChatAdvancedNotificationBuilder {
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
                     .setAutoCancel(false)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(intentIgnore)
-                    .setSound(defaultSoundUri)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
             if(shouldVibrate){

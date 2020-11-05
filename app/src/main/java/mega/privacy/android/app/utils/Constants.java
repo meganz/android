@@ -366,6 +366,8 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID = "InProgressMissedCallNotification";
     public static final String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME = "MEGA In Progress and Missed Calls";
     public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_ID = "ChatIncomingCallNotification";
+    public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID = "ChatIncomingCallNotificationNoVibrate";
+    public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME = "MEGA Incoming Calls (no vibration)";
     public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME = "MEGA Incoming Calls";
     public static final String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
     public static final String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";

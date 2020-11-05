@@ -158,14 +158,14 @@ public class AppRTCAudioManager {
             if (isNear) {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn() && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone:");
                     selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
             } else {
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn() && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone: ");
                     selectAudioDevice(AudioDevice.SPEAKER_PHONE, true);
                 }
@@ -422,7 +422,7 @@ public class AppRTCAudioManager {
 
     private void speakerElements(boolean isOn) {
         setDefaultAudioDevice(isOn ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE);
-        MegaApplication.setSpeakerOn(isOn);
+        MegaApplication.isSpeakerOn = isOn;
     }
 
     /**
@@ -595,20 +595,20 @@ public class AppRTCAudioManager {
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
         switch (device) {
             case SPEAKER_PHONE:
-                MegaApplication.setSpeakerOn(true);
+                MegaApplication.isSpeakerOn = true;
                 setSpeakerphoneOn(true);
                 break;
 
             case EARPIECE:
                 if(!isTemporary) {
-                    MegaApplication.setSpeakerOn(false);
+                    MegaApplication.isSpeakerOn = false;
                 }
                 setSpeakerphoneOn(false);
                 break;
 
             case WIRED_HEADSET:
             case BLUETOOTH:
-                MegaApplication.setSpeakerOn(false);
+                MegaApplication.isSpeakerOn = false;
                 setSpeakerphoneOn(false);
                 break;
 
@@ -819,7 +819,7 @@ public class AppRTCAudioManager {
         }
 
         if (userSelectedAudioDevice == AudioDevice.NONE) {
-            if (MegaApplication.isSpeakerOn()) {
+            if (MegaApplication.isSpeakerOn) {
                 userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
             } else if (hasWiredHeadset) {
                 userSelectedAudioDevice = AudioDevice.WIRED_HEADSET;
