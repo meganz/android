@@ -22,7 +22,6 @@
     <color name="file_list_second_row">#848484</color>
     <color name="file_list_selected_row">#1A000000</color>
     <color name="new_file_list_selected_row">#0A000000</color>
-    <color name="new_multiselect_color">#1A0ABFA5</color>
     <color name="border_file_properties">#cccccc</color>
     <color name="file_properties_text_available">#666666</color>
     <color name="grey_info_menu">#999999</color>
@@ -316,4 +315,6 @@
     <color name="bottom_sheet_navigation_bar_color">@android:color/white</color>
 
     <color name="homepage_background">#EEF2F1</color>
+
+    <color name="new_multiselect_color">#1A0ABFA5</color>
 </resources>

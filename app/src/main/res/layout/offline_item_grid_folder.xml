@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="56dp"
     android:layout_margin="2dp"
-    android:background="@drawable/background_item_grid_new"
+    android:background="@drawable/background_item_grid"
     android:padding="1dp">
 
     <ImageView
@@ -26,8 +26,7 @@
         android:layout_marginEnd="32dp"
         android:ellipsize="middle"
         android:singleLine="true"
-        android:textColor="@color/grey_alpha_087"
-        android:textSize="14sp"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
         tools:text="Folder" />
 
     <ImageButton

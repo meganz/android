@@ -28,8 +28,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textColor="@color/file_list_first_row"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
             tools:text="2048.jpg" />
 
         <TextView
@@ -38,8 +37,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/file_list_second_row"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
             tools:text="55.86KB . 24 Jul 2020 20:49" />
     </LinearLayout>
 
@@ -50,5 +48,6 @@
         android:layout_gravity="center_vertical|end"
         android:background="@null"
         android:padding="10dp"
-        android:src="@drawable/ic_dots_vertical_grey" />
+        android:src="@drawable/ic_dots_vertical_grey"
+        app:tint="?android:attr/textColorSecondary"/>
 </FrameLayout>

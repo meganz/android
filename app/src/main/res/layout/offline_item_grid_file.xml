@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="219dp"
     android:layout_margin="2dp"
-    android:background="@drawable/background_item_grid_new">
+    android:background="@drawable/background_item_grid">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/thumbnail"
@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="@dimen/grid_node_item_width"
-        android:background="@color/black_12_alpha" />
+        android:background="@color/grey_012_white_012" />
 
     <FrameLayout
         android:id="@+id/filename_container"
@@ -47,8 +47,7 @@
             android:layout_marginEnd="32dp"
             android:ellipsize="middle"
             android:singleLine="true"
-            android:textColor="@color/grey_alpha_087"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
             tools:text="name" />
 
         <ImageView

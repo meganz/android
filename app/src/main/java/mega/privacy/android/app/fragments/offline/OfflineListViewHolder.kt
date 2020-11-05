@@ -34,7 +34,7 @@ class OfflineListViewHolder(
 
             binding.thumbnail.setActualImageResource(R.drawable.ic_select_folder)
         } else {
-            binding.root.setBackgroundColor(Color.WHITE)
+            binding.root.setBackgroundColor(Color.TRANSPARENT)
 
             val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
 
