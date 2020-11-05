@@ -137,8 +137,7 @@
             android:id="@+id/header_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_centerVertical="true"/>

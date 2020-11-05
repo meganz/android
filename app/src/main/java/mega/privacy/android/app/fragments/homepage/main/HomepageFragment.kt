@@ -554,7 +554,7 @@ class HomepageFragment : Fragment() {
         private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
         private const val KEY_CONTACT_TYPE = "contactType"
         private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
-        private const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
+        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
         private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
     }
 }
