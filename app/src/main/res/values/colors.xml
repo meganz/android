@@ -228,4 +228,12 @@
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
     <color name="homepage_fab_label_text_color">#ff373737</color>
+
+    <!-- colors for audio player -->
+    <color name="audio_player_main_bg">#333333</color>
+    <color name="audio_player_controller_bg">#222222</color>
+    <color name="white_38_opacity">#60FFFFFF</color>
+    <color name="white_60_opacity">#99FFFFFF</color>
+    <color name="black_20_opacity">#33000000</color>
+    <color name="teal_300">#00BFA5</color>
 </resources>

@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
@@ -211,7 +212,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val internalIntent = isInternalIntent(node)
         val intent = if (internalIntent) {
-            Intent(context, AudioVideoPlayerLollipop::class.java)
+            Intent(context, AudioPlayerActivity::class.java)
         } else {
             Intent(Intent.ACTION_VIEW)
         }

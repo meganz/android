@@ -557,4 +557,10 @@
     <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
     </style>
+
+    <style name="AudioPlayerButton">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:layout_width">52dp</item>
+        <item name="android:layout_height">52dp</item>
+    </style>
 </resources>

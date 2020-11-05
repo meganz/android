@@ -2937,4 +2937,6 @@
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don't remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+
+    <string name="background_play_hint" context="Text that indicates the audio will still be played on background">Playing on the background</string>
 </resources>

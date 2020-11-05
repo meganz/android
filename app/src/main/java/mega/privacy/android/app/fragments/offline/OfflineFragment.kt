@@ -30,6 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -579,13 +580,16 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     }
                 } else {
                     internalIntent = true
-                    mediaIntent = Intent(context, AudioVideoPlayerLollipop::class.java)
+                    mediaIntent = Intent(
+                        context,
+                        if (mime.isVideo) AudioVideoPlayerLollipop::class.java else AudioPlayerActivity::class.java
+                    )
                 }
 
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.node.name)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:controller_layout_id="@layout/audio_player_control"
+        app:player_layout_id="@layout/audio_player_view"
+        app:surface_type="none" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:popupTheme="@style/Theme.Megaactionbar"
+        app:subtitleTextAppearance="@style/ToolbarSubtitle"
+        app:theme="@style/Theme.Megaactionbar"
+        app:titleTextAppearance="@style/ToolbarTitle" />
+</FrameLayout>

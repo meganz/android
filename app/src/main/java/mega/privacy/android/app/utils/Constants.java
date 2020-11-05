@@ -392,6 +392,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
+    public static final String NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID = "AudioPlayerNotification";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
     public static final String TYPE_TEXT_PLAIN = "text/plain";
@@ -680,4 +681,6 @@ public class Constants {
 
     public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
     public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
+
+    public static final String EXO_PLAYER_UA = "android2";
 }

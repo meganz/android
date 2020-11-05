@@ -85,4 +85,7 @@
     <dimen name="cu_fragment_selected_round_corner_radius">4dp</dimen>
     <dimen name="cu_fragment_image_margin_small">1dp</dimen>
     <dimen name="cu_fragment_image_margin_large">2dp</dimen>
+
+    <dimen name="audio_player_music_name_margin_bottom_small">10dp</dimen>
+    <dimen name="audio_player_music_name_margin_bottom_large">28dp</dimen>
 </resources>
