@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -264,16 +265,21 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.emptyHintImage.setImageResource(R.drawable.offline_empty_landscape)
         } else {
-            binding.emptyHintImage.setImageResource(R.drawable.ic_empty_offline)
+            binding.emptyHintImage.setImageResource(R.drawable.empty_offline)
         }
 
-        var textToShow = getString(R.string.context_empty_offline)
+        var textToShow = getString(R.string.context_empty_offline).toUpperCase()
 
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
-            textToShow = textToShow.replace("[/A]", "</font>")
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>")
-            textToShow = textToShow.replace("[/B]", "</font>")
+            textToShow = textToShow.replace(
+                "[A]", "<font color=\'"
+                        + getColorHexString(requireContext(), R.color.empty_hint_text_hightlight)
+                        + "\'>"
+            ).replace("[/A]", "</font>").replace(
+                "[B]", "<font color=\'"
+                        + getColorHexString(requireContext(), R.color.empty_hint_text_normal)
+                        + "\'>"
+            ).replace("[/B]", "</font>")
         } catch (e: Exception) {
             e.printStackTrace()
             logError("Exception formatting string", e)
