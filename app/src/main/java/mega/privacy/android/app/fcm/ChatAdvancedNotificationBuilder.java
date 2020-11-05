@@ -987,12 +987,14 @@ public final class ChatAdvancedNotificationBuilder {
                     .setShowWhen(true)
                     .setAutoCancel(false)
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
                     .setDeleteIntent(intentIgnore)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
 
-            if(shouldVibrate){
+            if (shouldVibrate) {
                 notificationBuilder.setVibrate(patternIncomingCall);
+            } else {
+                notificationBuilder.setDefaults(Notification.DEFAULT_SOUND)
+                        .setVibrate(new long[]{0L});
             }
 
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
