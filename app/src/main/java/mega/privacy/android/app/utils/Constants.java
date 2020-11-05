@@ -415,6 +415,13 @@ public class Constants {
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
     public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
 
+    public static final int MAX_REACTIONS_PER_USER = 24;
+    public static final int MAX_REACTIONS_PER_MESSAGE = 50;
+
+    public static final int REACTION_ERROR_TYPE_MESSAGE = -1;
+    public static final int REACTION_ERROR_DEFAULT_VALUE = 0;
+    public static final int REACTION_ERROR_TYPE_USER = 1;
+
     /**
      * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
      */
@@ -651,4 +658,7 @@ public class Constants {
     public static final int LOCATION_INDEX_TOP = 1;
 
     public static final String OFFLINE_ROOT = "/";
+
+    // 15360 GB = 15TB
+    public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 }

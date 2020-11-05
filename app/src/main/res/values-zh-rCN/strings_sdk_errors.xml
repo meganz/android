@@ -31,7 +31,6 @@
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">需要双重验证。</string>
     <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">拒绝非管理员用户访问</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">您的企业帐户已到期</string>
-    <string name="api_epaywall" context="Label to show that an error of Over Disk Quota Paywall occurs during a SDK operation.">Over Disk Quota Paywall</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">信用卡已拒绝</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">购买失败</string>
     <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">拒绝欺诈保护</string>

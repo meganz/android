@@ -8,315 +8,325 @@
     android:background="#ffffff"
     android:foreground="?selectableItemBackground">
 
-    <LinearLayout
-        android:id="@+id/sections_layout"
+    <RelativeLayout
+        android:id="@+id/navigation_drawer_account_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="24dp"
-        android:paddingTop="44dp"
-        android:paddingEnd="24dp">
+        android:paddingStart="16dp"
+        android:paddingTop="40dp"
+        android:paddingEnd="16dp">
 
         <RelativeLayout
-            android:id="@+id/navigation_drawer_account_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true">
 
-            <RelativeLayout
-                android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true">
-
-                <mega.privacy.android.app.components.RoundedImageView
-                    android:id="@+id/navigation_drawer_user_account_picture_profile"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:scaleType="fitCenter"
-                    rounded:border_width="0dp"
-                    rounded:corner_radius="30dp" />
-
-                <ImageView
-                    android:id="@+id/contact_state"
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:layout_alignTop="@id/navigation_drawer_user_account_picture_profile"
-                    android:layout_alignEnd="@id/navigation_drawer_user_account_picture_profile"
-                    android:background="@null"
-                    android:src="@drawable/ic_offline" />
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/navigation_drawer_account_information"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="20dp"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
-
-                <mega.privacy.android.app.components.twemoji.EmojiTextView
-                    android:id="@+id/navigation_drawer_account_information_display_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:singleLine="true"
-                    android:text="User Name"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    rounded:emojiSize="14sp" />
-
-                <TextView
-                    android:id="@+id/navigation_drawer_account_information_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:fontFamily="roboto"
-                    android:singleLine="true"
-                    android:text="email@domain.com"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/business_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="7dp"
-                    android:text="@string/business_label"
-                    android:textAllCaps="true"
-                    android:textColor="@color/business_color"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:id="@+id/nv_used_space_layout"
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/navigation_drawer_user_account_picture_profile"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/navigation_drawer_account_information"
-                android:background="#ffffff"
-                android:visibility="gone">
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:scaleType="fitCenter"
+                rounded:border_width="0dp"
+                rounded:corner_radius="30dp" />
 
-                <ProgressBar
-                    android:id="@+id/manager_used_space_bar"
-                    style="@style/UsedSpaceProgressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp" />
-
-                <TextView
-                    android:id="@+id/navigation_drawer_space"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/manager_used_space_bar"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-            </RelativeLayout>
+            <ImageView
+                android:id="@+id/contact_state"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_alignTop="@id/navigation_drawer_user_account_picture_profile"
+                android:layout_alignEnd="@id/navigation_drawer_user_account_picture_profile"
+                android:background="@null"
+                android:src="@drawable/ic_offline" />
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/my_account_section"
-            android:layout_width="match_parent"
-            android:layout_height="56dp">
-
-            <TextView
-                android:id="@+id/my_account_section_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:fontFamily="sans-serif-light"
-                android:gravity="start|center_vertical"
-                android:text="@string/section_account"
-                android:textColor="@color/name_my_account"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="16dp"
-                android:background="@color/black_12_alpha" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/contacts_section"
-            android:layout_width="match_parent"
-            android:layout_height="56dp">
-
-            <TextView
-                android:id="@+id/contacts_section_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:fontFamily="sans-serif-light"
-                android:gravity="start|center_vertical"
-                android:text="@string/section_contacts"
-                android:textColor="@color/name_my_account"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="16dp"
-                android:background="@color/black_12_alpha" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/inbox_section"
-            android:layout_width="match_parent"
-            android:layout_height="56dp">
-
-            <TextView
-                android:id="@+id/inbox_section_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:fontFamily="sans-serif-light"
-                android:gravity="start|center_vertical"
-                android:text="@string/section_inbox"
-                android:textColor="@color/name_my_account"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="16dp"
-                android:background="@color/black_12_alpha" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/notifications_section"
-            android:layout_width="match_parent"
-            android:layout_height="56dp">
-
-            <TextView
-                android:id="@+id/notification_section_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:fontFamily="sans-serif-light"
-                android:gravity="start|center_vertical"
-                android:text="@string/title_properties_chat_contact_notifications"
-                android:textColor="@color/name_my_account"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="16dp"
-                android:background="@color/black_12_alpha" />
-
-        </RelativeLayout>
-
-		<RelativeLayout
-			android:id="@+id/transfers_section"
-			android:layout_width="match_parent"
-			android:layout_height="56dp">
-
-			<TextView
-				android:id="@+id/transfers_section_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:gravity="left|center_vertical"
-				android:layout_centerVertical="true"
-				android:textSize="14sp"
-				android:fontFamily="sans-serif-light"
-				android:textStyle="bold"
-				android:textColor="@color/name_my_account"
-				android:text="@string/section_transfers"/>
-
-			<View
-				android:layout_width="match_parent"
-				android:layout_height="1dp"
-				android:layout_marginTop="16dp"
-				android:background="@color/black_12_alpha"
-				android:layout_alignParentBottom="true"/>
-
-		</RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/settings_section"
-            android:layout_width="match_parent"
-            android:layout_height="56dp">
-
-            <TextView
-                android:id="@+id/settings_section_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:fontFamily="sans-serif-light"
-                android:gravity="start|center_vertical"
-                android:text="@string/action_settings"
-                android:textColor="@color/name_my_account"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-
-            <View
-                android:id="@+id/settings_separator"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="16dp"
-                android:background="@color/black_12_alpha" />
-
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/upgrade_navigation_view"
+        <LinearLayout
+            android:id="@+id/navigation_drawer_account_information"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="14dp"
-            android:elevation="6dp"
-            android:fontFamily="sans-serif-light"
-            android:paddingLeft="16dp"
-            android:paddingTop="10dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="10dp"
-            android:text="@string/my_account_upgrade_pro"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_below="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                android:id="@+id/navigation_drawer_account_information_display_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:singleLine="true"
+                android:textColor="@color/name_my_account"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                rounded:emojiSize="14sp" />
+
+            <TextView
+                android:id="@+id/navigation_drawer_account_information_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="roboto"
+                android:singleLine="true"
+                android:textColor="@color/name_my_account"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/business_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:text="@string/business_label"
+                android:textAllCaps="true"
+                android:textColor="@color/business_color"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/nv_used_space_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/navigation_drawer_account_information"
+            android:background="#ffffff"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/manager_used_space_bar"
+                style="@style/UsedSpaceProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <TextView
+                android:id="@+id/navigation_drawer_space"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/manager_used_space_bar"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-light"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/navigation_drawer_add_phone_number_container"
+        android:layout_below="@+id/navigation_drawer_account_section"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical">
+
+    <LinearLayout
+            android:id="@+id/sections_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp">
+
+            <RelativeLayout
+                android:id="@+id/my_account_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:id="@+id/my_account_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/section_account"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/contacts_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:id="@+id/contacts_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/section_contacts"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/inbox_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:id="@+id/inbox_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/section_inbox"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/notifications_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:id="@+id/notification_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/title_properties_chat_contact_notifications"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/transfers_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:id="@+id/transfers_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/section_transfers"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/settings_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:id="@+id/settings_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/action_settings"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+
+                <View
+                    android:id="@+id/settings_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/upgrade_navigation_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="1dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:elevation="6dp"
+                android:fontFamily="sans-serif-light"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:text="@string/my_account_upgrade_pro"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
         android:id="@+id/navigation_drawer_add_phone_number_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_alignParentBottom="true"
         android:background="#FFF9F9F9"
         android:orientation="vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="14dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp"
+            android:paddingTop="20dp"
             android:paddingBottom="5dp">
 
             <ImageView

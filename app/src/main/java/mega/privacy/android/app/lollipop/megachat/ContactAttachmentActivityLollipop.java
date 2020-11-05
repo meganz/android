@@ -383,8 +383,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 					for(int i=0;i<contacts.size();i++){
 						String handle = contacts.get(i).getHandle();
-						long userHandle = megaApi.base64ToUserHandle(handle);
-						contactHandles.add(userHandle);
+						contactHandles.add(Long.parseLong(handle));
 					}
 
 					startGroupConversation(contactHandles);
@@ -435,16 +434,14 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		}
 	}
 
-	public void startGroupConversation(ArrayList<Long> userHandles){
-		logDebug("startGroupConversation");
+	private void startGroupConversation(ArrayList<Long> userHandles){
 		MegaChatPeerList peers = MegaChatPeerList.createInstance();
 
-		for(int i=0;i<userHandles.size();i++){
-			long handle = userHandles.get(i);
+		for (long handle : userHandles) {
 			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
 		}
 
-		megaChatApi.createChat(false, peers, this);
+		megaChatApi.createChat(true, peers, this);
 	}
 
 	@Override
