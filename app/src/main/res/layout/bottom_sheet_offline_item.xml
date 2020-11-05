@@ -55,8 +55,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
         </RelativeLayout>
 
@@ -67,7 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/sliding_panel_separator" />
+        android:background="@color/grey_012_white_012" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -95,11 +94,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/info_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_properties_text"
@@ -108,8 +107,7 @@
                     android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <View
@@ -131,11 +129,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_save_offline"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_offline_text"
@@ -146,8 +144,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/available_offline_switch"
@@ -177,12 +174,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_social_share_white"
-                    android:tint="@color/black"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_share_text"
@@ -192,8 +188,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_share"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <View
@@ -216,11 +211,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_open_with"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_open_with_text"
@@ -230,8 +225,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/external_play"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <View
@@ -254,11 +248,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_b_save_to_device"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_download_text"
@@ -268,8 +262,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_save_to_device"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
         </LinearLayout>

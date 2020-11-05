@@ -87,7 +87,7 @@
 
     <!-- Regular, 14sp, 0px, textColorSecondary-->
     <style name="TextAppearance.Mega.Body2.Secondary.Variant">
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <!-- Regular, 14sp, 0px, textColorPrimary-->
