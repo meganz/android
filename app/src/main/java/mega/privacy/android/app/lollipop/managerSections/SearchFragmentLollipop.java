@@ -175,6 +175,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		return null;
 	}
 
+	/**
+	 * Disables select mode by clearing selections and resetting selected items.
+	 */
+	private void closeSelectMode() {
+		clearSelections();
+		hideMultipleSelect();
+		resetSelectedItems();
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -190,8 +199,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList, false);
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_rename:{
@@ -199,8 +207,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
 
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -211,8 +218,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -223,8 +229,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -233,8 +238,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 //						NodeController nC = new NodeController(context);
 //						nC.exportLink(documents.get(0));
 						((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-						clearSelections();
-						hideMultipleSelect();
+						closeSelectMode();
 					}
 					break;
 				}
@@ -246,8 +250,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						break;
 					}
 					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 
 					break;
 				}
@@ -259,8 +262,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
@@ -272,8 +274,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -290,8 +291,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}				
 			}
