@@ -28,6 +28,7 @@
     <!-- Colors for empty content hint text. Use non-alpha colors, for
      <font color=""> doesn't support alpha -->
     <color name="empty_hint_text_normal">#A0A0A0</color>
+    <color name="empty_hint_text_hightlight">#E4EBEA</color>
 
     <!-- Turn on camera uploads -->
     <color name="teal_300_dark_grey">@color/dark_grey</color>

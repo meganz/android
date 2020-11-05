@@ -298,6 +298,7 @@
     <!-- Colors for empty content hint text. Must be non-alpha colors, for
       <font color=""> doesn't support alpha -->
     <color name="empty_hint_text_normal">#999999</color>
+    <color name="empty_hint_text_hightlight">#212121</color>
 
     <!-- app drawer related related colors -->
     <color name="drawer_add_phone_number_background">#F9F9F9</color>

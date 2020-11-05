@@ -107,9 +107,13 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
-    <!-- Regular, 12sp, 0.25px -->
+    <!-- Regular, 12sp, 0px -->
     <style name="TextAppearance.Mega.Caption.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Regular, 12sp, 0.25px -->
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant">
         <item name="android:letterSpacing">0.020833333</item>
     </style>
 

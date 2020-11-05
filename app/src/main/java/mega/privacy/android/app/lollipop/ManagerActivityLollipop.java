@@ -5457,6 +5457,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     		return;
 		}
 
+    	// The TabLayout style sets the default icon tint
 		switch (tabSelected) {
 			case OUTGOING_TAB:
 				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(R.drawable.ic_incoming_shares);

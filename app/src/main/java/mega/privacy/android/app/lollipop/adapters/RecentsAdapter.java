@@ -7,6 +7,8 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.PorterDuff;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -29,12 +31,14 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 
 import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
+import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -254,16 +258,19 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             }
 
             if (bucket.isUpdate()) {
-                holder.actionIcon.setImageResource(R.drawable.ic_versions_small);
+                holder.actionIcon.setImageDrawable(mutateIconSecondary(context,
+                        R.drawable.ic_versions_small, R.color.grey_054_white_054));
             } else {
-                holder.actionIcon.setImageResource(R.drawable.ic_recents_up);
+                holder.actionIcon.setImageDrawable(mutateIconSecondary(context,
+                        R.drawable.ic_recents_up, R.color.grey_054_white_054));
             }
         }
     }
 
     private Spanned formatUserAction(String userAction) {
         try {
-            userAction = userAction.replace("[A]", "<font color=\'#7a7a7a\'>");
+            userAction = userAction.replace("[A]", "<font color=\'" +
+                    ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal) + "\'>");
             userAction = userAction.replace("[/A]", "</font>");
         } catch (Exception e) {
             logError("Exception formatting string", e);

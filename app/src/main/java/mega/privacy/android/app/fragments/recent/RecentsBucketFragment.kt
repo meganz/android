@@ -26,8 +26,10 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -129,9 +131,21 @@ class RecentsBucketFragment : BaseFragment() {
             binding.folderNameText.text = folder.name
 
             if (bucket.isUpdate) {
-                binding.actionImage.setImageResource(R.drawable.ic_versions_small)
+                binding.actionImage.setImageDrawable(
+                    mutateIconSecondary(
+                        context,
+                        R.drawable.ic_versions_small,
+                        R.color.grey_054_white_054
+                    )
+                )
             } else {
-                binding.actionImage.setImageResource(R.drawable.ic_recents_up)
+                binding.actionImage.setImageDrawable(
+                    mutateIconSecondary(
+                        context,
+                        R.drawable.ic_recents_up,
+                        R.color.grey_054_white_054
+                    )
+                )
             }
 
             binding.dateText.text =

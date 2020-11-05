@@ -555,7 +555,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
             String textGoogleWallet = getString(R.string.payment_method_google_wallet);
             try{
                 textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_hightlight)
 						+ "\'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
             }
@@ -574,7 +574,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			String textCreditCardText = getString(R.string.payment_method_credit_card);
 			try{
 				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_hightlight)
 						+ "\'>");
 				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
 			}
@@ -593,7 +593,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			String textFortumoText = getString(R.string.payment_method_fortumo);
 			try{
 				textFortumoText = textFortumoText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_hightlight)
 						+ "\'>");
 				textFortumoText = textFortumoText.replace("[/A]", "</font>");
 			}
@@ -612,7 +612,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			String textCentiliText = getString(R.string.payment_method_centili);
 			try{
 				textCentiliText = textCentiliText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_hightlight)
 						+ "\'>");
 				textCentiliText = textCentiliText.replace("[/A]", "</font>");
 			}
@@ -726,7 +726,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 
 		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'"
-					+ ColorUtils.getColorHexString(context, R.color.black_white)
+					+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_hightlight)
 					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (NullPointerException ex) {
