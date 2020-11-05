@@ -276,6 +276,8 @@
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 
+    <color name="red_500_red_300">@color/red_500</color>
+
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">?android:attr/colorBackground</color>
 

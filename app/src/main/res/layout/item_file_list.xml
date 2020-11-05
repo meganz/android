@@ -13,6 +13,7 @@
         android:layout_centerVertical="true"
         android:background="@null"
         android:src="@drawable/ic_cloud_saved_offline"
+        app:tint="@color/red_500_red_300"
         tools:ignore="ContentDescription" />
 
     <RelativeLayout
@@ -61,10 +62,10 @@
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:layout_toStartOf="@id/file_list_three_dots_layout"
-        android:alpha="0.35"
         android:background="@null"
         android:src="@drawable/ic_permissions_full_access"
         android:visibility="gone"
+        app:tint="?android:attr/textColorSecondary"
         tools:ignore="ContentDescription" />
 
     <RelativeLayout
@@ -125,10 +126,10 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginEnd="8dp"
-            android:alpha="0.76"
             android:background="@null"
             android:src="@drawable/ic_versions_small"
             android:visibility="gone"
+            app:tint="@color/black_white"
             tools:ignore="ContentDescription" />
 
         <mega.privacy.android.app.components.twemoji.EmojiTextView

@@ -47,6 +47,7 @@
             android:background="@null"
             android:src="@drawable/ic_cloud_saved_offline"
             android:visibility="@{OfflineUtils.availableOffline(context, item.node) ? View.VISIBLE : View.INVISIBLE}"
+            app:tint="@color/red_500_red_300"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -87,10 +88,10 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginStart="3dp"
-            android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
             android:visibility="@{item.node.exported ? View.VISIBLE : View.INVISIBLE}"
+            app:tint="?android:attr/textColorSecondary"
             app:layout_constraintStart_toEndOf="@id/name"
             app:layout_constraintTop_toTopOf="@id/name"
             app:layout_constraintBottom_toBottomOf="@id/name"/>
@@ -104,6 +105,7 @@
             app:layout_constraintTop_toTopOf="@id/name"
             app:layout_constraintBottom_toBottomOf="@id/name"
             app:visibleGone="@{item.node.takenDown}"
+            app:tint="?attr/colorError"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -118,12 +120,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:alpha="0.76"
-                android:background="@null"
                 android:src="@drawable/ic_versions_small"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black_white"
                 app:visibleGone="@{megaApi.hasVersions(item.node)}" />
 
             <TextView
