@@ -82,7 +82,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         proLiteLayout = v.findViewById(R.id.choose_account_prolite_layout);
         proLiteLayout.setOnClickListener(this);
         TextView titleProLite = v.findViewById(R.id.choose_account_prolite_title_text);
-        titleProLite.setText(getString(R.string.prolite_account).toUpperCase());
+        titleProLite.setText(getString(R.string.prolite_account));
         monthSectionLite = v.findViewById(R.id.month_lite);
         storageSectionLite = v.findViewById(R.id.storage_lite);
         bandwidthSectionLite = v.findViewById(R.id.bandwidth_lite);
@@ -92,7 +92,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         pro1Layout = v.findViewById(R.id.choose_account_pro_i_layout);
         pro1Layout.setOnClickListener(this);
         TextView titlePro1 = v.findViewById(R.id.choose_account_pro_i_title_text);
-        titlePro1.setText(getString(R.string.pro1_account).toUpperCase());
+        titlePro1.setText(getString(R.string.pro1_account));
         monthSectionPro1 = v.findViewById(R.id.month_pro_i);
         storageSectionPro1 = v.findViewById(R.id.storage_pro_i);
         bandwidthSectionPro1 = v.findViewById(R.id.bandwidth_pro_i);
@@ -102,7 +102,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         pro2Layout = v.findViewById(R.id.choose_account_pro_ii_layout);
         pro2Layout.setOnClickListener(this);
         TextView titlePro2 = v.findViewById(R.id.choose_account_pro_ii_title_text);
-        titlePro2.setText(getString(R.string.pro2_account).toUpperCase());
+        titlePro2.setText(getString(R.string.pro2_account));
         monthSectionPro2 = v.findViewById(R.id.month_pro_ii);
         storageSectionPro2 = v.findViewById(R.id.storage_pro_ii);
         bandwidthSectionPro2 = v.findViewById(R.id.bandwidth_pro_ii);
@@ -112,7 +112,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         pro3Layout = v.findViewById(R.id.choose_account_pro_iii_layout);
         pro3Layout.setOnClickListener(this);
         TextView titlePro3 = v.findViewById(R.id.choose_account_pro_iii_title_text);
-        titlePro3.setText(getString(R.string.pro3_account).toUpperCase());
+        titlePro3.setText(getString(R.string.pro3_account));
         monthSectionPro3 = v.findViewById(R.id.month_pro_iii);
         storageSectionPro3 = v.findViewById(R.id.storage_pro_iii);
         bandwidthSectionPro3 = v.findViewById(R.id.bandwidth_pro_iii);
@@ -192,7 +192,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         }
         storageSectionFree.setText(getSpannedHtmlText(textToShowFreeStorage + "<sup><small><font color='#ff333a'>1</font></small></sup>"));
 
-        String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith).toUpperCase() + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
+        String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith) + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
         try {
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color='#000000'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");

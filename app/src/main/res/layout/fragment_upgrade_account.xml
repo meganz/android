@@ -70,7 +70,6 @@
 								android:textColor="@color/lite_account"
 								android:text="@string/prolite_account"
 								android:layout_below="@+id/image_lite"
-								android:textAllCaps="true"
 								android:textSize="18sp"/>
 						</RelativeLayout>
 					</RelativeLayout>
@@ -198,7 +197,6 @@
 								android:textColor="@color/login_warning"
 								android:text="@string/pro1_account"
 								android:layout_below="@+id/image_pro_i"
-								android:textAllCaps="true"
 								android:textSize="18sp"/>
 						</RelativeLayout>
 					</RelativeLayout>
@@ -325,7 +323,6 @@
 								android:textColor="@color/login_warning"
 								android:text="@string/pro2_account"
 								android:layout_below="@+id/image_pro_ii"
-								android:textAllCaps="true"
 								android:textSize="18sp"/>
 						</RelativeLayout>
 					</RelativeLayout>
@@ -453,7 +450,6 @@
 								android:textColor="@color/login_warning"
 								android:text="@string/pro3_account"
 								android:layout_below="@+id/image_pro_iii"
-								android:textAllCaps="true"
 								android:textSize="18sp"/>
 						</RelativeLayout>
 					</RelativeLayout>
@@ -593,7 +589,6 @@
 								android:textColor="@color/business_color"
 								android:text="@string/business_label"
 								android:layout_below="@+id/image_business"
-								android:textAllCaps="true"
 								android:textSize="18sp"/>
 						</RelativeLayout>
 					</RelativeLayout>

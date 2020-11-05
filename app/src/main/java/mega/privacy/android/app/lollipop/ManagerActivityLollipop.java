@@ -33,7 +33,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -203,6 +205,10 @@ import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaViewHolder;
+import mega.privacy.android.app.psa.PsaViewModel;
+import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -794,6 +800,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+	private PsaViewModel psaViewModel;
+	private PsaViewHolder psaViewHolder;
 
 
 	/**
@@ -2244,8 +2252,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		logDebug("Set view");
 		setContentView(R.layout.activity_manager);
-//		long num = 11179220468180L;
-//		dbH.setSecondaryFolderHandle(num);
+
+		observePsa();
+
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
 		toolbarLayout = (AppBarLayout) findViewById(R.id.toolbar_and_tabs_layout);
@@ -2339,15 +2348,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) navigationDrawerAddPhoneContainer.getLayoutParams();
-        if (isScreenInPortrait(this)) {
-        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        	params.removeRule(RelativeLayout.BELOW);
-		} else {
-        	params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			params.addRule(RelativeLayout.BELOW, R.id.sections_layout);
-		}
-        navigationDrawerAddPhoneContainer.setLayoutParams(params);
 
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
@@ -4854,6 +4854,43 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setFirstTime(false);
 		}
         checkBeforeShow();
+
+        psaViewModel.checkPsa();
+    }
+
+    /**
+	 * Observe LiveData for PSA, and show PSA view when get it.
+	 */
+    private void observePsa() {
+        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
+                .get(PsaViewModel.class);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+
+        psaViewModel.getPsa().observe(this, this::showPsa);
+    }
+
+	/**
+	 * Show PSA view.
+	 *
+	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
+	 * directly. Otherwise, show the normal PSA view.
+	 *
+	 * @param psa the PSA to show
+	 */
+    private void showPsa(Psa psa) {
+        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+            return;
+        }
+
+        if (!TextUtils.isEmpty(psa.getUrl())) {
+            Intent intent = new Intent(this, WebViewActivityLollipop.class);
+            intent.setData(Uri.parse(psa.getUrl()));
+            startActivity(intent);
+            psaViewModel.dismissPsa(psa.getId());
+            return;
+        }
+
+        psaViewHolder.bind(psa);
     }
 
     public void checkBeforeShow() {
@@ -5760,6 +5797,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		viewPagerTransfers.setVisibility(View.GONE);
 
     	fragmentContainer.setVisibility(View.GONE);
+
+    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);

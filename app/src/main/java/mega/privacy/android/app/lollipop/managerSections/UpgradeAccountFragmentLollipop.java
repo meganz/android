@@ -270,21 +270,22 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						break;
 
 					case BUSINESS:
-						String unlimitedSpace = getString(R.string.unlimited_space);
-						String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
+						// The initial amount of storage space for business account is 15TB
+						String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
+						String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
 
 						try {
-							unlimitedSpace = unlimitedSpace.replace("[A]", "<font color='#7a7a7a'>");
-							unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
-							unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color='#7a7a7a'>");
-							unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
+							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='#7a7a7a'>");
+							businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
+							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='#7a7a7a'>");
+							businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
 						} catch (Exception e) {
 							logError("Exception formatting string", e);
 						}
 
 						monthSectionBusiness.setText(textToShow);
-						storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
-						bandwidthSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
+						storageSectionBusiness.setText(getSpannedHtmlText(businessStorageSpace));
+						bandwidthSectionBusiness.setText(getSpannedHtmlText(businessTransferQuota));
 						break;
 				}
 			}
@@ -1034,25 +1035,24 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			switch (myAccountInfo.getAccountType()) {
 				case FREE:
 				default:
-					textToShow = getString(R.string.type_of_my_account, getString(R.string.free_account).toUpperCase());
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.free_account));
 					color = String.valueOf(ContextCompat.getColor(context, R.color.free_account));
 					break;
 				case PRO_I:
-					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro1_account).toUpperCase());
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro1_account));
 					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
 					break;
 				case PRO_II:
-					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro2_account).toUpperCase());
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro2_account));
 					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
 					break;
 				case PRO_III:
-					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro3_account).toUpperCase());
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro3_account));
 					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
 					break;
 				case PRO_LITE:
-					textToShow = getString(R.string.type_of_my_account, getString(R.string.prolite_account).toUpperCase());
+					textToShow = getString(R.string.type_of_my_account, getString(R.string.prolite_account));
 					color = String.valueOf(ContextCompat.getColor(context, R.color.lite_account));
-
 					break;
 			}
 
