@@ -50,8 +50,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
@@ -96,8 +95,7 @@
                     android:layout_toRightOf="@id/node_info_versions_icon"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
             </RelativeLayout>
 
         </RelativeLayout>
@@ -163,8 +161,7 @@
                         android:layout_marginLeft="18dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -201,8 +198,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_save_to_device"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -233,8 +229,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
@@ -270,8 +265,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/view_in_folder_label"
-                    android:textColor="@color/grey_087_white_087"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -309,8 +303,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_get_link_menu"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -340,8 +333,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_remove_link_menu"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -371,8 +363,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_share"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -402,8 +393,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_share_folder"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -433,8 +423,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_send_file_to_chat"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -464,8 +453,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_clean_shares_menu"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -503,8 +491,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_rename"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -534,8 +521,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_move_to"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -565,8 +551,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_copy"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -596,8 +581,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_restore"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -635,8 +619,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/external_play"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -666,8 +649,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/search_open_location"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
             </LinearLayout>
 
             <LinearLayout

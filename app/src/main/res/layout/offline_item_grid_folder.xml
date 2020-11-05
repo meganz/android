@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="56dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="2dp"
     android:background="@drawable/background_item_grid"
     android:padding="1dp">
@@ -35,5 +36,6 @@
         android:layout_height="24dp"
         android:layout_gravity="end|center_vertical"
         android:background="@null"
-        android:src="@drawable/ic_dots_vertical_grey" />
+        android:src="@drawable/ic_dots_vertical_grey"
+        app:tint="?android:attr/textColorSecondary"/>
 </FrameLayout>

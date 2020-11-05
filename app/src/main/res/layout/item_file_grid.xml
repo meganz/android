@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/file_grid_item_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -17,8 +17,7 @@
         <RelativeLayout
             android:id="@+id/file_grid_thumbnail_layout"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            >
+            android:layout_height="56dp">
 
             <ImageView
                 android:id="@+id/file_grid_icon"
@@ -61,7 +60,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
-                android:tint="?android:attr/textColorSecondary"
+                app:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>
@@ -70,7 +69,7 @@
         android:id="@+id/item_file_grid_file"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <RelativeLayout
             android:id="@+id/file_grid_thumbnail_layout_for_file"
@@ -177,7 +176,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
-                android:tint="?android:attr/textColorSecondary"
+                app:tint="?android:attr/textColorSecondary"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </RelativeLayout>
@@ -225,6 +224,6 @@
             android:textColor="@color/file_list_second_row"
             android:textSize="12sp"
             android:visibility="gone"
-            app:emojiSize="14sp"/>
+            app:emojiSize="14sp" />
     </FrameLayout>
 </RelativeLayout>

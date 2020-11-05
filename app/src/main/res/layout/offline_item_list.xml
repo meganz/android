@@ -1,5 +1,4 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -49,5 +48,5 @@
         android:background="@null"
         android:padding="10dp"
         android:src="@drawable/ic_dots_vertical_grey"
-        app:tint="?android:attr/textColorSecondary"/>
+        app:tint="?android:attr/textColorSecondary" />
 </FrameLayout>
