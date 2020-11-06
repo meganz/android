@@ -7982,6 +7982,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
             params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+			transfersWidgetLayout.setLayoutParams(params);
         }
     }
 

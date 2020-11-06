@@ -103,8 +103,6 @@ class HomepageFragment : Fragment() {
             }
         }
 
-        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
-
         return rootView
     }
 
@@ -117,6 +115,8 @@ class HomepageFragment : Fragment() {
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
+
+        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
 
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
