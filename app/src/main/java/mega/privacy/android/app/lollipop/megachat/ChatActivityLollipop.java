@@ -6262,46 +6262,81 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return indexToChange;
     }
 
-
-    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean checkTempId){
-        logDebug("Msg ID: " + msg.getMessage().getMsgId());
-        logDebug("Msg TEMP ID: " + msg.getMessage().getTempId());
-        logDebug("Msg status: " + msg.getMessage().getStatus());
-        int indexToChange = -1;
-        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
-
+    /**
+     * Checks on the provided list if the message to update exists.
+     * If so, returns its index on list.
+     *
+     * @param msg           The updated AndroidMegaChatMessage.
+     * @param checkTempId   True if has to check the temp id instead of final id.
+     * @param itr           ListIterator containing the list of messages to check.
+     * @return The index to change if successful, INVALID_POSITION otherwise.
+     */
+    private int getIndexToUpdate(AndroidMegaChatMessage msg, boolean checkTempId, ListIterator<AndroidMegaChatMessage> itr) {
         // Iterate in reverse.
-        while(itr.hasPrevious()) {
+        while (itr.hasPrevious()) {
             AndroidMegaChatMessage messageToCheck = itr.previous();
-            logDebug("Index: " + itr.nextIndex());
 
-            if(!messageToCheck.isUploading()){
-                logDebug("Checking with Msg ID: " + messageToCheck.getMessage().getMsgId());
-                logDebug("Checking with Msg TEMP ID: " + messageToCheck.getMessage().getTempId());
+            if (!messageToCheck.isUploading()) {
+                logDebug("Checking with Msg ID: " + messageToCheck.getMessage().getMsgId()
+                        + " and Msg TEMP ID: " + messageToCheck.getMessage().getTempId());
 
-                if(checkTempId){
-                    logDebug("Check temporal IDS");
-                    if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
-                        logDebug("Modify received messafe with idTemp");
-                        indexToChange = itr.nextIndex();
-                        break;
-                    }
+                if (checkTempId && messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+                    logDebug("Modify received message with idTemp");
+                    return itr.nextIndex();
+                } else if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
+                    logDebug("modifyMessageReceived");
+                    return itr.nextIndex();
                 }
-                else{
-                    if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                        logDebug("modifyMessageReceived");
-                        indexToChange = itr.nextIndex();
-                        break;
-                    }
-                }
-            }
-            else{
+            } else {
                 logDebug("This message is uploading");
             }
         }
 
+        return INVALID_POSITION;
+    }
+
+
+    /**
+     * Modifies a message on UI (messages list and adapter), on bufferMessages list
+     * or on bufferSending list, if it has been already loaded.
+     *
+     * @param msg           The updated AndroidMegaChatMessage.
+     * @param checkTempId   True if has to check the temp id instead of final id.
+     * @return The index to change if successful, INVALID_POSITION otherwise.
+     */
+    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean checkTempId){
+        logDebug("Msg ID: " + msg.getMessage().getMsgId()
+                + "Msg TEMP ID: " + msg.getMessage().getTempId()
+                + "Msg status: " + msg.getMessage().getStatus());
+
+        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+        int indexToChange = getIndexToUpdate(msg, checkTempId, itr);
+
+
+        if (indexToChange == INVALID_POSITION) {
+            itr = bufferMessages.listIterator(bufferMessages.size());
+            indexToChange = getIndexToUpdate(msg, checkTempId, itr);
+
+            if (indexToChange != INVALID_POSITION) {
+                bufferMessages.set(indexToChange, msg);
+                return indexToChange;
+            }
+        }
+
+        if (indexToChange == INVALID_POSITION) {
+            itr = bufferSending.listIterator(bufferSending.size());
+            indexToChange = getIndexToUpdate(msg, checkTempId, itr);
+
+            if (indexToChange != INVALID_POSITION) {
+                bufferSending.set(indexToChange, msg);
+                return indexToChange;
+            }
+        }
+
         logDebug("Index to change = " + indexToChange);
-        if(indexToChange==-1) return indexToChange;
+        if (indexToChange == INVALID_POSITION) {
+            return indexToChange;
+        }
 
         AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
         if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
@@ -8143,14 +8178,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
         }
 
-        Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
+        Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
         intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
+        intentOpenChat.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intentOpenChat.putExtra(CHAT_ID, chatHandle);
         intentOpenChat.putExtra(SHOW_SNACKBAR, text);
-
         closeChat(true);
-        onNewIntent(intentOpenChat);
+        startActivity(intentOpenChat);
+        finish();
     }
 
     public void markAsSeen(MegaChatMessage msg) {
