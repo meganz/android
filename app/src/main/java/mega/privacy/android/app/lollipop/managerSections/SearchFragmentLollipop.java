@@ -128,6 +128,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void activateActionMode(){
 		if (!adapter.isMultipleSelect()){
+			hideKeyboard(getActivity());
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
@@ -318,6 +319,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
+
+			((ManagerActivityLollipop) getActivity()).requestSearchViewFocus();
 		}
 
 		@Override
@@ -1312,5 +1315,18 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
+	}
+
+	/**
+	 * Checks if select mode is enabled.
+	 * If so, clear the focus on SearchView.
+	 */
+	public void checkSelectMode() {
+		if (getActivity() == null || !(getActivity() instanceof ManagerActivityLollipop)
+				|| adapter == null || !adapter.isMultipleSelect()) {
+			return;
+		}
+
+		((ManagerActivityLollipop) getActivity()).clearSearchViewFocus();
 	}
 }
