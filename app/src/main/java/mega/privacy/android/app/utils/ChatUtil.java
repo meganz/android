@@ -61,6 +61,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
@@ -469,8 +470,15 @@ public class ChatUtil {
         if (!(context instanceof ChatActivityLollipop))
             return;
 
-        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
-        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
+        if (isMyOwnReaction(chatId, messageId, reaction)) {
+            if (!isFromKeyboard) {
+                megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+            }
+        } else {
+            megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+        }
     }
 
     public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
@@ -497,6 +505,27 @@ public class ChatUtil {
         }
 
         return list;
+    }
+
+    /**
+     * Method for know if I have a concrete reaction to a particular message
+     *
+     * @param chatId   The chat ID.
+     * @param msgId    The message ID.
+     * @param reaction The reaction.
+     * @return True, if I have reacted. False otherwise.
+     */
+    public static boolean isMyOwnReaction(long chatId, long msgId, String reaction) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, msgId, reaction);
+
+        for (int i = 0; i < handleList.size(); i++) {
+            if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

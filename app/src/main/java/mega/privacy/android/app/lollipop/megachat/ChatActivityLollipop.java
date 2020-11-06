@@ -203,6 +203,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private static final String JOINING_OR_LEAVING = "JOINING_OR_LEAVING";
     private static final String JOINING_OR_LEAVING_ACTION = "JOINING_OR_LEAVING_ACTION";
     private static final String OPENING_AND_JOINING_ACTION = "OPENING_AND_JOINING_ACTION";
+    private static final String ERROR_REACTION_DIALOG = "ERROR_REACTION_DIALOG";
+    private static final String TYPE_ERROR_REACTION = "TYPE_ERROR_REACTION";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 32;
     private final static int MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN = 256;
@@ -275,6 +277,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
+    private AlertDialog errorReactionsDialog;
+    private boolean errorReactionsDialogIsShown;
+    private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private android.app.AlertDialog dialogCall;
 
     ProgressDialog dialog;
@@ -1355,6 +1360,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         joiningOrLeaving = savedInstanceState.getBoolean(JOINING_OR_LEAVING, false);
                         joiningOrLeavingAction = savedInstanceState.getString(JOINING_OR_LEAVING_ACTION);
                         openingAndJoining = savedInstanceState.getBoolean(OPENING_AND_JOINING_ACTION, false);
+                        errorReactionsDialogIsShown = savedInstanceState.getBoolean(ERROR_REACTION_DIALOG, false);
+                        typeErrorReaction = savedInstanceState.getLong(TYPE_ERROR_REACTION, REACTION_ERROR_DEFAULT_VALUE);
+                        if(errorReactionsDialogIsShown && typeErrorReaction != REACTION_ERROR_DEFAULT_VALUE){
+                            createLimitReactionsAlertDialog(typeErrorReaction);
+                        }
                     }
 
                     String text = null;
@@ -5882,8 +5892,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("STATUS_SERVER_REJECTED: " + msg.getStatus());
         }
 
-        if(!msg.isManagementMessage()){
-            logDebug("isNOTManagementMessage!");
+        if (!msg.isManagementMessage() || msg.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
             if(positionNewMessagesLayout!=-1){
                 logDebug("Layout unread messages shown: " + generalUnreadCount);
                 if(generalUnreadCount<0){
@@ -8022,6 +8031,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         outState.putBoolean(JOINING_OR_LEAVING, joiningOrLeaving);
         outState.putString(JOINING_OR_LEAVING_ACTION, joiningOrLeavingAction);
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
+        outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
+        outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
     }
 
     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
@@ -9424,5 +9435,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         return INVALID_POSITION;
+    }
+
+    /**
+     * Method to display a dialog to show the error related with the chat reactions.
+     *
+     * @param typeError Type of Error.
+     */
+    public void createLimitReactionsAlertDialog(long typeError) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        dialogBuilder.setMessage(typeError == REACTION_ERROR_TYPE_USER
+                ? getString(R.string.limit_reaction_per_user, MAX_REACTIONS_PER_USER)
+                : getString(R.string.limit_reaction_per_message, MAX_REACTIONS_PER_MESSAGE))
+                .setOnDismissListener(dialog -> {
+                    errorReactionsDialogIsShown = false;
+                    typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
+                })
+                .setPositiveButton(getString(R.string.general_ok),
+                        (dialog, which) -> {
+                            dialog.dismiss();
+                        });
+
+        errorReactionsDialog = dialogBuilder.create();
+        errorReactionsDialog.show();
+        errorReactionsDialogIsShown = true;
+        typeErrorReaction = typeError;
     }
 }
