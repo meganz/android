@@ -4,27 +4,34 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.utils.Constants;
+import static mega.privacy.android.app.utils.Constants.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class SnackbarNavigateOption implements View.OnClickListener {
 
     Context context;
     long idChat;
+    private int type;
     boolean isSentAsMessageSnackbar = false;
 
     public SnackbarNavigateOption(Context context) {
         this.context = context;
+    }
+
+    public SnackbarNavigateOption(Context context, int type) {
+        this.context = context;
+        this.type = type;
     }
 
     public SnackbarNavigateOption(Context context, long idChat) {
@@ -38,7 +45,9 @@ public class SnackbarNavigateOption implements View.OnClickListener {
         //Intent to Settings
 
         if (context instanceof ManagerActivityLollipop) {
-            if (isSentAsMessageSnackbar) {
+            if (type == MUTE_NOTIFICATIONS_SNACKBAR_TYPE) {
+                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);
+            } else if (isSentAsMessageSnackbar) {
                 ((ManagerActivityLollipop) context).moveToChatSection(idChat);
             } else {
                 ((ManagerActivityLollipop) context).moveToSettingsSectionStorage();

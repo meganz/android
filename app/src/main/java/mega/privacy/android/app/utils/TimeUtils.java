@@ -21,9 +21,10 @@ import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 
+import static android.text.format.DateFormat.getBestDateTimePattern;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static android.text.format.DateFormat.getBestDateTimePattern;
 
 public class TimeUtils implements Comparator<Calendar> {
 
@@ -35,6 +36,8 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_SHORT_SHORT_FORMAT = 2;
     public static final int DATE_MM_DD_YYYY_FORMAT = 3;
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
+    private static final int TIME_OF_CHANGE = 8;
+    private static final int INITIAL_PERIOD_TIME = 0;
 
     int type;
 
@@ -392,7 +395,82 @@ public class TimeUtils implements Comparator<Calendar> {
         return null;
     }
 
-    /*
+    /**
+     * Method for obtaining the appropriate String depending on the current time.
+     *
+     * @param context Activity context.
+     * @param option  Selected mute type.
+     * @return The right string.
+     */
+    public static String getCorrectStringDependingOnCalendar(Context context, String option) {
+        Calendar calendar = getCalendarSpecificTime(option);
+        TimeZone tz = calendar.getTimeZone();
+        java.text.DateFormat df = new SimpleDateFormat("h", Locale.getDefault());
+        df.setTimeZone(tz);
+        String time = df.format(calendar.getTime());
+        return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ?
+                context.getString(R.string.success_muting_a_chat_until_this_morning, time) :
+                context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow).toLowerCase(), time);
+    }
+
+    /**
+     * Method for obtaining the appropriate String depending on the option selected.
+     *
+     * @param timestamp The time in minutes that notifications of a chat or all chats are muted.
+     * @return The right string
+     */
+    public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestamp * 1000);
+
+        Calendar calToday = Calendar.getInstance();
+        calToday.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar calTomorrow = Calendar.getInstance();
+        calTomorrow.add(Calendar.DATE, +1);
+
+        java.text.DateFormat df;
+        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
+        df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
+
+        TimeZone tz = cal.getTimeZone();
+        df.setTimeZone(tz);
+        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, df.format(cal.getTime()));
+    }
+
+    /**
+     * Method for obtaining a calendar depending on the type of silencing chosen.
+     * @param option Selected mute type.
+     * @return The Calendar.
+     */
+    public static Calendar getCalendarSpecificTime(String option) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, TIME_OF_CHANGE);
+        calendar.set(Calendar.AM_PM, Calendar.AM);
+
+        if(option.equals(NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING)){
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return calendar;
+    }
+
+    /**
+     * Method to know if the silencing should be until this morning.
+     *
+     * @return True if it is. False it is not.
+     */
+    public static boolean isUntilThisMorning() {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int minute = cal.get(Calendar.MINUTE);
+        return hour < TIME_OF_CHANGE || (hour == TIME_OF_CHANGE && minute == INITIAL_PERIOD_TIME);
+    }
+
+    /**
      * Converts seconds time into a humanized format string.
      * - If time is greater than a DAY, the formatted string will be "X day(s)".
      * - If time is lower than a DAY and greater than a HOUR, the formatted string will be "Xh Ym".

@@ -1991,7 +1991,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (chatRoom != null && chatRoom.isGroup()) {
                     holder.nameContactText.setVisibility(View.VISIBLE);
                 }
-
                 textToShow = context.getResources().getString(R.string.call_started_messages);
 
             }else{
@@ -7395,7 +7394,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play or pause a voice clip
      */
     private void playOrPauseVoiceClip(int positionInAdapter, ViewHolderMessageChat holder){
-        AndroidMegaChatMessage currentMessage = getMessageAtAdapterPosition(positionInAdapter-1);
+        AndroidMegaChatMessage currentMessage = getMessageAtAdapterPosition(positionInAdapter);
         if (currentMessage == null || currentMessage.getMessage() == null ||
                 currentMessage.getMessage().getType() != MegaChatMessage.TYPE_VOICE_CLIP ||
                 messagesPlaying == null || messagesPlaying.isEmpty())

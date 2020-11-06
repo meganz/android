@@ -143,7 +143,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private TextView infoNumParticipantsText;
         private ImageView editImageView;
         private LinearLayout notificationsLayout;
+        private RelativeLayout notificationsSwitchLayout;
         private SwitchCompat notificationsSwitch;
+        private TextView notificationsTitle;
+        private TextView notificationsSubTitle;
         private View dividerNotifications;
         private LinearLayout chatLinkLayout;
         private View chatLinkSeparator;
@@ -190,8 +193,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 //Notifications Layout
                 holderHeader.notificationsLayout = v.findViewById(R.id.chat_group_contact_properties_notifications_layout);
+                holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
+                holderHeader.notificationsTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_title);
+                holderHeader.notificationsSubTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_muted_text);
+                holderHeader.notificationsSubTitle.setVisibility(View.GONE);
+                holderHeader.notificationsSwitchLayout = v.findViewById(R.id.chat_group_contact_properties_layout);
+                holderHeader.notificationsSwitchLayout.setOnClickListener(this);
                 holderHeader.notificationsSwitch = v.findViewById(R.id.chat_group_contact_properties_switch);
-                holderHeader.notificationsSwitch.setOnClickListener(this);
+                holderHeader.notificationsSwitch.setClickable(false);
                 holderHeader.dividerNotifications = v.findViewById(R.id.divider_notifications_layout);
 
                 holderHeader.infoNumParticipantsText = v.findViewById(R.id.chat_group_contact_properties_info_participants);
@@ -235,6 +244,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.participantsLayout =  v.findViewById(R.id.chat_group_contact_properties_participants_title);
                 holderHeader.observersSeparator = v.findViewById(R.id.divider_observers_layout);
 
+                v.setTag(holderHeader);
                 return holderHeader;
 
             case ITEM_VIEW_TYPE_NORMAL:
@@ -375,13 +385,14 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     }
 
                     if (getChat().isActive()) {
-                        holderHeader.notificationsSwitch.setChecked(!groupChatInfoActivity.isChatMuted());
                         holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerNotifications.setVisibility(View.VISIBLE);
                     } else {
                         holderHeader.notificationsLayout.setVisibility(View.GONE);
                         holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
+
+                    checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 
                 holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
@@ -597,18 +608,17 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
                 break;
 
-            case R.id.chat_group_contact_properties_switch: {
-                groupChatInfoActivity.setChatMuted();
-
-                ChatController chatC = new ChatController(groupChatInfoActivity);
-                if (groupChatInfoActivity.isChatMuted()) {
-                    chatC.muteChat(chatId);
-                } else {
-                    chatC.unmuteChat(chatId);
+            case R.id.chat_group_contact_properties_layout:
+                ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+                if (holderHeader != null) {
+                    if (holderHeader.notificationsSwitch.isChecked()) {
+                        createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
+                    } else {
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
+                    }
                 }
                 break;
 
-            }
             case R.id.chat_group_contact_properties_chat_link_layout: {
                 megaChatApi.queryChatLink(chatId, groupChatInfoActivity);
                 break;
@@ -623,6 +633,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 groupChatInfoActivity.startActivity(nodeHistoryIntent);
                 break;
             }
+        }
+    }
+
+    public void checkNotifications(long chatId) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
         }
     }
 

@@ -561,6 +561,9 @@ public class BaseActivity extends AppCompatActivity {
                 case NOT_SPACE_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
                     break;
+                case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.notifications_are_already_muted, Snackbar.LENGTH_LONG);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -601,6 +604,10 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.show();
                 break;
             }
+            case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
+                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
+                snackbar.show();
+                break;
         }
     }
 
