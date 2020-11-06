@@ -6112,7 +6112,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
 			// offline, and hide AppBarLayout when immediately on go back, we will see the flicker
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-			if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
+			if (bottomNavigationCurrentItem == HOMEPAGE_BNV
+                    && mHomepageScreen == HomepageScreen.HOMEPAGE) {
 				abL.setVisibility(View.GONE);
 			}
 		}
