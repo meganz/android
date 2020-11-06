@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -145,6 +146,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            emptyImage.setImageResource(R.drawable.empty_zero_data_recents_landscape);
+        } else {
+            emptyImage.setImageResource(R.drawable.empty_zero_data_recents_portrait);
+        }
+
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
         try {
             textToShow = textToShow.replace("[A]","<font color=\'"
@@ -179,8 +186,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 checkScroll();
             }
         });
-        setRecentsView();
         fillRecentItems(buckets);
+        setRecentsView();
         return v;
     }
 

@@ -18,6 +18,8 @@ class VideoViewModel @ViewModelInject constructor(
 
     var order: Int = ORDER_DEFAULT_ASC
         private set
+    var isList = true
+    var skipNextAutoScroll = false
 
     var searchMode = false
     var searchQuery = ""

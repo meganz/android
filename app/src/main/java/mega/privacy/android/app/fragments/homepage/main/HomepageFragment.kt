@@ -96,6 +96,14 @@ class HomepageFragment : Fragment() {
         rootView = viewDataBinding.root
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
+        if (savedInstanceState != null) {
+            val isBottomSheetExpanded = savedInstanceState.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED)
+            post {
+                if (isBottomSheetExpanded) {
+                    fullyExpandBottomSheet(true)
+                }
+            }
+        }
 
         (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
 
@@ -111,6 +119,8 @@ class HomepageFragment : Fragment() {
         setupBottomSheetUI()
         setupBottomSheetBehavior()
         setupFabs()
+
+        (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
 
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
@@ -152,7 +162,7 @@ class HomepageFragment : Fragment() {
             // we have to post to end of UI thread.
             viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
             rootView.category.isVisible = false
-            fullyExpandBottomSheet()
+            fullyExpandBottomSheet(false)
         }
 
         if (tabsChildren.isEmpty()) {
@@ -167,10 +177,10 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun fullyExpandBottomSheet() {
+    private fun fullyExpandBottomSheet(draggable: Boolean) {
         val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
         bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_EXPANDED
-        bottomSheetBehavior.isDraggable = false
+        bottomSheetBehavior.isDraggable = draggable
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
@@ -214,6 +224,10 @@ class HomepageFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
+        if (this::bottomSheetBehavior.isInitialized) {
+            outState.putBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED,
+                bottomSheetBehavior.state == HomepageBottomSheetBehavior.STATE_EXPANDED)
+        }
     }
 
     private fun setupBottomSheetUI() {
@@ -556,5 +570,6 @@ class HomepageFragment : Fragment() {
         private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
         const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
         private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
+        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
     }
 }

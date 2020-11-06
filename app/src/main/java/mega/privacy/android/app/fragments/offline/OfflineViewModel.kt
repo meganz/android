@@ -93,6 +93,7 @@ class OfflineViewModel @ViewModelInject constructor(
         private set
     var placeholderCount = 0
         private set
+    var skipNextAutoScroll = false
 
     init {
         add(

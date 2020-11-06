@@ -8,7 +8,6 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.PorterDuff;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;

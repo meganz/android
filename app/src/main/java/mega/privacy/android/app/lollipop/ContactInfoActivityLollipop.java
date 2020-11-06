@@ -291,6 +291,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 
 	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
@@ -344,18 +345,17 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	};
 
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
 
-		private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if (intent == null || intent.getAction() == null)
-					return;
-
-				if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
-					checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
-				}
+			if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
+				checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
 			}
-		};
+		}
+	};
 
 	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
 		@Override

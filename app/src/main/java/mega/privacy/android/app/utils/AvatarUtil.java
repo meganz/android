@@ -349,7 +349,7 @@ public class AvatarUtil {
 
     @Nullable
     public static Pair<Boolean, Bitmap> getCircleAvatar(Context context, String email) {
-        File avatar = buildAvatarFile(context, email + ".jpg");
+        File avatar = buildAvatarFile(context, email + JPG_EXTENSION);
         if (!(isFileAvailable(avatar) && avatar.length() > 0)) {
             return Pair.create(false, null);
         }
