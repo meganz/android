@@ -5735,6 +5735,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
+    	EventNotifierKt.notifyHomepageVisibilityChange(drawerItem == DrawerItem.HOMEPAGE);
+
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
