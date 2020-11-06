@@ -41,6 +41,10 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         private const val NUM_COLUMNS_LANDSCAPE = 4
         private const val GIF_MARGIN = 4F
         private const val DEFAULT_LIMIT = 25
+        private const val EMPTY_IMAGE_MARGIN_TOP_PORTRAIT = 152F
+        private const val EMPTY_TEXT_MARGIN_TOP_PORTRAIT = 12F
+        private const val EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE= 20F
+        private const val EMPTY_TEXT_MARGIN_TOP_LANDSCAPE = 0
 
         const val GIF_DATA = "GIF_DATA"
     }
@@ -189,14 +193,14 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
             numColumns = NUM_COLUMNS_PORTRAIT
             widthScreen = outMetrics.widthPixels
 
-            paramsEmptyImage.topMargin = px2dp(152F, resources.displayMetrics)
-            paramsEmptyText.topMargin = px2dp(12F, resources.displayMetrics)
+            paramsEmptyImage.topMargin = px2dp(EMPTY_IMAGE_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
+            paramsEmptyText.topMargin = px2dp(EMPTY_TEXT_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
         } else if (screenOrientation == ORIENTATION_LANDSCAPE) {
             numColumns = NUM_COLUMNS_LANDSCAPE
             widthScreen = outMetrics.heightPixels
 
-            paramsEmptyImage.topMargin = px2dp(20F, resources.displayMetrics)
-            paramsEmptyText.topMargin = 0
+            paramsEmptyImage.topMargin = px2dp(EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE, resources.displayMetrics)
+            paramsEmptyText.topMargin = EMPTY_TEXT_MARGIN_TOP_LANDSCAPE
         }
 
         binding.emptyGiphyImage.layoutParams = paramsEmptyImage
