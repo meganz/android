@@ -176,8 +176,13 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         val newOrientation = newConfig.orientation
         if (newOrientation == screenOrientation) return
 
+        val firstVisibleItems =
+            staggeredGridLayoutManager?.findFirstCompletelyVisibleItemPositions(IntArray(numColumns))
+
         screenOrientation = newOrientation
         updateView()
+
+        staggeredGridLayoutManager?.scrollToPosition(firstVisibleItems?.get(0) ?: 0)
     }
 
     /**
