@@ -55,7 +55,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DownloadUtil.*;
@@ -700,7 +699,7 @@ public class NodeController {
                             internalIntent = true;
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         }
-                        mediaIntent.putExtra(IS_PLAYLIST, false);
+                        mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
                         mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                         mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, MegaApplication.getInstance().isActivityVisible());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {

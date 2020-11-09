@@ -176,7 +176,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
-    public static final String IS_PLAYLIST = "IS_PLAYLIST";
 
     private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
             = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -464,7 +463,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
-        isPlayList = intent.getBooleanExtra(IS_PLAYLIST, true);
+        isPlayList = intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true);
 
         if (adapterType == OFFLINE_ADAPTER){
             isOffline = true;

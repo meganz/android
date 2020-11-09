@@ -54,7 +54,6 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -400,9 +399,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
             if (isMedia) {
                 intent.putExtra(NODE_HANDLES, getBucketNodeHandles(false));
-                intent.putExtra(IS_PLAYLIST, true);
+                intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true);
             } else {
-                intent.putExtra(IS_PLAYLIST, false);
+                intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
             }
 
             if (isLocalFile(node, megaApi, localPath)) {

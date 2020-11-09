@@ -279,6 +279,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
     public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
+    public static final String INTENT_EXTRA_KEY_IS_PLAYLIST = "IS_PLAYLIST";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

@@ -11,7 +11,6 @@ import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.text.Html;
 import android.text.Spanned;
@@ -44,7 +43,6 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -64,7 +62,6 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -80,7 +77,6 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -1413,7 +1409,7 @@ public class ChatController {
                             internalIntent = true;
                             mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
                         }
-                        mediaIntent.putExtra(IS_PLAYLIST, false);
+                        mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
                         mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                         mediaIntent.putExtra("adapterType", FROM_CHAT);
                         mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, app.isActivityVisible());

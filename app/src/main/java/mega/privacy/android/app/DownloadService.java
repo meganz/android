@@ -26,7 +26,6 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
 
 import io.reactivex.rxjava3.core.Single;
@@ -72,7 +71,6 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.SettingsConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -732,7 +730,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
 							}
 
-							mediaIntent.putExtra(IS_PLAYLIST, false);
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
                             mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());

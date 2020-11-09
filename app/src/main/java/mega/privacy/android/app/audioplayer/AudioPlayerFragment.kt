@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +25,6 @@ import mega.privacy.android.app.utils.autoCleared
 @AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
     private var binding by autoCleared<FragmentAudioPlayerBinding>()
-    private val viewModel: AudioPlayerViewModel by viewModels()
 
     private var bgPlayEnabled = true
 
@@ -65,6 +63,7 @@ class AudioPlayerFragment : Fragment() {
         val extras = activity?.intent?.extras ?: return
         val intent = Intent(requireContext(), AudioPlayerService::class.java)
         intent.putExtras(extras)
+        intent.setDataAndType(activity?.intent?.data, activity?.intent?.type)
         requireContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -78,6 +77,8 @@ class AudioPlayerFragment : Fragment() {
         binding.playerView.setRepeatToggleModes(
             RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
         )
+
+        binding.playerView.setControlDispatcher(AudioPlayerControlDispatcher())
 
         binding.playerView.showController()
     }

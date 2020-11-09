@@ -163,7 +163,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
@@ -4844,7 +4843,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                                         mediaIntent.putExtra("screenPosition", screenPosition);
                                         mediaIntent.putExtra("adapterType", FROM_CHAT);
-                                        mediaIntent.putExtra(IS_PLAYLIST, false);
+                                        mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
                                         mediaIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());

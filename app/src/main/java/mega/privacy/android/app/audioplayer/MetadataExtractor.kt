@@ -1,6 +1,6 @@
 package mega.privacy.android.app.audioplayer
 
-import com.google.android.exoplayer2.analytics.AnalyticsListener
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.metadata.Metadata
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
 import com.google.android.exoplayer2.source.TrackGroupArray
@@ -13,17 +13,21 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 class MetadataExtractor(
     private val trackSelector: MappingTrackSelector,
     private val callback: (String?, String?) -> Unit
-) : AnalyticsListener {
+) : Player.EventListener {
     override fun onTracksChanged(
-        eventTime: AnalyticsListener.EventTime,
         trackGroups: TrackGroupArray,
         trackSelections: TrackSelectionArray
     ) {
+        super.onTracksChanged(trackGroups, trackSelections)
+
+        // TODO: which one?
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo
         if (mappedTrackInfo == null) {
             callback(null, null)
             return
         }
+
+//        val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return
 
         for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
             val trackSelection = trackSelections[rendererIndex] ?: continue

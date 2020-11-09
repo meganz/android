@@ -241,9 +241,9 @@ class RecentsBucketFragment : BaseFragment() {
 
         if (isMedia) {
             intent.putExtra(NODE_HANDLES, getNodesHandles(false))
-            intent.putExtra(AudioVideoPlayerLollipop.IS_PLAYLIST, true)
+            intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)
         } else {
-            intent.putExtra(AudioVideoPlayerLollipop.IS_PLAYLIST, false)
+            intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
         }
 
         val paramsSetSuccessfully =
