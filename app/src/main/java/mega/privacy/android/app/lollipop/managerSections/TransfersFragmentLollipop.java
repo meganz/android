@@ -203,6 +203,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		if (adapter != null && !adapter.isMultipleSelect()) {
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity) context).startSupportActionMode(new TransfersActionBarCallBack(this));
+			updateActionModeTitle();
 		}
 	}
 
@@ -238,6 +239,12 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	@Override
 	public void onDestroyActionMode() {
 		managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
+		clearSelections();
+
+		if (adapter != null) {
+			adapter.hideMultipleSelect();
+		}
+
 		checkScroll();
 	}
 

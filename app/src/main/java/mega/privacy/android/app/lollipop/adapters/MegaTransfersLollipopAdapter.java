@@ -437,7 +437,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 	}
 
 	private boolean isItemChecked(int position) {
-		return selectedItems.get(position);
+		return selectedItems != null && selectedItems.get(position);
 	}
 
 	public ArrayList<MegaTransfer> getSelectedTransfers() {
