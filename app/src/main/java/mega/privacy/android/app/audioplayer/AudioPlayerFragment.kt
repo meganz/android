@@ -15,8 +15,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
+import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
+import com.google.android.exoplayer2.util.Util
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
@@ -25,6 +28,9 @@ import mega.privacy.android.app.utils.autoCleared
 @AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
     private var binding by autoCleared<FragmentAudioPlayerBinding>()
+
+    private lateinit var playerServiceIntent: Intent
+    private var playerService: AudioPlayerService? = null
 
     private var bgPlayEnabled = true
 
@@ -37,9 +43,9 @@ class AudioPlayerFragment : Fragment() {
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is AudioPlayerServiceBinder) {
-                setupPlayerView(service.exoPlayer)
-                observePlayingNode(service)
-                listenButtons()
+                playerService = service.service
+
+                setupPlayer(service.service)
             }
         }
     }
@@ -59,12 +65,41 @@ class AudioPlayerFragment : Fragment() {
         binding.toolbar.navigationIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         val extras = activity?.intent?.extras ?: return
-        val intent = Intent(requireContext(), AudioPlayerService::class.java)
-        intent.putExtras(extras)
-        intent.setDataAndType(activity?.intent?.data, activity?.intent?.type)
-        requireContext().bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
+        playerServiceIntent.putExtras(extras)
+        playerServiceIntent.setDataAndType(activity?.intent?.data, activity?.intent?.type)
+        Util.startForegroundService(requireContext(), playerServiceIntent)
+
+        requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val service = playerService
+        if (service != null) {
+            setupPlayer(service)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        playerService?.mainPlayerUIClosed()
+        playerService = null
+        requireContext().unbindService(connection)
+    }
+
+    private fun setupPlayer(service: AudioPlayerService) {
+        setupPlayerView(service.exoPlayer)
+        observeMetadata(service.metadata)
+        listenButtons()
     }
 
     private fun setupPlayerView(player: SimpleExoPlayer) {
@@ -83,8 +118,8 @@ class AudioPlayerFragment : Fragment() {
         binding.playerView.showController()
     }
 
-    private fun observePlayingNode(service: AudioPlayerServiceBinder) {
-        service.metadata.observe(viewLifecycleOwner, this::displayMetadata)
+    private fun observeMetadata(metadata: LiveData<Metadata>) {
+        metadata.observe(viewLifecycleOwner, this::displayMetadata)
     }
 
     private fun displayMetadata(metadata: Metadata) {
@@ -115,20 +150,28 @@ class AudioPlayerFragment : Fragment() {
 
     private fun listenButtons() {
         listenBgPlaySetting()
+        listenPlaylistButton()
     }
 
     private fun listenBgPlaySetting() {
         val bgPlay = binding.root.findViewById<ImageButton>(R.id.background_play_toggle)
-        setBgPlayIcon(bgPlay)
+        updateBgPlay(bgPlay)
         bgPlay.setOnClickListener {
             bgPlayEnabled = !bgPlayEnabled
-            setBgPlayIcon(bgPlay)
+            updateBgPlay(bgPlay)
         }
     }
 
-    private fun setBgPlayIcon(bgPlay: ImageButton) {
+    private fun updateBgPlay(bgPlay: ImageButton) {
         bgPlay.setImageResource(
             if (bgPlayEnabled) R.drawable.player_play_bg_on else R.drawable.player_play_bg_off
         )
+        playerService?.toggleBackgroundPlay(bgPlayEnabled)
+    }
+
+    private fun listenPlaylistButton() {
+        binding.root.findViewById<ImageButton>(R.id.playlist).setOnClickListener {
+            findNavController().navigate(R.id.action_player_to_playlist)
+        }
     }
 }

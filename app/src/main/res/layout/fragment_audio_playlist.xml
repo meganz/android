@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/audio_player_main_bg">
+    android:background="@color/audio_player_controller_bg">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,12 +14,19 @@
         app:theme="@style/Theme.Megaactionbar"
         app:titleTextAppearance="@style/ToolbarTitle" />
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/player_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        app:controller_layout_id="@layout/audio_player_control"
-        app:player_layout_id="@layout/audio_player_view"
+        android:layout_marginBottom="@dimen/audio_player_playlist_player_height" />
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="115dp"
+        android:layout_gravity="bottom"
+        app:controller_layout_id="@layout/audio_player_control_in_playlist"
+        app:player_layout_id="@layout/audio_player_view_in_playlist"
         app:surface_type="none" />
 </FrameLayout>

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.audioplayer
 
 import android.os.Binder
-import androidx.lifecycle.LiveData
-import com.google.android.exoplayer2.SimpleExoPlayer
 
 /**
  * This class will be what is returned when an activity binds to this service.
@@ -10,6 +8,5 @@ import com.google.android.exoplayer2.SimpleExoPlayer
  * about the video playback.
  */
 class AudioPlayerServiceBinder(
-    val exoPlayer: SimpleExoPlayer,
-    val metadata: LiveData<Metadata>,
+    val service: AudioPlayerService,
 ) : Binder()

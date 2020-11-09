@@ -88,4 +88,6 @@
 
     <dimen name="audio_player_music_name_margin_bottom_small">10dp</dimen>
     <dimen name="audio_player_music_name_margin_bottom_large">28dp</dimen>
+    <dimen name="audio_player_playlist_player_height">106dp</dimen>
+    <dimen name="audio_player_mini_player_height">64dp</dimen>
 </resources>

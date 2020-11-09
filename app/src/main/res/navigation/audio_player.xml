@@ -9,5 +9,13 @@
         android:name="mega.privacy.android.app.audioplayer.AudioPlayerFragment"
         android:label="audio_player"
         tools:layout="@layout/fragment_audio_player">
+        <action
+            android:id="@+id/action_player_to_playlist"
+            app:destination="@id/playlist" />
     </fragment>
+    <fragment
+        android:id="@+id/playlist"
+        android:name="mega.privacy.android.app.audioplayer.PlaylistFragment"
+        android:label="audio_player"
+        tools:layout="@layout/fragment_audio_playlist" />
 </navigation>
