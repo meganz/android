@@ -292,17 +292,19 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			long[] idPendMsgs = intent.getLongArrayExtra(EXTRA_PEND_MSG_IDS);
 			long[] attachFiles = intent.getLongArrayExtra(EXTRA_ATTACH_FILES);
 			long[] idChats = intent.getLongArrayExtra(EXTRA_ATTACH_CHAT_IDS);
-
+			boolean validIdChats = idChats != null && idChats.length > 0;
 			boolean onlyOneChat = true;
 
-			if (attachFiles != null && attachFiles.length > 0 && idChats != null && idChats.length > 0) {
-				for (int i = 0; i < attachFiles.length; i++) {
-					for (int j = 0; j < idChats.length; j++) {
+			if (attachFiles != null && attachFiles.length > 0 && validIdChats) {
+				for (long attachFile : attachFiles) {
+					for (long idChat : idChats) {
 						requestSent++;
-						megaChatApi.attachNode(idChats[j], attachFiles[i], this);
+						megaChatApi.attachNode(idChat, attachFile, this);
 					}
 				}
+			}
 
+			if (validIdChats) {
 				if (idChats.length == 1) {
 					snackbarChatHandle = idChats[0];
 				} else {

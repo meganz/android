@@ -2556,6 +2556,7 @@
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">You are not allowed to join this call as it has reached the maximum number of participants.</string>
     <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants in the chat.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Error. The file cannot be opened.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Incoming call&#8230;</string>
@@ -2657,6 +2658,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Ongoing Call</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
+    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
@@ -2675,11 +2677,18 @@
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignore</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s muted this call</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
+    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Call on hold</string>
+    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold &#38; Answer</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold &#38; Join</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End &#38; Answer</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End &#38; Join</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
+    <string name="text_join__another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
 
@@ -2752,6 +2761,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">An error occurred while trying to upload the voice message.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Incoming call</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Loading</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Please wait&#8230;</string>
@@ -2778,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">SCALABLE [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Will automatically increase, at no additional charge, for genuine business purposes.</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Unlimited [A]Transfer quota[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you log out, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">When you log out, ongoing transfers will be cancelled.</string>
@@ -2816,6 +2828,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnecting</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">You are back.</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Poor internet connection</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Recording&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Create new file</string>
@@ -2844,12 +2857,10 @@
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
-    <string name="label_get_more_transfer_quota" context="Label indicating the action 'upgrate account' to get more transfer quota">Get more transfer quota</string>
+    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
     <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
 
     <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
-
-    <string name="label_time_in_days" context="Time in days. The placeholder is for the time value, please adjust the position based on linguistics">%dd</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Storage Full</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Your data is at risk!</string>
@@ -2859,7 +2870,7 @@
     </plurals>
     <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
     <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is currently subject to deletion.</string>
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]You must act immediately to save your data.[/B]</string>
 
     <plurals name="label_time_in_days_full">
@@ -2902,10 +2913,17 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
+    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don't remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 </resources>
