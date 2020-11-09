@@ -16,6 +16,8 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
+    <color name="grey_054_white_087">@color/white_alpha_087</color>
+
     <!-- Notification badge -->
     <color name="white_dark_grey">@color/dark_grey</color>
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -37,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="219dp"
         android:layout_margin="2dp"
-        android:background="@{item.selected ? @drawable/background_item_grid_selected : @drawable/background_item_grid_new}"
+        android:background="@{item.selected ? @drawable/background_item_grid_selected : @drawable/background_item_grid}"
         android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item)}"
         android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
 
@@ -67,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:src="@drawable/ic_play_arrow_white_24dp"
+                app:tint="?android:attr/textColorPrimary"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -75,8 +75,7 @@
                 android:layout_marginStart="33dp"
                 android:layout_marginTop="2dp"
                 android:text="@{TimeUtils.getVideoDuration(item.node.duration)}"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
         </FrameLayout>
 
         <ImageView
@@ -92,7 +91,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/grid_node_item_width"
-            android:background="@color/black_12_alpha" />
+            android:background="@color/grey_012_white_012" />
 
         <LinearLayout
             android:id="@+id/filename_container"
@@ -113,7 +112,7 @@
                 android:ellipsize="middle"
                 android:singleLine="true"
                 android:text="@{item.node.name}"
-                android:textColor="@{item.node.isTakenDown() ? @color/dark_primary_color : @color/grey_alpha_087 }"
+                android:textColor="@{item.node.isTakenDown() ? @color/red_600_red_300 : @color/grey_087_white_087}"
                 android:textSize="14sp"
                 tools:text="2048.jpg" />
 
@@ -124,15 +123,16 @@
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
                 android:src="@drawable/ic_input_warning"
-                app:tint="@color/red_600_red_300"
-                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}"
+                app:tint="@color/red_600_red_300" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
-                android:src="@drawable/ic_dots_vertical_grey" />
+                android:src="@drawable/ic_dots_vertical_grey"
+                app:tint="?android:attr/textColorSecondary" />
         </LinearLayout>
     </FrameLayout>
 </layout>

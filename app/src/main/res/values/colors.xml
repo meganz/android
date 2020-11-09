@@ -289,6 +289,8 @@
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/grey_alpha_054</color>
 
+    <color name="grey_054_white_087">@color/grey_alpha_054</color>
+
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
     <color name="password_weak">#FFD300</color>

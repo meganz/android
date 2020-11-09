@@ -119,8 +119,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="33dp"
                     android:text="00:00"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
 
                 <ImageView
                     android:id="@+id/file_grid_video_icon"
@@ -129,6 +128,7 @@
                     android:layout_alignParentStart="true"
                     android:background="@null"
                     android:src="@drawable/ic_play_arrow_white_24dp"
+                    app:tint="?android:attr/textColorPrimary"
                     tools:ignore="ContentDescription" />
             </RelativeLayout>
         </RelativeLayout>

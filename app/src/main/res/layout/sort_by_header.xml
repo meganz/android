@@ -34,8 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:text="@{context.resources.getString(orderNameStringId)}"
-                android:textColor="@color/file_list_first_row"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -46,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:src="@drawable/ic_down"
+                app:tint="@color/grey_054_white_087"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/sorted_by"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -59,7 +59,7 @@
             android:layout_marginEnd="12dp"
             android:onClick="@{() -> sortByHeaderViewModel.switchListGrid()}"
             android:src="@{sortByHeaderViewModel.isList ? @drawable/ic_grid_view_new : @drawable/ic_list_view_new}"
-            app:tint="@color/black_54_alpha"
+            app:tint="@color/grey_054_white_087"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

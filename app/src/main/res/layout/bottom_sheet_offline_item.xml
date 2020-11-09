@@ -114,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha" />
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_delete_offline_layout"
@@ -159,7 +159,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha" />
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_share_layout"
@@ -196,7 +196,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha" />
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -233,7 +233,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/black_12_alpha" />
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_download_layout"

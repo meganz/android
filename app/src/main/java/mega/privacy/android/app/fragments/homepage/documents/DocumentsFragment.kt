@@ -108,13 +108,6 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
-        binding.emptyHint.emptyHintImage.setImageResource(
-            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                R.drawable.ic_zero_data_recents_portrait
-            } else {
-                R.drawable.ic_zero_data_recents_landscape
-            }
-        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
