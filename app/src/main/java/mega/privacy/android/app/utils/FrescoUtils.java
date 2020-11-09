@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
@@ -25,7 +26,9 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.RoundedImageView;
 
+import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter.updateViewDimensions;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class FrescoUtils {
@@ -34,18 +37,22 @@ public class FrescoUtils {
      * Load GIF/WEBP to display the animation.
      * SimpleDraweeView handles with cache and resource release.
      *
-     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
-     * @param pb            Progress bar showing when loading.
-     * @param drawable      Used as placeholder, before the GIF/WEBP is fully loaded.
-     * @param uri           The uri of GIF/WEBP. May be from url or local path.
+     * @param gifImgDisplay            The SimpleDraweeView to display the GIF/WEBP.
+     * @param pb                       Progress bar showing when loading.
+     * @param shouldDisplayPlaceHolder If true, a placeholder should be shown while the animated image is loading.
+     * @param placeholder                 Used as placeholder, before the GIF/WEBP is fully loaded.
+     * @param uri                      The uri of GIF/WEBP. May be from url or local path.
      */
-    public static void loadGif(SimpleDraweeView gifImgDisplay, ProgressBar pb, @Nullable Drawable drawable, Uri uri) {
+    public static void loadGif(SimpleDraweeView gifImgDisplay, @Nullable ProgressBar pb, boolean shouldDisplayPlaceHolder, @Nullable Drawable placeholder, Uri uri) {
         // Set placeholder and its scale type here rather than in xml.
-        if (drawable == null) {
-            gifImgDisplay.getHierarchy().setPlaceholderImage(R.drawable.ic_image_thumbnail, ScalingUtils.ScaleType.CENTER_INSIDE);
-        } else {
-            gifImgDisplay.getHierarchy().setPlaceholderImage(drawable, ScalingUtils.ScaleType.CENTER_INSIDE);
+        if (shouldDisplayPlaceHolder) {
+            if (placeholder == null) {
+                gifImgDisplay.getHierarchy().setPlaceholderImage(R.drawable.ic_image_thumbnail, ScalingUtils.ScaleType.CENTER_INSIDE);
+            } else {
+                gifImgDisplay.getHierarchy().setPlaceholderImage(placeholder, ScalingUtils.ScaleType.CENTER_INSIDE);
+            }
         }
+
         ImageRequest imageRequest = ImageRequest.fromUri(uri);
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequest)
@@ -54,17 +61,41 @@ public class FrescoUtils {
 
                     @Override
                     public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                        pb.setVisibility(View.GONE);
+                        hideProgressBar(pb);
                     }
 
                     @Override
                     public void onFailure(String id, Throwable throwable) {
-                        pb.setVisibility(View.GONE);
+                        hideProgressBar(pb);
                         logWarning("Load gif failed, error: " + throwable.getMessage());
                     }
                 })
                 .build();
         gifImgDisplay.setController(controller);
+    }
+
+    /**
+     * Load GIF/WEBP to display the animation.
+     * SimpleDraweeView handles with cache and resource release.
+     *
+     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
+     * @param pb            Progress bar showing when loading.
+     * @param placeholder      Used as placeholder, before the GIF/WEBP is fully loaded.
+     * @param uri           The uri of GIF/WEBP. May be from url or local path.
+     */
+    public static void loadGif(SimpleDraweeView gifImgDisplay, @Nullable ProgressBar pb, @Nullable Drawable placeholder, Uri uri) {
+        loadGif(gifImgDisplay, pb, true, placeholder, uri);
+    }
+
+    /**
+     * Load GIF/WEBP to display the animation.
+     * SimpleDraweeView handles with cache and resource release.
+     *
+     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
+     * @param uri           The uri of GIF/WEBP. May be from url or local path.
+     */
+    public static void loadGif(SimpleDraweeView gifImgDisplay, Uri uri) {
+        loadGif(gifImgDisplay, null, false, null, uri);
     }
 
     /**
@@ -88,7 +119,7 @@ public class FrescoUtils {
                 if (bitmap != null && !bitmap.isRecycled()) {
                     // Work around: bitmap will be recylced by Fresco soon, create a copy then use the copy.
                     Bitmap copy = bitmap.copy(Bitmap.Config.ARGB_8888, false);
-                    pb.setVisibility(View.GONE);
+                    hideProgressBar(pb);
                     imageView.setImageBitmap(copy);
                 }
             }
@@ -98,5 +129,64 @@ public class FrescoUtils {
                 // No cleanup required here.
             }
         }, UiThreadImmediateExecutorService.getInstance());
+    }
+
+    /**
+     * Load GIF/WEBP in a chat message.
+     * SimpleDraweeView handles with cache and resource release.
+     *
+     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
+     * @param pb            Progress bar showing when loading.
+     * @param preview       View where the file preview is shown.
+     * @param fileView      View where the file inso is shown.
+     * @param uri           The uri of GIF/WEBP. May be from url or local path.
+     */
+    public static void loadGifMessage(SimpleDraweeView gifImgDisplay, ProgressBar pb, RoundedImageView preview, RelativeLayout fileView, Uri uri) {
+        if (gifImgDisplay == null) {
+            logWarning("Unable to load GIF, view is null.");
+            return;
+        }
+
+        if (gifImgDisplay.getVisibility() != View.VISIBLE) {
+            gifImgDisplay.setVisibility(View.VISIBLE);
+        }
+
+        if (pb != null) {
+            pb.setVisibility(View.VISIBLE);
+        }
+
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(ImageRequest.fromUri(uri))
+                .setAutoPlayAnimations(true)
+                .setControllerListener(new BaseControllerListener<ImageInfo>() {
+                    @Override
+                    public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                        updateViewDimensions(gifImgDisplay, imageInfo.getWidth(), imageInfo.getHeight());
+
+                        hideProgressBar(pb);
+
+                        if (fileView != null && fileView.getVisibility() != View.GONE) {
+                            fileView.setVisibility(View.GONE);
+                        }
+
+                        if (preview != null) {
+                            preview.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(String id, Throwable throwable) {
+                        logWarning("Load gif failed, error: " + throwable.getMessage());
+                    }
+                })
+                .build();
+
+        gifImgDisplay.setController(controller);
+    }
+
+    private static void hideProgressBar(ProgressBar pb) {
+        if (pb != null) {
+            pb.setVisibility(View.GONE);
+        }
     }
 }

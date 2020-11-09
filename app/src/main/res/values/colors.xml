@@ -207,6 +207,7 @@
     <color name="business_color">#2BA6DE</color>
 
     <color name="black_40_alpha">#66000000</color>
+    <color name="black_54_alpha">#89000000</color>
 
     <color name="red_alert">#FF6464</color>
     <color name="status_bar_red_alert">#CF4949</color>
@@ -214,7 +215,13 @@
     <color name="reconnecting_bar">#FFF5A623</color>
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
+
+    <color name="light_toolbar_title">#A8A8A8</color>
+    <color name="giphy_search_text">#121212</color>
+    <color name="giphy_loading_background">#ECECEC</color>
+
     <color name="border_avatar_call">#4DFFFFFF</color>
+
     <color name="over_quota_yellow">#FFFFB42B</color>
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
