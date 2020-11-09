@@ -76,7 +76,7 @@ object ColorUtils {
 
     @JvmStatic
     fun setEditTextUnderlineColorAttr(editText: EditText, @AttrRes color: Int) {
-        doSetEditTextUnderlineColor(editText, false, editText.context.themeColor(color))
+        doSetEditTextUnderlineColor(editText, false, getThemeColor(editText.context, color))
     }
 
     @JvmStatic
@@ -91,7 +91,7 @@ object ColorUtils {
 
     @JvmStatic
     fun getThemeColorHexString(context: Context, @AttrRes attr: Int): String {
-        return String.format("#%06X", context.themeColor(attr) and 0xFFFFFF)
+        return String.format("#%06X", getThemeColor(context, attr) and 0xFFFFFF)
     }
 
     /**

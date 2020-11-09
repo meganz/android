@@ -7,7 +7,7 @@ import android.widget.TextView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.utils.themeColor
+import mega.privacy.android.app.utils.ColorUtils
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
 import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
@@ -65,7 +65,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun setSelectedColor(text: TextView) {
-        text.setTextColor(context.themeColor(R.attr.colorSecondary))
+        text.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary))
     }
 
     private fun setCloudOrder(managerActivity: ManagerActivityLollipop, order: Int) {

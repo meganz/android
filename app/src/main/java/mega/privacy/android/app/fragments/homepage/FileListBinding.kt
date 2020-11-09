@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.themeColor
 import java.io.File
 
 @Suppress("UNCHECKED_CAST")
@@ -112,7 +112,7 @@ fun getRoundingParams(context: Context): RoundingParams? {
 
     roundingParams?.apply {
         setBorder(
-            context.themeColor(R.attr.colorSecondary), Util.dp2px(
+            ColorUtils.getThemeColor(context, R.attr.colorSecondary), Util.dp2px(
                 context.resources.getDimension(R.dimen.photo_selected_border_width),
                 context.resources.displayMetrics
             ).toFloat()

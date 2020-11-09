@@ -225,7 +225,6 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.ViewExtensionsKt;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -8168,7 +8167,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CheckBox dontShowAgain = new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, R.color.grey_054_white_054));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -8212,7 +8211,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, R.color.grey_054_white_054));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -8256,7 +8255,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ViewExtensionsKt.themeColor(this, R.color.grey_054_white_054));
+		dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -9279,7 +9278,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkDialogIsErrorShown = true;
-				openLinkText.setTextColor(ViewExtensionsKt.themeColor(this, R.attr.colorError));
+				openLinkText.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorError));
 				ColorUtils.setEditTextUnderlineColorAttr(openLinkText, R.attr.colorError);
 				openLinkError.setVisibility(View.VISIBLE);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -9289,14 +9288,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
                     switch (error) {
                         case CHAT_LINK: {
-							openLinkText.setTextColor(ViewExtensionsKt.themeColor(this,
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 									android.R.attr.textColorPrimary));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case CONTACT_LINK: {
-							openLinkText.setTextColor(ViewExtensionsKt.themeColor(this,
+							openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 									android.R.attr.textColorPrimary));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
@@ -9319,7 +9318,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ViewExtensionsKt.themeColor(this,
+					openLinkText.setTextColor(ColorUtils.getThemeColor(this,
 							android.R.attr.textColorPrimary));
 					ColorUtils.resetEditTextUnderlineColor(openLinkText);
 					openLinkError.setVisibility(View.GONE);
@@ -12456,7 +12455,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
 			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(
-					ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
+					ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 		}
 
 		if (inboxSection != null){
@@ -12470,7 +12469,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
 					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(
-							ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
+							ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12485,7 +12484,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
 			}
 			contactsSectionText.setTextColor(
-					ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
+					ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 			setContactTitleSection();
 		}
 
@@ -12495,7 +12494,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
 			}
 			notificationsSectionText.setTextColor(
-					ViewExtensionsKt.themeColor(this, android.R.attr.textColorPrimary));
+					ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
 			setNotificationsTitleSection();
 		}
 

@@ -23,7 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TextUtil;
-import mega.privacy.android.app.utils.ViewExtensionsKt;
 
 import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
 
@@ -149,7 +148,7 @@ public class DecryptAlertDialog extends DialogFragment {
 
         if (TextUtil.isTextEmpty(mKey)) {
             mEdit.setHint(getString(R.string.password_text));
-            mEdit.setTextColor(ViewExtensionsKt.themeColor(mContext, android.R.attr.textColorPrimary));
+            mEdit.setTextColor(ColorUtils.getThemeColor(mContext, android.R.attr.textColorPrimary));
         } else {
             showErrorMessage();
         }
@@ -207,7 +206,7 @@ public class DecryptAlertDialog extends DialogFragment {
 
         mEdit.setText(mKey);
         mEdit.setSelectAllOnFocus(true);
-        mEdit.setTextColor(ViewExtensionsKt.themeColor(mContext, R.attr.colorError));
+        mEdit.setTextColor(ColorUtils.getThemeColor(mContext, R.attr.colorError));
         ColorUtils.setEditTextUnderlineColorAttr(mEdit, R.attr.colorError);
 
         mErrorView.setVisibility(View.VISIBLE);

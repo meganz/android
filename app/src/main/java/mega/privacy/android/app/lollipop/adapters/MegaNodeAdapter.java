@@ -50,8 +50,8 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
-import mega.privacy.android.app.utils.ViewExtensionsKt;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -679,13 +679,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileNameForFile.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
-            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
+            holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
             holder.takenDownImageForFile.setVisibility(View.VISIBLE);
         } else {
-            holder.textViewFileNameForFile.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
-            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
+            holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
             holder.takenDownImageForFile.setVisibility(View.GONE);
         }
@@ -879,10 +879,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (node.isTakenDown()) {
-            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
             holder.takenDownImage.setVisibility(View.VISIBLE);
         } else {
-            holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
+            holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             holder.takenDownImage.setVisibility(View.GONE);
         }
 
@@ -931,10 +931,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.publicLinkImage.setVisibility(View.INVISIBLE);
 
                 if (node.isTakenDown()) {
-                    holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, R.attr.colorError));
+                    holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
                     holder.takenDownImage.setVisibility(View.VISIBLE);
                 } else {
-                    holder.textViewFileName.setTextColor(ViewExtensionsKt.themeColor(context, android.R.attr.textColorPrimary));
+                    holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
                     holder.takenDownImage.setVisibility(View.GONE);
                 }
 
