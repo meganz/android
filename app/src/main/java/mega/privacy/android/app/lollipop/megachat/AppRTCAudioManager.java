@@ -38,6 +38,9 @@ import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
+import static android.media.AudioManager.RINGER_MODE_NORMAL;
+import static android.media.AudioManager.RINGER_MODE_SILENT;
+import static android.media.AudioManager.RINGER_MODE_VIBRATE;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -262,7 +265,9 @@ public class AppRTCAudioManager {
         }
 
         mediaPlayer = new MediaPlayer();
-        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
+        if(audioManager.getRingerMode() != RINGER_MODE_SILENT) {
+            audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
+        }
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
         mediaPlayer.setLooping(true);
@@ -288,22 +293,25 @@ public class AppRTCAudioManager {
 
         logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING) + ", Voice call volume: " + audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
 
-        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT ||
-                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && audioManager.isStreamMute(AudioManager.STREAM_RING))) {
-            if (vibrator == null || !vibrator.hasVibrator()) return;
-            stopVibration();
-            return;
-        }
+        switch (audioManager.getRingerMode()) {
+            case RINGER_MODE_SILENT:
+                stopVibration();
+                break;
 
-        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-            startVibration();
-            return;
-        }
+            case RINGER_MODE_VIBRATE:
+                startVibration();
+                break;
 
-        if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
-            return;
+            case RINGER_MODE_NORMAL:
+                if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0 &&
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+                    stopVibration();
+                } else {
+                    startVibration();
+                }
+                break;
         }
-        startVibration();
     }
 
     private void startVibration() {
@@ -346,14 +354,24 @@ public class AppRTCAudioManager {
      * Method to mute or unmute an incoming call.
      */
     public void muteOrUnmuteIncomingCall(boolean isNeccesaryMute) {
-        if ((isNeccesaryMute && !isPlayingIncomingCall()) || audioManager == null){
+        if (audioManager == null || audioManager.getRingerMode() == RINGER_MODE_SILENT ||
+                (isNeccesaryMute && !isPlayingIncomingCall())) {
+            return;
+        }
+
+        if (audioManager.getRingerMode() == RINGER_MODE_VIBRATE) {
+            if (isNeccesaryMute) {
+                stopVibration();
+            } else {
+                startVibration();
+            }
             return;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (isNeccesaryMute && !audioManager.isStreamMute(AudioManager.STREAM_RING)) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
-                checkVibration();
+                stopVibration();
             } else if (!isNeccesaryMute && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
                 audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
                 checkVibration();
