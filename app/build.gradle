@@ -130,9 +130,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.3.0'
     implementation 'com.google.firebase:firebase-core:17.5.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.11.8'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.11.8'
-    implementation(name: 'exoplayer-extension-ffmpeg-2.11.8', ext: 'aar')
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.12.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.12.1'
+    implementation(name: 'exoplayer-extension-ffmpeg-2.12.1', ext: 'aar')
     implementation 'com.google.zxing:core:3.4.0'
     implementation 'com.budiyev.android:code-scanner:1.8.3'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'

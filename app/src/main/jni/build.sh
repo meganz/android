@@ -115,11 +115,11 @@ PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
 EXOPLAYER=ExoPlayer
-EXOPLAYER_VERSION=2.11.8
+EXOPLAYER_VERSION=2.12.1
 EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
-EXOPLAYER_SHA1="56ad241f26e1e48b387cd9606572b45799c24ad9"
+EXOPLAYER_SHA1="a6476469ada55d089ea2523e3e78528dc4032e00"
 
 function downloadCheckAndUnpack()
 {
@@ -429,21 +429,24 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${EXOPLAYER_DOWNLOAD_URL} ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE} ${EXOPLAYER_SHA1} ${EXOPLAYER}
     pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
     EXOPLAYER_ROOT="$(pwd)"
-    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main/jni"
+    FFMPEG_EXT_PATH="$(pwd)/extensions/ffmpeg/src/main"
     if [[ "$OSTYPE" == "darwin"* ]]; then
         HOST_PLATFORM="darwin-x86_64"
     else
         HOST_PLATFORM="linux-x86_64"
     fi
     ENABLED_DECODERS=(ac3)
-    cd "${FFMPEG_EXT_PATH}"
-    sed -i "s/APP_PLATFORM.*/APP_PLATFORM := ${APP_PLATFORM}/" Application.mk
+    pushd "${FFMPEG_EXT_PATH}/jni" &>> ${LOG_FILE}
+    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg)
+    pushd ffmpeg &>> ${LOG_FILE}
+    git checkout release/4.2
+    popd &>> ${LOG_FILE}
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
-    cd "${FFMPEG_EXT_PATH}"
-    ${NDK_BUILD} APP_ABI="${BUILD_ARCHS}" &>> ${LOG_FILE}
-    cd "${EXOPLAYER_ROOT}"
+    popd &>> ${LOG_FILE}
     echo "* Building ExoPlayer FFMPEG extension"
+    NDK_REVISION=$(cat ${NDK_ROOT}/source.properties | grep Revision | cut -d " " -f 3)
+    sed -i "s/android {/android {\n    ndkVersion '${NDK_REVISION}'/" common_library_config.gradle
     ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
     cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
     popd &>> ${LOG_FILE}
