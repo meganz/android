@@ -2597,6 +2597,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this);
 
+		transferData = megaApi.getTransferData(this);
+		if (transferData != null) {
+			for (int i = 0; i < transferData.getNumDownloads(); i++) {
+				transfersInProgress.add(transferData.getDownloadTag(i));
+			}
+
+			for (int i = 0; i < transferData.getNumUploads(); i++) {
+				transfersInProgress.add(transferData.getUploadTag(i));
+			}
+		}
+
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
 
@@ -2859,17 +2870,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			megaApi.shouldShowRichLinkWarning(this);
 			megaApi.isRichPreviewsEnabled(this);
 			megaApi.isGeolocationEnabled(this);
-
-			transferData = megaApi.getTransferData(this);
-			int downloadsInProgress = transferData.getNumDownloads();
-			int uploadsInProgress = transferData.getNumUploads();
-
-            for(int i=0;i<downloadsInProgress;i++){
-                transfersInProgress.add(transferData.getDownloadTag(i));
-            }
-            for(int i=0;i<uploadsInProgress;i++){
-                transfersInProgress.add(transferData.getUploadTag(i));
-            }
 
 			if(savedInstanceState==null) {
 				logDebug("Run async task to check offline files");
@@ -3345,6 +3345,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		megaApi.shouldShowPasswordReminderDialog(false, this);
 
 		if (verify2FADialogIsShown){
