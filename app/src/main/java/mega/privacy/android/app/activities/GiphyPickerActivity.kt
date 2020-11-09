@@ -12,6 +12,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.RelativeLayout
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -75,7 +76,7 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         binding = ActivityGiphyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = resources.getColor(R.color.dark_primary_color)
+        window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.dark_primary_color)
 
         setSupportActionBar(binding.giphyToolbar)
         val actionBar = supportActionBar
@@ -364,11 +365,11 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         searchView.maxWidth = Int.MAX_VALUE
 
         val line = searchView.findViewById(androidx.appcompat.R.id.search_plate) as View
-        line.setBackgroundColor(resources.getColor(android.R.color.transparent))
+        line.setBackgroundColor(ContextCompat.getColor(applicationContext, android.R.color.transparent))
 
         val searchAutoComplete =
             searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
-        searchAutoComplete.setTextColor(resources.getColor(R.color.giphy_search_text))
+        searchAutoComplete.setTextColor(ContextCompat.getColor(applicationContext, R.color.giphy_search_text))
         searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
@@ -422,8 +423,8 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         )
     }
 
-    override fun setEmptyState(emptyState: Boolean) {
-        if (emptyState) {
+    override fun setEmptyState(emptyList: Boolean) {
+        if (emptyList) {
             binding.emptyGiphyView.visibility = VISIBLE
             binding.giphyListView.visibility = GONE
         } else {
