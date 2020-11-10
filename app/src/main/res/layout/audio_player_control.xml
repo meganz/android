@@ -8,7 +8,7 @@
     <View
         android:id="@+id/controller_bg"
         android:layout_width="0dp"
-        android:layout_height="212dp"
+        android:layout_height="@dimen/audio_player_main_controller_height"
         android:background="@color/audio_player_controller_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="@dimen/audio_player_music_name_margin_bottom_small"
+        android:layout_marginBottom="@dimen/audio_player_track_name_margin_bottom_small"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:textColor="@color/white"

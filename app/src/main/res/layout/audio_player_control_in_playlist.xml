@@ -11,7 +11,7 @@
         android:layout_height="0dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintGuide_end="@dimen/audio_player_playlist_player_height" />
+        app:layout_constraintGuide_end="@dimen/audio_player_playlist_controller_height" />
 
     <mega.privacy.android.app.components.DefaultTimeBar
         android:id="@id/exo_progress"

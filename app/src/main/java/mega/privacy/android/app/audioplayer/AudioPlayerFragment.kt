@@ -9,8 +9,10 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -23,6 +25,7 @@ import com.google.android.exoplayer2.util.Util
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.autoCleared
 
 @AndroidEntryPoint
@@ -116,6 +119,22 @@ class AudioPlayerFragment : Fragment() {
         binding.playerView.setControlDispatcher(AudioPlayerControlDispatcher())
 
         binding.playerView.showController()
+
+        post {
+            val artworkWidth = resources.displayMetrics.widthPixels / 3 * 2
+            val controllerHeight =
+                resources.getDimensionPixelSize(R.dimen.audio_player_main_controller_height)
+
+            val artworkContainer = binding.root.findViewById<CardView>(R.id.artwork_container)
+            val layoutParams = artworkContainer.layoutParams as FrameLayout.LayoutParams
+            layoutParams.width = artworkWidth
+            layoutParams.height = artworkWidth
+            layoutParams.topMargin =
+                (binding.playerView.measuredHeight - artworkWidth - controllerHeight) / 2
+            artworkContainer.layoutParams = layoutParams
+
+            artworkContainer.isVisible = true
+        }
     }
 
     private fun observeMetadata(metadata: LiveData<Metadata>) {
@@ -142,8 +161,8 @@ class AudioPlayerFragment : Fragment() {
     private fun setTrackNameBottomMargin(trackName: TextView, small: Boolean) {
         val params = trackName.layoutParams as ConstraintLayout.LayoutParams
         params.bottomMargin = resources.getDimensionPixelSize(
-            if (small) R.dimen.audio_player_music_name_margin_bottom_small
-            else R.dimen.audio_player_music_name_margin_bottom_large
+            if (small) R.dimen.audio_player_track_name_margin_bottom_small
+            else R.dimen.audio_player_track_name_margin_bottom_large
         )
         trackName.layoutParams = params
     }

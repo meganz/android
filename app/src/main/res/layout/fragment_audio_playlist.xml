@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="@dimen/audio_player_playlist_player_height" />
+        android:layout_marginBottom="@dimen/audio_player_playlist_controller_height" />
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player_view"

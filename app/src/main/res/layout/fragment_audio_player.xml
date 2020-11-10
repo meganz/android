@@ -20,6 +20,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         app:controller_layout_id="@layout/audio_player_control"
+        app:default_artwork="@drawable/ic_audio_thumbnail"
         app:player_layout_id="@layout/audio_player_view"
         app:surface_type="none" />
 </FrameLayout>

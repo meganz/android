@@ -86,8 +86,9 @@
     <dimen name="cu_fragment_image_margin_small">1dp</dimen>
     <dimen name="cu_fragment_image_margin_large">2dp</dimen>
 
-    <dimen name="audio_player_music_name_margin_bottom_small">10dp</dimen>
-    <dimen name="audio_player_music_name_margin_bottom_large">28dp</dimen>
-    <dimen name="audio_player_playlist_player_height">106dp</dimen>
-    <dimen name="audio_player_mini_player_height">64dp</dimen>
+    <dimen name="audio_player_track_name_margin_bottom_small">10dp</dimen>
+    <dimen name="audio_player_track_name_margin_bottom_large">28dp</dimen>
+    <dimen name="audio_player_main_controller_height">212dp</dimen>
+    <dimen name="audio_player_playlist_controller_height">106dp</dimen>
+    <dimen name="audio_player_mini_controller_height">64dp</dimen>
 </resources>
