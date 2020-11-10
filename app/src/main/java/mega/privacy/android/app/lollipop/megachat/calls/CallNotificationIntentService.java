@@ -79,8 +79,15 @@ public class CallNotificationIntentService extends IntentService implements Mega
                         }
                     }
                 } else {
-                    logDebug("Hanging up current call ... ");
-                    megaChatApi.hangChatCall(chatIdCurrentCall, this);
+                    MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
+                    if (currentCall == null) {
+                        logDebug("Answering incoming call ...");
+                        addChecksForACall(chatIdIncomingCall, false);
+                        megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
+                    } else {
+                        logDebug("Hanging up current call ... ");
+                        megaChatApi.hangChatCall(chatIdCurrentCall, this);
+                    }
                 }
                 break;
 
@@ -100,10 +107,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             case HOLD_ANSWER:
             case HOLD_JOIN:
                 MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
-                if (currentCall == null)
-                    break;
-
-                if (currentCall.isOnHold()) {
+                if (currentCall == null || currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
                     addChecksForACall(chatIdIncomingCall, false);
                     megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
