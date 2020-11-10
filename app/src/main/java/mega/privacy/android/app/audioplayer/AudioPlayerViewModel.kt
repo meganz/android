@@ -44,7 +44,14 @@ class AudioPlayerViewModel(
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
 
-    fun buildPlayerSource(intent: Intent) {
+    var playingHandle = INVALID_HANDLE
+    var currentIntent: Intent? = null
+
+    fun buildPlayerSource(intent: Intent?) {
+        if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
+            return
+        }
+
         val type = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         val uri = intent.data
 
@@ -52,39 +59,52 @@ class AudioPlayerViewModel(
             return
         }
 
+        val samePlaylist = isSamePlaylist(type, intent)
+        currentIntent = intent
+
         var displayNodeNameFirst = true
-        var playingNodeName = ""
+        var firstPlayNodeName = ""
         when (type) {
             OFFLINE_ADAPTER -> {
                 val path = intent.getStringExtra(INTENT_EXTRA_KEY_PATH) ?: return
-                playingNodeName = File(path).name
                 displayNodeNameFirst = false
+                firstPlayNodeName = File(path).name
             }
             AUDIO_SEARCH_ADAPTER, AUDIO_BROWSE_ADAPTER -> {
                 val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
                 val node = megaApi.getNodeByHandle(handle) ?: return
-                playingNodeName = node.name
+                firstPlayNodeName = node.name
+            }
+            else -> {
+                return
             }
         }
 
+        val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+
         val mediaItem = MediaItem.Builder()
             .setUri(uri)
-            .setMediaId(playingNodeName)
+            .setMediaId(firstPlayNodeName)
+            .setTag(firstPlayHandle)
             .build()
-        _playerSource.value = Triple(listOf(mediaItem), INVALID_VALUE, displayNodeNameFirst)
+        _playerSource.value = Triple(
+            listOf(mediaItem),
+            if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
+            displayNodeNameFirst
+        )
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             compositeDisposable.add(Completable
                 .fromCallable {
                     when (type) {
                         OFFLINE_ADAPTER -> {
-                            buildPlaylistFromOfflineNodes(intent)
+                            buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                         }
                         AUDIO_SEARCH_ADAPTER -> {
-                            buildPlaylistFromHandles(intent)
+                            buildPlaylistFromHandles(intent, firstPlayHandle)
                         }
                         AUDIO_BROWSE_ADAPTER -> {
-                            buildPlaylistForAudio(intent)
+                            buildPlaylistForAudio(intent, firstPlayHandle)
                         }
                     }
                 }
@@ -93,11 +113,36 @@ class AudioPlayerViewModel(
         }
     }
 
-    private fun buildPlaylistFromOfflineNodes(intent: Intent) {
+    private fun isSamePlaylist(type: Int, intent: Intent): Boolean {
+        val oldIntent = currentIntent ?: return false
+
+        when (type) {
+            OFFLINE_ADAPTER -> {
+                val oldDir = oldIntent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
+                    ?: return false
+                val newDir =
+                    intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY) ?: return false
+                return oldDir == newDir
+            }
+            AUDIO_SEARCH_ADAPTER -> {
+                val oldHandles = oldIntent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
+                    ?: return false
+                val newHandles =
+                    intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return false
+                return oldHandles.contentEquals(newHandles)
+            }
+            AUDIO_BROWSE_ADAPTER -> {
+                return true
+            }
+            else -> {
+                return false
+            }
+        }
+    }
+
+    private fun buildPlaylistFromOfflineNodes(intent: Intent, firstPlayHandle: Long) {
         val nodes = intent.getParcelableArrayListExtra<MegaOffline>(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
             ?: return
-
-        val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
 
         buildPlaylistFromNodes(
             nodes, firstPlayHandle,
@@ -107,7 +152,7 @@ class AudioPlayerViewModel(
                         && !MimeTypeList.typeForName(it.name).isAudioNotSupported
             },
             {
-                mediaItemFromFile(getOfflineFile(context, it), it.name)
+                mediaItemFromFile(getOfflineFile(context, it), it.name, it.handle.toLong())
             },
             {
                 it.handle.toLong()
@@ -115,18 +160,15 @@ class AudioPlayerViewModel(
         )
     }
 
-    private fun buildPlaylistFromHandles(intent: Intent) {
+    private fun buildPlaylistFromHandles(intent: Intent, firstPlayHandle: Long) {
         val handles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return
-        buildPlaylistFromHandles(
-            handles.toList(), intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-        )
+        buildPlaylistFromHandles(handles.toList(), firstPlayHandle)
     }
 
-    private fun buildPlaylistForAudio(intent: Intent) {
+    private fun buildPlaylistForAudio(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
         buildPlaylistFromNodes(
-            megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
-            intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+            megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE), firstPlayHandle
         )
     }
 
@@ -165,11 +207,12 @@ class AudioPlayerViewModel(
                     && (isOnMegaDownloads || nodeFingerPrint != null
                             && nodeFingerPrint == localPathFingerPrint)
                 ) {
-                    mediaItemFromFile(File(localPath), it.name)
+                    mediaItemFromFile(File(localPath), it.name, it.handle)
                 } else if (dbHandler.credentials != null) {
                     MediaItem.Builder()
                         .setUri(Uri.parse(megaApi.httpServerGetLocalLink(it)))
                         .setMediaId(it.name)
+                        .setTag(it.handle)
                         .build()
                 } else {
                     null
@@ -211,7 +254,7 @@ class AudioPlayerViewModel(
         }
     }
 
-    private fun mediaItemFromFile(file: File, name: String): MediaItem {
+    private fun mediaItemFromFile(file: File, name: String, handle: Long): MediaItem {
         val mediaUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
             && file.absolutePath.contains(Environment.getExternalStorageDirectory().path)
         ) {
@@ -223,6 +266,7 @@ class AudioPlayerViewModel(
         return MediaItem.Builder()
             .setUri(mediaUri)
             .setMediaId(name)
+            .setTag(handle)
             .build()
     }
 

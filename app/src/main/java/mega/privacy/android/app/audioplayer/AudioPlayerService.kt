@@ -18,7 +18,8 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -71,6 +72,13 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         exoPlayer.repeatMode = viewModel.repeatMode()
 
         exoPlayer.addListener(object : Player.EventListener {
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                val tag = mediaItem?.playbackProperties?.tag ?: return
+                if (tag is Long) {
+                    viewModel.playingHandle = tag
+                }
+            }
+
             override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                 viewModel.setShuffleEnabled(shuffleModeEnabled)
             }
@@ -151,12 +159,12 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     override fun onBind(intent: Intent): IBinder? {
         super.onBind(intent)
-
-        if (intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
-            viewModel.buildPlayerSource(intent)
-        }
-
         return binder
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        viewModel.buildPlayerSource(intent)
+        return super.onStartCommand(intent, flags, startId)
     }
 
     private fun observeLiveData() {
@@ -165,17 +173,33 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     private fun playSource(
         mediaItems: List<MediaItem>,
-        seekWindow: Int,
+        newIndexForCurrentItem: Int,
         displayNodeNameFirst: Boolean
     ) {
         if (displayNodeNameFirst && mediaItems.isNotEmpty()) {
             _metadata.value = Metadata(null, null, mediaItems.first().mediaId)
         }
 
-        if (seekWindow == INVALID_VALUE) {
+        if (newIndexForCurrentItem == INVALID_VALUE) {
             exoPlayer.setMediaItems(mediaItems)
         } else {
-            exoPlayer.setMediaItems(mediaItems, seekWindow, exoPlayer.currentPosition)
+            val oldIndexForCurrentItem = exoPlayer.currentWindowIndex
+            val oldItemsCount = exoPlayer.mediaItemCount
+            if (oldIndexForCurrentItem != oldItemsCount - 1) {
+                exoPlayer.removeMediaItems(oldIndexForCurrentItem + 1, oldItemsCount)
+            }
+            if (oldIndexForCurrentItem != 0) {
+                exoPlayer.removeMediaItems(0, oldIndexForCurrentItem)
+            }
+
+            if (newIndexForCurrentItem != 0) {
+                exoPlayer.addMediaItems(0, mediaItems.subList(0, newIndexForCurrentItem))
+            }
+            if (newIndexForCurrentItem != mediaItems.size - 1) {
+                exoPlayer.addMediaItems(
+                    mediaItems.subList(newIndexForCurrentItem + 1, mediaItems.size)
+                )
+            }
         }
 
         exoPlayer.playWhenReady = true
