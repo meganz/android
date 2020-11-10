@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/save_to_device"
+        android:icon="@drawable/ic_download_white"
+        android:orderInCategory="100"
+        android:title="@string/general_save_to_device"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/properties"
+        android:icon="@drawable/info_ic_white"
+        android:orderInCategory="105"
+        android:title="@string/general_file_info"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/send_to_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="110"
+        android:title="@string/general_share"
+        app:iconTint="@color/white"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/get_link"
+        android:orderInCategory="115"
+        android:title="@string/context_get_link_menu"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/remove_link"
+        android:orderInCategory="115"
+        android:title="@string/context_remove_link_menu"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/rename"
+        android:orderInCategory="120"
+        android:title="@string/context_rename"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/move"
+        android:orderInCategory="125"
+        android:title="@string/context_move"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/copy"
+        android:orderInCategory="130"
+        android:title="@string/context_copy"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/move_to_trash"
+        android:orderInCategory="135"
+        android:title="@string/context_move_to_trash"
+        app:showAsAction="never" />
+</menu>

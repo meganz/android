@@ -20,7 +20,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_audio_player)
 
-        Util.changeStatusBarColor(this, window, R.color.black_20_opacity)
+        Util.changeStatusBarColor(this, window, R.color.black)
     }
 
     override fun onNewIntent(intent: Intent?) {

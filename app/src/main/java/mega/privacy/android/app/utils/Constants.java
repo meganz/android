@@ -684,5 +684,7 @@ public class Constants {
     public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
     public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
 
-    public static final String EXO_PLAYER_UA = "android2";
+    public static final long AUDIO_PLAYER_BACKGROUND_PLAY_HINT_FADE_OUT_DURATION_MS = 3000;
+    public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
+    public static final long AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
 }

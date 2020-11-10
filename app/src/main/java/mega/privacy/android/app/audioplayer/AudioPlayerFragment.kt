@@ -1,17 +1,17 @@
 package mega.privacy.android.app.audioplayer
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -25,7 +25,10 @@ import com.google.android.exoplayer2.util.Util
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
+import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.autoCleared
 
 @AndroidEntryPoint
@@ -53,6 +56,8 @@ class AudioPlayerFragment : Fragment() {
         }
     }
 
+    private var toolbarVisible = true
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,6 +73,48 @@ class AudioPlayerFragment : Fragment() {
         binding.toolbar.navigationIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
         binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
+
+        binding.toolbar.inflateMenu(R.menu.audio_player)
+        binding.toolbar.setOnMenuItemClickListener(object : Toolbar.OnMenuItemClickListener {
+            override fun onMenuItemClick(item: MenuItem): Boolean {
+                when (item.itemId) {
+                    R.id.save_to_device -> {
+                        return true
+                    }
+                    R.id.properties -> {
+                        return true
+                    }
+                    R.id.send_to_chat -> {
+                        return true
+                    }
+                    R.id.get_link -> {
+                        return true
+                    }
+                    R.id.remove_link -> {
+                        return true
+                    }
+                    R.id.rename -> {
+                        return true
+                    }
+                    R.id.move -> {
+                        return true
+                    }
+                    R.id.copy -> {
+                        return true
+                    }
+                    R.id.move_to_trash -> {
+                        return true
+                    }
+                }
+                return false
+            }
+        })
+
+        runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
+            if (isResumed) {
+                hideToolbar()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +152,7 @@ class AudioPlayerFragment : Fragment() {
         listenButtons()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupPlayerView(player: SimpleExoPlayer) {
         binding.playerView.player = player
 
@@ -119,6 +167,17 @@ class AudioPlayerFragment : Fragment() {
         binding.playerView.setControlDispatcher(AudioPlayerControlDispatcher())
 
         binding.playerView.showController()
+
+        binding.playerView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                if (toolbarVisible) {
+                    hideToolbar()
+                } else {
+                    showToolbar()
+                }
+            }
+            true
+        }
 
         post {
             val artworkWidth = resources.displayMetrics.widthPixels / 3 * 2
@@ -192,5 +251,23 @@ class AudioPlayerFragment : Fragment() {
         binding.root.findViewById<ImageButton>(R.id.playlist).setOnClickListener {
             findNavController().navigate(R.id.action_player_to_playlist)
         }
+    }
+
+    private fun hideToolbar() {
+        toolbarVisible = false
+
+        binding.toolbar.animate()
+            .translationY(-binding.toolbar.measuredHeight.toFloat())
+            .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
+            .start()
+    }
+
+    private fun showToolbar() {
+        toolbarVisible = true
+
+        binding.toolbar.animate()
+            .translationY(0F)
+            .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
+            .start()
     }
 }

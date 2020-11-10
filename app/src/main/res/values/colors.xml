@@ -234,6 +234,5 @@
     <color name="audio_player_controller_bg">#222222</color>
     <color name="white_38_opacity">#60FFFFFF</color>
     <color name="white_60_opacity">#99FFFFFF</color>
-    <color name="black_20_opacity">#33000000</color>
     <color name="teal_300">#00BFA5</color>
 </resources>

@@ -5,22 +5,19 @@
     android:layout_height="match_parent"
     android:background="@color/audio_player_main_bg">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:popupTheme="@style/Theme.Megaactionbar"
-        app:subtitleTextAppearance="@style/ToolbarSubtitle"
-        app:theme="@style/Theme.Megaactionbar"
-        app:titleTextAppearance="@style/ToolbarTitle" />
-
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
         app:controller_layout_id="@layout/audio_player_control"
         app:default_artwork="@drawable/ic_audio_thumbnail"
         app:player_layout_id="@layout/audio_player_view"
         app:surface_type="none" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 </FrameLayout>
