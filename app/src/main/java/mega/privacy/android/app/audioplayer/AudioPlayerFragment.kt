@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
@@ -60,6 +61,14 @@ class AudioPlayerFragment : Fragment() {
         }
     }
     private val playerListener = object : Player.EventListener {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            if (isResumed && mediaItem != null
+                && reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
+            ) {
+                displayMetadata(Metadata(null, null, mediaItem.mediaId))
+            }
+        }
+
         override fun onPlaybackStateChanged(state: Int) {
             if (isResumed) {
                 binding.loading.isVisible = state == Player.STATE_BUFFERING
@@ -233,8 +242,11 @@ class AudioPlayerFragment : Fragment() {
             }
         } else {
             setTrackNameBottomMargin(trackName, false)
+            val needAnimate = trackName.text != metadata.nodeName
             trackName.text = metadata.nodeName
-            animateTrackAndArtist(trackName, true)
+            if (needAnimate) {
+                animateTrackAndArtist(trackName, true)
+            }
 
             artistName.isVisible = false
         }
@@ -262,6 +274,7 @@ class AudioPlayerFragment : Fragment() {
         textView.alpha = if (showing) 0F else 1F
 
         val animator = textView.animate()
+        animator.cancel()
 
         if (listener != null) {
             animator.setListener(object : SimpleAnimatorListener() {

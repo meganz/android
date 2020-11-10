@@ -82,6 +82,13 @@ class AudioPlayerViewModel(
 
         val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
 
+        if (samePlaylist && firstPlayHandle == playingHandle) {
+            // if we are already playing this music, then the metadata is already
+            // in LiveData (_metadata of AudioPlayerService), we don't need (and can't)
+            // emit node name.
+            displayNodeNameFirst = false
+        }
+
         val mediaItem = MediaItem.Builder()
             .setUri(uri)
             .setMediaId(firstPlayNodeName)
