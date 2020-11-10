@@ -44,8 +44,6 @@ class AudioPlayerFragment : Fragment() {
     private lateinit var playerServiceIntent: Intent
     private var playerService: AudioPlayerService? = null
 
-    private var bgPlayEnabled = true
-
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
         }
@@ -297,18 +295,32 @@ class AudioPlayerFragment : Fragment() {
 
     private fun listenBgPlaySetting() {
         val bgPlay = binding.root.findViewById<ImageButton>(R.id.background_play_toggle)
-        updateBgPlay(bgPlay)
+        val bgPlayHint = binding.root.findViewById<TextView>(R.id.background_play_hint)
+
+        val enabled = playerService?.backgroundPlayEnabled() ?: return
+        updateBgPlay(bgPlay, bgPlayHint, enabled)
+
         bgPlay.setOnClickListener {
-            bgPlayEnabled = !bgPlayEnabled
-            updateBgPlay(bgPlay)
+            val service = playerService ?: return@setOnClickListener
+
+            service.toggleBackgroundPlay()
+            updateBgPlay(bgPlay, bgPlayHint, service.backgroundPlayEnabled())
         }
     }
 
-    private fun updateBgPlay(bgPlay: ImageButton) {
+    private fun updateBgPlay(bgPlay: ImageButton, bgPlayHint: TextView, enabled: Boolean) {
         bgPlay.setImageResource(
-            if (bgPlayEnabled) R.drawable.player_play_bg_on else R.drawable.player_play_bg_off
+            if (enabled) R.drawable.player_play_bg_on else R.drawable.player_play_bg_off
         )
-        playerService?.toggleBackgroundPlay(bgPlayEnabled)
+
+        bgPlayHint.setText(
+            if (enabled) R.string.background_play_hint else R.string.not_background_play_hint
+        )
+        bgPlayHint.alpha = 1F
+
+        bgPlayHint.animate()
+            .setDuration(AUDIO_PLAYER_BACKGROUND_PLAY_HINT_FADE_OUT_DURATION_MS)
+            .alpha(0F)
     }
 
     private fun listenPlaylistButton() {

@@ -9,6 +9,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -33,6 +34,12 @@ class AudioPlayerViewModel(
     private val compositeDisposable = CompositeDisposable()
 
     private val downloadLocationDefaultPath = getDownloadLocation()
+
+    private val preferences = context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
+
+    private var backgroundPlayEnabled = preferences.getBoolean(KEY_BACKGROUND_PLAY_ENABLED, true)
+    private var shuffleEnabled = preferences.getBoolean(KEY_SHUFFLE_ENABLED, false)
+    private var repeatMode = preferences.getInt(KEY_REPEAT_MODE, Player.REPEAT_MODE_OFF)
 
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
@@ -219,7 +226,54 @@ class AudioPlayerViewModel(
             .build()
     }
 
+    fun backgroundPlayEnabled(): Boolean {
+        return backgroundPlayEnabled
+    }
+
+    fun toggleBackgroundPlay() {
+        backgroundPlayEnabled = !backgroundPlayEnabled
+        preferences.edit()
+            .putBoolean(KEY_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
+            .apply()
+    }
+
+    fun shuffleEnabled(): Boolean {
+        return shuffleEnabled
+    }
+
+    fun setShuffleEnabled(enabled: Boolean) {
+        shuffleEnabled = enabled
+        preferences.edit()
+            .putBoolean(KEY_SHUFFLE_ENABLED, shuffleEnabled)
+            .apply()
+    }
+
+    fun repeatMode(): Int {
+        return repeatMode
+    }
+
+    fun setRepeatMode(repeatMode: Int) {
+        this.repeatMode = repeatMode
+        preferences.edit()
+            .putInt(KEY_REPEAT_MODE, repeatMode)
+            .apply()
+    }
+
     fun clear() {
         compositeDisposable.dispose()
+    }
+
+    companion object {
+        private const val SETTINGS_FILE = "audio_player_settings"
+        private const val KEY_BACKGROUND_PLAY_ENABLED = "background_play_enabled"
+        private const val KEY_SHUFFLE_ENABLED = "shuffle_enabled"
+        private const val KEY_REPEAT_MODE = "repeat_mode"
+
+        fun clearSettings(context: Context) {
+            context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply()
+        }
     }
 }

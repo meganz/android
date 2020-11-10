@@ -43,7 +43,6 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     private val _metadata = MutableLiveData<Metadata>()
     val metadata: LiveData<Metadata> = _metadata
 
-    private var backgroundPlayEnabled = true
     private var needPlayWhenGoForeground = false
 
     override fun onCreate() {
@@ -66,6 +65,19 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
         exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist ->
             _metadata.value = Metadata(title, artist, exoPlayer.currentMediaItem?.mediaId ?: "")
+        })
+
+        exoPlayer.shuffleModeEnabled = viewModel.shuffleEnabled()
+        exoPlayer.repeatMode = viewModel.repeatMode()
+
+        exoPlayer.addListener(object : Player.EventListener {
+            override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
+                viewModel.setShuffleEnabled(shuffleModeEnabled)
+            }
+
+            override fun onRepeatModeChanged(repeatMode: Int) {
+                viewModel.setRepeatMode(repeatMode)
+            }
         })
     }
 
@@ -195,15 +207,15 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
-        if (!backgroundPlayEnabled && playing()) {
+        if (!viewModel.backgroundPlayEnabled() && playing()) {
             exoPlayer.playWhenReady = false
             needPlayWhenGoForeground = true
         }
     }
 
-    fun toggleBackgroundPlay(enabled: Boolean) {
-        backgroundPlayEnabled = enabled
-    }
+    fun backgroundPlayEnabled() = viewModel.backgroundPlayEnabled()
+
+    fun toggleBackgroundPlay() = viewModel.toggleBackgroundPlay()
 
     private fun playing() =
         exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED

@@ -173,12 +173,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="29dp"
         android:fontFamily="sans-serif-medium"
-        android:text="@string/background_play_hint"
         android:textColor="@color/teal_300"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/background_play_hint" />
 
     <ImageButton
         android:id="@+id/playlist"

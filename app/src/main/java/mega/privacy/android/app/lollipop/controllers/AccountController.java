@@ -33,6 +33,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.audioplayer.AudioPlayerViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -442,6 +443,7 @@ public class AccountController {
         clearCUBackUp();
 
         new LastShowSMSDialogTimeChecker(context).reset();
+        AudioPlayerViewModel.Companion.clearSettings(context);
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();
