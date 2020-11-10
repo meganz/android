@@ -90,7 +90,7 @@ public class CallService extends Service{
                         break;
                     case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
                     case MegaChatCall.CALL_STATUS_DESTROYED:
-                        removeNotification();
+                        removeNotification(chatIdReceived);
                         break;
                 }
             }
@@ -302,18 +302,10 @@ public class CallService extends Service{
         showCallInProgressNotification();
     }
 
-    private void removeNotification() {
+    private void removeNotification(long chatId) {
         ArrayList<Long> listCalls = getCallsParticipating();
-        if(listCalls == null || listCalls.size() == 0){
-            MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-            if (listCallsRingIn == null || listCallsRingIn.size() == 0) {
-                stopForeground(true);
-                mNotificationManager.cancel(getCurrentCallNotifId());
-                stopSelf();
-                return;
-            }
-
-            updateCall(listCallsRingIn.get(listCallsRingIn.size() - 1));
+        if (listCalls == null || listCalls.size() == 0) {
+            stopNotification(chatId);
             return;
         }
 
@@ -323,8 +315,18 @@ public class CallService extends Service{
                 return;
             }
         }
+
+        stopNotification(currentChatId);
+    }
+
+    /**
+     * Method for cancelling a notification that is being displayed.
+     *
+     * @param chatId That chat ID of a call.
+     */
+    private void stopNotification(long chatId) {
         stopForeground(true);
-        mNotificationManager.cancel(getCurrentCallNotifId());
+        mNotificationManager.cancel(getCallNotifId(chatId));
         stopSelf();
     }
 
@@ -387,6 +389,16 @@ public class CallService extends Service{
 
     private int getCurrentCallNotifId(){
         return (MegaApiJava.userHandleToBase64(currentChatId)).hashCode();
+    }
+
+    /**
+     * Method to get the notification id of a particular call
+     *
+     * @param chatId That chat ID of the call.
+     * @return The id of the notification.
+     */
+    private int getCallNotifId(long chatId) {
+        return (MegaApiJava.userHandleToBase64(chatId)).hashCode();
     }
 
     @Override
