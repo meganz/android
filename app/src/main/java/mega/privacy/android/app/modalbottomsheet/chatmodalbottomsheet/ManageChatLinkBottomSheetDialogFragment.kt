@@ -13,6 +13,8 @@ import mega.privacy.android.app.databinding.BottomSheetManageChatLinkBinding
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
+import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
+import mega.privacy.android.app.utils.Constants.PLAIN_TEXT_SHARE_TYPE
 
 class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment() {
 
@@ -49,9 +51,9 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
         mainLinearLayout = binding.manageChatLinkBottomSheet
         items_layout = binding.itemsLayout
 
-        binding.copyManageChatLinkLayout.setOnClickListener {
+        binding.copyManageChatLinkOption.setOnClickListener {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Copied Text", chatLink)
+            val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink)
             clipboard.setPrimaryClip(clip)
 
             if (activity is GroupChatInfoActivityLollipop) {
@@ -61,17 +63,17 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
             setStateBottomSheetBehaviorHidden()
         }
 
-        binding.shareManageChatLinkLayout.setOnClickListener {
+        binding.shareManageChatLinkOption.setOnClickListener {
             val sharingIntent = Intent(Intent.ACTION_SEND)
-            sharingIntent.type = "text/plain"
+            sharingIntent.type = PLAIN_TEXT_SHARE_TYPE
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink)
             startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)))
 
             setStateBottomSheetBehaviorHidden()
         }
 
-        if (!isModerator) binding.deleteManageChatLinkLayout.visibility = View.GONE
-        else binding.deleteManageChatLinkLayout.setOnClickListener {
+        if (!isModerator) binding.deleteManageChatLinkOption.visibility = View.GONE
+        else binding.deleteManageChatLinkOption.setOnClickListener {
             showConfirmationRemoveChatLink(
                 activity
             )

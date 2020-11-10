@@ -150,10 +150,10 @@ public class ChatUtil {
         Button copyButton = v.findViewById(R.id.copy_button);
         copyButton.setOnClickListener(v12 -> {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
+            android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
             clipboard.setPrimaryClip(clip);
             if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
+                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
 
             }
             dismissShareChatLinkDialog(context, shareLinkDialog);
@@ -162,7 +162,7 @@ public class ChatUtil {
         Button shareButton = v.findViewById(R.id.share_button);
         shareButton.setOnClickListener(v13 -> {
             Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-            sharingIntent.setType("text/plain");
+            sharingIntent.setType(PLAIN_TEXT_SHARE_TYPE);
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
             context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
             dismissShareChatLinkDialog(context, shareLinkDialog);
