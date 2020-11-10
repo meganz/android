@@ -34,8 +34,8 @@ class AudioPlayerViewModel(
 
     private val downloadLocationDefaultPath = getDownloadLocation()
 
-    private val _playerSource = MutableLiveData<Pair<List<MediaItem>, Int>>()
-    val playerSource: LiveData<Pair<List<MediaItem>, Int>> = _playerSource
+    private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
+    val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
 
     fun buildPlayerSource(intent: Intent) {
         val type = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
@@ -45,11 +45,13 @@ class AudioPlayerViewModel(
             return
         }
 
+        var displayNodeNameFirst = true
         var playingNodeName = ""
         when (type) {
             OFFLINE_ADAPTER -> {
                 val path = intent.getStringExtra(INTENT_EXTRA_KEY_PATH) ?: return
                 playingNodeName = File(path).name
+                displayNodeNameFirst = false
             }
             AUDIO_SEARCH_ADAPTER, AUDIO_BROWSE_ADAPTER -> {
                 val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
@@ -62,7 +64,7 @@ class AudioPlayerViewModel(
             .setUri(uri)
             .setMediaId(playingNodeName)
             .build()
-        _playerSource.value = Pair(listOf(mediaItem), INVALID_VALUE)
+        _playerSource.value = Triple(listOf(mediaItem), INVALID_VALUE, displayNodeNameFirst)
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             compositeDisposable.add(Completable
@@ -198,7 +200,7 @@ class AudioPlayerViewModel(
         }
 
         if (mediaItems.isNotEmpty()) {
-            _playerSource.postValue(Pair(mediaItems, firstPlayIndex))
+            _playerSource.postValue(Triple(mediaItems, firstPlayIndex, false))
         }
     }
 

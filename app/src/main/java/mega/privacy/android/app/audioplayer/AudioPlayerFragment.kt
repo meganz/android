@@ -1,5 +1,6 @@
 package mega.privacy.android.app.audioplayer
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
@@ -19,21 +20,26 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import com.google.android.exoplayer2.util.Util
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
-import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
-import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.SimpleAnimatorListener
 import mega.privacy.android.app.utils.autoCleared
 
 @AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
     private var binding by autoCleared<FragmentAudioPlayerBinding>()
+
+    private lateinit var artworkContainer: CardView
+    private lateinit var trackName: TextView
+    private lateinit var artistName: TextView
 
     private lateinit var playerServiceIntent: Intent
     private var playerService: AudioPlayerService? = null
@@ -55,6 +61,13 @@ class AudioPlayerFragment : Fragment() {
             }
         }
     }
+    private val playerListener = object : Player.EventListener {
+        override fun onPlaybackStateChanged(state: Int) {
+            if (isResumed) {
+                binding.loading.isVisible = state == Player.STATE_BUFFERING
+            }
+        }
+    }
 
     private var toolbarVisible = true
 
@@ -69,6 +82,10 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        artworkContainer = binding.root.findViewById(R.id.artwork_container)
+        trackName = binding.root.findViewById(R.id.track_name)
+        artistName = binding.root.findViewById(R.id.artist_name)
 
         binding.toolbar.navigationIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
@@ -141,6 +158,7 @@ class AudioPlayerFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
+        playerService?.exoPlayer?.removeListener(playerListener)
         playerService?.mainPlayerUIClosed()
         playerService = null
         requireContext().unbindService(connection)
@@ -179,12 +197,14 @@ class AudioPlayerFragment : Fragment() {
             true
         }
 
+        binding.loading.isVisible = player.playbackState == Player.STATE_BUFFERING
+        player.addListener(playerListener)
+
         post {
             val artworkWidth = resources.displayMetrics.widthPixels / 3 * 2
             val controllerHeight =
                 resources.getDimensionPixelSize(R.dimen.audio_player_main_controller_height)
 
-            val artworkContainer = binding.root.findViewById<CardView>(R.id.artwork_container)
             val layoutParams = artworkContainer.layoutParams as FrameLayout.LayoutParams
             layoutParams.width = artworkWidth
             layoutParams.height = artworkWidth
@@ -201,20 +221,64 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun displayMetadata(metadata: Metadata) {
-        val trackName = binding.root.findViewById<TextView>(R.id.track_name)
-        val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
         if (metadata.title != null && metadata.artist != null) {
-            setTrackNameBottomMargin(trackName, true)
-            trackName.text = metadata.title
+            if (trackName.text.isEmpty()) {
+                displayTrackAndArtist(trackName, artistName, metadata)
+            } else {
+                animateTrackAndArtist(trackName, false) {
+                    displayTrackAndArtist(trackName, artistName, metadata)
+                }
 
-            artistName.isVisible = true
-            artistName.text = metadata.artist
+                if (artistName.isVisible) {
+                    animateTrackAndArtist(artistName, false)
+                }
+            }
         } else {
             setTrackNameBottomMargin(trackName, false)
             trackName.text = metadata.nodeName
+            animateTrackAndArtist(trackName, true)
 
             artistName.isVisible = false
         }
+    }
+
+    private fun displayTrackAndArtist(
+        trackName: TextView,
+        artistName: TextView,
+        metadata: Metadata
+    ) {
+        setTrackNameBottomMargin(trackName, true)
+        trackName.text = metadata.title
+        animateTrackAndArtist(trackName, true)
+
+        artistName.isVisible = true
+        artistName.text = metadata.artist
+        animateTrackAndArtist(artistName, true)
+    }
+
+    private fun animateTrackAndArtist(
+        textView: TextView,
+        showing: Boolean,
+        listener: (() -> Unit)? = null
+    ) {
+        textView.alpha = if (showing) 0F else 1F
+
+        val animator = textView.animate()
+
+        if (listener != null) {
+            animator.setListener(object : SimpleAnimatorListener() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    animator.setListener(null)
+
+                    listener()
+                }
+            })
+        }
+
+        animator
+            .setDuration(AUDIO_PLAYER_TRACK_NAME_FADE_DURATION_MS)
+            .alpha(if (showing) 1F else 0F)
+            .start()
     }
 
     private fun setTrackNameBottomMargin(trackName: TextView, small: Boolean) {

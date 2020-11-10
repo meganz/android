@@ -20,15 +20,7 @@ class MetadataExtractor(
     ) {
         super.onTracksChanged(trackGroups, trackSelections)
 
-        // TODO: which one?
-        val mappedTrackInfo = trackSelector.currentMappedTrackInfo
-        if (mappedTrackInfo == null) {
-            callback(null, null)
-            return
-        }
-
-//        val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return
-
+        val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return
         for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
             val trackSelection = trackSelections[rendererIndex] ?: continue
             for (selectionIndex in 0 until trackSelection.length()) {

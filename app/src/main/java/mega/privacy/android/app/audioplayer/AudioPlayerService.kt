@@ -148,17 +148,24 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     }
 
     private fun observeLiveData() {
-        viewModel.playerSource.observe(this) {
-            playSource(it.first, it.second)
-        }
+        viewModel.playerSource.observe(this, Observer { playSource(it.first, it.second, it.third) })
     }
 
-    private fun playSource(mediaItems: List<MediaItem>, seekWindow: Int) {
+    private fun playSource(
+        mediaItems: List<MediaItem>,
+        seekWindow: Int,
+        displayNodeNameFirst: Boolean
+    ) {
+        if (displayNodeNameFirst && mediaItems.isNotEmpty()) {
+            _metadata.value = Metadata(null, null, mediaItems.first().mediaId)
+        }
+
         if (seekWindow == INVALID_VALUE) {
             exoPlayer.setMediaItems(mediaItems)
         } else {
             exoPlayer.setMediaItems(mediaItems, seekWindow, exoPlayer.currentPosition)
         }
+
         exoPlayer.playWhenReady = true
         exoPlayer.prepare()
     }
