@@ -1472,6 +1472,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || callChat.getStatus() == MegaChatCall.CALL_STATUS_JOINING || callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
 
+            rejectFAB.hide();
+
             if (!microFAB.isShown()) microFAB.show();
             updateMicroFABStatus();
 
@@ -1481,12 +1483,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (!onHoldFAB.isShown()) onHoldFAB.show();
             updateOnHoldFABStatus();
 
-            if (!videoFAB.isShown()) videoFAB.show();
             updateVideoFABStatus();
 
             if(!hangFAB.isShown()) hangFAB.show();
-
-            rejectFAB.hide();
             answerCallFAB.hide();
 
             relativeVideo.setVisibility(View.VISIBLE);
@@ -1532,6 +1531,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         translateAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                rejectFAB.setEnabled(false);
             }
 
             @Override
@@ -2094,6 +2094,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     showInitialFABConfiguration();
                 } else {
+                    rejectFAB.hide();
                     hangFAB.show();
                 }
                 break;
