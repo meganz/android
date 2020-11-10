@@ -231,7 +231,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
-                    android:drawablePadding="6dp"
+                    android:drawablePadding="8dp"
                     android:gravity="end|center_vertical"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"

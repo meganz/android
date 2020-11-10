@@ -720,12 +720,25 @@ public class MegaNodeUtil {
                 .setNegativeButton(R.string.general_cancel, null).show();
     }
 
+    /**
+     * Gets the tinted circle Drawable for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @param resources     Android resources
+     * @return              Drawable
+     */
     public static Drawable getNodeLabelDrawable(int nodeLabel, Resources resources) {
         Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null);
         drawable.setTint(ResourcesCompat.getColor(resources, getNodeLabelColor(nodeLabel), null));
         return drawable;
     }
 
+    /**
+     * Gets the String resource reference for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @return              String resource reference
+     */
     @StringRes
     public static int getNodeLabelText(int nodeLabel) {
         switch (nodeLabel) {
@@ -746,6 +759,12 @@ public class MegaNodeUtil {
         }
     }
 
+    /**
+     * Gets the Color resource reference for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @return              Color resource reference
+     */
     @ColorRes
     public static int getNodeLabelColor(int nodeLabel) {
         switch (nodeLabel) {
