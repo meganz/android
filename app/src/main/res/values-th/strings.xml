@@ -559,7 +559,7 @@
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     -->
 
-    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">คีย์การถอดรหัสลับ</string>
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">คีย์ถอดรหัสลับ</string>
     <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">กรุณากรอกคีย์ถอดรหัสสำหรับลิงก์นี้</string>
     <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">คีย์ถอดรหัสลับไม่ถูกต้อง</string>
 
@@ -1107,7 +1107,7 @@
         <item context="Plural of items which contains a folder. 2 items" quantity="other">รายการ</item>
     </plurals>
 
-    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">บัญชีผู้ใช้ที่เชื่อมโยงได้ถูกยกเลิกแล้ว เนื่องจากมีการละเมิดเงื่อนไขการให้บริการของเราหลายครั้ง</string>
+    <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">บัญชีผู้ใช้ที่เกี่ยวข้องถูกยกเลิกเนื่องจากการละเมิดเงื่อนไขการให้บริการของเราหลายครั้ง</string>
 
     <string name="general_error_invalid_decryption_key" context="Error message shown after login into a folder link with an invalid decryption key">คีย์ถอดรหัสสำหรับลิงก์โฟลเดอร์ไม่ถูกต้อง</string>
 
@@ -1361,8 +1361,8 @@
     <string name="error_sharing_folder" context="Message shown when the folder sharing process fails">เกิดข้อผิดพลาดในการแชร์โฟลเดอร์ กรุณาลองอีกครั้ง</string>
 
     <plurals name="confirmation_remove_contact">
-        <item context="confirmation message before removing a contact, Singular" quantity="one">ข้อมูลทั้งหมดที่เชื่อมโยงกับผู้ติดต่อที่เลือกจะสูญหายไปอย่างถาวร</item>
-        <item context="confirmation message before removing a contact, Plural" quantity="other">ข้อมูลทั้งหมดที่เชื่อมโยงกับผู้ติดต่อที่เลือกจะสูญหายไปอย่างถาวร</item>
+        <item context="confirmation message before removing a contact, Singular" quantity="one">ข้อมูลทั้งหมดที่เกี่ยวข้องกับผู้ติดต่อที่เลือกไว้จะสูญหายอย่างถาวร</item>
+        <item context="confirmation message before removing a contact, Plural" quantity="other">ข้อมูลทั้งหมดที่เกี่ยวข้องกับรายชื่อที่เลือกไว้จะสูญหายอย่างถาวร</item>
     </plurals>
 
     <plurals name="title_confirmation_remove_contact">
@@ -2490,7 +2490,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">ผู้เข้าร่วม %d คน</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="">%1$s และอื่น ๆ อีก %2$d รายการ</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s และอื่น ๆ อีก %2$d รายการ</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">ก่อนที่คุณจะสามารถสร้างลิงก์สำหรับการแชทนี้คุณต้องตั้งคำอธิบาย:</string>
 
