@@ -3026,7 +3026,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.previewOwnLocation.setImageBitmap(bitmapImage);
             }
 
-
             switch (message.getStatus()) {
                 case MegaChatMessage.STATUS_SERVER_REJECTED:
                 case MegaChatMessage.STATUS_SENDING_MANUAL:

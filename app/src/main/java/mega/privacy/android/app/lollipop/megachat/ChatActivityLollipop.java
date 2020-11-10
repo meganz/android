@@ -6295,7 +6295,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return INVALID_POSITION;
     }
 
-
     /**
      * Modifies a message on UI (messages list and adapter), on bufferMessages list
      * or on bufferSending list, if it has been already loaded.
@@ -8165,6 +8164,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    /**
+     * If the chat id received is valid, opens a chat after forward messages.
+     * If no, only disables select mode and shows a Snackbar if the text received is not null neither empty.
+     *
+     * @param chatHandle Chat id.
+     * @param text       Text to show as Snackbar if needed, null or empty otherwise.
+     */
     public void openChatAfterForward(long chatHandle, String text) {
         removeProgressDialog();
 

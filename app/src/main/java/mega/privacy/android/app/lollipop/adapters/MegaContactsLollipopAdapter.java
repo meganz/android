@@ -930,24 +930,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		notifyItemChanged(position);
 	}
 
-	/*public void startOneToOneChat(MegaUser user){
-		log("startOneToOneChat");
-		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
-		MegaChatPeerList peers = MegaChatPeerList.createInstance();
-		if(chat==null){
-			log("No chat, create it!");
-			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-			megaChatApi.createChat(false, peers, this);
-		}
-		else{
-			log("There is already a chat, open it!");
-			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
-			this.startActivity(intentOpenChat);
-		}
-	}*/
-
 	public ArrayList<MegaContactAdapter> getContacts() {
 		return contacts;
 	}
