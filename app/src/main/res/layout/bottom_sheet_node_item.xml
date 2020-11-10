@@ -170,7 +170,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <ImageView
                     android:id="@+id/option_favourite_image"
@@ -187,10 +189,10 @@
                     android:id="@+id/option_favourite_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/file_properties_favourite"
                     android:layout_marginStart="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_favourite"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -200,7 +202,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <ImageView
                     android:id="@+id/option_label_image"
@@ -217,11 +221,11 @@
                     android:id="@+id/option_label_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/file_properties_label"
                     android:layout_marginStart="18dp"
                     android:layout_weight="5"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_label"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp" />
 
@@ -238,8 +242,7 @@
                     android:textSize="16sp"
                     tools:drawableRight="@drawable/ic_circle_label"
                     tools:text="@string/label_red"
-                    tools:textColor="@color/label_red"
-                    />
+                    tools:textColor="@color/label_red" />
             </LinearLayout>
 
             <LinearLayout
