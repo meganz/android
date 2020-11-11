@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
+import androidx.core.text.HtmlCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -451,7 +452,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		} catch (Exception e) {
 			logWarning("Exception formatting text, ", e);
 		}
-		emptyTextView.setText(getSpannedHtmlText(textToShow));
+		emptyTextView.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		listView = findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this, getOutMetrics()));

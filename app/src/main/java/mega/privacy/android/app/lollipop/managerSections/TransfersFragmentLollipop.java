@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.core.text.HtmlCompat;
+
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -46,7 +48,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment {
 		} catch (Exception e) {
 			logWarning("Exception formatting string", e);
 		}
-		emptyText.setText(getSpannedHtmlText(textToShow));
+		emptyText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		setTransfers();
 
