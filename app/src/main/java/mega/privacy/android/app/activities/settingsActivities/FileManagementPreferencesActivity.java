@@ -17,49 +17,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaAccountDetails;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_SET_VERSION_INFO_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
-import static mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE;
-import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
-import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
-import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
-import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.app.utils.Util.*;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
     private static final int MINIMUM_PERIOD = 6;
     private static final int MAXIMUM_PERIOD = 31;
-
     private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog generalDialog;
-
 
     private final BroadcastReceiver cacheSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -143,7 +123,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            logDebug("Network broadcast received!");
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
@@ -160,11 +139,11 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver updateRBSchedulerReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            logDebug("Network broadcast received!");
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
             long daysCount = intent.getLongExtra(DAYS_COUNT, INVALID_VALUE);
+
             if (daysCount != INVALID_VALUE) {
                 sttFileManagment.updateRBScheduler(daysCount);
             }
@@ -174,7 +153,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver updateFileVersionsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            logDebug("Network broadcast received!");
             if (intent == null || intent.getAction() == null || sttFileManagment == null)
                 return;
 
@@ -193,10 +171,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         registerReceiver(cacheSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));
+
         registerReceiver(offlineSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_OFFLINE_SIZE_SETTING));
+
         registerReceiver(networkReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
         registerReceiver(updateMyAccountReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS));
 
@@ -207,6 +188,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         registerReceiver(setVersionInfoReceiver,
                 new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
+
         registerReceiver(resetVersionInfoReceiver,
                 new IntentFilter(ACTION_RESET_VERSION_INFO_SETTING));
 
@@ -283,7 +265,10 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         Button firstButton = v.findViewById(R.id.dialog_first_button);
         firstButton.setText(getString(R.string.button_plans_almost_full_warning));
-        firstButton.setOnClickListener(v1 -> generalDialog.dismiss());
+        firstButton.setOnClickListener(v1 -> {
+            generalDialog.dismiss();
+            showUpgradeAccount();
+        });
 
         Button secondButton = v.findViewById(R.id.dialog_second_button);
         secondButton.setText(getString(R.string.button_not_now_rich_links));
@@ -291,6 +276,12 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         generalDialog = builder.create();
         generalDialog.show();
+    }
+
+    private void showUpgradeAccount() {
+        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
+        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
+        startActivity(upgradeIntent);
     }
 
     /**
@@ -357,7 +348,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      * Show Rubbish bin scheduler value dialog.
      */
     public void showRbSchedulerValueDialog(final boolean isEnabling) {
-        logDebug("showRbSchedulerValueDialog");
         DisplayMetrics outMetrics = getOutMetrics();
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
