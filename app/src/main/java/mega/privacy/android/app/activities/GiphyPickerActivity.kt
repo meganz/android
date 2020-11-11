@@ -13,6 +13,7 @@ import android.view.View.VISIBLE
 import android.widget.RelativeLayout
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -112,9 +113,9 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
             logWarning("Exception formatting string", e)
         }
 
-        binding.giphyEndList.text = getSpannedHtmlText(endOfList)
+        binding.giphyEndList.text = HtmlCompat.fromHtml(endOfList, HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.giphyEndList.visibility = GONE
-        binding.emptyGiphyText.text = getSpannedHtmlText(emptyTextSearch)
+        binding.emptyGiphyText.text = HtmlCompat.fromHtml(emptyTextSearch, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         giphyService = GiphyService.buildService()
         requestTrendingData(false)

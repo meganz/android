@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import android.text.Html;
@@ -316,7 +318,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								logError("NullPointerException happens when getting the storage string", e);
 							}
 
-							monthSectionPro1.setText(getSpannedHtmlText(textToShow));
+							monthSectionPro1.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat. FROM_HTML_MODE_LEGACY));
 							storageSectionPro1.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 							bandwidthSectionPro1.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
@@ -332,7 +334,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								logError("NullPointerException happens when getting the storage string", e);
 							}
 
-							monthSectionPro2.setText(getSpannedHtmlText(textToShow));
+							monthSectionPro2.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 							storageSectionPro2.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 							bandwidthSectionPro2.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
@@ -348,7 +350,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								logError("NullPointerException happens when getting the storage string", e);
 							}
 
-							monthSectionPro3.setText(getSpannedHtmlText(textToShow));
+							monthSectionPro3.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 							storageSectionPro3.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 							bandwidthSectionPro3.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
@@ -364,7 +366,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								logError("NullPointerException happens when getting the storage string", e);
 							}
 
-							monthSectionLite.setText(getSpannedHtmlText(textToShow));
+							monthSectionLite.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 							storageSectionLite.setText(generateByteString(account.getStorage(), TYPE_STORAGE_LABEL));
 							bandwidthSectionLite.setText(generateByteString(account.getTransfer(), TYPE_TRANSFER_LABEL));
 
@@ -389,9 +391,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 								logError("NullPointerException happens when getting the storage string", e);
 							}
 
-							monthSectionBusiness.setText(getSpannedHtmlText(textToShow));
-							storageSectionBusiness.setText(getSpannedHtmlText(businessStorageSpace));
-							bandwidthSectionBusiness.setText(getSpannedHtmlText(businessTransferQuota));
+							monthSectionBusiness.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
+							storageSectionBusiness.setText(HtmlCompat.fromHtml(businessStorageSpace, HtmlCompat.FROM_HTML_MODE_LEGACY));
+							bandwidthSectionBusiness.setText(HtmlCompat.fromHtml(businessTransferQuota, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 							break;
 						}
@@ -561,7 +563,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
             }
             catch (Exception e){}
 
-            googleWalletText.setText(getSpannedHtmlText(textGoogleWallet));
+            googleWalletText.setText(HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 
 			creditCardLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
@@ -578,7 +580,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 			catch (Exception e){}
 
-			creditCardText.setText(getSpannedHtmlText(textCreditCardText));
+			creditCardText.setText(HtmlCompat.fromHtml(textCreditCardText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			fortumoLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
 			fortumoLayout.setOnClickListener(this);
@@ -595,7 +597,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 			catch (Exception e){}
 
-			fortumoText.setText(getSpannedHtmlText(textFortumoText));
+			fortumoText.setText(HtmlCompat.fromHtml(textFortumoText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			centiliLayout = (RelativeLayout) selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
 			centiliLayout.setOnClickListener(this);
@@ -612,7 +614,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			}
 			catch (Exception e){}
 
-			centiliText.setText(getSpannedHtmlText(textCentiliText));
+			centiliText.setText(HtmlCompat.fromHtml(textCentiliText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			optionsBilling = (LinearLayout) selectPaymentMethodClicked.findViewById(R.id.options);
 
@@ -725,7 +727,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 			logError("NullPointerException happens when getting the storage string", ex);
 		}
 
-		return getSpannedHtmlText(textToShow);
+		return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
 	}
 
 	private String storageOrTransferLabel(int labelType) {
@@ -1209,7 +1211,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					catch (Exception e){}
 
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+					textMyAccount.setText(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					break;
 				}
 
@@ -1221,7 +1223,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					catch (Exception e){}
 
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+					textMyAccount.setText(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					break;
 				}
 
@@ -1233,7 +1235,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					catch (Exception e){}
 
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+					textMyAccount.setText(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					break;
 				}
 
@@ -1245,7 +1247,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					catch (Exception e){}
 
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+					textMyAccount.setText(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					break;
 				}
 
@@ -1257,7 +1259,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 					}
 					catch (Exception e){}
 
-					textMyAccount.setText(getSpannedHtmlText(textToShowB));
+					textMyAccount.setText(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					break;
 				}
 
@@ -1328,7 +1330,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
+						billedMonthly.setText(HtmlCompat.fromHtml(textToShowMonthly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					}
 					if (account.getLevel()==1 && account.getMonths()==12){
 						double price = account.getAmount()/100.00;
@@ -1359,7 +1361,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
+						billedYearly.setText(HtmlCompat.fromHtml(textToShowYearly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					}
 				}
 
@@ -1470,7 +1472,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
+						billedMonthly.setText(HtmlCompat.fromHtml(textToShowMonthly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					}
 					if (account.getLevel()==2 && account.getMonths()==12){
 						double price = account.getAmount()/100.00;
@@ -1500,7 +1502,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
+						billedYearly.setText(HtmlCompat.fromHtml(textToShowYearly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 					}
 				}
@@ -1612,7 +1614,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
+						billedMonthly.setText(HtmlCompat.fromHtml(textToShowMonthly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					}
 					if (account.getLevel()==3 && account.getMonths()==12){
 						double price = account.getAmount()/100.00;
@@ -1643,7 +1645,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
+						billedYearly.setText(HtmlCompat.fromHtml(textToShowYearly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 					}
 				}
@@ -1752,7 +1754,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedMonthly.setText(getSpannedHtmlText(textToShowMonthly));
+						billedMonthly.setText(HtmlCompat.fromHtml(textToShowMonthly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 					}
 					if (account.getLevel()==4 && account.getMonths()==12){
@@ -1785,7 +1787,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						catch (Exception e){}
 
-						billedYearly.setText(getSpannedHtmlText(textToShowYearly));
+						billedYearly.setText(HtmlCompat.fromHtml(textToShowYearly, HtmlCompat.FROM_HTML_MODE_LEGACY));
 					}
 				}
 

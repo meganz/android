@@ -1706,16 +1706,7 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
-		}
-
-		return Html.fromHtml(string);
-	}
-
-	public static void checkTakePicture(Activity activity, int option) {
+    public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {
 			if(option == TAKE_PHOTO_CODE) {
 				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);

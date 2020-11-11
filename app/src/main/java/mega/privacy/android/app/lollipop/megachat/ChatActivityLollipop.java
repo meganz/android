@@ -36,6 +36,7 @@ import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.appcompat.widget.Toolbar;
@@ -1566,7 +1567,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logWarning("Exception formatting string", e);
         }
 
-        emptyScreen(getSpannedHtmlText(textToShowB).toString());
+        emptyScreen(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
 
         if (!isTextEmpty(textSnackbar)) {
             String chatLink = getIntent().getStringExtra(CHAT_LINK_EXTRA);
@@ -5382,7 +5383,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     String userTyping =  getResources().getQuantityString(R.plurals.user_typing, 1, toCDATA(usersTypingSync.get(0).getParticipantTyping().getFirstName()));
                     userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                     userTyping = userTyping.replace("[/A]", "</font>");
-                    userTypingText.setText(getSpannedHtmlText(userTyping));
+                    userTypingText.setText(HtmlCompat.fromHtml(userTyping, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
                     userTypingLayout.setVisibility(View.VISIBLE);
                 }
@@ -5441,7 +5442,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         userTyping = userTyping.replace("[A]", "<font color=\'#8d8d94\'>");
                         userTyping = userTyping.replace("[/A]", "</font>");
 
-                        userTypingText.setText(getSpannedHtmlText(userTyping));
+                        userTypingText.setText(HtmlCompat.fromHtml(userTyping, HtmlCompat.FROM_HTML_MODE_LEGACY));
                         userTypingLayout.setVisibility(View.VISIBLE);
                     }
                 }
