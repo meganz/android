@@ -103,12 +103,12 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
         switch (preference.getKey()) {
             case KEY_OFFLINE:
-                ManageOfflineTask clearOfflineTask = new ManageOfflineTask(context, true);
+                ManageOfflineTask clearOfflineTask = new ManageOfflineTask(true);
                 clearOfflineTask.execute();
                 break;
 
             case KEY_CACHE:
-                ManageCacheTask clearCacheTask = new ManageCacheTask(context, true);
+                ManageCacheTask clearCacheTask = new ManageCacheTask(true);
                 clearCacheTask.execute();
                 break;
 
@@ -232,12 +232,12 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
     }
 
     public void taskGetSizeCache() {
-        ManageCacheTask getCacheSizeTask = new ManageCacheTask(context, false);
+        ManageCacheTask getCacheSizeTask = new ManageCacheTask(false);
         getCacheSizeTask.execute();
     }
 
     public void taskGetSizeOffline() {
-        ManageOfflineTask getOfflineSizeTask = new ManageOfflineTask(context, false);
+        ManageOfflineTask getOfflineSizeTask = new ManageOfflineTask(false);
         getOfflineSizeTask.execute();
     }
 

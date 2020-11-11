@@ -1,13 +1,11 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.Intent;
 
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
-import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -22,14 +20,31 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
+import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.MY_CHAT_FILES;
+import static mega.privacy.android.app.utils.CameraUploadUtil.compareAndUpdateLocalFolderAttribute;
+import static mega.privacy.android.app.utils.CameraUploadUtil.forceUpdateCameraUploadFolderIcon;
+import static mega.privacy.android.app.utils.CameraUploadUtil.initCUFolderFromScratch;
+import static mega.privacy.android.app.utils.Constants.CHAT_FOLDER;
+import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate;
+import static mega.privacy.android.app.utils.ContactUtil.updateDBNickname;
+import static mega.privacy.android.app.utils.ContactUtil.updateFirstName;
+import static mega.privacy.android.app.utils.ContactUtil.updateLastName;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_AVATAR;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_ED25519_PUBLIC_KEY;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
 
 public class GetAttrUserListener extends BaseListener {
 
@@ -150,36 +165,32 @@ public class GetAttrUserListener extends BaseListener {
                 break;
 
             case MegaApiJava.USER_ATTR_RUBBISH_TIME:
-                if (context instanceof FileManagementPreferencesActivity) {
-                    if (e.getErrorCode() == MegaError.API_ENOENT) {
-                        ((FileManagementPreferencesActivity) context).updateRBScheduler(MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE
-                                ? DAYS_USER_FREE
-                                : DAYS_USER_PRO);
-                    } else {
-                        ((FileManagementPreferencesActivity) context).updateRBScheduler(request.getNumber());
-                    }
+                Intent intent = new Intent(ACTION_UPDATE_RB_SCHEDULER);
+                if (e.getErrorCode() == MegaError.API_ENOENT) {
+                    intent.putExtra(DAYS_COUNT, MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE
+                            ? DAYS_USER_FREE
+                            : DAYS_USER_PRO);
+                } else {
+                    intent.putExtra(DAYS_COUNT, request.getNumber());
                 }
+                MegaApplication.getInstance().sendBroadcast(intent);
                 break;
 
             case MegaApiJava.USER_ATTR_DISABLE_VERSIONS:
-                if (context instanceof FileManagementPreferencesActivity) {
-                    MegaApplication.setDisableFileVersions(request.getFlag());
-                    ((FileManagementPreferencesActivity) context).updateEnabledFileVersions();
-                }
+                MegaApplication.setDisableFileVersions(request.getFlag());
+                MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_FILE_VERSIONS));
                 break;
 
             case MegaApiJava.USER_ATTR_RICH_PREVIEWS:
-                if (context instanceof ChatPreferencesActivity) {
-                    if (e.getErrorCode() == MegaError.API_ENOENT) {
-                        logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
-                    }
-                    if (request.getNumDetails() == 1) {
-                        MegaApplication.setShowRichLinkWarning(request.getFlag());
-                        MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
-                    } else if (request.getNumDetails() == 0) {
-                        MegaApplication.setEnabledRichLinks(request.getFlag());
-                        ((ChatPreferencesActivity) context).needUpdateRichLinks();
-                    }
+                if (e.getErrorCode() == MegaError.API_ENOENT) {
+                    logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
+                }
+                if (request.getNumDetails() == 1) {
+                    MegaApplication.setShowRichLinkWarning(request.getFlag());
+                    MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
+                } else if (request.getNumDetails() == 0) {
+                    MegaApplication.setEnabledRichLinks(request.getFlag());
+                    MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
                 }
                 break;
         }

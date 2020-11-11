@@ -31,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -295,6 +296,10 @@ public class BaseActivity extends AppCompatActivity {
                 if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
+
+                    if (baseActivity instanceof ChatPreferencesActivity) {
+                        ((ChatPreferencesActivity) context).needUpdatePresence(false);
+                    }
                 }
             }
         }

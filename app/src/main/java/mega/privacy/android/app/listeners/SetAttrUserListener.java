@@ -6,8 +6,6 @@ import android.content.Intent;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
-import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
@@ -16,16 +14,19 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaStringMap;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING;
-import static mega.privacy.android.app.constants.BroadcastConstants.PRIMARY_HANDLE;
-import static mega.privacy.android.app.constants.BroadcastConstants.SECONDARY_FOLDER;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_ALIAS;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_FIRSTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_LASTNAME;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER;
+import static nz.mega.sdk.MegaApiJava.base64ToHandle;
 
 public class SetAttrUserListener extends BaseListener {
 
@@ -45,16 +46,19 @@ public class SetAttrUserListener extends BaseListener {
                     logWarning("Error setting \"My chat files\" folder as user's attribute");
                 }
                 break;
+
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateFirstName(context, request.getText(), request.getEmail());
                 }
                 break;
+
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateLastName(context, request.getText(), request.getEmail());
                 }
                 break;
+
             case USER_ATTR_ALIAS:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     String nickname = request.getText();
@@ -126,31 +130,29 @@ public class SetAttrUserListener extends BaseListener {
                 break;
 
             case MegaApiJava.USER_ATTR_RUBBISH_TIME:
-                if (context instanceof FileManagementPreferencesActivity) {
-                    if (e.getErrorCode() == MegaError.API_OK) {
-                        ((FileManagementPreferencesActivity) context).updateRBScheduler(request.getNumber());
-                    } else {
-                        Util.showSnackbar(context, context.getString(R.string.error_general_nodes));
-                    }
+                if (e.getErrorCode() == MegaError.API_OK) {
+                    Intent intent = new Intent(ACTION_UPDATE_RB_SCHEDULER);
+                    intent.putExtra(DAYS_COUNT, request.getNumber());
+                    MegaApplication.getInstance().sendBroadcast(intent);
+                } else {
+                    Util.showSnackbar(context, context.getString(R.string.error_general_nodes));
                 }
+
                 break;
 
             case MegaApiJava.USER_ATTR_RICH_PREVIEWS:
-                if (context instanceof ChatPreferencesActivity && e.getErrorCode() != MegaError.API_OK) {
-                    ((ChatPreferencesActivity) context).needUpdateRichLinks();
+                if (e.getErrorCode() != MegaError.API_OK) {
+                    MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
                 }
                 break;
 
             case MegaApiJava.USER_ATTR_DISABLE_VERSIONS:
-                if (context instanceof FileManagementPreferencesActivity) {
-                    MegaApplication.setDisableFileVersions(Boolean.parseBoolean(request.getText()));
-
-                    if (e.getErrorCode() != MegaError.API_OK) {
-                        logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-                        ((FileManagementPreferencesActivity) context).updateEnabledFileVersions();
-                    } else {
-                        logDebug("File versioning attribute changed correctly");
-                    }
+                MegaApplication.setDisableFileVersions(Boolean.parseBoolean(request.getText()));
+                if (e.getErrorCode() != MegaError.API_OK) {
+                    logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
+                    MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_UPDATE_FILE_VERSIONS));
+                } else {
+                    logDebug("File versioning attribute changed correctly");
                 }
                 break;
         }

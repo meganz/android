@@ -31,6 +31,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
 
+
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -196,15 +197,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     public void needUpdatePresence(boolean cancelled) {
         if (sttChat != null) {
             sttChat.updatePresenceConfigChat(cancelled);
-        }
-    }
-
-    /**
-     * Method required to update Rich links config.
-     */
-    public void needUpdateRichLinks() {
-        if (sttChat != null) {
-            sttChat.updateEnabledRichLinks();
         }
     }
 

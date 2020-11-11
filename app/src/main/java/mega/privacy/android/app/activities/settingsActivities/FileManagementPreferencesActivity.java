@@ -28,10 +28,27 @@ import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaAccountDetails;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_RESET_VERSION_INFO_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_SET_VERSION_INFO_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CACHE_SIZE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FILE_VERSIONS;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_OFFLINE_SIZE_SETTING;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER;
+import static mega.privacy.android.app.constants.BroadcastConstants.CACHE_SIZE;
+import static mega.privacy.android.app.constants.BroadcastConstants.DAYS_COUNT;
+import static mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_SIZE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SETTINGS_UPDATED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
+import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
+import static mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
@@ -140,6 +157,31 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
+    private final BroadcastReceiver updateRBSchedulerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            logDebug("Network broadcast received!");
+            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+                return;
+
+            long daysCount = intent.getLongExtra(DAYS_COUNT, INVALID_VALUE);
+            if (daysCount != INVALID_VALUE) {
+                sttFileManagment.updateRBScheduler(daysCount);
+            }
+        }
+    };
+
+    private final BroadcastReceiver updateFileVersionsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            logDebug("Network broadcast received!");
+            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+                return;
+
+            sttFileManagment.updateEnabledFileVersions();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,6 +190,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         sttFileManagment = new SettingsFileManagementFragment();
         replaceFragment(sttFileManagment);
+
         registerReceiver(cacheSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));
         registerReceiver(offlineSizeUpdateReceiver,
@@ -166,6 +209,12 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
                 new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
         registerReceiver(resetVersionInfoReceiver,
                 new IntentFilter(ACTION_RESET_VERSION_INFO_SETTING));
+
+        registerReceiver(updateRBSchedulerReceiver,
+                new IntentFilter(ACTION_UPDATE_RB_SCHEDULER));
+
+        registerReceiver(updateFileVersionsReceiver,
+                new IntentFilter(ACTION_UPDATE_FILE_VERSIONS));
     }
 
     @Override
@@ -178,6 +227,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(updateCUSettingsReceiver);
         unregisterReceiver(setVersionInfoReceiver);
         unregisterReceiver(resetVersionInfoReceiver);
+        unregisterReceiver(updateRBSchedulerReceiver);
+        unregisterReceiver(updateFileVersionsReceiver);
     }
 
     /**
@@ -303,24 +354,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     }
 
     /**
-     * Method for updating rubbish bin Scheduler.
-     */
-    public void updateRBScheduler(long daysCount) {
-        if (sttFileManagment != null) {
-            sttFileManagment.updateRBScheduler(daysCount);
-        }
-    }
-
-    /**
-     * Method for enable or disable the file versions.
-     */
-    public void updateEnabledFileVersions() {
-        if (sttFileManagment != null) {
-            sttFileManagment.updateEnabledFileVersions();
-        }
-    }
-
-    /**
      * Show Rubbish bin scheduler value dialog.
      */
     public void showRbSchedulerValueDialog(final boolean isEnabling) {
@@ -374,8 +407,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) -> {
-            if (isEnabling) {
-                updateRBScheduler(0);
+            if (isEnabling && sttFileManagment != null) {
+                sttFileManagment.updateRBScheduler(0);
             }
         });
         builder.setView(layout);
