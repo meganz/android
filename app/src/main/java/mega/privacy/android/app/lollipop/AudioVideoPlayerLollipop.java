@@ -832,7 +832,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     /**
-     * update controller layout parameters according to screen orientation.
+     * Update controller layout parameters according to screen orientation.
      */
     private void setControllerLayoutParam() {
         RelativeLayout.LayoutParams paramsName = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
@@ -2567,7 +2567,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     /**
-     * create an AlertDialog.Builder with a "Do not show again" CheckBox.
+     * Create an AlertDialog.Builder with a "Do not show again" CheckBox.
      *
      * @return the first is AlertDialog.Builder, the second is CheckBox
      */
