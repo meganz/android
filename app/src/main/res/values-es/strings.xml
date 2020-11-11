@@ -114,7 +114,7 @@
     <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar todo</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista en miniatura</string>
-    <string name="action_list" context="Menu item to change from grid view to list view">Ver como lista</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">Vista de lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Guardar Clave de recuperación</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar suscripción</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La suscripción ha sido cancelada</string>
@@ -2490,7 +2490,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participantes</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="">%1$s y %2$d más</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s y %2$d más</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
 

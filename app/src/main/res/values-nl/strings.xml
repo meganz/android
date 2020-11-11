@@ -2490,7 +2490,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d deelnemers</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="">%1$s en %2$d meer</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s en %2$d meer</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Voordat u een koppeling kunt genereren voor dit gesprek, moet u een omschrijving instellen:</string>
 

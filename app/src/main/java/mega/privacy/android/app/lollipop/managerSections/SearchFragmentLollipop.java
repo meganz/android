@@ -130,6 +130,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void activateActionMode(){
 		if (!adapter.isMultipleSelect()){
+			hideKeyboard(getActivity());
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
@@ -177,6 +178,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		return null;
 	}
 
+	/**
+	 * Disables select mode by clearing selections and resetting selected items.
+	 */
+	private void closeSelectMode() {
+		clearSelections();
+		hideMultipleSelect();
+		resetSelectedItems();
+	}
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -192,13 +202,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.prepareForDownload(handleList, false);
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_rename:{
-
 					if (documents.size()==1){
 						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
+
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -209,6 +221,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToCopyNodes(handleList);
+					closeSelectMode();
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -219,6 +232,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 					NodeController nC = new NodeController(context);
 					nC.chooseLocationToMoveNodes(handleList);
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -227,8 +241,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 //						NodeController nC = new NodeController(context);
 //						nC.exportLink(documents.get(0));
 						((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-						clearSelections();
-						hideMultipleSelect();
+						closeSelectMode();
 					}
 					break;
 				}
@@ -240,8 +253,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						break;
 					}
 					((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(documents.get(0));
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 
 					break;
 				}
@@ -253,8 +265,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						break;
 					}
 					((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_send_to_chat:{
@@ -266,8 +277,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
 					NodeController nC = new NodeController(context);
 					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -284,8 +294,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_unselect_all:{
-					clearSelections();
-					hideMultipleSelect();
+					closeSelectMode();
 					break;
 				}				
 			}
@@ -297,6 +306,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
             trashIcon = menu.findItem(R.id.cab_menu_trash);
+			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).setTextSubmitted();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
@@ -311,6 +321,8 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
+
+			((ManagerActivityLollipop) getActivity()).requestSearchViewFocus();
 		}
 
 		@Override
@@ -1153,6 +1165,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		}
 
 		logDebug("levels == -1");
+		resetSelectedItems();
 		((ManagerActivityLollipop) context).showFabButton();
 		return 0;
 	}
@@ -1304,5 +1317,18 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
+	}
+
+	/**
+	 * Checks if select mode is enabled.
+	 * If so, clear the focus on SearchView.
+	 */
+	public void checkSelectMode() {
+		if (getActivity() == null || !(getActivity() instanceof ManagerActivityLollipop)
+				|| adapter == null || !adapter.isMultipleSelect()) {
+			return;
+		}
+
+		((ManagerActivityLollipop) getActivity()).clearSearchViewFocus();
 	}
 }

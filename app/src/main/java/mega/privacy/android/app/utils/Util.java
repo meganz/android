@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -38,7 +37,6 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -46,11 +44,9 @@ import androidx.core.content.FileProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -440,10 +436,9 @@ public class Util {
 	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 	
@@ -1707,16 +1702,7 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
-		}
-
-		return Html.fromHtml(string);
-	}
-
-	public static void checkTakePicture(Activity activity, int option) {
+    public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {
 			if(option == TAKE_PHOTO_CODE) {
 				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);

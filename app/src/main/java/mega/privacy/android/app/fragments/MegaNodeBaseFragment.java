@@ -9,6 +9,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -787,7 +788,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             logWarning("Exception formatting text", e);
         }
 
-        emptyTextViewFirst.setText(getSpannedHtmlText(text));
+        emptyTextViewFirst.setText(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));
         checkEmptyView();
     }
 

@@ -3,9 +3,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +14,10 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 
 import com.android.billingclient.api.SkuDetails;
 
@@ -34,11 +35,11 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import nz.mega.sdk.MegaApiAndroid;
 
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 
 public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnClickListener{
 
@@ -185,7 +186,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		String textToShowB = getString(R.string.label_custom_plan);
 		textToShowB = textToShowB.replace("[A]", "<font color='" + strColor + "'>");
 		textToShowB = textToShowB.replace("[/A]", "</font>");
-		Spanned resultB = getSpannedHtmlText(textToShowB);
+		Spanned resultB = HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY);
 		labelCustomPlan.setText(resultB);
 		//END -- PRO III ACCOUNT
 
@@ -284,8 +285,8 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						}
 
 						monthSectionBusiness.setText(textToShow);
-						storageSectionBusiness.setText(getSpannedHtmlText(businessStorageSpace));
-						bandwidthSectionBusiness.setText(getSpannedHtmlText(businessTransferQuota));
+						storageSectionBusiness.setText(HtmlCompat.fromHtml(businessStorageSpace, HtmlCompat.FROM_HTML_MODE_LEGACY));
+						bandwidthSectionBusiness.setText(HtmlCompat.fromHtml(businessTransferQuota, HtmlCompat.FROM_HTML_MODE_LEGACY));
 						break;
 				}
 			}
@@ -325,7 +326,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		String color = String.valueOf(ContextCompat.getColor(context,R.color.black));
 		if (monthlyBasePrice) {
 			if (product.getMonths() != 1) {
-				return getSpannedHtmlText("");
+				return HtmlCompat.fromHtml("", HtmlCompat.FROM_HTML_MODE_LEGACY);
 			}
 
 			switch (product.getLevel()) {
@@ -356,7 +357,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			logError("Exception formatting string", e);
 		}
 
-		return getSpannedHtmlText(stringPrice);
+		return HtmlCompat.fromHtml(stringPrice, HtmlCompat.FROM_HTML_MODE_LEGACY);
 	}
 
 	public void showAvailableAccount() {
@@ -444,7 +445,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				logError("Exception formatting string", e);
 			}
 
-            googleWalletText.setText(getSpannedHtmlText(textGoogleWallet));
+            googleWalletText.setText(HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 
 			creditCardLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
@@ -462,7 +463,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				logError("Exception formatting string", e);
 			}
 
-			creditCardText.setText(getSpannedHtmlText(textCreditCardText));
+			creditCardText.setText(HtmlCompat.fromHtml(textCreditCardText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			fortumoLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_fortumo);
 			fortumoLayout.setOnClickListener(this);
@@ -480,7 +481,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				logError("Exception formatting string", e);
 			}
 
-			fortumoText.setText(getSpannedHtmlText(textFortumoText));
+			fortumoText.setText(HtmlCompat.fromHtml(textFortumoText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			centiliLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_centili);
 			centiliLayout.setOnClickListener(this);
@@ -498,7 +499,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				logError("Exception formatting string", e);
 			}
 
-			centiliText.setText(getSpannedHtmlText(textCentiliText));
+			centiliText.setText(HtmlCompat.fromHtml(textCentiliText, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 			optionsBilling = selectPaymentMethodClicked.findViewById(R.id.options);
 
@@ -584,7 +585,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			logError("Exception formatting string", e);
 		}
 
-		return getSpannedHtmlText(textToShow);
+		return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
 	}
 
 	private String storageOrTransferLabel(int labelType) {
@@ -1063,7 +1064,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				logWarning("Exception formatting string", e);
 			}
 
-			textMyAccount.setText(getSpannedHtmlText(textToShow));
+			textMyAccount.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 		}
 	}
 

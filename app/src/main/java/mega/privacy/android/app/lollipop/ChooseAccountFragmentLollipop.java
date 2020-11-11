@@ -3,9 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -13,6 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 
 import java.util.ArrayList;
 
@@ -190,7 +191,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
         }
-        storageSectionFree.setText(getSpannedHtmlText(textToShowFreeStorage + "<sup><small><font color='#ff333a'>1</font></small></sup>"));
+        storageSectionFree.setText(HtmlCompat.fromHtml(textToShowFreeStorage + "<sup><small><font color='#ff333a'>1</font></small></sup>", HtmlCompat.FROM_HTML_MODE_LEGACY));
 
         String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith) + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
         try {
@@ -199,8 +200,8 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
         }
-        bandwidthSectionFree.setText(getSpannedHtmlText(textToShowFreeBandwidth));
-        achievementsSectionFree.setText(getSpannedHtmlText("<sup><small><font color='#ff333a'>1</font></small></sup> " + getString(R.string.footnote_achievements)));
+        bandwidthSectionFree.setText(HtmlCompat.fromHtml(textToShowFreeBandwidth, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        achievementsSectionFree.setText(HtmlCompat.fromHtml("<sup><small><font color='#ff333a'>1</font></small></sup> " + getString(R.string.footnote_achievements), HtmlCompat.FROM_HTML_MODE_LEGACY));
 
         super.setPricingInfo();
     }
