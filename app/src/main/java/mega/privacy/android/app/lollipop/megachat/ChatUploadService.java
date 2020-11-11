@@ -1223,6 +1223,31 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 	}
 
+	/**
+	 * Checks if pendingMessages list is empty.
+	 * If not, do nothing.
+	 * If so, means the service has been restarted after a transfers resumption or some error happened
+	 * and tries to get the PendingMessageSingle related to the current MegaTransfer from DB.
+	 * If the PendingMessageSingle exists, attaches it to the chat conversation.
+	 *
+	 * @param id       Identifier of PendingMessageSingle.
+	 * @param transfer Current MegaTransfer.
+	 * @return True if the list is empty, false otherwise.
+	 */
+	private boolean arePendingMessagesEmpty(int id, MegaTransfer transfer) {
+		if (pendingMessages != null && pendingMessages.size() > 0) {
+			return false;
+		}
+
+		PendingMessageSingle pendingMessage = dbH.findPendingMessageById(id);
+		if (pendingMessage != null) {
+			pendingMessages.add(pendingMessage);
+			attach(pendingMessage, transfer);
+		}
+
+		return true;
+	}
+
 	public void attachNodes(MegaTransfer transfer){
 		logDebug("attachNodes()");
 		//Find the pending message
@@ -1234,6 +1259,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		int id = Integer.parseInt(idFound);
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
+
+		if (arePendingMessagesEmpty(id, transfer)) {
+			return;
+		}
 
 		String fingerprint = megaApi.getFingerprint(transfer.getPath());
 		if (fingerprint != null) {
@@ -1294,6 +1323,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
 
+		if (arePendingMessagesEmpty(id, transfer)) {
+			return;
+		}
+
 		for(int i=0; i<pendingMessages.size();i++) {
 			PendingMessageSingle pendMsg = pendingMessages.get(i);
 			if (pendMsg.getId() == id) {
@@ -1332,6 +1365,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		int id = Integer.parseInt(idFound);
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
+
+		if (pendingMessages == null || pendingMessages.isEmpty()) {
+			PendingMessageSingle pendingMessage = dbH.findPendingMessageById(id);
+			if (pendingMessage != null) {
+				pendingMessages.add(pendingMessage);
+			}
+		}
 	}
 
 	public void attachPdfNode(long nodeHandle){
