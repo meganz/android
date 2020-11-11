@@ -27,7 +27,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class MyStorageFragmentLollipop extends Fragment {
 
