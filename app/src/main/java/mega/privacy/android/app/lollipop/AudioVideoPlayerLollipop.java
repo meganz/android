@@ -831,6 +831,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         setControllerLayoutParam();
     }
 
+    /**
+     * update controller layout parameters according to screen orientation.
+     */
     private void setControllerLayoutParam() {
         RelativeLayout.LayoutParams paramsName = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
         RelativeLayout.LayoutParams paramsControlButtons = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
@@ -2563,6 +2566,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
          downloadConfirmationDialog.show();
     }
 
+    /**
+     * create an AlertDialog.Builder with a "Do not show again" CheckBox.
+     *
+     * @return the first is AlertDialog.Builder, the second is CheckBox
+     */
     private Pair<AlertDialog.Builder, CheckBox> confirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         LinearLayout confirmationLayout = new LinearLayout(this);
