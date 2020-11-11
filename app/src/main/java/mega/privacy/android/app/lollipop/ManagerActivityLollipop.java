@@ -13806,26 +13806,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logError("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
 			}
 		}
-		else if(request.getType() == MegaRequest.TYPE_REMOVE_VERSIONS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_REMOVE_VERSIONS");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.success_delete_versions), -1);
-
-				sendBroadcast(new Intent(ACTION_RESET_VERSION_INFO_SETTING));
-
-				//Get info of the version again (after 10 seconds)
-				final Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						updateAccountStorageInfo();
-					}
-				}, 8000);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_delete_versions), -1);
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION");

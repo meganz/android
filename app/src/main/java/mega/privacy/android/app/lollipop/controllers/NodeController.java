@@ -30,6 +30,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
+import mega.privacy.android.app.listeners.RemoveVersionsListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -1347,7 +1348,7 @@ public class NodeController {
 
     public void clearAllVersions(){
         logDebug("clearAllVersions");
-        megaApi.removeVersions((ManagerActivityLollipop) context);
+        megaApi.removeVersions(new RemoveVersionsListener(context));
     }
 
     public void deleteOffline(MegaOffline selectedNode){
