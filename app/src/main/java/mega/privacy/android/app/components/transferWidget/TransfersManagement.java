@@ -36,7 +36,6 @@ public class TransfersManagement {
     private boolean resumeTransfersWarningHasAlreadyBeenShown;
 
     private ArrayList<String> pausedTransfers = new ArrayList<>();
-    private Map<String, String> targetPaths = new HashMap<>();
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -254,14 +253,6 @@ public class TransfersManagement {
 
     public boolean isTransferOverQuotaBannerShown() {
         return isTransferOverQuotaBannerShown;
-    }
-
-    public void setTargetPaths(Map<String, String> targetPaths) {
-        this.targetPaths = targetPaths;
-    }
-
-    public Map<String, String> getTargetPaths() {
-        return targetPaths;
     }
 
     public void setResumeTransfersWarningHasAlreadyBeenShown(boolean resumeTransfersWarningHasAlreadyBeenShown) {

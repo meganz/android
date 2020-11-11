@@ -69,7 +69,6 @@ public class Constants {
     public static final String EXTRA_NODE_HANDLE = "NODE_HANDLE";
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
-    public static final String EXTRA_VOICE_CLIP = "VOICE_CLIP";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
     public static final String RESULT = "RESULT";
@@ -410,8 +409,15 @@ public class Constants {
 
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
-    public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
-    public static final String CU_UPLOAD = "CU_UPLOAD";
+    //Transfers app data parameters
+    public static final String APP_DATA_VOICE_CLIP = "VOICE_CLIP";
+    public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
+    public static final String APP_DATA_CU = "CU_UPLOAD";
+    public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
+    //Indicates the string after it, is the value of a transfer parameter
+    public static final String APP_DATA_INDICATOR = ">";
+    //Indicates the string after it, is a new transfer parameter
+    public static final String APP_DATA_SEPARATOR = "-";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";

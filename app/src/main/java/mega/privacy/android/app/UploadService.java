@@ -254,12 +254,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
                     for (int i = 0; i < uploadsInProgress; i++) {
                         MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
-                        if (transfer == null) {
-                            continue;
-                        }
-
-                        String data = transfer.getAppData();
-                        if (!isTextEmpty(data) && (data.contains(UPLOAD_APP_DATA_CHAT) || data.contains(CU_UPLOAD))) {
+                        if (transfer == null || isCUOrChatTransfer(transfer)) {
                             continue;
                         }
 
@@ -1195,7 +1190,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private boolean isCUOrChatTransfer(MegaTransfer transfer) {
         String appData = transfer.getAppData();
         return !isTextEmpty(appData)
-                && (appData.contains(CU_UPLOAD)
-                || appData.contains(UPLOAD_APP_DATA_CHAT));
+                && (appData.contains(APP_DATA_CU)
+                || appData.contains(APP_DATA_CHAT));
     }
 }

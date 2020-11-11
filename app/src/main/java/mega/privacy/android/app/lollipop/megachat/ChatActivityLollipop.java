@@ -48,7 +48,6 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -8615,7 +8614,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         pMsgSingle.setChatId(idChat);
         if(isVoiceClip(file.getAbsolutePath())){
             pMsgSingle.setType(TYPE_VOICE_CLIP);
-            intent.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
+            intent.putExtra(EXTRA_TRANSFER_TYPE, APP_DATA_VOICE_CLIP);
         }
 
         long timestamp = System.currentTimeMillis()/1000;
