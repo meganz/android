@@ -40,7 +40,6 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import java.io.File;
 import java.util.Locale;
 
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
@@ -70,6 +69,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
 
 	private static final String TAG_DECRYPT = "decrypt";
+	private static final String AD_SLOT = "and5";
 
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -116,6 +116,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	public static final int FILE_LINK = 1;
 
 	private String mKey;
+
+	private GoogleAdsLoader mAdsLoader;
 
 	@Override
 	public void onDestroy(){
@@ -242,8 +244,13 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
-		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
-				findViewById(R.id.ad_view_container), getOutMetrics());
+		initAdsLoader();
+	}
+
+	private void initAdsLoader() {
+		mAdsLoader = new GoogleAdsLoader(AD_SLOT, false);
+		getLifecycle().addObserver(mAdsLoader);
+		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
 	}
 
 	@Override
@@ -398,6 +405,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					dbH.setLastPublicHandle(document.getHandle());
 					dbH.setLastPublicHandleTimeStamp();
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
+
+					mAdsLoader.queryPublicHandle(document.getHandle());
 				}
 
 //				nameView.setText(document.getName());

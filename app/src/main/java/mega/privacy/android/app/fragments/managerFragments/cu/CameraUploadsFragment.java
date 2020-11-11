@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +45,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
@@ -115,6 +113,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private CuViewModel mViewModel;
     private long mDraggingNodeHandle = INVALID_HANDLE;
+
+    private GoogleAdsLoader mAdsLoader;
+    private static final String AD_SLOT = "and3";
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -369,6 +370,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         mManagerActivity = (ManagerActivityLollipop) context;
+        initAdsLoader();
+    }
+
+    private void initAdsLoader() {
+        mAdsLoader = new GoogleAdsLoader(AD_SLOT, true);
+        getLifecycle().addObserver(mAdsLoader);
     }
 
     @Nullable @Override
@@ -434,13 +441,12 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupOtherViews();
         observeLiveData();
         setDraggingThumbnailCallback();
-        setupGoogledAds();
+        setupGoogleAds();
     }
 
-    private void setupGoogledAds() {
-        GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
-                mBinding.adViewContainer,
-                ((BaseActivity) getActivity()).getOutMetrics());
+    private void setupGoogleAds() {
+        mAdsLoader.setAdViewContainer(mBinding.adViewContainer,
+                mManagerActivity.getOutMetrics());
     }
 
     private void setDraggingThumbnailCallback() {

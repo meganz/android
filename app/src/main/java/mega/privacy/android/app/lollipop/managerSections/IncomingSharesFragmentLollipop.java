@@ -40,6 +40,9 @@ import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
+	private GoogleAdsLoader mAdsLoader;
+	private static final String AD_SLOT = "and4";
+
 	@Override
 	public void activateActionMode() {
 		if (!adapter.isMultipleSelect()) {
@@ -104,11 +107,14 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	@Override
-	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
-				view.findViewById(R.id.ad_view_container),
-				((BaseActivity) getActivity()).getOutMetrics());
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		initAdsLoader();
+	}
+
+	private void initAdsLoader() {
+		mAdsLoader = new GoogleAdsLoader(AD_SLOT, true);
+		getLifecycle().addObserver(mAdsLoader);
 	}
 
 	@Override
@@ -160,6 +166,9 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		recyclerView.setAdapter(adapter);
 		visibilityFastScroller();
 		setEmptyView();
+
+		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
+				managerActivity.getOutMetrics());
 
 		logDebug("Deep browser tree: " + managerActivity.deepBrowserTreeIncoming);
 

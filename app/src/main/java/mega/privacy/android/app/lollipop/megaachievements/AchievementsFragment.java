@@ -135,6 +135,20 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 	private AchievementsActivity mActivity;
 
+	private GoogleAdsLoader mAdsLoader;
+	private static final String AD_SLOT = "and2";
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		initAdsLoader();
+	}
+
+	private void initAdsLoader() {
+		mAdsLoader = new GoogleAdsLoader(AD_SLOT, true);
+		getLifecycle().addObserver(mAdsLoader);
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
@@ -312,6 +326,9 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 		figureUnlockedRewardTransfer.setText("...");
 
+		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
+				mActivity.getOutMetrics());
+
 		return v;
 	}
 
@@ -330,10 +347,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		if (sFetcher != null) {
 			sFetcher.setDataCallback(this);
 		}
-
-		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this,
-				getView().findViewById(R.id.ad_view_container),
-				((BaseActivity) getActivity()).getOutMetrics());
 	}
 
 	@Override

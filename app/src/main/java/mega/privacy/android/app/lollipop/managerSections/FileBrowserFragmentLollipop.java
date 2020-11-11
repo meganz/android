@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,9 +36,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.io.BufferedReader;
@@ -49,7 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +132,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	private PublisherAdView adView;
     private RelativeLayout transferOverQuotaBanner;
     private TextView transferOverQuotaBannerText;
+
+    private GoogleAdsLoader mAdsLoader;
+    private static final String AD_SLOT = "and1";
 
 	@Override
 	protected MegaNodeAdapter getAdapter() {
@@ -466,8 +464,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 		}
 
+		initAdsLoader();
+
 		super.onCreate(savedInstanceState);
 		logDebug("After onCreate called super");
+	}
+
+	private void initAdsLoader() {
+		mAdsLoader = new GoogleAdsLoader(AD_SLOT, true);
+		getLifecycle().addObserver(mAdsLoader);
 	}
 
 	public void checkScroll() {
@@ -482,7 +487,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-		Log.i("Alex", "onCreateView");
 		logDebug("onCreateView");
 		if (!isAdded()) {
 			return null;
@@ -634,7 +638,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 		setTransferOverQuotaBannerVisibility();
 
-		GoogleAdsLoader.Companion.bindGoogleAdsLoader(this, v.findViewById(R.id.ad_view_container), ((BaseActivity)getActivity()).getOutMetrics());
+		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
+				((ManagerActivityLollipop) context).getOutMetrics());
 
 		return v;
     }
