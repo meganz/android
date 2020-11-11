@@ -296,10 +296,6 @@ public class BaseActivity extends AppCompatActivity {
                 if(delaySignalPresence && megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()){
                     delaySignalPresence = false;
                     retryConnectionsAndSignalPresence();
-
-                    if (baseActivity instanceof ChatPreferencesActivity) {
-                        ((ChatPreferencesActivity) context).needUpdatePresence(false);
-                    }
                 }
             }
         }

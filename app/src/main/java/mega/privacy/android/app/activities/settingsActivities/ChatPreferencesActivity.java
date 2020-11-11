@@ -18,19 +18,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatFragment;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE;
-import static mega.privacy.android.app.utils.Constants.GO_OFFLINE;
-import static mega.privacy.android.app.utils.Constants.GO_ONLINE;
-import static mega.privacy.android.app.utils.Constants.INVALID_OPTION;
-import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
-import static mega.privacy.android.app.utils.Constants.MAX_AUTOAWAY_TIMEOUT;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
 public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
     private SettingsChatFragment sttChat;
     private AlertDialog newFolderDialog;
-
 
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
@@ -86,6 +81,18 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
+    private final BroadcastReceiver signalPresenceReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || sttChat == null)
+                return;
+
+            if (megaChatApi != null && megaChatApi.getPresenceConfig() != null && !megaChatApi.getPresenceConfig().isPending()) {
+                sttChat.updatePresenceConfigChat(false);
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,12 +103,19 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
         registerReceiver(networkReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
+
         registerReceiver(richLinksUpdateReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
+
         registerReceiver(statusUpdateReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
+
+
         registerReceiver(chatRoomMuteUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+
+        registerReceiver(signalPresenceReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE));
     }
 
     /**
@@ -220,5 +234,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(richLinksUpdateReceiver);
         unregisterReceiver(statusUpdateReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(signalPresenceReceiver);
     }
 }
