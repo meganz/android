@@ -504,14 +504,18 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		nodes.addAll(fileNodes);
 	}
 
-    private void checkWritePermissions() {
-        MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-        int accessLevel = megaApi.getAccess(parentNode);
+	private void checkWritePermissions() {
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-        hasWritePermissions = accessLevel != MegaShare.ACCESS_READ && accessLevel != MegaShare.ACCESS_UNKNOWN;
+		if (parentNode == null) {
+			hasWritePermissions = false;
+		} else {
+			int accessLevel = megaApi.getAccess(parentNode);
+			hasWritePermissions = accessLevel >= MegaShare.ACCESS_READWRITE;
+		}
 
-        activateButton(hasWritePermissions);
-    }
+		activateButton(hasWritePermissions);
+	}
 
 	@Override
     public void onAttach(Activity activity) {
