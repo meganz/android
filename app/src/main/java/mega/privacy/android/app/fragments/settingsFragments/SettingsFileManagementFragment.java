@@ -12,7 +12,8 @@ import androidx.preference.SwitchPreferenceCompat;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
-import mega.privacy.android.app.listeners.SettingsListener;
+import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.tasks.ManageCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
@@ -64,7 +65,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         autoPlaySwitch.setChecked(prefs.isAutoPlayEnabled());
 
         if (megaApi.serverSideRubbishBinAutopurgeEnabled()) {
-            megaApi.getRubbishBinAutopurgePeriod(new SettingsListener(context));
+            megaApi.getRubbishBinAutopurgePeriod(new GetAttrUserListener(context));
             getPreferenceScreen().addPreference(enableRbSchedulerSwitch);
             getPreferenceScreen().addPreference(daysRbSchedulerPreference);
             daysRbSchedulerPreference.setOnPreferenceClickListener(this);
@@ -94,7 +95,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         taskGetSizeCache();
         taskGetSizeOffline();
 
-        megaApi.getFileVersionsOption(new SettingsListener(context));
+        megaApi.getFileVersionsOption(new GetAttrUserListener(context));
     }
 
     @Override
@@ -148,7 +149,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
                 if (isOffline(context))
                     return false;
 
-                megaApi.setFileVersionsOption(!enableVersionsSwitch.isChecked(), new SettingsListener(context));
+                megaApi.setFileVersionsOption(!enableVersionsSwitch.isChecked(), new SetAttrUserListener(context));
                 break;
 
             case KEY_CLEAR_VERSIONS:

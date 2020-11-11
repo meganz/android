@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
+import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.SettingsListener;
@@ -1343,11 +1344,7 @@ public class NodeController {
 
     public void cleanRubbishBin(){
         logDebug("cleanRubbishBin");
-        if(context instanceof FileManagementPreferencesActivity){
-            megaApi.cleanRubbishBin(new SettingsListener(context));
-        }else{
-            megaApi.cleanRubbishBin((ManagerActivityLollipop) context);
-        }
+        megaApi.cleanRubbishBin(new CleanRubbishBinListener(context));
     }
 
     public void clearAllVersions(){

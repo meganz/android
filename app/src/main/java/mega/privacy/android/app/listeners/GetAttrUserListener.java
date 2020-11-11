@@ -6,12 +6,15 @@ import android.graphics.Bitmap;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
+import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.JobUtil;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -29,6 +32,10 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class GetAttrUserListener extends BaseListener {
+
+    private static final int DAYS_USER_FREE = 30;
+    private static final int DAYS_USER_PRO = 90;
+
     /**
      * Indicates if the request is only to update the DB.
      * If so, the rest of the actions in onRequestFinish() can be ignored.
@@ -139,6 +146,40 @@ public class GetAttrUserListener extends BaseListener {
             case USER_ATTR_AVATAR:
                 if (e.getErrorCode() == MegaError.API_OK) {
                     updateAvatar(request);
+                }
+                break;
+
+            case MegaApiJava.USER_ATTR_RUBBISH_TIME:
+                if (context instanceof FileManagementPreferencesActivity) {
+                    if (e.getErrorCode() == MegaError.API_ENOENT) {
+                        ((FileManagementPreferencesActivity) context).updateRBScheduler(MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE
+                                ? DAYS_USER_FREE
+                                : DAYS_USER_PRO);
+                    } else {
+                        ((FileManagementPreferencesActivity) context).updateRBScheduler(request.getNumber());
+                    }
+                }
+                break;
+
+            case MegaApiJava.USER_ATTR_DISABLE_VERSIONS:
+                if (context instanceof FileManagementPreferencesActivity) {
+                    MegaApplication.setDisableFileVersions(request.getFlag());
+                    ((FileManagementPreferencesActivity) context).updateEnabledFileVersions();
+                }
+                break;
+
+            case MegaApiJava.USER_ATTR_RICH_PREVIEWS:
+                if (context instanceof ChatPreferencesActivity) {
+                    if (e.getErrorCode() == MegaError.API_ENOENT) {
+                        logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
+                    }
+                    if (request.getNumDetails() == 1) {
+                        MegaApplication.setShowRichLinkWarning(request.getFlag());
+                        MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
+                    } else if (request.getNumDetails() == 0) {
+                        MegaApplication.setEnabledRichLinks(request.getFlag());
+                        ((ChatPreferencesActivity) context).needUpdateRichLinks();
+                    }
                 }
                 break;
         }

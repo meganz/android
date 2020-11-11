@@ -16,7 +16,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.components.TwoLineCheckPreference;
-import mega.privacy.android.app.listeners.SettingsListener;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaPushNotificationSettings;
@@ -150,7 +150,7 @@ public class SettingsChatFragment extends SettingsBaseFragment {
                 break;
 
             case KEY_CHAT_RICH_LINK:
-                megaApi.enableRichPreviews(richLinksSwitch.isChecked(), new SettingsListener(((ChatPreferencesActivity) context)));
+                megaApi.enableRichPreviews(richLinksSwitch.isChecked(), new SetAttrUserListener(context));
                 break;
         }
 

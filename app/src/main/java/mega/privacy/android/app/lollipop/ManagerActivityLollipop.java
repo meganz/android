@@ -13806,16 +13806,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logError("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
-				resetAccountDetailsTimeStamp();
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
-			}
-		}
 		else if(request.getType() == MegaRequest.TYPE_REMOVE_VERSIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("OK MegaRequest.TYPE_REMOVE_VERSIONS");

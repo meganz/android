@@ -24,7 +24,7 @@ import androidx.core.content.ContextCompat;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
-import mega.privacy.android.app.listeners.SettingsListener;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaAccountDetails;
 
@@ -35,8 +35,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
-    private static final int MINIMUM_DAY = 6;
-    private static final int MAXIMUM_DAY = 31;
+    private static final int MINIMUM_PERIOD = 6;
+    private static final int MAXIMUM_PERIOD = 31;
 
     private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
@@ -252,7 +252,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         int intValue = Integer.parseInt(value);
 
         if (megaApi != null) {
-            megaApi.setRubbishBinAutopurgePeriod(intValue, new SettingsListener(this));
+            megaApi.setRubbishBinAutopurgePeriod(intValue, new SetAttrUserListener(this));
         }
     }
 
@@ -269,14 +269,10 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         try {
             int daysCount = Integer.parseInt(value);
-            if (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                if (daysCount > MINIMUM_DAY) {
-                    setRBSchedulerValue(value);
-                    newFolderDialog.dismiss();
-                } else {
-                    clearInputText(input);
-                }
-            } else if (daysCount > MINIMUM_DAY && daysCount < MAXIMUM_DAY) {
+            boolean isNotFree = MegaApplication.getInstance().getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE;
+
+            if ((isNotFree && daysCount > MINIMUM_PERIOD)
+                    || (daysCount > MINIMUM_PERIOD && daysCount < MAXIMUM_PERIOD)) {
                 setRBSchedulerValue(value);
                 newFolderDialog.dismiss();
             } else {

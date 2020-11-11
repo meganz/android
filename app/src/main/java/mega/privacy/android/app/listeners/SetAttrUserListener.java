@@ -6,8 +6,11 @@ import android.content.Intent;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
+import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -119,6 +122,35 @@ public class SetAttrUserListener extends BaseListener {
                 } else {
                     logWarning("Set CU attributes failed, error code: " + e.getErrorCode() + ", " + e.getErrorString());
                     JobUtil.stopRunningCameraUploadService(context);
+                }
+                break;
+
+            case MegaApiJava.USER_ATTR_RUBBISH_TIME:
+                if (context instanceof FileManagementPreferencesActivity) {
+                    if (e.getErrorCode() == MegaError.API_OK) {
+                        ((FileManagementPreferencesActivity) context).updateRBScheduler(request.getNumber());
+                    } else {
+                        Util.showSnackbar(context, context.getString(R.string.error_general_nodes));
+                    }
+                }
+                break;
+
+            case MegaApiJava.USER_ATTR_RICH_PREVIEWS:
+                if (context instanceof ChatPreferencesActivity && e.getErrorCode() != MegaError.API_OK) {
+                    ((ChatPreferencesActivity) context).needUpdateRichLinks();
+                }
+                break;
+
+            case MegaApiJava.USER_ATTR_DISABLE_VERSIONS:
+                if (context instanceof FileManagementPreferencesActivity) {
+                    MegaApplication.setDisableFileVersions(Boolean.parseBoolean(request.getText()));
+
+                    if (e.getErrorCode() != MegaError.API_OK) {
+                        logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
+                        ((FileManagementPreferencesActivity) context).updateEnabledFileVersions();
+                    } else {
+                        logDebug("File versioning attribute changed correctly");
+                    }
                 }
                 break;
         }
