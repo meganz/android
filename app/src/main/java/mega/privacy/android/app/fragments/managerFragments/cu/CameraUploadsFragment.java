@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -370,7 +371,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         mManagerActivity = (ManagerActivityLollipop) context;
+        Log.i("Alex", "1");
         initAdsLoader();
+        Log.i("Alex", "2");
     }
 
     private void initAdsLoader() {
@@ -458,7 +461,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     @Override public void onDestroy() {
         super.onDestroy();
-
+        Log.i("Alex", "camera upload ondestroy");
         FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(CameraUploadsFragment.class);
         AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(CameraUploadsFragment.class);
     }

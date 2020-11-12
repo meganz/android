@@ -13,28 +13,46 @@ object AdUnitSource : MegaRequestListenerInterface {
     private var adUnitMap: MegaStringMap? = null
     private val megaApi = MegaApplication.getInstance().megaApi
     private var lastFetchTime: Long = 0
+    private var lastQueryTime: Long = 0
+    private var isAdsUser = true
 
-    private var callbacks = mutableSetOf<Callback>()
+    private var callbacks = mutableSetOf<FetchCallback>()
+    private var queryCallback: QueryCallback? = null
 
-    interface Callback {
+    private val handleQueryCache = mutableMapOf<Long, Int>()
+
+    interface FetchCallback {
         fun adUnitsFetched()
-        fun queryShowAds(result: Int)
     }
 
-    fun addCallback(cb: Callback) {
+    interface QueryCallback {
+        fun queryShowAdsDone(result: Int)
+    }
+
+    fun setQueryCallback(cb: QueryCallback?) {
+        queryCallback = cb
+    }
+
+    fun addCallback(cb: FetchCallback) {
         callbacks.add(cb)
     }
 
-    fun removeCallback(cb: Callback) {
+    fun removeCallback(cb: FetchCallback) {
         callbacks.remove(cb)
     }
+
+    fun isAdsUser(): Boolean {
+        if (needRequery(lastFetchTime)) isAdsUser = true
+        return isAdsUser  // true to trigger the query
+    }
+
     fun getAdUnitBySlot(slotId: String): String {
-        if (System.currentTimeMillis() - lastFetchTime > TimeUtils.DAY) return INVALID_UNIT_ID
+        if (needRequery(lastFetchTime)) return INVALID_UNIT_ID
         return adUnitMap?.get(slotId) ?: INVALID_UNIT_ID
     }
 
     fun fetchAdUnits() {
-        if (fetching)  {
+        if (fetching) {
             Log.i("Alex", "fetching in progress, return")
             return
         }
@@ -57,8 +75,15 @@ object AdUnitSource : MegaRequestListenerInterface {
     fun showAdOrNot(publicHandle: Long) {
         if (publicHandle == INVALID_HANDLE) return
 
-        megaApi.queryGoogleAds(512, publicHandle, this)
+        val cacheResult = handleQueryCache[publicHandle]
+        if (!needRequery(lastQueryTime) && cacheResult != null) {
+            queryCallback?.queryShowAdsDone(cacheResult)
+        } else {
+            megaApi.queryGoogleAds(512, publicHandle, this)
+        }
     }
+
+    private fun needRequery(lastTime: Long) = System.currentTimeMillis() - lastTime > TimeUtils.DAY
 
     override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
         Log.i("Alex", "onRequestStart")
@@ -73,20 +98,22 @@ object AdUnitSource : MegaRequestListenerInterface {
             MegaRequest.TYPE_FETCH_GOOGLE_ADS -> {
                 fetching = false
                 e?.let {
-                    if (e.errorCode == API_OK) {
-                        lastFetchTime = System.currentTimeMillis()
-//                        adUnitMap = request.megaStringMap
-                        adUnitMap = MegaStringMap.createInstance()
-                        adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
+                    lastFetchTime = System.currentTimeMillis()
 
-                        for (cb in callbacks) {
-                            cb.adUnitsFetched()
-                        }
+                    when (e.errorCode) {
+                        API_OK -> {
+                        adUnitMap = request.megaStringMap
+//                            adUnitMap = MegaStringMap.createInstance()
+//                            adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
+//                            adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
+//                            adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
+//                            adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
+//                            adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
+//                            adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
+
+                            for (cb in callbacks) {
+                                cb.adUnitsFetched()
+                            }
 //                        Log.i("Alex", "size=" + a?.size())
 //                        val b = a?.keys
 //                        for (i in 0..7) {
@@ -94,19 +121,28 @@ object AdUnitSource : MegaRequestListenerInterface {
 //                            Log.i("Alex", "key=" + (b?.get(i) ?: -1))
 //                            Log.i("Alex", "unit id=" + a?.get(b?.get(i)))
 //                        }
+                        }
 
+                        API_ENOENT -> {
+                            isAdsUser = false
+                        }
+
+                        else -> {
+
+                        }
                     }
                 }
             }
 
             MegaRequest.TYPE_QUERY_GOOGLE_ADS -> {
+                lastQueryTime = System.currentTimeMillis()
                 e?.let {
                     if (e.errorCode == API_OK) {
-                        for (cb in callbacks) {
-                            Log.i("Alex", "showAdOrNot:${request.numDetails}")
+                        val result = request.numDetails
+                        handleQueryCache[request.nodeHandle] = result
+                        queryCallback?.queryShowAdsDone(result)
+                        Log.i("Alex", "showAdOrNot:${result}")
 //                            cb.queryShowAds(request.numDetails)
-                            cb.queryShowAds(1)
-                        }
                     }
                 }
             }

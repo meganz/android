@@ -1,10 +1,8 @@
 package mega.privacy.android.app
 
-import android.app.Activity
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdSize
@@ -12,7 +10,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.google.android.gms.ads.doubleclick.PublisherAdView
 
 class GoogleAdsLoader(private val slotId: String, private var showImmediate: Boolean = true) :
-    DefaultLifecycleObserver, AdUnitSource.Callback {
+    DefaultLifecycleObserver, AdUnitSource.FetchCallback, AdUnitSource.QueryCallback {
     private lateinit var adViewContainer: ViewGroup
     private lateinit var displayMetrics: DisplayMetrics
     private var initialLayoutComplete = false
@@ -46,18 +44,25 @@ class GoogleAdsLoader(private val slotId: String, private var showImmediate: Boo
 
         // Start loading the ad in the background.
         adView?.loadAd(adRequest)
+        Log.i("Alex", "loadbanner end")
     }
 
     private fun setUpBanner() {
-        if (!showImmediate) return
+        Log.i("Alex", "setupbanner begin")
+        if (!AdUnitSource.isAdsUser() || !showImmediate) return
 
-        unitId = AdUnitSource.getAdUnitBySlot(slotId)
+        val unitId = AdUnitSource.getAdUnitBySlot(slotId)
         if (unitId == AdUnitSource.INVALID_UNIT_ID) {
             AdUnitSource.addCallback(this)
             AdUnitSource.fetchAdUnits()
             return
         }
 
+        if (this.unitId == unitId) return  // The same ad has been shown
+        this.unitId = unitId
+
+        Log.i("Alex", "new PublisherAdView")
+        adViewContainer.removeAllViews()
         adView = PublisherAdView(MegaApplication.getInstance())
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
@@ -76,17 +81,24 @@ class GoogleAdsLoader(private val slotId: String, private var showImmediate: Boo
     }
 
     override fun onCreate(owner: LifecycleOwner) {
-        if (owner is Activity) setUpBanner()
+        Log.i("Alex", "onCreate 1")
+//        if (owner is Activity) setUpBanner()
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        if (owner is Fragment) {
+        Log.i("Alex", "onStart 1")
+//        if (owner is Fragment) {
             setUpBanner()
-        }
+//        }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        Log.i("Alex", "onStop 1")
+        AdUnitSource.removeCallback(this)
+        AdUnitSource.setQueryCallback(null)
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        AdUnitSource.removeCallback(this)
         adView?.destroy()
     }
 
@@ -95,6 +107,7 @@ class GoogleAdsLoader(private val slotId: String, private var showImmediate: Boo
     }
 
     override fun onResume(owner: LifecycleOwner) {
+        Log.i("Alex", "onResume 1")
         adView?.resume()
     }
 
@@ -111,16 +124,16 @@ class GoogleAdsLoader(private val slotId: String, private var showImmediate: Boo
         setUpBanner()
     }
 
-    override fun queryShowAds(result: Int) {
-        if (result == 1) {
+    fun queryPublicHandle(handle: Long) {
+        Log.i("Alex", "query handle:$handle")
+        AdUnitSource.setQueryCallback(this)
+        AdUnitSource.showAdOrNot(handle)
+    }
+
+    override fun queryShowAdsDone(result: Int) {
+        if (result == 0) {
             showImmediate = true
             setUpBanner()
         }
-    }
-
-    fun queryPublicHandle(handle: Long) {
-        Log.i("Alex", "query handle:$handle")
-        AdUnitSource.addCallback(this)
-        AdUnitSource.showAdOrNot(handle)
     }
 }
