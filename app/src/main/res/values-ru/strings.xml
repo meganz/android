@@ -240,9 +240,9 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">Удалить эту передачу?</string>
-    <string name="cancel_all_transfer_confirmation">Удалить все передачи?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_transfer_confirmation">Отменить эту передачу?</string>
+    <string name="cancel_all_transfer_confirmation">Отменить все передачи?</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Отменить все</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Облачный диск</string>
     <string name="section_recents" context="Label to reference a recents section">Недавние</string>
@@ -750,8 +750,8 @@
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Внешнее хранилище</item>
     </string-array>
 
-    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</string>
-    <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">External storage</string>
+    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Внутреннее хранилище</string>
+    <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Внешнее хранилище</string>
 
     <string-array name="add_contact_array">
         <item context="title of the dialog shown when sending or sharing a folder">Эл. почта пользователя</item>
@@ -1088,7 +1088,7 @@
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Неверный email и/или пароль. Попробуйте ещё раз.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Ваша учетная запись была заблокирована из-за нарушений Условий использования. Пожалуйста, свяжитесь с support&#64;mega.nz</string>
-    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Слишком много попыток войти, подождите час.</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Слишком много неудачных попыток войти. Пожалуйста, подождите час.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Учётная запись ещё не подтверждена. Проверьте почту.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">Ссылка на папку недоступна</string>
@@ -1187,16 +1187,16 @@
 
     <string name="general_mute" context="button">Приглушить</string>
     <string name="general_unmute" context="button">Включить звук</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Не беспокоить</string>
     <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
 
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
-    <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">On</string>
+    <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Вкл</string>
 
-    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
-    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">Until tomorrow morning</string>
-    <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Until this morning</string>
-    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn it back on</string>
+    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Выкл</string>
+    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">До завтрашнего утра</string>
+    <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">До сегодняшнего утра</string>
+    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Пока я не включу их снова</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
     <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
@@ -1461,7 +1461,7 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Просмотр</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Приостановить все передачи</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Возобновить все передачи</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Очистить завершенные</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Очистить все передачи</string>
     <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Приостановить передачу?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Возобновить передачу?</string>
@@ -1564,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Недостаточная квота передач</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Передача в очереди превышает текущую квоту, доступную для вашего IP-адреса, и поэтому может быть прервана.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Передача в очереди превышает текущую квоту, доступную для вашего IP-адреса. Улучшите аккаунт или подождите %s, чтобы продолжить скачивание.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Посмотреть подписки</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Продолжить без регистрации</string>
 
