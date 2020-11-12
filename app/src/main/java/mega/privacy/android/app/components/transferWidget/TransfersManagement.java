@@ -86,7 +86,17 @@ public class TransfersManagement {
      */
     public void checkIfTransferIsPaused(int transferTag) {
         MegaTransfer transfer = MegaApplication.getInstance().getMegaApi().getTransferByTag(transferTag);
+        checkIfTransferIsPaused(transfer);
+    }
 
+    /**
+     * Checks if a transfer is paused.
+     * If so, adds it to the paused transfers list.
+     * If not, do nothing.
+     *
+     * @param transfer MegaTransfer to check.
+     */
+    public void checkIfTransferIsPaused(MegaTransfer transfer) {
         if (transfer != null && transfer.getState() == MegaTransfer.STATE_PAUSED) {
             addPausedTransfers(transfer.getTag());
         }

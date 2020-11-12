@@ -268,6 +268,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 					if (data.contains(APP_DATA_VOICE_CLIP)) {
 						voiceClipsInProgress++;
+					} else {
+						MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
 					}
 				}
 			}

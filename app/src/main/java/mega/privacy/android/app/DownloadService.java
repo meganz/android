@@ -291,6 +291,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 
 				if (!isVoiceClipType(transfer.getAppData())) {
+					MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
 					transfersCount++;
 				}
 			}

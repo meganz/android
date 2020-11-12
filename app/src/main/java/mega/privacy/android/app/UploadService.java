@@ -258,6 +258,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                             continue;
                         }
 
+                        MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+
                         if (transfer.isFolderTransfer()) {
                             mapProgressFolderTransfers.put(transfer.getTag(), transfer);
                         } else {
