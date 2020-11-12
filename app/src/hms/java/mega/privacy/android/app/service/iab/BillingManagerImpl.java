@@ -39,7 +39,6 @@ import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
 import mega.privacy.android.app.utils.billing.Security;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -131,12 +130,10 @@ public class BillingManagerImpl implements BillingManager {
      *
      * @param activity        The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
-     * @param pl              Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
      */
-    public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener, String pl) {
+    public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
-        payload = pl;
 
         iapClient = Iap.getIapClient(mActivity);
         Task<IsEnvReadyResult> task = iapClient.isEnvReady();
@@ -191,12 +188,8 @@ public class BillingManagerImpl implements BillingManager {
         try {
             InAppPurchaseData data = new InAppPurchaseData(originalJson);
             if (data.getPurchaseState() == InAppPurchaseData.PurchaseState.PURCHASED && data.isSubValid()) {
-                if (isPayloadValid(data.getDeveloperPayload())) {
-                    logDebug("New purchase added, payload is: " + data.getDeveloperPayload());
-                    mPurchases.add(Converter.convert(originalJson));
-                } else {
-                    logWarning("Invalid developer payload");
-                }
+                logDebug("New purchase added, payload is: " + data.getDeveloperPayload());
+                mPurchases.add(Converter.convert(originalJson));
             }
         } catch (JSONException e) {
             logError(e.getMessage(), e);
@@ -365,16 +358,6 @@ public class BillingManagerImpl implements BillingManager {
         } else {
             logWarning("intent is null");
         }
-    }
-
-    @Override
-    public boolean isPayloadValid(String pl) {
-        return payload.equals(pl);
-    }
-
-    @Override
-    public String getPayload() {
-        return payload;
     }
 
     /**
