@@ -208,6 +208,10 @@ public class OfflineUtils {
 
         MegaNode parentNodeI = megaApi.getParentNode(nodeToFind);
         long result=-1;
+
+        if(nodeToFind == null)
+            return result;
+
         if(parentNodeI==null){
             logDebug("A: " + nodeToFind.getHandle());
             return nodeToFind.getHandle();

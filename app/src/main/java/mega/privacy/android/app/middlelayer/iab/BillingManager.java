@@ -85,22 +85,6 @@ public interface BillingManager {
     void getInventory(QuerySkuListCallback callback);
 
     /**
-     * Check if the payload of a purchase is valid.
-     * In MEGA app payload is current login account's handle.
-     *
-     * @param pl Payload of the purchase.
-     * @return true the payload equals current login account's handle, false otherwise.
-     */
-    boolean isPayloadValid(String pl);
-
-    /**
-     * Get current payload.
-     *
-     * @return Current login account's handle
-     */
-    String getPayload();
-
-    /**
      * Query purchases across various use cases and deliver the result in a formalized way through
      * a listener.
      * This method executes every time when BillingManager initialize to get current subscrptions.

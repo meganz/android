@@ -62,7 +62,6 @@
                             android:textSize="16sp"
                             android:imeOptions="actionNext"
                             android:inputType="textEmailAddress"
-                            android:text="aw+6@mega.nz"
                             android:theme="@style/ColorControlStyle"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -100,7 +99,6 @@
                             android:textSize="16sp"
                             android:imeOptions="actionNext"
                             android:inputType="textPassword"
-                            android:text="kytka6123"
                             android:theme="@style/ColorControlStyle"/>
 
                     </com.google.android.material.textfield.TextInputLayout>

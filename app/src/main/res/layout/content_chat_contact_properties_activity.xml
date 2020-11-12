@@ -16,6 +16,10 @@
         android:layout_marginBottom="8dp"
         android:orientation="vertical" >
 
+        <include layout="@layout/item_call_in_progress_layout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
         <!-- CONTACT INFO LAYOUT -->
 
         <LinearLayout
@@ -263,19 +267,36 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
                     android:textColor="@color/name_my_account"
-                    android:layout_weight="5"
                     android:text="@string/title_properties_chat_notifications_contact"
-                    android:textSize="16dp" />
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/chat_contact_properties_notifications_muted_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/chat_contact_properties_notifications_text"
+                    android:layout_gravity="start|center_vertical"
+                    android:textColor="@color/black_40_alpha"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/chat_contact_properties_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="end|center_vertical">
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/chat_contact_properties_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:clickable="false" />
 
             </RelativeLayout>
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/chat_contact_properties_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="16dp"
-                android:layout_weight="1"/>
         </LinearLayout>
 
         <View

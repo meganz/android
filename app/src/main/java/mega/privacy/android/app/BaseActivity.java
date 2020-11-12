@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
 
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -561,6 +562,9 @@ public class BaseActivity extends AppCompatActivity {
                 case NOT_SPACE_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.error_not_enough_free_space, Snackbar.LENGTH_LONG);
                     break;
+                case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
+                    snackbar = Snackbar.make(view, R.string.notifications_are_already_muted, Snackbar.LENGTH_LONG);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -601,6 +605,10 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.show();
                 break;
             }
+            case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
+                snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
+                snackbar.show();
+                break;
         }
     }
 
@@ -662,7 +670,7 @@ public class BaseActivity extends AppCompatActivity {
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
             }
-            builder.setMessage(TextUtils.concat(getSpannedHtmlText(expiredString), "\n\n" + getString(R.string.expired_user_business_text_2)));
+            builder.setMessage(TextUtils.concat(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY), "\n\n" + getString(R.string.expired_user_business_text_2)));
         }
 
         builder.setNegativeButton(R.string.general_dismiss, new DialogInterface.OnClickListener() {

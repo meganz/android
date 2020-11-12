@@ -47,16 +47,16 @@ import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.middlelayer.iab.QuerySkuListCallback;
-import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.billing.PaymentUtils;
 import mega.privacy.android.app.utils.billing.Security;
-import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaApiJava;
 
 import static com.android.billingclient.api.BillingFlowParams.ProrationMode.DEFERRED;
 import static com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logInfo;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.getProductLevel;
 
 /**
  * Handles all the interactions with Play Store (via Billing library), maintains connection to
@@ -101,7 +101,6 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
     public static final int PAYMENT_GATEWAY = MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET;
 
-    private String payload;
     private BillingClient mBillingClient;
     private boolean mIsServiceConnected;
     private final BillingUpdatesListener mBillingUpdatesListener;
@@ -116,12 +115,10 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      *
      * @param activity        The Context, here's {@link mega.privacy.android.app.lollipop.ManagerActivityLollipop}
      * @param updatesListener The callback, when billing status update. {@link BillingUpdatesListener}
-     * @param pl              Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
      */
-    public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener, String pl) {
+    public BillingManagerImpl(Activity activity, BillingUpdatesListener updatesListener) {
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
-        payload = pl;
 
         //must enable pending purchases to use billing library
         mBillingClient = BillingClient.newBuilder(mActivity).enablePendingPurchases().setListener(this).build();
@@ -161,16 +158,33 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? IMMEDIATE_WITH_TIME_PRORATION : DEFERRED;
         logDebug("prorationMode is " + prorationMode);
-
-        executeServiceRequest(() -> {
-            BillingFlowParams purchaseParams = BillingFlowParams
+        Runnable purchaseFlowRequest = () -> {
+            BillingFlowParams.Builder builder = BillingFlowParams
                     .newBuilder()
                     .setSkuDetails(getSkuDetails(skuDetails))
-                    .setOldSku(oldSku, purchaseToken)
-                    .setReplaceSkusProrationMode(prorationMode)
-                    .build();
+                    .setReplaceSkusProrationMode(prorationMode);
+
+            // setOldSku requires non-null parameters.
+            if (oldSku != null && purchaseToken != null) {
+                builder.setOldSku(oldSku, purchaseToken);
+            }
+
+            BillingFlowParams purchaseParams = builder.build();
+
+            /*
+                If do a full login, ManagerActivity's mIntent will be set as null.
+                Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
+                otherwise billing library crashes internally.
+                @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")
+             */
+            if (mActivity.getIntent() == null) {
+                mActivity.setIntent(new Intent());
+            }
+
             mBillingClient.launchBillingFlow(mActivity, purchaseParams);
-        });
+        };
+
+        executeServiceRequest(purchaseFlowRequest);
     }
 
     private SkuDetails getSkuDetails(MegaSku skuDetails) {
@@ -289,24 +303,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             }
         }
 
-        if (isPayloadValid(purchase.getDeveloperPayload())) {
-            logDebug("new purchase added, " + purchase.getOriginalJson());
-            mPurchases.add(purchase);
-        } else {
-            logWarning("Invalid DeveloperPayload");
-        }
-    }
-
-    /**
-     * Check if the payload of a purchase is valid(the purchase belongs to current open MEGA account).
-     *
-     * @param pl Payload, using MegaUser's hanlde as payload. {@link MegaUser#getHandle()}
-     * @return If the payload is valid.
-     */
-    @Override
-    public boolean isPayloadValid(String pl) {
-        //backward compatibility - old version does not have payload so just let it go
-        return TextUtil.isTextEmpty(pl) || payload.equals(pl);
+        logDebug("new purchase added, " + purchase.getOriginalJson());
+        mPurchases.add(purchase);
     }
 
     /**
@@ -349,8 +347,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      * Query purchases across various use cases and deliver the result in a formalized way through
      * a listener
      */
-    @Override
-    public void queryPurchases() {
+        @Override
+        public void queryPurchases() {
         Runnable queryToExecute = () -> {
             PurchasesResult purchasesResult = mBillingClient.queryPurchases(SkuType.INAPP);
             List<Purchase> purchasesList = purchasesResult.getPurchasesList();
@@ -391,6 +389,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
      */
     private void startServiceConnection(final Runnable executeOnSuccess) {
         mBillingClient.startConnection(new BillingClientStateListener() {
+
             @Override
             public void onBillingSetupFinished(BillingResult billingResult) {
                 logDebug("Response code is: " + billingResult.getResponseCode());
@@ -441,11 +440,6 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             logWarning("Purchase failed to valid signature", e);
             return false;
         }
-    }
-
-    @Override
-    public String getPayload() {
-        return payload;
     }
 
     private static class Converter {

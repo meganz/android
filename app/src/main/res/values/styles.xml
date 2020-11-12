@@ -218,6 +218,12 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="LightToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/light_toolbar_title</item>
+        <item name="fontFamily">sans-serif</item>
+    </style>
+
     <style name="ToolbarSubTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/mail_my_account</item>
@@ -515,6 +521,12 @@
         <item name="android:textSize">13sp</item>
     </style>
 
+    <style name="CheckBoxStyleStyle" parent="Theme.Megaactionbar">
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="android:colorControlNormal">@color/mail_my_account</item>
+        <item name="colorControlNormal">@color/mail_my_account</item>
+    </style>
+
     <style name="GalleryImageShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">0dp</item>
@@ -522,6 +534,48 @@
 
     <style name="GalleryImageShape.Selected">
         <item name="cornerSize">@dimen/cu_fragment_selected_round_corner_radius</item>
+    </style>
+
+    <style name="Theme.Giphy" parent="Theme.Megaactionbar">
+        <item name="autoCompleteTextViewStyle">@style/GiphyCursor</item>
+    </style>
+
+    <style name="GiphyCursor" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@drawable/giphy_search_cursor</item>
+    </style>
+
+    <style name="IconGifMessage">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:src">@drawable/ic_gif_message</item>
+    </style>
+
+    <style name="ProgressBarGifMessage">
+        <item name="android:layout_width">45dp</item>
+        <item name="android:layout_height">45dp</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:indeterminateTint">@color/white</item>
+    </style>
+
+    <style name="SimpleDraweeViewMessages">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:maxHeight">212dp</item>
+        <item name="android:maxWidth">212dp</item>
+    </style>
+
+    <style name="PreviewMessage">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:maxHeight">212dp</item>
+        <item name="android:maxWidth">212dp</item>
+        <item name="android:layout_gravity">center_horizontal|center_vertical</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
     <style name="AppBottomSheetDialogThemeReactions" parent="Theme.Design.Light.BottomSheetDialog">
