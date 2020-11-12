@@ -111,7 +111,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.0_329";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.1_335";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -1615,6 +1615,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             }
             logDebug("Creating RTC Audio Manager");
             rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
+			startProximitySensor();
         }
     }
 
@@ -1898,14 +1899,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static boolean isBlockedDueToWeakAccount() {
 		return isBlockedDueToWeakAccount;
-	}
-
-	public static boolean isIsReactionFromKeyboard() {
-		return isReactionFromKeyboard;
-	}
-
-	public static void setIsReactionFromKeyboard(boolean isReactionFromKeyboard) {
-		MegaApplication.isReactionFromKeyboard = isReactionFromKeyboard;
 	}
 
 	public static void setIsWebOpenDueToEmailVerification(boolean isWebOpenDueToEmailVerification) {

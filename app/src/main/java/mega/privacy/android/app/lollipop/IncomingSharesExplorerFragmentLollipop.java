@@ -5,12 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
@@ -29,6 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -51,7 +51,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaApiAndroid;
@@ -60,8 +59,11 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
+import static mega.privacy.android.app.utils.Util.getPreferences;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
@@ -110,6 +112,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private SearchNodesTask searchNodesTask;
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
+	private boolean hasWritePermissions = true;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -332,8 +335,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
         fastScroller.setRecyclerView(recyclerView);
         setNodes(nodes);
 
-		findDisabledNodes();
-
 		
 		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
 			optionButton.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));
@@ -503,30 +504,17 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		nodes.addAll(fileNodes);
 	}
 
-	private void findDisabledNodes (){
-		logDebug("findDisabledNodes");
-		if (((FileExplorerActivityLollipop) context).isMultiselect()) {
-			return;
-		}
-		ArrayList<Long> disabledNodes = new ArrayList<Long>();
+	private void checkWritePermissions() {
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-		for (int i=0;i<nodes.size();i++){
-			MegaNode folder = nodes.get(i);
-			int accessLevel = megaApi.getAccess(folder);
-
-			if(selectFile){
-				if(accessLevel!=MegaShare.ACCESS_FULL) {
-					disabledNodes.add(folder.getHandle());
-				}
-			}
-			else{
-				if(accessLevel==MegaShare.ACCESS_READ) {
-					disabledNodes.add(folder.getHandle());
-				}
-			}
+		if (parentNode == null) {
+			hasWritePermissions = false;
+		} else {
+			int accessLevel = megaApi.getAccess(parentNode);
+			hasWritePermissions = accessLevel >= MegaShare.ACCESS_READWRITE;
 		}
 
-		this.setDisableNodes(disabledNodes);
+		activateButton(hasWritePermissions);
 	}
 
 	@Override
@@ -677,7 +665,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			setParentHandle(-1);
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
-			findDisabledNodes();
 
 			setNodes(nodes);
 
@@ -763,13 +750,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			return 0;
 		}
 	}
-	
-	/*
-	 * Disable nodes from the list
-	 */
-	private void setDisableNodes(ArrayList<Long> disabledNodes) {
-		adapter.setDisableNodes(disabledNodes);
-	}
 
 	public long getParentHandle() {
 		return parentHandle;
@@ -791,6 +771,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			adapter.setNodes(nodes);
 			showEmptyScreen();
 		}
+
+		checkWritePermissions();
 	}
 	
 	private RecyclerView getRecyclerView(){
@@ -798,11 +780,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	}
 
 	private void activateButton(boolean show) {
-		if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-			fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
-		} else {
-			optionButton.setEnabled(show);
-			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));
+        if (modeCloud == FileExplorerActivityLollipop.SELECT) {
+            fabSelect.setVisibility(selectFile && show ? View.VISIBLE : View.GONE);
+        } else {
+            boolean shouldShowButton = hasWritePermissions && show;
+            optionButton.setEnabled(shouldShowButton);
+            optionButton.setTextColor(ContextCompat.getColor(context, shouldShowButton ? R.color.accentColor : R.color.invite_button_deactivated));
 		}
 	}
 

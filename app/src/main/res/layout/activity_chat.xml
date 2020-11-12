@@ -352,6 +352,23 @@
                                 android:src="@drawable/attach_file"
                                 android:tint="@color/transparent_black" />
                         </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rl_gif_chat"
+                            android:layout_width="56dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageButton
+                                android:id="@+id/gif_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:background="@null"
+                                android:src="@drawable/ic_gif_toolbar"
+                                android:tint="@color/transparent_black" />
+                        </RelativeLayout>
+
                     </LinearLayout>
 
                     <mega.privacy.android.app.components.twemoji.EmojiKeyboard

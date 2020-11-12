@@ -24,7 +24,6 @@ import android.os.PowerManager.WakeLock;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -651,7 +650,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Upload start: " + transfer.getFileName());
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-		    if (isCUTransfer(transfer)) return;
+		    if (isCUOrChatTransfer(transfer)) return;
 
 		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			String appData = transfer.getAppData();
@@ -685,7 +684,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     private void doOnTransferFinish(MegaTransfer transfer, MegaError error) {
 		logDebug("Path: " + transfer.getPath() + ", Size: " + transfer.getTransferredBytes());
-        if (isCUTransfer(transfer)) return;
+        if (isCUOrChatTransfer(transfer)) return;
 
 		launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
@@ -941,7 +940,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void doOnTransferUpdate(MegaTransfer transfer) {
 		logDebug("onTransferUpdate");
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD){
-            if (isCUTransfer(transfer)) return;
+            if (isCUOrChatTransfer(transfer)) return;
 
 		    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
@@ -986,7 +985,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		logWarning("onTransferTemporaryError: " + e.getErrorString() + "__" + e.getErrorCode());
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-            if (isCUTransfer(transfer)) return;
+            if (isCUOrChatTransfer(transfer)) return;
 
             if(isTransferBelongsToFolderTransfer(transfer)){
                 return;
@@ -1144,13 +1143,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     /**
-     * Checks if a transfer is a CU transfer.
+     * Checks if a transfer is a CU or Chat transfer.
      *
-     * @param transfer  MegaTransfer to check
-     * @return True if the transfer is a CU transfer, false otherwise.
+     * @param transfer MegaTransfer to check
+     * @return True if the transfer is a CU or Chat transfer, false otherwise.
      */
-    private boolean isCUTransfer(MegaTransfer transfer) {
+    private boolean isCUOrChatTransfer(MegaTransfer transfer) {
         String appData = transfer.getAppData();
-        return !isTextEmpty(appData) && appData.contains(CU_UPLOAD);
+        return !isTextEmpty(appData)
+                && (appData.contains(CU_UPLOAD)
+                || appData.contains(UPLOAD_APP_DATA_CHAT));
     }
 }

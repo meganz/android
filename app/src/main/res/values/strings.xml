@@ -2790,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">While MEGA does not have access to your data, your organization administrators do have the ability to control and view the Camera Uploads in your user account</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Something went wrong</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contact your business account administrator to resolve the issue and activate your account.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** For genuine business purposes.</string>
-    <string name="unlimited_space" context="Label to indicate an scalable space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">SCALABLE [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Transfer quota[/A] **</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Will automatically increase, at no additional charge, for genuine business purposes.</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Unlimited [A]Transfer quota[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">When you log out, files from your Offline section will be deleted from your device.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">When you log out, ongoing transfers will be cancelled.</string>
@@ -2857,12 +2857,10 @@
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
-    <string name="label_get_more_transfer_quota" context="Label indicating the action 'upgrate account' to get more transfer quota">Get more transfer quota</string>
+    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
     <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
 
     <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
-
-    <string name="label_time_in_days" context="Time in days. The placeholder is for the time value, please adjust the position based on linguistics">%dd</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Storage Full</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Your data is at risk!</string>
@@ -2872,7 +2870,7 @@
     </plurals>
     <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
     <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is currently subject to deletion.</string>
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]You must act immediately to save your data.[/B]</string>
 
     <plurals name="label_time_in_days_full">
@@ -2915,10 +2913,17 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
+    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don't remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 </resources>
