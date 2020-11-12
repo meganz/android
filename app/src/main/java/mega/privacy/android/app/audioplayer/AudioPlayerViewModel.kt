@@ -13,11 +13,14 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ShuffleOrder
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.reactivex.rxjava3.subjects.PublishSubject
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
@@ -25,10 +28,11 @@ import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
-import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.app.utils.Util.isOnline
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
-import nz.mega.sdk.MegaNode
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class AudioPlayerViewModel(
     private val context: Context,
@@ -45,11 +49,20 @@ class AudioPlayerViewModel(
     private var shuffleEnabled = preferences.getBoolean(KEY_SHUFFLE_ENABLED, false)
     private var repeatMode = preferences.getInt(KEY_REPEAT_MODE, Player.REPEAT_MODE_OFF)
 
+    private val createThumbnailFinished = PublishSubject.create<Boolean>()
+    private val createThumbnailRequest = object : BaseListener(context) {
+        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+            if (e.errorCode == MegaError.API_OK) {
+                createThumbnailFinished.onNext(true)
+            }
+        }
+    }
+
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
 
-    private val _playlist = MutableLiveData<List<PlaylistItem>>()
-    val playlist: LiveData<List<PlaylistItem>> = _playlist
+    private val _playlist = MutableLiveData<Pair<List<PlaylistItem>, Int>>()
+    val playlist: LiveData<Pair<List<PlaylistItem>, Int>> = _playlist
 
     var currentIntent: Intent? = null
 
@@ -69,6 +82,12 @@ class AudioPlayerViewModel(
             postPlaylistItems()
         }
 
+    init {
+        compositeDisposable.add(
+            createThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
+                .subscribe({ postPlaylistItems() }, logErr("creatingThumbnailFinished"))
+        )
+    }
 
     fun buildPlayerSource(intent: Intent?) {
         if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
@@ -274,6 +293,8 @@ class AudioPlayerViewModel(
         var index = 0
         var firstPlayIndex = 0
 
+        val nodesWithoutThumbnail = ArrayList<Pair<Long, File>>()
+
         for (node in nodes) {
             if (!validator(node)) {
                 continue
@@ -290,11 +311,12 @@ class AudioPlayerViewModel(
             }
 
             playlistItems.add(
-                PlaylistItem(
-                    handle, mediaItem.mediaId, if (thumbnail.exists()) thumbnail else null, index,
-                    PlaylistItem.TYPE_NEXT
-                )
+                PlaylistItem(handle, mediaItem.mediaId, thumbnail, index, PlaylistItem.TYPE_NEXT)
             )
+
+            if (!thumbnail.exists()) {
+                nodesWithoutThumbnail.add(Pair(handle, thumbnail))
+            }
 
             index++
         }
@@ -303,6 +325,21 @@ class AudioPlayerViewModel(
             _playerSource.postValue(Triple(mediaItems, firstPlayIndex, false))
 
             postPlaylistItems()
+        }
+
+        if (nodesWithoutThumbnail.isNotEmpty() && isOnline(context)) {
+            compositeDisposable.add(
+                Observable.fromIterable(nodesWithoutThumbnail)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({
+                        val node = megaApi.getNodeByHandle(it.first)
+                        if (node != null) {
+                            megaApi.getThumbnail(
+                                node, it.second.absolutePath, createThumbnailRequest
+                            )
+                        }
+                    }, logErr("AudioPlayerViewModel createThumbnail"))
+            )
         }
     }
 
@@ -369,21 +406,24 @@ class AudioPlayerViewModel(
         }
 
         for ((index, item) in items.withIndex()) {
-            item.type = when {
+            val type = when {
                 index < playingIndex -> PlaylistItem.TYPE_PREVIOUS
                 playingIndex == index -> PlaylistItem.TYPE_PLAYING
                 else -> PlaylistItem.TYPE_NEXT
             }
+            items[index] = item.finalizeThumbnailAndType(type)
         }
 
         val hasPrevious = playingIndex > 0
         val hasNext = playingIndex < playlistItems.size - 1
 
         var offset = 0
+        var scrollPosition = playingIndex
 
         if (hasPrevious) {
             items.add(0, PlaylistItem.headerItem(context, PlaylistItem.TYPE_PREVIOUS_HEADER))
             offset++
+            scrollPosition++
         }
 
         items.add(
@@ -399,7 +439,7 @@ class AudioPlayerViewModel(
             )
         }
 
-        _playlist.postValue(items)
+        _playlist.postValue(Pair(items, scrollPosition))
     }
 
     fun backgroundPlayEnabled(): Boolean {

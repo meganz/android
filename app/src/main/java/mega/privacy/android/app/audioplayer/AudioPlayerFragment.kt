@@ -188,7 +188,7 @@ class AudioPlayerFragment : Fragment() {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
-                playlist.isEnabled = it.size > 1
+                playlist.isEnabled = it.first.size > 1
             }
         }
     }

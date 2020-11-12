@@ -11,8 +11,16 @@ data class PlaylistItem(
     val nodeName: String,
     val thumbnail: File?,
     val index: Int,
-    var type: Int,
+    val type: Int,
 ) {
+    fun finalizeThumbnailAndType(type: Int): PlaylistItem {
+        return PlaylistItem(
+            nodeHandle, nodeName,
+            if (thumbnail?.exists() == true) thumbnail else null,
+            index, type
+        )
+    }
+
     companion object {
         const val TYPE_PREVIOUS = 1
         const val TYPE_PREVIOUS_HEADER = 2

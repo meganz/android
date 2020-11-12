@@ -29,6 +29,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
     private var playerService: AudioPlayerService? = null
 
     private lateinit var adapter: PlaylistAdapter
+    private lateinit var listLayoutManager: LinearLayoutManager
 
     private var playlistObserved = false
 
@@ -68,7 +69,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         adapter = PlaylistAdapter(this)
 
         binding.playlist.setHasFixedSize(true)
-        binding.playlist.layoutManager = LinearLayoutManager(requireContext())
+        listLayoutManager = LinearLayoutManager(requireContext())
+        binding.playlist.layoutManager = listLayoutManager
         binding.playlist.adapter = adapter
 
         tryObservePlaylist()
@@ -95,7 +97,9 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
-                adapter.submitList(it)
+                adapter.submitList(it.first) {
+                    listLayoutManager.scrollToPositionWithOffset(it.second, 0)
+                }
             }
         }
     }
