@@ -3,8 +3,8 @@ package mega.privacy.android.app.audioplayer
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.File
+import java.util.*
 
 data class PlaylistItem(
     val nodeHandle: Long,
@@ -43,7 +43,13 @@ data class PlaylistItem(
                     }
                 }
             )
-            return PlaylistItem(INVALID_HANDLE, name, null, INVALID_VALUE, type)
+            // We can't use the same handle (INVALID_HANDLE) for multiple header items,
+            // which will cause display issue when PlaylistItemDiffCallback use
+            // handle for areItemsTheSame.
+            // RandomUUID() can ensure non-repetitive values in practical purpose.
+            return PlaylistItem(
+                UUID.randomUUID().leastSignificantBits, name, null, INVALID_VALUE, type
+            )
         }
     }
 }
