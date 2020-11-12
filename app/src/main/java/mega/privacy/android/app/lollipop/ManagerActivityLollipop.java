@@ -31,7 +31,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -112,7 +111,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -143,7 +141,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -236,7 +233,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -2599,11 +2595,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		transferData = megaApi.getTransferData(this);
 		if (transferData != null) {
 			for (int i = 0; i < transferData.getNumDownloads(); i++) {
-				transfersInProgress.add(transferData.getDownloadTag(i));
+				int tag = transferData.getDownloadTag(i);
+				transfersInProgress.add(tag);
+				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
 			}
 
 			for (int i = 0; i < transferData.getNumUploads(); i++) {
+				int tag = transferData.getUploadTag(i);
 				transfersInProgress.add(transferData.getUploadTag(i));
+				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
 			}
 		}
 

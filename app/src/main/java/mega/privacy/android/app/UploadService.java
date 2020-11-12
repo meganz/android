@@ -268,6 +268,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     totalFolderUploads = mapProgressFolderTransfers.size();
                     totalFileUploads = mapProgressFileTransfers.size();
                     uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+                    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
                     break;
             }
 

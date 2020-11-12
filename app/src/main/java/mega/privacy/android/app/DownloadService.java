@@ -299,6 +299,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				updateProgressNotification();
 			}
 
+			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 			return;
 		}
 

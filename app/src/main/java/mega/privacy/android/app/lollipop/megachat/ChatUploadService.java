@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
@@ -277,6 +278,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				updateProgressNotification();
 			}
 
+			launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			return;
 		}
 
@@ -928,6 +930,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if(appData==null) return;
 
 			if(appData.contains(APP_DATA_CHAT)){
+				launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 				logDebug("This is a chat upload: " + appData);
 				if(!appData.contains(APP_DATA_VOICE_CLIP)) {
 					transfersCount++;
@@ -956,6 +959,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
+			launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			logDebug("onTransferUpdate: " + transfer.getNodeHandle());
 
 			String appData = transfer.getAppData();
@@ -979,6 +983,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						logDebug("After cancel");
 						return;
 					}
+
+					launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 					if(isOverquota!=0){
 						logWarning("After overquota error");
@@ -1050,6 +1056,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					totalUploadsCompleted++;
 				}
 				mapProgressTransfers.put(transfer.getTag(), transfer);
+				launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 				if (canceled) {
 					logWarning("Upload cancelled: " + transfer.getNodeHandle());

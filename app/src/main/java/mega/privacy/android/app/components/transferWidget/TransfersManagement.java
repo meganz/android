@@ -14,6 +14,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
@@ -68,7 +69,27 @@ public class TransfersManagement {
      * @param transferTag   tag of the paused transfer
      */
     public void addPausedTransfers(int transferTag) {
+        String tag = Integer.toString(transferTag);
+        if (pausedTransfers.contains(tag)) {
+            return;
+        }
+
         pausedTransfers.add(Integer.toString(transferTag));
+    }
+
+    /**
+     * Checks if a transfer is paused.
+     * If so, adds it to the paused transfers list.
+     * If not, do nothing.
+     *
+     * @param transferTag Identifier of the MegaTransfer to check.
+     */
+    public void checkIfTransferIsPaused(int transferTag) {
+        MegaTransfer transfer = MegaApplication.getInstance().getMegaApi().getTransferByTag(transferTag);
+
+        if (transfer != null && transfer.getState() == MegaTransfer.STATE_PAUSED) {
+            addPausedTransfers(transfer.getTag());
+        }
     }
 
     /**
