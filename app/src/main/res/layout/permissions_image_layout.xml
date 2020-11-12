@@ -8,14 +8,13 @@
         android:id="@+id/image_permissions_layout"
         android:layout_width="match_parent"
         android:layout_height="218dp"
-        android:layout_margin="8dp"
-        android:background="@color/white">
+        android:layout_margin="8dp">
 
         <ImageView
             android:id="@+id/image_permissions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
 
     </RelativeLayout>
 
@@ -27,43 +26,41 @@
             android:id="@+id/title_permissions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/subtitle_permissions"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
+            android:gravity="center"
             android:paddingBottom="16dp"
-            android:layout_above="@+id/subtitle_permissions"
-            android:textSize="22sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:gravity="center"/>
+            android:textAppearance="@style/TextAppearance.Mega.Headline5" />
 
         <View
             android:id="@+id/invisible_view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="92dp"/>
+            android:layout_marginTop="92dp" />
 
         <TextView
             android:id="@+id/subtitle_permissions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/invisible_view"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
-            android:layout_alignTop="@+id/invisible_view"
-            android:textSize="16sp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant" />
+
         <TextView
             android:id="@+id/subtitle_explanation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/subtitle_permissions"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:fontFamily="sans-serif"
-            android:layout_below="@+id/subtitle_permissions"
+            android:gravity="center"
             android:text="@string/allow_access_contact_explanation"
-            android:textSize="14sp"
-            android:visibility="gone"
-            android:textColor="?android:attr/textColorSecondary"
-            android:gravity="center"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
+            android:visibility="gone" />
 
     </RelativeLayout>
 

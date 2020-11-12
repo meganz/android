@@ -2,8 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,8 +15,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="36dp"
             android:layout_marginRight="36dp"
-            android:id="@+id/setup_fragment_container"
-            android:background="@color/white">
+            android:id="@+id/setup_fragment_container" >
 
             <ImageView
                 android:layout_width="90dp"
@@ -30,16 +28,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:textSize="20sp"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textAppearance="@style/TextAppearance.Mega.Headline6"
                 android:text="@string/general_setup_mega"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:textSize="16sp"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant"
                 android:text="@string/setup_mega_explanation"/>
 
             <LinearLayout
@@ -53,31 +49,16 @@
                     android:id="@+id/not_now_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_button_white"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp"
                     android:text="@string/button_not_now_rich_links"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16.5dp"
-                    android:paddingLeft="16.5dp"
-                    android:elevation="0dp"
-                    style="?android:attr/borderlessButtonStyle"/>
+                    style="?attr/borderlessButtonStyle"/>
 
                 <Button
                     android:id="@+id/setup_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_accent_button"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
                     android:text="@string/general_setup_mega"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16.5dp"
-                    android:paddingLeft="16.5dp"
                     android:layout_marginLeft="16dp"
-                    style="@style/ButtonStyle"/>
+                    style="@style/Widget.Mega.Button"/>
 
             </LinearLayout>
 
@@ -103,31 +84,16 @@
                     android:id="@+id/not_now_button_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_button_white"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp"
                     android:text="@string/button_not_now_rich_links"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16.5dp"
-                    android:paddingLeft="16.5dp"
-                    android:elevation="0dp"
-                    style="?android:attr/borderlessButtonStyle"/>
+                    style="?attr/borderlessButtonStyle"/>
 
                 <Button
                     android:id="@+id/enable_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_accent_button"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
                     android:text="@string/general_enable_access"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingRight="16.5dp"
-                    android:paddingLeft="16.5dp"
                     android:layout_marginLeft="16dp"
-                    style="@style/ButtonStyle"/>
+                    style="@style/Widget.Mega.Button"/>
 
             </LinearLayout>
 
