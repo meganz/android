@@ -414,10 +414,12 @@ public class Constants {
     public static final String APP_DATA_CHAT = "CHAT_UPLOAD";
     public static final String APP_DATA_CU = "CU_UPLOAD";
     public static final String APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD";
-    //Indicates the string after it, is the value of a transfer parameter
+    //Indicates the data after it, is the value of a transfer parameter
     public static final String APP_DATA_INDICATOR = ">";
-    //Indicates the string after it, is a new transfer parameter
+    //Indicates the data after it, is a new transfer parameter
     public static final String APP_DATA_SEPARATOR = "-";
+    //Indicates the data after it, is a new AppData due to a repeated transfer
+    public static final String APP_DATA_REPEATED_TRANSFER_SEPARATOR = "!";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
