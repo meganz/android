@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,11 +22,15 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.autoCleared
 
 @AndroidEntryPoint
-class PlaylistFragment : Fragment() {
+class PlaylistFragment : Fragment(), PlaylistItemOperation {
     private var binding by autoCleared<FragmentAudioPlaylistBinding>()
 
     private lateinit var playerServiceIntent: Intent
     private var playerService: AudioPlayerService? = null
+
+    private lateinit var adapter: PlaylistAdapter
+
+    private var playlistObserved = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -39,6 +44,7 @@ class PlaylistFragment : Fragment() {
                 playerService = service.service
 
                 setupPlayerView(service.service.exoPlayer)
+                tryObservePlaylist()
             }
         }
     }
@@ -58,6 +64,14 @@ class PlaylistFragment : Fragment() {
         binding.toolbar.navigationIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+
+        adapter = PlaylistAdapter(this)
+
+        binding.playlist.setHasFixedSize(true)
+        binding.playlist.layoutManager = LinearLayoutManager(requireContext())
+        binding.playlist.adapter = adapter
+
+        tryObservePlaylist()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +89,17 @@ class PlaylistFragment : Fragment() {
         requireContext().unbindService(connection)
     }
 
+    private fun tryObservePlaylist() {
+        val service = playerService
+        if (!playlistObserved && service != null) {
+            playlistObserved = true
+
+            service.viewModel.playlist.observe(viewLifecycleOwner) {
+                adapter.submitList(it)
+            }
+        }
+    }
+
     private fun setupPlayerView(player: SimpleExoPlayer) {
         binding.playerView.player = player
 
@@ -86,8 +111,13 @@ class PlaylistFragment : Fragment() {
             RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
         )
 
-        binding.playerView.setControlDispatcher(AudioPlayerControlDispatcher())
-
         binding.playerView.showController()
+    }
+
+    override fun onItemClick(item: PlaylistItem) {
+        playerService?.exoPlayer?.seekTo(item.index, 0)
+    }
+
+    override fun openItemOptionPanel(item: PlaylistItem) {
     }
 }

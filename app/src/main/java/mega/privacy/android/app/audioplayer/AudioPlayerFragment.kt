@@ -41,9 +41,14 @@ class AudioPlayerFragment : Fragment() {
     private lateinit var artworkContainer: CardView
     private lateinit var trackName: TextView
     private lateinit var artistName: TextView
+    private lateinit var bgPlay: ImageButton
+    private lateinit var bgPlayHint: TextView
+    private lateinit var playlist: ImageButton
 
     private lateinit var playerServiceIntent: Intent
     private var playerService: AudioPlayerService? = null
+
+    private var playlistObserved = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -57,6 +62,7 @@ class AudioPlayerFragment : Fragment() {
                 playerService = service.service
 
                 setupPlayer(service.service)
+                tryObservePlaylist()
             }
         }
     }
@@ -65,7 +71,7 @@ class AudioPlayerFragment : Fragment() {
             if (isResumed && mediaItem != null
                 && reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
             ) {
-                displayMetadata(Metadata(null, null, mediaItem.mediaId))
+                displayMetadata(Metadata(null, null, null, mediaItem.mediaId))
             }
         }
 
@@ -93,6 +99,9 @@ class AudioPlayerFragment : Fragment() {
         artworkContainer = binding.root.findViewById(R.id.artwork_container)
         trackName = binding.root.findViewById(R.id.track_name)
         artistName = binding.root.findViewById(R.id.artist_name)
+        bgPlay = binding.root.findViewById(R.id.background_play_toggle)
+        bgPlayHint = binding.root.findViewById(R.id.background_play_hint)
+        playlist = binding.root.findViewById(R.id.playlist)
 
         binding.toolbar.navigationIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
@@ -134,6 +143,8 @@ class AudioPlayerFragment : Fragment() {
             }
         })
 
+        tryObservePlaylist()
+
         runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
             if (isResumed) {
                 hideToolbar()
@@ -171,10 +182,24 @@ class AudioPlayerFragment : Fragment() {
         requireContext().unbindService(connection)
     }
 
+    private fun tryObservePlaylist() {
+        val service = playerService
+        if (!playlistObserved && service != null) {
+            playlistObserved = true
+
+            service.viewModel.playlist.observe(viewLifecycleOwner) {
+                playlist.isEnabled = it.size > 1
+            }
+        }
+    }
+
     private fun setupPlayer(service: AudioPlayerService) {
         setupPlayerView(service.exoPlayer)
         observeMetadata(service.metadata)
-        listenButtons()
+
+        // we need setup control buttons again, because reset player would reset
+        // PlayerControlView
+        setupButtons()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -188,8 +213,6 @@ class AudioPlayerFragment : Fragment() {
         binding.playerView.setRepeatToggleModes(
             RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
         )
-
-        binding.playerView.setControlDispatcher(AudioPlayerControlDispatcher())
 
         binding.playerView.showController()
 
@@ -301,15 +324,12 @@ class AudioPlayerFragment : Fragment() {
         trackName.layoutParams = params
     }
 
-    private fun listenButtons() {
-        listenBgPlaySetting()
-        listenPlaylistButton()
+    private fun setupButtons() {
+        setupBgPlaySetting()
+        setupPlaylistButton()
     }
 
-    private fun listenBgPlaySetting() {
-        val bgPlay = binding.root.findViewById<ImageButton>(R.id.background_play_toggle)
-        val bgPlayHint = binding.root.findViewById<TextView>(R.id.background_play_hint)
-
+    private fun setupBgPlaySetting() {
         val enabled = playerService?.backgroundPlayEnabled() ?: return
         updateBgPlay(bgPlay, bgPlayHint, enabled)
 
@@ -336,8 +356,8 @@ class AudioPlayerFragment : Fragment() {
             .alpha(0F)
     }
 
-    private fun listenPlaylistButton() {
-        binding.root.findViewById<ImageButton>(R.id.playlist).setOnClickListener {
+    private fun setupPlaylistButton() {
+        playlist.setOnClickListener {
             findNavController().navigate(R.id.action_player_to_playlist)
         }
     }

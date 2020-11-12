@@ -8,8 +8,10 @@ import android.os.Environment
 import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.source.ShuffleOrder
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -19,8 +21,10 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
@@ -30,7 +34,7 @@ class AudioPlayerViewModel(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
-) {
+) : ExposedShuffleOrder.ShuffleChangeListener {
     private val compositeDisposable = CompositeDisposable()
 
     private val downloadLocationDefaultPath = getDownloadLocation()
@@ -44,8 +48,27 @@ class AudioPlayerViewModel(
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
 
-    var playingHandle = INVALID_HANDLE
+    private val _playlist = MutableLiveData<List<PlaylistItem>>()
+    val playlist: LiveData<List<PlaylistItem>> = _playlist
+
     var currentIntent: Intent? = null
+
+    private val playlistItems = ArrayList<PlaylistItem>()
+
+    var shuffleOrder: ShuffleOrder = ExposedShuffleOrder(0, this)
+
+    var playingHandle = INVALID_HANDLE
+        set(value) {
+            field = value
+            postPlaylistItems()
+        }
+
+    var paused = false
+        set(value) {
+            field = value
+            postPlaylistItems()
+        }
+
 
     fun buildPlayerSource(intent: Intent?) {
         if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
@@ -163,6 +186,9 @@ class AudioPlayerViewModel(
             },
             {
                 it.handle.toLong()
+            },
+            {
+                getThumbnailFile(context, it)
             }
         )
     }
@@ -227,6 +253,9 @@ class AudioPlayerViewModel(
             },
             {
                 it.handle
+            },
+            {
+                File(getThumbFolder(context), it.base64Handle.plus(JPG_EXTENSION))
             }
         )
     }
@@ -236,8 +265,11 @@ class AudioPlayerViewModel(
         firstPlayHandle: Long,
         validator: (T) -> Boolean,
         mapper: (T) -> MediaItem?,
-        handleGetter: (T) -> Long
+        handleGetter: (T) -> Long,
+        thumbnailGetter: (T) -> File,
     ) {
+        playlistItems.clear()
+
         val mediaItems = ArrayList<MediaItem>()
         var index = 0
         var firstPlayIndex = 0
@@ -250,14 +282,27 @@ class AudioPlayerViewModel(
             val mediaItem = mapper(node) ?: continue
             mediaItems.add(mediaItem)
 
-            if (handleGetter(node) == firstPlayHandle) {
+            val handle = handleGetter(node)
+            val thumbnail = thumbnailGetter(node)
+
+            if (handle == firstPlayHandle) {
                 firstPlayIndex = index
             }
+
+            playlistItems.add(
+                PlaylistItem(
+                    handle, mediaItem.mediaId, if (thumbnail.exists()) thumbnail else null, index,
+                    PlaylistItem.TYPE_NEXT
+                )
+            )
+
             index++
         }
 
         if (mediaItems.isNotEmpty()) {
             _playerSource.postValue(Triple(mediaItems, firstPlayIndex, false))
+
+            postPlaylistItems()
         }
     }
 
@@ -275,6 +320,86 @@ class AudioPlayerViewModel(
             .setMediaId(name)
             .setTag(handle)
             .build()
+    }
+
+    private fun postPlaylistItems() {
+        compositeDisposable.add(Completable.fromCallable { doPostPlaylistItems() }
+            .subscribeOn(Schedulers.single())
+            .subscribe(IGNORE, logErr("AudioPlayerViewModel postPlaylistItems")))
+    }
+
+    private fun doPostPlaylistItems() {
+        if (playlistItems.isEmpty()) {
+            return
+        }
+
+        var playingIndex = 0
+        for ((index, item) in playlistItems.withIndex()) {
+            if (item.nodeHandle == playingHandle) {
+                playingIndex = index
+                break
+            }
+        }
+
+        val order = shuffleOrder
+
+        val items: ArrayList<PlaylistItem>
+        if (shuffleEnabled && order.length == playlistItems.size) {
+            items = ArrayList()
+
+            items.add(playlistItems[playingIndex])
+
+            var newPlayingIndex = 0
+            var index = order.getPreviousIndex(playingIndex)
+            while (index != C.INDEX_UNSET) {
+                items.add(0, playlistItems[index])
+                index = order.getPreviousIndex(index)
+                newPlayingIndex++
+            }
+
+            index = order.getNextIndex(playingIndex)
+            while (index != C.INDEX_UNSET) {
+                items.add(playlistItems[index])
+                index = order.getNextIndex(index)
+            }
+
+            playingIndex = newPlayingIndex
+        } else {
+            items = ArrayList(playlistItems)
+        }
+
+        for ((index, item) in items.withIndex()) {
+            item.type = when {
+                index < playingIndex -> PlaylistItem.TYPE_PREVIOUS
+                playingIndex == index -> PlaylistItem.TYPE_PLAYING
+                else -> PlaylistItem.TYPE_NEXT
+            }
+        }
+
+        val hasPrevious = playingIndex > 0
+        val hasNext = playingIndex < playlistItems.size - 1
+
+        var offset = 0
+
+        if (hasPrevious) {
+            items.add(0, PlaylistItem.headerItem(context, PlaylistItem.TYPE_PREVIOUS_HEADER))
+            offset++
+        }
+
+        items.add(
+            playingIndex + offset,
+            PlaylistItem.headerItem(context, PlaylistItem.TYPE_PLAYING_HEADER, paused)
+        )
+        offset += 2
+
+        if (hasNext) {
+            items.add(
+                playingIndex + offset,
+                PlaylistItem.headerItem(context, PlaylistItem.TYPE_NEXT_HEADER)
+            )
+        }
+
+        _playlist.postValue(items)
     }
 
     fun backgroundPlayEnabled(): Boolean {
@@ -297,6 +422,13 @@ class AudioPlayerViewModel(
         preferences.edit()
             .putBoolean(KEY_SHUFFLE_ENABLED, shuffleEnabled)
             .apply()
+
+        postPlaylistItems()
+    }
+
+    fun newShuffleOrder(): ShuffleOrder {
+        shuffleOrder = ExposedShuffleOrder(playlistItems.size, this)
+        return shuffleOrder
     }
 
     fun repeatMode(): Int {
@@ -326,5 +458,11 @@ class AudioPlayerViewModel(
                 .clear()
                 .apply()
         }
+    }
+
+    override fun onShuffleChanged(newShuffle: ShuffleOrder) {
+        shuffleOrder = newShuffle
+
+        postPlaylistItems()
     }
 }

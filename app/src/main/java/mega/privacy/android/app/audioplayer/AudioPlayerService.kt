@@ -34,7 +34,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     private val binder = AudioPlayerServiceBinder(this)
 
-    private lateinit var viewModel: AudioPlayerViewModel
+    lateinit var viewModel: AudioPlayerViewModel
 
     private lateinit var trackSelector: DefaultTrackSelector
     lateinit var exoPlayer: SimpleExoPlayer
@@ -64,8 +64,9 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             .setTrackSelector(trackSelector)
             .build()
 
-        exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist ->
-            _metadata.value = Metadata(title, artist, exoPlayer.currentMediaItem?.mediaId ?: "")
+        exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist, album ->
+            _metadata.value =
+                Metadata(title, artist, album, exoPlayer.currentMediaItem?.mediaId ?: "")
         })
 
         exoPlayer.shuffleModeEnabled = viewModel.shuffleEnabled()
@@ -81,12 +82,22 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
             override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                 viewModel.setShuffleEnabled(shuffleModeEnabled)
+
+                if (shuffleModeEnabled) {
+                    exoPlayer.setShuffleOrder(viewModel.newShuffleOrder())
+                }
             }
 
             override fun onRepeatModeChanged(repeatMode: Int) {
                 viewModel.setRepeatMode(repeatMode)
             }
+
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                viewModel.paused = !playWhenReady
+            }
         })
+
+        exoPlayer.setShuffleOrder(viewModel.shuffleOrder)
     }
 
     private fun createPlayerControlNotification() {
@@ -151,7 +162,6 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             }
         ).apply {
             setUseChronometer(false)
-            setControlDispatcher(AudioPlayerControlDispatcher())
 
             setPlayer(exoPlayer)
         }
@@ -177,7 +187,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         displayNodeNameFirst: Boolean
     ) {
         if (displayNodeNameFirst && mediaItems.isNotEmpty()) {
-            _metadata.value = Metadata(null, null, mediaItems.first().mediaId)
+            _metadata.value = Metadata(null, null, null, mediaItems.first().mediaId)
         }
 
         if (newIndexForCurrentItem == INVALID_VALUE) {

@@ -425,7 +425,7 @@
 
         <activity
             android:name=".audioplayer.AudioPlayerActivity"
-            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" />
 
         <activity
