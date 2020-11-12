@@ -7,14 +7,20 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError.*
 
 object AdUnitSource : MegaRequestListenerInterface {
+
     const val INVALID_UNIT_ID = "invalid_unit_id"
+    const val SLOT_NUM = 5
+
+    private val megaApi = MegaApplication.getInstance().megaApi
 
     private var fetching = false
+    private var querying = false
+
     private var adUnitMap: MegaStringMap? = null
-    private val megaApi = MegaApplication.getInstance().megaApi
+    private var isAdsUser = true
+
     private var lastFetchTime: Long = 0
     private var lastQueryTime: Long = 0
-    private var isAdsUser = true
 
     private var callbacks = mutableSetOf<FetchCallback>()
     private var queryCallback: QueryCallback? = null
@@ -26,7 +32,7 @@ object AdUnitSource : MegaRequestListenerInterface {
     }
 
     interface QueryCallback {
-        fun queryShowAdsDone(result: Int)
+        fun queryShowOrNotDone(result: Int)
     }
 
     fun setQueryCallback(cb: QueryCallback?) {
@@ -60,25 +66,30 @@ object AdUnitSource : MegaRequestListenerInterface {
         fetching = true
 
         val adSlotIds = MegaStringList.createInstance()
-        adSlotIds.add("and0")
-        adSlotIds.add("and1")
-        adSlotIds.add("and2")
-        adSlotIds.add("and3")
-        adSlotIds.add("and4")
-        adSlotIds.add("and5")
+        for (i in 0..SLOT_NUM) {
+            adSlotIds.add("and".plus(i))
+        }
+//        adSlotIds.add("and0")
+//        adSlotIds.add("and1")
+//        adSlotIds.add("and2")
+//        adSlotIds.add("and3")
+//        adSlotIds.add("and4")
+//        adSlotIds.add("and5")
 
         Log.i("Alex", "startcall")
         megaApi.fetchGoogleAds(512, adSlotIds, INVALID_HANDLE, this)
         Log.i("Alex", "endcall")
     }
 
-    fun showAdOrNot(publicHandle: Long) {
+    fun queryShowOrNot(publicHandle: Long) {
         if (publicHandle == INVALID_HANDLE) return
 
         val cacheResult = handleQueryCache[publicHandle]
         if (!needRequery(lastQueryTime) && cacheResult != null) {
-            queryCallback?.queryShowAdsDone(cacheResult)
+            queryCallback?.queryShowOrNotDone(cacheResult)
         } else {
+            if (querying) return
+            querying = true
             megaApi.queryGoogleAds(512, publicHandle, this)
         }
     }
@@ -97,30 +108,23 @@ object AdUnitSource : MegaRequestListenerInterface {
         when (request?.type) {
             MegaRequest.TYPE_FETCH_GOOGLE_ADS -> {
                 fetching = false
-                e?.let {
-                    lastFetchTime = System.currentTimeMillis()
+                lastFetchTime = System.currentTimeMillis()
 
+                e?.let {
                     when (e.errorCode) {
                         API_OK -> {
-                        adUnitMap = request.megaStringMap
-//                            adUnitMap = MegaStringMap.createInstance()
-//                            adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
-//                            adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
-//                            adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
-//                            adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
-//                            adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
-//                            adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
+//                            adUnitMap = request.megaStringMap
+                            adUnitMap = MegaStringMap.createInstance()
+                            adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
+                            adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
+                            adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
+                            adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
+                            adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
+                            adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
 
                             for (cb in callbacks) {
                                 cb.adUnitsFetched()
                             }
-//                        Log.i("Alex", "size=" + a?.size())
-//                        val b = a?.keys
-//                        for (i in 0..7) {
-////
-//                            Log.i("Alex", "key=" + (b?.get(i) ?: -1))
-//                            Log.i("Alex", "unit id=" + a?.get(b?.get(i)))
-//                        }
                         }
 
                         API_ENOENT -> {
@@ -135,14 +139,15 @@ object AdUnitSource : MegaRequestListenerInterface {
             }
 
             MegaRequest.TYPE_QUERY_GOOGLE_ADS -> {
+                querying = false
                 lastQueryTime = System.currentTimeMillis()
+
                 e?.let {
                     if (e.errorCode == API_OK) {
                         val result = request.numDetails
                         handleQueryCache[request.nodeHandle] = result
-                        queryCallback?.queryShowAdsDone(result)
+                        queryCallback?.queryShowOrNotDone(result)
                         Log.i("Alex", "showAdOrNot:${result}")
-//                            cb.queryShowAds(request.numDetails)
                     }
                 }
             }

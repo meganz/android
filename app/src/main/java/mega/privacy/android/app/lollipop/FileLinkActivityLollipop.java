@@ -396,17 +396,19 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					return;
 				}
 
-				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + document.getHandle());
+				long handle = document.getHandle();
+
+				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + handle);
 				if (dbH == null){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
 
-				if (document.getHandle() != MegaApiJava.INVALID_HANDLE) {
-					dbH.setLastPublicHandle(document.getHandle());
+				if (handle != MegaApiJava.INVALID_HANDLE) {
+					dbH.setLastPublicHandle(handle);
 					dbH.setLastPublicHandleTimeStamp();
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
 
-					mAdsLoader.queryPublicHandle(document.getHandle());
+					mAdsLoader.queryShowOrNotByHandle(handle);
 				}
 
 //				nameView.setText(document.getName());
