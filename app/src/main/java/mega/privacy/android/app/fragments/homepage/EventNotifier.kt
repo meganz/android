@@ -28,6 +28,9 @@ val notificationCountChange: LiveData<Int> = notificationCountChange_
 private val chatOnlineStatusChange_ = MutableLiveData<Int>()
 val chatOnlineStatusChange: LiveData<Int> = chatOnlineStatusChange_
 
+private val homepageVisibilityChange_ = MutableLiveData<Boolean>()
+val homepageVisibilityChange: LiveData<Boolean> = homepageVisibilityChange_
+
 fun notifyNodesChange(forceUpdate: Boolean) {
     nodesChange_.value = forceUpdate
 }
@@ -54,4 +57,8 @@ fun notifyNotificationCountChange(count: Int) {
 
 fun notifyChatOnlineStatusChange(status: Int) {
     chatOnlineStatusChange_.value = status
+}
+
+fun notifyHomepageVisibilityChange(visible: Boolean) {
+    homepageVisibilityChange_.value = visible
 }

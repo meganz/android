@@ -153,15 +153,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             holder.itemNumUsersReaction.setLayoutParams(params);
             holder.itemNumUsersReaction.setGravity(Gravity.CENTER_VERTICAL);
 
-            boolean ownReaction = false;
-            MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
-            for (int i = 0; i < handleList.size(); i++) {
-                if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
-                    ownReaction = true;
-                    break;
-                }
-            }
-
+            boolean ownReaction = isMyOwnReaction(chatId, messageId, reaction);
             holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
         }else{

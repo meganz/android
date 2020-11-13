@@ -26,7 +26,7 @@
             app:destination="@id/audioFragment" />
         <action
             android:id="@+id/action_homepage_to_recentBucket"
-            app:destination="@id/recentBucketFragment"/>
+            app:destination="@id/recentBucketFragment" />
         <action
             android:id="@+id/action_homepageFragment_to_videoFragment"
             app:destination="@id/videoFragment" />
@@ -34,10 +34,18 @@
     <fragment
         android:id="@+id/photosFragment"
         android:name="mega.privacy.android.app.fragments.homepage.photos.PhotosFragment"
-        android:label="@string/sortby_type_photo_first" />
+        android:label="@string/sortby_type_photo_first">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
     <fragment
         android:id="@+id/recentBucketFragment"
-        android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment"/>
+        android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
     <fragment
         android:id="@+id/fullscreen_offline"
         android:name="mega.privacy.android.app.fragments.offline.OfflineFragment"
@@ -64,17 +72,32 @@
         <argument
             android:name="handle"
             app:argType="string" />
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
     </fragment>
     <fragment
         android:id="@+id/documentsFragment"
         android:name="mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment"
-        android:label="DocumentsFragment" />
+        android:label="DocumentsFragment">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
     <fragment
         android:id="@+id/audioFragment"
         android:name="mega.privacy.android.app.fragments.homepage.audio.AudioFragment"
-        android:label="AudioFragment" />
+        android:label="AudioFragment">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
     <fragment
         android:id="@+id/videoFragment"
         android:name="mega.privacy.android.app.fragments.homepage.video.VideoFragment"
-        android:label="VideoFragment" />
+        android:label="VideoFragment">
+        <action
+            android:id="@+id/action_homepage_to_fullscreen_offline"
+            app:destination="@id/fullscreen_offline" />
+    </fragment>
 </navigation>

@@ -50,7 +50,7 @@ ext {
     // App dependencies
     appCompatVersion = '1.2.0'
     daggerVersion = "2.24"
-    constraintLayoutVersion = '2.0.0-rc1'
+    constraintLayoutVersion = '2.0.3'
     coroutinesVersion = "1.3.0-M2"
     fragmentKtxVersion = '1.2.5'
     glideVersion = '4.10.0'

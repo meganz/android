@@ -173,8 +173,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 checkScroll();
             }
         });
-        setRecentsView();
         fillRecentItems(buckets);
+        setRecentsView();
         return v;
     }
 

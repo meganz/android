@@ -47,6 +47,7 @@ public class Constants {
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
+    public static final int REQUEST_CODE_PICK_GIF = 1034;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -59,6 +60,7 @@ public class Constants {
     public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
     public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
     public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
+    public static final String ACTION_PREVIEW_GIPHY = "ACTION_PREVIEW_GIPHY";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -432,6 +434,13 @@ public class Constants {
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
     public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
 
+    public static final int MAX_REACTIONS_PER_USER = 24;
+    public static final int MAX_REACTIONS_PER_MESSAGE = 50;
+
+    public static final int REACTION_ERROR_TYPE_MESSAGE = -1;
+    public static final int REACTION_ERROR_DEFAULT_VALUE = 0;
+    public static final int REACTION_ERROR_TYPE_USER = 1;
+
     /**
      * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
      */
@@ -688,4 +697,7 @@ public class Constants {
     public static final long AUDIO_PLAYER_TRACK_NAME_FADE_DURATION_MS = 200;
     public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
     public static final long AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
+
+    // 15360 GB = 15TB
+    public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 }

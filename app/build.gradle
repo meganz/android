@@ -16,10 +16,12 @@ android {
 
     defaultConfig {
         applicationId "mega.privacy.android.app"
+
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 329
-        versionName "3.8.0 (329)"
+        versionCode 334
+        versionName "3.8.1 (334)"
+
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
     }
@@ -161,12 +163,20 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
 
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
+
     implementation "com.facebook.fresco:fresco:$frescoVersion"
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
     implementation "com.facebook.fresco:animated-webp:$frescoVersion"
     implementation "com.facebook.fresco:webpsupport:$frescoVersion"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+    implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
