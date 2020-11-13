@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer
+package mega.privacy.android.app.audioplayer.playlist
 
 import androidx.recyclerview.widget.DiffUtil
 

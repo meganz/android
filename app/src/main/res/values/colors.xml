@@ -237,7 +237,9 @@
     <!-- colors for audio player -->
     <color name="audio_player_main_bg">#333333</color>
     <color name="audio_player_controller_bg">#222222</color>
+    <color name="white_12_opacity">#1EFFFFFF</color>
     <color name="white_38_opacity">#60FFFFFF</color>
     <color name="white_60_opacity">#99FFFFFF</color>
+    <color name="white_70_opacity">#B2FFFFFF</color>
     <color name="teal_300">#00BFA5</color>
 </resources>

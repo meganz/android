@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer
+package mega.privacy.android.app.audioplayer.playlist
 
 import android.content.ComponentName
 import android.content.Context
@@ -9,23 +9,20 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
-import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity
+import mega.privacy.android.app.audioplayer.AudioPlayerService
+import mega.privacy.android.app.audioplayer.AudioPlayerServiceBinder
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.autoCleared
 
-@AndroidEntryPoint
 class PlaylistFragment : Fragment(), PlaylistItemOperation {
     private var binding by autoCleared<FragmentAudioPlaylistBinding>()
 
-    private lateinit var playerServiceIntent: Intent
     private var playerService: AudioPlayerService? = null
 
     private lateinit var adapter: PlaylistAdapter
@@ -62,9 +59,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbar.navigationIcon =
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        (requireActivity() as AudioPlayerActivity).showToolbar(false)
 
         adapter = PlaylistAdapter(this)
 
@@ -79,7 +74,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
+        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
         playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
         requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }

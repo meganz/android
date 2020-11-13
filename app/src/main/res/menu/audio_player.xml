@@ -25,6 +25,14 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_menu_search"
+        android:orderInCategory="85"
+        android:title="@string/action_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
         android:id="@+id/get_link"
         android:orderInCategory="115"
         android:title="@string/context_get_link_menu"

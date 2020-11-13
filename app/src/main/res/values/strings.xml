@@ -2948,4 +2948,5 @@
     <string name="not_background_play_hint" context="Text that indicates the audio will not be played on background">Not playing on the background</string>
     <string name="audio_player_now_playing" context="Text that indicates the song is now playing">Now Playing</string>
     <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now Playing (paused)</string>
+    <string name="audio_track_info" context="Title of the song info screen">Track info</string>
 </resources>

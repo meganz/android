@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -76,8 +77,14 @@ public class OfflineUtils {
             String path = dlFiles.get(document);
 
             if(availableFreeSpace <document.getSize()){
-                Util.showErrorAlertDialog(context.getString(R.string.error_not_enough_free_space) + " (" + document.getName() + ")", false, activity);
-                continue;
+                RunOnUIThreadUtils.INSTANCE.post(() -> {
+                    Util.showErrorAlertDialog(
+                            context.getString(R.string.error_not_enough_free_space)
+                                    + " (" + document.getName() + ")",
+                            false, activity);
+                    return Unit.INSTANCE;
+                });
+                return;
             }
 
             String url = null;

@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="mega.privacy.android.app.audioplayer.PlaylistItem" />
+            type="mega.privacy.android.app.audioplayer.playlist.PlaylistItem" />
 
         <variable
             name="highlight"
@@ -17,7 +17,7 @@
 
         <variable
             name="itemOperation"
-            type="mega.privacy.android.app.audioplayer.PlaylistItemOperation" />
+            type="mega.privacy.android.app.audioplayer.playlist.PlaylistItemOperation" />
     </data>
 
     <FrameLayout

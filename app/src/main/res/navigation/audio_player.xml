@@ -7,15 +7,43 @@
     <fragment
         android:id="@+id/audio_player"
         android:name="mega.privacy.android.app.audioplayer.AudioPlayerFragment"
-        android:label="audio_player"
+        android:label=""
         tools:layout="@layout/fragment_audio_player">
         <action
             android:id="@+id/action_player_to_playlist"
             app:destination="@id/playlist" />
+
+        <action
+            android:id="@+id/action_player_to_track_info"
+            app:destination="@id/track_info" />
     </fragment>
+
     <fragment
         android:id="@+id/playlist"
-        android:name="mega.privacy.android.app.audioplayer.PlaylistFragment"
-        android:label="audio_player"
-        tools:layout="@layout/fragment_audio_playlist" />
+        android:name="mega.privacy.android.app.audioplayer.playlist.PlaylistFragment"
+        android:label=""
+        tools:layout="@layout/fragment_audio_playlist">
+        <action
+            android:id="@+id/action_playlist_to_track_info"
+            app:destination="@id/track_info" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/track_info"
+        android:name="mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment"
+        android:label=""
+        tools:layout="@layout/fragment_audio_track_info">
+        <argument
+            android:name="adapterType"
+            app:argType="integer" />
+        <argument
+            android:name="from"
+            app:argType="integer" />
+        <argument
+            android:name="handle"
+            app:argType="long" />
+        <argument
+            android:name="uri"
+            app:argType="android.net.Uri" />
+    </fragment>
 </navigation>

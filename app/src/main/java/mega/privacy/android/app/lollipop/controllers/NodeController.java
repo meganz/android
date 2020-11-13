@@ -48,6 +48,7 @@ import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.download.DownloadInfo;
 import nz.mega.sdk.MegaApiAndroid;
@@ -316,13 +317,7 @@ public class NodeController {
     }
 
     public MegaNode getParent (MegaNode node) {
-        MegaNode parent = node;
-
-        while (megaApi.getParentNode(parent) != null){
-            parent = megaApi.getParentNode(parent);
-        }
-
-        return parent;
+        return MegaNodeUtil.getTopAncestorNode(node);
     }
 
     public int getIncomingLevel(MegaNode node) {

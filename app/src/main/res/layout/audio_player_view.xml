@@ -16,11 +16,17 @@
         tools:layout_marginTop="60dp"
         tools:visibility="visible">
 
+        <!-- ExoPlayer will set exo_artwork invisible until it get metadata -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_default_audio_cover" />
+
         <ImageView
             android:id="@id/exo_artwork"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_audio_thumbnail" />
+            tools:visibility="invisible" />
     </androidx.cardview.widget.CardView>
 
     <View

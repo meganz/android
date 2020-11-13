@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.audioplayer.playlist.PlaylistItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*

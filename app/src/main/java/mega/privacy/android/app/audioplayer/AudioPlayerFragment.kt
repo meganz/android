@@ -8,14 +8,15 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -25,7 +26,6 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import com.google.android.exoplayer2.util.Util
-import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.utils.Constants.*
@@ -34,7 +34,6 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.SimpleAnimatorListener
 import mega.privacy.android.app.utils.autoCleared
 
-@AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
     private var binding by autoCleared<FragmentAudioPlayerBinding>()
 
@@ -45,7 +44,6 @@ class AudioPlayerFragment : Fragment() {
     private lateinit var bgPlayHint: TextView
     private lateinit var playlist: ImageButton
 
-    private lateinit var playerServiceIntent: Intent
     private var playerService: AudioPlayerService? = null
 
     private var playlistObserved = false
@@ -103,46 +101,6 @@ class AudioPlayerFragment : Fragment() {
         bgPlayHint = binding.root.findViewById(R.id.background_play_hint)
         playlist = binding.root.findViewById(R.id.playlist)
 
-        binding.toolbar.navigationIcon =
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_back_white)!!.mutate()
-        binding.toolbar.setNavigationOnClickListener { requireActivity().finish() }
-
-        binding.toolbar.inflateMenu(R.menu.audio_player)
-        binding.toolbar.setOnMenuItemClickListener(object : Toolbar.OnMenuItemClickListener {
-            override fun onMenuItemClick(item: MenuItem): Boolean {
-                when (item.itemId) {
-                    R.id.save_to_device -> {
-                        return true
-                    }
-                    R.id.properties -> {
-                        return true
-                    }
-                    R.id.send_to_chat -> {
-                        return true
-                    }
-                    R.id.get_link -> {
-                        return true
-                    }
-                    R.id.remove_link -> {
-                        return true
-                    }
-                    R.id.rename -> {
-                        return true
-                    }
-                    R.id.move -> {
-                        return true
-                    }
-                    R.id.copy -> {
-                        return true
-                    }
-                    R.id.move_to_trash -> {
-                        return true
-                    }
-                }
-                return false
-            }
-        })
-
         tryObservePlaylist()
 
         runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
@@ -155,12 +113,8 @@ class AudioPlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val extras = activity?.intent?.extras ?: return
-        playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
-        playerServiceIntent.putExtras(extras)
-        playerServiceIntent.setDataAndType(activity?.intent?.data, activity?.intent?.type)
-        Util.startForegroundService(requireContext(), playerServiceIntent)
-
+        val playerServiceIntent = Intent(requireContext(), AudioPlayerService::class.java)
+        playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
         requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -365,18 +319,12 @@ class AudioPlayerFragment : Fragment() {
     private fun hideToolbar() {
         toolbarVisible = false
 
-        binding.toolbar.animate()
-            .translationY(-binding.toolbar.measuredHeight.toFloat())
-            .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
-            .start()
+        (requireActivity() as AudioPlayerActivity).hideToolbar()
     }
 
     private fun showToolbar() {
         toolbarVisible = true
 
-        binding.toolbar.animate()
-            .translationY(0F)
-            .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
-            .start()
+        (requireActivity() as AudioPlayerActivity).showToolbar()
     }
 }

@@ -5,15 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/audio_player_controller_bg">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:popupTheme="@style/Theme.Megaactionbar"
-        app:subtitleTextAppearance="@style/ToolbarSubtitle"
-        app:theme="@style/Theme.Megaactionbar"
-        app:titleTextAppearance="@style/ToolbarTitle" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlist"
         android:layout_width="match_parent"

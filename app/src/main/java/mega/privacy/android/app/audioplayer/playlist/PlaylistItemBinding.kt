@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer
+package mega.privacy.android.app.audioplayer.playlist
 
 import android.net.Uri
 import androidx.databinding.BindingAdapter
