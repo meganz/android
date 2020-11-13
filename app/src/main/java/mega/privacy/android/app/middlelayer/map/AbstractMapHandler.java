@@ -6,6 +6,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.MapAddress;
 import mega.privacy.android.app.lollipop.megachat.MapsActivity;
 
+/**
+ * Hold a MapsActivity reference,
+ * so that the sub classes share the methods that requires to access MapsActivity.
+ */
 public abstract class AbstractMapHandler implements MapHandler {
 
     protected MapsActivity activity;

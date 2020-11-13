@@ -104,6 +104,12 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         }
     }
 
+    /**
+     * Callback when get a location's coordinate.
+     *
+     * @param lati Latitude of the location.
+     * @param longi Longitude of the location.
+     */
     public void onGetLastLocation(double lati, double longi) {
         addresses = getAddresses(this, lati, longi);
         if (addresses != null) {
@@ -425,6 +431,13 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         }
     }
 
+    /**
+     * Callback when snapshot of current location is ready.
+     *
+     * @param byteArray Binary data of the snapshot.
+     * @param latitude Latitude of the location.
+     * @param longitude Longitude of the location.
+     */
     public void onSnapshotReady(byte[] byteArray, double latitude, double longitude) {
         Intent intent = new Intent();
         intent.putExtra(SNAPSHOT, byteArray);
@@ -483,6 +496,9 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         }
     }
 
+    /**
+     * Show map marker.
+     */
     public void showMarker() {
         if (fullscreenMarkerIcon.getVisibility() == View.VISIBLE) {
             fullscreenMarkerIcon.animate().translationY(0).setDuration(100L).withEndAction(() ->

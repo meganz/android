@@ -12230,7 +12230,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
                     mBillingManager.updatePurchase();
                 } else {
-                    //TODO already owned
+                    logWarning("Purchase failed, error code: " + purchaseResult);
                 }
             } else {
                 logWarning("cancel subscribe");

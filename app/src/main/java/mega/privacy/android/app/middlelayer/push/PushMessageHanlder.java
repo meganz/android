@@ -54,7 +54,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
     private boolean beep;
 
-    private static String TOKEN;
+    private static String token;
 
     public PushMessageHanlder() {
         app = MegaApplication.getInstance();
@@ -63,6 +63,11 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         dbH = DatabaseHandler.getDbHandler(app);
     }
 
+    /**
+     * Awake CPU to make sure the following operations can finish.
+     *
+     * @param launchService Whether launch a foreground service to keep the app alive.
+     */
     private void awakeCpu(boolean launchService) {
         PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
         if (pm != null) {
@@ -166,6 +171,13 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         }
     }
 
+    /**
+     * Send the push token to API to register the device.
+     * Token will be cached, only when the new token is different,it will be sent.
+     *
+     * @param newToken Push token gotten from the platform.
+     * @param deviceType DEVICE_ANDROID or DEVICE_HUAWEI
+     */
     public void sendRegistrationToServer(String newToken, int deviceType) {
         if(TextUtil.isTextEmpty(newToken)) return;
 
@@ -176,7 +188,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
                 megaApi = app.getMegaApi();
             }
             logDebug("Push service's new token: " + newToken);
-            TOKEN = token;
+            PushMessageHanlder.token = token;
             megaApi.registerPushNotifications(deviceType, newToken, this);
         } else {
             logDebug("No need to register new token.");
@@ -184,9 +196,14 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     }
 
     public static String getToken() {
-        return TOKEN;
+        return token;
     }
 
+    /**
+     * If the account hasn't logined in, login first.
+     *
+     * @param gSession Cached session, used to do a fast login.
+     */
     private void performLoginProccess(String gSession) {
         isLoggingIn = MegaApplication.isLoggingIn();
         if (!isLoggingIn) {
@@ -321,6 +338,9 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
     }
 
+    /**
+     * Generic push message object, used to unify corresponding platform dependent purchase object.
+     */
     public static class Message {
 
         private static final String KEY_SILENT = "silent";
@@ -329,12 +349,25 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
         private static final String NO_BEEP = "1";
 
+        /**
+         * Where is the message from. May be null. Just for log purpose.
+         */
         private String from;
 
+        /**
+         * Store couples of info sent from server,
+         * but the client only use: silent, type, email.
+         */
         private Map<String, String> data;
 
+        /**
+         * Just for log and debug purpose.
+         */
         private int originalPriority;
 
+        /**
+         * Just for log and debug purpose.
+         */
         private int priority;
 
         public Message(String from, int originalPriority, int priority, Map<String, String> data) {
@@ -344,10 +377,20 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             this.data = data;
         }
 
+        /**
+         * Check if the data map has info.
+         *
+         * @return true, has; false, doesn't have.
+         */
         public boolean hasData() {
             return data != null && data.size() > 0;
         }
 
+        /**
+         * Get the message type.
+         *
+         * @return Message type, or null if data map is empty.
+         */
         @Nullable
         public String getType() {
             if (hasData()) {
@@ -357,6 +400,11 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             return null;
         }
 
+        /**
+         * Get the email.
+         *
+         * @return Email, or null if data map is empty.
+         */
         @Nullable
         public String getEmail() {
             if (hasData()) {
@@ -366,6 +414,11 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             return null;
         }
 
+        /**
+         * Get if the push message should be silent.
+         *
+         * @return Message type, or null if data map is empty.
+         */
         @Nullable
         public String getSilent() {
             if (hasData()) {

@@ -90,8 +90,6 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.nirhart:parallaxscroll:1.0'
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.firebase:firebase-messaging:20.3.0'
-    implementation 'com.google.firebase:firebase-core:17.5.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.vdurmont:emoji-java:4.0.0'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.11.8'
@@ -107,9 +105,6 @@ dependencies {
     implementation 'androidx.emoji:emoji-appcompat:1.1.0'
     implementation 'androidx.emoji:emoji-bundled:1.1.0'
     implementation 'androidx.preference:preference:1.1.1'
-    implementation 'com.google.android.gms:play-services-location:17.1.0'
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
     implementation 'com.github.tony19:named-regexp:0.2.5'
@@ -132,7 +127,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     //GMS
-    gmsImplementation 'com.google.firebase:firebase-messaging:20.3.0'
+    implementation 'com.google.firebase:firebase-core:18.0.0'
+    gmsImplementation 'com.google.firebase:firebase-messaging:21.0.0'
     gmsImplementation 'com.android.billingclient:billing:3.0.1'
     gmsImplementation 'com.google.android.gms:play-services-location:17.1.0'
     gmsImplementation 'com.google.android.gms:play-services-maps:17.0.0'

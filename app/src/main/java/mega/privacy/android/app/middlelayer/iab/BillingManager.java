@@ -32,7 +32,7 @@ public interface BillingManager {
             SKU_PRO_LITE_YEAR);
 
     /**
-     * For HMS resolution
+     * For HMS only.
      */
     interface RequestCode {
 

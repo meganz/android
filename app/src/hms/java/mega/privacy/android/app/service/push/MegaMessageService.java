@@ -27,6 +27,12 @@ public class MegaMessageService extends HmsMessageService {
         messageHanlder = new PushMessageHanlder();
     }
 
+    /**
+     * Convert Huawei RemoteMessage object into generic Message object.
+     *
+     * @param remoteMessage Huawei RemoteMessage.
+     * @return Generic Message object.
+     */
     private PushMessageHanlder.Message convert(RemoteMessage remoteMessage) {
         return new PushMessageHanlder.Message(
                 remoteMessage.getFrom(),
@@ -48,6 +54,11 @@ public class MegaMessageService extends HmsMessageService {
         messageHanlder.sendRegistrationToServer(s, DEVICE_HUAWEI);
     }
 
+    /**
+     * Request push service token by sending appId to HMS, then register it in API as an identifier of the device.
+     *
+     * @param context Context.
+     */
     public static void getToken(Context context) {
         Executors.newFixedThreadPool(1).submit(() -> {
             String appId = AGConnectServicesConfig.fromContext(context).getString("client/app_id");

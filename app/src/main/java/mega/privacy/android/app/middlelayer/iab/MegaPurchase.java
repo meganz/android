@@ -1,16 +1,31 @@
 package mega.privacy.android.app.middlelayer.iab;
 
-
+/**
+ * Generic purchase object, used to unify corresponding platform dependent purchase object.
+ *
+ * In HMS, it's InAppPurchaseData.
+ * In GMS, it's Purchase.
+ */
 public class MegaPurchase {
 
+    /**
+     * SKU of the product.
+     */
     private String sku;
 
+    /**
+     * Receipt of the purchase, will be submitted to API.
+     */
     private String receipt;
 
-    private String userHandle;
-
+    /**
+     * State of the purchase.
+     */
     private int state;
 
+    /**
+     * Token of the purchase.
+     */
     private String token;
 
     public String getSku() {
@@ -19,10 +34,6 @@ public class MegaPurchase {
 
     public String getReceipt() {
         return receipt;
-    }
-
-    public String getUserHandle() {
-        return userHandle;
     }
 
     public int getState() {
@@ -39,10 +50,6 @@ public class MegaPurchase {
 
     public void setReceipt(String receipt) {
         this.receipt = receipt;
-    }
-
-    public void setUserHandle(String userHandle) {
-        this.userHandle = userHandle;
     }
 
     public void setState(int state) {

@@ -442,17 +442,32 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
         }
     }
 
+    /**
+     * Converter for converting platform dependent objects to generic MEGA objects.
+     */
     private static class Converter {
+
+        /**
+         * Convert Purchase object in GMS into generic MegaPurchase object.
+         *
+         * @param purchase Purchase object.
+         * @return Generic MegaPurchase object.
+         */
         public static MegaPurchase convert(Purchase purchase) {
             MegaPurchase p = new MegaPurchase();
             p.setSku(purchase.getSku());
             p.setReceipt(purchase.getOriginalJson());
             p.setState(purchase.getPurchaseState());
             p.setToken(purchase.getPurchaseToken());
-            p.setUserHandle(purchase.getDeveloperPayload());
             return p;
         }
 
+        /**
+         * Convert Purchase objects in a list into generic MegaPurchase objects list.
+         *
+         * @param purchases Purchase objects list.
+         * @return Generic MegaPurchase objects list.
+         */
         public static List<MegaPurchase> convertPurchases(@Nullable List<Purchase> purchases) {
             if (purchases == null) {
                 return null;
@@ -464,12 +479,24 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             return result;
         }
 
+        /**
+         * Convert SkuDetails object in GMS into generic MegaSku object.
+         *
+         * @param sku SkuDetails object.
+         * @return Generic MegaSku object.
+         */
         public static MegaSku convert(SkuDetails sku) {
             MegaSku megaSku = new MegaSku();
             megaSku.setSku(sku.getSku());
             return megaSku;
         }
 
+        /**
+         * Convert SkuDetails objects in a list into generic MegaSku objects list.
+         *
+         * @param skus SkuDetails objects list.
+         * @return Generic MegaSku objects list.
+         */
         public static List<MegaSku> convertSkus(@Nullable List<SkuDetails> skus) {
             if (skus == null) {
                 return null;

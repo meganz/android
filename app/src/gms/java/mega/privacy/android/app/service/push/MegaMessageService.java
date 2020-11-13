@@ -33,6 +33,12 @@ public class MegaMessageService extends FirebaseMessagingService {
         super.onDestroy();
     }
 
+    /**
+     * Convert Google RemoteMessage object into generic Message object.
+     *
+     * @param remoteMessage Google RemoteMessage.
+     * @return Generic Message object.
+     */
     private PushMessageHanlder.Message convert(RemoteMessage remoteMessage) {
         return new PushMessageHanlder.Message(
                 remoteMessage.getFrom(),
@@ -54,6 +60,11 @@ public class MegaMessageService extends FirebaseMessagingService {
         messageHanlder.sendRegistrationToServer(s, DEVICE_ANDROID);
     }
 
+    /**
+     * Request push service token, then register it in API as an identifier of the device.
+     *
+     * @param context Context.
+     */
     public static void getToken(Context context) {
         //project number from google-service.json
         Executors.newFixedThreadPool(1).submit(() -> {

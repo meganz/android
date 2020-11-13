@@ -1,5 +1,8 @@
 package mega.privacy.android.app.middlelayer.map;
 
+/**
+ * Generic coordinate object, used to unify corresponding platform dependent purchase object.
+ */
 public class MegaLatLng {
 
     private double latitude;

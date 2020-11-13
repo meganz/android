@@ -114,8 +114,6 @@ public class BillingManagerImpl implements BillingManager {
      */
     public static final int PAYMENT_GATEWAY = MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET;
 
-    private String payload;
-
     private final Activity mActivity;
 
     private final BillingUpdatesListener mBillingUpdatesListener;
@@ -154,6 +152,12 @@ public class BillingManagerImpl implements BillingManager {
         getPurchase(true);
     }
 
+    /**
+     * Query the subscription of current Huawei account and cache it in mPurchases.
+     *
+     * @param refresh true, after making a purchase, needs to refresh immediatley.
+     *                false, just update account info.
+     */
     private void getPurchase(boolean refresh) {
         OwnedPurchasesReq req = new OwnedPurchasesReq();
         req.setPriceType(IapClient.PriceType.IN_APP_SUBSCRIPTION);
@@ -184,6 +188,11 @@ public class BillingManagerImpl implements BillingManager {
         }).addOnFailureListener(this::handleException);
     }
 
+    /**
+     * Check if a purchase is purchased and valid, if so add it to mPurchases.
+     *
+     * @param originalJson
+     */
     private void handlePurchase(String originalJson) {
         try {
             InAppPurchaseData data = new InAppPurchaseData(originalJson);
@@ -220,7 +229,6 @@ public class BillingManagerImpl implements BillingManager {
         PurchaseIntentReq req = new PurchaseIntentReq();
         req.setPriceType(IapClient.PriceType.IN_APP_SUBSCRIPTION);
         req.setProductId(newSku);
-        req.setDeveloperPayload(payload);
 
         Task<PurchaseIntentResult> task = iapClient.createPurchaseIntent(req);
         task.addOnSuccessListener(result -> {
@@ -285,6 +293,7 @@ public class BillingManagerImpl implements BillingManager {
 
     /**
      * Code from HMS official sample.
+     * If the exception is an IapApiException, will get the error code and produce corresponding error message.
      *
      * @param e Exception
      */
@@ -339,7 +348,7 @@ public class BillingManagerImpl implements BillingManager {
     }
 
     /**
-     * To start an Activity.
+     * To start an Activity specied by the pendingIntent in Status object.
      *
      * @param status  This parameter contains the pendingIntent object of the payment page.
      * @param reqCode Result code.
@@ -365,12 +374,24 @@ public class BillingManagerImpl implements BillingManager {
      */
     private static class Converter {
 
+        /**
+         * Convert ProductInfo object in HMS into generic MegaSku object.
+         *
+         * @param sku ProductInfo object.
+         * @return Generic MegaSku object.
+         */
         public static MegaSku convert(ProductInfo sku) {
             MegaSku megaSku = new MegaSku();
             megaSku.setSku(sku.getProductId());
             return megaSku;
         }
 
+        /**
+         * Convert ProductInfo objects in a list into generic MegaSku objects list.
+         *
+         * @param skus ProductInfo objects list.
+         * @return Generic MegaSku objects list.
+         */
         public static List<MegaSku> convertSkus(@Nullable List<ProductInfo> skus) {
             if (skus == null) {
                 return null;
@@ -382,30 +403,21 @@ public class BillingManagerImpl implements BillingManager {
             return result;
         }
 
+        /**
+         * Convert an InAppPurchaseData object in HMS into generic MegaPurchase object.
+         *
+         * @param originalJson The JSON used to build InAppPurchaseData object.
+         * @return Generic MegaPurchase object.
+         * @throws JSONException When InAppPurchaseData with JSON string.
+         */
         public static MegaPurchase convert(String originalJson) throws JSONException {
             InAppPurchaseData data = new InAppPurchaseData(originalJson);
             MegaPurchase purchase = new MegaPurchase();
-            purchase.setUserHandle(data.getDeveloperPayload());
             purchase.setToken(data.getPurchaseToken());
             purchase.setState(data.getPurchaseState());
             purchase.setSku(data.getProductId());
             purchase.setReceipt(originalJson);
             return purchase;
-        }
-
-        public static List<MegaPurchase> convertPurchases(@Nullable List<String> originalJsons) {
-            if (originalJsons == null) {
-                return null;
-            }
-            List<MegaPurchase> result = new ArrayList<>(originalJsons.size());
-            for (String data : originalJsons) {
-                try {
-                    result.add(convert(data));
-                } catch (JSONException e) {
-                    logError(e.getMessage(), e);
-                }
-            }
-            return result;
         }
     }
 }
