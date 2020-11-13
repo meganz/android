@@ -14,9 +14,11 @@ object AdUnitSource : MegaRequestListenerInterface {
     // The value indicates the unit ID hasn't been fetched or outdated
     const val INVALID_UNIT_ID = "invalid_unit_id"
     // Currently, only 5 screens has 1 Ad banner view for each
-    const val SLOT_NUM = 5
+    private const val SLOT_NUM = 5
     // Ad Flag (see API doc)
-    const val AD_FLAG = 512
+    private const val AD_FLAG = 512
+    // The time threshold for requiring a new fetch/query
+    private const val TIME_THRESHOLD = TimeUtils.HOUR * 6
 
     private val megaApi = MegaApplication.getInstance().megaApi
 
@@ -127,7 +129,7 @@ object AdUnitSource : MegaRequestListenerInterface {
     }
 
     private fun needRequery(lastTime: Long) =
-        System.currentTimeMillis() - lastTime > TimeUtils.HOUR * 6
+        System.currentTimeMillis() - lastTime > TIME_THRESHOLD
 
     override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
         Log.i("Alex", "onRequestStart")
