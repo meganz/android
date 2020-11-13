@@ -173,7 +173,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
     /**
      * Method for updating version information.
      */
-    public void setVersionsInfo() {
+    private void setVersionsInfo() {
         MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
 
         if (myAccountInfo == null)

@@ -7616,7 +7616,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Back up timestamps and disabled MU upload.
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
-                sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_MU_UI_SETTING));
             } else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
@@ -11085,7 +11084,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-						sendBroadcast(new Intent(ACTION_GET_SIZE_OFFLINE_SETTING));
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -11116,7 +11114,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
-						sendBroadcast(new Intent(ACTION_GET_SIZE_OFFLINE_SETTING));
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13085,13 +13082,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				}
 			}
-			else if (request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-				logDebug("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
-				if (e.getErrorCode() != MegaError.API_OK){
-					logError("ERROR:USER_ATTR_RICH_PREVIEWS");
-					sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
-				}
-			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
 				if (e.getErrorCode() == MegaError.API_OK) {
@@ -13229,29 +13219,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 			}
-            else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
-
-				if(e.getErrorCode() == MegaError.API_ENOENT){
-					logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
-				}
-
-				if(request.getNumDetails()==1){
-					logDebug("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-
-					long counter = request.getNumber();
-					boolean flag = request.getFlag();
-
-					MegaApplication.setShowRichLinkWarning(request.getFlag());
-					MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
-				}
-				else if(request.getNumDetails()==0){
-
-					logDebug("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:" + request.getFlag());
-
-					MegaApplication.setEnabledRichLinks(request.getFlag());
-					sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
-				}
-            }
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
 
 				if(e.getErrorCode() == MegaError.API_OK){
@@ -13880,8 +13847,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if(mStorageFLol!=null){
 				mStorageFLol.refreshVersionsInfo();
 			}
-
-			sendBroadcast(new Intent(ACTION_SET_VERSION_INFO_SETTING));
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
@@ -15168,27 +15133,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		logDebug("onChatPresenceConfigUpdate");
-		if(config!=null){
-			logDebug("Config status: " + config.getOnlineStatus());
-			logDebug("Config autoway: " + config.isAutoawayEnabled());
-			logDebug("Config persist: " + config.isPersist());
-			logDebug("Config lastGreen: " + config.isLastGreenVisible());
-			boolean isLastGreen = config.isLastGreenVisible();
-			if(config.isPending()){
-				logDebug("Config is pending - do not update UI");
-			}
-			else{
-				Intent intentPresence = new Intent(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE);
-				intentPresence.putExtra(PRESENCE_CANCELLED, false);
-				sendBroadcast(intentPresence);
-			}
-		}
-		else{
-			logWarning("Config is null");
-		}
-	}
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) { }
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {

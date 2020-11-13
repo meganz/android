@@ -68,19 +68,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
-    private final BroadcastReceiver statusUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttChat == null)
-                return;
-
-            if (intent.getAction().equals(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE)) {
-                boolean cancelled = intent.getBooleanExtra(PRESENCE_CANCELLED, false);
-                sttChat.updatePresenceConfigChat(cancelled);
-            }
-        }
-    };
-
     private final BroadcastReceiver signalPresenceReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -106,10 +93,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
 
         registerReceiver(richLinksUpdateReceiver,
                 new IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE));
-
-        registerReceiver(statusUpdateReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_STATUS_SETTING_UPDATE));
-
 
         registerReceiver(chatRoomMuteUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
@@ -232,7 +215,6 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
         super.onDestroy();
         unregisterReceiver(networkReceiver);
         unregisterReceiver(richLinksUpdateReceiver);
-        unregisterReceiver(statusUpdateReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(signalPresenceReceiver);
     }

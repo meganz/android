@@ -34,8 +34,8 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
-    private static final int MINIMUM_PERIOD = 6;
-    private static final int MAXIMUM_PERIOD = 31;
+    private static final int RB_SCHEDULER_MINIMUM_PERIOD = 6;
+    private static final int RB_SCHEDULER_MAXIMUM_PERIOD = 31;
     private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
@@ -50,18 +50,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
             if (intent.getAction().equals(ACTION_UPDATE_CACHE_SIZE_SETTING)) {
                 String size = intent.getStringExtra(CACHE_SIZE);
                 sttFileManagment.setCacheSize(size);
-            }
-        }
-    };
-
-    private final BroadcastReceiver setVersionInfoReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_SET_VERSION_INFO_SETTING)) {
-                sttFileManagment.setVersionsInfo();
             }
         }
     };
@@ -186,9 +174,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
-        registerReceiver(setVersionInfoReceiver,
-                new IntentFilter(ACTION_SET_VERSION_INFO_SETTING));
-
         registerReceiver(resetVersionInfoReceiver,
                 new IntentFilter(ACTION_RESET_VERSION_INFO_SETTING));
 
@@ -207,7 +192,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(networkReceiver);
         unregisterReceiver(updateMyAccountReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
-        unregisterReceiver(setVersionInfoReceiver);
         unregisterReceiver(resetVersionInfoReceiver);
         unregisterReceiver(updateRBSchedulerReceiver);
         unregisterReceiver(updateFileVersionsReceiver);
@@ -313,8 +297,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
             int daysCount = Integer.parseInt(value);
             boolean isNotFree = MegaApplication.getInstance().getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE;
 
-            if ((isNotFree && daysCount > MINIMUM_PERIOD)
-                    || (daysCount > MINIMUM_PERIOD && daysCount < MAXIMUM_PERIOD)) {
+            if ((isNotFree && daysCount > RB_SCHEDULER_MINIMUM_PERIOD)
+                    || (daysCount > RB_SCHEDULER_MINIMUM_PERIOD && daysCount < RB_SCHEDULER_MAXIMUM_PERIOD)) {
                 setRBSchedulerValue(value);
                 newFolderDialog.dismiss();
             } else {

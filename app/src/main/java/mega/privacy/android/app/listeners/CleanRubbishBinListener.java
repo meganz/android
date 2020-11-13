@@ -19,23 +19,17 @@ public class CleanRubbishBinListener extends BaseListener {
 
     @Override
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-        super.onRequestFinish(api, request, e);
-        if (context == null)
-            return;
+        if (request.getType() != MegaRequest.TYPE_CLEAN_RUBBISH_BIN) return;
 
-        switch (request.getType()) {
-            case MegaRequest.TYPE_CLEAN_RUBBISH_BIN:
-                if (e.getErrorCode() == MegaError.API_OK) {
-                    Util.showSnackbar(context, context.getString(R.string.rubbish_bin_emptied));
-                    resetAccountDetailsTimeStamp();
-                    if (context instanceof FileManagementPreferencesActivity) {
-                        ((FileManagementPreferencesActivity) context).resetRubbishInfo();
-                    }
-                } else {
-                    Util.showSnackbar(context, context.getString(R.string.rubbish_bin_no_emptied));
-                }
+        if (e.getErrorCode() == MegaError.API_OK) {
+            Util.showSnackbar(context, context.getString(R.string.rubbish_bin_emptied));
+            resetAccountDetailsTimeStamp();
 
-                break;
+            if (context instanceof FileManagementPreferencesActivity) {
+                ((FileManagementPreferencesActivity) context).resetRubbishInfo();
+            }
+        } else {
+            Util.showSnackbar(context, context.getString(R.string.rubbish_bin_no_emptied));
         }
     }
 }

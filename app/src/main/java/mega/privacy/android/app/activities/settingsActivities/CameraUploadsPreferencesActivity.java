@@ -77,10 +77,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 case ACTION_UPDATE_DISABLE_CU_UI_SETTING:
                     sttCameraUploads.disableCameraUploadUIProcess();
                     break;
-
-                case ACTION_UPDATE_DISABLE_MU_UI_SETTING:
-                    sttCameraUploads.disableMediaUploadUIProcess();
-                    break;
             }
         }
     };
@@ -131,7 +127,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 new IntentFilter(ACTION_UPDATE_ENABLE_CU_SETTING);
         filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_SETTING);
         filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_UI_SETTING);
-        filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_MU_UI_SETTING);
         registerReceiver(enableDisableCameraUploadReceiver, filterCUMUSettings);
 
         IntentFilter filterUpdateCUSettings =
