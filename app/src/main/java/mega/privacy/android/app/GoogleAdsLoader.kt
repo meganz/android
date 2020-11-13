@@ -42,8 +42,11 @@ class GoogleAdsLoader(
     // The Ad banner view
     private var adView: PublisherAdView? = null
 
-    // Current Ad unit Id
+    // The unit Id of the Ad going to be loaded
     private var adUnitId = AdUnitSource.INVALID_UNIT_ID
+
+    // The unit id of the current successfully showed AD
+    private var showedAdUnitId = AdUnitSource.INVALID_UNIT_ID
 
     private val adSize: AdSize
         get() {
@@ -100,7 +103,7 @@ class GoogleAdsLoader(
         }
 
         // Return if the unit id is invalid or the same Ad had been loaded
-        if (TextUtil.isTextEmpty(adUnitId) || this.adUnitId == adUnitId) return
+        if (TextUtil.isTextEmpty(adUnitId) || showedAdUnitId == adUnitId) return
         this.adUnitId = adUnitId
 
         Log.i("Alex", "new PublisherAdView")
@@ -109,6 +112,7 @@ class GoogleAdsLoader(
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 logDebug("Ad has been loaded")
+                showedAdUnitId = this@GoogleAdsLoader.adUnitId
             }
         }
         adViewContainer.addView(adView)
@@ -150,6 +154,7 @@ class GoogleAdsLoader(
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
+        Log.i("Alex", "onDestroy")
         adView?.destroy()
 
         AdUnitSource.removeFetchCallback(this)
