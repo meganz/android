@@ -474,7 +474,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	}
 
 	private void initAdsLoader() {
-		mAdsLoader = new GoogleAdsLoader(AD_SLOT, true);
+		mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
 		getLifecycle().addObserver(mAdsLoader);
 	}
 

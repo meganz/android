@@ -248,7 +248,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	}
 
 	private void initAdsLoader() {
-		mAdsLoader = new GoogleAdsLoader(AD_SLOT, false);
+		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
 		getLifecycle().addObserver(mAdsLoader);
 		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
 	}
