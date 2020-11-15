@@ -15494,7 +15494,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 
 				updateFabPositionAndShow(true);
-				fabButton.setImageDrawable(mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 				break;
 
 			case SEARCH:
