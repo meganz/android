@@ -165,7 +165,6 @@
             android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
             android:launchMode="singleTask"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:windowSoftInputMode="adjustNothing">
 
             <intent-filter>
@@ -186,8 +185,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
@@ -359,8 +357,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileInfoActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
         <activity
             android:name=".activities.OfflineFileInfoActivity"
