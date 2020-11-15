@@ -127,7 +127,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
     //GMS
-    implementation 'com.google.firebase:firebase-core:18.0.0'
+    gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
     gmsImplementation 'com.google.firebase:firebase-messaging:21.0.0'
     gmsImplementation 'com.android.billingclient:billing:3.0.1'
     gmsImplementation 'com.google.android.gms:play-services-location:17.1.0'
