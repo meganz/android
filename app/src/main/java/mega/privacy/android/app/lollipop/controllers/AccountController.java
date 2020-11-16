@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
 
@@ -29,11 +28,10 @@ import java.io.IOException;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.audioplayer.AudioPlayerViewModel;
+import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -443,7 +441,7 @@ public class AccountController {
         clearCUBackUp();
 
         new LastShowSMSDialogTimeChecker(context).reset();
-        AudioPlayerViewModel.Companion.clearSettings(context);
+        AudioPlayerServiceViewModel.Companion.clearSettings(context);
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();

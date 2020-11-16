@@ -8,25 +8,32 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.service.AudioPlayerService
+import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
 
 @AndroidEntryPoint
-class AudioPlayerActivity : AppCompatActivity() {
+class AudioPlayerActivity : BaseActivity() {
+
+    private val viewModel: AudioPlayerViewModel by viewModels()
 
     private lateinit var toolbar: Toolbar
     private lateinit var actionBar: ActionBar
     private lateinit var navController: NavController
+
+    private var adapterType = INVALID_VALUE
 
     private var optionsMenu: Menu? = null
     private var propertiesMenuItem: MenuItem? = null
@@ -60,6 +67,12 @@ class AudioPlayerActivity : AppCompatActivity() {
             return
         }
 
+        adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+        if (adapterType == INVALID_VALUE) {
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_audio_player)
         changeStatusBarColor(this, window, R.color.black)
 
@@ -70,13 +83,13 @@ class AudioPlayerActivity : AppCompatActivity() {
         setupToolbar()
         setupNavDestListener()
 
-        val extras = intent?.extras ?: return
+        val extras = intent.extras ?: return
         val playerServiceIntent = Intent(this, AudioPlayerService::class.java)
 
         playerServiceIntent.putExtras(extras)
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
-            playerServiceIntent.setDataAndType(intent?.data, intent?.type)
+            playerServiceIntent.setDataAndType(intent.data, intent.type)
             startForegroundService(this, playerServiceIntent)
         }
 
@@ -194,18 +207,27 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val launchIntent = intent ?: return false
+        val service = playerService ?: return false
+        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return false
+
         when (item.itemId) {
             R.id.save_to_device -> {
+                if (adapterType == OFFLINE_ADAPTER) {
+                    viewModel.saveOfflineNode(service.viewModel.playingHandle) { intent, code ->
+                        startActivityForResult(intent, code)
+                    }
+                } else {
+                    viewModel.saveMegaNode(
+                        service.viewModel.playingHandle,
+                        adapterType == FOLDER_LINK_ADAPTER
+                    ) { intent, code ->
+                        startActivityForResult(intent, code)
+                    }
+                }
                 return true
             }
             R.id.properties -> {
-                val launchIntent = intent ?: return false
-                val service = playerService ?: return false
-                val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri
-                    ?: return false
-
-                val adapterType =
-                    launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
                 val from = launchIntent.getIntExtra(INTENT_EXTRA_KEY_FROM, INVALID_VALUE)
                 navController.navigate(
                     AudioPlayerFragmentDirections.actionPlayerToTrackInfo(
@@ -237,6 +259,12 @@ class AudioPlayerActivity : AppCompatActivity() {
             }
         }
         return false
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (!viewModel.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     fun setToolbarTitle(title: String) {

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer
+package mega.privacy.android.app.audioplayer.service
 
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.metadata.Metadata

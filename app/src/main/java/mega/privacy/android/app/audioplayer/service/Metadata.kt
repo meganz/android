@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer
+package mega.privacy.android.app.audioplayer.service
 
 /**
  * This class hold metadata for an audio node.

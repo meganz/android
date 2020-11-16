@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -616,6 +617,9 @@ public class NodeController {
         else if(context instanceof ContactInfoActivityLollipop){
             ActivityCompat.requestPermissions(((ContactInfoActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
+        else if(context instanceof BaseActivity){
+            ActivityCompat.requestPermissions(((BaseActivity) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+        }
     }
 
     public void download(String parentPath, String url, long size, long[] hashes, boolean highPriority) {
@@ -779,9 +783,11 @@ public class NodeController {
                 if (node.getType() == MegaNode.TYPE_FOLDER) {
                     if (sdCardOperator.isSDCardDownload()) {
                         sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node);
-                        getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
+                        MegaNodeUtil.getDlList(megaApi, dlFiles, node,
+                                new File(sdCardOperator.getDownloadRoot(), node.getName()));
                     } else {
-                        getDlList(dlFiles, node, new File(parentPath, node.getName()));
+                        MegaNodeUtil.getDlList(megaApi, dlFiles, node,
+                                new File(parentPath, node.getName()));
                     }
                 } else {
                     if (sdCardOperator.isSDCardDownload()) {
@@ -857,28 +863,6 @@ public class NodeController {
             }
 
             showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, emptyFolders);
-        }
-    }
-
-    /*
-	 * Get list of all child files
-	 */
-    private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-        logDebug("getDlList");
-        if (megaApi.getRootNode() == null)
-            return;
-
-        folder.mkdir();
-        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
-        for(int i=0; i<nodeList.size(); i++){
-            MegaNode document = nodeList.get(i);
-            if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subfolder = new File(folder, new String(document.getName()));
-                getDlList(dlFiles, document, subfolder);
-            }
-            else {
-                dlFiles.put(document, folder.getAbsolutePath());
-            }
         }
     }
 

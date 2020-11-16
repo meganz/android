@@ -809,9 +809,11 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				if (node.getType() == MegaNode.TYPE_FOLDER) {
                     if (sdCardOperator.isSDCardDownload()) {
                         sdCardOperator.buildFileStructure(targets, parentPath, megaApiFolder, node);
-                        getDlList(dlFiles, node, new File(sdCardOperator.getDownloadRoot(), node.getName()));
+                        getDlList(megaApiFolder, dlFiles, node,
+								new File(sdCardOperator.getDownloadRoot(), node.getName()));
                     } else {
-                        getDlList(dlFiles, node, new File(parentPath, node.getName()));
+                        getDlList(megaApiFolder, dlFiles, node,
+								new File(parentPath, node.getName()));
                     }
 				} else {
                     if (sdCardOperator.isSDCardDownload()) {
@@ -891,30 +893,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			showSnackBarWhenDownloading(this, numberOfNodesPending, numberOfNodesAlreadyDownloaded, emptyFolders);
 		}
 	}
-	
-	
-	/*
-	 * Get list of all child files
-	 */
-	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-		
-		if (megaApiFolder.getRootNode() == null)
-			return;
-		
-		folder.mkdir();
-		ArrayList<MegaNode> nodeList = megaApiFolder.getChildren(parent, orderGetChildren);
-		for(int i=0; i<nodeList.size(); i++){
-			MegaNode document = nodeList.get(i);
-			if (document.getType() == MegaNode.TYPE_FOLDER) {
-				File subfolder = new File(folder, new String(document.getName()));
-				getDlList(dlFiles, document, subfolder);
-			} 
-			else {
-				dlFiles.put(document, folder.getAbsolutePath());
-			}
-		}
-	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("onActivityResult");

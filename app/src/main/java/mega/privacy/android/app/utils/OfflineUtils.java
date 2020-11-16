@@ -66,7 +66,7 @@ public class OfflineUtils {
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             logDebug("Is Folder");
             MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-            getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
+            MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
         } else {
             logDebug("Is File");
             dlFiles.put(node, destination.getAbsolutePath());
@@ -94,32 +94,6 @@ public class OfflineUtils {
             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
             service.putExtra(DownloadService.EXTRA_PATH, path);
             context.startService(service);
-        }
-    }
-
-    /*
-     * Get list of all child files
-     */
-    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder,
-            MegaApiAndroid megaApi) {
-        if (megaApi.getRootNode() == null) {
-            return;
-        }
-
-        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
-        if (nodeList.size() == 0) {
-            // if this is an empty folder, do nothing
-            return;
-        }
-        folder.mkdir();
-        for (int i = 0; i < nodeList.size(); i++) {
-            MegaNode document = nodeList.get(i);
-            if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subFolder = new File(folder, document.getName());
-                getDlList(dlFiles, document, subFolder, megaApi);
-            } else {
-                dlFiles.put(document, folder.getAbsolutePath());
-            }
         }
     }
 
@@ -399,7 +373,7 @@ public class OfflineUtils {
         Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
         if (node.getType() == MegaNode.TYPE_FOLDER) {
             logDebug("Is Folder");
-            getDlList(dlFiles, node, new File(destination, node.getName()), megaApi);
+            MegaNodeUtil.getDlList(megaApi, dlFiles, node, new File(destination, node.getName()));
         } else {
             logDebug("Is File");
             dlFiles.put(node, destination.getAbsolutePath());

@@ -25,8 +25,10 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
-import com.google.android.exoplayer2.util.Util
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.service.AudioPlayerService
+import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
+import mega.privacy.android.app.audioplayer.service.Metadata
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post

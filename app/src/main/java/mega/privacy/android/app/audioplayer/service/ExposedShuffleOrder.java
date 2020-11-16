@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer;
+package mega.privacy.android.app.audioplayer.service;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.source.ShuffleOrder;

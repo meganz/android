@@ -19,6 +19,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -748,5 +749,36 @@ public class MegaNodeUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * Get list of all child files.
+     *
+     * @param megaApi MegaApiAndroid instance
+     * @param dlFiles map to store all child files
+     * @param parent the parent node
+     * @param folder the destination folder
+     */
+    public static void getDlList(MegaApiAndroid megaApi, Map<MegaNode, String> dlFiles,
+                                 MegaNode parent, File folder) {
+        if (megaApi.getRootNode() == null) {
+            return;
+        }
+
+        ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
+        if (nodeList.size() == 0) {
+            // if this is an empty folder, do nothing
+            return;
+        }
+        folder.mkdir();
+        for(int i=0; i<nodeList.size(); i++){
+            MegaNode document = nodeList.get(i);
+            if (document.getType() == MegaNode.TYPE_FOLDER) {
+                File subfolder = new File(folder, document.getName());
+                getDlList(megaApi, dlFiles, document, subfolder);
+            } else {
+                dlFiles.put(document, folder.getAbsolutePath());
+            }
+        }
     }
 }

@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
-import mega.privacy.android.app.audioplayer.AudioPlayerService
-import mega.privacy.android.app.audioplayer.AudioPlayerServiceBinder
+import mega.privacy.android.app.audioplayer.service.AudioPlayerService
+import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.autoCleared

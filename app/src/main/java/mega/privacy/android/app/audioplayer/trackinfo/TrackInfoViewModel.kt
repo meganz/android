@@ -13,8 +13,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.audioplayer.Metadata
-import mega.privacy.android.app.audioplayer.MetadataExtractor
+import mega.privacy.android.app.audioplayer.service.Metadata
+import mega.privacy.android.app.audioplayer.service.MetadataExtractor
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER

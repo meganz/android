@@ -533,7 +533,7 @@
         </service>
 
         <service
-            android:name=".audioplayer.AudioPlayerService"
+            android:name=".audioplayer.service.AudioPlayerService"
             android:exported="false" >
         </service>
 

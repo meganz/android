@@ -23,6 +23,25 @@ class OfflineNodeSaver @Inject constructor(
     /**
      * Save an offline node into device.
      *
+     * @param handle the handle of the offline node to save
+     * @param highPriority whether this download is high priority or not
+     * @param activityStarter a high-order function to launch activity when needed
+     */
+    fun save(handle: Long, highPriority: Boolean, activityStarter: (Intent, Int) -> Unit) {
+        save(activityStarter, savingProducer = {
+            val node = dbHandler.findByHandle(handle)
+
+            if (node == null) {
+                null
+            } else {
+                OfflineSaving(getTotalSize(getOfflineFile(context, node)), highPriority, node)
+            }
+        })
+    }
+
+    /**
+     * Save an offline node into device.
+     *
      * @param node the offline node to save
      * @param highPriority whether this download is high priority or not
      * @param activityStarter a high-order function to launch activity when needed

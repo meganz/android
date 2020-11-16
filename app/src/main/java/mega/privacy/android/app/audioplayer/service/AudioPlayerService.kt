@@ -1,4 +1,4 @@
-package mega.privacy.android.app.audioplayer
+package mega.privacy.android.app.audioplayer.service
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.audioplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
@@ -35,7 +36,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     private val binder = AudioPlayerServiceBinder(this)
 
-    lateinit var viewModel: AudioPlayerViewModel
+    lateinit var viewModel: AudioPlayerServiceViewModel
 
     private lateinit var trackSelector: DefaultTrackSelector
     lateinit var exoPlayer: SimpleExoPlayer
@@ -50,7 +51,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
 
-        viewModel = AudioPlayerViewModel(this, megaApi, dbHandler)
+        viewModel = AudioPlayerServiceViewModel(this, megaApi, dbHandler)
 
         createPlayer()
         createPlayerControlNotification()

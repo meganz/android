@@ -2,7 +2,6 @@ package mega.privacy.android.app.components.saver
 
 import android.Manifest.permission
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -26,10 +26,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_FROM_SETTINGS
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PATH
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PROMPT
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
@@ -42,13 +39,9 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.askMe
-import mega.privacy.android.app.utils.Util.getSizeString
-import mega.privacy.android.app.utils.Util.scaleHeightPx
-import mega.privacy.android.app.utils.Util.scaleWidthPx
-import mega.privacy.android.app.utils.Util.showNotEnoughSpaceSnackbar
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiJava
+import java.util.concurrent.Callable
 
 /**
  * A class that encapsulate all the procedure of saving a node into device,
@@ -66,7 +59,7 @@ import nz.mega.sdk.MegaApiJava
  */
 abstract class NodeSaver(
     protected val context: Context,
-    private val dbHandler: DatabaseHandler
+    protected val dbHandler: DatabaseHandler,
 ) {
     private val compositeDisposable = CompositeDisposable()
     private val uiHandler = Handler(Looper.getMainLooper())
@@ -87,6 +80,10 @@ abstract class NodeSaver(
      * fragment/activity should handle the result by other code.
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
+        if (saving == Saving.NOTHING) {
+            return false
+        }
+
         if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == Activity.RESULT_OK) {
             logDebug("REQUEST_CODE_SELECT_LOCAL_FOLDER")
             if (intent == null) {
@@ -109,13 +106,9 @@ abstract class NodeSaver(
             if (intent == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
                 if (resultCode != Activity.RESULT_OK) {
-                    Util.showSnackbar(
-                        context, context.getString(R.string.download_requires_permission)
-                    )
+                    showSnackbar(context, context.getString(R.string.download_requires_permission))
                 } else {
-                    Util.showSnackbar(
-                        context, context.getString(R.string.no_external_SD_card_detected)
-                    )
+                    showSnackbar(context, context.getString(R.string.no_external_SD_card_detected))
                 }
                 return false
             }
@@ -156,25 +149,28 @@ abstract class NodeSaver(
      * @param activityStarter a high-order function to launch activity when needed
      * @param savingProducer a high-order function to produce internal state needed for later use
      */
-    protected fun save(activityStarter: (Intent, Int) -> Unit, savingProducer: () -> Saving) {
+    protected fun save(activityStarter: (Intent, Int) -> Unit, savingProducer: () -> Saving?) {
         if (lackPermission()) {
             return
         }
 
-        add(Completable
-            .fromCallable {
-                saving = savingProducer()
-                this.activityStarter = activityStarter
-                val downloadLocationDefaultPath = getDownloadLocation()
+        add(
+            Completable
+                .fromCallable(Callable {
+                    val saving = savingProducer() ?: return@Callable
+                    this.saving = saving
+                    this.activityStarter = activityStarter
+                    val downloadLocationDefaultPath = getDownloadLocation()
 
-                if (askMe(context)) {
-                    requestLocalFolder(null, activityStarter)
-                } else {
-                    checkSizeBeforeDownload(downloadLocationDefaultPath)
-                }
-            }
-            .subscribeOn(Schedulers.io())
-            .subscribe(IGNORE, logErr("NodeSaver save")))
+                    if (askMe(context)) {
+                        requestLocalFolder(null, activityStarter)
+                    } else {
+                        checkSizeBeforeDownload(downloadLocationDefaultPath)
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver save"))
+        )
     }
 
     private fun requestLocalFolder(
@@ -314,7 +310,7 @@ abstract class NodeSaver(
         notShowAgain.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
         confirmationLayout.addView(notShowAgain, params)
 
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
             .setView(confirmationLayout)
             .setMessage(message)
             .setPositiveButton(
