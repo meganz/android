@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.databinding.FragmentAudioTrackInfoBinding
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.autoCleared
@@ -33,6 +34,8 @@ class TrackInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (requireActivity() as AudioPlayerActivity).showToolbar(false)
 
         viewModel.metadata.observe(viewLifecycleOwner) {
             val metadata = it.first

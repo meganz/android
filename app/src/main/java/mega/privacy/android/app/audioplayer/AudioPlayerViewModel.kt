@@ -20,10 +20,12 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.playlist.PlaylistItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.IGNORE
@@ -62,10 +64,11 @@ class AudioPlayerViewModel(
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
 
-    private val _playlist = MutableLiveData<Pair<List<PlaylistItem>, Int>>()
-    val playlist: LiveData<Pair<List<PlaylistItem>, Int>> = _playlist
+    private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
+    val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
 
     var currentIntent: Intent? = null
+    var playlistTitle = ""
 
     private val playlistItems = ArrayList<PlaylistItem>()
 
@@ -148,12 +151,13 @@ class AudioPlayerViewModel(
                 .fromCallable {
                     when (type) {
                         OFFLINE_ADAPTER -> {
+                            playlistTitle = getOfflineFolderName(firstPlayHandle)
+
                             buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                         }
-                        AUDIO_SEARCH_ADAPTER -> {
-                            buildPlaylistFromHandles(intent, firstPlayHandle)
-                        }
                         AUDIO_BROWSE_ADAPTER -> {
+                            playlistTitle = context.getString(R.string.upload_to_audio)
+
                             buildPlaylistForAudio(intent, firstPlayHandle)
                         }
                     }
@@ -211,6 +215,25 @@ class AudioPlayerViewModel(
                 getThumbnailFile(context, it)
             }
         )
+    }
+
+    private fun getOfflineFolderName(handle: Long): String {
+        val node = dbHandler.findByHandle(handle) ?: return ""
+        val file = getOfflineFile(context, node)
+        if (!file.exists()) {
+            return ""
+        }
+
+        val parentName = file.parentFile?.name ?: return ""
+        val grandParentName = file.parentFile?.parentFile?.name
+        return when {
+            grandParentName != null
+                    && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR ->
+                context.getString(R.string.section_saved_for_offline_new)
+            parentName == OfflineUtils.OFFLINE_DIR ->
+                context.getString(R.string.section_saved_for_offline_new)
+            else -> parentName
+        }
     }
 
     private fun buildPlaylistFromHandles(intent: Intent, firstPlayHandle: Long) {
@@ -440,7 +463,7 @@ class AudioPlayerViewModel(
             )
         }
 
-        _playlist.postValue(Pair(items, scrollPosition))
+        _playlist.postValue(Triple(items, scrollPosition, playlistTitle))
     }
 
     fun backgroundPlayEnabled(): Boolean {

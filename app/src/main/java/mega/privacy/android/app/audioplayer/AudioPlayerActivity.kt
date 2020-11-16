@@ -122,7 +122,6 @@ class AudioPlayerActivity : AppCompatActivity() {
                     toggleAllMenuItemsVisibility(false)
                     searchMenuItem?.isVisible = true
 
-                    actionBar.title = ""
                     viewingTrackInfo = null
                 }
                 R.id.track_info -> {
@@ -211,6 +210,10 @@ class AudioPlayerActivity : AppCompatActivity() {
             }
         }
         return false
+    }
+
+    fun setToolbarTitle(title: String) {
+        toolbar.title = title
     }
 
     fun hideToolbar() {

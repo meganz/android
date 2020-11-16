@@ -95,6 +95,8 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
                 adapter.submitList(it.first) {
                     listLayoutManager.scrollToPositionWithOffset(it.second, 0)
                 }
+
+                (requireActivity() as AudioPlayerActivity).setToolbarTitle(it.third)
             }
         }
     }
