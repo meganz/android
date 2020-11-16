@@ -1309,7 +1309,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         setJoiningOrLeaving(getString(R.string.joining_label));
                     }
                 } else {
-                    long newIdChat = newIntent.getLongExtra("CHAT_ID", -1);
+                    long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 
                     if(idChat != newIdChat){
                         megaChatApi.closeChatRoom(idChat, this);
@@ -1387,7 +1387,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                         int errorCode = newIntent.getIntExtra("PUBLIC_LINK", 1);
                         if (savedInstanceState == null) {
-                            text = newIntent.getStringExtra("showSnackbar");
+                            text = newIntent.getStringExtra(SHOW_SNACKBAR);
                             if (text == null) {
                                 if (errorCode != 1) {
                                     if (errorCode == MegaChatError.ERROR_OK) {
@@ -6356,46 +6356,80 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return indexToChange;
     }
 
-
-    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean checkTempId){
-        logDebug("Msg ID: " + msg.getMessage().getMsgId());
-        logDebug("Msg TEMP ID: " + msg.getMessage().getTempId());
-        logDebug("Msg status: " + msg.getMessage().getStatus());
-        int indexToChange = -1;
-        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
-
+    /**
+     * Checks on the provided list if the message to update exists.
+     * If so, returns its index on list.
+     *
+     * @param msg           The updated AndroidMegaChatMessage.
+     * @param checkTempId   True if has to check the temp id instead of final id.
+     * @param itr           ListIterator containing the list of messages to check.
+     * @return The index to change if successful, INVALID_POSITION otherwise.
+     */
+    private int getIndexToUpdate(AndroidMegaChatMessage msg, boolean checkTempId, ListIterator<AndroidMegaChatMessage> itr) {
         // Iterate in reverse.
-        while(itr.hasPrevious()) {
+        while (itr.hasPrevious()) {
             AndroidMegaChatMessage messageToCheck = itr.previous();
-            logDebug("Index: " + itr.nextIndex());
 
-            if(!messageToCheck.isUploading()){
-                logDebug("Checking with Msg ID: " + messageToCheck.getMessage().getMsgId());
-                logDebug("Checking with Msg TEMP ID: " + messageToCheck.getMessage().getTempId());
+            if (!messageToCheck.isUploading()) {
+                logDebug("Checking with Msg ID: " + messageToCheck.getMessage().getMsgId()
+                        + " and Msg TEMP ID: " + messageToCheck.getMessage().getTempId());
 
-                if(checkTempId){
-                    logDebug("Check temporal IDS");
-                    if (messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
-                        logDebug("Modify received messafe with idTemp");
-                        indexToChange = itr.nextIndex();
-                        break;
-                    }
+                if (checkTempId && messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+                    logDebug("Modify received message with idTemp");
+                    return itr.nextIndex();
+                } else if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
+                    logDebug("modifyMessageReceived");
+                    return itr.nextIndex();
                 }
-                else{
-                    if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
-                        logDebug("modifyMessageReceived");
-                        indexToChange = itr.nextIndex();
-                        break;
-                    }
-                }
-            }
-            else{
+            } else {
                 logDebug("This message is uploading");
             }
         }
 
+        return INVALID_POSITION;
+    }
+
+    /**
+     * Modifies a message on UI (messages list and adapter), on bufferMessages list
+     * or on bufferSending list, if it has been already loaded.
+     *
+     * @param msg           The updated AndroidMegaChatMessage.
+     * @param checkTempId   True if has to check the temp id instead of final id.
+     * @return The index to change if successful, INVALID_POSITION otherwise.
+     */
+    public int modifyMessageReceived(AndroidMegaChatMessage msg, boolean checkTempId){
+        logDebug("Msg ID: " + msg.getMessage().getMsgId()
+                + "Msg TEMP ID: " + msg.getMessage().getTempId()
+                + "Msg status: " + msg.getMessage().getStatus());
+
+        ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
+        int indexToChange = getIndexToUpdate(msg, checkTempId, itr);
+
+
+        if (indexToChange == INVALID_POSITION) {
+            itr = bufferMessages.listIterator(bufferMessages.size());
+            indexToChange = getIndexToUpdate(msg, checkTempId, itr);
+
+            if (indexToChange != INVALID_POSITION) {
+                bufferMessages.set(indexToChange, msg);
+                return indexToChange;
+            }
+        }
+
+        if (indexToChange == INVALID_POSITION) {
+            itr = bufferSending.listIterator(bufferSending.size());
+            indexToChange = getIndexToUpdate(msg, checkTempId, itr);
+
+            if (indexToChange != INVALID_POSITION) {
+                bufferSending.set(indexToChange, msg);
+                return indexToChange;
+            }
+        }
+
         logDebug("Index to change = " + indexToChange);
-        if(indexToChange==-1) return indexToChange;
+        if (indexToChange == INVALID_POSITION) {
+            return indexToChange;
+        }
 
         AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
         if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
@@ -7387,7 +7421,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("There is already a chat, open it!");
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
             this.startActivity(intentOpenChat);
         }
     }
@@ -7577,7 +7611,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("Open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
                 intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-                intent.putExtra("CHAT_ID", request.getChatHandle());
+                intent.putExtra(CHAT_ID, request.getChatHandle());
                 this.startActivity(intent);
                 finish();
             }
@@ -7935,7 +7969,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     return;
                 }else{
-                    long newidChat = intent.getLongExtra("CHAT_ID", -1);
+                    long newidChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
                     if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
                         cleanBuffers();
                     }
@@ -8226,42 +8260,34 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void openChatAfterForward(long chatHandle, String text){
-        logDebug("openChatAfterForward");
-
+    /**
+     * If the chat id received is valid, opens a chat after forward messages.
+     * If no, only disables select mode and shows a Snackbar if the text received is not null neither empty.
+     *
+     * @param chatHandle Chat id.
+     * @param text       Text to show as Snackbar if needed, null or empty otherwise.
+     */
+    public void openChatAfterForward(long chatHandle, String text) {
         removeProgressDialog();
 
-        if(chatHandle==idChat){
-            logDebug("Chat already opened");
-
+        if (chatHandle == idChat || chatHandle == MEGACHAT_INVALID_HANDLE) {
             disableMultiselection();
 
-            if(text!=null){
-                showSnackbar(SNACKBAR_TYPE, text, -1);
+            if (text != null) {
+                showSnackbar(SNACKBAR_TYPE, text, MEGACHAT_INVALID_HANDLE);
             }
-        }
-        else{
-            if(chatHandle!=-1){
-                logDebug("Open chat to forward messages");
 
-                Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
-                intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intentOpenChat.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-                intentOpenChat.putExtra("CHAT_ID", chatHandle);
-                if(text!=null){
-                    intentOpenChat.putExtra("showSnackbar", text);
-                }
-                startActivity(intentOpenChat);
-                closeChat(true);
-                finish();
-            }
-            else{
-                disableMultiselection();
-                if(text!=null){
-                    showSnackbar(SNACKBAR_TYPE, text, -1);
-                }
-            }
+            return;
         }
+
+        Intent intentOpenChat = new Intent(this, ManagerActivityLollipop.class);
+        intentOpenChat.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intentOpenChat.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
+        intentOpenChat.putExtra(CHAT_ID, chatHandle);
+        intentOpenChat.putExtra(SHOW_SNACKBAR, text);
+        closeChat(true);
+        startActivity(intentOpenChat);
+        finish();
     }
 
     public void markAsSeen(MegaChatMessage msg) {
