@@ -82,7 +82,6 @@ class GoogleAdsLoader(
         Log.i("Alex", "loadAd end")
     }
 
-
     private fun setUpBanner() {
         Log.i("Alex", "setupbanner begin")
         // If the user is not an Ad user any more, remove the Ad view if any and then return
@@ -126,10 +125,6 @@ class GoogleAdsLoader(
 
     override fun onCreate(owner: LifecycleOwner) {
         Log.i("Alex", "onCreate")
-        // The Ad loader is interested in the update of the ad units
-        // and the status change of the user
-        AdUnitSource.addFetchCallback(this)
-
         // Register a broadcast receiver for the changing of the user account
         // Re-fetch the ad unit ids and Ad user status if account changed (e.g. a free user
         // has just upgraded to pro user, then should not show Ads)
@@ -141,6 +136,9 @@ class GoogleAdsLoader(
 
     override fun onStart(owner: LifecycleOwner) {
         Log.i("Alex", "onStart")
+        // The Ad loader is interested in the update of the ad units
+        // and the status change of the user
+        AdUnitSource.addFetchCallback(this)
         // Start to set up the Ad banner view, provided that the view container
         // and the display metrics have been set. Put it at onStart() make the screen has
         // more chances to update the ad unit ids and the user status in time
@@ -149,7 +147,7 @@ class GoogleAdsLoader(
 
     override fun onStop(owner: LifecycleOwner) {
         Log.i("Alex", "onStop")
-//        AdUnitSource.removeCallback(this)
+        AdUnitSource.removeFetchCallback(this)
 //        AdUnitSource.setQueryCallback(null)
     }
 
@@ -157,7 +155,7 @@ class GoogleAdsLoader(
         Log.i("Alex", "onDestroy")
         adView?.destroy()
 
-        AdUnitSource.removeFetchCallback(this)
+//        AdUnitSource.removeFetchCallback(this)
         AdUnitSource.setQueryCallback(null)
         context.unregisterReceiver(updateAccountDetailsReceiver)
     }

@@ -371,8 +371,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         mManagerActivity = (ManagerActivityLollipop) context;
-
-        initAdsLoader();
     }
 
     private void initAdsLoader() {
@@ -392,6 +390,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             mBinding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
+
+            initAdsLoader();
+            setupGoogleAds();
+
             return mBinding.getRoot();
         }
     }
@@ -443,7 +445,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupOtherViews();
         observeLiveData();
         setDraggingThumbnailCallback();
-        setupGoogleAds();
     }
 
     private void setupGoogleAds() {
@@ -460,6 +461,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     @Override public void onDestroy() {
         super.onDestroy();
+
         FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(CameraUploadsFragment.class);
         AudioVideoPlayerLollipop.removeDraggingThumbnailCallback(CameraUploadsFragment.class);
     }

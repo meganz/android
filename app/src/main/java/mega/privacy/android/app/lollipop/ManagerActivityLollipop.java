@@ -5955,6 +5955,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (cuFragment == null) {
 					cuFragment = CameraUploadsFragment.newInstance(
 							CameraUploadsFragment.TYPE_CAMERA);
+				}else {
+					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
 
 				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
@@ -5979,6 +5981,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (muFragment == null) {
 					muFragment = CameraUploadsFragment.newInstance(
 							CameraUploadsFragment.TYPE_MEDIA);
+				}else {
+					refreshFragment(FragmentTag.MEDIA_UPLOADS.getTag());
 				}
 
 				replaceFragment(muFragment, FragmentTag.MEDIA_UPLOADS.getTag());
