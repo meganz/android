@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.ShareListener;
@@ -301,6 +302,9 @@ public class NodeController {
         }
         else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
+        }
+        else if (context instanceof AudioPlayerActivity) {
+            ((AudioPlayerActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
     }
 

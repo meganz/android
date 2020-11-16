@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
@@ -21,14 +22,23 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AudioPlayerActivity : BaseActivity() {
 
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
+
     private val viewModel: AudioPlayerViewModel by viewModels()
 
+    private lateinit var rootLayout: FrameLayout
     private lateinit var toolbar: Toolbar
     private lateinit var actionBar: ActionBar
     private lateinit var navController: NavController
@@ -75,6 +85,8 @@ class AudioPlayerActivity : BaseActivity() {
 
         setContentView(R.layout.activity_audio_player)
         changeStatusBarColor(this, window, R.color.black)
+
+        rootLayout = findViewById(R.id.root_layout)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -209,7 +221,7 @@ class AudioPlayerActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val launchIntent = intent ?: return false
         val service = playerService ?: return false
-        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return false
+        val isFolderLink = adapterType == FOLDER_LINK_ADAPTER
 
         when (item.itemId) {
             R.id.save_to_device -> {
@@ -220,7 +232,7 @@ class AudioPlayerActivity : BaseActivity() {
                 } else {
                     viewModel.saveMegaNode(
                         service.viewModel.playingHandle,
-                        adapterType == FOLDER_LINK_ADAPTER
+                        isFolderLink
                     ) { intent, code ->
                         startActivityForResult(intent, code)
                     }
@@ -228,6 +240,7 @@ class AudioPlayerActivity : BaseActivity() {
                 return true
             }
             R.id.properties -> {
+                val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return true
                 val from = launchIntent.getIntExtra(INTENT_EXTRA_KEY_FROM, INVALID_VALUE)
                 navController.navigate(
                     AudioPlayerFragmentDirections.actionPlayerToTrackInfo(
@@ -237,6 +250,13 @@ class AudioPlayerActivity : BaseActivity() {
                 return true
             }
             R.id.send_to_chat -> {
+                if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning()
+                    return true
+                }
+
+                val node = megaApi.getNodeByHandle(service.viewModel.playingHandle) ?: return true
+                NodeController(this, isFolderLink).checkIfNodeIsMineAndSelectChatsToSendNode(node)
                 return true
             }
             R.id.get_link -> {
@@ -262,9 +282,19 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (!viewModel.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (viewModel.handleActivityResult(requestCode, resultCode, data)) {
+            return
+        } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK
+            && data != null
+        ) {
+            viewModel.handleSelectChatResult(data)
         }
+    }
+
+    fun showSnackbar(type: Int, content: String, chatId: Long) {
+        showSnackbar(type, rootLayout, content, chatId)
     }
 
     fun setToolbarTitle(title: String) {
