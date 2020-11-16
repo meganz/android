@@ -1457,14 +1457,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
-            String title;
             setSizeInputText(true);
-            if (chatRoom.hasCustomTitle()) {
-                title = getString(R.string.type_message_hint_with_customized_title, getTitleChat(chatRoom));
-            } else {
-                title = getString(R.string.type_message_hint_with_default_title, getTitleChat(chatRoom));
-            }
-            textChat.setHint(transformEmojis(title, textChat.getTextSize()));
+            textChat.setHint(transformEmojis(getString(R.string.hint_message_in_chat), textChat.getTextSize()));
         }
     }
 
