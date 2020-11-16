@@ -311,10 +311,6 @@
     <color name="lite_account">#FFA500</color>
     <color name="pro_account">#F0373A</color>
 
-    <!-- reference ?attr/colorPrimary in AppBottomSheetDialogTheme doesn't work,
-     need define a separate color -->
-    <color name="bottom_sheet_navigation_bar_color">@android:color/white</color>
-
     <color name="homepage_background">#EEF2F1</color>
 
     <color name="new_multiselect_color">#1A0ABFA5</color>

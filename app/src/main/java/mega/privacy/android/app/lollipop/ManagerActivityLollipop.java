@@ -3389,22 +3389,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             showTransfersTransferOverQuotaWarning();
         }
 
-		setStatusBarTextColor();
+		ColorUtils.setStatusBarTextColor(this);
 
 		logDebug("END onCreate");
-	}
-
-	/**
-	 * Set status bar text and icon colours for good visibility in light/dark mode accordingly
-	 */
-	private void setStatusBarTextColor() {
-		View decor = getWindow().getDecorView();
-
-		if (Util.isDarkMode(this)) {
-			decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-		} else {
-			decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-		}
 	}
 
 	/**

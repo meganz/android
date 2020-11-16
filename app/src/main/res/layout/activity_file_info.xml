@@ -1,108 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/file_info_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/file_info_fragment_container"
     android:fitsSystemWindows="true"
-    android:background="@color/white"
     tools:context=".lollipop.ContactInfoActivityLollipop">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="168dp"
+        android:fitsSystemWindows="true">
+
+        <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
+            android:id="@+id/file_info_collapse_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="168dp"
-            android:background="@color/content_text_background"
-            android:fitsSystemWindows="true">
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleGravity="start|top"
+            app:expandedTitleMarginBottom="14dp"
+            app:expandedTitleMarginStart="72dp"
+            app:expandedTitleMarginTop="65dp"
+            app:expandedTitleTextAppearance="?attr/textAppearanceSubtitle1"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:lineSpacingMultiplier="1.2"
+            app:maxLines="3">
 
-            <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
-                android:id="@+id/file_info_collapse_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white"
+            <RelativeLayout
+                android:id="@+id/file_info_icon_layout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="left"
+                android:background="@android:color/transparent"
                 android:fitsSystemWindows="true"
-                app:contentScrim="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                android:theme="@style/Theme.Megaactionbar.InfoScreens"
-                app:collapsedTitleTextAppearance="@style/ToolbarTitle"
-                app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
-                app:expandedTitleGravity="start|top"
-                app:expandedTitleMarginTop="65dp"
-                app:expandedTitleMarginStart="72dp"
-                app:expandedTitleMarginBottom="14dp"
-                app:maxLines="3"
-                app:lineSpacingMultiplier="1.2">
+                app:layout_collapseMode="pin">
 
-                <RelativeLayout
-                    android:id="@+id/file_info_icon_layout"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@android:color/transparent"
-                    android:layout_gravity="left"
-                    app:layout_collapseMode="pin"
-                    android:fitsSystemWindows="true">
-                    <ImageView
-                        android:id="@+id/file_info_toolbar_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter" />
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/file_info_image_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_collapseMode="parallax"
-                    android:fitsSystemWindows="true">
-
-                    <ImageView
-                        android:id="@+id/file_info_toolbar_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:adjustViewBounds="true"
-                        android:fitsSystemWindows="true"
-                        android:scaleType="centerCrop" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="112dp"
-                        android:layout_alignParentTop="true"
-                        android:background="@drawable/gradient_shape" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_alignParentBottom="true"
-                        android:background="@drawable/actionbar_gradient_dark" />
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/file_properties_permission_info"
+                <ImageView
+                    android:id="@+id/file_info_toolbar_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:layout_gravity="left|bottom"
-                    android:layout_marginLeft="72dp"
-                    android:layout_marginBottom="15dp"
-                    android:textColor="?android:attr/textColorSecondary"/>
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter" />
+            </RelativeLayout>
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
+            <RelativeLayout
+                android:id="@+id/file_info_image_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                app:layout_collapseMode="parallax">
+
+                <ImageView
+                    android:id="@+id/file_info_toolbar_image"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:titleTextAppearance="@style/ToolbarTitle"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                    app:layout_collapseMode="pin"/>
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="centerCrop" />
 
-                <!--android:background="@drawable/gradient_shape"-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="112dp"
+                    android:layout_alignParentTop="true"
+                    android:background="@drawable/gradient_shape" />
 
-            </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
-        </com.google.android.material.appbar.AppBarLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/actionbar_gradient_dark" />
+            </RelativeLayout>
 
-        <include layout="@layout/content_file_info_activity" />
+            <TextView
+                android:id="@+id/file_properties_permission_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|bottom"
+                android:layout_marginLeft="72dp"
+                android:layout_marginBottom="15dp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant2" />
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium" />
+
+            <!--android:background="@drawable/gradient_shape"-->
+
+        </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <include layout="@layout/content_file_info_activity" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

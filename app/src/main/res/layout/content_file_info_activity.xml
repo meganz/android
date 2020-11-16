@@ -5,10 +5,9 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
-    tools:showIn="@layout/activity_chat_contact_properties"
+    tools:showIn="@layout/activity_file_info"
     android:id="@+id/nested_layout">
 
     <LinearLayout
@@ -39,7 +38,7 @@
                     android:layout_height="fill_parent"
                     android:scaleType="fitCenter"
                     android:layout_centerInParent="true"
-                    rounded:border_color="@color/white"
+                    rounded:border_color="?android:attr/colorPrimary"
                     rounded:border_width="0dp"
                     rounded:corner_radius="20dp" />
             </RelativeLayout>
@@ -62,20 +61,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="3dp"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
                         app:emojiSize="14sp"
-                        android:fontFamily="sans-serif-light"
-                        android:textStyle="bold"
                         android:maxLines="1"
-                        android:singleLine="true"/>
+                        android:singleLine="true" />
 
                     <TextView
                         android:id="@+id/file_properties_owner_label_owner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:textColor="@color/emoji_icons"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        android:textColor="@color/grey_038_white_038"
                         android:maxLines="1" />
 
                     <ImageView
@@ -109,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="16dp"
-                android:background="@color/separator_grey"
+                android:background="@color/grey_012_white_012"
                 android:layout_alignParentBottom="true"/>
         </RelativeLayout>
 
@@ -119,7 +115,6 @@
             android:id="@+id/available_offline_layout"
             android:layout_width="fill_parent"
             android:layout_height="48dp"
-            android:background="@color/white"
             android:orientation="horizontal" >
 
             <TextView

@@ -40,13 +40,13 @@
         <!--        <item name="colorOnError"></item>-->
         <!--        <item name="colorOnBackground"></item>-->
 
-        <!-- The color applied to icons/controls in their normal state -->
+        <!-- The color appliindicatorColored to icons/controls in their normal state -->
         <!-- e.g. The overflow menu item (3 dotes) automatically use this color
              so is the BadgeDrawerArrowDrawable's arrow color.
              Other action bar menu icons tint (activity_manager menu xml), etc. -->
         <item name="colorControlNormal">@color/grey_alpha_087</item>
         <!-- You can also set colorControlActivated
-        colorControlHighlight & colorSwitchThumbNormal. -->
+        colorControlHighlighindicatorColort & colorSwitchThumbNormal. -->
 
 <!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
 <!--        <item name="android:windowTranslucentStatus">false</item>-->
@@ -95,6 +95,9 @@
 
         <!-- Alert Dialog -->
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
+
+        <!-- Switch -->
+        <item name="switchStyle">@style/Widget.Mega.Switch</item>
 
         <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->

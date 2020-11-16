@@ -50,7 +50,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
@@ -161,7 +161,7 @@
                         android:layout_marginLeft="18dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -198,7 +198,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_save_to_device"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -229,7 +229,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
@@ -265,7 +265,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/view_in_folder_label"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -303,7 +303,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_get_link_menu"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -333,7 +333,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_remove_link_menu"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -363,7 +363,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_share"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -393,7 +393,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_share_folder"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -423,7 +423,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_send_file_to_chat"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -453,7 +453,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_clean_shares_menu"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -491,7 +491,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_rename"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -521,7 +521,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_move_to"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -551,7 +551,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_copy"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -581,7 +581,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_restore"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -619,7 +619,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/external_play"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -649,7 +649,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/search_open_location"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout

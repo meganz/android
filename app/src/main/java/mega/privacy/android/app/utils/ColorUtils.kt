@@ -1,10 +1,11 @@
 package mega.privacy.android.app.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
-import android.util.DisplayMetrics
+import android.view.View
 import android.widget.EditText
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -123,4 +124,17 @@ object ColorUtils {
         ElevationOverlayProvider(context).compositeOverlayWithThemeSurfaceColorIfNeeded(
             elevation
         )
+
+    /**
+     * Set status bar text and icon colours for good visibility in light/dark mode accordingly
+     */
+    @JvmStatic
+    fun setStatusBarTextColor(activity: Activity) {
+        val decor: View = activity.window.decorView
+        if (Util.isDarkMode(activity)) {
+            decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        } else {
+            decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+    }
 }

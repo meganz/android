@@ -606,4 +606,13 @@
         <item name="tabIconTint">@color/grey_054_white_054</item>
     </style>
 
+    <!--- Switch -->
+    <style name="Widget.Mega.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="useMaterialThemeColors">false</item>
+    </style>
+
+    <!-- For the CollapsingToolbarLayout -->
+    <style name="ThemeOverlay.Mega.DefaultToolBar" parent="">
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
+    </style>
 </resources>
