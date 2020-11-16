@@ -13,7 +13,7 @@
 
     <androidx.preference.Preference
         android:key="settings_pin_lock_code"
-        android:title="@string/settings_reset_lock_code"
+        android:title="@string/settings_change_passcode"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />

@@ -39,27 +39,11 @@ public class SettingsPasscodeLockFragment extends SettingsBaseFragment {
         updatePinLock();
 
         if (pinLock) {
-            formatPinCode();
+            dbH.setPinLockCode(pinLockCodeTxt);
             getPreferenceScreen().addPreference(pinLockCode);
         } else {
             getPreferenceScreen().removePreference(pinLockCode);
         }
-    }
-
-    /**
-     * Method for displaying the pin as the asterisk symbol.
-     */
-    private void formatPinCode() {
-        ast = "";
-        if (isTextEmpty(pinLockCodeTxt)) {
-            ast = getString(R.string.settings_pin_lock_code_not_set);
-        } else {
-            for (int i = 0; i < pinLockCodeTxt.length(); i++) {
-                ast = String.format("%s*", ast);
-            }
-        }
-        pinLockCode.setSummary(ast);
-        dbH.setPinLockCode(pinLockCodeTxt);
     }
 
     @Override
@@ -112,8 +96,7 @@ public class SettingsPasscodeLockFragment extends SettingsBaseFragment {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         prefs = dbH.getPreferences();
         if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0) {
-            pinLockCodeTxt = (String) newValue;
-            formatPinCode();
+            dbH.setPinLockCode((String) newValue);
         }
         return true;
     }
@@ -139,10 +122,9 @@ public class SettingsPasscodeLockFragment extends SettingsBaseFragment {
             pinLockCodeTxt = prefs.getPinLockCode();
             if (pinLockCodeTxt == null) {
                 pinLockCodeTxt = "";
-                dbH.setPinLockCode(pinLockCodeTxt);
-
             }
-            formatPinCode();
+
+            dbH.setPinLockCode(pinLockCodeTxt);
             getPreferenceScreen().addPreference(pinLockCode);
             dbH.setPinLockEnabled(true);
         }
