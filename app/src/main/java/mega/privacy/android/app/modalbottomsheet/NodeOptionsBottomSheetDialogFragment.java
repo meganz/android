@@ -344,10 +344,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionMove.setVisibility(View.VISIBLE);
                 optionCopy.setVisibility(View.VISIBLE);
 
-                if (((ManagerActivityLollipop) context).isList()) {
-                    optionLabel.setVisibility(View.VISIBLE);
-                    optionFavourite.setVisibility(View.VISIBLE);
-                }
+                optionLabel.setVisibility(View.VISIBLE);
+                optionFavourite.setVisibility(View.VISIBLE);
 
                 //Hide
                 counterRemove--;
@@ -547,10 +545,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                             }
 
-                            if (((ManagerActivityLollipop) context).isList()) {
-                                optionLabel.setVisibility(View.VISIBLE);
-                                optionFavourite.setVisibility(View.VISIBLE);
-                            }
+                            optionLabel.setVisibility(View.VISIBLE);
+                            optionFavourite.setVisibility(View.VISIBLE);
 
                             break;
 
@@ -638,10 +634,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionCopy.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
 
-                    if (((ManagerActivityLollipop) context).isList()) {
-                        optionLabel.setVisibility(View.VISIBLE);
-                        optionFavourite.setVisibility(View.VISIBLE);
-                    }
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
 
                     //Hide
                     counterRemove--;
@@ -699,10 +693,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionMove.setVisibility(View.VISIBLE);
                     optionCopy.setVisibility(View.VISIBLE);
 
-                    if (((ManagerActivityLollipop) context).isList()) {
-                        optionLabel.setVisibility(View.VISIBLE);
-                        optionFavourite.setVisibility(View.VISIBLE);
-                    }
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
 
                     //Hide
                     counterRemove--;
