@@ -61,6 +61,12 @@ class InviteToChatRoomListener(context: Context) : ChatBaseListener(context) {
         }
     }
 
+    /**
+     * Launches the requests to invite new participants to a chat conversation.
+     *
+     * @param chatId       Identifier of the chat where the participants should be added.
+     * @param contactsData List of contacts that should be added as new participants.
+     */
     fun inviteToChat(chatId: Long, contactsData: List<String>) {
         numberOfRequests = contactsData.size
         val megaApi = MegaApplication.getInstance().megaApi
