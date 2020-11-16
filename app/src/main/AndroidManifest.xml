@@ -425,7 +425,8 @@
 
         <activity
             android:name=".audioplayer.AudioPlayerActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.qrcode.QRCodeActivity"

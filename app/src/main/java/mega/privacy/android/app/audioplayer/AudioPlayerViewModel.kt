@@ -30,12 +30,15 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class AudioPlayerViewModel(
     private val context: Context,
@@ -71,6 +74,11 @@ class AudioPlayerViewModel(
     var playlistTitle = ""
 
     private val playlistItems = ArrayList<PlaylistItem>()
+    var playlistSearchQuery: String? = null
+        set(value) {
+            field = value
+            postPlaylistItems()
+        }
 
     var shuffleOrder: ShuffleOrder = ExposedShuffleOrder(0, this)
 
@@ -429,6 +437,12 @@ class AudioPlayerViewModel(
             items = ArrayList(playlistItems)
         }
 
+        val searchQuery = playlistSearchQuery
+        if (!TextUtil.isTextEmpty(searchQuery)) {
+            filterPlaylistItems(items, searchQuery!!)
+            return
+        }
+
         for ((index, item) in items.withIndex()) {
             val type = when {
                 index < playingIndex -> PlaylistItem.TYPE_PREVIOUS
@@ -464,6 +478,18 @@ class AudioPlayerViewModel(
         }
 
         _playlist.postValue(Triple(items, scrollPosition, playlistTitle))
+    }
+
+    private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
+        val filteredItems = ArrayList<PlaylistItem>()
+
+        for (item in items) {
+            if (item.nodeName.toLowerCase(Locale.ROOT).contains(filter)) {
+                filteredItems.add(item.finalizeThumbnailAndType(PlaylistItem.TYPE_PREVIOUS))
+            }
+        }
+
+        _playlist.postValue(Triple(filteredItems, 0, playlistTitle))
     }
 
     fun backgroundPlayEnabled(): Boolean {

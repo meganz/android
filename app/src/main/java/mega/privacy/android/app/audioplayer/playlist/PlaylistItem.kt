@@ -29,6 +29,14 @@ data class PlaylistItem(
         const val TYPE_NEXT = 5
         const val TYPE_NEXT_HEADER = 6
 
+        // We can't use the same handle (INVALID_HANDLE) for multiple header items,
+        // which will cause display issue when PlaylistItemDiffCallback use
+        // handle for areItemsTheSame.
+        // RandomUUID() can ensure non-repetitive values in practical purpose.
+        private val previousHeaderHandle = UUID.randomUUID().leastSignificantBits
+        private val playingHeaderHandle = UUID.randomUUID().leastSignificantBits
+        private val nextHeaderHandle = UUID.randomUUID().leastSignificantBits
+
         fun headerItem(context: Context, type: Int, paused: Boolean = false): PlaylistItem {
             val name = context.getString(
                 when (type) {
@@ -43,13 +51,14 @@ data class PlaylistItem(
                     }
                 }
             )
-            // We can't use the same handle (INVALID_HANDLE) for multiple header items,
-            // which will cause display issue when PlaylistItemDiffCallback use
-            // handle for areItemsTheSame.
-            // RandomUUID() can ensure non-repetitive values in practical purpose.
-            return PlaylistItem(
-                UUID.randomUUID().leastSignificantBits, name, null, INVALID_VALUE, type
-            )
+
+            val handle = when (type) {
+                TYPE_PREVIOUS_HEADER -> previousHeaderHandle
+                TYPE_NEXT_HEADER -> nextHeaderHandle
+                else -> playingHeaderHandle
+            }
+
+            return PlaylistItem(handle, name, null, INVALID_VALUE, type)
         }
     }
 }

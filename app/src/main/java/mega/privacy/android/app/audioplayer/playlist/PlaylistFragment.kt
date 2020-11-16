@@ -117,6 +117,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
 
     override fun onItemClick(item: PlaylistItem) {
         playerService?.exoPlayer?.seekTo(item.index, 0)
+        (requireActivity() as AudioPlayerActivity).closeSearch()
     }
 
     override fun openItemOptionPanel(item: PlaylistItem) {

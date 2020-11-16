@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -156,6 +157,32 @@ class AudioPlayerActivity : AppCompatActivity() {
         removeLinkMenuItem = menu.findItem(R.id.remove_link)
         searchMenuItem = menu.findItem(R.id.action_search)
 
+        val searchView = searchMenuItem?.actionView
+        if (searchView is SearchView) {
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    playerService?.viewModel?.playlistSearchQuery = newText
+                    return true
+                }
+
+            })
+        }
+
+        searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                playerService?.viewModel?.playlistSearchQuery = null
+                return true
+            }
+        })
+
         return true
     }
 
@@ -214,6 +241,10 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     fun setToolbarTitle(title: String) {
         toolbar.title = title
+    }
+
+    fun closeSearch() {
+        searchMenuItem?.collapseActionView()
     }
 
     fun hideToolbar() {
