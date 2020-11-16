@@ -14,7 +14,6 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.google.android.gms.ads.doubleclick.PublisherAdView
 import mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.TextUtil
 
@@ -29,7 +28,7 @@ class GoogleAdsLoader(
     // Load the Ad immediately if true, false indicates some conditions need to be checked regarding
     // whether load the ad or not, e.g. Public Handle of link file/folder
     private var loadImmediate: Boolean = true
-) : DefaultLifecycleObserver, AdUnitSource.FetchCallback, AdUnitSource.QueryCallback {
+) : DefaultLifecycleObserver, AdUnitSource.FetchCallback, AdUnitSource.QueryShowOrNotCallback {
 
     // The view container of the Ad banner view
     private lateinit var adViewContainer: ViewGroup
@@ -110,7 +109,7 @@ class GoogleAdsLoader(
         adView = PublisherAdView(MegaApplication.getInstance())
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
-                logDebug("Ad has been loaded")
+                Log.i("Alex","Ad has been loaded")
                 showedAdUnitId = this@GoogleAdsLoader.adUnitId
             }
         }
@@ -121,6 +120,8 @@ class GoogleAdsLoader(
                 loadBanner(adSize)
             }
         }
+
+        if (initialLayoutComplete) loadBanner(adSize)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -156,7 +157,7 @@ class GoogleAdsLoader(
         adView?.destroy()
 
 //        AdUnitSource.removeFetchCallback(this)
-        AdUnitSource.setQueryCallback(null)
+        AdUnitSource.setQueryShowOrNotCallback(null)
         context.unregisterReceiver(updateAccountDetailsReceiver)
     }
 
@@ -194,7 +195,7 @@ class GoogleAdsLoader(
      */
     fun queryShowOrNotByHandle(handle: Long) {
         Log.i("Alex", "query handle:$handle")
-        AdUnitSource.setQueryCallback(this)
+        AdUnitSource.setQueryShowOrNotCallback(this)
         AdUnitSource.queryShowOrNotByHandle(handle)
     }
 

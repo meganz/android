@@ -1,6 +1,7 @@
 package mega.privacy.android.app
 
 import android.util.Log
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -9,14 +10,17 @@ import nz.mega.sdk.MegaError.*
 /**
  * Provide interfaces for fetching/querying Ad unit ids and user status
  */
-object AdUnitSource : MegaRequestListenerInterface {
+object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
 
     // The value indicates the unit ID hasn't been fetched or outdated
     const val INVALID_UNIT_ID = "invalid_unit_id"
+
     // Currently, only 5 screens has 1 Ad banner view for each
     private const val SLOT_NUM = 5
+
     // Ad Flag (see API doc)
     private const val AD_FLAG = 512
+
     // The time threshold for requiring a new fetch/query
     private const val TIME_THRESHOLD = TimeUtils.HOUR * 6
 
@@ -24,11 +28,13 @@ object AdUnitSource : MegaRequestListenerInterface {
 
     // True if the async fetch is in progress
     private var fetching = false
+
     // True if the async querying is in progress
     private var querying = false
 
     // The map of ad slot id to ad unit id. Given by the server
     private var adUnitMap: MegaStringMap? = null
+
     // True if need showing Ads for the user, false otherwise
     private var isAdsUser = true
 
@@ -38,8 +44,9 @@ object AdUnitSource : MegaRequestListenerInterface {
 
     // The set of FetchCallbacks for fetching ad unit ids
     private var callbacks = mutableSetOf<FetchCallback>()
+
     // The QueryCallback for querying whether showing the Ad or not
-    private var queryCallback: QueryCallback? = null
+    private var queryShowOrNotCallback: QueryShowOrNotCallback? = null
 
     // The memory cache to save the query result, for reducing the API request times
     // and shortening the delay of showing the Ad. A map of public handle to result value.
@@ -55,12 +62,12 @@ object AdUnitSource : MegaRequestListenerInterface {
     /**
      * The callback of querying whether show the Ad or not
      */
-    interface QueryCallback {
+    interface QueryShowOrNotCallback {
         fun queryShowOrNotDone(result: Int)
     }
 
-    fun setQueryCallback(cb: QueryCallback?) {
-        queryCallback = cb
+    fun setQueryShowOrNotCallback(cb: QueryShowOrNotCallback?) {
+        queryShowOrNotCallback = cb
     }
 
     fun addFetchCallback(cb: FetchCallback) {
@@ -90,7 +97,7 @@ object AdUnitSource : MegaRequestListenerInterface {
      */
     fun getAdUnitBySlot(slotId: String): String {
         if (needRequery(lastFetchTime) || adUnitMap == null) return INVALID_UNIT_ID
-        return adUnitMap?.get(slotId)?: ""
+        return adUnitMap?.get(slotId) ?: ""
     }
 
     /**
@@ -121,7 +128,7 @@ object AdUnitSource : MegaRequestListenerInterface {
         val cachedResult = handleQueryCache[publicHandle]
 
         if (!needRequery(lastQueryTime) && cachedResult != null) {
-            queryCallback?.queryShowOrNotDone(cachedResult)
+            queryShowOrNotCallback?.queryShowOrNotDone(cachedResult)
         } else {
             querying = true
             megaApi.queryGoogleAds(AD_FLAG, publicHandle, this)
@@ -131,42 +138,33 @@ object AdUnitSource : MegaRequestListenerInterface {
     private fun needRequery(lastTime: Long) =
         System.currentTimeMillis() - lastTime > TIME_THRESHOLD
 
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
-        Log.i("Alex", "onRequestStart")
-    }
 
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
-        Log.i("Alex", "onRequestUpdate")
-    }
-
-    override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
-        when (request?.type) {
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        when (request.type) {
             MegaRequest.TYPE_FETCH_GOOGLE_ADS -> {
                 fetching = false
                 lastFetchTime = System.currentTimeMillis()
 
-                e?.let {
-                    when (e.errorCode) {
-                        API_OK -> {
+                when (e.errorCode) {
+                    API_OK -> {
 //                            adUnitMap = request.megaStringMap
-                            adUnitMap = MegaStringMap.createInstance()
-                            adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
-                            adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
-                            adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
-                            adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
-                            adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
-                            adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
+                        adUnitMap = MegaStringMap.createInstance()
+                        adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
+                        adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
+                        adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
+                        adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
+                        adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
+                        adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
 
-                            if (adUnitMap == null) return
+                        if (adUnitMap == null) return
 
-                            callBackForFetch()
-                        }
-                        // -9 for the user is a non-Ad user (here SDK returns -9 for API -9)
-                        API_ENOENT -> {
-                            adUnitMap = null
-                            isAdsUser = false
-                            callBackForFetch()
-                        }
+                        callBackForFetch()
+                    }
+                    // -9 for the user is a non-Ad user (here SDK returns -9 for API -9)
+                    API_ENOENT -> {
+                        adUnitMap = null
+                        isAdsUser = false
+                        callBackForFetch()
                     }
                 }
             }
@@ -175,13 +173,11 @@ object AdUnitSource : MegaRequestListenerInterface {
                 querying = false
                 lastQueryTime = System.currentTimeMillis()
 
-                e?.let {
-                    if (e.errorCode == API_OK) {
-                        val result = request.numDetails
-                        handleQueryCache[request.nodeHandle] = result
-                        queryCallback?.queryShowOrNotDone(result)
-                        Log.i("Alex", "showAdOrNot:${result}")
-                    }
+                if (e.errorCode == API_OK) {
+                    val result = request.numDetails
+                    handleQueryCache[request.nodeHandle] = result
+                    queryShowOrNotCallback?.queryShowOrNotDone(result)
+                    Log.i("Alex", "showAdOrNot:${result}")
                 }
             }
         }
@@ -191,13 +187,5 @@ object AdUnitSource : MegaRequestListenerInterface {
         for (cb in callbacks) {
             cb.adUnitsFetched()
         }
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaApiJava?,
-        request: MegaRequest?,
-        e: MegaError?
-    ) {
-        Log.i("Alex", "onRequestTemporaryError")
     }
 }
