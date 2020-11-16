@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -25,8 +26,8 @@ import static mega.privacy.android.app.utils.Constants.HANDLE;
 
 public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
-    private static final float HALF_EXPANDED_RATIO = 0.7f;
-    private static final float HALF_EXPANDED_RATIO_OFFSET = 0.01f;
+    private static final float HALF_EXPANDED_RATIO_OFFSET = 0.98f;
+    private static final float LANDSCAPE_HEIGHT_FACTOR = 0.65f;
 
     private BottomSheetNodeLabelBinding binding;
     private MegaNode node = null;
@@ -53,14 +54,8 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
         getDialog().setOnShowListener(dialog -> {
-                    float halfExpandedRatio;
-                    float displayHeight = getDisplayHeight();
-
-                    if (view.getMeasuredHeight() < displayHeight * HALF_EXPANDED_RATIO) {
-                        halfExpandedRatio = (view.getMeasuredHeight() / displayHeight) - HALF_EXPANDED_RATIO_OFFSET;
-                    } else {
-                        halfExpandedRatio = HALF_EXPANDED_RATIO;
-                    }
+                    float viewHeight = isLandscape() ? view.getMeasuredHeight() * LANDSCAPE_HEIGHT_FACTOR : view.getMeasuredHeight();
+                    float halfExpandedRatio = (viewHeight * HALF_EXPANDED_RATIO_OFFSET) / getDisplayHeight();
 
                     BottomSheetBehavior<FrameLayout> behavior = ((BottomSheetDialog) dialog).getBehavior();
                     behavior.setSkipCollapsed(true);
@@ -143,6 +138,10 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         return displayMetrics.heightPixels;
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private MegaApiAndroid getMegaApi() {
