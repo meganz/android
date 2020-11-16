@@ -91,4 +91,6 @@
     <dimen name="audio_player_main_controller_height">212dp</dimen>
     <dimen name="audio_player_playlist_controller_height">106dp</dimen>
     <dimen name="audio_player_mini_controller_height">64dp</dimen>
+
+    <dimen name="bottom_navigation_view_height">56dp</dimen>
 </resources>

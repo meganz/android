@@ -6,9 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,7 +17,7 @@
             android:id="@+id/fragment_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="56dp"
+            android:layout_marginBottom="@dimen/bottom_navigation_view_height"
             android:orientation="vertical">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -116,7 +114,6 @@
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/app_bar_layout"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
         </LinearLayout>
 
@@ -137,7 +134,7 @@
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
-                android:layout_above="@id/psa_layout"
+                android:layout_above="@id/mini_audio_player"
                 android:layout_alignParentEnd="true"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
@@ -145,6 +142,17 @@
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white" />
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/mini_audio_player"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/audio_player_mini_controller_height"
+                android:layout_above="@id/psa_layout"
+                android:background="@color/white"
+                android:visibility="gone"
+                app:controller_layout_id="@layout/audio_player_control_in_mini_player"
+                app:player_layout_id="@layout/audio_player_view_controller_only"
+                app:surface_type="none" />
 
             <include
                 android:id="@+id/psa_layout"
@@ -159,7 +167,7 @@
             <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
                 android:id="@+id/bottom_navigation_view"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="@dimen/bottom_navigation_view_height"
                 android:layout_alignParentBottom="true"
                 android:background="@color/dark_primary_color"
                 app:itemIconTint="@drawable/bottom_navigation_item_tint"

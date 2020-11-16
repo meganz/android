@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavOptions;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -136,6 +137,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.audioplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -541,6 +543,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	RoundedImageView nVPictureProfile;
 	TextView spaceTV;
 	ProgressBar usedSpacePB;
+
+	private MiniAudioPlayerController miniAudioPlayerController;
 
     //Tabs in Shares
 	private TabLayout tabLayoutShares;
@@ -2310,6 +2314,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bNV.enableShiftingMode(false);
 		bNV.setTextVisibility(false);
 
+		miniAudioPlayerController = new MiniAudioPlayerController(
+				findViewById(R.id.mini_audio_player), this,
+				() -> {
+					// we need update fragmentLayout's layout params when player view is closed.
+					if (bNV.getVisibility() == View.VISIBLE) {
+						showBNVImmediate();
+					}
+				});
+
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -3735,6 +3748,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		checkTransferOverQuotaOnResume();
+
+		if (miniAudioPlayerController != null) {
+			miniAudioPlayerController.onResume();
+		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4664,6 +4681,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         if (confirmationTransfersDialog != null) {
             confirmationTransfersDialog.dismiss();
         }
+
+        if (miniAudioPlayerController != null) {
+			miniAudioPlayerController.onDestroy();
+			miniAudioPlayerController = null;
+		}
 
     	super.onDestroy();
 	}
@@ -6174,10 +6196,33 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private void showBNVImmediate() {
 		bNV.setTranslationY(0);
 		bNV.setVisibility(View.VISIBLE);
+
+		boolean miniAudioPlayerVisible = updateMiniAudioPlayerVisibility(true);
+		int extraBottomMargin = miniAudioPlayerVisible
+				? getResources().getDimensionPixelSize(R.dimen.audio_player_mini_controller_height)
+				: 0;
+
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-		params.setMargins(0, 0, 0, dp2px(56, outMetrics));
+		params.setMargins(0, 0, 0,
+				getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
+						+ extraBottomMargin);
 		fragmentLayout.setLayoutParams(params);
+	}
+
+	/**
+	 * Update whether we should display the mini audio player. It should only
+	 * be visible when BNV is visible.
+	 *
+	 * @param shouldVisible whether we should display the mini audio player
+	 * @return is the mini player visible after this update
+	 */
+	private boolean updateMiniAudioPlayerVisibility(boolean shouldVisible) {
+		if (miniAudioPlayerController != null) {
+			miniAudioPlayerController.setShouldVisible(shouldVisible);
+			return miniAudioPlayerController.isVisible();
+		}
+		return false;
 	}
 
 	private boolean isCloudAdded () {
@@ -16177,13 +16222,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
 		if (hide && bNV.getVisibility() == View.VISIBLE) {
+			updateMiniAudioPlayerVisibility(false);
 			params.setMargins(0, 0, 0, 0);
 			fragmentLayout.setLayoutParams(params);
 			bNV.animate().translationY(220).setDuration(400L).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
 		} else if (!hide && bNV.getVisibility() == View.GONE) {
-			params.setMargins(0, 0, 0, dp2px(56, outMetrics));
+			params.setMargins(0, 0, 0,
+					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
 			bNV.setVisibility(View.VISIBLE);
-			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
+			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> {
+				boolean miniAudioPlayerVisible = updateMiniAudioPlayerVisibility(true);
+				int extraBottomMargin = miniAudioPlayerVisible
+						? getResources().getDimensionPixelSize(R.dimen.audio_player_mini_controller_height)
+						: 0;
+				params.bottomMargin += extraBottomMargin;
+
+				fragmentLayout.setLayoutParams(params);
+			}).start();
 		}
 
 		updateTransfersWidgetPosition(hide);

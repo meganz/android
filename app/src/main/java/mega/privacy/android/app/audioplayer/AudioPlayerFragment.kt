@@ -131,7 +131,6 @@ class AudioPlayerFragment : Fragment() {
         super.onDestroy()
 
         playerService?.exoPlayer?.removeListener(playerListener)
-        playerService?.mainPlayerUIClosed()
         playerService = null
         requireContext().unbindService(connection)
     }

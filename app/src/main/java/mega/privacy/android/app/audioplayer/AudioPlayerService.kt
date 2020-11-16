@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import nz.mega.sdk.MegaApiAndroid
@@ -56,6 +57,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         observeLiveData()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+
+        MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
     }
 
     private fun createPlayer() {
@@ -143,7 +146,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                 }
 
                 override fun onNotificationCancelled(notificationId: Int) {
-                    stopSelf()
+                    stopAudioPlayer()
                 }
 
                 override fun onNotificationPosted(
@@ -227,8 +230,13 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     fun mainPlayerUIClosed() {
         if (!playing()) {
-            stopSelf()
+            stopAudioPlayer()
         }
+    }
+
+    fun stopAudioPlayer() {
+        MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
+        stopSelf()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

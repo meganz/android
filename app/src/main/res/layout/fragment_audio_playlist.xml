@@ -18,6 +18,6 @@
         android:layout_height="115dp"
         android:layout_gravity="bottom"
         app:controller_layout_id="@layout/audio_player_control_in_playlist"
-        app:player_layout_id="@layout/audio_player_view_in_playlist"
+        app:player_layout_id="@layout/audio_player_view_controller_only"
         app:surface_type="none" />
 </FrameLayout>

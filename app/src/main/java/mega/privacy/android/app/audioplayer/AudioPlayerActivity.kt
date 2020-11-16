@@ -71,9 +71,13 @@ class AudioPlayerActivity : AppCompatActivity() {
 
         val extras = intent?.extras ?: return
         val playerServiceIntent = Intent(this, AudioPlayerService::class.java)
+
         playerServiceIntent.putExtras(extras)
-        playerServiceIntent.setDataAndType(intent?.data, intent?.type)
-        startForegroundService(this, playerServiceIntent)
+
+        if (intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
+            playerServiceIntent.setDataAndType(intent?.data, intent?.type)
+            startForegroundService(this, playerServiceIntent)
+        }
 
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }
@@ -89,9 +93,18 @@ class AudioPlayerActivity : AppCompatActivity() {
         actionBar.title = ""
 
         toolbar.setNavigationOnClickListener {
-            if (!navController.navigateUp()) {
-                finish()
-            }
+            handleNavigateUp()
+        }
+    }
+
+    override fun onBackPressed() {
+        handleNavigateUp()
+    }
+
+    private fun handleNavigateUp() {
+        if (!navController.navigateUp()) {
+            playerService?.mainPlayerUIClosed()
+            finish()
         }
     }
 
@@ -216,11 +229,5 @@ class AudioPlayerActivity : AppCompatActivity() {
         } else {
             toolbar.translationY = 0F
         }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        // TODO: handle notification click event
     }
 }
