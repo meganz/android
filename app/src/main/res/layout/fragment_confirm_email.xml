@@ -104,7 +104,7 @@
 
             <Button
                 android:id="@+id/confirm_email_new_email_resend"
-                style="@style/Widget.Mega.Button"
+                style="?attr/materialButtonStyle"
                 android:text="@string/confirm_email_misspelled_resend" />
 
             <Button

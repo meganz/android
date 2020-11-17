@@ -398,7 +398,7 @@ app/src/main/res/layout/fragment_create_account.xml
 
                 <Button
                     android:id="@+id/button_create_account_create"
-                    style="@style/Widget.Mega.Button"
+                    style="?attr/materialButtonStyle"
                     android:layout_gravity="center_vertical"
                     tools:text="create account" />
 

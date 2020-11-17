@@ -53,6 +53,11 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <!-- -0.4px -->
+    <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant2">
+        <item name="android:letterSpacing">-0.00875</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>

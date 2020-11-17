@@ -151,7 +151,7 @@
 
         <Button
             android:id="@+id/file_storage_button"
-            style="@style/Widget.Mega.Button"
+            style="?attr/materialButtonStyle"
             android:layout_marginEnd="19dp" />
 
     </LinearLayout>

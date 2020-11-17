@@ -106,7 +106,7 @@
 
                 <Button
                     android:id="@+id/button_login_login"
-                    style="@style/Widget.Mega.Button"
+                    style="?attr/materialButtonStyle"
                     android:layout_marginStart="3dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="10dp"
@@ -143,7 +143,7 @@
 
                 <TextView
                     android:id="@+id/button_forgot_pass"
-                    style="@style/Widget.Mega.Button.TextButton"
+                    style="?attr/borderlessButtonStyle"
                     android:paddingLeft="3dp"
                     android:layout_marginBottom="18dp"
                     tools:text="FORGET YOUR PASSWORD?" />
@@ -167,7 +167,7 @@
 
                 <TextView
                     android:id="@+id/button_create_account_login"
-                    style="@style/Widget.Mega.Button.TextButton"
+                    style="?attr/borderlessButtonStyle"
                     android:layout_marginBottom="24dp" />
 
             </LinearLayout>

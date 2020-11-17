@@ -68,6 +68,8 @@
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
 
         <item name="borderlessButtonStyle">@style/Widget.Mega.Button.TextButton</item>
+        <item name="materialButtonStyle">@style/Widget.Mega.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Mega.Button.OutlinedButton</item>
 
         <!-- Headline text color. Title on action bar, menu item text automatically use it -->
         <item name="android:textColorPrimary">@color/grey_alpha_087</item>

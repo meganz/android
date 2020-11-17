@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/general_setup_mega"
                     android:layout_marginLeft="16dp"
-                    style="@style/Widget.Mega.Button"/>
+                    style="?attr/materialButtonStyle"/>
 
             </LinearLayout>
 
@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/general_enable_access"
                     android:layout_marginLeft="16dp"
-                    style="@style/Widget.Mega.Button"/>
+                    style="?attr/materialButtonStyle"/>
 
             </LinearLayout>
 

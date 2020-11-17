@@ -38,7 +38,7 @@
                     android:layout_height="fill_parent"
                     android:scaleType="fitCenter"
                     android:layout_centerInParent="true"
-                    rounded:border_color="?android:attr/colorPrimary"
+                    rounded:border_color="?attr/colorPrimary"
                     rounded:border_width="0dp"
                     rounded:corner_radius="20dp" />
             </RelativeLayout>
@@ -93,8 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_owner_linear"
-                    android:textSize="16sp"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:singleLine="true"/>
@@ -125,8 +124,7 @@
                 android:layout_weight="5"
                 android:layout_marginLeft="72dp"
                 android:text="@string/file_properties_available_offline"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="16sp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant2"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/file_properties_switch"
@@ -142,7 +140,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/separator_grey" />
+            android:background="@color/grey_012_white_012" />
 
         <!-- VERSIONS LAYOUT -->
 

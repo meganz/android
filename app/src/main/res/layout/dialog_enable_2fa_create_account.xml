@@ -43,7 +43,7 @@
 
         <Button
             android:id="@+id/enable_2fa_button"
-            style="@style/Widget.Mega.Button"
+            style="?attr/materialButtonStyle"
             android:layout_gravity="center"
             android:layout_marginTop="32dp"
             android:text="@string/general_enable" />
