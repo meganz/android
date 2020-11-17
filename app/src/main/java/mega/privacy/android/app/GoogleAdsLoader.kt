@@ -11,6 +11,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.google.android.gms.ads.doubleclick.PublisherAdView
 import mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED
@@ -118,6 +119,11 @@ class GoogleAdsLoader(
             override fun onAdLoaded() {
                 Log.i("Alex", "Ad has been loaded")
                 showedAdUnitId = this@GoogleAdsLoader.adUnitId
+            }
+
+            override fun onAdFailedToLoad(p0: LoadAdError?) {
+                super.onAdFailedToLoad(p0)
+                Log.i("Alex", "Ad failed to load:${p0?.cause},${p0?.message}")
             }
         }
         adViewContainer.addView(adView)
