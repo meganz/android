@@ -47,6 +47,9 @@ class GoogleAdsLoader(
     // The unit id of the current successfully showed AD
     private var showedAdUnitId = AdUnitSource.INVALID_UNIT_ID
 
+    // Whether the ads view container was set
+    private var isContainerSet = false
+
     private val adSize: AdSize
         get() {
             val density = displayMetrics.density
@@ -83,15 +86,17 @@ class GoogleAdsLoader(
 
     private fun setUpBanner() {
         Log.i("Alex", "setupbanner begin")
+        if (!isContainerSet) return
+        Log.i("Alex", "setupbanner begin2")
         // If the user is not an Ad user any more, remove the Ad view if any and then return
         if (!AdUnitSource.isAdsUser()) {
             adViewContainer.removeAllViews()
             return
         }
-
+        Log.i("Alex", "setupbanner begin3")
         // Don't move forward until the loadImmediate flag is set to true by callbacks (e.g. queryCallback)
         if (!loadImmediate) return
-
+        Log.i("Alex", "setupbanner begin4")
         // Get the ad unit Id by the slot id, fetch it from the server
         // if had never been fetched or outdated
         val adUnitId = AdUnitSource.getAdUnitBySlot(slotId)
@@ -99,9 +104,11 @@ class GoogleAdsLoader(
             AdUnitSource.fetchAdUnits()
             return
         }
-
+        Log.i("Alex", "setupbanner begin5")
         // Return if the unit id is invalid or the same Ad had been loaded
-        if (TextUtil.isTextEmpty(adUnitId) || showedAdUnitId == adUnitId) return
+        if (TextUtil.isTextEmpty(adUnitId)
+            || (adViewContainer.childCount != 0 && showedAdUnitId == adUnitId)
+        ) return
         this.adUnitId = adUnitId
 
         Log.i("Alex", "new PublisherAdView")
@@ -109,7 +116,7 @@ class GoogleAdsLoader(
         adView = PublisherAdView(MegaApplication.getInstance())
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
-                Log.i("Alex","Ad has been loaded")
+                Log.i("Alex", "Ad has been loaded")
                 showedAdUnitId = this@GoogleAdsLoader.adUnitId
             }
         }
@@ -181,6 +188,7 @@ class GoogleAdsLoader(
     fun setAdViewContainer(adViewContainer: ViewGroup, displayMetrics: DisplayMetrics) {
         this.adViewContainer = adViewContainer
         this.displayMetrics = displayMetrics
+        isContainerSet = true
     }
 
     override fun adUnitsFetched() {
