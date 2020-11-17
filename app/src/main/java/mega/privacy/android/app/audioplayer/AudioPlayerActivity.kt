@@ -6,28 +6,38 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.FrameLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.Util.changeStatusBarColor
+import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,9 +56,6 @@ class AudioPlayerActivity : BaseActivity() {
     private var adapterType = INVALID_VALUE
 
     private var optionsMenu: Menu? = null
-    private var propertiesMenuItem: MenuItem? = null
-    private var getLinkMenuItem: MenuItem? = null
-    private var removeLinkMenuItem: MenuItem? = null
     private var searchMenuItem: MenuItem? = null
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
@@ -65,6 +72,11 @@ class AudioPlayerActivity : BaseActivity() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is AudioPlayerServiceBinder) {
                 playerService = service.service
+
+                service.service.viewModel.playlist.observe(this@AudioPlayerActivity) {
+                    val currentFragment = navController.currentDestination?.id ?: return@observe
+                    refreshMenuOptionsVisibility(currentFragment)
+                }
             }
         }
     }
@@ -138,23 +150,13 @@ class AudioPlayerActivity : BaseActivity() {
         navController.addOnDestinationChangedListener { _, dest, args ->
             when (dest.id) {
                 R.id.audio_player -> {
-                    toggleAllMenuItemsVisibility(true)
-                    searchMenuItem?.isVisible = false
-
                     actionBar.title = ""
                     viewingTrackInfo = null
                 }
                 R.id.playlist -> {
-                    toggleAllMenuItemsVisibility(false)
-                    searchMenuItem?.isVisible = true
-
                     viewingTrackInfo = null
                 }
                 R.id.track_info -> {
-                    toggleAllMenuItemsVisibility(true)
-                    propertiesMenuItem?.isVisible = false
-                    searchMenuItem?.isVisible = false
-
                     actionBar.setTitle(R.string.audio_track_info)
 
                     if (args != null) {
@@ -162,6 +164,7 @@ class AudioPlayerActivity : BaseActivity() {
                     }
                 }
             }
+            refreshMenuOptionsVisibility(dest.id)
         }
     }
 
@@ -177,9 +180,6 @@ class AudioPlayerActivity : BaseActivity() {
 
         menuInflater.inflate(R.menu.audio_player, menu)
 
-        propertiesMenuItem = menu.findItem(R.id.properties)
-        getLinkMenuItem = menu.findItem(R.id.get_link)
-        removeLinkMenuItem = menu.findItem(R.id.remove_link)
         searchMenuItem = menu.findItem(R.id.action_search)
 
         val searchView = searchMenuItem?.actionView
@@ -218,22 +218,91 @@ class AudioPlayerActivity : BaseActivity() {
         }
     }
 
+    private fun refreshMenuOptionsVisibility(currentFragment: Int) {
+        when (currentFragment) {
+            R.id.playlist -> {
+                toggleAllMenuItemsVisibility(false)
+                searchMenuItem?.isVisible = true
+            }
+            R.id.audio_player, R.id.track_info -> {
+                if (adapterType == OFFLINE_ADAPTER) {
+                    toggleAllMenuItemsVisibility(false)
+                    optionsMenu?.findItem(R.id.properties)?.isVisible =
+                        currentFragment == R.id.audio_player
+                    return
+                }
+
+                val service = playerService
+                if (service == null) {
+                    toggleAllMenuItemsVisibility(false)
+                    return
+                }
+
+                val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
+                if (node == null) {
+                    toggleAllMenuItemsVisibility(false)
+                    return
+                }
+
+                toggleAllMenuItemsVisibility(true)
+                searchMenuItem?.isVisible = false
+
+                optionsMenu?.findItem(R.id.save_to_device)?.isVisible = adapterType != ZIP_ADAPTER
+
+                optionsMenu?.findItem(R.id.properties)?.isVisible =
+                    currentFragment == R.id.audio_player
+
+                optionsMenu?.findItem(R.id.send_to_chat)?.isVisible =
+                    adapterType != FROM_CHAT && adapterType != FILE_LINK_ADAPTER
+                            && adapterType != ZIP_ADAPTER
+
+                if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
+                    if (node.isExported) {
+                        optionsMenu?.findItem(R.id.get_link)?.isVisible = false
+                        optionsMenu?.findItem(R.id.remove_link)?.isVisible = true
+                    } else {
+                        optionsMenu?.findItem(R.id.get_link)?.isVisible = true
+                        optionsMenu?.findItem(R.id.remove_link)?.isVisible = false
+                    }
+                } else {
+                    optionsMenu?.findItem(R.id.get_link)?.isVisible = false
+                    optionsMenu?.findItem(R.id.remove_link)?.isVisible = false
+                }
+
+                when (megaApi.getAccess(node)) {
+                    MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
+                        optionsMenu?.findItem(R.id.rename)?.isVisible = false
+                        optionsMenu?.findItem(R.id.move)?.isVisible = false
+                        optionsMenu?.findItem(R.id.move_to_trash)?.isVisible = false
+                    }
+                    MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
+                        optionsMenu?.findItem(R.id.rename)?.isVisible = true
+                        optionsMenu?.findItem(R.id.move)?.isVisible = true
+                        optionsMenu?.findItem(R.id.move_to_trash)?.isVisible = true
+                    }
+                }
+
+                optionsMenu?.findItem(R.id.copy)?.isVisible =
+                    adapterType != FOLDER_LINK_ADAPTER && adapterType != FILE_LINK_ADAPTER
+                            && adapterType != ZIP_ADAPTER && adapterType != FROM_CHAT
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val launchIntent = intent ?: return false
         val service = playerService ?: return false
+        val playingHandle = service.viewModel.playingHandle
         val isFolderLink = adapterType == FOLDER_LINK_ADAPTER
 
         when (item.itemId) {
             R.id.save_to_device -> {
                 if (adapterType == OFFLINE_ADAPTER) {
-                    viewModel.saveOfflineNode(service.viewModel.playingHandle) { intent, code ->
+                    viewModel.saveOfflineNode(playingHandle) { intent, code ->
                         startActivityForResult(intent, code)
                     }
                 } else {
-                    viewModel.saveMegaNode(
-                        service.viewModel.playingHandle,
-                        isFolderLink
-                    ) { intent, code ->
+                    viewModel.saveMegaNode(playingHandle, isFolderLink) { intent, code ->
                         startActivityForResult(intent, code)
                     }
                 }
@@ -244,7 +313,7 @@ class AudioPlayerActivity : BaseActivity() {
                 val from = launchIntent.getIntExtra(INTENT_EXTRA_KEY_FROM, INVALID_VALUE)
                 navController.navigate(
                     AudioPlayerFragmentDirections.actionPlayerToTrackInfo(
-                        adapterType, from, service.viewModel.playingHandle, uri
+                        adapterType, from, playingHandle, uri
                     )
                 )
                 return true
@@ -255,14 +324,29 @@ class AudioPlayerActivity : BaseActivity() {
                     return true
                 }
 
-                val node = megaApi.getNodeByHandle(service.viewModel.playingHandle) ?: return true
+                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
                 NodeController(this, isFolderLink).checkIfNodeIsMineAndSelectChatsToSendNode(node)
                 return true
             }
             R.id.get_link -> {
+                if (MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(
+                        megaApi.getNodeByHandle(playingHandle), this
+                    )
+                ) {
+                    return true
+                }
+                val intent = Intent(this, GetLinkActivityLollipop::class.java)
+                intent.putExtra(HANDLE, playingHandle)
+                startActivity(intent)
                 return true
             }
             R.id.remove_link -> {
+                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
+                if (MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                    return true
+                }
+
+                showRemoveLink(node)
                 return true
             }
             R.id.rename -> {
@@ -279,6 +363,37 @@ class AudioPlayerActivity : BaseActivity() {
             }
         }
         return false
+    }
+
+    private fun showRemoveLink(node: MegaNode) {
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+
+        val dialogLayout = layoutInflater.inflate(R.layout.dialog_link, null)
+
+        dialogLayout.findViewById<TextView>(R.id.dialog_link_link_url).isVisible = false
+        dialogLayout.findViewById<TextView>(R.id.dialog_link_link_key).isVisible = false
+        dialogLayout.findViewById<TextView>(R.id.dialog_link_symbol).isVisible = false
+
+        val removeText = dialogLayout.findViewById<TextView>(R.id.dialog_link_text_remove)
+        (removeText.layoutParams as RelativeLayout.LayoutParams).setMargins(
+            scaleWidthPx(REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT, outMetrics),
+            scaleHeightPx(REMOVE_LINK_DIALOG_TEXT_MARGIN_TOP, outMetrics),
+            scaleWidthPx(REMOVE_LINK_DIALOG_TEXT_MARGIN_RIGHT, outMetrics),
+            0
+        )
+        removeText.visibility = View.VISIBLE
+        removeText.text = getString(R.string.context_remove_link_warning_text)
+
+        val scaleW = getScaleW(outMetrics, resources.displayMetrics.density)
+        removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, REMOVE_LINK_DIALOG_TEXT_SIZE * scaleW)
+
+        builder.setView(dialogLayout)
+            .setPositiveButton(getString(R.string.context_remove)) { _, _ ->
+                megaApi.disableExport(node)
+            }
+            .setNegativeButton(getString(R.string.general_cancel), null)
+            .create()
+            .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -319,7 +434,15 @@ class AudioPlayerActivity : BaseActivity() {
                 .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
+            toolbar.animate().cancel()
             toolbar.translationY = 0F
         }
+    }
+
+    companion object {
+        const val REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT = 25
+        const val REMOVE_LINK_DIALOG_TEXT_MARGIN_TOP = 20
+        const val REMOVE_LINK_DIALOG_TEXT_MARGIN_RIGHT = 10
+        const val REMOVE_LINK_DIALOG_TEXT_SIZE = 15
     }
 }
