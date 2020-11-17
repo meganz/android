@@ -14135,7 +14135,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 		} else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
-			MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+			if (e.getErrorCode() == MegaError.API_OK){
+				MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+				transfersWidget.update();
+				supportInvalidateOptionsMenu();
+			} else {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
+			}
 		} else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			logDebug("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
@@ -14154,21 +14160,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 
-		}
-		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
-			logDebug("One MegaRequest.TYPE_CANCEL_TRANSFER");
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("REQUEST OK - wait for onTransferFinish()");
-				transfersWidget.update();
-				supportInvalidateOptionsMenu();
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-			}
-
-		}
-		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+		} else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			logDebug("requestFinish TYPE_KILL_SESSION"+MegaRequest.TYPE_KILL_SESSION);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Success kill sessions");
@@ -14948,6 +14940,29 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		confirmationTransfersDialog = builder.create();
         setConfirmationTransfersDialogNotCancellableAndShow();
+	}
+	/**
+	 * Shows a warning to ensure if it is sure of cancel selected transfers.
+	 */
+	public void showConfirmationCancelSelectedTransfers(List<MegaTransfer> selectedTransfers) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setMessage(getResources().getString(R.string.cancel_selected_transfer_confirmation))
+				.setPositiveButton(R.string.cancel_selected_action, (dialog, which) -> {
+					for (MegaTransfer transfer : selectedTransfers) {
+						megaApi.cancelTransfer(transfer, managerActivity);
+					}
+
+					if(isTransfersInProgressAdded()) {
+						tFLol.destroyActionMode();
+					}
+					
+					refreshFragment(FragmentTag.TRANSFERS.getTag());
+					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
+				})
+				.setNegativeButton(R.string.general_dismiss, null);
+
+		confirmationTransfersDialog = builder.create();
+		setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**

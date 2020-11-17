@@ -4,9 +4,10 @@
 
     <item
         android:id="@+id/cab_menu_cancel_transfer"
-        android:icon="@drawable/ic_download_white"
+        android:icon="@drawable/ic_remove"
         android:orderInCategory="100"
         android:title="@string/option_cancel_transfer"
+        app:iconTint="@color/white"
         app:showAsAction="ifRoom" />
 
     <item

@@ -242,7 +242,9 @@
     -->
     <string name="cancel_transfer_confirmation">Cancel this transfer?</string>
     <string name="cancel_all_transfer_confirmation">Cancel all transfers?</string>
+    <string name="cancel_selected_transfer_confirmation">Cancel selected transfers?</string>
     <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_selected_action" context="Label for any ‘Cancel selected’ button, link, etc. - (String as short as possible).">Cancel selected</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Recents</string>

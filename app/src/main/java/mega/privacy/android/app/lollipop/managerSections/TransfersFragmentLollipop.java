@@ -195,6 +195,11 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	}
 
 	@Override
+	public void notifyItemChanged() {
+		updateActionModeTitle();
+	}
+
+	@Override
 	protected RotatableAdapter getAdapter() {
 		return adapter;
 	}
@@ -251,12 +256,16 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 	@Override
 	public void cancelTransfers() {
-
+		if (adapter != null) {
+			managerActivity.showConfirmationCancelSelectedTransfers(adapter.getSelectedTransfers());
+		}
 	}
 
 	@Override
 	public void selectAll() {
-
+		if (adapter != null) {
+			adapter.selectAll();
+		}
 	}
 
 	@Override
