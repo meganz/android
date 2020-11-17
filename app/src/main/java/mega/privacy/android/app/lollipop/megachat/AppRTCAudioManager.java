@@ -38,6 +38,9 @@ import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaHandleList;
 
+import static android.media.AudioManager.RINGER_MODE_NORMAL;
+import static android.media.AudioManager.RINGER_MODE_SILENT;
+import static android.media.AudioManager.RINGER_MODE_VIBRATE;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -65,6 +68,8 @@ public class AppRTCAudioManager {
     private OnProximitySensorListener proximitySensorListener;
     private int typeStatus;
     private boolean isTemporary;
+    private boolean isIncomingSound = false;
+    private int previousVolume;
 
     // Default audio device; speaker phone for video calls or earpiece for audio
     // only calls.
@@ -158,7 +163,9 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Near");
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                if ((apprtcContext instanceof MegaApplication && isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof MegaApplication && isSpeakerOn &&
+                        (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
+                        apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone:");
                     selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
@@ -166,7 +173,9 @@ public class AppRTCAudioManager {
                 logDebug("Status of proximity sensor is: Far");
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if ((apprtcContext instanceof MegaApplication && isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+                if ((apprtcContext instanceof MegaApplication && isSpeakerOn &&
+                        (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
+                        apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone: ");
                     selectAudioDevice(AudioDevice.SPEAKER_PHONE, true);
                 }
@@ -247,6 +256,7 @@ public class AppRTCAudioManager {
 
         logDebug("Start outgoing call sound");
         mediaPlayer.start();
+        isIncomingSound = false;
     }
 
     private void incomingCallSound() {
@@ -262,7 +272,9 @@ public class AppRTCAudioManager {
         }
 
         mediaPlayer = new MediaPlayer();
-        audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
+        if(audioManager.getRingerMode() != RINGER_MODE_SILENT) {
+            audioManager.setStreamVolume(AudioManager.STREAM_RING, audioManager.getStreamVolume(AudioManager.STREAM_RING), 0);
+        }
         mediaPlayer.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE).build());
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_RING);
         mediaPlayer.setLooping(true);
@@ -278,6 +290,8 @@ public class AppRTCAudioManager {
         }
         logDebug("Start incoming call sound");
         mediaPlayer.start();
+        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_RING);
+        isIncomingSound = true;
     }
 
     private void checkVibration() {
@@ -286,21 +300,25 @@ public class AppRTCAudioManager {
 
         logDebug("Ringer mode: " + audioManager.getRingerMode() + ", Stream volume: " + audioManager.getStreamVolume(AudioManager.STREAM_RING) + ", Voice call volume: " + audioManager.getStreamVolume(AudioManager.STREAM_VOICE_CALL));
 
-        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT) {
-            if (vibrator == null || !vibrator.hasVibrator()) return;
-            stopVibration();
-            return;
-        }
+        switch (audioManager.getRingerMode()) {
+            case RINGER_MODE_SILENT:
+                stopVibration();
+                break;
 
-        if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-            startVibration();
-            return;
-        }
+            case RINGER_MODE_VIBRATE:
+                startVibration();
+                break;
 
-        if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0) {
-            return;
+            case RINGER_MODE_NORMAL:
+                if (audioManager.getStreamVolume(AudioManager.STREAM_RING) == 0 &&
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                        audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+                    stopVibration();
+                } else {
+                    startVibration();
+                }
+                break;
         }
-        startVibration();
     }
 
     private void startVibration() {
@@ -316,8 +334,69 @@ public class AppRTCAudioManager {
         vibrator.vibrate(pattern, 0);
     }
 
+    /**
+     * Method of checking whether the volume has been raised or lowered using the keys on the device.
+     *
+     * @param newVolume The new volume detected.
+     */
+    public void checkVolume(int newVolume) {
+        if (newVolume < previousVolume) {
+            muteOrUnmuteIncomingCall(true);
+        } else if (newVolume > previousVolume && isPlayingIncomingCall()) {
+            muteOrUnmuteIncomingCall(false);
+        }
+        previousVolume = newVolume;
+    }
+
+    /**
+     * Method to know if an incoming call is ringing
+     *
+     * @return True, if it's ringing. False, if not.
+     */
+    private boolean isPlayingIncomingCall() {
+        return mediaPlayer != null && mediaPlayer.isPlaying() && isIncomingSound && audioManager != null;
+    }
+
+    /**
+     * Method to mute or unmute an incoming call.
+     */
+    public void muteOrUnmuteIncomingCall(boolean isNeccesaryMute) {
+        if (audioManager == null || audioManager.getRingerMode() == RINGER_MODE_SILENT ||
+                (isNeccesaryMute && !isPlayingIncomingCall())) {
+            return;
+        }
+
+        if (audioManager.getRingerMode() == RINGER_MODE_VIBRATE) {
+            if (isNeccesaryMute) {
+                stopVibration();
+            } else {
+                startVibration();
+            }
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (isNeccesaryMute && !audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+                audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_MUTE, 0);
+                stopVibration();
+            } else if (!isNeccesaryMute && audioManager.isStreamMute(AudioManager.STREAM_RING)) {
+                audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 0);
+                checkVibration();
+            }
+        } else {
+            audioManager.setStreamMute(AudioManager.STREAM_RING, isNeccesaryMute);
+            if (isNeccesaryMute) {
+                stopVibration();
+            } else {
+                checkVibration();
+            }
+        }
+    }
+
+    /**
+     * Method for stopping sound and vibration.
+     */
     public void stopAudioSignals() {
-        logDebug("Stop sound and vibration");
         stopSound();
         stopVibration();
     }
@@ -330,6 +409,7 @@ public class AppRTCAudioManager {
                 mediaPlayer.reset();
                 mediaPlayer.release();
                 mediaPlayer = null;
+                muteOrUnmuteIncomingCall(false);
             }
         } catch (Exception e) {
             logWarning("Exception stopping player", e);

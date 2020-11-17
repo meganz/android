@@ -12,14 +12,13 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
-public class SorterContentActivity extends PinActivityLollipop {
+public class SorterContentActivity extends TransfersManagementActivity {
 
     private ManagerActivityLollipop managerActivityLollipop;
     private FileExplorerActivityLollipop fileExplorerActivity;
@@ -388,7 +387,7 @@ public class SorterContentActivity extends PinActivityLollipop {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER);
         intent.putExtra("cloudOrder", cloudOrder);
         intent.putExtra("order", order);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     private void setFileExplorerOrder(ManagerActivityLollipop.DrawerItem drawerItem, Context context, int order) {

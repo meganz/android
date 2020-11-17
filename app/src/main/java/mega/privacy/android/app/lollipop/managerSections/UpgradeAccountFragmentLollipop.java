@@ -372,25 +372,26 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 						}
 						case BUSINESS: {
 							textToShow = getPriceString(df, account, true);
-							String unlimitedSpace = getString(R.string.unlimited_space);
-							String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
+                            // The initial amount of storage space for business account is 15TB
+							String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
+							String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
 
 							try{
 								textToShow = textToShow.replace("[A]", "<font color=\'#2ba6de\'>");
 								textToShow = textToShow.replace("[/A]", "</font>");
 								textToShow = textToShow.replace("[B]", "<font color=\'#2ba6de\'>");
 								textToShow = textToShow.replace("[/B]", "</font>");
-								unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
-								unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
-								unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
-								unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
+								businessStorageSpace = businessStorageSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
+								businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
+								businessTransferQuota = businessTransferQuota.replace("[A]", "<font color=\'#7a7a7a\'>");
+								businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
 							}catch (Exception e){
 								logError("NullPointerException happens when getting the storage string", e);
 							}
 
 							monthSectionBusiness.setText(getSpannedHtmlText(textToShow));
-							storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
-							bandwidthSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
+							storageSectionBusiness.setText(getSpannedHtmlText(businessStorageSpace));
+							bandwidthSectionBusiness.setText(getSpannedHtmlText(businessTransferQuota));
 
 							break;
 						}
@@ -1213,7 +1214,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 1: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro1_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro1_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -1225,7 +1226,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 2: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro2_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro2_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -1237,7 +1238,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 3: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro3_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.pro3_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ff333a\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");
@@ -1249,7 +1250,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements OnClickL
 				}
 
 				case 4: {
-					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.lite_account).toUpperCase());
+					String textToShowB = getString(R.string.type_of_my_account, getString(R.string.lite_account));
 					try{
 						textToShowB = textToShowB.replace("[A]", "<font color=\'#ffa500\'>");
 						textToShowB = textToShowB.replace("[/A]", "</font>");

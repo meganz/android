@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/transfers_widget_layout"
+    android:layout_width="82dp"
+    android:layout_height="82dp"
+    android:padding="16dp"
+    android:clipToPadding="false">
+
+    <RelativeLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/transfers_circle_shape"
+        android:elevation="6dp">
+
+        <ImageButton
+            android:id="@+id/transfers_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:background="@drawable/transfers_circle_shape"/>
+
+        <ProgressBar
+            android:id="@+id/transfers_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"/>
+
+        <ImageView
+            android:id="@+id/transfers_status"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="8dp"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

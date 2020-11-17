@@ -104,13 +104,6 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
-			android:key="settings_local_camera_upload_folder_sdcard"
-			android:title="@string/settings_local_camera_upload_folder"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-		<androidx.preference.Preference
 			android:key="settings_mega_camera_folder"
 			android:title="@string/settings_mega_camera_upload_folder"
 			app:allowDividerAbove="true"
@@ -146,7 +139,14 @@
 		app:allowDividerBelow="false">
 		<!--        android:textColor="@color/pressed_mega">  -->
 
-		<androidx.preference.ListPreference
+		<androidx.preference.Preference
+			android:key="settings_nested_notifications_chat"
+			android:title="@string/title_properties_contact_notifications_for_chat"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+        <androidx.preference.ListPreference
 			android:key="settings_chat_list_status"
 			android:title="@string/set_status_option_label"
 			android:entries="@array/settings_status_entries"
@@ -214,21 +214,6 @@
 		<mega.privacy.android.app.components.TwoLineCheckPreference
 			android:key="settings_persistence_chat_checkpreference"
 			android:title="@string/settings_persistence_subtitle"
-			app:allowDividerAbove="true"
-			app:allowDividerBelow="true"
-			app:iconSpaceReserved="false" />
-
-	</androidx.preference.PreferenceCategory>
-
-	<androidx.preference.PreferenceCategory
-		android:key="settings_notifications_chat"
-		android:title="@string/title_properties_chat_contact_notifications"
-		app:allowDividerAbove="false"
-		app:allowDividerBelow="false">
-
-		<androidx.preference.Preference
-			android:key="settings_nested_notifications_chat"
-			android:title="@string/section_chat"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />

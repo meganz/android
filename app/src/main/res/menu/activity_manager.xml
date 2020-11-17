@@ -196,8 +196,15 @@
 		android:visible="false"/>
 
 	<item
-		android:id="@+id/action_menu_upgrade_account"
+		android:id="@+id/action_menu_do_not_disturb"
 		android:orderInCategory="140"
+		android:title="@string/title_dialog_mute_chat_notifications"
+		MEGA:showAsAction="never"
+		android:visible="false"/>
+
+	<item
+		android:id="@+id/action_menu_upgrade_account"
+		android:orderInCategory="145"
 		android:title="@string/action_upgrade_account"
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never"
@@ -214,6 +221,14 @@
 		android:id="@+id/action_menu_cancel_subscriptions"
 		android:orderInCategory="155"
 		android:title="@string/action_cancel_subscriptions"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="never"
+		android:visible="false"/>
+
+	<item
+		android:id="@+id/action_menu_retry_transfers"
+		android:orderInCategory="165"
+		android:title="@string/option_to_retry_transfers"
 		android:icon="@drawable/ic_action_bar_null"
 		MEGA:showAsAction="never"
 		android:visible="false"/>
