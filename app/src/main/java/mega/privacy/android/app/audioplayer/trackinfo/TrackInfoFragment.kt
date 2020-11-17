@@ -86,4 +86,10 @@ class TrackInfoFragment : Fragment() {
 
         viewModel.loadTrackInfo(args)
     }
+
+    fun updateNodeNameIfNeeded(handle: Long, newName: String) {
+        if (isResumed) {
+            viewModel.updateNodeNameIfNeeded(handle, newName)
+        }
+    }
 }

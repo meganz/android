@@ -71,7 +71,9 @@ class AudioPlayerFragment : Fragment() {
             if (isResumed && mediaItem != null
                 && reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
             ) {
-                displayMetadata(Metadata(null, null, null, mediaItem.mediaId))
+                val nodeName =
+                    playerService?.viewModel?.getPlaylistItem(mediaItem.mediaId)?.nodeName ?: ""
+                displayMetadata(Metadata(null, null, null, nodeName))
             }
         }
 
@@ -285,14 +287,14 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun setupBgPlaySetting() {
-        val enabled = playerService?.backgroundPlayEnabled() ?: return
+        val enabled = playerService?.viewModel?.backgroundPlayEnabled() ?: return
         updateBgPlay(bgPlay, bgPlayHint, enabled)
 
         bgPlay.setOnClickListener {
             val service = playerService ?: return@setOnClickListener
 
-            service.toggleBackgroundPlay()
-            updateBgPlay(bgPlay, bgPlayHint, service.backgroundPlayEnabled())
+            service.viewModel.toggleBackgroundPlay()
+            updateBgPlay(bgPlay, bgPlayHint, service.viewModel.backgroundPlayEnabled())
         }
     }
 

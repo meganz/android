@@ -250,7 +250,6 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         megaApi.renameNode(node, newName, object : BaseListener(context) {
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 if (request.type == MegaRequest.TYPE_RENAME) {
-                    // TODO: update displayed metadata
                     _snackbarToShow.value = Triple(
                         SNACKBAR_TYPE,
                         context.getString(

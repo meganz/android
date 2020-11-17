@@ -22,6 +22,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
+import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
@@ -134,7 +135,7 @@ class AudioPlayerActivity : BaseActivity() {
         }
 
         viewModel.itemToRemove.observe(this) {
-            playerService?.removeItem(it)
+            playerService?.viewModel?.removeItem(it)
         }
     }
 
@@ -244,7 +245,7 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     private fun refreshMenuOptionsVisibility(currentFragment: Int) {
-        val adapterType = playerService?.getLaunchIntent()
+        val adapterType = playerService?.viewModel?.currentIntent
             ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE) ?: return
 
         when (currentFragment) {
@@ -319,7 +320,7 @@ class AudioPlayerActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val service = playerService ?: return false
-        val launchIntent = service.getLaunchIntent() ?: return false
+        val launchIntent = service.viewModel.currentIntent ?: return false
         val playingHandle = service.viewModel.playingHandle
         val adapterType = launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         val isFolderLink = adapterType == FOLDER_LINK_ADAPTER
@@ -383,6 +384,8 @@ class AudioPlayerActivity : BaseActivity() {
             R.id.rename -> {
                 val node = megaApi.getNodeByHandle(playingHandle) ?: return true
                 AlertsAndWarnings.showRenameDialog(this, node.name, node.isFolder) {
+                    playerService?.viewModel?.updateItemName(node.handle, it)
+                    updateTrackInfoNodeNameIfNeeded(node.handle, it)
                     viewModel.renameNode(node, it)
                 }
                 return true
@@ -415,6 +418,15 @@ class AudioPlayerActivity : BaseActivity() {
         return false
     }
 
+    private fun updateTrackInfoNodeNameIfNeeded(handle: Long, newName: String) {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) ?: return
+        val firstChild = navHostFragment.childFragmentManager.fragments.firstOrNull() ?: return
+        if (firstChild is TrackInfoFragment) {
+            firstChild.updateNodeNameIfNeeded(handle, newName)
+        }
+    }
+
     private fun moveToRubbishBin(node: MegaNode) {
         logDebug("moveToRubbishBin")
         if (!isOnline(this)) {
@@ -428,7 +440,7 @@ class AudioPlayerActivity : BaseActivity() {
         MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_move_to_rubbish)
             .setPositiveButton(R.string.general_move) { _, _ ->
-                playerService?.removeItem(node.handle)
+                playerService?.viewModel?.removeItem(node.handle)
                 viewModel.moveNodeToRubbishBin(node)
             }
             .setNegativeButton(R.string.general_cancel, null)

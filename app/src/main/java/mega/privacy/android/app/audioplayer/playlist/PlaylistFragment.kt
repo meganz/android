@@ -121,6 +121,6 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
     }
 
     override fun openItemRemove(item: PlaylistItem) {
-        playerService?.removeItem(item.nodeHandle)
+        playerService?.viewModel?.removeItem(item.nodeHandle)
     }
 }

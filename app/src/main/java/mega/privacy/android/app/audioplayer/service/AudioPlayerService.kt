@@ -66,8 +66,9 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             .build()
 
         exoPlayer.addListener(MetadataExtractor(trackSelector) { title, artist, album ->
-            _metadata.value =
-                Metadata(title, artist, album, exoPlayer.currentMediaItem?.mediaId ?: "")
+            val nodeName =
+                viewModel.getPlaylistItem(exoPlayer.currentMediaItem?.mediaId)?.nodeName ?: ""
+            _metadata.value = Metadata(title, artist, album, nodeName)
         })
 
         exoPlayer.shuffleModeEnabled = viewModel.shuffleEnabled()
@@ -75,10 +76,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
         exoPlayer.addListener(object : Player.EventListener {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                val tag = mediaItem?.playbackProperties?.tag ?: return
-                if (tag is Long) {
-                    viewModel.playingHandle = tag
-                }
+                val handle = mediaItem?.mediaId ?: return
+                viewModel.playingHandle = handle.toLong()
             }
 
             override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -193,20 +192,26 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                 val nextIndex = exoPlayer.nextWindowIndex
                 if (nextIndex != C.INDEX_UNSET) {
                     val nextItem = exoPlayer.getMediaItemAt(nextIndex)
-                    _metadata.value = Metadata(null, null, null, nextItem.mediaId)
+                    val nodeName = viewModel.getPlaylistItem(nextItem.mediaId)?.nodeName ?: ""
+                    _metadata.value = Metadata(null, null, null, nodeName)
                 }
                 exoPlayer.removeMediaItem(it)
             }
+        })
+
+        viewModel.nodeNameUpdate.observe(this, Observer {
+            val meta = _metadata.value ?: return@Observer
+            _metadata.value = Metadata(meta.title, meta.artist, meta.album, it)
         })
     }
 
     private fun playSource(
         mediaItems: List<MediaItem>,
         newIndexForCurrentItem: Int,
-        displayNodeNameFirst: Boolean
+        nameToDisplay: String?
     ) {
-        if (displayNodeNameFirst && mediaItems.isNotEmpty()) {
-            _metadata.value = Metadata(null, null, null, mediaItems.first().mediaId)
+        if (nameToDisplay != null) {
+            _metadata.value = Metadata(null, null, null, nameToDisplay)
         }
 
         if (newIndexForCurrentItem == INVALID_VALUE) {
@@ -271,14 +276,6 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             needPlayWhenGoForeground = true
         }
     }
-
-    fun removeItem(handle: Long) = viewModel.removeItem(handle)
-
-    fun backgroundPlayEnabled() = viewModel.backgroundPlayEnabled()
-
-    fun toggleBackgroundPlay() = viewModel.toggleBackgroundPlay()
-
-    fun getLaunchIntent() = viewModel.currentIntent
 
     private fun playing() =
         exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED

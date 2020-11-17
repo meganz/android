@@ -21,6 +21,8 @@ data class PlaylistItem(
         )
     }
 
+    fun updateNodeName(newName: String) = PlaylistItem(nodeHandle, newName, thumbnail, index, type)
+
     companion object {
         const val TYPE_PREVIOUS = 1
         const val TYPE_PREVIOUS_HEADER = 2

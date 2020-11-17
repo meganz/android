@@ -1,6 +1,7 @@
 package mega.privacy.android.app.utils
 
 import android.content.Context
+import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -352,14 +353,19 @@ class AlertsAndWarnings {
 
             renameDialog = MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
                 .setTitle(context.getString(R.string.context_rename) + " " + nodeName)
-                .setPositiveButton(R.string.context_rename) { _, _ ->
-                    checkInput(input.text.toString())
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                    input.background.clearColorFilter()
-                }
+                .setPositiveButton(R.string.context_rename, null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .setView(layout)
                 .show()
+
+            // the dialog will be dismissed automatically after positive button listener
+            // is executed, but we need check if the input is valid, so we use
+            // getButton.setOnClickListener to override it.
+            renameDialog?.getButton(BUTTON_POSITIVE)?.setOnClickListener {
+                checkInput(input.text.toString())
+            }
+
+            input.requestFocus()
         }
     }
 }

@@ -3,9 +3,6 @@ package mega.privacy.android.app.audioplayer.service
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.exoplayer2.C
@@ -39,6 +36,7 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class AudioPlayerServiceViewModel(
     private val context: Context,
@@ -64,11 +62,14 @@ class AudioPlayerServiceViewModel(
         }
     }
 
-    private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
-    val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
+    private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, String?>>()
+    val playerSource: LiveData<Triple<List<MediaItem>, Int, String?>> = _playerSource
 
     private val _mediaItemToRemove = MutableLiveData<Int>()
     val mediaItemToRemove: LiveData<Int> = _mediaItemToRemove
+
+    private val _nodeNameUpdate = MutableLiveData<String>()
+    val nodeNameUpdate: LiveData<String> = _nodeNameUpdate
 
     private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
     val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
@@ -78,6 +79,8 @@ class AudioPlayerServiceViewModel(
     var playlistTitle = ""
 
     private val playlistItems = ArrayList<PlaylistItem>()
+    private val playlistItemsMap = HashMap<String, PlaylistItem>()
+
     var playlistSearchQuery: String? = null
         set(value) {
             field = value
@@ -152,13 +155,12 @@ class AudioPlayerServiceViewModel(
 
         val mediaItem = MediaItem.Builder()
             .setUri(uri)
-            .setMediaId(firstPlayNodeName)
-            .setTag(firstPlayHandle)
+            .setMediaId(firstPlayHandle.toString())
             .build()
         _playerSource.value = Triple(
             listOf(mediaItem),
             if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
-            displayNodeNameFirst
+            if (displayNodeNameFirst) firstPlayNodeName else null
         )
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
@@ -221,10 +223,13 @@ class AudioPlayerServiceViewModel(
                         && !MimeTypeList.typeForName(it.name).isAudioNotSupported
             },
             {
-                mediaItemFromFile(getOfflineFile(context, it), it.name, it.handle.toLong())
+                mediaItemFromFile(getOfflineFile(context, it), it.handle)
             },
             {
                 it.handle.toLong()
+            },
+            {
+                it.name
             },
             {
                 getThumbnailFile(context, it)
@@ -298,12 +303,11 @@ class AudioPlayerServiceViewModel(
                     && (isOnMegaDownloads || nodeFingerPrint != null
                             && nodeFingerPrint == localPathFingerPrint)
                 ) {
-                    mediaItemFromFile(File(localPath), it.name, it.handle)
+                    mediaItemFromFile(File(localPath), it.handle.toString())
                 } else if (dbHandler.credentials != null) {
                     MediaItem.Builder()
                         .setUri(Uri.parse(megaApi.httpServerGetLocalLink(it)))
-                        .setMediaId(it.name)
-                        .setTag(it.handle)
+                        .setMediaId(it.handle.toString())
                         .build()
                 } else {
                     null
@@ -311,6 +315,9 @@ class AudioPlayerServiceViewModel(
             },
             {
                 it.handle
+            },
+            {
+                it.name
             },
             {
                 File(getThumbFolder(context), it.base64Handle.plus(JPG_EXTENSION))
@@ -324,9 +331,11 @@ class AudioPlayerServiceViewModel(
         validator: (T) -> Boolean,
         mapper: (T) -> MediaItem?,
         handleGetter: (T) -> Long,
+        nameGetter: (T) -> String,
         thumbnailGetter: (T) -> File,
     ) {
         playlistItems.clear()
+        playlistItemsMap.clear()
 
         val mediaItems = ArrayList<MediaItem>()
         var index = 0
@@ -349,9 +358,10 @@ class AudioPlayerServiceViewModel(
                 firstPlayIndex = index
             }
 
-            playlistItems.add(
-                PlaylistItem(handle, mediaItem.mediaId, thumbnail, index, PlaylistItem.TYPE_NEXT)
-            )
+            val playlistItem =
+                PlaylistItem(handle, nameGetter(node), thumbnail, index, PlaylistItem.TYPE_NEXT)
+            playlistItems.add(playlistItem)
+            playlistItemsMap[handle.toString()] = playlistItem
 
             if (!thumbnail.exists()) {
                 nodesWithoutThumbnail.add(Pair(handle, thumbnail))
@@ -361,7 +371,7 @@ class AudioPlayerServiceViewModel(
         }
 
         if (mediaItems.isNotEmpty()) {
-            _playerSource.postValue(Triple(mediaItems, firstPlayIndex, false))
+            _playerSource.postValue(Triple(mediaItems, firstPlayIndex, null))
 
             postPlaylistItems()
         }
@@ -382,19 +392,10 @@ class AudioPlayerServiceViewModel(
         }
     }
 
-    private fun mediaItemFromFile(file: File, name: String, handle: Long): MediaItem {
-        val mediaUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-            && file.absolutePath.contains(Environment.getExternalStorageDirectory().path)
-        ) {
-            FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file)
-        } else {
-            Uri.fromFile(file)
-        }
-
+    private fun mediaItemFromFile(file: File, handle: String): MediaItem {
         return MediaItem.Builder()
-            .setUri(mediaUri)
-            .setMediaId(name)
-            .setTag(handle)
+            .setUri(getUriForFile(context, file))
+            .setMediaId(handle)
             .build()
     }
 
@@ -499,6 +500,13 @@ class AudioPlayerServiceViewModel(
         _playlist.postValue(Triple(filteredItems, 0, playlistTitle))
     }
 
+    fun getPlaylistItem(handle: String?): PlaylistItem? {
+        if (handle == null) {
+            return null
+        }
+        return playlistItemsMap[handle]
+    }
+
     fun removeItem(handle: Long) {
         for ((index, item) in playlistItems.withIndex()) {
             if (item.nodeHandle == handle) {
@@ -508,6 +516,21 @@ class AudioPlayerServiceViewModel(
                     _playlist.value = Triple(emptyList(), 0, playlistTitle)
                 } else {
                     postPlaylistItems()
+                }
+                return
+            }
+        }
+    }
+
+    fun updateItemName(handle: Long, newName: String) {
+        for ((index, item) in playlistItems.withIndex()) {
+            if (item.nodeHandle == handle) {
+                val newItem = playlistItems[index].updateNodeName(newName)
+                playlistItems[index] = newItem
+                playlistItemsMap[handle.toString()] = newItem
+                postPlaylistItems()
+                if (handle == playingHandle) {
+                    _nodeNameUpdate.postValue(newName)
                 }
                 return
             }

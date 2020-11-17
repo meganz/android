@@ -214,6 +214,16 @@ class TrackInfoViewModel @ViewModelInject constructor(
         }
     }
 
+    fun updateNodeNameIfNeeded(handle: Long, newName: String) {
+        if (handle == trackInfoArgs?.handle) {
+            val meta = _metadata.value ?: return
+            _metadata.value = Pair(
+                Metadata(meta.first.title, meta.first.artist, meta.first.album, newName),
+                meta.second
+            )
+        }
+    }
+
     fun toggleAvailableOffline(available: Boolean) {
         val args = trackInfoArgs ?: return
 
