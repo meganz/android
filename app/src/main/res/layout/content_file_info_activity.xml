@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nested_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
-    tools:showIn="@layout/activity_file_info"
-    android:id="@+id/nested_layout">
+    tools:showIn="@layout/activity_file_info">
 
     <LinearLayout
         android:id="@+id/file_info_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:paddingBottom="20dp">
 
         <!-- OWNER LAYOUT -->
 
@@ -29,15 +29,15 @@
                 android:id="@+id/contact_list_relative_layout_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="18dp"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="18dp">
 
                 <mega.privacy.android.app.components.RoundedImageView
                     android:id="@+id/contact_list_thumbnail"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:scaleType="fitCenter"
                     android:layout_centerInParent="true"
+                    android:scaleType="fitCenter"
                     rounded:border_color="?attr/colorPrimary"
                     rounded:border_width="0dp"
                     rounded:corner_radius="20dp" />
@@ -47,45 +47,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="72dp"
-                android:layout_gravity="left">
+                android:layout_gravity="left"
+                android:layout_marginLeft="72dp">
 
                 <LinearLayout
                     android:id="@+id/file_properties_owner_linear"
-                    android:orientation="horizontal"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
                         android:id="@+id/file_properties_owner_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="3dp"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        app:emojiSize="14sp"
                         android:maxLines="1"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
+                        app:emojiSize="14sp" />
 
                     <TextView
                         android:id="@+id/file_properties_owner_label_owner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:maxLines="1"
                         android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="@color/grey_038_white_038"
-                        android:maxLines="1" />
+                        android:textColor="@color/grey_038_white_038" />
 
                     <ImageView
                         android:id="@+id/file_properties_owner_state_icon"
                         android:layout_width="6dp"
                         android:layout_height="6dp"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginTop="1dp"
                         android:layout_marginLeft="6dp"
+                        android:layout_marginTop="1dp"
                         android:background="@null"
                         android:src="@drawable/circle_status_contact_offline"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
-                    </LinearLayout>
+                </LinearLayout>
 
 
                 <TextView
@@ -93,19 +93,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_owner_linear"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:singleLine="true"/>
+                    android:singleLine="true"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginLeft="16dp"
-                android:background="@color/grey_012_white_012"
-                android:layout_alignParentBottom="true"/>
+                android:background="@color/grey_012_white_012" />
         </RelativeLayout>
 
         <!-- AVAILABLE OFFLINE LAYOUT -->
@@ -114,17 +114,17 @@
             android:id="@+id/available_offline_layout"
             android:layout_width="fill_parent"
             android:layout_height="48dp"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/file_properties_available_offline_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left|center_vertical"
-                android:layout_weight="5"
                 android:layout_marginLeft="72dp"
+                android:layout_weight="5"
                 android:text="@string/file_properties_available_offline"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant2"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant2" />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/file_properties_switch"
@@ -148,32 +148,26 @@
             android:id="@+id/file_properties_versions_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:gravity="left" >
+            android:gravity="left">
+
             <ImageView
                 android:id="@+id/file_properties_versions_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
                 android:src="@drawable/ic_g_version" />
 
             <Button
                 android:id="@+id/file_properties_text_number_versions"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="72dp"
                 android:layout_centerVertical="true"
-                android:textAllCaps="true"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
-                android:stateListAnimator="@null"
-                android:elevation="0dp"
-                android:textColor="@color/accentColor"
-                android:background="@color/white"
+                android:layout_marginLeft="72dp"
                 android:gravity="left|center_vertical"
-                style="@style/ButtonStyle"/>
+                android:stateListAnimator="@null" />
         </RelativeLayout>
 
         <View
@@ -188,8 +182,8 @@
         <RelativeLayout
             android:id="@+id/file_properties_shared_layout"
             android:layout_width="match_parent"
-            android:layout_marginLeft="72dp"
-            android:layout_height="56dp" >
+            android:layout_height="56dp"
+            android:layout_marginLeft="72dp">
 
             <TextView
                 android:id="@+id/file_properties_shared_label"
@@ -198,73 +192,56 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="left|center_vertical"
                 android:text="@string/file_properties_shared_folder_select_contact"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16dp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
             <Button
                 android:id="@+id/file_properties_shared_info_button"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/transparent"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginRight="8dp"
-                style="@style/ButtonStyle"/>
+                android:layout_centerVertical="true" />
         </RelativeLayout>
 
-	    <!--shared contact list view-->
-	    <FrameLayout
-		    android:id="@+id/shared_contact_list_container"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:background="@color/white"
-		    android:visibility="gone">
+        <!--shared contact list view-->
+        <FrameLayout
+            android:id="@+id/shared_contact_list_container"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
-		    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		                    android:id="@+id/file_info_contact_list_container"
-		                    android:layout_width="match_parent"
-		                    android:layout_height="wrap_content"
-		                    android:background="@color/white">
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/file_info_contact_list_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-			    <androidx.recyclerview.widget.RecyclerView
-				    android:id="@+id/file_info_contact_list_view"
-				    android:layout_width="match_parent"
-				    android:layout_height="wrap_content"
-				    android:choiceMode="multipleChoice"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/file_info_contact_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:choiceMode="multipleChoice" />
 
-			    <Button android:id="@+id/more_button"
+                <Button
+                    android:id="@+id/more_button"
+                    style="?attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
                     android:layout_below="@+id/file_info_contact_list_view"
-                    android:background="@android:color/transparent"
-                    android:text="4 More"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp"
-                    style="@style/ButtonStyle"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:layout_marginRight="8dp"/>
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:text="4 More" />
 
-		    </RelativeLayout>
+            </RelativeLayout>
 
-	    </FrameLayout>
+        </FrameLayout>
 
         <View
             android:id="@+id/divider_shared_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/separator_grey" />
+            android:background="@color/grey_012_white_012" />
 
 
         <!-- INFO LAYOUT -->
@@ -275,34 +252,28 @@
             android:id="@+id/file_properties_size_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:gravity="left"
-            android:layout_marginLeft="72dp" >
+            android:layout_marginLeft="72dp"
+            android:gravity="left">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_size"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/file_properties_info_size"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_size"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
-¡
         </RelativeLayout>
 
         <!-- CONTENT LAYOUT -->
@@ -317,26 +288,21 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/file_properties_info_content"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -353,27 +319,22 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_folder_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
                     android:text="@string/title_section_versions"
-                    android:textAllCaps="true"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginRight="8dp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_folder_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -397,20 +358,15 @@
                     android:id="@+id/file_properties_info_menu_folder_current_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
                     android:text="@string/file_properties_folder_current_versions"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginRight="8dp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_folder_current_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -427,27 +383,23 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_folder_previous_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
                     android:text="@string/file_properties_folder_previous_versions"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginRight="8dp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_folder_previous_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -458,40 +410,34 @@
             android:id="@+id/file_properties_location_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
-            android:minHeight="56dp"
             android:layout_marginLeft="72dp"
-            android:layout_marginRight="10dp">
+            android:layout_marginRight="10dp"
+            android:gravity="left"
+            android:minHeight="56dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
                     android:text="@string/file_properties_info_location"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginRight="8dp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_location"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
                     android:layout_marginRight="20dp"
-                    android:textColor="@color/accentColor" />
+                    android:paddingVertical="0dp"
+                    android:paddingHorizontal="0dp"
+                    style="?attr/borderlessButtonStyle" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -502,34 +448,29 @@
             android:id="@+id/file_properties_added_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:gravity="left"
-            android:layout_marginLeft="72dp">
+            android:layout_marginLeft="72dp"
+            android:gravity="left">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_added"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
                     android:text="@string/file_properties_info_added"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginRight="8dp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_added"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_added"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -540,34 +481,29 @@
             android:id="@+id/file_properties_created_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:gravity="left"
-            android:layout_marginLeft="72dp">
+            android:layout_marginLeft="72dp"
+            android:gravity="left">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/file_properties_info_menu_created"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
                     android:text="@string/file_properties_info_last_modified"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-light"
-                    android:textStyle="bold"
-                    android:textAllCaps="true"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:layout_marginRight="8dp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
                 <TextView
                     android:id="@+id/file_properties_info_data_created"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_created"
-                    android:textSize="14sp"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -586,20 +522,16 @@
             android:id="@+id/file_properties_link_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:layout_marginLeft="72dp"
             android:layout_marginTop="8dp"
-            android:layout_marginLeft="72dp">
+            android:gravity="left">
 
             <TextView
                 android:id="@+id/file_properties_link_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/file_properties_shared_folder_public_link_name"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif-light"
-                android:textStyle="bold"
-                android:textAllCaps="true" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
             <TextView
                 android:id="@+id/file_properties_link_text"
@@ -608,8 +540,7 @@
                 android:layout_below="@id/file_properties_link_label"
                 android:layout_marginRight="20dp"
                 android:maxWidth="250dp"
-                android:textSize="14sp"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             <TextView
                 android:id="@+id/file_properties_link_date"
@@ -619,8 +550,7 @@
                 android:layout_marginTop="13dp"
                 android:layout_marginRight="20dp"
                 android:maxWidth="250dp"
-                android:textSize="14sp"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
 
         </RelativeLayout>
 
@@ -629,18 +559,13 @@
             android:id="@+id/file_properties_copy_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:layout_marginLeft="72dp">
+            android:layout_marginLeft="72dp"
+            android:layout_marginTop="14dp">
 
             <Button
                 android:id="@+id/file_properties_link_button"
-                style="@style/AccentBorderBackgroundButton"
                 android:layout_height="wrap_content"
-                android:paddingLeft="16dp"
-                android:paddingTop="10dp"
-                android:paddingRight="16dp"
-                android:paddingBottom="10dp"
-                android:textSize="14sp" />
+                style="?attr/materialButtonOutlinedStyle" />
         </RelativeLayout>
 
     </LinearLayout>

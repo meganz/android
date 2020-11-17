@@ -529,6 +529,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="strokeColor">?attr/colorSecondary</item>
         <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:backgroundTint">@null</item>
     </style>
 
     <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
