@@ -6,18 +6,13 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.FrameLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -31,11 +26,13 @@ import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.changeStatusBarColor
+import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -124,6 +121,11 @@ class AudioPlayerActivity : BaseActivity() {
 
         viewModel.snackbarToShow.observe(this) {
             showSnackbar(it.first, it.second, it.third)
+        }
+        viewModel.intentToLaunch.observe(this) {
+            startActivity(it)
+            playerService?.exoPlayer?.pause()
+            finish()
         }
     }
 
@@ -353,10 +355,16 @@ class AudioPlayerActivity : BaseActivity() {
                     return true
                 }
 
-                showRemoveLink(node)
+                AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
+                    megaApi.disableExport(node)
+                }
                 return true
             }
             R.id.rename -> {
+                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
+                AlertsAndWarnings.showRenameDialog(this, node.name, node.isFolder) {
+                    viewModel.renameNode(node, it)
+                }
                 return true
             }
             R.id.move -> {
@@ -385,37 +393,6 @@ class AudioPlayerActivity : BaseActivity() {
             }
         }
         return false
-    }
-
-    private fun showRemoveLink(node: MegaNode) {
-        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
-
-        val dialogLayout = layoutInflater.inflate(R.layout.dialog_link, null)
-
-        dialogLayout.findViewById<TextView>(R.id.dialog_link_link_url).isVisible = false
-        dialogLayout.findViewById<TextView>(R.id.dialog_link_link_key).isVisible = false
-        dialogLayout.findViewById<TextView>(R.id.dialog_link_symbol).isVisible = false
-
-        val removeText = dialogLayout.findViewById<TextView>(R.id.dialog_link_text_remove)
-        (removeText.layoutParams as RelativeLayout.LayoutParams).setMargins(
-            scaleWidthPx(REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT, outMetrics),
-            scaleHeightPx(REMOVE_LINK_DIALOG_TEXT_MARGIN_TOP, outMetrics),
-            scaleWidthPx(REMOVE_LINK_DIALOG_TEXT_MARGIN_RIGHT, outMetrics),
-            0
-        )
-        removeText.visibility = View.VISIBLE
-        removeText.text = getString(R.string.context_remove_link_warning_text)
-
-        val scaleW = getScaleW(outMetrics, resources.displayMetrics.density)
-        removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, REMOVE_LINK_DIALOG_TEXT_SIZE * scaleW)
-
-        builder.setView(dialogLayout)
-            .setPositiveButton(getString(R.string.context_remove)) { _, _ ->
-                megaApi.disableExport(node)
-            }
-            .setNegativeButton(getString(R.string.general_cancel), null)
-            .create()
-            .show()
     }
 
     private fun moveToRubbishBin(node: MegaNode) {
@@ -471,12 +448,5 @@ class AudioPlayerActivity : BaseActivity() {
             toolbar.animate().cancel()
             toolbar.translationY = 0F
         }
-    }
-
-    companion object {
-        const val REMOVE_LINK_DIALOG_TEXT_MARGIN_LEFT = 25
-        const val REMOVE_LINK_DIALOG_TEXT_MARGIN_TOP = 20
-        const val REMOVE_LINK_DIALOG_TEXT_MARGIN_RIGHT = 10
-        const val REMOVE_LINK_DIALOG_TEXT_SIZE = 15
     }
 }

@@ -172,6 +172,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         val listener = object : BaseListener(context) {
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 if (request.type == MegaRequest.TYPE_MOVE) {
+                    // TODO: update playlist
                     _snackbarToShow.value = Triple(
                         SNACKBAR_TYPE,
                         context.getString(
@@ -242,13 +243,35 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         }
     }
 
+    fun renameNode(node: MegaNode, newName: String) {
+        megaApi.renameNode(node, newName, object : BaseListener(context) {
+            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+                if (request.type == MegaRequest.TYPE_RENAME) {
+                    // TODO: update displayed metadata
+                    _snackbarToShow.value = Triple(
+                        SNACKBAR_TYPE,
+                        context.getString(
+                            if (e.errorCode == MegaError.API_OK) R.string.context_correctly_renamed
+                            else R.string.context_no_renamed
+                        ),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                }
+            }
+        })
+    }
+
     fun moveNodeToRubbishBin(node: MegaNode) {
         megaApi.moveNode(node, megaApi.rubbishNode, object : BaseListener(context) {
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                if (request.type == MegaRequest.TYPE_MOVE && e.errorCode != MegaError.API_OK) {
+                if (request.type == MegaRequest.TYPE_MOVE) {
+                    // TODO: update playlist
                     _snackbarToShow.value = Triple(
                         SNACKBAR_TYPE,
-                        context.getString(R.string.context_no_moved),
+                        context.getString(
+                            if (e.errorCode == MegaError.API_OK) R.string.context_correctly_moved
+                            else R.string.context_no_moved
+                        ),
                         MEGACHAT_INVALID_HANDLE
                     )
                 }
