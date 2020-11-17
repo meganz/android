@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +11,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -21,7 +19,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
@@ -1281,8 +1282,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 }
 				shareIt = false;
 				AlertDialog removeLinkDialog;
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);

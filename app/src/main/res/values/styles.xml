@@ -511,16 +511,23 @@
     <style name="Widget.Mega.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:backgroundTint">@color/btn_bg_color_selector</item>
-        <item name="android:textColor">@color/btn_text_color_selector</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button</item>
+    </style>
+
+    <style name="ThemeOverlay.Mega.Button" parent="">
+        <item name="colorPrimary">?attr/colorSecondary</item>
+        <item name="colorOnPrimary">?attr/colorOnSecondary</item>
     </style>
 
     <!-- Text button -->
     <style name="Widget.Mega.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/text_btn_text_color_selector</item>
-        <item name="android:backgroundTint">@null</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
+    </style>
+
+    <style name="ThemeOverlay.Mega.Button.TextButton" parent="">
+        <item name="colorPrimary">?attr/colorSecondary</item>
     </style>
 
     <!-- Outlined button -->
@@ -528,8 +535,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="strokeColor">?attr/colorSecondary</item>
-        <item name="android:textColor">?attr/colorSecondary</item>
-        <item name="android:backgroundTint">@null</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
     </style>
 
     <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
@@ -567,6 +573,7 @@
         <item name="android:background">@drawable/background_bottomsheet_round_top</item>
     </style>
 
+    <!-- Alert Dialog -->
     <style name="ThemeOverlay.Mega.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.Mega.Title.Text</item>
         <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.Mega.Body.Text</item>
@@ -581,7 +588,6 @@
 
     <style name="MaterialAlertDialog.Mega.Body.Text" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Secondary</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="Widget.Mega.NegativeButton.Dialog" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
