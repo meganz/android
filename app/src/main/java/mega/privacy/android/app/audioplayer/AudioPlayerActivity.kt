@@ -28,14 +28,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import javax.inject.Inject
@@ -118,6 +121,10 @@ class AudioPlayerActivity : BaseActivity() {
         }
 
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
+
+        viewModel.snackbarToShow.observe(this) {
+            showSnackbar(it.first, it.second, it.third)
+        }
     }
 
     private fun setupToolbar() {
@@ -353,12 +360,27 @@ class AudioPlayerActivity : BaseActivity() {
                 return true
             }
             R.id.move -> {
+                val intent = Intent(this, FileExplorerActivityLollipop::class.java)
+                intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
+                intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
+                startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER)
                 return true
             }
             R.id.copy -> {
+                if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                    showOverDiskQuotaPaywallWarning()
+                    return true
+                }
+
+                val intent = Intent(this, FileExplorerActivityLollipop::class.java)
+                intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
+                intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
+                startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER)
                 return true
             }
             R.id.move_to_trash -> {
+                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
+                moveToRubbishBin(node)
                 return true
             }
         }
@@ -396,16 +418,28 @@ class AudioPlayerActivity : BaseActivity() {
             .show()
     }
 
+    private fun moveToRubbishBin(node: MegaNode) {
+        logDebug("moveToRubbishBin")
+        if (!isOnline(this)) {
+            showSnackbar(
+                SNACKBAR_TYPE, getString(R.string.error_server_connection_problem),
+                MEGACHAT_INVALID_HANDLE
+            )
+            return
+        }
+
+        MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+            .setMessage(R.string.confirmation_move_to_rubbish)
+            .setPositiveButton(R.string.general_move) { _, _ ->
+                viewModel.moveNodeToRubbishBin(node)
+            }
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (viewModel.handleActivityResult(requestCode, resultCode, data)) {
-            return
-        } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK
-            && data != null
-        ) {
-            viewModel.handleSelectChatResult(data)
-        }
+        viewModel.handleActivityResult(requestCode, resultCode, data)
     }
 
     fun showSnackbar(type: Int, content: String, chatId: Long) {
