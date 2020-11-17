@@ -9,10 +9,7 @@ import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.*
-import com.google.android.exoplayer2.DefaultRenderersFactory
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -99,6 +96,13 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
                 viewModel.paused = !playWhenReady
             }
+
+            override fun onPlaybackStateChanged(state: Int) {
+                when {
+                    state == Player.STATE_ENDED && !viewModel.paused -> viewModel.paused = true
+                    state == Player.STATE_READY && viewModel.paused -> viewModel.paused = false
+                }
+            }
         })
 
         exoPlayer.setShuffleOrder(viewModel.shuffleOrder)
@@ -183,6 +187,17 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     private fun observeLiveData() {
         viewModel.playerSource.observe(this, Observer { playSource(it.first, it.second, it.third) })
+
+        viewModel.mediaItemToRemove.observe(this, Observer {
+            if (it < exoPlayer.mediaItemCount) {
+                val nextIndex = exoPlayer.nextWindowIndex
+                if (nextIndex != C.INDEX_UNSET) {
+                    val nextItem = exoPlayer.getMediaItemAt(nextIndex)
+                    _metadata.value = Metadata(null, null, null, nextItem.mediaId)
+                }
+                exoPlayer.removeMediaItem(it)
+            }
+        })
     }
 
     private fun playSource(
@@ -236,6 +251,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     }
 
     fun stopAudioPlayer() {
+        exoPlayer.stop()
         MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
         stopSelf()
     }
@@ -256,9 +272,13 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
+    fun removeItem(handle: Long) = viewModel.removeItem(handle)
+
     fun backgroundPlayEnabled() = viewModel.backgroundPlayEnabled()
 
     fun toggleBackgroundPlay() = viewModel.toggleBackgroundPlay()
+
+    fun getLaunchIntent() = viewModel.currentIntent
 
     private fun playing() =
         exoPlayer.playWhenReady && exoPlayer.playbackState != Player.STATE_ENDED

@@ -120,6 +120,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         (requireActivity() as AudioPlayerActivity).closeSearch()
     }
 
-    override fun openItemOptionPanel(item: PlaylistItem) {
+    override fun openItemRemove(item: PlaylistItem) {
+        playerService?.removeItem(item.nodeHandle)
     }
 }

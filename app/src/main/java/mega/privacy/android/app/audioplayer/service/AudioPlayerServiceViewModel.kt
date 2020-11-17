@@ -67,10 +67,14 @@ class AudioPlayerServiceViewModel(
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, Boolean>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, Boolean>> = _playerSource
 
+    private val _mediaItemToRemove = MutableLiveData<Int>()
+    val mediaItemToRemove: LiveData<Int> = _mediaItemToRemove
+
     private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
     val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
 
     var currentIntent: Intent? = null
+        private set
     var playlistTitle = ""
 
     private val playlistItems = ArrayList<PlaylistItem>()
@@ -493,6 +497,21 @@ class AudioPlayerServiceViewModel(
         }
 
         _playlist.postValue(Triple(filteredItems, 0, playlistTitle))
+    }
+
+    fun removeItem(handle: Long) {
+        for ((index, item) in playlistItems.withIndex()) {
+            if (item.nodeHandle == handle) {
+                playlistItems.removeAt(index)
+                _mediaItemToRemove.value = index
+                if (playlistItems.isEmpty()) {
+                    _playlist.value = Triple(emptyList(), 0, playlistTitle)
+                } else {
+                    postPlaylistItems()
+                }
+                return
+            }
+        }
     }
 
     fun backgroundPlayEnabled(): Boolean {

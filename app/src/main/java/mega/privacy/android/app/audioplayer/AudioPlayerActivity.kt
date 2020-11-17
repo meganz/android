@@ -53,13 +53,12 @@ class AudioPlayerActivity : BaseActivity() {
     private lateinit var actionBar: ActionBar
     private lateinit var navController: NavController
 
-    private var adapterType = INVALID_VALUE
-
     private var optionsMenu: Menu? = null
     private var searchMenuItem: MenuItem? = null
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
+    private var serviceBound = false
     private var playerService: AudioPlayerService? = null
 
     private val connection = object : ServiceConnection {
@@ -74,8 +73,12 @@ class AudioPlayerActivity : BaseActivity() {
                 playerService = service.service
 
                 service.service.viewModel.playlist.observe(this@AudioPlayerActivity) {
-                    val currentFragment = navController.currentDestination?.id ?: return@observe
-                    refreshMenuOptionsVisibility(currentFragment)
+                    if (it.first.isEmpty()) {
+                        stopPlayer()
+                    } else {
+                        val currentFragment = navController.currentDestination?.id ?: return@observe
+                        refreshMenuOptionsVisibility(currentFragment)
+                    }
                 }
             }
         }
@@ -89,8 +92,9 @@ class AudioPlayerActivity : BaseActivity() {
             return
         }
 
-        adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        if (adapterType == INVALID_VALUE) {
+        val rebuildPlaylist = intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)
+        val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+        if (adapterType == INVALID_VALUE && rebuildPlaylist) {
             finish()
             return
         }
@@ -112,21 +116,31 @@ class AudioPlayerActivity : BaseActivity() {
 
         playerServiceIntent.putExtras(extras)
 
-        if (intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
+        if (rebuildPlaylist) {
             playerServiceIntent.setDataAndType(intent.data, intent.type)
             startForegroundService(this, playerServiceIntent)
         }
 
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
+        serviceBound = true
 
         viewModel.snackbarToShow.observe(this) {
             showSnackbar(it.first, it.second, it.third)
         }
+
         viewModel.intentToLaunch.observe(this) {
             startActivity(it)
-            playerService?.exoPlayer?.pause()
-            finish()
+            stopPlayer()
         }
+
+        viewModel.itemToRemove.observe(this) {
+            playerService?.removeItem(it)
+        }
+    }
+
+    private fun stopPlayer() {
+        playerService?.stopAudioPlayer()
+        finish()
     }
 
     private fun setupToolbar() {
@@ -181,7 +195,9 @@ class AudioPlayerActivity : BaseActivity() {
         super.onDestroy()
 
         playerService = null
-        unbindService(connection)
+        if (serviceBound) {
+            unbindService(connection)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -228,6 +244,9 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     private fun refreshMenuOptionsVisibility(currentFragment: Int) {
+        val adapterType = playerService?.getLaunchIntent()
+            ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE) ?: return
+
         when (currentFragment) {
             R.id.playlist -> {
                 toggleAllMenuItemsVisibility(false)
@@ -299,9 +318,10 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val launchIntent = intent ?: return false
         val service = playerService ?: return false
+        val launchIntent = service.getLaunchIntent() ?: return false
         val playingHandle = service.viewModel.playingHandle
+        val adapterType = launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         val isFolderLink = adapterType == FOLDER_LINK_ADAPTER
 
         when (item.itemId) {
@@ -370,8 +390,8 @@ class AudioPlayerActivity : BaseActivity() {
             R.id.move -> {
                 val intent = Intent(this, FileExplorerActivityLollipop::class.java)
                 intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
-                intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
-                startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER)
+                intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
+                startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER)
                 return true
             }
             R.id.copy -> {
@@ -382,8 +402,8 @@ class AudioPlayerActivity : BaseActivity() {
 
                 val intent = Intent(this, FileExplorerActivityLollipop::class.java)
                 intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
-                intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
-                startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER)
+                intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
+                startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER)
                 return true
             }
             R.id.move_to_trash -> {
@@ -408,6 +428,7 @@ class AudioPlayerActivity : BaseActivity() {
         MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.confirmation_move_to_rubbish)
             .setPositiveButton(R.string.general_move) { _, _ ->
+                playerService?.removeItem(node.handle)
                 viewModel.moveNodeToRubbishBin(node)
             }
             .setNegativeButton(R.string.general_cancel, null)

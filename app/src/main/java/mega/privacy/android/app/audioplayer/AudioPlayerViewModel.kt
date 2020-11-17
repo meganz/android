@@ -38,6 +38,9 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     private val _intentToLaunch = MutableLiveData<Intent>()
     val intentToLaunch: LiveData<Intent> = _intentToLaunch
 
+    private val _itemToRemove = MutableLiveData<Long>()
+    val itemToRemove: LiveData<Long> = _itemToRemove
+
     fun saveOfflineNode(handle: Long, activityStarter: (Intent, Int) -> Unit) {
         offlineNodeSaver.save(handle, false, activityStarter)
     }
@@ -172,7 +175,6 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         val listener = object : BaseListener(context) {
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 if (request.type == MegaRequest.TYPE_MOVE) {
-                    // TODO: update playlist
                     _snackbarToShow.value = Triple(
                         SNACKBAR_TYPE,
                         context.getString(
@@ -188,6 +190,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         for (handle in moveHandles) {
             val node = megaApi.getNodeByHandle(handle)
             if (node != null) {
+                _itemToRemove.value = handle
                 megaApi.moveNode(node, parent, listener)
             }
         }
@@ -265,7 +268,6 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         megaApi.moveNode(node, megaApi.rubbishNode, object : BaseListener(context) {
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 if (request.type == MegaRequest.TYPE_MOVE) {
-                    // TODO: update playlist
                     _snackbarToShow.value = Triple(
                         SNACKBAR_TYPE,
                         context.getString(
