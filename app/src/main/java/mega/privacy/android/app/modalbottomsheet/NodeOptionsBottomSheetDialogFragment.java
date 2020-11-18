@@ -45,16 +45,22 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
-    /* The "modes" are defined to allow the client to specify the dialog style more flexibly.
-    At the same time, compatible with old code.For which mode corresponds to which dialog style,
+    /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
+    At the same time, compatible with old code. For which mode corresponds to which dialog style,
      please refer to the code */
-    public static final int MODE0 = 0;  // No definite mode, map the drawerItem to a specific mode
+    /** No definite mode, map the drawerItem to a specific mode */
+    public static final int MODE0 = 0;
+    /** For Cloud Drive */
     public static final int MODE1 = 1;
+    /** For Rubbish Bin */
     public static final int MODE2 = 2;
+    /** For Inbox */
     public static final int MODE3 = 3;
+    /** For Shared items */
     public static final int MODE4 = 4;
+    /** For Search */
     public static final int MODE5 = 5;
-    // For recent
+    /** For Recents */
     public static final int MODE6 = 6;
 
     private static final String SAVED_STATE_KEY_MODE = "MODE";

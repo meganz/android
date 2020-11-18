@@ -4,7 +4,7 @@ buildscript {
     ext.kotlinVersion = '1.4.10'
     ext.navigationVersion = '2.3.0'
     ext.googleServicesVersion = '4.3.4'
-    ext.hiltVersion = "2.28-alpha"
+    ext.hiltVersion = "2.29.1-alpha"
 
     repositories {
         jcenter()
