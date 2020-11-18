@@ -1,14 +1,17 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,8 +71,13 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
+		listView.setItemAnimator(new DefaultItemAnimator());
 
 		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+			private boolean addElevation = true;
+			private boolean resetElevation = false;
+
+
 			@Override
 			public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
 				int posDragged = viewHolder.getAdapterPosition();
@@ -84,6 +92,37 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			@Override
 			public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
+			}
+
+			@Override
+			public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+				// Add elevation when the item is picked
+				if (addElevation) {
+					ViewPropertyAnimator animator = viewHolder.itemView.animate();
+					viewHolder.itemView.setTranslationZ(px2dp(2, outMetrics));
+					animator.start();
+
+					addElevation = false;
+				}
+
+				// Remove elevation when the item is loose
+				if (resetElevation){
+					ViewPropertyAnimator animator = viewHolder.itemView.animate();
+					viewHolder.itemView.setTranslationZ(0);
+					animator.start();
+
+					addElevation = true;
+					resetElevation = false;
+				}
+
+				super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+			}
+
+			@Override
+			public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+				super.clearView(recyclerView, viewHolder);
+				// Drag finished, elevation should be removed.
+				resetElevation = true;
 			}
 		});
 
