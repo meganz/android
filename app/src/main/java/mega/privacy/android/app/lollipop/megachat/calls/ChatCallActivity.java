@@ -2050,7 +2050,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @return True, if there's less. False, if there's more.
      */
     private boolean lessThanSevenParticipants() {
-        return chat.isGroup() && peersOnCall != null && peersOnCall.size() <= MAX_PARTICIPANTS_GRID;
+        return chat != null && chat.isGroup() && peersOnCall != null && peersOnCall.size() <= MAX_PARTICIPANTS_GRID;
     }
 
     private void updateChangesAudio(int position) {
