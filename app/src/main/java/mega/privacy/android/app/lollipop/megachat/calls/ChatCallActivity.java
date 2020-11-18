@@ -272,6 +272,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
+        clearIncomingCallNotification(chatId);
+
         titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
 
@@ -1370,11 +1372,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
 
         if(!checkPermissions()){
-            rejectFAB.hide();
+            withoutCallPermissions();
             answerCallFAB.hide();
             microFAB.hide();
             videoFAB.hide();
-            hangFAB.show();
+            rejectFAB.hide();
             onHoldFAB.hide();
             return;
         }
@@ -2091,10 +2093,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     showInitialFABConfiguration();
                 } else {
-                    hangFAB.show();
+                    withoutCallPermissions();
                 }
                 break;
         }
+    }
+
+    /**
+     * Method showing only the hang up button because you do not have the necessary permissions.
+     */
+    private void withoutCallPermissions() {
+        hangFAB.show();
+        displayLinearFAB(false);
     }
 
     /**
