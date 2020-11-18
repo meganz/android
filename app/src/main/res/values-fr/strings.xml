@@ -2490,7 +2490,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="">%1$s et %2$d de plus</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s et %2$d de plus</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Avant de pouvoir générer un lien pour cette conversation, vous devez définir une description :</string>
 
@@ -2567,7 +2567,7 @@
     <string name="current_location_label" context="Label layout on maps activity that permits send current location">Envoyer votre position actuelle</string>
     <string name="current_location_landscape_label" context="Label layout on maps activity that permits send current location. Placeholder is the current location">Envoyer votre position actuelle : [A]%1$s[/A]</string>
     <string name="nearby_places_label" context="Label layout on maps activity indicating nearby places">Lieux à proximité</string>
-    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">Cette position sera ouverte en utilisant un fournisseur de cartes tiers en dehors de la plateforme chiffrée de bout en bout de MEGA.</string>
+    <string name="explanation_send_location" context="Message shown in a dialog explaining the consequences of accesing the location">Cette position géographique sera ouverte en utilisant un fournisseur de cartes tiers en dehors de la plateforme chiffrée de bout en bout de MEGA.</string>
     <string name="title_marker_maps" context="Title of the location marker set by the user">Envoyer cette position</string>
     <string name="no_places_found" context="Label shown when after a maps search and no places were found">Aucun lieu n\'a été trouvé</string>
     <string name="gps_disabled" context="Title of the dialog shown when the location is disabled">Le GPS est désactivé</string>

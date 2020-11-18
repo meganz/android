@@ -2100,8 +2100,7 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]No completed[/B][A] Transfers[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Empty[/B][A] Folder[/A][B].[/B]</string>
 
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Write message to “%s”&#8230;</string>
-    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
+    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Two-Factor Authentication</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Two-Factor Authentication is a second layer of security for your account.</string>
