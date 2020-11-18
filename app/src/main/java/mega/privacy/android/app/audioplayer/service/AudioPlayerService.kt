@@ -2,9 +2,12 @@ package mega.privacy.android.app.audioplayer.service
 
 import android.app.Notification
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -17,6 +20,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.audioplayer.miniplayer.MiniAudioPlayerController
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import nz.mega.sdk.MegaApiAndroid
@@ -44,6 +48,15 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     val metadata: LiveData<Metadata> = _metadata
 
     private var needPlayWhenGoForeground = false
+    private var needPlayWhenReceiveResumeCommand = false
+
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val resumePlayRunnable = {
+        if (needPlayWhenReceiveResumeCommand) {
+            exoPlayer.playWhenReady = true
+            needPlayWhenReceiveResumeCommand = false
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -55,8 +68,6 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         observeLiveData()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-
-        MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
     }
 
     private fun createPlayer() {
@@ -171,6 +182,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             setUseChronometer(false)
 
             setPlayer(exoPlayer)
+            setControlDispatcher(CallAwareControlDispatcher())
         }
     }
 
@@ -180,7 +192,27 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        viewModel.buildPlayerSource(intent)
+        mainHandler.removeCallbacks(resumePlayRunnable)
+
+        when (intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
+            COMMAND_PAUSE -> {
+                if (playing()) {
+                    exoPlayer.playWhenReady = false
+                    needPlayWhenReceiveResumeCommand = true
+                }
+            }
+            COMMAND_RESUME -> {
+                mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
+            }
+            COMMAND_STOP -> {
+                stopAudioPlayer()
+            }
+            else -> {
+                if (viewModel.buildPlayerSource(intent)) {
+                    MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                }
+            }
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -243,6 +275,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     override fun onDestroy() {
         super.onDestroy()
 
+        mainHandler.removeCallbacks(resumePlayRunnable)
+
         viewModel.clear()
 
         playerNotificationManager.setPlayer(null)
@@ -282,5 +316,41 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1
+
+        private const val INTENT_EXTRA_KEY_COMMAND = "command"
+        private const val COMMAND_CREATE = 1
+        private const val COMMAND_PAUSE = 2
+        private const val COMMAND_RESUME = 3
+        private const val COMMAND_STOP = 4
+
+        private const val RESUME_DELAY_MS = 500L
+
+        @JvmStatic
+        fun pauseAudioPlayer(context: Context) {
+            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
+            audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
+            context.startService(audioPlayerIntent)
+        }
+
+        @JvmStatic
+        fun resumeAudioPlayer(context: Context) {
+            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
+            audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_RESUME)
+            context.startService(audioPlayerIntent)
+        }
+
+        @JvmStatic
+        fun resumeAudioPlayerIfNotInCall(context: Context) {
+            if (!CallUtil.participatingInACall()) {
+                resumeAudioPlayer(context)
+            }
+        }
+
+        @JvmStatic
+        fun stopAudioPlayer(context: Context) {
+            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
+            audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
+            context.startService(audioPlayerIntent)
+        }
     }
 }

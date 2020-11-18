@@ -105,6 +105,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
@@ -786,6 +787,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         else {
             createPlayer();
         }
+
+        AudioPlayerService.pauseAudioPlayer(this);
 
         if (savedInstanceState == null){
             ViewTreeObserver observer = playerView.getViewTreeObserver();
@@ -3445,6 +3448,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         if (player != null){
             player.release();
+
+            AudioPlayerService.resumeAudioPlayer(this);
         }
 
         if (handler != null) {

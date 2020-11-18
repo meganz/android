@@ -28,6 +28,7 @@ import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
+import mega.privacy.android.app.audioplayer.service.CallAwareControlDispatcher
 import mega.privacy.android.app.audioplayer.service.Metadata
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.utils.Constants.*
@@ -172,6 +173,8 @@ class AudioPlayerFragment : Fragment() {
         )
 
         binding.playerView.showController()
+
+        binding.playerView.setControlDispatcher(CallAwareControlDispatcher())
 
         binding.playerView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {

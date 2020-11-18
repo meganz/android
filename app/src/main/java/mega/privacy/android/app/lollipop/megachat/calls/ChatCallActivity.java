@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView;
 import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -690,6 +691,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         aB.setTitle(null);
         aB.setSubtitle(null);
 
+        AudioPlayerService.pauseAudioPlayer(this);
+
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
         titleToolbar.setMaxWidthEmojis(dp2px(TITLE_TOOLBAR, getOutMetrics()));
@@ -1082,6 +1085,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         unregisterReceiver(chatCallUpdateReceiver);
         unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(proximitySensorReceiver);
+
+        AudioPlayerService.resumeAudioPlayerIfNotInCall(this);
 
         super.onDestroy();
     }

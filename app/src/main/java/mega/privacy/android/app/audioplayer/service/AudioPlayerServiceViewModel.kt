@@ -111,16 +111,16 @@ class AudioPlayerServiceViewModel(
         )
     }
 
-    fun buildPlayerSource(intent: Intent?) {
+    fun buildPlayerSource(intent: Intent?): Boolean {
         if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
-            return
+            return false
         }
 
         val type = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         val uri = intent.data
 
         if (type == INVALID_VALUE || uri == null) {
-            return
+            return false
         }
 
         val samePlaylist = isSamePlaylist(type, intent)
@@ -130,17 +130,17 @@ class AudioPlayerServiceViewModel(
         var firstPlayNodeName = ""
         when (type) {
             OFFLINE_ADAPTER -> {
-                val path = intent.getStringExtra(INTENT_EXTRA_KEY_PATH) ?: return
+                val path = intent.getStringExtra(INTENT_EXTRA_KEY_PATH) ?: return false
                 displayNodeNameFirst = false
                 firstPlayNodeName = File(path).name
             }
             AUDIO_SEARCH_ADAPTER, AUDIO_BROWSE_ADAPTER -> {
                 val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-                val node = megaApi.getNodeByHandle(handle) ?: return
+                val node = megaApi.getNodeByHandle(handle) ?: return false
                 firstPlayNodeName = node.name
             }
             else -> {
-                return
+                return false
             }
         }
 
@@ -182,6 +182,8 @@ class AudioPlayerServiceViewModel(
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel buildPlayerSource")))
         }
+
+        return true
     }
 
     private fun isSamePlaylist(type: Int, intent: Intent): Boolean {

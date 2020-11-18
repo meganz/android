@@ -16,7 +16,9 @@ import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
+import mega.privacy.android.app.audioplayer.service.CallAwareControlDispatcher
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.autoCleared
 
@@ -113,10 +115,14 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         )
 
         binding.playerView.showController()
+
+        binding.playerView.setControlDispatcher(CallAwareControlDispatcher())
     }
 
     override fun onItemClick(item: PlaylistItem) {
-        playerService?.exoPlayer?.seekTo(item.index, 0)
+        if (!CallUtil.participatingInACall()) {
+            playerService?.exoPlayer?.seekTo(item.index, 0)
+        }
         (requireActivity() as AudioPlayerActivity).closeSearch()
     }
 

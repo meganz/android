@@ -90,6 +90,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
@@ -2495,6 +2496,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * Start recording
      */
     public void startRecording(){
+        AudioPlayerService.pauseAudioPlayer(this);
+
         long timeStamp = System.currentTimeMillis() / 1000;
         outputFileName = "/note_voice" + getVoiceClipName(timeStamp);
         File vcFile = buildVoiceClipFile(this, outputFileName);
@@ -7818,6 +7821,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(megaApi != null) {
             megaApi.removeRequestListener(this);
         }
+
+        AudioPlayerService.resumeAudioPlayerIfNotInCall(this);
 
         super.onDestroy();
     }

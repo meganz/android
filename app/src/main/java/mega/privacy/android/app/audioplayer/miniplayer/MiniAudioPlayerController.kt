@@ -16,7 +16,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
+import mega.privacy.android.app.audioplayer.service.CallAwareControlDispatcher
 import mega.privacy.android.app.audioplayer.service.Metadata
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 
 private val audioPlayerPlaying = MutableLiveData<Boolean>()
@@ -92,9 +94,11 @@ class MiniAudioPlayerController(
         }
 
         playerView.setOnClickListener {
-            val intent = Intent(context, AudioPlayerActivity::class.java)
-            intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
-            context.startActivity(intent)
+            if (!CallUtil.participatingInACall()) {
+                val intent = Intent(context, AudioPlayerActivity::class.java)
+                intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
+                context.startActivity(intent)
+            }
         }
     }
 
@@ -139,6 +143,8 @@ class MiniAudioPlayerController(
         playerView.controllerHideOnTouch = false
 
         playerView.showController()
+
+        playerView.setControlDispatcher(CallAwareControlDispatcher())
     }
 
     companion object {
