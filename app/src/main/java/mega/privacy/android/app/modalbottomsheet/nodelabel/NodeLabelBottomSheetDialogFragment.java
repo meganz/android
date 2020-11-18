@@ -1,11 +1,11 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
-import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.FrameLayout;
 
 import androidx.annotation.IdRes;
@@ -26,8 +26,7 @@ import static mega.privacy.android.app.utils.Constants.HANDLE;
 
 public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
-    private static final float HALF_EXPANDED_RATIO_OFFSET = 0.98f;
-    private static final float LANDSCAPE_HEIGHT_FACTOR = 0.65f;
+    private static final float HALF_EXPANDED_RATIO_OFFSET = 1.5f;
 
     private BottomSheetNodeLabelBinding binding;
     private MegaNode node = null;
@@ -54,12 +53,14 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
         getDialog().setOnShowListener(dialog -> {
-                    float viewHeight = isLandscape() ? view.getMeasuredHeight() * LANDSCAPE_HEIGHT_FACTOR : view.getMeasuredHeight();
-                    float halfExpandedRatio = (viewHeight * HALF_EXPANDED_RATIO_OFFSET) / getDisplayHeight();
+                    float displayHeight = getDisplayHeight();
+                    int itemHeight = getItemHeight();
+                    int viewHeight = view.getMeasuredHeight();
+                    float expandedRatio = (viewHeight - itemHeight * HALF_EXPANDED_RATIO_OFFSET) / displayHeight;
 
                     BottomSheetBehavior<FrameLayout> behavior = ((BottomSheetDialog) dialog).getBehavior();
                     behavior.setSkipCollapsed(true);
-                    behavior.setHalfExpandedRatio(halfExpandedRatio);
+                    behavior.setHalfExpandedRatio(expandedRatio);
 
                     if (behavior.getState() != BottomSheetBehavior.STATE_HALF_EXPANDED) {
                         behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
@@ -134,14 +135,15 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         dismiss();
     }
 
-    private float getDisplayHeight() {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        return displayMetrics.heightPixels;
+    private int getItemHeight() {
+        return binding.txtTitle.getMeasuredHeight();
     }
 
-    private boolean isLandscape() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    private float getDisplayHeight() {
+        Rect rectangle = new Rect();
+        Window window = getActivity().getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+        return rectangle.bottom - rectangle.top;
     }
 
     private MegaApiAndroid getMegaApi() {
