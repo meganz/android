@@ -148,6 +148,7 @@ import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
+import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.CloudPageAdapter;
@@ -14945,19 +14946,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * Shows a warning to ensure if it is sure of cancel selected transfers.
 	 */
 	public void showConfirmationCancelSelectedTransfers(List<MegaTransfer> selectedTransfers) {
+		if (selectedTransfers == null || selectedTransfers.isEmpty()) {
+			return;
+		}
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setMessage(getResources().getString(R.string.cancel_selected_transfer_confirmation))
-				.setPositiveButton(R.string.cancel_selected_action, (dialog, which) -> {
-					for (MegaTransfer transfer : selectedTransfers) {
-						megaApi.cancelTransfer(transfer, managerActivity);
-					}
+		builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
+				.setPositiveButton(R.string.button_continue, (dialog, which) -> {
+					CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
+					cancelTransferListener.cancelTransfers(selectedTransfers);
 
 					if(isTransfersInProgressAdded()) {
 						tFLol.destroyActionMode();
 					}
-					
-					refreshFragment(FragmentTag.TRANSFERS.getTag());
-					refreshFragment(FragmentTag.COMPLETED_TRANSFERS.getTag());
 				})
 				.setNegativeButton(R.string.general_dismiss, null);
 

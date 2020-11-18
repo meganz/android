@@ -208,6 +208,9 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         if (isItemChecked) {
             holder.iconDownloadUploadView.setVisibility(GONE);
             holder.imageView.setImageResource(R.drawable.ic_select_folder);
+            params.height = params.width = px2dp(48, outMetrics);
+            params.setMargins(36, 0, 0, 0);
+            holder.imageView.setLayoutParams(params);
             holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
         } else {
             holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -366,9 +369,25 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         }
     }
 
+    /**
+     * Removes a transfer from adapter.
+     * Also checks if the transfer to remove is selected. If so, removes it from selected items list
+     * and updates the list with the new positions that the rest of selected transfers occupies after
+     * the removal.
+     *
+     * @param position Item to remove.
+     */
     public void removeItemData(int position) {
         if (isItemChecked(position)) {
+            int nextIndex = selectedItems.indexOfKey(position);
             selectedItems.delete(position);
+
+            for (int i = nextIndex; i < selectedItems.size(); i++) {
+                int pos = selectedItems.keyAt(i);
+                selectedItems.delete(pos);
+                selectedItems.append(pos - 1, true);
+            }
+
             selectModeInterface.notifyItemChanged();
         }
 
@@ -444,7 +463,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
             selectedItems.delete(pos);
             return true;
         } else {
-            selectedItems.put(pos, true);
+            selectedItems.append(pos, true);
             return false;
         }
     }
