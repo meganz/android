@@ -162,6 +162,10 @@ public class TransfersManagement {
                 .putExtra(COMPLETED_TRANSFER, completedTransfer));
     }
 
+    /**
+     * Starts a CountDownTimer after show warnings related to no internet connection.
+     * If the timer finishes, launches a Broadcast to update the widget.
+     */
     public void startNetworkTimer() {
         networkTimer = new CountDownTimer(WAIT_TIME_TO_SHOW_NETWORK_WARNING,
                 WAIT_TIME_TO_SHOW_NETWORK_WARNING) {
@@ -183,6 +187,9 @@ public class TransfersManagement {
         networkTimer.start();
     }
 
+    /**
+     * Cancels the CountDownTimer to show warnings related to no internet connection.
+     */
     public void resetNetworkTimer() {
         if (networkTimer != null) {
             networkTimer.cancel();

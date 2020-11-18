@@ -472,11 +472,22 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         }
     }
 
+    /**
+     * Selects or deselects a transfer with an animation view.
+     *
+     * @param pos Position to select or deselect.
+     */
     public void toggleSelection(int pos) {
         startAnimation(pos, putOrDeletePosition(pos));
         selectModeInterface.notifyItemChanged();
     }
 
+    /**
+     * Applies the animation to the select or deselect action.
+     *
+     * @param pos    Position of the view to animate.
+     * @param delete True if the action is deselect, false if it is select.
+     */
     private void startAnimation(final int pos, final boolean delete) {
 		MegaTransfersLollipopAdapter.ViewHolderTransfer view = (MegaTransfersLollipopAdapter.ViewHolderTransfer) listFragment.findViewHolderForLayoutPosition(pos);
 		if (view == null) {
