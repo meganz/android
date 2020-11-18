@@ -190,6 +190,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
+
+                if (isEmptyFolder(node)) {
+                    counterSave--;
+                    optionOffline.setVisibility(View.GONE);
+                }
+
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
             } else {
