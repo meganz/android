@@ -1020,7 +1020,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			int actionType;
 
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if(actionType == GO_OFFLINE){
 				    //stop cu process
@@ -5730,7 +5730,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && transfersWidget.getPendingTransfers() <= 0;
 
-		indexTransfers = MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
+		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+		indexTransfers = transfersManagement.thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
 		if (viewPagerTransfers != null) {
 			switch (indexTransfers) {
@@ -5742,6 +5743,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				default:
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					viewPagerTransfers.setCurrentItem(PENDING_TAB);
+
+					if (transfersManagement.shouldShowNetWorkWarning()) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+					}
+
 					break;
 			}
 

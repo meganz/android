@@ -253,7 +253,9 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
                 case STATE_ACTIVE:
                     holder.progressText.setText(getProgress(transfer));
-                    holder.speedText.setText(getSpeedString(transfer.getSpeed()));
+                    holder.speedText.setText(getSpeedString(isOnline(context)
+                            ? transfer.getSpeed()
+                            : 0));
                     break;
 
                 case STATE_COMPLETING:
@@ -410,7 +412,9 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         }
 
         holder.progressText.setText(getProgress(transfer));
-        holder.speedText.setText(getSpeedString(transfer.getSpeed()));
+        holder.speedText.setText(getSpeedString(isOnline(context) ?
+                transfer.getSpeed()
+                : 0));
     }
 
     public boolean isMultipleSelect() {

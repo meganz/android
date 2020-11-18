@@ -9213,7 +9213,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void startConnection() {
         logDebug("Broadcast to ManagerActivity");
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra("actionType", START_RECONNECTION);
+        intent.putExtra(ACTION_TYPE, START_RECONNECTION);
         sendBroadcast(intent);
     }
 

@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.widget.RelativeLayout;
 
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
+import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 
@@ -22,6 +23,28 @@ public class TransfersManagementActivity extends PinActivityLollipop {
     protected TransferWidget transfersWidget;
 
     /**
+     * Broadcast to pdate the transfers widget when a change in network connection is detected.
+     */
+    protected BroadcastReceiver networkUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null
+                    || !intent.getAction().equals(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)) {
+                return;
+            }
+
+            int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
+            TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+
+            if (actionType == GO_ONLINE) {
+                transfersManagement.resetNetworkTimer();
+            } else if (actionType == GO_OFFLINE) {
+                transfersManagement.startNetworkTimer();
+            }
+        }
+    };
+
+    /**
      * Broadcast to update the transfers widget.
      */
     protected BroadcastReceiver transfersUpdateReceiver = new BroadcastReceiver() {
@@ -32,10 +55,14 @@ public class TransfersManagementActivity extends PinActivityLollipop {
     };
 
     /**
-     * Registers the transfers BroadcastReceiver.
+     * Registers the transfers BroadcastReceivers.
      */
     protected void registerTransfersReceiver() {
-        registerReceiver(transfersUpdateReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+        registerReceiver(transfersUpdateReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
+
+        registerReceiver(networkUpdateReceiver,
+                new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
     }
 
     /**
@@ -118,5 +145,6 @@ public class TransfersManagementActivity extends PinActivityLollipop {
         super.onDestroy();
 
         unregisterReceiver(transfersUpdateReceiver);
+        unregisterReceiver(networkUpdateReceiver);
     }
 }
