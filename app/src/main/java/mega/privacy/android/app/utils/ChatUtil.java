@@ -177,7 +177,7 @@ public class ChatUtil {
         try {
             shareLinkDialog.show();
         } catch (Exception e) {
-            logWarning("Exception showing share link dialog.");
+            logWarning("Exception showing share link dialog.", e);
         }
     }
 
