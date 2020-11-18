@@ -981,13 +981,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(fromContacts){
 					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 					intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 					this.startActivity(intentOpenChat);
 				}
 				else{
 					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 					intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 					intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intentOpenChat);
 				}
@@ -1038,30 +1038,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					startCall();
 				}
 				break;
-		}
-	}
-
-	public void openChat(long chatId, String text){
-		logDebug("openChat: " + chatId);
-
-		if(chatId!=-1){
-			MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-			if(chat!=null){
-				logDebug("Open chat with id: " + chatId);
-				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
-				intentToChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intentToChat.putExtra("CHAT_ID", chatId);
-				if(text!=null){
-					intentToChat.putExtra("showSnackbar", text);
-				}
-				this.startActivity(intentToChat);
-			}
-			else{
-				logWarning("Error, chat is NULL");
-			}
-		}
-		else{
-			logWarning("Error, chat id is -1");
 		}
 	}
 
@@ -1906,27 +1882,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			logDebug("Create chat request finish!!!");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Chat CREATEDD!!!---> open it!");
+			if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+				logDebug("Chat created ---> open it!");
 
-				if(fromContacts){
-					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intent.putExtra("CHAT_ID", request.getChatHandle());
-					this.startActivity(intent);
-					finish();
-				}
-				else{
-					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intent.putExtra("CHAT_ID", request.getChatHandle());
+				Intent intent = new Intent(this, ChatActivityLollipop.class)
+						.setAction(ACTION_CHAT_SHOW_MESSAGES)
+						.putExtra(CHAT_ID, request.getChatHandle());
+
+				if (!fromContacts) {
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					this.startActivity(intent);
-					finish();
 				}
-			}
-			else{
+
+				this.startActivity(intent);
+				finish();
+			} else {
 				logDebug("ERROR WHEN CREATING CHAT " + e.getErrorString());
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
 			}

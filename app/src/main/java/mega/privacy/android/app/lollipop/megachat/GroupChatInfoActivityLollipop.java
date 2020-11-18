@@ -838,7 +838,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 logDebug("Open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
                 intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-                intent.putExtra("CHAT_ID", request.getChatHandle());
+                intent.putExtra(CHAT_ID, request.getChatHandle());
                 this.startActivity(intent);
             } else {
                 logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
@@ -1142,7 +1142,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else {
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
             this.startActivity(intentOpenChat);
         }
     }
@@ -1164,7 +1164,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (errorCode == MegaChatError.ERROR_OK) {
             Intent intent = new Intent(this, ChatActivityLollipop.class);
             intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", chatHandle);
+            intent.putExtra(CHAT_ID, chatHandle);
             if (publicLink) {
                 intent.putExtra("PUBLIC_LINK", errorCode);
             }

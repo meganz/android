@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
 
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -669,7 +670,7 @@ public class BaseActivity extends AppCompatActivity {
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
             }
-            builder.setMessage(TextUtils.concat(getSpannedHtmlText(expiredString), "\n\n" + getString(R.string.expired_user_business_text_2)));
+            builder.setMessage(TextUtils.concat(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY), "\n\n" + getString(R.string.expired_user_business_text_2)));
         }
 
         builder.setNegativeButton(R.string.general_dismiss, new DialogInterface.OnClickListener() {

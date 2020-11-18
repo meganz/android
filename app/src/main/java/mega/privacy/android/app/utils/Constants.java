@@ -482,7 +482,8 @@ public class Constants {
     public static final int BACK_PRESS_HANDLED = 1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
-    public static final String CHAT_ID = "chatHandle";
+    public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
+    public static final String CHAT_ID = "CHAT_ID";
     public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
     public static final String CHAT_ID_OF_CURRENT_CALL = "chatHandleInProgress";

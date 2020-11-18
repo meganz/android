@@ -30,6 +30,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavOptions;
+import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
@@ -3004,12 +3005,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						logDebug("Chat notitificacion received");
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
-						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 						if (getIntent().getBooleanExtra("moveToChatSection", false)){
 							moveToChatSection(chatId);
 						}
 						else {
-							String text = getIntent().getStringExtra("showSnackbar");
+							String text = getIntent().getStringExtra(SHOW_SNACKBAR);
 							if (chatId != -1) {
 								openChat(chatId, text);
 							}
@@ -3128,7 +3129,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						update2FASetting();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
-						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 						showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
 						getIntent().setAction(null);
 						setIntent(null);
@@ -4062,12 +4063,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
 
-					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 					if (getIntent().getBooleanExtra("moveToChatSection", false)){
 						moveToChatSection(chatId);
 					}
 					else {
-						String text = getIntent().getStringExtra("showSnackbar");
+						String text = getIntent().getStringExtra(SHOW_SNACKBAR);
 						if (chatId != -1) {
 							openChat(chatId, text);
 						}
@@ -4127,7 +4128,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
-					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 					showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
 				}
 
@@ -4241,10 +4242,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("Open chat with id: " + chatId);
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intentToChat.putExtra("CHAT_ID", chatId);
-				if(text!=null){
-					intentToChat.putExtra("showSnackbar", text);
-				}
+				intentToChat.putExtra(CHAT_ID, chatId);
+				intentToChat.putExtra(SHOW_SNACKBAR, text);
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -6377,7 +6376,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (idChat != -1) {
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intent.putExtra("CHAT_ID", idChat);
+			intent.putExtra(CHAT_ID, idChat);
 			this.startActivity(intent);
 		}
     	drawerItem = DrawerItem.CHAT;
@@ -11119,7 +11118,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
 				}
-				spaceTV.setText(getSpannedHtmlText(textToShow));
+				spaceTV.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 				int progress = info.getUsedPerc();
 				long usedSpace = info.getUsedStorage();
 				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
@@ -12308,7 +12307,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 			this.startActivity(intentOpenChat);
 		}
 	}
@@ -13445,7 +13444,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Open new chat: " + chatHandle);
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intent.putExtra("CHAT_ID", chatHandle);
+			intent.putExtra(CHAT_ID, chatHandle);
 			this.startActivity(intent);
 		}
 		else{
