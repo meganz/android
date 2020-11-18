@@ -25,7 +25,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -61,7 +60,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		public ImageView imageViewCompleted;
 		public TextView textViewCompleted;
 		public RelativeLayout itemLayout;
-		public ImageView optionRemove;
+		public ImageView optionReorder;
 		public ImageView optionPause;
 		public int currentPosition;
 		public long document;
@@ -88,7 +87,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		holder.speedText = v.findViewById(R.id.transfers_speed_text);
 		holder.imageViewCompleted =  v.findViewById(R.id.transfers_list_completed_image);
 		holder.textViewCompleted = v.findViewById(R.id.transfers_list_completed_text);
-		holder.optionRemove = v.findViewById(R.id.transfers_list_option_remove);
+		holder.optionReorder = v.findViewById(R.id.transfers_list_option_reorder);
 		holder.optionPause = v.findViewById(R.id.transfers_list_option_pause);
 		v.setTag(holder);
 
@@ -104,7 +103,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		String fileName = transfer.getFileName();
 		holder.textViewFileName.setText(fileName);
 		holder.optionPause.setVisibility(View.GONE);
-		holder.optionRemove.setVisibility(View.GONE);
+		holder.optionReorder.setVisibility(View.GONE);
 		holder.progressText.setVisibility(View.GONE);
 		holder.speedText.setVisibility(View.GONE);
 

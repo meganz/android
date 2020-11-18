@@ -86,7 +86,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         public ImageView imageViewCompleted;
         public TextView textViewCompleted;
         public RelativeLayout itemLayout;
-        public ImageView optionRemove;
+        public ImageView optionReorder;
         public ImageView optionPause;
         public long document;
         public String currentPath;
@@ -114,8 +114,8 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         holder.speedText = v.findViewById(R.id.transfers_speed_text);
         holder.imageViewCompleted = v.findViewById(R.id.transfers_list_completed_image);
         holder.textViewCompleted = v.findViewById(R.id.transfers_list_completed_text);
-        holder.optionRemove = v.findViewById(R.id.transfers_list_option_remove);
-        holder.optionRemove.setOnClickListener(this);
+        holder.optionReorder = v.findViewById(R.id.transfers_list_option_reorder);
+        holder.optionReorder.setOnClickListener(this);
         holder.optionPause = v.findViewById(R.id.transfers_list_option_pause);
         holder.optionPause.setOnClickListener(this);
         v.setTag(holder);
@@ -218,10 +218,10 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         }
 
         if (isMultipleSelect()) {
-            holder.optionRemove.setVisibility(GONE);
+            holder.optionReorder.setVisibility(GONE);
             holder.optionPause.setVisibility(GONE);
         } else {
-            holder.optionRemove.setVisibility(VISIBLE);
+            holder.optionReorder.setVisibility(VISIBLE);
             holder.optionPause.setVisibility(VISIBLE);
             holder.optionPause.setImageResource(R.drawable.ic_pause_grey);
         }
@@ -302,7 +302,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         }
 
         holder.itemLayout.setTag(holder);
-        holder.optionRemove.setTag(holder);
+        holder.optionReorder.setTag(holder);
         holder.optionPause.setTag(holder);
     }
 
@@ -354,20 +354,10 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
             return;
         }
 
-        switch (v.getId()) {
-            case R.id.transfers_list_option_remove:
-                ((ManagerActivityLollipop) context).showConfirmationCancelTransfer(t);
-                break;
-
-            case R.id.transfers_list_option_pause:
-                ((ManagerActivityLollipop) context).pauseIndividualTransfer(t);
-                break;
-
-			case R.id.transfers_list_item_layout:
-				if (isMultipleSelect()) {
-					toggleSelection(currentPosition);
-				}
-				break;
+        if (v.getId() == R.id.transfers_list_option_pause) {
+            ((ManagerActivityLollipop) context).pauseIndividualTransfer(t);
+        } else if (v.getId() == R.id.transfers_list_item_layout && isMultipleSelect()) {
+            toggleSelection(currentPosition);
         }
     }
 
@@ -395,6 +385,11 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, getItemCount());
+    }
+
+    public void moveItemData(ArrayList<MegaTransfer> tL, int oldPosition, int newPosition) {
+        this.tL = tL;
+        notifyItemMoved(oldPosition, newPosition);
     }
 
     public void updateProgress(int position, MegaTransfer transfer) {

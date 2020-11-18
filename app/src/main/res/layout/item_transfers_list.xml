@@ -3,6 +3,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="72dp"
 	android:layout_marginEnd="13dp"
+	android:background="@color/white"
 	android:descendantFocusability="blocksDescendants">
 
 <ImageView
@@ -53,14 +54,14 @@
 		android:ellipsize="middle"/>
 
 	<ImageButton
-		android:id="@+id/transfers_list_option_remove"
+		android:id="@+id/transfers_list_option_reorder"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_alignParentEnd="true"
 		android:layout_centerVertical="true"
 		android:layout_marginEnd="16dp"
 		android:background="@null"
-		android:src="@drawable/ic_close_grey" />
+		android:src="@drawable/ic_reorder" />
 
 	<ImageView
 		android:id="@+id/transfers_list_option_pause"
@@ -69,7 +70,7 @@
 		android:layout_centerVertical="true"
 		android:layout_marginStart="16dp"
 		android:layout_marginEnd="24dp"
-		android:layout_toStartOf="@id/transfers_list_option_remove"
+		android:layout_toStartOf="@id/transfers_list_option_reorder"
 		android:background="@null"
 		android:src="@drawable/ic_pause" />
 

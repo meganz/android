@@ -5,11 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.R;
@@ -64,6 +68,26 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
+
+		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+			@Override
+			public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+				int posDragged = viewHolder.getAdapterPosition();
+				int posTarget = target.getAdapterPosition();
+
+				Collections.swap(tL, posDragged, posTarget);
+				adapter.moveItemData(tL, posDragged, posTarget);
+
+				return false;
+			}
+
+			@Override
+			public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+			}
+		});
+
+		itemTouchHelper.attachToRecyclerView(listView);
 
 		return v;
 	}

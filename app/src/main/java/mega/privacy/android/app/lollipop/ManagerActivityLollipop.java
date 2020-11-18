@@ -14935,20 +14935,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	/**
-	 * Shows a warning to ensure if it is sure of cancel a transfer.
-	 *
-	 * @param mT	the transfer to cancel
-	 */
-	public void showConfirmationCancelTransfer(final MegaTransfer mT) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.cancel_transfer_confirmation)
-				.setPositiveButton(R.string.general_cancel, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
-				.setNegativeButton(R.string.general_dismiss, null);
-
-		confirmationTransfersDialog = builder.create();
-        setConfirmationTransfersDialogNotCancellableAndShow();
-	}
-	/**
 	 * Shows a warning to ensure if it is sure of cancel selected transfers.
 	 */
 	public void showConfirmationCancelSelectedTransfers(List<MegaTransfer> selectedTransfers) {
