@@ -1693,9 +1693,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void setPreviewGroupalSubtitle() {
         long participants = chatRoom.getPeerCount();
 
+        if (!chatRoom.isPreview() && chatRoom.isActive()) {
+            participants++;
+        }
+
         setGroupalSubtitleToolbarVisibility(participants > 0);
         if (participants > 0) {
-            groupalSubtitleToolbar.setText(adjustForLargeFont(getString(R.string.number_of_participants, participants)));
+            groupalSubtitleToolbar.setText(adjustForLargeFont(getResources()
+                    .getQuantityString(R.plurals.subtitle_of_group_chat, (int) participants, (int) participants)));
         }
     }
 
