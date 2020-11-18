@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -80,6 +81,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             val nodeName =
                 viewModel.getPlaylistItem(exoPlayer.currentMediaItem?.mediaId)?.nodeName ?: ""
             _metadata.value = Metadata(title, artist, album, nodeName)
+
+            playerNotificationManager.invalidate()
         })
 
         exoPlayer.shuffleModeEnabled = viewModel.shuffleEnabled()
@@ -124,7 +127,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             R.string.audio_player_notification_channel_name, 0, PLAYBACK_NOTIFICATION_ID,
             object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun getCurrentContentTitle(player: Player): String {
-                    return "content title"
+                    val meta = _metadata.value ?: return ""
+                    return meta.title ?: meta.nodeName
                 }
 
                 @Nullable
@@ -138,7 +142,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
                 @Nullable
                 override fun getCurrentContentText(player: Player): String? {
-                    return "content text"
+                    val meta = _metadata.value ?: return ""
+                    return meta.artist ?: ""
                 }
 
                 @Nullable
@@ -146,10 +151,14 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                     player: Player,
                     callback: PlayerNotificationManager.BitmapCallback
                 ): Bitmap? {
-                    return ContextCompat.getDrawable(
-                        this@AudioPlayerService,
-                        R.drawable.ic_audio_thumbnail
-                    )?.toBitmap()
+                    val thumbnail = viewModel.playingThumbnail.value
+                    if (thumbnail == null || !thumbnail.exists()) {
+                        return ContextCompat.getDrawable(
+                            this@AudioPlayerService,
+                            R.drawable.ic_default_audio_cover
+                        )?.toBitmap()
+                    }
+                    return BitmapFactory.decodeFile(thumbnail.absolutePath, BitmapFactory.Options())
                 }
             },
             object : PlayerNotificationManager.NotificationListener {
@@ -158,10 +167,6 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                     notification: Notification
                 ) {
                     startForeground(notificationId, notification)
-                }
-
-                override fun onNotificationCancelled(notificationId: Int) {
-                    stopAudioPlayer()
                 }
 
                 override fun onNotificationPosted(
@@ -179,6 +184,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                 }
             }
         ).apply {
+            setSmallIcon(R.drawable.ic_stat_notify)
             setUseChronometer(false)
 
             setPlayer(exoPlayer)
@@ -234,6 +240,10 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         viewModel.nodeNameUpdate.observe(this, Observer {
             val meta = _metadata.value ?: return@Observer
             _metadata.value = Metadata(meta.title, meta.artist, meta.album, it)
+        })
+
+        viewModel.playingThumbnail.observe(this, Observer {
+            playerNotificationManager.invalidate()
         })
     }
 

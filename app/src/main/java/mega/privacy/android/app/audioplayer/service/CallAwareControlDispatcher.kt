@@ -4,7 +4,7 @@ import com.google.android.exoplayer2.DefaultControlDispatcher
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.utils.CallUtil
 
-class CallAwareControlDispatcher : DefaultControlDispatcher() {
+class CallAwareControlDispatcher : DefaultControlDispatcher(0, 0) {
     override fun dispatchSeekTo(player: Player, windowIndex: Int, positionMs: Long): Boolean {
         if (CallUtil.participatingInACall()) {
             return false

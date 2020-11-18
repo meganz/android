@@ -58,6 +58,10 @@ class AudioPlayerServiceViewModel(
         override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
             if (e.errorCode == MegaError.API_OK) {
                 createThumbnailFinished.onNext(true)
+
+                if (request.nodeHandle == playingHandle) {
+                    postPlayingThumbnail()
+                }
             }
         }
     }
@@ -70,6 +74,9 @@ class AudioPlayerServiceViewModel(
 
     private val _nodeNameUpdate = MutableLiveData<String>()
     val nodeNameUpdate: LiveData<String> = _nodeNameUpdate
+
+    private val _playingThumbnail = MutableLiveData<File>()
+    val playingThumbnail: LiveData<File> = _playingThumbnail
 
     private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
     val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
@@ -93,6 +100,7 @@ class AudioPlayerServiceViewModel(
         set(value) {
             field = value
             postPlaylistItems()
+            postPlayingThumbnail()
         }
 
     var paused = false
@@ -399,6 +407,13 @@ class AudioPlayerServiceViewModel(
             .setUri(getUriForFile(context, file))
             .setMediaId(handle)
             .build()
+    }
+
+    private fun postPlayingThumbnail() {
+        val thumbnail = playlistItemsMap[playingHandle.toString()]?.thumbnail ?: return
+        if (thumbnail.exists()) {
+            _playingThumbnail.postValue(thumbnail)
+        }
     }
 
     private fun postPlaylistItems() {
