@@ -15,6 +15,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -519,7 +520,7 @@ class HomepageFragment : Fragment() {
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else resources.getColor(R.color.accentColor)
+            if (isExpand) Color.WHITE else ContextCompat.getColor(requireContext(), R.color.accentColor)
         )
 
         AnimatorSet().apply {

@@ -95,10 +95,6 @@ dependencies {
     implementation "com.google.code.gson:gson:$gsonVersion"
 
     // Architecture Components
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-ktx:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
-
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"

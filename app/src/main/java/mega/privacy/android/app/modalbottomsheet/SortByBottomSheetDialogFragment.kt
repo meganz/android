@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.os.Build
 import android.view.LayoutInflater
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -64,13 +65,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
     }
 
-    private fun setSelectedColor(text: TextView) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            text.setTextColor(resources.getColor(R.color.accentColor, null))
-        } else {
-            text.setTextColor(resources.getColor(R.color.accentColor))
-        }
-    }
+    private fun setSelectedColor(text: TextView) =
+        text.setTextColor(ContextCompat.getColor(context, R.color.accentColor))
 
     private fun setCloudOrder(managerActivity: ManagerActivityLollipop, order: Int) {
         managerActivity.refreshCloudOrder(order)
