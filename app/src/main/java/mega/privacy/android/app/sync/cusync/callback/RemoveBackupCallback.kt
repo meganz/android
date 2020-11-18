@@ -7,7 +7,9 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-
+/**
+ * Remove backup event callback.
+ */
 class RemoveBackupCallback : SyncEventCallback {
 
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_REMOVE
@@ -17,6 +19,7 @@ class RemoveBackupCallback : SyncEventCallback {
         request: MegaRequest,
         error: MegaError
     ) {
+        // Remove local cache.
         request.let {
             getDatabase().deleteBackupById(it.parentHandle)
             logDebug("Successful callback: delete ${it.parentHandle}.")

@@ -3,13 +3,15 @@ package mega.privacy.android.app.sync
 import mega.privacy.android.app.DatabaseHandler.*
 import mega.privacy.android.app.MegaApplication
 import java.lang.Boolean
-import kotlin.random.Random
 
-
+/**
+ * @return Name of the node with the hanlde. null if the node doesn't exist.
+ */
 fun Long.name(): String? = MegaApplication.getInstance().megaApi.getNodeByHandle(this)?.name
 
-fun randomResult() = Random.nextBoolean()
-
+/**
+ * @return A update SQL with a given backup object.
+ */
 fun updateSQL(backup: Backup) =
     "UPDATE $TABLE_BACKUPS SET " +
             "$KEY_BACKUP_NAME = '${encrypt(backup.backupName)}', " +
@@ -27,4 +29,8 @@ fun updateSQL(backup: Backup) =
             "$KEY_BACKUP_OUTDATED = '${encrypt(Boolean.toString(backup.outdated))}'" +
             "WHERE $KEY_BACKUP_ID = '${encrypt(backup.backupId.toString())}'"
 
+/**
+ * @param id Backup id which is to be deleted.
+ * @return A delete backup SQL.
+ */
 fun deleteSQL(id: Long) = "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"

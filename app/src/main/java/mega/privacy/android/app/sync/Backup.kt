@@ -4,13 +4,32 @@ import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 
+/**
+ * Backup data object.
+ */
 data class Backup(
+
     var backupId: Long,
     var backupType: Int,
+
+    /**
+     * Handle of the MegaNode where the backup targets to.
+     */
     var targetNode: Long,
+    /**
+     * Path of the local folder where the backup uploads from.
+     */
     var localFolder: String,
     var backupName: String,
+    /**
+     * Valid value definitions
+     * @see MegaApiJava
+     */
     var state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+    /**
+     * Valid value definitions
+     * @see MegaError
+     */
     var subState: Int = MegaError.API_OK,
     var extraData: String = INVALID_NON_NULL_VALUE,
     @ClientOnly var startTimestamp: Long = 0L,
@@ -21,7 +40,10 @@ data class Backup(
     @ClientOnly var outdated: Boolean = false
 ) {
 
-    @Target(AnnotationTarget.PROPERTY)
+    /**
+     * Mark the field is only used for client, unrelated with server side.
+     */
+    @Target(AnnotationTarget.FIELD)
     @Retention(AnnotationRetention.SOURCE)
     annotation class ClientOnly
 

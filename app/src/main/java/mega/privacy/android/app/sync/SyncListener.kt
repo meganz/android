@@ -8,8 +8,13 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-
+/**
+ * Listen to backup related requests callback.
+ */
 class SyncListener(
+    /**
+     * Callback executes when request finsished.
+     */
     private val callback: SyncEventCallback,
     context: Context
 ) : BaseListener(context) {

@@ -6,7 +6,9 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-
+/**
+ * Update backup event callback.
+ */
 class UpdateBackupCallback: SyncEventCallback {
 
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_PUT
@@ -16,6 +18,7 @@ class UpdateBackupCallback: SyncEventCallback {
         request: MegaRequest,
         error: MegaError
     ) {
+        // Update local cache.
         request.apply {
             val backup = getDatabase().getBackupById(parentHandle)
 

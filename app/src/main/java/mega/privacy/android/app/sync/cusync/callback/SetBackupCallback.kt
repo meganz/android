@@ -8,7 +8,9 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 
-
+/**
+ * Set backup event callback.
+ */
 open class SetBackupCallback : SyncEventCallback {
 
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_PUT
@@ -18,6 +20,7 @@ open class SetBackupCallback : SyncEventCallback {
         request: MegaRequest,
         error: MegaError
     ) {
+        // Save backup to local database.
         request.apply {
             val backup = Backup(
                 backupId = parentHandle,
@@ -37,6 +40,7 @@ open class SetBackupCallback : SyncEventCallback {
 
     override fun onFail(api: MegaApiJava, request: MegaRequest, error: MegaError) {
         super.onFail(api, request, error)
+        // Re-enable preference in settings fragment.
         CuSyncManager.reEnableCameraUploadsPreference(request.totalBytes.toInt())
     }
 }
