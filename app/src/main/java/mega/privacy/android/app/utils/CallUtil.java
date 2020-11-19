@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +33,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -42,7 +44,7 @@ import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -954,6 +956,9 @@ public class CallUtil {
     public static boolean checkPermissionsCall(Activity activity, int typePermission) {
         boolean hasCameraPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
         if (!hasCameraPermission) {
+            if(activity == null)
+                return false;
+
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
@@ -963,6 +968,9 @@ public class CallUtil {
 
         boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
         if (!hasRecordAudioPermission) {
+            if(activity == null)
+                return false;
+
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
@@ -1029,6 +1037,28 @@ public class CallUtil {
     public static void addChecksForACall(long chatId, boolean speakerStatus){
         MegaApplication.setCallLayoutStatus(chatId, false);
         MegaApplication.setSpeakerStatus(chatId, speakerStatus);
+    }
+
+    /**
+     * Method for removing the incoming call notification.
+     *
+     * @param chatIdIncomingCall The chat ID wit the call.
+     */
+    public static void clearIncomingCallNotification(long chatIdIncomingCall) {
+        logDebug("Clear the notification in chat: " + chatIdIncomingCall);
+
+        try {
+            NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getBaseContext().getSystemService(NOTIFICATION_SERVICE);
+
+            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdIncomingCall);
+            if (call == null)
+                return;
+
+            int notificationId = MegaApiJava.userHandleToBase64(chatIdIncomingCall).hashCode();
+            notificationManager.cancel(notificationId);
+        } catch (Exception e) {
+            logError("EXCEPTION", e);
+        }
     }
 
     /**

@@ -1761,21 +1761,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	public void clearIncomingCallNotification(long chatCallId) {
-		logDebug("Chat ID: " + chatCallId);
-
-		try {
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-			String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
-			int notificationId = (notificationCallId).hashCode();
-
-			notificationManager.cancel(notificationId);
-		} catch (Exception e) {
-			logError("EXCEPTION", e);
-		}
-	}
-
 	public static boolean isShowRichLinkWarning() {
 		return showRichLinkWarning;
 	}
