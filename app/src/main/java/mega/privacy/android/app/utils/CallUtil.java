@@ -1060,4 +1060,15 @@ public class CallUtil {
             logError("EXCEPTION", e);
         }
     }
+
+    /**
+     * Method for getting the call notification ID.
+     *
+     * @param callId The call ID.
+     * @return The notification ID.
+     */
+    public static int getCallNotificationId(long callId) {
+        String notificationCallId = MegaApiAndroid.userHandleToBase64(callId);
+        return notificationCallId.hashCode() + NOTIFICATION_CALL_IN_PROGRESS;
+    }
 }

@@ -621,7 +621,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                     if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                         if(cameraFragmentFullScreen != null){
-                            cameraFragmentFullScreen.changeUser(chatId, callChat.getId(), peerId, clientId);
+                            cameraFragmentFullScreen.changeUser(chatId, callId, peerId, clientId);
                         }
                         hideReconnecting();
                         updateAVFlags(session);

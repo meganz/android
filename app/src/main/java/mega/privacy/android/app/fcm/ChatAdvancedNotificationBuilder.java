@@ -821,7 +821,7 @@ public final class ChatAdvancedNotificationBuilder {
         long chatIdCallToAnswer = callToAnswer.getChatid();
         long chatIdCallInProgress = callInProgress.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
-        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
+        int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
 
         PendingIntent intentIgnore = getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
@@ -1020,7 +1020,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
-        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
+        int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
 
         Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
@@ -1555,7 +1555,9 @@ public final class ChatAdvancedNotificationBuilder {
         removeAllChatNotifications();
         Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
 
-        if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
+        if (chatSettings == null ||
+                chatSettings.getNotificationsSound() == null ||
+                chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
             defaultSoundUri = null;
         } else if (chatSettings.getNotificationsSound() != null) {
             String soundString = chatSettings.getNotificationsSound();
@@ -1570,7 +1572,7 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+        sendBundledNotification(defaultSoundUri, chatSettings == null ? STRING_TRUE : chatSettings.getVibrationEnabled(), chatid, handleListUnread);
     }
 
     public void setIsUpdatingUserName() {
