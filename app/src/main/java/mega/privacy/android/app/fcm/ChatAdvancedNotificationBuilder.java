@@ -821,7 +821,7 @@ public final class ChatAdvancedNotificationBuilder {
         long chatIdCallToAnswer = callToAnswer.getChatid();
         long chatIdCallInProgress = callInProgress.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
-        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
+        int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
 
         PendingIntent intentIgnore = getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
@@ -1013,7 +1013,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
-        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
+        int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
 
         Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
