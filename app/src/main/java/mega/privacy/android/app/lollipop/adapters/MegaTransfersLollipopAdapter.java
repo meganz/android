@@ -362,14 +362,28 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     }
 
     /**
+     * Adds a new transfer to the adapter.
+     *
+     * @param tL       Updated list of transfers.
+     * @param position Position of the transfer in the adapter.
+     */
+    public void addItemData(ArrayList<MegaTransfer> tL, int position) {
+        this.tL = tL;
+        notifyItemInserted(position);
+    }
+
+    /**
      * Removes a transfer from adapter.
      * Also checks if the transfer to remove is selected. If so, removes it from selected items list
      * and updates the list with the new positions that the rest of selected transfers occupies after
      * the removal.
      *
+     * @param tL       Updated list of transfers.
      * @param position Item to remove.
      */
-    public void removeItemData(int position) {
+    public void removeItemData(ArrayList<MegaTransfer> tL, int position) {
+        this.tL = tL;
+
         if (isItemChecked(position)) {
             int nextIndex = selectedItems.indexOfKey(position);
             selectedItems.delete(position);
@@ -384,9 +398,15 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         }
 
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position, getItemCount());
     }
 
+    /**
+     * Moves a transfer.
+     *
+     * @param tL          Updated list of transfers.
+     * @param oldPosition Old position of the transfer.
+     * @param newPosition New position of the transfer.
+     */
     public void moveItemData(ArrayList<MegaTransfer> tL, int oldPosition, int newPosition) {
         this.tL = tL;
         notifyItemMoved(oldPosition, newPosition);

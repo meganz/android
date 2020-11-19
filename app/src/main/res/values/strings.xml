@@ -2933,4 +2933,5 @@
 
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
 
+    <string name="change_of_transfer_priority_failed" context="Error shown to informe the priority change of a transfer failed. Please don't remove the place holder, it's to set the name of the transfer. Example: The priority change of the transfer 'video.mp4' failed.">The priority change of the transfer \'%1$s\' failed.</string>
 </resources>

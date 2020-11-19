@@ -15089,14 +15089,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Update onTransferUpdate: " + transfer.getNodeHandle() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
 			lastTimeOnTransferUpdate = now;
 
-			if (!transfer.isFolderTransfer()){
-				if(transferCallback<transfer.getNotificationNumber()){
-					transferCallback = transfer.getNotificationNumber();
+			if (!transfer.isFolderTransfer() && transferCallback < transfer.getNotificationNumber()) {
+				transferCallback = transfer.getNotificationNumber();
 
-                    if (isTransfersInProgressAdded()){
-						tFLol.transferUpdate(transfer);
-					}
-
+				if (isTransfersInProgressAdded()) {
+					tFLol.transferUpdate(transfer);
 				}
 			}
 		}

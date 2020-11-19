@@ -22,17 +22,23 @@ import java.util.ListIterator;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack;
+import mega.privacy.android.app.interfaces.MoveTransferInterface;
+import mega.privacy.android.app.listeners.MoveTransferListener;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
 import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaTransfer.STATE_COMPLETING;
 
 
-public class TransfersFragmentLollipop extends TransfersBaseFragment implements MegaTransfersLollipopAdapter.SelectModeInterface, TransfersActionBarCallBack.TransfersActionInterface {
+public class TransfersFragmentLollipop extends TransfersBaseFragment implements MegaTransfersLollipopAdapter.SelectModeInterface, TransfersActionBarCallBack.TransfersActionInterface, MoveTransferInterface {
 
 	private MegaTransfersLollipopAdapter adapter;
 
@@ -83,6 +89,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 				int posDragged = viewHolder.getAdapterPosition();
 				int posTarget = target.getAdapterPosition();
 
+				startMovementRequest(tL.get(posDragged), posTarget);
 				Collections.swap(tL, posDragged, posTarget);
 				adapter.moveItemData(tL, posDragged, posTarget);
 
@@ -141,31 +148,47 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			}
 		}
 
+		orderTransfersByDescendingPriority();
+
 		setEmptyView(tL.size());
 	}
 
 	/**
 	 * Updates the state of a transfer.
 	 *
-	 * @param transfer	transfer to update
+	 * @param transfer transfer to update
 	 */
 	public void transferUpdate(MegaTransfer transfer) {
+		int transferPosition = tryToUpdateTransfer(transfer);
+
+		if (transferPosition != INVALID_POSITION && adapter != null) {
+			adapter.updateProgress(transferPosition, transfer);
+		}
+	}
+
+	/**
+	 * Tries to update a MegaTransfer in the transfers list.
+	 *
+	 * @param transfer The MegaTransfer to update.
+	 * @return The position of the updated transfer if success, INVALID_POSITION otherwise.
+	 */
+	public int tryToUpdateTransfer(MegaTransfer transfer) {
 		try {
-			ListIterator li = tL.listIterator();
-			int index = 0;
+			ListIterator<MegaTransfer> li = tL.listIterator();
+
 			while (li.hasNext()) {
 				MegaTransfer next = (MegaTransfer) li.next();
 				if (next != null && next.getTag() == transfer.getTag()) {
-					index = li.previousIndex();
-					break;
+					int index = li.previousIndex();
+					tL.set(index, transfer);
+					return index;
 				}
 			}
-			tL.set(index, transfer);
-
-			adapter.updateProgress(index, transfer);
 		} catch (IndexOutOfBoundsException e) {
-			logError("EXCEPTION", e);
+			logError("IndexOutOfBoundsException trying to update a transfer.", e);
 		}
+
+		return INVALID_POSITION;
 	}
 
 	/**
@@ -204,14 +227,13 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			MegaTransfer transfer = tL.get(i);
 			if (transfer != null && transfer.getTag() == transferTag) {
 				tL.remove(i);
-				adapter.removeItemData(i);
+				adapter.removeItemData(tL, i);
 				break;
 			}
 		}
 
-		setEmptyView(tL.size());
-
 		if (tL.isEmpty()) {
+			setEmptyView(tL.size());
 			managerActivity.supportInvalidateOptionsMenu();
 		}
 	}
@@ -231,8 +253,12 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		}
 
 		tL.add(transfer);
-		adapter.notifyItemInserted(tL.size() - 1);
-		setEmptyView(tL.size());
+		orderTransfersByDescendingPriority();
+		adapter.addItemData(tL, tL.indexOf(transfer));
+
+		if (tL.size() == 1) {
+			setEmptyView(tL.size());
+		}
 	}
 
 	/**
@@ -242,6 +268,36 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	 */
 	public boolean isEmpty() {
 		return tL.isEmpty();
+	}
+
+	private void orderTransfersByDescendingPriority() {
+		Collections.sort(tL, (t1, t2) -> t1.getPriority().compareTo(t2.getPriority()));
+	}
+
+	/**
+	 * Launches the request to change the priority of a transfer.
+	 *
+	 * @param transfer    MegaTransfer to change its priority.
+	 * @param newPosition The new position on the list.
+	 */
+	private void startMovementRequest(MegaTransfer transfer, int newPosition) {
+		MoveTransferListener moveTransferListener = new MoveTransferListener(context, this);
+
+		if (newPosition == 0) {
+			megaApi.moveTransferToFirst(transfer, moveTransferListener);
+		} else if (newPosition == tL.size() - 1) {
+			megaApi.moveTransferToLast(transfer, moveTransferListener);
+		} else {
+			megaApi.moveTransferBefore(transfer, tL.get(newPosition - 1), moveTransferListener);
+		}
+	}
+
+	private void reorderTransfersAfterFailedMovement() {
+		orderTransfersByDescendingPriority();
+
+		if (adapter != null) {
+			adapter.setTransfers(tL);
+		}
 	}
 
 	@Override
@@ -346,5 +402,29 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	@Override
 	public boolean areAllTransfersSelected() {
 		return adapter != null && adapter.getSelectedItemsCount() == adapter.getItemCount();
+	}
+
+	@Override
+	public void movementFailed(int transferTag) {
+		MegaTransfer transfer = megaApi.getTransferByTag(transferTag);
+		if (transfer == null || transfer.getState() < STATE_COMPLETING) {
+			logWarning("The transfer doesn't exist, finished or is finishing.");
+			return;
+		}
+
+		int transferPosition = tryToUpdateTransfer(transfer);
+		if (transferPosition == INVALID_POSITION) {
+			logWarning("The transfer doesn't exist.");
+			return;
+		}
+
+		reorderTransfersAfterFailedMovement();
+		managerActivity.showSnackbar(SNACKBAR_TYPE,
+				getString(R.string.change_of_transfer_priority_failed, transfer.getFileName()),
+				MEGACHAT_INVALID_HANDLE);
+
+		if (adapter != null) {
+			adapter.setTransfers(tL);
+		}
 	}
 }
