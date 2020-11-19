@@ -96,7 +96,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         } else {
             Intent intentOpenChat = new Intent(context,ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID",chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID,chat.getChatId());
             intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentOpenChat);
         }

@@ -715,6 +715,37 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Checks if a folder node is empty.
+     * If a folder is empty means although contains more folders inside,
+     * all of them don't contain any file.
+     *
+     * @param node  MegaNode to check.
+     * @return  True if the folder is folder and is empty, false otherwise.
+     */
+    public static boolean isEmptyFolder(MegaNode node) {
+        if (node == null || node.isFile()) {
+            return false;
+        }
+
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        List<MegaNode> children = megaApi.getChildren(node);
+
+        if (children != null && !children.isEmpty()) {
+            for (MegaNode child : children) {
+                if (child == null) {
+                    continue;
+                }
+
+                if (child.isFile() || !isEmptyFolder(child)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get a node's name by its handle.
      *
      * @param handle Hanlde of node.

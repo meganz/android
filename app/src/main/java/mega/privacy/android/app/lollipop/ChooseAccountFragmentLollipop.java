@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -179,7 +181,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         proLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout);
         proLiteLayout.setOnClickListener(this);
         titleProLite = (TextView) v.findViewById(R.id.choose_account_prolite_title_text);
-        titleProLite.setText(getString(R.string.lite_account).toUpperCase());
+        titleProLite.setText(getString(R.string.lite_account));
         monthSectionProLite = (TextView) v.findViewById(R.id.month_lite);
         storageSectionProLite = (TextView) v.findViewById(R.id.storage_lite);
         bandwidthSectionProLite = (TextView) v.findViewById(R.id.bandwidth_lite);
@@ -189,7 +191,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro1Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_i_layout);
         pro1Layout.setOnClickListener(this);
         titlePro1 = (TextView) v.findViewById(R.id.choose_account_pro_i_title_text);
-        titlePro1.setText(getString(R.string.pro1_account).toUpperCase());
+        titlePro1.setText(getString(R.string.pro1_account));
         monthSectionPro1 = (TextView) v.findViewById(R.id.month_pro_i);
         storageSectionPro1 = (TextView) v.findViewById(R.id.storage_pro_i);
         bandwidthSectionPro1 = (TextView) v.findViewById(R.id.bandwidth_pro_i);
@@ -200,7 +202,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro2Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_ii_layout);
         pro2Layout.setOnClickListener(this);
         titlePro2 = (TextView) v.findViewById(R.id.choose_account_pro_ii_title_text);
-        titlePro2.setText(getString(R.string.pro2_account).toUpperCase());
+        titlePro2.setText(getString(R.string.pro2_account));
         monthSectionPro2 = (TextView) v.findViewById(R.id.month_pro_ii);
         storageSectionPro2 = (TextView) v.findViewById(R.id.storage_pro_ii);
         bandwidthSectionPro2 = (TextView) v.findViewById(R.id.bandwidth_pro_ii);
@@ -210,7 +212,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         pro3Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_iii_layout);
         pro3Layout.setOnClickListener(this);
         titlePro3 = (TextView) v.findViewById(R.id.choose_account_pro_iii_title_text);
-        titlePro3.setText(getString(R.string.pro3_account).toUpperCase());
+        titlePro3.setText(getString(R.string.pro3_account));
         monthSectionPro3 = (TextView) v.findViewById(R.id.month_pro_iii);
         storageSectionPro3 = (TextView) v.findViewById(R.id.storage_pro_iii);
         bandwidthSectionPro3 = (TextView) v.findViewById(R.id.bandwidth_pro_iii);
@@ -375,7 +377,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         }
         storageSectionFree.setText(resultFreeStorage);
 
-        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith).toUpperCase()+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
+        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith)+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
         try{
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'#000000\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
@@ -665,25 +667,26 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
                 }
 
                 String textToShowBusinessMonth = getString(R.string.type_month, textMonth);
-                String unlimitedSpace = getString(R.string.unlimited_space);
-                String unlimitedTransfer = getString(R.string.unlimited_transfer_quota);
+                // The initial amount of storage space for business account is 15TB
+                String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
+                String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
 
                 try{
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[A]", "<font color=\'#2ba6de\'>");
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[/A]", "</font>");
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[B]", "<font color=\'#2ba6de\'>");
                     textToShowBusinessMonth = textToShowBusinessMonth.replace("[/B]", "</font>");
-                    unlimitedSpace = unlimitedSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    unlimitedSpace = unlimitedSpace.replace("[/A]", "</font>");
-                    unlimitedTransfer = unlimitedTransfer.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    unlimitedTransfer = unlimitedTransfer.replace("[/A]", "</font>");
+                    businessStorageSpace = businessStorageSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
+                    businessTransferQuota = businessTransferQuota.replace("[A]", "<font color=\'#7a7a7a\'>");
+                    businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
                 }catch (Exception e){
                     logError("NullPointerException happens when getting the storage string", e);
                 }
 
-                monthSectionBusiness.setText(getSpannedHtmlText(textToShowBusinessMonth));
-                storageSectionBusiness.setText(getSpannedHtmlText(unlimitedSpace));
-                bandwidhtSectionBusiness.setText(getSpannedHtmlText(unlimitedTransfer));
+                monthSectionBusiness.setText(HtmlCompat.fromHtml(textToShowBusinessMonth, HtmlCompat.FROM_HTML_MODE_LEGACY));
+                storageSectionBusiness.setText(HtmlCompat.fromHtml(businessStorageSpace, HtmlCompat.FROM_HTML_MODE_LEGACY));
+                bandwidhtSectionBusiness.setText(HtmlCompat.fromHtml(businessTransferQuota, HtmlCompat.FROM_HTML_MODE_LEGACY));
             }
             accounts.add(account);
         }

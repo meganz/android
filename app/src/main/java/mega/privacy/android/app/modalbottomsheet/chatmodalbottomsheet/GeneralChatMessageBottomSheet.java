@@ -206,10 +206,12 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionShare.setVisibility(typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT || !isOnline(context) || chatC.isInAnonymousMode() || message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() ? View.GONE : View.VISIBLE);
                 optionForward.setVisibility(!isOnline(context) || chatC.isInAnonymousMode() ? View.GONE : View.VISIBLE);
 
-                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isEditable() || typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                    optionEdit.setVisibility(View.GONE);
+                if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()
+                        && message.getMessage().isEditable()
+                        && (typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META)) {
+                    optionEdit.setVisibility(View.VISIBLE);
                 } else {
-                    optionEdit.setVisibility(typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META ? View.VISIBLE : View.GONE);
+                    optionEdit.setVisibility(View.GONE);
                 }
 
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {

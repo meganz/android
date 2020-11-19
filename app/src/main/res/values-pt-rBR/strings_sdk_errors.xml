@@ -31,7 +31,6 @@
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Autenticação de dois fatores necessária.</string>
     <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Acesso negado para usuários sem permissão de administrador</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">A sua conta business expirou</string>
-    <string name="api_epaywall" context="Label to show that an error of Over Disk Quota Paywall occurs during a SDK operation.">Over Disk Quota Paywall</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Cartão de crédito recusado</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Erro na cobrança</string>
     <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Recusado pelo sistema de antifraude</string>

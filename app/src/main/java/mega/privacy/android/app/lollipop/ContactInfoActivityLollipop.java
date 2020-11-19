@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.palette.graphics.Palette;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -48,6 +49,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -90,6 +92,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -126,6 +129,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
@@ -234,8 +238,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	Drawable drawableArrow;
 	Drawable drawableDots;
 
-	MenuItem shareMenuItem;
-	MenuItem sendFileMenuItem;
+	private MenuItem shareMenuItem;
+	private MenuItem sendFileMenuItem;
+	private MenuItem returnCallMenuItem;
+	private Chronometer chronometerMenuItem;
+	private LinearLayout layoutCallMenuItem;
+
 	boolean isShareFolderExpanded;
     ContactSharedFolderFragment sharedFoldersFragment;
     MegaNode selectedNode;
@@ -247,6 +255,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private ContactNicknameBottomSheetDialogFragment contactNicknameBottomSheetDialogFragment;
 
 	private AskForDisplayOverDialog askForDisplayOverDialog;
+
+	private RelativeLayout callInProgressLayout;
+	private Chronometer callInProgressChrono;
+	private TextView callInProgressText;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -283,17 +295,73 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	};
 
-	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver chatCallUpdateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
-				checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+					return;
+
+				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
+				switch (callStatus) {
+					case MegaChatCall.CALL_STATUS_RING_IN:
+					case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+					case MegaChatCall.CALL_STATUS_RECONNECTING:
+					case MegaChatCall.CALL_STATUS_JOINING:
+					case MegaChatCall.CALL_STATUS_DESTROYED:
+					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+						if (MegaApplication.getCallLayoutStatus(chatIdReceived)) {
+							checkScreenRotationToShowCall();
+						}
+						break;
+				}
+			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
+				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
+				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+					return;
+
+				checkScreenRotationToShowCall();
 			}
 		}
 	};
+
+	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+				return;
+
+			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
+				checkScreenRotationToShowCall();
+			}
+		}
+	};
+
+
+		private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (intent == null || intent.getAction() == null)
+					return;
+
+				if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
+					checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+				}
+			}
+		};
 
 	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
 		@Override
@@ -310,9 +378,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	};
 
 	private void setAppBarOffset(int offsetPx){
-		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-		AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-		behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, offsetPx, new int[]{0, 0});
+		if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
+			changeToolbarLayoutElevation();
+		} else {
+			CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+			AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+			assert behavior != null;
+			behavior.onNestedPreScroll(fragmentContainer, appBarLayout, null, 0, offsetPx, new int[]{0, 0});
+		}
 	}
 
 	@Override
@@ -425,6 +498,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 			});
 
+			callInProgressLayout = findViewById(R.id.call_in_progress_layout);
+			callInProgressLayout.setOnClickListener(this);
+			callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
+			callInProgressText = findViewById(R.id.call_in_progress_text);
+			callInProgressLayout.setVisibility(View.GONE);
+
 			//OPTIONS LAYOUT
 			optionsLayout = findViewById(R.id.chat_contact_properties_options);
 
@@ -439,7 +518,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			videoCallLayout.setOnClickListener(this);
 
 			//Notifications Layout
-
 			notificationsLayout = findViewById(R.id.chat_contact_properties_notifications_layout);
 			notificationsLayout.setVisibility(View.VISIBLE);
 			notificationsTitle = findViewById(R.id.chat_contact_properties_notifications_text);
@@ -553,6 +631,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			updateVerifyCredentialsLayout();
+			checkScreenRotationToShowCall();
 
 			if(isOnline(this)){
 				logDebug("online -- network connection");
@@ -639,6 +718,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		userNameUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		registerReceiver(userNameReceiver, userNameUpdateFilter);
+
+		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
+		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
+		registerReceiver(chatCallUpdateReceiver, filterCall);
+
+		registerReceiver(chatSessionUpdateReceiver,
+				new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
 
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
@@ -754,6 +840,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		shareMenuItem = menu.findItem(R.id.cab_menu_share_folder);
 		sendFileMenuItem = menu.findItem(R.id.cab_menu_send_file);
+		returnCallMenuItem = menu.findItem(R.id.action_return_call);
+		RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
+		layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
+		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
+		chronometerMenuItem.setVisibility(View.GONE);
+
+		rootView.setOnClickListener(v -> onOptionsItemSelected(returnCallMenuItem));
+		setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
+
 		sendFileMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
 
 		if(isOnline(this)){
@@ -844,6 +939,11 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				sendFileToChat();
 				break;
 			}
+			case R.id.action_return_call:
+				if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
+					returnActiveCall(this);
+				}
+				return true;
 		}
 		return true;
 	}
@@ -887,13 +987,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				if(fromContacts){
 					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 					intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 					this.startActivity(intentOpenChat);
 				}
 				else{
 					Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 					intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+					intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 					intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					this.startActivity(intentOpenChat);
 				}
@@ -944,30 +1044,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					startCall();
 				}
 				break;
-		}
-	}
-
-	public void openChat(long chatId, String text){
-		logDebug("openChat: " + chatId);
-
-		if(chatId!=-1){
-			MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-			if(chat!=null){
-				logDebug("Open chat with id: " + chatId);
-				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
-				intentToChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intentToChat.putExtra("CHAT_ID", chatId);
-				if(text!=null){
-					intentToChat.putExtra("showSnackbar", text);
-				}
-				this.startActivity(intentToChat);
-			}
-			else{
-				logWarning("Error, chat is NULL");
-			}
-		}
-		else{
-			logWarning("Error, chat id is -1");
 		}
 	}
 
@@ -1195,16 +1271,16 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				sendMessageToChat();
 				break;
 			}
-			case R.id.chat_contact_properties_chat_call_layout:{
-				logDebug("Start audio call option");
-				startingACall(false);
+
+			case R.id.chat_contact_properties_chat_video_layout:
+			case R.id.chat_contact_properties_chat_call_layout:
+				if (isCallOptionEnabled()) {
+					startingACall(v.getId() == R.id.chat_contact_properties_chat_video_layout);
+				} else {
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.not_allowed_to_start_call), MEGACHAT_INVALID_HANDLE);
+				}
 				break;
-			}
-			case R.id.chat_contact_properties_chat_video_layout:{
-				logDebug("Star video call option");
-				startingACall(true);
-				break;
-			}
+
 			case R.id.chat_contact_properties_share_contact_layout: {
 				logDebug("Share contact option");
 
@@ -1255,6 +1331,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				Intent intent = new Intent(this, AuthenticityCredentialsActivity.class);
 				intent.putExtra(EMAIL, user.getEmail());
 				startActivity(intent);
+				break;
+
+			case R.id.call_in_progress_layout:
+				if(checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)){
+					returnActiveCall(this);
+				}
 				break;
 		}
 	}
@@ -1712,6 +1794,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.recycle();
         }
 
+		unregisterReceiver(chatCallUpdateReceiver);
+		unregisterReceiver(chatSessionUpdateReceiver);
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(userNameReceiver);
@@ -1726,10 +1810,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	@Override
 	protected void onResume() {
-		logDebug("onResume");
 		super.onResume();
 
 		updateVerifyCredentialsLayout();
+		checkScreenRotationToShowCall();
 		setContactPresenceStatus();
 		requestLastGreen(-1);
 	}
@@ -1804,27 +1888,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
-			logDebug("Create chat request finish!!!");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Chat CREATEDD!!!---> open it!");
+			if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+				logDebug("Chat created ---> open it!");
 
-				if(fromContacts){
-					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intent.putExtra("CHAT_ID", request.getChatHandle());
-					this.startActivity(intent);
-					finish();
-				}
-				else{
-					Intent intent = new Intent(this, ChatActivityLollipop.class);
-					intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-					intent.putExtra("CHAT_ID", request.getChatHandle());
+				Intent intent = new Intent(this, ChatActivityLollipop.class)
+						.setAction(ACTION_CHAT_SHOW_MESSAGES)
+						.putExtra(CHAT_ID, request.getChatHandle());
+
+				if (!fromContacts) {
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					this.startActivity(intent);
-					finish();
 				}
-			}
-			else{
+
+				this.startActivity(intent);
+				finish();
+			} else {
 				logDebug("ERROR WHEN CREATING CHAT " + e.getErrorString());
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
 			}
@@ -2405,7 +2482,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
-		MegaApplication.setSpeakerStatus(chatRoom.getChatId(), startVideo);
+		addChecksForACall(chatRoom.getChatId(), startVideo);
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, this);
 		MegaApplication.setIsWaitingForCall(false);
 	}
@@ -2427,5 +2504,40 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		} else {
 			verifyCredentialsLayout.setVisibility(View.GONE);
 		}
+	}
+
+	/**
+	 * This method is used to change the elevation of the toolbar.
+	 */
+	public void changeToolbarLayoutElevation() {
+		appBarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
+				px2dp(16, outMetrics) : 0);
+
+		if (callInProgressLayout.getVisibility() == View.VISIBLE) {
+			appBarLayout.setExpanded(false);
+		}
+	}
+
+	/**
+	 * Method to check the rotation of the screen to display the call properly.
+	 */
+	private void checkScreenRotationToShowCall() {
+		if (isScreenInPortrait(ContactInfoActivityLollipop.this)) {
+			setCallWidget();
+		} else {
+			supportInvalidateOptionsMenu();
+		}
+	}
+
+	/**
+	 * This method sets "Tap to return to call" banner when there is a call in progress.
+	 */
+	private void setCallWidget() {
+		if (!isScreenInPortrait(this)) {
+			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
+			return;
+		}
+
+		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
 	}
 }

@@ -693,6 +693,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         if (adapterType == OFFLINE_ADAPTER){
             collapsingToolbar.setTitle(getIntent().getStringExtra(NAME).toUpperCase());
             availableOfflineLayout.setVisibility(View.GONE);
+
+            View view = findViewById(R.id.available_offline_separator);
+            if (view != null) {
+                view.setVisibility(View.GONE);
+            }
+
             sharedLayout.setVisibility(View.GONE);
             dividerSharedLayout.setVisibility(View.GONE);
             dividerLinkLayout.setVisibility(View.GONE);
@@ -777,6 +783,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 if (node.isFolder()) {
                     modifiedLayout.setVisibility(View.GONE);
+
+                    if (isEmptyFolder(node)) {
+                        availableOfflineLayout.setVisibility(View.GONE);
+
+                        View view = findViewById(R.id.available_offline_separator);
+                        if (view != null) {
+                            view.setVisibility(View.GONE);
+                        }
+                    }
                 } else {
                     modifiedLayout.setVisibility(View.VISIBLE);
                 }

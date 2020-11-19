@@ -48,6 +48,7 @@ public class Constants {
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
+    public static final int REQUEST_CODE_PICK_GIF = 1034;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -60,6 +61,7 @@ public class Constants {
     public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
     public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
     public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
+    public static final String ACTION_PREVIEW_GIPHY = "ACTION_PREVIEW_GIPHY";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -414,6 +416,13 @@ public class Constants {
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
     public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
 
+    public static final int MAX_REACTIONS_PER_USER = 24;
+    public static final int MAX_REACTIONS_PER_MESSAGE = 50;
+
+    public static final int REACTION_ERROR_TYPE_MESSAGE = -1;
+    public static final int REACTION_ERROR_DEFAULT_VALUE = 0;
+    public static final int REACTION_ERROR_TYPE_USER = 1;
+
     /**
      * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
      */
@@ -451,14 +460,16 @@ public class Constants {
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
-    public static final int INVALID_STATE_CALL = -1;
+    public static final int INVALID_CALL_STATUS = -1;
+    public static final int MAX_PARTICIPANTS_GRID = 6;
 
     public static final String CONTACT_HANDLE = "contactHandle";
-    public static final String CHAT_ID = "chatHandle";
+    public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
+    public static final String CHAT_ID = "CHAT_ID";
     public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
-    public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
-    public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
+    public static final String CHAT_ID_OF_CURRENT_CALL = "chatHandleInProgress";
+    public static final String CHAT_ID_OF_INCOMING_CALL = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
     public static final String PEER_ID = "peerId";
     public static final String CLIENT_ID = "clientId";
@@ -476,12 +487,16 @@ public class Constants {
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
+    public static final String TYPE_CAMERA = "TYPE_CAMERA";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
     public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
     public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
+    public static final String INCOMING_VIDEO_CALL = "INCOMING_VIDEO_CALL";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
+    public static final String COPIED_TEXT_LABEL = "Copied Text";
+    public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
@@ -510,8 +525,9 @@ public class Constants {
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
-    public static final int AVATAR_SIZE = 150;
+    public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
+    public static final int AVATAR_SIZE = 150;
 
     public static final String SEPARATOR = File.separator;
 
@@ -645,6 +661,9 @@ public class Constants {
     public static final int LOCATION_INDEX_TOP = 1;
 
     public static final String OFFLINE_ROOT = "/";
+
+    // 15360 GB = 15TB
+    public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 
     /** In database, invalid value is dedfined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
