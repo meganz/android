@@ -667,4 +667,7 @@ public class Constants {
 
     /** In database, invalid value is dedfined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
+
+    public static final String ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE = "ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE";
+    public static final String KEY_REENABLE_WHICH_PREFERENCE = "REENABLE_WHICH_PREFERENCE";
 }

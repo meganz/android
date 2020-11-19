@@ -7,8 +7,8 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.constants.SettingsConstants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
-import mega.privacy.android.app.constants.SettingsConstants.KEY_REENABLE_WHICH_PREFERENCE
+import mega.privacy.android.app.utils.Constants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
+import mega.privacy.android.app.utils.Constants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.jobservices.SyncRecord
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.sync.SyncListener
@@ -723,7 +723,7 @@ object CuSyncManager {
      */
     private fun createOnFinishListener(onFinish: () -> Unit): MegaRequestListenerInterface {
         return object : BaseListener(null) {
-            override fun onRequestFinish(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 onFinish()
             }
         }
