@@ -6949,6 +6949,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
     public <F extends Fragment> F getFragmentByType(Class<F> fragmentClass) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
