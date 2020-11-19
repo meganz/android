@@ -251,26 +251,6 @@ public class MegaNodeUtil {
     }
 
     /**
-     * Gets the top ancestor node of a node.
-     *
-     * @param node  MegaNode to get the top ancestor node
-     * @return the top ancestor node
-     */
-    public static MegaNode getTopAncestorNode(MegaNode node) {
-        MegaApplication app = MegaApplication.getInstance();
-        MegaApiAndroid megaApi = app.getMegaApi();
-
-        MegaNode topAncestor = node;
-        MegaNode parent = megaApi.getParentNode(topAncestor);
-        while (parent != null) {
-            topAncestor = parent;
-            parent = megaApi.getParentNode(topAncestor);
-        }
-
-        return topAncestor;
-    }
-
-    /**
      *
      * Shares a node.
      * If the node is a folder creates and/or shares the folder link.

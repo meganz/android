@@ -8,6 +8,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -25,7 +26,7 @@ import javax.inject.Inject
 
 class MegaNodeRepo @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler
 ) {
 

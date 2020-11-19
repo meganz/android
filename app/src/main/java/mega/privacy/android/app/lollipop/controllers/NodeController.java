@@ -322,7 +322,7 @@ public class NodeController {
     }
 
     public MegaNode getParent (MegaNode node) {
-        return MegaNodeUtil.getTopAncestorNode(node);
+        return MegaNodeUtil.getRootParentNode(node);
     }
 
     public int getIncomingLevel(MegaNode node) {
@@ -700,9 +700,15 @@ public class NodeController {
                             }
                         } else {
                             internalIntent = true;
-                            mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
+                                mediaIntent = new Intent(context, AudioPlayerActivity.class);
+                            } else {
+                                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                            }
                         }
                         mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
+                        mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_DOWNLOAD);
+                        mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, tempNode.getName());
                         mediaIntent.putExtra("HANDLE", tempNode.getHandle());
                         mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY, MegaApplication.getInstance().isActivityVisible());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {

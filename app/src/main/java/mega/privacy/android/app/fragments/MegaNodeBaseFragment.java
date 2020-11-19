@@ -39,6 +39,7 @@ import java.util.Stack;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
@@ -517,7 +518,11 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 String[] s = node.getName().split("\\.");
                 opusFile = s.length > 1 && s[s.length - 1].equals("opus");
             } else {
-                intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                if (mimeType.isAudio()) {
+                    intent = new Intent(context, AudioPlayerActivity.class);
+                } else {
+                    intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                }
                 internalIntent = true;
             }
 

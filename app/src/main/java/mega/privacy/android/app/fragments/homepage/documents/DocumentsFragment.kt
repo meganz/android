@@ -26,6 +26,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentDocumentsBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -60,6 +61,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 

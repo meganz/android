@@ -15,13 +15,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.audioplayer.service.Metadata
 import mega.privacy.android.app.audioplayer.service.MetadataExtractor
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.MegaNodeUtil.getTopAncestorNode
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.IGNORE
@@ -37,7 +38,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
 class TrackInfoViewModel @ViewModelInject constructor(
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
     // we need call legacy code OfflineUtils.saveOffline to save node for offline, which require
     // activity :(
@@ -164,9 +165,9 @@ class TrackInfoViewModel @ViewModelInject constructor(
             val node = megaApi.getNodeByHandle(args.handle) ?: return
 
             val parent = megaApi.getParentNode(node)
-            val topAncestor = getTopAncestorNode(node)
+            val topAncestor = getRootParentNode(node)
             val location = when {
-                args.from == FROM_INCOMING_SHARES -> {
+                args.fromIncomingShare -> {
                     if (parent != null) {
                         parent.name + " (" + context.getString(R.string.tab_incoming_shares) + ")"
                     } else {

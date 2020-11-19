@@ -11,6 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.MegaNodeSaver
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.CreateChatListener
@@ -28,7 +29,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     @ActivityContext private val context: Context,
     private val offlineNodeSaver: OfflineNodeSaver,
     private val megaNodeSaver: MegaNodeSaver,
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
 ) : BaseRxViewModel() {
 

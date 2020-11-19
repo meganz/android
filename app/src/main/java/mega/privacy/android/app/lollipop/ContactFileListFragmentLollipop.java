@@ -45,6 +45,7 @@ import java.util.Stack;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -581,8 +582,13 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}
 					else {
 						internalIntent = true;
-						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
+							mediaIntent = new Intent(context, AudioPlayerActivity.class);
+						} else {
+							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						}
 					}
+					mediaIntent.putExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL, contact.getEmail());
 					mediaIntent.putExtra("position", position);
 					mediaIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
@@ -594,7 +600,6 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					mediaIntent.putExtra("screenPosition", screenPosition);
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
-					mediaIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 					imageDrag = imageView;
 
 					String localPath = getLocalFile(context, file.getName(), file.getSize());

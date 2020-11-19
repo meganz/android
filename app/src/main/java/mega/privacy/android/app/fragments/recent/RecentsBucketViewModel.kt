@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
@@ -12,7 +13,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 
 class RecentsBucketViewModel @ViewModelInject constructor(
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     private val recentsBucketRepository: RecentsBucketRepository
 ) : ViewModel() {
 

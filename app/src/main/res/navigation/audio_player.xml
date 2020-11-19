@@ -37,8 +37,8 @@
             android:name="adapterType"
             app:argType="integer" />
         <argument
-            android:name="from"
-            app:argType="integer" />
+            android:name="fromIncomingShare"
+            app:argType="boolean" />
         <argument
             android:name="handle"
             app:argType="long" />

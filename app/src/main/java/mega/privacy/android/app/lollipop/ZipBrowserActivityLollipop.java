@@ -48,6 +48,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import nz.mega.sdk.MegaApiJava;
@@ -468,12 +469,17 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			}
 			else {
 				internalIntent = true;
-				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+					mediaIntent = new Intent(this, AudioPlayerActivity.class);
+				} else {
+					mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				}
 			}
 
 			int index = currentNode.getName().lastIndexOf('/');
 			String name = currentNode.getName().substring(index+1);
 			mediaIntent.putExtra("FILENAME", name);
+			mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, (long) name.hashCode());
 			mediaIntent.putExtra("path", currentFile.getAbsolutePath());
 			mediaIntent.putExtra("adapterType", ZIP_ADAPTER);
 			mediaIntent.putExtra("position", position);

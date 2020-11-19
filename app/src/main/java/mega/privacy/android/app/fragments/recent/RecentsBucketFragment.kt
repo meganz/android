@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -230,7 +231,11 @@ class RecentsBucketFragment : BaseFragment() {
         localPath: String?
     ) {
         val intent = if (FileUtil.isInternalIntent(node)) {
-            Intent(activity, AudioVideoPlayerLollipop::class.java)
+            if (MimeTypeList.typeForName(node.name).isAudio) {
+                Intent(activity, AudioPlayerActivity::class.java)
+            } else {
+                Intent(activity, AudioVideoPlayerLollipop::class.java)
+            }
         } else {
             Intent(Intent.ACTION_VIEW)
         }

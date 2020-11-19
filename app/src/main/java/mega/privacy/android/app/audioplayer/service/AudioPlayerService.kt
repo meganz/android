@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -21,6 +22,8 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.audioplayer.miniplayer.MiniAudioPlayerController
+import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
@@ -30,8 +33,13 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    @MegaApiFolder
+    @Inject
+    lateinit var megaApiFolder: MegaApiAndroid
 
     @Inject
     lateinit var dbHandler: DatabaseHandler
@@ -62,7 +70,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
     override fun onCreate() {
         super.onCreate()
 
-        viewModel = AudioPlayerServiceViewModel(this, megaApi, dbHandler)
+        viewModel = AudioPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
 
         createPlayer()
         createPlayerControlNotification()
@@ -92,6 +100,11 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 val handle = mediaItem?.mediaId ?: return
                 viewModel.playingHandle = handle.toLong()
+
+                if (reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED) {
+                    val nodeName = viewModel.getPlaylistItem(handle)?.nodeName ?: ""
+                    _metadata.value = Metadata(null, null, null, nodeName)
+                }
             }
 
             override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -216,6 +229,18 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             else -> {
                 if (viewModel.buildPlayerSource(intent)) {
                     MiniAudioPlayerController.notifyAudioPlayerPlaying(true)
+                } else {
+                    // if we didn't play the audio, we still need fire a notification,
+                    // otherwise the system may treat us as ANR, or throw
+                    // RemoteServiceException: Context.startForegroundService() did not then
+                    // call Service.startForeground()
+                    // when close AudioPlayerActivity
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForeground(
+                            PLAYBACK_NOTIFICATION_ID,
+                            Notification.Builder(this, NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID).build()
+                        )
+                    }
                 }
             }
         }
@@ -334,6 +359,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         private const val COMMAND_STOP = 4
 
         private const val RESUME_DELAY_MS = 500L
+
+        const val SINGLE_PLAYLIST_SIZE = 2
 
         @JvmStatic
         fun pauseAudioPlayer(context: Context) {

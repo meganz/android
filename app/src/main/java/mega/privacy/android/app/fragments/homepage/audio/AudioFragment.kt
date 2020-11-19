@@ -26,6 +26,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
@@ -64,6 +65,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
@@ -225,6 +227,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (viewModel.searchMode) {
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_SEARCH_ADAPTER)
             intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, viewModel.getHandlesOfAudio())
+            intent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
         } else {
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
         }

@@ -52,6 +52,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
@@ -664,16 +665,19 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				}
 			} else {
 				internalIntent = true;
-				mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+				if (MimeTypeList.typeForName(node.getName()).isAudio()) {
+					mediaIntent = new Intent(context, AudioPlayerActivity.class);
+				} else {
+					mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+				}
 			}
 			mediaIntent.putExtra("position", position);
-			if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_RUBBISH) {
+			if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_INCOMING) {
 				mediaIntent.putExtra("parentNodeHandle", -1L);
 			} else {
 				mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
 			}
 			mediaIntent.putExtra("orderGetChildren", ((ManagerActivityLollipop) context).orderCloud);
-			mediaIntent.putExtra("adapterType", RUBBISH_BIN_ADAPTER);
 			mediaIntent.putExtra("screenPosition", screenPosition);
 			mediaIntent.putExtra("placeholder", placeholderCount);
 			mediaIntent.putExtra("HANDLE", file.getHandle());

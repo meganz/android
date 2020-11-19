@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -727,12 +728,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								}
 							} else {
 								internalIntent = true;
-								mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+								if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
+									mediaIntent = new Intent(this, AudioPlayerActivity.class);
+								} else {
+									mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+								}
 							}
 
 							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 							mediaIntent.putExtra("HANDLE", handle);
 							mediaIntent.putExtra("fromDownloadService", true);
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_DOWNLOAD);
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, currentFile.getName());
                             mediaIntent.putExtra(AudioVideoPlayerLollipop.PLAY_WHEN_READY,app.isActivityVisible());
 							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !externalFile) {
 								mediaIntent.setDataAndType(FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());

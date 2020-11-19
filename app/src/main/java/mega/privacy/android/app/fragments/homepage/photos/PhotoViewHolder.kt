@@ -6,6 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemNodeListBinding
 import mega.privacy.android.app.databinding.ItemPhotoBrowseBinding
 import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
 import nz.mega.sdk.MegaApiAndroid
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class PhotoViewHolder(private val binding: ViewDataBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 

@@ -53,6 +53,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SearchNodesTask;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
@@ -803,7 +804,12 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 					else {
 						internalIntent = true;
-						mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
+							mediaIntent = new Intent(context, AudioPlayerActivity.class);
+							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
+						} else {
+							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+						}
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("position", position);

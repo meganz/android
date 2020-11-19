@@ -24,6 +24,7 @@ import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -44,6 +45,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AudioPlayerActivity : BaseActivity() {
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
@@ -234,6 +236,11 @@ class AudioPlayerActivity : BaseActivity() {
             }
         })
 
+        val currentFragment = navController.currentDestination?.id
+        if (currentFragment != null) {
+            refreshMenuOptionsVisibility(currentFragment)
+        }
+
         return true
     }
 
@@ -261,6 +268,10 @@ class AudioPlayerActivity : BaseActivity() {
                     return
                 }
 
+                if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
+                    toggleAllMenuItemsVisibility(false)
+                }
+
                 val service = playerService
                 if (service == null) {
                     toggleAllMenuItemsVisibility(false)
@@ -276,14 +287,12 @@ class AudioPlayerActivity : BaseActivity() {
                 toggleAllMenuItemsVisibility(true)
                 searchMenuItem?.isVisible = false
 
-                optionsMenu?.findItem(R.id.save_to_device)?.isVisible = adapterType != ZIP_ADAPTER
+                optionsMenu?.findItem(R.id.save_to_device)?.isVisible = true
 
                 optionsMenu?.findItem(R.id.properties)?.isVisible =
                     currentFragment == R.id.audio_player
 
-                optionsMenu?.findItem(R.id.send_to_chat)?.isVisible =
-                    adapterType != FROM_CHAT && adapterType != FILE_LINK_ADAPTER
-                            && adapterType != ZIP_ADAPTER
+                optionsMenu?.findItem(R.id.send_to_chat)?.isVisible = adapterType != FROM_CHAT
 
                 if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
                     if (node.isExported) {
@@ -298,22 +307,24 @@ class AudioPlayerActivity : BaseActivity() {
                     optionsMenu?.findItem(R.id.remove_link)?.isVisible = false
                 }
 
-                when (megaApi.getAccess(node)) {
+                val access = megaApi.getAccess(node)
+                when (access) {
                     MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
                         optionsMenu?.findItem(R.id.rename)?.isVisible = false
                         optionsMenu?.findItem(R.id.move)?.isVisible = false
-                        optionsMenu?.findItem(R.id.move_to_trash)?.isVisible = false
                     }
                     MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
                         optionsMenu?.findItem(R.id.rename)?.isVisible = true
                         optionsMenu?.findItem(R.id.move)?.isVisible = true
-                        optionsMenu?.findItem(R.id.move_to_trash)?.isVisible = true
                     }
                 }
 
+                optionsMenu?.findItem(R.id.move_to_trash)?.isVisible =
+                    node.parentHandle != megaApi.rubbishNode.handle
+                            && (access == MegaShare.ACCESS_FULL || access == MegaShare.ACCESS_OWNER)
+
                 optionsMenu?.findItem(R.id.copy)?.isVisible =
-                    adapterType != FOLDER_LINK_ADAPTER && adapterType != FILE_LINK_ADAPTER
-                            && adapterType != ZIP_ADAPTER && adapterType != FROM_CHAT
+                    adapterType != FOLDER_LINK_ADAPTER && adapterType != FROM_CHAT
             }
         }
     }
@@ -340,10 +351,9 @@ class AudioPlayerActivity : BaseActivity() {
             }
             R.id.properties -> {
                 val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri ?: return true
-                val from = launchIntent.getIntExtra(INTENT_EXTRA_KEY_FROM, INVALID_VALUE)
                 navController.navigate(
                     AudioPlayerFragmentDirections.actionPlayerToTrackInfo(
-                        adapterType, from, playingHandle, uri
+                        adapterType, adapterType == INCOMING_SHARES_ADAPTER, playingHandle, uri
                     )
                 )
                 return true

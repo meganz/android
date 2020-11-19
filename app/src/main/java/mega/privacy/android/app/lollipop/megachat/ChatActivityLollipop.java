@@ -90,6 +90,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
@@ -4938,7 +4939,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                         else {
                                             logDebug("setIntentToAudioVideoPlayer");
-                                            mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+                                            if (MimeTypeList.typeForName(node.getName()).isAudio()) {
+                                                mediaIntent = new Intent(this, AudioPlayerActivity.class);
+                                            } else {
+                                                mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+                                            }
                                             internalIntent=true;
                                         }
                                         logDebug("putExtra: screenPosition("+screenPosition+"), msgId("+m.getMessage().getMsgId()+"), chatId("+idChat+"), filename("+node.getName()+")");

@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.FileUtil
@@ -22,7 +23,7 @@ import java.util.*
 import javax.inject.Inject
 
 class TypedFilesRepository @Inject constructor(
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context
 ) {
 

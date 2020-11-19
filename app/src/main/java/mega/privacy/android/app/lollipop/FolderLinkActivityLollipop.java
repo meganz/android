@@ -70,6 +70,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -1556,7 +1557,11 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					}
 					else {
 						internalIntent = true;
-						mediaIntent = new Intent(FolderLinkActivityLollipop.this, AudioVideoPlayerLollipop.class);
+						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
+							mediaIntent = new Intent(this, AudioPlayerActivity.class);
+						} else {
+							mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+						}
 					}
 					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 					mediaIntent.putExtra("isFolderLink", true);

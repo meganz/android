@@ -46,6 +46,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import nz.mega.sdk.MegaApiAndroid;
@@ -659,8 +660,13 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				}
 			} else {
 				logDebug("setIntentToAudioVideoPlayer");
-				mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				if (MimeTypeList.typeForName(document.getName()).isAudio()) {
+					mediaIntent = new Intent(this, AudioPlayerActivity.class);
+				} else {
+					mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
+				}
 				mediaIntent.putExtra("adapterType", FILE_LINK_ADAPTER);
+				mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 				mediaIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);
 				mediaIntent.putExtra(URL_FILE_LINK, url);
 				internalIntent = true;
@@ -693,10 +699,12 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				} else {
 					logWarning("ERROR: HTTP server get local link");
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
+					return;
 				}
 			} else {
 				logWarning("ERROR: HTTP server get local link");
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
+				return;
 			}
 
 			mediaIntent.putExtra("HANDLE", document.getHandle());

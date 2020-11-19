@@ -36,6 +36,7 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
+import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
@@ -379,7 +380,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         if (isAudioOrVideo(node)) {
             if (isInternalIntent(node)) {
-                intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                if (MimeTypeList.typeForName(node.getName()).isAudio()) {
+                    intent = new Intent(context, AudioPlayerActivity.class);
+                } else {
+                    intent = new Intent(context, AudioVideoPlayerLollipop.class);
+                }
             } else {
                 intent = new Intent(Intent.ACTION_VIEW);
             }

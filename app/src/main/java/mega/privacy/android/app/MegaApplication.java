@@ -41,6 +41,9 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+
+import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -122,14 +125,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
 
+	@MegaApi
 	@Inject
 	MegaApiAndroid megaApi;
+	@MegaApiFolder
+	@Inject
+	MegaApiAndroid megaApiFolder;
 	@Inject
 	MegaChatApiAndroid megaChatApi;
 	@Inject
 	DatabaseHandler dbH;
 
-	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
 	final static public String APP_KEY = "6tioyn8ka5l6hty";
@@ -711,9 +717,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		checkAppUpgrade();
 
 		setupMegaApi();
+		setupMegaApiFolder();
 		setupMegaChatApi();
 
-		megaApiFolder = getMegaApiFolder();
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
@@ -870,31 +876,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public MegaApiAndroid getMegaApiFolder(){
-		if (megaApiFolder == null){
-			PackageManager m = getPackageManager();
-			String s = getPackageName();
-			PackageInfo p;
-			String path = null;
-			try
-			{
-				p = m.getPackageInfo(s, 0);
-				path = p.applicationInfo.dataDir + "/";
-			}
-			catch (NameNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-			
-			Log.d(TAG, "Database path: " + path);
-			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					MegaApplication.USER_AGENT, path);
-
-			megaApiFolder.retrySSLerrors(true);
-
-			megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-			megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-		}
-		
 		return megaApiFolder;
 	}
 
@@ -931,6 +912,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			languageString = megaApi.setLanguage(language);
 			logDebug("Result: " + languageString + " Language: " + language);
 		}
+	}
+
+	private void setupMegaApiFolder() {
+		megaApiFolder.retrySSLerrors(true);
+
+		megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
+		megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
 	}
 
 	private void setupMegaChatApi() {

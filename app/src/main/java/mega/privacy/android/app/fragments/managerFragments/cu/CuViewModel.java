@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
+import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.listeners.BaseListener;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import nz.mega.sdk.MegaApiAndroid;
@@ -68,8 +69,8 @@ class CuViewModel extends BaseRxViewModel {
     private int mRealNodeCount;
 
     @Inject
-    public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
-            Context context, int type) {
+    public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
+                       MegaNodeRepo repo, Context context, int type) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;

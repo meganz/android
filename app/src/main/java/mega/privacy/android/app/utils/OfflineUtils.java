@@ -237,9 +237,13 @@ public class OfflineUtils {
     }
 
     public static File getThumbnailFile(Context context, MegaOffline node) {
+        return getThumbnailFile(context, node.getHandle());
+    }
+
+    public static File getThumbnailFile(Context context, String handle) {
         File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
-        String thumbName = Base64.encodeToString(node.getHandle().getBytes(), Base64.DEFAULT);
-        return new File(thumbDir, thumbName + ".jpg");
+        String thumbName = Base64.encodeToString(handle.getBytes(), Base64.DEFAULT);
+        return new File(thumbDir, thumbName + JPG_EXTENSION);
     }
 
     public static String getFolderInfo(Resources res, File file) {

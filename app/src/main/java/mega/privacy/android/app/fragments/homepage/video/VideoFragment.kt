@@ -25,6 +25,7 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentVideoBinding
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
@@ -61,6 +62,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private var draggingNodeHandle = MegaApiJava.INVALID_HANDLE
 
+    @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 

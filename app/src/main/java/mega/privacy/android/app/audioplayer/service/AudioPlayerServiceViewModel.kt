@@ -1,5 +1,6 @@
 package mega.privacy.android.app.audioplayer.service
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -21,7 +22,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.playlist.PlaylistItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
@@ -34,6 +37,7 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import java.io.File
 import java.util.*
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -41,6 +45,7 @@ import kotlin.collections.HashMap
 class AudioPlayerServiceViewModel(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
+    private val megaApiFolder: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,
 ) : ExposedShuffleOrder.ShuffleChangeListener {
     private val compositeDisposable = CompositeDisposable()
@@ -134,29 +139,17 @@ class AudioPlayerServiceViewModel(
         val samePlaylist = isSamePlaylist(type, intent)
         currentIntent = intent
 
-        var displayNodeNameFirst = true
-        var firstPlayNodeName = ""
-        when (type) {
-            OFFLINE_ADAPTER -> {
-                val path = intent.getStringExtra(INTENT_EXTRA_KEY_PATH) ?: return false
-                displayNodeNameFirst = false
-                firstPlayNodeName = File(path).name
-            }
-            AUDIO_SEARCH_ADAPTER, AUDIO_BROWSE_ADAPTER -> {
-                val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-                val node = megaApi.getNodeByHandle(handle) ?: return false
-                firstPlayNodeName = node.name
-            }
-            else -> {
-                return false
-            }
+        val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+        if (firstPlayHandle == INVALID_HANDLE) {
+            return false
         }
 
-        val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+        val firstPlayNodeName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: return false
 
+        var displayNodeNameFirst = type != OFFLINE_ADAPTER
         if (samePlaylist && firstPlayHandle == playingHandle) {
             // if we are already playing this music, then the metadata is already
-            // in LiveData (_metadata of AudioPlayerService), we don't need (and can't)
+            // in LiveData (_metadata of AudioPlayerService), we don't need (and shouldn't)
             // emit node name.
             displayNodeNameFirst = false
         }
@@ -167,28 +160,194 @@ class AudioPlayerServiceViewModel(
             .build()
         _playerSource.value = Triple(
             listOf(mediaItem),
+            // we will emit a single item list at first, and the current playing item
+            // will always be at index 0 in that single item list.
             if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
             if (displayNodeNameFirst) firstPlayNodeName else null
         )
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
-            compositeDisposable.add(Completable
-                .fromCallable {
-                    when (type) {
-                        OFFLINE_ADAPTER -> {
-                            playlistTitle = getOfflineFolderName(firstPlayHandle)
+            if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
+                setupStreamingServer(if (type == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi)
+            }
 
-                            buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
-                        }
-                        AUDIO_BROWSE_ADAPTER -> {
-                            playlistTitle = context.getString(R.string.upload_to_audio)
+            compositeDisposable.add(
+                Completable
+                    .fromCallable(Callable {
+                        when (type) {
+                            OFFLINE_ADAPTER -> {
+                                playlistTitle = getOfflineFolderName(firstPlayHandle)
 
-                            buildPlaylistForAudio(intent, firstPlayHandle)
+                                buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
+                            }
+                            AUDIO_BROWSE_ADAPTER -> {
+                                playlistTitle = context.getString(R.string.upload_to_audio)
+
+                                buildPlaylistForAudio(intent, firstPlayHandle)
+                            }
+                            FILE_BROWSER_ADAPTER,
+                            RUBBISH_BIN_ADAPTER,
+                            INBOX_ADAPTER,
+                            LINKS_ADAPTER,
+                            INCOMING_SHARES_ADAPTER,
+                            OUTGOING_SHARES_ADAPTER,
+                            CONTACT_FILE_ADAPTER -> {
+                                val parentHandle = intent.getLongExtra(
+                                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                                    INVALID_HANDLE
+                                )
+                                val order = intent.getIntExtra(
+                                    INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                                    ORDER_DEFAULT_ASC
+                                )
+
+                                if (isInRootLinksLevel(type, parentHandle)) {
+                                    playlistTitle = context.getString(R.string.tab_links_shares)
+
+                                    buildPlaylistFromNodes(
+                                        megaApi, megaApi.getPublicLinks(order), firstPlayHandle
+                                    )
+                                    return@Callable
+                                }
+
+                                if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
+                                    playlistTitle = context.getString(R.string.tab_incoming_shares)
+
+                                    buildPlaylistFromNodes(
+                                        megaApi, megaApi.getInShares(order), firstPlayHandle
+                                    )
+                                    return@Callable
+                                }
+
+                                if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
+                                    playlistTitle = context.getString(R.string.tab_outgoing_shares)
+
+                                    val nodes = ArrayList<MegaNode>()
+                                    var lastHandle = INVALID_HANDLE
+                                    for (share in megaApi.getOutShares(order)) {
+                                        val node = megaApi.getNodeByHandle(share.nodeHandle)
+                                        if (node != null && node.handle != lastHandle) {
+                                            lastHandle = node.handle
+                                            nodes.add(node)
+                                        }
+                                    }
+
+                                    buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
+                                    return@Callable
+                                }
+
+                                if (type == CONTACT_FILE_ADAPTER && parentHandle == INVALID_HANDLE) {
+                                    val email =
+                                        intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)
+                                    val contact = megaApi.getContact(email) ?: return@Callable
+                                    val nodes = megaApi.getInShares(contact)
+
+                                    playlistTitle =
+                                        context.getString(R.string.title_incoming_shares_with_explorer) +
+                                                getMegaUserNameDB(contact)
+
+                                    buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
+                                    return@Callable
+                                }
+
+                                val parent = (if (parentHandle == INVALID_HANDLE) {
+                                    when (type) {
+                                        RUBBISH_BIN_ADAPTER -> megaApi.rubbishNode
+                                        INBOX_ADAPTER -> megaApi.inboxNode
+                                        else -> megaApi.rootNode
+                                    }
+                                } else {
+                                    megaApi.getNodeByHandle(parentHandle)
+                                }) ?: return@Callable
+
+                                playlistTitle = if (parentHandle == INVALID_HANDLE) {
+                                    context.getString(
+                                        when (type) {
+                                            RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
+                                            INBOX_ADAPTER -> R.string.section_inbox
+                                            else -> R.string.section_cloud_drive
+                                        }
+                                    )
+                                } else {
+                                    parent.name
+                                }
+
+                                buildPlaylistFromParent(parent, intent, firstPlayHandle)
+                            }
+                            RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
+                                playlistTitle = context.getString(R.string.section_recents)
+
+                                buildPlaylistFromHandles(intent, firstPlayHandle)
+                            }
+                            FOLDER_LINK_ADAPTER -> {
+                                val parentHandle = intent.getLongExtra(
+                                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                                    INVALID_HANDLE
+                                )
+                                val order = intent.getIntExtra(
+                                    INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                                    ORDER_DEFAULT_ASC
+                                )
+
+                                val parent = (if (parentHandle == INVALID_HANDLE) {
+                                    megaApiFolder.rootNode
+                                } else {
+                                    megaApiFolder.getNodeByHandle(parentHandle)
+                                }) ?: return@Callable
+
+                                playlistTitle = parent.name
+
+                                buildPlaylistFromNodes(
+                                    megaApiFolder, megaApiFolder.getChildren(parent, order),
+                                    firstPlayHandle
+                                )
+                            }
+                            ZIP_ADAPTER -> {
+                                val zipPath =
+                                    intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
+                                        ?: return@Callable
+
+                                playlistTitle = File(zipPath).parentFile?.name ?: ""
+
+                                val files = File(zipPath).parentFile?.listFiles() ?: return@Callable
+                                buildPlaylistFromFiles(files.asList(), firstPlayHandle)
+                            }
                         }
-                    }
+
+                        postPlayingThumbnail()
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel buildPlayerSource"))
+            )
+        } else {
+            playlistItems.clear()
+            playlistItemsMap.clear()
+
+            val node = megaApi.getNodeByHandle(firstPlayHandle)
+            val thumbnail = when {
+                type == OFFLINE_ADAPTER -> {
+                    getThumbnailFile(context, firstPlayHandle.toString())
                 }
-                .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("AudioPlayerServiceViewModel buildPlayerSource")))
+                node == null -> {
+                    null
+                }
+                else -> {
+                    File(getThumbFolder(context), node.base64Handle.plus(JPG_EXTENSION))
+                }
+            }
+
+            val playlistItem = PlaylistItem(
+                firstPlayHandle, firstPlayNodeName, thumbnail, 0, PlaylistItem.TYPE_PLAYING
+            )
+            playlistItems.add(playlistItem)
+            playlistItemsMap[firstPlayHandle.toString()] = playlistItem
+            postPlaylistItems()
+
+            if (thumbnail != null && !thumbnail.exists()) {
+                megaApi.getThumbnail(node, thumbnail.absolutePath, createThumbnailRequest)
+            } else {
+                postPlayingThumbnail()
+            }
         }
 
         return true
@@ -196,6 +355,7 @@ class AudioPlayerServiceViewModel(
 
     private fun isSamePlaylist(type: Int, intent: Intent): Boolean {
         val oldIntent = currentIntent ?: return false
+        val oldType = oldIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         when (type) {
             OFFLINE_ADAPTER -> {
@@ -212,11 +372,61 @@ class AudioPlayerServiceViewModel(
                     intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return false
                 return oldHandles.contentEquals(newHandles)
             }
-            AUDIO_BROWSE_ADAPTER -> {
-                return true
+            AUDIO_BROWSE_ADAPTER,
+            FROM_CHAT,
+            FROM_DOWNLOAD,
+            FILE_LINK_ADAPTER -> {
+                return oldType == type
+            }
+            FILE_BROWSER_ADAPTER,
+            RUBBISH_BIN_ADAPTER,
+            INBOX_ADAPTER,
+            LINKS_ADAPTER,
+            INCOMING_SHARES_ADAPTER,
+            OUTGOING_SHARES_ADAPTER,
+            CONTACT_FILE_ADAPTER,
+            FOLDER_LINK_ADAPTER -> {
+                val oldParentHandle = oldIntent.getLongExtra(
+                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                    INVALID_HANDLE
+                )
+                val newParentHandle = intent.getLongExtra(
+                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                    INVALID_HANDLE
+                )
+                return oldType == type && oldParentHandle == newParentHandle
+            }
+            RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
+                val oldHandles = oldIntent.getLongArrayExtra(NODE_HANDLES) ?: return false
+                val newHandles = intent.getLongArrayExtra(NODE_HANDLES) ?: return false
+                return oldHandles.contentEquals(newHandles)
+            }
+            ZIP_ADAPTER -> {
+                val oldZipPath = oldIntent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
+                    ?: return false
+                val newZipPath =
+                    intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY) ?: return false
+                return oldZipPath == newZipPath
             }
             else -> {
                 return false
+            }
+        }
+    }
+
+    private fun setupStreamingServer(api: MegaApiAndroid) {
+        if (api.httpServerIsRunning() == 0) {
+            api.httpServerStart()
+
+            val memoryInfo = ActivityManager.MemoryInfo()
+            val activityManager =
+                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            activityManager.getMemoryInfo(memoryInfo)
+
+            if (memoryInfo.totalMem > BUFFER_COMP) {
+                api.httpServerSetMaxBufferSize(MAX_BUFFER_32MB)
+            } else {
+                api.httpServerSetMaxBufferSize(MAX_BUFFER_16MB)
             }
         }
     }
@@ -226,7 +436,7 @@ class AudioPlayerServiceViewModel(
             ?: return
 
         buildPlaylistFromNodes(
-            nodes, firstPlayHandle,
+            megaApi, nodes, firstPlayHandle,
             {
                 isFileAvailable(getOfflineFile(context, it))
                         && MimeTypeList.typeForName(it.name).isAudio
@@ -267,14 +477,21 @@ class AudioPlayerServiceViewModel(
     }
 
     private fun buildPlaylistFromHandles(intent: Intent, firstPlayHandle: Long) {
-        val handles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return
+        val handles = intent.getLongArrayExtra(NODE_HANDLES) ?: return
         buildPlaylistFromHandles(handles.toList(), firstPlayHandle)
+    }
+
+    private fun buildPlaylistFromParent(parent: MegaNode, intent: Intent, firstPlayHandle: Long) {
+        val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+        val children = megaApi.getChildren(parent, order) ?: return
+        buildPlaylistFromNodes(megaApi, children, firstPlayHandle)
     }
 
     private fun buildPlaylistForAudio(intent: Intent, firstPlayHandle: Long) {
         val order = intent.getIntExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
         buildPlaylistFromNodes(
-            megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE), firstPlayHandle
+            megaApi, megaApi.searchByType(order, FILE_TYPE_AUDIO, SEARCH_TARGET_ROOTNODE),
+            firstPlayHandle
         )
     }
 
@@ -288,12 +505,38 @@ class AudioPlayerServiceViewModel(
             }
         }
 
-        buildPlaylistFromNodes(nodes, firstPlayHandle)
+        buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
     }
 
-    private fun buildPlaylistFromNodes(nodes: List<MegaNode>, firstPlayHandle: Long) {
+    private fun buildPlaylistFromFiles(files: List<File>, firstPlayHandle: Long) {
         buildPlaylistFromNodes(
-            nodes, firstPlayHandle,
+            megaApi, files, firstPlayHandle,
+            {
+                it.isFile && MimeTypeList.typeForName(it.name).isAudio
+                        && !MimeTypeList.typeForName(it.name).isAudioNotSupported
+            },
+            {
+                mediaItemFromFile(it, it.name.hashCode().toString())
+            },
+            {
+                it.name.hashCode().toLong()
+            },
+            {
+                it.name
+            },
+            {
+                null
+            }
+        )
+    }
+
+    private fun buildPlaylistFromNodes(
+        api: MegaApiAndroid,
+        nodes: List<MegaNode>,
+        firstPlayHandle: Long
+    ) {
+        buildPlaylistFromNodes(
+            api, nodes, firstPlayHandle,
             {
                 MimeTypeList.typeForName(it.name).isAudio
                         && !MimeTypeList.typeForName(it.name).isAudioNotSupported
@@ -306,8 +549,8 @@ class AudioPlayerServiceViewModel(
                 }
 
                 val localPath = getLocalFile(context, it.name, it.size)
-                val nodeFingerPrint = megaApi.getFingerprint(it)
-                val localPathFingerPrint = megaApi.getFingerprint(localPath)
+                val nodeFingerPrint = api.getFingerprint(it)
+                val localPathFingerPrint = api.getFingerprint(localPath)
 
                 if (localPath != null
                     && (isOnMegaDownloads || nodeFingerPrint != null
@@ -316,7 +559,7 @@ class AudioPlayerServiceViewModel(
                     mediaItemFromFile(File(localPath), it.handle.toString())
                 } else if (dbHandler.credentials != null) {
                     MediaItem.Builder()
-                        .setUri(Uri.parse(megaApi.httpServerGetLocalLink(it)))
+                        .setUri(Uri.parse(api.httpServerGetLocalLink(it)))
                         .setMediaId(it.handle.toString())
                         .build()
                 } else {
@@ -336,13 +579,14 @@ class AudioPlayerServiceViewModel(
     }
 
     private fun <T> buildPlaylistFromNodes(
+        api: MegaApiAndroid,
         nodes: List<T>,
         firstPlayHandle: Long,
         validator: (T) -> Boolean,
         mapper: (T) -> MediaItem?,
         handleGetter: (T) -> Long,
         nameGetter: (T) -> String,
-        thumbnailGetter: (T) -> File,
+        thumbnailGetter: (T) -> File?,
     ) {
         playlistItems.clear()
         playlistItemsMap.clear()
@@ -373,7 +617,7 @@ class AudioPlayerServiceViewModel(
             playlistItems.add(playlistItem)
             playlistItemsMap[handle.toString()] = playlistItem
 
-            if (!thumbnail.exists()) {
+            if (thumbnail != null && !thumbnail.exists()) {
                 nodesWithoutThumbnail.add(Pair(handle, thumbnail))
             }
 
@@ -391,9 +635,9 @@ class AudioPlayerServiceViewModel(
                 Observable.fromIterable(nodesWithoutThumbnail)
                     .subscribeOn(Schedulers.io())
                     .subscribe({
-                        val node = megaApi.getNodeByHandle(it.first)
+                        val node = api.getNodeByHandle(it.first)
                         if (node != null) {
-                            megaApi.getThumbnail(
+                            api.getThumbnail(
                                 node, it.second.absolutePath, createThumbnailRequest
                             )
                         }
@@ -411,9 +655,7 @@ class AudioPlayerServiceViewModel(
 
     private fun postPlayingThumbnail() {
         val thumbnail = playlistItemsMap[playingHandle.toString()]?.thumbnail ?: return
-        if (thumbnail.exists()) {
-            _playingThumbnail.postValue(thumbnail)
-        }
+        _playingThumbnail.postValue(thumbnail)
     }
 
     private fun postPlaylistItems() {
@@ -596,6 +838,8 @@ class AudioPlayerServiceViewModel(
 
     fun clear() {
         compositeDisposable.dispose()
+        megaApi.httpServerStop()
+        megaApiFolder.httpServerStop()
     }
 
     companion object {

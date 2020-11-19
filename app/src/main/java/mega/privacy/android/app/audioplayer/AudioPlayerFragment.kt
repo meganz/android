@@ -21,11 +21,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.navigation.fragment.findNavController
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
 import mega.privacy.android.app.R
+import mega.privacy.android.app.audioplayer.playlist.PlaylistItem
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.service.CallAwareControlDispatcher
@@ -68,16 +68,6 @@ class AudioPlayerFragment : Fragment() {
         }
     }
     private val playerListener = object : Player.EventListener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            if (isResumed && mediaItem != null
-                && reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
-            ) {
-                val nodeName =
-                    playerService?.viewModel?.getPlaylistItem(mediaItem.mediaId)?.nodeName ?: ""
-                displayMetadata(Metadata(null, null, null, nodeName))
-            }
-        }
-
         override fun onPlaybackStateChanged(state: Int) {
             if (isResumed) {
                 binding.loading.isVisible = state == Player.STATE_BUFFERING
@@ -146,7 +136,7 @@ class AudioPlayerFragment : Fragment() {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
-                playlist.isEnabled = it.first.size > 1
+                togglePlaylistEnabled(it.first)
             }
         }
     }
@@ -317,9 +307,18 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun setupPlaylistButton() {
+        val playlistItems = playerService?.viewModel?.playlist?.value?.first
+        if (playlistItems != null) {
+            togglePlaylistEnabled(playlistItems)
+        }
+
         playlist.setOnClickListener {
             findNavController().navigate(R.id.action_player_to_playlist)
         }
+    }
+
+    private fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
+        playlist.isEnabled = playlistItems.size > AudioPlayerService.SINGLE_PLAYLIST_SIZE
     }
 
     private fun hideToolbar() {

@@ -5,6 +5,7 @@ import android.content.Intent
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.DownloadService
+import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.DownloadUtil.showSnackBarWhenDownloading
@@ -17,7 +18,7 @@ import kotlin.collections.ArrayList
 
 class MegaNodeSaver @Inject constructor(
     @ActivityContext context: Context,
-    private val megaApi: MegaApiAndroid,
+    @MegaApi private val megaApi: MegaApiAndroid,
     dbHandler: DatabaseHandler,
 ) : NodeSaver(context, dbHandler) {
 
