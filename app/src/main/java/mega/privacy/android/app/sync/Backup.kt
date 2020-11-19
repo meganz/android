@@ -1,5 +1,6 @@
 package mega.privacy.android.app.sync
 
+import mega.privacy.android.app.sync.cusync.CuSyncManager
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -9,6 +10,9 @@ import nz.mega.sdk.MegaError
  */
 data class Backup(
 
+    /**
+     * ID of the backup, generate by server when set backup.
+     */
     var backupId: Long,
     var backupType: Int,
 
@@ -25,7 +29,7 @@ data class Backup(
      * Valid value definitions
      * @see MegaApiJava
      */
-    var state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+    var state: Int = CuSyncManager.State.CU_SYNC_STATE_ACTIVE,
     /**
      * Valid value definitions
      * @see MegaError

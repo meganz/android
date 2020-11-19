@@ -34,10 +34,57 @@ import java.util.concurrent.TimeUnit.SECONDS
  */
 object CuSyncManager {
 
+    /**
+     * If CU process finished.
+     */
+    var isFinished = false
+
     const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
     const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
     private const val PROGRESS_INVALID = -1
     private const val PROGRESS_FINISHED = 100
+
+    /**
+     * Backup state,
+     * originally defined in heartbeats.h
+        enum State {
+            ACTIVE = 1,             // Working fine (enabled)
+            FAILED = 2,             // Failed (permanently disabled)
+            TEMPORARY_DISABLED = 3, // Temporarily disabled due to a transient situation (e.g: account blocked). Will be resumed when the condition passes
+            DISABLED = 4,           // Disabled by the user
+            PAUSE_UP = 5,           // Active but upload transfers paused in the SDK
+            PAUSE_DOWN = 6,         // Active but download transfers paused in the SDK
+            PAUSE_FULL = 7,         // Active but transfers paused in the SDK
+        };
+     */
+    object State {
+        const val CU_SYNC_STATE_ACTIVE = 1
+        const val CU_SYNC_STATE_FAILED = 2
+        const val CU_SYNC_STATE_TEMPORARY_DISABLED = 3
+        const val CU_SYNC_STATE_DISABLED = 4
+        const val CU_SYNC_STATE_PAUSE_UP = 5
+        const val CU_SYNC_STATE_PAUSE_DOWN = 6
+        const val CU_SYNC_STATE_PAUSE_FULL = 7
+    }
+
+    /**
+     * Heartbeat status,
+     * originally defined in heartbeats.h
+        enum Status {
+            UPTODATE = 1, // Up to date: local and remote paths are in sync
+            SYNCING = 2, // The sync engine is working, transfers are in progress
+            PENDING = 3, // The sync engine is working, e.g: scanning local folders
+            INACTIVE = 4, // Sync is not active. A state != ACTIVE should have been sent through '''sp'''
+            UNKNOWN = 5, // Unknown status
+        };
+     */
+    object Status {
+        const val CU_SYNC_STATUS_UPTODATE = 1
+        const val CU_SYNC_STATUS_SYNCING = 2
+        const val CU_SYNC_STATUS_PENDING = 3
+        const val CU_SYNC_STATUS_INACTIVE = 4
+        const val CU_SYNC_STATUS_UNKNOWN = 5
+    }
 
     /**
      * While CU process is running, send heartbeat every 30s.
@@ -136,7 +183,7 @@ object CuSyncManager {
         backupType: Int,
         targetNode: Long?,
         localFolder: String?,
-        state: Int = MegaApiJava.CU_SYNC_STATE_ACTIVE,
+        state: Int = State.CU_SYNC_STATE_ACTIVE,
         subState: Int = MegaError.API_OK,
         extraData: String = INVALID_NON_NULL_VALUE
     ) {
@@ -323,6 +370,66 @@ object CuSyncManager {
     }
 
     /**
+     * Update CU backup's state.
+     *
+     * @see MegaApiJava
+     */
+    fun updateSecondaryBackupState(newState: Int) {
+        if (!CameraUploadUtil.isSecondaryEnabled()) {
+            logDebug("MU is not enabled, no need to update.")
+            return
+        }
+
+        val muSync = databaseHandler.muBackup
+        if (muSync == null) {
+            setSecondaryBackup()
+        } else {
+            muSync.apply {
+                updateBackup(
+                    backupId,
+                    backupType,
+                    targetNode,
+                    localFolder,
+                    backupName,
+                    newState,
+                    subState,
+                    extraData
+                )
+            }
+        }
+    }
+
+    /**
+     * Update CU backup's state.
+     *
+     * @see MegaApiJava
+     */
+    fun updatePrimaryBackupState(newState: Int) {
+        if (!CameraUploadUtil.isPrimaryEnabled()) {
+            logDebug("CU is not enabled, no need to update.")
+            return
+        }
+
+        val cuSync = databaseHandler.cuBackup
+        if (cuSync == null) {
+            setSecondaryBackup()
+        } else {
+            cuSync.apply {
+                updateBackup(
+                    backupId,
+                    backupType,
+                    targetNode,
+                    localFolder,
+                    backupName,
+                    newState,
+                    subState,
+                    extraData
+                )
+            }
+        }
+    }
+
+    /**
      * Update a backup.
      *
      * @param backupId ID of the backup which is to be updated.
@@ -403,6 +510,7 @@ object CuSyncManager {
      * @param records Pending upload/copy files.
      */
     fun startActiveHeartbeat(records: List<SyncRecord>) {
+        isFinished = false
         if (records.isEmpty()) {
             return
         }
@@ -425,10 +533,12 @@ object CuSyncManager {
         logDebug("CU pending upload file $cuPendingUploads, size: $cuTotalUploadBytes; MU pending upload file $muPendingUploads, size: $muTotalUploadBytes")
 
         if (CameraUploadUtil.isPrimaryEnabled()) {
+            updatePrimaryBackupState(State.CU_SYNC_STATE_ACTIVE)
             cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
         }
 
         if (CameraUploadUtil.isSecondaryEnabled()) {
+            updateSecondaryBackupState(State.CU_SYNC_STATE_ACTIVE)
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
         }
 
@@ -438,7 +548,7 @@ object CuSyncManager {
                 if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null && cuTotalUploadBytes != 0L) {
                     megaApi.sendBackupHeartbeat(
                         cuBackup.backupId,
-                        MegaApiJava.CU_SYNC_STATUS_SYNCING,
+                        Status.CU_SYNC_STATUS_SYNCING,
                         (cuUploadedBytes / cuTotalUploadBytes.toFloat() * 100).toInt(),
                         cuPendingUploads,
                         0,
@@ -452,7 +562,7 @@ object CuSyncManager {
                 if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null && muTotalUploadBytes != 0L) {
                     megaApi.sendBackupHeartbeat(
                         muBackup.backupId,
-                        MegaApiJava.CU_SYNC_STATUS_SYNCING,
+                        Status.CU_SYNC_STATUS_SYNCING,
                         (muUploadedBytes / muTotalUploadBytes.toFloat() * 100).toInt(),
                         muPendingUploads,
                         0,
@@ -488,13 +598,14 @@ object CuSyncManager {
      * Callback when the process finished, report to server.
      */
     fun reportUploadFinish() {
+        isFinished = true
         val cuBackup = databaseHandler.cuBackup
         if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
             logDebug("CU sync finished at $cuLastActionTimestampSeconds, last uploaded handle is $cuLastUploadedHandle backup id:${cuBackup.backupId}")
             cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
-                MegaApiJava.CU_SYNC_STATUS_UPTODATE,
+                Status.CU_SYNC_STATUS_UPTODATE,
                 PROGRESS_FINISHED,
                 0,
                 0,
@@ -510,9 +621,46 @@ object CuSyncManager {
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
-                MegaApiJava.CU_SYNC_STATUS_UPTODATE,
+                Status.CU_SYNC_STATUS_UPTODATE,
                 PROGRESS_FINISHED,
                 0,
+                0,
+                muLastActionTimestampSeconds,
+                muLastUploadedHandle,
+                null
+            )
+        }
+    }
+
+    /**
+     * Callback when the process is interrupted, report to server.
+     */
+    fun reportUploadInterrupted() {
+        val cuBackup = databaseHandler.cuBackup
+        if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
+            logDebug("CU sync is interrupted.")
+            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+            megaApi.sendBackupHeartbeat(
+                cuBackup.backupId,
+                Status.CU_SYNC_STATUS_INACTIVE,
+                PROGRESS_INVALID,
+                cuPendingUploads,
+                0,
+                cuLastActionTimestampSeconds,
+                cuLastUploadedHandle,
+                null
+            )
+        }
+
+        val muBackup = databaseHandler.muBackup
+        if (muBackup != null && muLastUploadedHandle != INVALID_HANDLE) {
+            logDebug("MU sync is interrupted.")
+            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
+            megaApi.sendBackupHeartbeat(
+                muBackup.backupId,
+                Status.CU_SYNC_STATUS_INACTIVE,
+                PROGRESS_INVALID,
+                muPendingUploads,
                 0,
                 muLastActionTimestampSeconds,
                 muLastUploadedHandle,
@@ -541,7 +689,7 @@ object CuSyncManager {
         if (cuBackup != null && CameraUploadUtil.isPrimaryEnabled()) {
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
-                MegaApiJava.CU_SYNC_STATUS_INACTIVE,
+                Status.CU_SYNC_STATUS_INACTIVE,
                 PROGRESS_INVALID,
                 0,
                 0,
@@ -555,7 +703,7 @@ object CuSyncManager {
         if (muBackup != null && CameraUploadUtil.isSecondaryEnabled()) {
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
-                MegaApiJava.CU_SYNC_STATUS_INACTIVE,
+                Status.CU_SYNC_STATUS_INACTIVE,
                 PROGRESS_INVALID,
                 0,
                 0,

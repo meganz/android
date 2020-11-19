@@ -203,6 +203,7 @@ import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -14083,6 +14084,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					pauseTransfersMenuIcon.setVisible(!paused);
 					playTransfersMenuIcon.setVisible(paused);
 				}
+
+			    // Update CU backup state.
+                boolean uploadPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD);
+			    if(uploadPaused) {
+                    CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP);
+                    CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP);
+                }
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
