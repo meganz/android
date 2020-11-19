@@ -298,7 +298,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		if (((FileExplorerActivityLollipop) context).isList()) {
 			recyclerView = v.findViewById(R.id.file_list_view_browser);
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 		}

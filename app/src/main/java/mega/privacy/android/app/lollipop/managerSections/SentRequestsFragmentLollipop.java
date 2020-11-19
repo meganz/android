@@ -352,7 +352,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 	        listView.setClipToPadding(false);;
 			
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());

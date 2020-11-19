@@ -304,7 +304,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		recyclerView = (RecyclerView) findViewById(R.id.zip_list_view_browser);
 		recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		recyclerView.setClipToPadding(false);
-		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setHasFixedSize(true);

@@ -34,7 +34,7 @@ public class TransfersBaseFragment extends RotatableFragment {
         View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
         listView = v.findViewById(R.id.transfers_list_view);
-        listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+        listView.addItemDecoration(new SimpleDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);

@@ -307,7 +307,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		listView = (RecyclerView) findViewById(R.id.recycler_view_versions_file);
 		listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		listView.setClipToPadding(false);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());

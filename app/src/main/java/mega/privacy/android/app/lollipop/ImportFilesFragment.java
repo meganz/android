@@ -115,7 +115,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
 
         contentText = (TextView) v.findViewById(R.id.content_text);
         recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
         cloudDriveButton = (RelativeLayout) v.findViewById(R.id.cloud_drive_layout);

@@ -10,8 +10,8 @@ import static mega.privacy.android.app.utils.Constants.*;
 
 public class HeaderItemDecoration extends SimpleDividerItemDecoration {
 
-    public HeaderItemDecoration(Context context, DisplayMetrics outMetrics) {
-        super(context, outMetrics);
+    public HeaderItemDecoration(Context context) {
+        super(context);
     }
 
     @Override

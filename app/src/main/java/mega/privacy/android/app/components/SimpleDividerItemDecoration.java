@@ -10,7 +10,10 @@ package mega.privacy.android.app.components;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -22,16 +25,14 @@ import mega.privacy.android.app.R;
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     protected Context context;
     protected Drawable mDivider;
-    protected DisplayMetrics outMetrics;
 
     protected int left;
     protected int right;
     protected int childCount;
 
-    public SimpleDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
+    public SimpleDividerItemDecoration(Context context) {
         mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
         this.context = context;
-        this.outMetrics = outMetrics;
     }
 
     @Override

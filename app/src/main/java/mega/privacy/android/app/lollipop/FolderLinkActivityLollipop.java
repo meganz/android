@@ -527,7 +527,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		emptyTextView.setVisibility(View.GONE);
 
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());

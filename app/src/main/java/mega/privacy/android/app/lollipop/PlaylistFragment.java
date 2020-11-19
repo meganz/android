@@ -187,7 +187,7 @@ public class PlaylistFragment extends Fragment{
             adapter = new PlayListAdapter(context, this, handles, parentHandle, recyclerView, adapterType);
         }
 
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setHasFixedSize(true);

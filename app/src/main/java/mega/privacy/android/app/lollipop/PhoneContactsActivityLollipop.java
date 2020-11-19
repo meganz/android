@@ -151,7 +151,7 @@ public class PhoneContactsActivityLollipop extends PinActivityLollipop implement
 
 		fragmentContainer = (RelativeLayout)  findViewById(R.id.fragment_container_contacts_explorer);
 		listView = (RecyclerView) findViewById(R.id.contacts_explorer_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 

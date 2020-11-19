@@ -9,8 +9,8 @@ import static mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaPartic
 
 public class GroupParticipantsDividerItemDecoration extends HeaderItemDecoration {
 
-    public GroupParticipantsDividerItemDecoration(Context context, DisplayMetrics outMetrics) {
-        super(context, outMetrics);
+    public GroupParticipantsDividerItemDecoration(Context context) {
+        super(context);
     }
 
     @Override

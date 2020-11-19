@@ -224,7 +224,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());

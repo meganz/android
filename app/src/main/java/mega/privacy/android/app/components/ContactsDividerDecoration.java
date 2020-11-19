@@ -10,8 +10,8 @@ import static mega.privacy.android.app.lollipop.InvitationContactInfo.TYPE_PHONE
 
 public class ContactsDividerDecoration extends HeaderItemDecoration {
 
-    public ContactsDividerDecoration(Context context, DisplayMetrics outMetrics) {
-        super(context, outMetrics);
+    public ContactsDividerDecoration(Context context) {
+        super(context);
     }
 
     @Override

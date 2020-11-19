@@ -874,7 +874,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             listView = (RecyclerView)findViewById(R.id.file_info_contact_list_view);
             //listView.addOnItemTouchListener(this);
             listView.setItemAnimator(new DefaultItemAnimator());
-            listView.addItemDecoration(new SimpleDividerItemDecoration(this,outMetrics));
+            listView.addItemDecoration(new SimpleDividerItemDecoration(this));
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
             listView.setLayoutManager(mLayoutManager);
 

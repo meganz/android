@@ -333,7 +333,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			}
 
 			listView = (RecyclerView) v.findViewById(R.id.contact_file_list_view_browser);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());

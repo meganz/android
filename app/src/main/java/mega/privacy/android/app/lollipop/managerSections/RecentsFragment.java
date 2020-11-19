@@ -213,7 +213,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
         adapter = new RecentsAdapter(context, this, recentsItems);
         listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
+        listView.addItemDecoration(new HeaderItemDecoration(context));
         setVisibleContacts();
         setRecentsView();
 
@@ -577,7 +577,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
             linearLayoutManager = new LinearLayoutManager(context);
             multipleBucketView.setLayoutManager(linearLayoutManager);
             if (simpleDividerItemDecoration == null) {
-                simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
+                simpleDividerItemDecoration = new SimpleDividerItemDecoration(context);
             }
             multipleBucketView.addItemDecoration(simpleDividerItemDecoration);
         }

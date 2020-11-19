@@ -44,7 +44,7 @@ public class ReferralBonusesFragment extends BaseFragment implements OnClickList
 		parentRelativeLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_relative_layout);
 
 		recyclerView = (RecyclerView) v.findViewById(R.id.referral_bonuses_recycler_view);
-		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		recyclerView.setLayoutManager(mLayoutManager);
 		recyclerView.setItemAnimator(new DefaultItemAnimator());

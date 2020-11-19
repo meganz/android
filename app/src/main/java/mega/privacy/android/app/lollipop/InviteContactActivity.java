@@ -224,7 +224,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         recyclerViewList.setHasFixedSize(true);
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         recyclerViewList.setLayoutManager(linearLayoutManager);
-        recyclerViewList.addItemDecoration(new ContactsDividerDecoration(this, outMetrics));
+        recyclerViewList.addItemDecoration(new ContactsDividerDecoration(this));
         invitationContactsAdapter = new InvitationContactsAdapter(this, filteredContacts, this, megaApi);
         recyclerViewList.setAdapter(invitationContactsAdapter);
         containerContacts = findViewById(R.id.container_list_contacts);
