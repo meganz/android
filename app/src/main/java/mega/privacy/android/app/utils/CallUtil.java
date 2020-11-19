@@ -30,7 +30,6 @@ import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -1030,5 +1029,16 @@ public class CallUtil {
     public static void addChecksForACall(long chatId, boolean speakerStatus){
         MegaApplication.setCallLayoutStatus(chatId, false);
         MegaApplication.setSpeakerStatus(chatId, speakerStatus);
+    }
+
+    /**
+     * Method for getting the call notification ID.
+     *
+     * @param callId The call ID.
+     * @return The notification ID.
+     */
+    public static int getCallNotificationId(long callId) {
+        String notificationCallId = MegaApiAndroid.userHandleToBase64(callId);
+        return notificationCallId.hashCode() + NOTIFICATION_CALL_IN_PROGRESS;
     }
 }
