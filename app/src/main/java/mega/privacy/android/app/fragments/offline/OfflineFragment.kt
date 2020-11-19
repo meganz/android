@@ -196,7 +196,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         adapter =
             OfflineAdapter(isList(), sortByHeaderViewModel, object : OfflineAdapterListener {
                 override fun onNodeClicked(position: Int, node: OfflineNode) {
-                    var firstVisiblePosition = INVALID_POSITION
+                    var firstVisiblePosition: Int
                     if (isList()) {
                         firstVisiblePosition =
                             (binding.offlineBrowserList.layoutManager as LinearLayoutManager)

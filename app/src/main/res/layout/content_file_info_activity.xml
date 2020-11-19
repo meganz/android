@@ -137,6 +137,7 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/available_offline_separator"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"

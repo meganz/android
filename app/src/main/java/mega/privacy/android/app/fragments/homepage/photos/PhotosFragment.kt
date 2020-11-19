@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -251,7 +252,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView = if (viewModel.searchMode) {
-                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color))
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         // Draw the green outline for the thumbnail view at once

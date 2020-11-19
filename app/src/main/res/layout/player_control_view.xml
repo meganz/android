@@ -89,8 +89,8 @@
                 android:fontFamily="Roboto"
                 android:layout_below="@id/exo_duration"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="14dp"
+                android:layout_marginTop="@dimen/av_player_file_name_margin_top_portrait"
+                android:layout_marginBottom="@dimen/av_player_file_name_margin_bottom_portrait"
                 android:singleLine="true"
                 android:ellipsize="middle"/>
 
@@ -98,8 +98,8 @@
                 android:id="@+id/container_control_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="@dimen/av_player_control_buttons_margin_top_portrait"
+                android:layout_marginBottom="@dimen/av_player_control_buttons_margin_bottom_portrait"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@id/exo_name_file">
 

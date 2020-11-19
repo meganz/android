@@ -1,5 +1,6 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -127,7 +128,7 @@
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
-                android:layout_above="@+id/bottom_navigation_view"
+                android:layout_above="@id/psa_layout"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
@@ -135,6 +136,15 @@
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white" />
+
+            <include
+                android:id="@+id/psa_layout"
+                layout="@layout/psa_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/bottom_navigation_view"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
                 android:id="@+id/bottom_navigation_view"
@@ -199,7 +209,7 @@
             android:layout_gravity="bottom|end"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="80dp"
-            android:src="@drawable/ic_chat"
+            android:src="@drawable/ic_add_white"
             android:tint="@color/white"
             android:visibility="invisible"
             app:backgroundTint="@color/accentColor"
@@ -225,14 +235,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-            <include layout="@layout/navigation_view_layout" />
-
-        </ScrollView>
+        <include layout="@layout/navigation_view_layout"/>
 
     </com.google.android.material.navigation.NavigationView>
 

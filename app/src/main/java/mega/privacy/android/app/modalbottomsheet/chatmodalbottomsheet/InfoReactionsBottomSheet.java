@@ -126,7 +126,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         BottomSheetUtils.setupViewPager(infoReactionsPager);
         ViewGroup.LayoutParams params = generalLayout.getLayoutParams();
         int height = getHeight();
-        if(height == 0)
+        if (height == 0)
             return;
 
         if (params != null) {
@@ -142,7 +142,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         BottomSheetUtils.setBottomSheetBehavior(getTotalHeight(), height, halfHeightDisplay, infoReactionsPager);
     }
 
-    private long getMaxUsers(){
+    private long getMaxUsers() {
         if (list == null || list.isEmpty()) {
             return 0;
         }
@@ -163,7 +163,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         return numMaxUsers;
     }
 
-    private int getTotalHeight(){
+    private int getTotalHeight() {
         int numOptions = (int) getMaxUsers();
         int heightChild = dp2px(HEIGHT_USERS, outMetrics);
         int peekHeight = dp2px(HEIGHT_HEADER, outMetrics);
@@ -245,17 +245,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
         if (numUsers > 0 && emoji != null) {
             reactionImage.setEmoji(emoji, true);
-            boolean ownReaction = false;
-            MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
-            for (int i = 0; i < handleList.size(); i++) {
-                if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
-                    ownReaction = true;
-                    break;
-                }
-            }
-
             reactionText.setText(numUsers + "");
-            reactionText.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.grey_054_white_054));
+            reactionText.setTextColor(ContextCompat.getColor(context,
+                    isMyOwnReaction(chatId, messageId, reaction)
+                            ? R.color.accentColor : R.color.grey_054_white_054));
             parent.addView(button);
             return button;
         }
@@ -264,11 +257,12 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
 
     @Override
     public void onPageSelected(final int i) {
-        if(reactionTabLastSelectedIndex == i)
+        if (reactionTabLastSelectedIndex == i)
             return;
 
         if (reactionTabLastSelectedIndex >= 0 && reactionTabLastSelectedIndex < reactionTabs.size()) {
@@ -296,7 +290,8 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) { }
+    public void onPageScrollStateChanged(int state) {
+    }
 
     /**
      * Method for controlling changes received in reactions.

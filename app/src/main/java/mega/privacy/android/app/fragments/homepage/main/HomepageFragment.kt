@@ -15,6 +15,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -32,6 +33,7 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.fragments.homepage.homepageVisibilityChange
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
@@ -59,6 +61,16 @@ class HomepageFragment : Fragment() {
     private var currentSelectedTabFragment: Fragment? = null
     private val tabsChildren = ArrayList<View>()
     private var windowContent: ViewGroup? = null
+
+    private var pendingExpandBottomSheet = false
+    private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
+        if (it && pendingExpandBottomSheet) {
+            pendingExpandBottomSheet = false
+            post {
+                fullyExpandBottomSheet(true)
+            }
+        }
+    }
 
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -95,12 +107,18 @@ class HomepageFragment : Fragment() {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
 
+        homepageVisibilityChange.observeForever(homepageVisibilityChangeObserver)
+
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
         if (savedInstanceState != null) {
             val isBottomSheetExpanded = savedInstanceState.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED)
             post {
                 if (isBottomSheetExpanded) {
-                    fullyExpandBottomSheet(true)
+                    if (rootView.height == 0) {
+                        pendingExpandBottomSheet = true
+                    } else {
+                        fullyExpandBottomSheet(true)
+                    }
                 }
             }
         }
@@ -140,6 +158,7 @@ class HomepageFragment : Fragment() {
 
         tabsChildren.clear()
         requireContext().unregisterReceiver(networkReceiver)
+        homepageVisibilityChange.removeObserver(homepageVisibilityChangeObserver)
     }
 
     private fun showOnlineMode() {
@@ -225,8 +244,10 @@ class HomepageFragment : Fragment() {
         super.onSaveInstanceState(outState)
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
-            outState.putBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED,
-                bottomSheetBehavior.state == HomepageBottomSheetBehavior.STATE_EXPANDED)
+            outState.putBoolean(
+                KEY_IS_BOTTOM_SHEET_EXPANDED,
+                bottomSheetBehavior.state == HomepageBottomSheetBehavior.STATE_EXPANDED
+            )
         }
     }
 
@@ -521,7 +542,7 @@ class HomepageFragment : Fragment() {
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else resources.getColor(R.color.accentColor)
+            if (isExpand) Color.WHITE else ContextCompat.getColor(requireContext(), R.color.accentColor)
         )
 
         AnimatorSet().apply {

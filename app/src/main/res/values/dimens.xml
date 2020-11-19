@@ -86,6 +86,13 @@
     <dimen name="cu_fragment_image_margin_small">1dp</dimen>
     <dimen name="cu_fragment_image_margin_large">2dp</dimen>
 
+    <dimen name="av_player_file_name_margin_top_portrait">16dp</dimen>
+    <dimen name="av_player_file_name_margin_bottom_portrait">14dp</dimen>
+    <dimen name="av_player_file_name_margin_bottom_landscape">5dp</dimen>
+    <dimen name="av_player_control_buttons_margin_top_portrait">14dp</dimen>
+    <dimen name="av_player_control_buttons_margin_bottom_portrait">20dp</dimen>
+    <dimen name="av_player_control_buttons_margin_bottom_landscape">5dp</dimen>
+
     <!-- Dark mode refactor start -->
 
     <dimen name="btn_padding_vertical">10dp</dimen>

@@ -31,6 +31,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -802,7 +803,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 54) {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " = '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "';");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " = '" + encrypt(String.valueOf(INVALID_HANDLE)) + "';");
 		}
 
 		if (oldVersion <= 55) {
@@ -821,13 +822,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " = '" + encrypt("false") + "';");
 
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_OFFLINE + " = '" + encrypt("false") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_TIMESTAMP + " = '" + encrypt(System.currentTimeMillis() + "") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ERROR + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ERROR + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ORIGINAL_PATH + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ORIGINAL_PATH + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PARENT_HANDLE + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt("") + "';");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt(INVALID_HANDLE + "") + "';");
 		}
 	}
 
@@ -3639,7 +3642,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	public long getMyChatFilesFolderHandle() {
 		logInfo("Getting the storage state from DB");
-		return getLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, MegaApiJava.INVALID_HANDLE);
+		return getLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, INVALID_HANDLE);
 	}
 
 	/**
@@ -3744,11 +3747,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             lastPublicHandleType = attributes.getLastPublicHandleType();
 		} catch (Exception e) {
 			logWarning("EXCEPTION getting last public handle info.", e);
-			lastPublicHandle = MegaApiJava.INVALID_HANDLE;
+			lastPublicHandle = INVALID_HANDLE;
 		}
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
-		if (lastPublicHandle != MegaApiJava.INVALID_HANDLE) {
+		if (lastPublicHandle != INVALID_HANDLE) {
 		    try{
 		        setLastPublicHandle(lastPublicHandle);
 		        setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);

@@ -720,16 +720,27 @@
                         android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_portrait_rl">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_own_message_thumb_portrait_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="152dp"
-                            android:maxHeight="350dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_portrait_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_own_message_thumb_portrait_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -865,16 +876,27 @@
                         android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_landscape_rl">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_own_message_thumb_landscape_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="152dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_landscape_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_own_message_thumb_landscape_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1764,16 +1786,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_contact_message_thumb_portrait_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="152dp"
-                            android:maxHeight="350dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_portrait_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_contact_message_thumb_portrait_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1850,16 +1883,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_contact_message_thumb_landscape_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/mail_my_account"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="350dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_landscape_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_contact_message_thumb_landscape_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout

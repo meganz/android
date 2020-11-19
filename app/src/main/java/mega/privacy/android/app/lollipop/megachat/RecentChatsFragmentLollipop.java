@@ -836,7 +836,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             logDebug("Open chat: Position: " + position + ", Chat ID: " + chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
+            intent.putExtra(CHAT_ID, adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivityLollipop) {
                 if (((ManagerActivityLollipop) context).getSearchQuery() != null && !((ManagerActivityLollipop) context).getSearchQuery().isEmpty()) {

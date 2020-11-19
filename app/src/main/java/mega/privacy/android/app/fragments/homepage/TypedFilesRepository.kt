@@ -85,13 +85,13 @@ class TypedFilesRepository @Inject constructor(
             if (node.hasThumbnail()) {
                 megaApi.getThumbnail(node, thumbFile.absolutePath, object : BaseListener(context) {
                     override fun onRequestFinish(
-                        api: MegaApiJava?,
-                        request: MegaRequest?,
-                        e: MegaError?
+                        api: MegaApiJava,
+                        request: MegaRequest,
+                        e: MegaError
                     ) {
-                        if (e?.errorCode != MegaError.API_OK) return
+                        if (e.errorCode != MegaError.API_OK) return
 
-                        request?.let {
+                        request.let {
                             fileNodesMap[it.nodeHandle]?.apply {
                                 thumbnail = thumbFile.absoluteFile
                                 uiDirty = true

@@ -33,10 +33,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.widget.FrameLayout;
+import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -222,6 +225,10 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaViewHolder;
+import mega.privacy.android.app.psa.PsaViewModel;
+import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -358,7 +365,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	TextView getProText;
 	TextView leftCancelButton;
 	TextView rightUpgradeButton;
-	TextView addPhoneNumberButton;
+	Button addPhoneNumberButton;
 	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
@@ -539,7 +546,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	LinearLayout fragmentLayout;
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
-	LinearLayout usedSpaceLayout;
+	RelativeLayout usedSpaceLayout;
 	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	TextView businessLabel;
@@ -764,21 +771,22 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public long comesFromNotificationHandleSaved = -1;
 	public int comesFromNotificationDeepBrowserTreeIncoming = -1;
 
-	LinearLayout myAccountHeader;
+	RelativeLayout myAccountHeader;
 	ImageView contactStatus;
-	FrameLayout myAccountSection;
-	FrameLayout inboxSection;
-	FrameLayout contactsSection;
-	FrameLayout notificationsSection;
-	FrameLayout settingsSection;
-	FrameLayout themeSection;
-	FrameLayout transfersSection;
+	RelativeLayout myAccountSection;
+	RelativeLayout inboxSection;
+	RelativeLayout contactsSection;
+	RelativeLayout notificationsSection;
+	private RelativeLayout transfersSection;
+	RelativeLayout settingsSection;
 	Button upgradeAccount;
 	TextView contactsSectionText;
 	TextView notificationsSectionText;
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
+
+	FrameLayout themeSection;
 
 	private boolean connected;
 
@@ -816,6 +824,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+	private PsaViewModel psaViewModel;
+	private PsaViewHolder psaViewHolder;
 
 
 	/**
@@ -1505,14 +1515,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
 	}
 
-	public void initGooglePlayPayments() {
-		//make sure user logged in
-		MegaUser user = megaApi.getMyUser();
-		if (user != null) {
-			String payload = String.valueOf(user.getHandle());
-			mBillingManager = new BillingManager(this, this, payload);
-		}
-	}
+    public void initGooglePlayPayments() {
+        mBillingManager = new BillingManager(this, this);
+    }
 
 	@Override
 	public void onBillingClientSetupFinished() {
@@ -1571,8 +1576,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		int temp = -1;
 		Purchase max = null;
 		for (Purchase purchase : purchases) {
-			if(!mBillingManager.isPurchaseBelongToCurrentAccount(purchase)) continue;
-
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -2300,8 +2303,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("Set view");
 		setContentView(R.layout.activity_manager);
 
-//		long num = 11179220468180L;
-//		dbH.setSecondaryFolderHandle(num);
+		observePsa();
+
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
 		toolbarLayout = (AppBarLayout) findViewById(R.id.toolbar_and_tabs_layout);
@@ -2391,17 +2394,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) navigationDrawerAddPhoneContainer.getLayoutParams();
-        if (isScreenInPortrait(this)) {
-        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        	params.removeRule(RelativeLayout.BELOW);
-		} else {
-        	params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			params.addRule(RelativeLayout.BELOW, R.id.sections_layout);
-		}
-        navigationDrawerAddPhoneContainer.setLayoutParams(params);
 
-        addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
+        addPhoneNumberButton = (Button)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
 
         addPhoneNumberLabel = findViewById(R.id.navigation_drawer_add_phone_number_label);
@@ -3027,12 +3021,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						logDebug("Chat notitificacion received");
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
-						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 						if (getIntent().getBooleanExtra("moveToChatSection", false)){
 							moveToChatSection(chatId);
 						}
 						else {
-							String text = getIntent().getStringExtra("showSnackbar");
+							String text = getIntent().getStringExtra(SHOW_SNACKBAR);
 							if (chatId != -1) {
 								openChat(chatId, text);
 							}
@@ -3151,7 +3145,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						update2FASetting();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
-						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 						showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
 						getIntent().setAction(null);
 						setIntent(null);
@@ -4086,12 +4080,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
 
-					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 					if (getIntent().getBooleanExtra("moveToChatSection", false)){
 						moveToChatSection(chatId);
 					}
 					else {
-						String text = getIntent().getStringExtra("showSnackbar");
+						String text = getIntent().getStringExtra(SHOW_SNACKBAR);
 						if (chatId != -1) {
 							openChat(chatId, text);
 						}
@@ -4151,7 +4145,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
-					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 					showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
 				}
 
@@ -4265,10 +4259,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("Open chat with id: " + chatId);
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intentToChat.putExtra("CHAT_ID", chatId);
-				if(text!=null){
-					intentToChat.putExtra("showSnackbar", text);
-				}
+				intentToChat.putExtra(CHAT_ID, chatId);
+				intentToChat.putExtra(SHOW_SNACKBAR, text);
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -4801,8 +4793,46 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstTimeAfterInstallation = false;
 			dbH.setFirstTime(false);
 		}
+
 		checkBeforeShowSMSVerificationDialog();
-	}
+
+        psaViewModel.checkPsa();
+    }
+
+    /**
+	 * Observe LiveData for PSA, and show PSA view when get it.
+	 */
+    private void observePsa() {
+        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi, this))
+                .get(PsaViewModel.class);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+
+        psaViewModel.getPsa().observe(this, this::showPsa);
+    }
+
+	/**
+	 * Show PSA view.
+	 *
+	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
+	 * directly. Otherwise, show the normal PSA view.
+	 *
+	 * @param psa the PSA to show
+	 */
+    private void showPsa(Psa psa) {
+        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+            return;
+        }
+
+        if (!TextUtils.isEmpty(psa.getUrl())) {
+            Intent intent = new Intent(this, WebViewActivityLollipop.class);
+            intent.setData(Uri.parse(psa.getUrl()));
+            startActivity(intent);
+            psaViewModel.dismissPsa(psa.getId());
+            return;
+        }
+
+        psaViewHolder.bind(psa);
+    }
 
     public void checkBeforeShowSMSVerificationDialog() {
         //This account hasn't verified a phone number and first login.
@@ -5702,6 +5732,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
 
+    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
+
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
 			drawerLayout.closeDrawer(Gravity.LEFT);
@@ -5750,6 +5782,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 		}
+
+    	EventNotifierKt.notifyHomepageVisibilityChange(drawerItem == DrawerItem.HOMEPAGE);
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -6040,8 +6074,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     			drawerItem = DrawerItem.SEARCH;
 				if (getSearchFragment() == null) {
 					sFLol = SearchFragmentLollipop.newInstance();
-				} else {
-					refreshFragment(FragmentTag.SEARCH.getTag());
 				}
 
 				replaceFragment(sFLol, FragmentTag.SEARCH.getTag());
@@ -6128,7 +6160,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
 			// offline, and hide AppBarLayout when immediately on go back, we will see the flicker
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-			if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
+			if (bottomNavigationCurrentItem == HOMEPAGE_BNV
+                    && mHomepageScreen == HomepageScreen.HOMEPAGE) {
 				abL.setVisibility(View.GONE);
 			}
 		}
@@ -6360,7 +6393,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (idChat != -1) {
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intent.putExtra("CHAT_ID", idChat);
+			intent.putExtra(CHAT_ID, idChat);
 			this.startActivity(intent);
 		}
     	drawerItem = DrawerItem.CHAT;
@@ -6556,7 +6589,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setToolbarTitle();
 					logDebug("Search query: " + query);
 					textSubmitted = true;
-					showFabButton();
 					supportInvalidateOptionsMenu();
 				}
 				return true;
@@ -6782,6 +6814,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				case SEARCH:
 					if (searchExpand) {
 						openSearchView();
+						sFLol.checkSelectMode();
 					} else {
 						rubbishBinMenuItem.setVisible(true);
 						if (getSearchFragment() != null
@@ -6929,6 +6962,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
     public <F extends Fragment> F getFragmentByType(Class<F> fragmentClass) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment navHostFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment);
@@ -11022,7 +11056,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
 				}
-				spaceTV.setText(getSpannedHtmlText(textToShow));
+				spaceTV.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 				int progress = info.getUsedPerc();
 				long usedSpace = info.getUsedStorage();
 				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
@@ -12220,7 +12254,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 			this.startActivity(intentOpenChat);
 		}
 	}
@@ -13357,7 +13391,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Open new chat: " + chatHandle);
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intent.putExtra("CHAT_ID", chatHandle);
+			intent.putExtra(CHAT_ID, chatHandle);
 			this.startActivity(intent);
 		}
 		else{
@@ -15406,7 +15440,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 
 				updateFabPositionAndShow(true);
-				fabButton.setImageDrawable(mutateIconSecondary(this, R.drawable.ic_chat, R.color.white));
 				break;
 
 			case SEARCH:
@@ -16144,6 +16177,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	public void clearSearchViewFocus() {
+		if (searchView != null) {
+			searchView.clearFocus();
+		}
+	}
+
+	public void requestSearchViewFocus() {
+		if (searchView == null || textSubmitted) {
+			return;
+		}
+
+		searchView.setIconified(false);
+	}
+
 	public boolean checkPermission(String permission) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			return true;
@@ -16215,7 +16262,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
     private void refreshAddPhoneNumberButton(){
-        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+//        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
         if(maFLol != null){
             maFLol.updateAddPhoneNumberLabel();
         }
@@ -16234,7 +16281,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
             navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
         } else {
-            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+//            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
         }
     }
 

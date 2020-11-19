@@ -38,7 +38,6 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -46,6 +45,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -438,7 +438,7 @@ public class Util {
 	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
 	public static int dp2px(float dp, DisplayMetrics outMetrics) {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
@@ -1686,8 +1686,7 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
+	public static Spanned getSpannedHtmlText(String string) {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
 		}
