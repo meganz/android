@@ -240,8 +240,8 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">Cancellare questo trasferimento?</string>
-    <string name="cancel_all_transfer_confirmation">Cancellare tutti i trasferimenti?</string>
+    <string name="cancel_transfer_confirmation">Annullare questo trasferimento?</string>
+    <string name="cancel_all_transfer_confirmation">Annullare tutti i trasferimenti?</string>
     <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
@@ -1187,10 +1187,10 @@
 
     <string name="general_mute" context="button">Muta</string>
     <string name="general_unmute" context="button">Togli il muto</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Non disturbare</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Muta tutte le notifiche delle chat per</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mota le notifiche</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Attivo</string>
 
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
@@ -1198,13 +1198,13 @@
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Fino a questa mattina</string>
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Finché non lo riattivo</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Le notifiche delle chat saranno mutate per %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Le notifiche delle chat saranno mutate fino alle %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Le notifiche delle chat saranno mutate fino al %1$s alle %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Le notifiche delle chat sono mutate</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Le notifiche delle chat sono attive</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Muta fino al %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifiche</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Suono del messaggio</string>
@@ -1296,7 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] ha abbandonato la chat di gruppo[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Messaggio non inviato. Clicca per opzioni</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">I trasferimenti sono stati messi in pausa. Clicca per riprenderli.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1461,8 +1461,8 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Vedi</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pausa tutti i trasferimenti</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Riprendi tutti i trasferimenti</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Pulisci i trasferimenti completati</string>
-    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Pulisci tutti i trasferimenti</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Ritenta tutti i trasferimenti</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Mettere in pausa i trasferimenti?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Riprendere i trasferimenti?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Riprendi</string>
@@ -1474,9 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">In pausa</string>
     <string name="transfer_queued" context="Possible state of a transfer">In coda</string>
-    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
-    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completando</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Ritentando</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Annullato</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1564,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Banda di trasferimento insufficiente</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">I trasferimenti che hai messo in coda superano la tua banda di trasferimento disponibile per il tuo indirizzo IP e potrebbero essere interrotti.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">I trasferimenti che hai messo in coda superano la tua banda di trasferimento disponibile per il tuo indirizzo IP. Aggiorna il tuo account o attendi %s per continuare il tuo download.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Guarda i nostri piani</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continua senza account</string>
 
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Sola lettura</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Leggi e scrivi</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Trasferimenti in pausa!</string>
     <string name="attachment_uploading_state_uploading">Upload&#8230;</string>
     <string name="attachment_uploading_state_error">Errore. Non inviato.</string>
 
@@ -2790,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Mentre MEGA non ha accesso ai tuoi dati, gli amministratori della tua organizzazione hanno l\'abilità di controllare e vedere i Caricamenti da fotocamera nel tuo account utente.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Qualcosa è andato storto</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contatta l\'amministratore del tuo account business per risolvere il problema ed attivare il tuo account.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Per vere intenzioni di business.</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Aumenterà automaticamente, senza costi addizionali, per vere intenzioni di business.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Banda di trasferimento[/A] ILLIMITATA**</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Banda di trasferimento[/A] illimitata</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando effettui il logout, i file presenti nella sezione Offline verranno eliminati dal tuo dispositivo.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Quando effettui il logout, i trasferimenti in corso verranno annullati.</string>

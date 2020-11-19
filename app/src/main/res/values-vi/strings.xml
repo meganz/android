@@ -240,9 +240,9 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">Xóa truyền tải này?</string>
-    <string name="cancel_all_transfer_confirmation">Xóa tất cả truyền tải?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_transfer_confirmation">Hủy bỏ truyền tải này?</string>
+    <string name="cancel_all_transfer_confirmation">Hủy bỏ tất cả các truyền tải?</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Hủy tất cả</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Ổ Mây</string>
     <string name="section_recents" context="Label to reference a recents section">Hoạt Động Gần Đây</string>
@@ -809,7 +809,7 @@
     <string name="settings_pin_lock_switch" context="settings of the pin lock">Khóa bằng PIN</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Nhập</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Tất cả các dữ liệu đã được lưu nội bộ trong ứng dụng MEGA sẽ bị xóa sau 10 lần nhập sai mã</string>
+    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Tất cả các dữ liệu có liên quan đến ứng dụng MEGA trong điện thoại sẽ bị xóa sau 10 lần nhập sai mã</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Mã chưa đúng</string>
     <plurals name="pin_lock_incorrect_alert">
         <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Mã PIN sai, xin thử lại. Chỉ còn lại 1 lần thử</item>
@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Tài Khoản Miễn Phí</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Tài khoản hạng PRO Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Tài khoản hạng PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Tài khoản hạng PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Tài khoản hạng PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Tài khoản hạng Pro Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Tài khoản hạng Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Tài khoản hạng Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Tài khoản hạng Pro III</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Tài Khoản PRO Lite</string>
 
@@ -1187,10 +1187,10 @@
 
     <string name="general_mute" context="button">Tắt tiếng</string>
     <string name="general_unmute" context="button">Bỏ tắt tiếng</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Không làm phiền</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Tắt tiếng các âm báo chát trong</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Tắt tiếng thông báo</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Bật</string>
 
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Tắt</string>
@@ -1198,13 +1198,13 @@
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Cho đến buổi sáng hôm nay</string>
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Cho đến khi tôi bật lại</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Âm báo chát sẽ tắt tiếng trong %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Âm báo chát sẽ tắt tiếng cho đến %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Âm báo chát sẽ tắt tiếng cho đến %1$s lúc %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Âm báo chát đã tắt tiếng</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Âm báo chát được bật</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Tắt tiếng cho đến %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Thông Báo</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Âm báo tin nhắn</string>
@@ -1461,7 +1461,7 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Xem</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Dừng tất cả truyền tải</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Tiếp tục tất cả các truyền tải</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Ẩn mục đã hoàn tất</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Dọn danh sách</string>
     <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Dừng truyền tải?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Tiếp tục truyền tải?</string>
@@ -1564,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Không đủ thông truyền tải</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Mục bạn muốn tải xuống sẽ làm quá tải băng thông bạn hiện đang có cho truyền tải ở địa chỉ IP này, nếu tiếp tục thực hiện các phiên tải có thể sẽ bị gián đoạn.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Không đủ băng thông hiện đang có để truyền tải cho địa chỉ IP này. Nâng cấp tài khoản hoặc đợi %s để tiếp tục tải về.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Xem các gói cước</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Tiếp tục tiến hành không cần tài khoản</string>
 
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Chỉ được xem</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Cho xem và sửa</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Phiên truyền tải bị dừng!</string>
     <string name="attachment_uploading_state_uploading">Đang tải lên&#8230;</string>
     <string name="attachment_uploading_state_error">Lỗi. Không gửi được.</string>
 
@@ -1929,11 +1929,11 @@
     <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
     <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
     <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
-    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/s</string>
-    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/s</string>
-    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/s</string>
-    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/s</string>
-    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/s</string>
+    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/giây</string>
+    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/giây</string>
+    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/giây</string>
+    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/giây</string>
+    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/giây</string>
     <string name="label_mega_byte" context="Size in megabytes.">MB</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -2288,7 +2288,7 @@
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Chọn thư mục</string>
 
     <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">Tất cả các truyền tải sẽ bị hủy bỏ, vẫn tiến hành đăng nhập?</string>
-    <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">Tất cả các truyền tải sẽ bị hủy bỏ, vẫn tiến hành đăng xuất?</string>
+    <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">Tất cả các truyền tải sẽ bị hủy bỏ, vẫn tiến hành đăng xuất</string>
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Chỉ được xem</string>
 
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Hôm nay</string>
     <string name="label_yesterday" context="label yesterday">Hôm qua</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Ngày mai</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Không có [/B][A]Tệp Tin Chia Sẻ[/A][B].[/B]</string>
 
@@ -2792,7 +2792,7 @@
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Liên hệ với ban tổng quản lý tài khoản doanh nghiệp để giải quyết và khôi phục tài khoản của bạn.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** cho mục đích doanh nghiệp chân chính.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">KHÔNG GIỚI HẠN [A]Băng thông[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">KHÔNG GIỚI HẠN [A]Băng thông[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Khi đăng xuất, các tệp tin trong phần Ngoại Tuyến sẽ bị xóa khỏi thiết bị.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Khi đăng xuất, tất cả các phiên truyền tải chưa xong sẽ bị hủy.</string>

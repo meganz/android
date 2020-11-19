@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств.  В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка PRO LITE: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка PRO I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка PRO II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка PRO III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -> Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -> Сделайте снимок и загрузите фото в MEGA\nREAD_CONTACTS -> Просто добавьте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -> MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android\n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms\n\n\nНастольный — https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA предоставляет зашифрованные, контролируемые пользователем облачное хранилище и чат в обычных веб-браузерах, а также специальных приложениях для мобильных устройств. В отличие от других облачных хранилищ, здесь данные шифруют и расшифровывают только ваши устройства, а не мы.\n\nЗагружайте файлы со смартфона или планшета, и ищите, храните, скачивайте, транслируйте, просматривайте, раздавайте, переименовывайте или удаляйте когда угодно, с любого устройства, где угодно. Делитесь папками со своими контактами и следите за изменениями в реальном времени. Процесс шифрования означает, что мы не можем получить доступ или сбросить пароль, поэтому вы ДОЛЖНЫ его запомнить (если у вас нет резервной копии ключа восстановления), иначе вы потеряете доступ к сохранённым файлам.\n\nЗащищённый сквозным пользовательским шифрованием видеочат MEGA обеспечивает максимальную приватность и доступен в браузере с 2016 года. Он был расширен для нашего мобильного приложения, и история чата доступна на нескольких устройствах. Пользователи также могут легко добавлять файлы в чат из своего облачного диска MEGA.\n\nMEGA щедро предлагает бесплатные 50 ГБ для всех зарегистрированных пользователей с бонусными достижениями и предлагает платные подписки с гораздо более высокими лимитами:\n\n\nПодписка PRO LITE: 4,99 € в месяц или 49,99 € в год предоставляет 400 ГБ дискового пространства и 1 ТБ трафика в месяц.\nПодписка PRO I: 9,99 € в месяц или 99,99 € в год предоставляет 2 ТБ дискового пространства и 2 ТБ трафика в месяц.\nПодписка PRO II: 19,99 € в месяц или 199,99 € в год предоставляет 8 ТБ дискового пространства и 8 ТБ трафика в месяц.\nПодписка PRO III: 29,99 € в месяц или 299,99 € в год предоставляет 16 ТБ дискового пространства и 16 TB ТБ трафика в месяц.\n\nПодписки продлеваются автоматически на тот же срок по такой же цене. Чтобы управлять подписками, просто нажмите на значок Play Store на своем мобильном устройстве, войдите в свой аккаунт Google (если вы ещё этого не сделали), а затем нажмите на приложение MEGA. Там вы сможете управлять подпиской.\n\nРазрешения приложений:\nWRITE_EXTERNAL_STORAGE -> Скачивайте свои файлы с MEGA на устройство и загружайте файлы с устройства в MEGA\nCAMERA -> Делайте снимки и загружайте фото в MEGA\nREAD_CONTACTS -> Просто добавляйте контакты с устройства в свои MEGA-контакты\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (микрофон и камера) -> MEGA предоставляет сквозные зашифрованные аудио/видео звонки\n\n\nЧтобы повысить доверие пользователей к системе MEGA, весь клиентский код публикуется, поэтому заинтересованные исследователи безопасности могут оценить процесс шифрования. Код мобильного приложения расположен здесь: https://github.com/meganz/android\n\nБольше информации на нашем сайте:\nСмотрите https://mega.nz/terms\n\n\nНастольный — https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA — это облачное хранилище с мощной и постоянной конфиденциальностью.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Просмотр PDF MEGA</string>
@@ -209,7 +209,7 @@
     <string name="tour_privacy_title">MEGA-конфиденциальность</string>
     <string name="tour_access_title">MEGA-доступ</string>
     <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 50 ГБ* свободного места</string>
-    <string name="tour_speed_text">Быстрая загрузка на сервер и обмен файлами с кем угодно</string>
+    <string name="tour_speed_text">Быстрая загрузка в облако и обмен файлами с кем угодно</string>
     <string name="tour_privacy_text">Храните файлы в безопасности со сквозным шифрованием MEGA</string>
     <string name="tour_access_text">Полностью зашифрованный доступ в любом месте в любое время</string>
 
@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Бесплатный</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Учётная запись Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Учётная запись PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Учётная запись PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Учётная запись PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Аккаунт Pro Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Аккаунт Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Аккаунт Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Аккаунт PRO III</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite</string>
 
@@ -1188,9 +1188,9 @@
     <string name="general_mute" context="button">Приглушить</string>
     <string name="general_unmute" context="button">Включить звук</string>
     <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Не беспокоить</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Отключить все уведомления чата на:</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Отключить уведомления</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Вкл</string>
 
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Выкл</string>
@@ -1198,13 +1198,13 @@
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">До сегодняшнего утра</string>
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Пока я не включу их снова</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Уведомления чата будут отключены на %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Уведомления чата будут отключены до %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Уведомления чата будут отключены до %1$s %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Уведомления чата отключены</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Уведомления чата включены</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Уведомления отключены до %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Оповещения</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Звук сообщения</string>
@@ -1296,7 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] покинул чат[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Сообщение не отправлено. Коснитесь для выбора</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Передачи приостановлены. Коснитесь, чтобы продолжить.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1462,7 +1462,7 @@
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Приостановить все передачи</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Возобновить все передачи</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Очистить все передачи</string>
-    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Перезапустить все передачи</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Приостановить передачу?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Возобновить передачу?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Возобновить</string>
@@ -1474,9 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">На паузе</string>
     <string name="transfer_queued" context="Possible state of a transfer">В очереди</string>
-    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
-    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Завершено</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Повторная попытка</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Отменено</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Только чтение</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Чтение и запись</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Передачи приостановлены!</string>
     <string name="attachment_uploading_state_uploading">Загрузка&#8230;</string>
     <string name="attachment_uploading_state_error">Ошибка. Не отправлено.</string>
 
@@ -1929,11 +1929,11 @@
     <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s МБ</string>
     <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ГБ</string>
     <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s ТБ</string>
-    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/s</string>
-    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/s</string>
-    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/s</string>
-    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/s</string>
-    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/s</string>
+    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s Б/с</string>
+    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s КБ/с</string>
+    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s МБ/с</string>
+    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s ГБ/с</string>
+    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s ТБ/с</string>
     <string name="label_mega_byte" context="Size in megabytes.">МБ</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Сегодня</string>
     <string name="label_yesterday" context="label yesterday">Вчера</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Завтра</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Нет [/B][A]общих папок[/A][B].[/B]</string>
 
@@ -2790,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Несмотря на то, что MEGA не имеет доступа к вашим данным, администраторы вашей организации могут контролировать и просматривать загрузки из камеры в вашем аккаунте.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Что-то пошло не так</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Обратитесь к администратору своего аккаунта, чтобы найти выход и активировать аккаунт.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Для действительно бизнес-целей.</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Для действительно деловых целей будет автоматически увеличиваться без дополнительной оплаты.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">НЕОГРАНИЧЕННЫЙ [A]трафик[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Неограниченный [A]трафик[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">При выходе из системы файлы из раздела «Оффлайн» будут удалены с вашего устройства.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">При выходе из системы текущие передачи будут отменены.</string>

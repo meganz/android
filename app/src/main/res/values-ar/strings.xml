@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">للقراءة فقط</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">قراءة وكتابة</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">تم إيقاف التحويل</string>
     <string name="attachment_uploading_state_uploading">جاري الرفع&#8230;</string>
     <string name="attachment_uploading_state_error">خطأ. لم ترسل.</string>
 

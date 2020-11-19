@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I Account</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II Account</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III Account</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite Account</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
 

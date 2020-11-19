@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ให้บริการจัดเก็บข้อมูลบนระบบคลาวด์ที่ผู้ใช้ควบคุมได้ด้วยตนเอง มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ซึ่งแตกต่างจากผู้ให้บริการที่เก็บข้อมูลบนคลาวด์อื่น ๆ โดยที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยอุปกรณ์ไคลเอ็นต์ของคุณเท่านั้นและเราจะไม่เข้าไปยุ่งเกี่ยวกับข้อมูลใด ๆ ของคุณ\n\nอัปโหลดไฟล์จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้จากทุกที่ แชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้ก่อนหน้าแล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสลับแบบต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน PRO LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน PRO I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน PRO II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน PRO III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอป:\nWRITE_EXTERNAL_STORAGE -> ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -> ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -> เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -> MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสลับแบบต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA ให้บริการจัดเก็บข้อมูลบนระบบคลาวด์ที่ผู้ใช้ควบคุมได้ด้วยตนเอง มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ซึ่งแตกต่างจากผู้ให้บริการจัดเก็บข้อมูลบนคลาวด์รายอื่นตรงที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยใช้อุปกรณ์ไคลเอนต์ของคุณเท่านั้น ไม่มีการดำเนินการใด ๆ จากเราทั้งสิ้น\n\nสามารถอัปโหลดไฟล์ได้จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้ในทุก ๆ ที่ อีกทั้งยังแชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ได้เช่นเดียวกัน กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำรหัสผ่านไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้แล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้เลย\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสลับแบบต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน PRO LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน PRO I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน PRO II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน PRO III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอปมีดังนี้:\nWRITE_EXTERNAL_STORAGE -> ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -> ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -> เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -> MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสลับแบบต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA เป็นระบบจัดเก็บไฟล์ในระบบคลาวด์ พร้อมด้วยความเป็นส่วนตัวอย่างทรงพลัง</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">ดูไฟล์ PDF ด้วย MEGA</string>
@@ -217,7 +217,7 @@
     <string name="name_text" context="category in sort by action">ชื่อ</string>
     <string name="first_name_text" context="First Name of the user">ชื่อ</string>
     <string name="lastname_text" context="Last name of the user">สกุล</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">ฉันเห็นด้วยกับ[A]เงื่อนไขการให้บริการ[/A] MEGA</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">ฉันยอมรับ[A]เงื่อนไขการให้บริการ[/A] MEGA</string>
     <string name="top" context="Text placed on the checkbox to make sure user agree that understand the danger of losing password">ฉันเข้าใจว่า[B]ถ้าฉันทำรหัสผ่านหาย[/B] ฉันอาจสูญเสียข้อมูลของฉันได้ อ่านเพิ่มเติมเกี่ยวกับ[A]การเข้ารหัสลับแบบต้นทางถึงปลายทาง MEGA[/A] ได้</string>
     <string name="already_account" context="Does the user already have a MEGA account">มีบัญชีอยู่แล้วใช่ไหม</string>
 
@@ -240,9 +240,9 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">ลบการถ่ายโอนนี้หรือไม่</string>
-    <string name="cancel_all_transfer_confirmation">ลบการถ่ายโอนทั้งหมดหรือไม่</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_transfer_confirmation">ยกเลิกการถ่ายโอนนี้หรือไม่</string>
+    <string name="cancel_all_transfer_confirmation">ยกเลิกการถ่ายโอนทั้งหมดหรือไม่</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">ยกเลิกทั้งหมด</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">คลาวด์ไดรฟ์</string>
     <string name="section_recents" context="Label to reference a recents section">เมื่อเร็ว ๆ นี้</string>
@@ -1088,7 +1088,7 @@
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">อีเมลและ/หรือรหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">บัญชีของคุณถูกระงับ เนื่องจากละเมิดเงื่อนไขการให้บริการกรุณาติดต่อ support&#64;mega.co.nz</string>
-    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">มีการลงชื่อเข้าใช้มากเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">มีการเข้าสู่ระบบไม่สำเร็จหลายครั้งเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">บัญชีนี้ยังไม่ผ่านการตรวจสอบ กรุณาตรวจสอบอีเมลของคุณ</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">ลิงก์โฟลเดอร์ยังไม่พร้อมใช้งาน</string>
@@ -1187,10 +1187,10 @@
 
     <string name="general_mute" context="button">ปิดเสียง</string>
     <string name="general_unmute" context="button">เปิดเสียง</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">ห้ามรบกวน</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">ปิดเสียงแจ้งเตือนแชททั้งหมดเป็นเวลา</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">ปิดเสียงการแจ้งเตือน</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">เปิด</string>
 
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">ปิด</string>
@@ -1198,13 +1198,13 @@
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">จนกว่าจะถึงเช้านี้</string>
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">จนกว่าฉันจะเปิดอีกครั้ง</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">การแจ้งเตือนแชทจะถูกปิดเสียงเป็นเวลา %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">แจ้งเตือนแชทจะถูกปิดเสียงจนถึง %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">การแจ้งเตือนแชทจะถูกปิดจนถึง%1$sเวลา %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">ปิดเสียงแจ้งเตือนแชท</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">เปิดใช้งานแจ้งเตือนแชท</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">ปิดเสียงจนถึง %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">การแจ้งเตือน</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">ข้อความเสียง</string>
@@ -1296,7 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] ออกจากการแชทกลุ่ม[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">ไม่ได้ส่งข้อความ แตะเพื่อดูตัวเลือก</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">หยุดการถ่ายโอนชั่วคราว แตะเพื่อดำเนินการต่อ</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1461,8 +1461,8 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">ดู</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">หยุดการถ่ายโอนทั้งหมดชั่วคราว</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">ดำเนินการถ่ายโอนต่อทั้งหมด</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">เคลียร์รายการที่เสร็จสมบูรณ์</string>
-    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">เคลียร์การถ่ายโอนทั้งหมด</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">ลองการถ่ายโอนใหม่ทั้งหมด</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">หยุดการถ่ายโอนชั่วคราวหรือไม่</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">ต้องการถ่ายโอนต่อหรือไม่</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">ต่อ</string>
@@ -1474,9 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">พักแล้ว</string>
     <string name="transfer_queued" context="Possible state of a transfer">อยู่ในคิว</string>
-    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
-    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">กำลังดำเนินการให้เสร็จสิ้น</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">กำลังลองใหม่</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">ยกเลิกแล้ว</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1564,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">โควต้าการถ่ายโอนไม่เพียงพอ</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">การถ่ายโอนที่รออยู่ของคุณเกินโควต้าการถ่ายโอนข้อมูลปัจจุบันสำหรับที่อยู่ IP ของคุณแล้วและอาจถูกขัดจังหวะได้</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">โควต้าการถ่ายโอนมีไม่เพียงพอสำหรับที่อยู่ IP ของคุณ อัปเกรดบัญชีของคุณหรือรออีก %s เพื่อดาวน์โหลดต่อ</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">ดูแผนการของเรา</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">ดำเนินการต่อโดยไม่มีบัญชี</string>
 
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">อ่านอย่างเดียว</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">อ่านและเขียน</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">หยุดการถ่ายโอนชั่วคราวแล้ว</string>
     <string name="attachment_uploading_state_uploading">กำลังอัปโหลด&#8230;</string>
     <string name="attachment_uploading_state_error">ผิดพลาด ยังไม่ได้ส่ง</string>
 
@@ -2008,14 +2008,14 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">ส่งไปยังแชท</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">คุณจำรหัสผ่านได้หรือไม่</string>
-    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">คุณกำลังจะออกจากระบบ กรุณาทดสอบรหัสผ่านเพื่อให้แน่ใจว่าคุณจำได้\nหากคุณลืมรหัสผ่าน คุณจะสูญเสียการเข้าถึงข้อมูล MEGA ของคุณ</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">คุณกำลังจะออกจากระบบ กรุณาทดสอบรหัสผ่านของคุณเพื่อให้แน่ใจว่าคุณจำได้\nหากคุณทำรหัสผ่านหายคุณจะไม่สามารถเข้าถึงข้อมูล MEGA ของคุณได้</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">กรุณาทดสอบรหัสผ่านเพื่อให้แน่ใจว่าคุณจำได้ หากลืมรหัสผ่าน คุณจะสูญเสียการเข้าถึงข้อมูล MEGA ของคุณ</string>
     <string name="general_do_not_show" context="Dialog option that permits user do not show it again">ไม่ต้องแสดงในครั้งต่อไป</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">ทดสอบรหัสผ่าน</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">ทดสอบรหัสผ่านของคุณ</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">ยอมรับรหัสผ่านแล้ว</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">รหัสผ่านไม่ถูกต้อง\nสำรองคีย์การกู้คืนของคุณโดยเร็วที่สุด!</string>
-    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">คุณกำลังจะออกจากระบบ กรุณาทดสอบรหัสผ่านเพื่อให้แน่ใจว่าคุณจำได้\nหากคุณลืมรหัสผ่าน คุณจะสูญเสียการเข้าถึงข้อมูล MEGA ของคุณ</string>
+    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">คุณกำลังจะออกจากระบบ กรุณาทดสอบรหัสผ่านของคุณเพื่อให้แน่ใจว่าคุณจำได้\nหากคุณทำรหัสผ่านหายคุณจะไม่สามารถเข้าถึงข้อมูล MEGA ของคุณได้</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">คัดลอกไปที่คลิปบอร์ด</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">ส่งออกคีย์การกู้คืน</string>
     <string name="proceed_to_logout" context="Option that permits user logout">ดำเนินการเพื่อออกจากระบบ</string>
@@ -2287,7 +2287,7 @@
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">เลือกโฟลเดอร์</string>
 
-    <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">การถ่ายโอนทั้งหมดจะถูกยกเลิก คุณต้องการลงชื่อเข้าใช้หรือไม่</string>
+    <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">การถ่ายโอนทั้งหมดจะถูกยกเลิก คุณต้องการเข้าสู่ระบบหรือไม่</string>
     <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">การถ่ายโอนทั้งหมดจะถูกยกเลิก คุณต้องการออกจากระบบหรือไม่</string>
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">อ่านอย่างเดียว</string>
@@ -2790,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">แม้ว่า MEGA จะไม่เข้าถึงข้อมูลของคุณ แต่ผู้ดูแลระบบองค์กรของคุณมีความสามารถในการควบคุมและดูการอัปโหลดจากกล้องในบัญชีผู้ใช้ของคุณได้</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">มีบางอย่างผิดพลาด</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">ติดต่อผู้ดูแลระบบบัญชีธุรกิจของคุณเพื่อแก้ไขปัญหาและเปิดใช้งานบัญชีของคุณ</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** เพื่อวัตถุประสงค์ทางธุรกิจที่แท้จริง</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** จะเพิ่มขึ้นให้โดยอัตโนมัติโดยไม่มีค่าใช้จ่ายเพิ่มเติมเพื่อให้ตรงตามวัตถุประสงค์ทางธุรกิจที่แท้จริง</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]โควต้าการถ่ายโอน[/A] ไม่จำกัด **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">ไม่จำกัด[A]โควต้าการถ่ายโอน[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">เมื่อคุณออกจากระบบ ไฟล์จากส่วนออฟไลน์ของคุณจะถูกลบออกจากอุปกรณ์</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">เมื่อคุณออกจากระบบ การถ่ายโอนที่กำลังดำเนินการอยู่จะถูกยกเลิก</string>

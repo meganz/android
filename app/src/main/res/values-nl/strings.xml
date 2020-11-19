@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaties voor mobiele apparaten. In tegenstelling tot andere cloudopslagproviders worden uw gegevens alleen door uw klant-apparaten gecodeerd en gedecodeerd en nooit door ons. \n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel, hernoem of verwijder uw bestanden altijd, vanaf elk apparaat, overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we uw wachtwoord niet kunnen openen of opnieuw instellen, dus u MOET het onthouden (tenzij u een back-up van uw Herstelsleutel maakt) of u verliest toegang tot uw opgeslagen bestanden.\n\nEnd-to-end gebruiker-gecodeerde MEGA videochat biedt totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met gespreksgeschiedenis toegankelijk op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een gesprek vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslag voor alle geregistreerde gebruikers met bonusprestaties en biedt betaalde plannen met veel hogere limieten:\n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand.\nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: € 29,99 per maand of € 299,99 per jaar voor 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de eerste gekozen periode. Om uw abonnementen te beheren, klikt u eenvoudig op het Play Store-pictogram op uw mobiele apparaat, log in met uw Google ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie.U kunt uw abonnement daar beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -> Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -> Neem een foto en upload uw foto\'s naar MEGA \nREAD_CONTACTS -> Voeg eenvoudig contacten van uw apparaat toe als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -> MEGA zorgt voor end-to-end gecodeerde audio/video-oproepen \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle client-side code gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op: https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website:\nZie https://mega.nz/terms\n\n\n Desktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaites voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw clientapparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruiker versleutelde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, klikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -> Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -> Neem een foto en upload je foto\'s naar MEGA \nREAD_CONTACTS -> Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -> MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de clientzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA is Cloud Opslag met Krachtige geïntegreerde Privacy.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
@@ -240,9 +240,9 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">Deze overdracht verwijderen?</string>
-    <string name="cancel_all_transfer_confirmation">Alle overdrachten verwijderen?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_transfer_confirmation">Deze overdracht annuleren?</string>
+    <string name="cancel_all_transfer_confirmation">Alle overdrachten annuleren?</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Alles annuleren</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Schijf</string>
     <string name="section_recents" context="Label to reference a recents section">Recent</string>
@@ -1088,7 +1088,7 @@
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Ongeldige email en/of wachtwoord. Probeer nogmaals.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Uw account is geschorst door schending van de Algemene Voorwaarden. Neem contact op met support&#64;mega.co.nz</string>
-    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Teveel mislukte pogingen met inloggen, wacht een uur.</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Teveel mislukte pogingen om in te loggen, alstublieft wacht voor een uur.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">Dit account is nog niet gevalideerd. Controleer uw e-mail.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">Koppeling naar map is niet beschikbaar</string>
@@ -1187,10 +1187,10 @@
 
     <string name="general_mute" context="button">Dempen</string>
     <string name="general_unmute" context="button">Dempen uitzetten</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Niet storen</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Alle gespreksnotificaties dempen voor</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Notificaties dempen</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Aan</string>
 
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Uit</string>
@@ -1198,13 +1198,13 @@
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Tot deze morgen</string>
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Totdat ik ze weer aanzet</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Gesprek notificaties worden gedempt voor %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Gespreksnotificaties worden gedempt tot %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Gespreksmeldingen worden gedempt tot %1$s at %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Gespreksmeldingen worden gedempt</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Gespreksmeldingen ingeschakeld</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Dempen tot %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Meldingen</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Bericht geluid</string>
@@ -1296,7 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] verliet de groep chat[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Bericht niet verzonden. Tik voor opties</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Overdrachten gepauzeerd. Tik om te hervatten.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1461,8 +1461,8 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Weergeven</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pauzeer alle transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Alle overdrachten hervatten</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Wissen voltooid</string>
-    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Alle overdrachten wissen</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Alle overdrachten opnieuw proberen</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Overdracht pauzeren?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Overdracht hervatten?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Doorgaan</string>
@@ -1474,9 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Gepauzeerd</string>
     <string name="transfer_queued" context="Possible state of a transfer">Wachtrij</string>
-    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
-    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Voltooien</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Opnieuw Proberen</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Geannuleerd</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1564,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Onvoldoende overdracht tegoed</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Uw wachtende overdrachten overschrijft uw huidige overdracht tegoed die beschikbaar is voor uw IP adres en kan daardoor onderbroken worden.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Geen genoeg overdracht tegoed beschikbaar voor uw IP adres. Upgrade uw account of wacht %s om uw download te hervatten.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Zie onze abonnementen</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Ga door zonder account</string>
 
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Alleen lezen</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Lezen en schrijven</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Overdrachten gepauzeerd</string>
     <string name="attachment_uploading_state_uploading">Uploaden&#8230;</string>
     <string name="attachment_uploading_state_error">Fout. Niet verzonden.</string>
 
@@ -2008,14 +2008,14 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Verstuur naar gesprek</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Herinnert u zich uw wachtwoord?</string>
-    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">U staat op het punt uit te loggen, test uw wachtwoord om er zeker van te zijn dat u deze onthoud. \nAls u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">U staat op het punt om uit te loggen, test uw wachtwoord om zeker te zijn dat u het herinnerd.\n als u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Test uw wachtwoord om er zeker van te zijn dat u deze onthoud. Als u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Laat niet opnieuw zien</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Wachtwoord testen</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test uw wachtwoord</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Wachtwoord geaccepteerd</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Verkeerd wachtwoord.\nBackup uw Herstelsleutel zo snel mogelijk!</string>
-    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">U staat op het punt uit te loggen, test uw wachtwoord om er zeker van te zijn dat u deze onthoud. \nAls u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
+    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">U staat op het punt om uit te loggen, test uw wachtwoord om zeker te zijn dat u het herinnerd.\n als u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Kopieer naar klembord</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Herstelsleutel Exporteren</string>
     <string name="proceed_to_logout" context="Option that permits user logout">Doorgaan met uitloggen</string>
@@ -2790,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Hoewel MEGA geen toegang heeft tot uw gegevens, hebben de beheerders van uw organisatie de mogelijkheid om de camera-uploads in uw gebruikersaccount te beheren en te bekijken</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Er is iets fout gegaan</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren,.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Voor daadwerkelijke zakelijke doeleinden.</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**Wordt automatisch verhoogd, zonder koste, voor echte zakelijke doelen.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">ONGELIMITEERD [A]Overdracht tegoed[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">Ongelimiteerde [A]Overdracht tegoed[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>

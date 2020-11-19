@@ -505,7 +505,7 @@
     <string name="context_no_shared_number_removed" context="error message when sharing a folder">Erreur. %d</string>
     <string name="context_no_shared" context="error message">Erreur. N\'a pas été partagé</string>
     <string name="context_no_removed_shared" context="error message">Erreur. Échec de retrait du partage</string>
-    <string name="context_remove_sharing" context="success message when removing a sharing">Le partage du dossier a été retiré</string>
+    <string name="context_remove_sharing" context="success message when removing a sharing">Le partage du dossier a été supprimé</string>
     <string name="context_no_link" context="error message">Échec de création du lien</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">A été supprimé avec succès</string>
     <string name="context_no_removed" context="error message">Erreur. Échec de suppression</string>
@@ -540,7 +540,7 @@
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancel Subscription</string>
     -->
     <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Nous vous remercions de votre rétroaction. Voulez-vous vraiment annuler votre abonnement MEGA ?</string>
-    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Votre abonnement n\'a pas été annulé. Veuillez fournir le motif de votre annulation.</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Votre abonnement n\'a pas été annulé. Veuillez indiquer le motif de votre annulation.</string>
     <string name="message_user_purchased_subscription" context="welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly)">Nous vous remercions pour votre abonnement %1$s %2$s.</string>
     <string name="message_user_purchased_subscription_down_grade" context="Pop up message shows when user purchased a lower level of subscription">Votre nouvel abonnement prendra effet une fois que l\'actuel aura expiré. Le nouveau prix vous sera alors facturé.</string>
     <string name="message_user_payment_pending" context="Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher">Votre nouvel abonnement prendra effet une fois que le paiement aura été traité par Google.</string>
@@ -549,7 +549,7 @@
 
     <string name="context_node_private" context="success message after removing the public link of a folder">Le dossier est désormais privé</string>
 
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Le partage a été retiré</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Le partage a été supprimé</string>
 
 
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Nouveau dossier</string>
@@ -758,7 +758,7 @@
         <item context="choose the way the new user’s email is inserted, import from phone option">Importer de l\'appareil</item>
     </string-array>
 
-    <string name="settings_camera_upload_on" context="settings option">Activer les téléversements de l\'appareil photo</string>
+    <string name="settings_camera_upload_on" context="settings option">Activer Téléversements de l\'appareil photo</string>
     <string name="settings_camera_upload_turn_on" context="settings option">Activer Téléversements de l\'appareil photo</string>
     <string name="settings_camera_upload_off" context="settings option">Désactiver Téléversements de l\'appareil photo</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Comment téléverser</string>
@@ -1168,11 +1168,11 @@
 
     <string name="selected_items" context="Title shown when multiselection is enable in chat tabs">%d sont sélectionnés</string>
 
-    <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">Le contact %s sera retiré du dossier partagé.</string>
-    <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts seront retirés du dossier partagé.</string>
+    <string name="remove_contact_shared_folder" context="Message to confirm if the user wants to delete a contact from a shared folder">Le contact %s sera supprimé du dossier partagé.</string>
+    <string name="remove_multiple_contacts_shared_folder" context="Message to confirm if the user wants to delete a multiple contacts from a shared folder">%d contacts seront supprimés du dossier partagé.</string>
 
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts ont été supprimés avec succès du dossier partagé</string>
-    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts n\'ont pas été retirés avec succès</string>
+    <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts n\'ont pas été supprimés avec succès</string>
 
 	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Les droits ont été mis à jour avec succès pour %d contacts</string>
 	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Échec de mise à jour des droits pour %d contacts</string>
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Lecture seulement</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Lecture et écriture</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Les transferts ont été mis en pause</string>
     <string name="attachment_uploading_state_uploading">Téléversement&#8230;</string>
     <string name="attachment_uploading_state_error">Erreur. N\'a pas été envoyé.</string>
 
@@ -2417,7 +2417,7 @@
     <string name="subtitle_outgoing_contact_request_denied" context="Subtitle of the historic notification for contact request denied">[A]%s [/A][B]a refusé votre demande de contact.[/B]</string>
     <string name="subtitle_outgoing_contact_request_accepted" context="Subtitle of the historic notification for contact request accepted">[A]%s [/A][B]a accepté votre demande de contact.[/B]</string>
 
-    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]Les accès aux dossiers partagés par [/B][A]%s[/A][B] ont été retirés.[/B]</string>
+    <string name="notification_deleted_shared_folder" context="Subtitle of the historic notification for deleted shared folders (one or many)">[B]Les accès aux dossiers partagés par [/B][A]%s[/A][B] ont été supprimés.[/B]</string>
     <string name="notification_left_shared_folder" context="Subtitle of the historic notification when a contact leaves a shared folder">[A]%s[/A][B] a quitté un dossier partagé.[/B]</string>
     <string name="notification_left_shared_folder_with_name" context="Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known">[A]%1$s[/A][B] a quitté le dossier partagé [/B][A]%2$s.[/A]</string>
 
