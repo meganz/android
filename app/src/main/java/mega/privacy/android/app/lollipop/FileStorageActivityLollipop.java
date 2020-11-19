@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -599,6 +600,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		//for below N or above P, open SAF
 		if (intent == null) {
 			intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 		}
 
 		startActivityForResult(intent, REQUEST_CODE_TREE);
@@ -1287,6 +1289,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
+            ContentResolver contentResolver = getContentResolver();
+			contentResolver.takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 			if (pickedDir == null || !pickedDir.canWrite()) {
 				logWarning("PickedDir null or cannot write.");

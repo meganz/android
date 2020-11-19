@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -342,10 +343,20 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
                         holderHeader.clearChatLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerLeaveLayout.setVisibility(View.VISIBLE);
+                        holderHeader.privateLayout.setVisibility(View.VISIBLE);
+                        holderHeader.privateSeparator.setVisibility(View.VISIBLE);
 
-                        if (getChat().isPublic()) {
-                            holderHeader.privateLayout.setVisibility(View.VISIBLE);
-                            holderHeader.privateSeparator.setVisibility(View.VISIBLE);
+                        if (!getChat().isPublic()) {
+                            holderHeader.privateTitle.setText(R.string.private_chat);
+                            holderHeader.privateTitle.setAllCaps(false);
+                            holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.name_my_account));
+                            holderHeader.privateText.setText(R.string.make_chat_private_option_text);
+                            holderHeader.privateLayout.setOnClickListener(null);
+                        } else {
+                            holderHeader.privateTitle.setText(R.string.make_chat_private_option);
+                            holderHeader.privateTitle.setAllCaps(true);
+                            holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
 
                             if (participantsCount <= MAX_PARTICIPANTS_CHANGE_TO_PRIVATE) {
                                 holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.accentColor));
@@ -356,10 +367,6 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                                 holderHeader.privateText.setText(R.string.make_chat_private_not_available_text);
                                 holderHeader.privateLayout.setOnClickListener(null);
                             }
-                        } else {
-                            logDebug("Private getChat()");
-                            holderHeader.privateLayout.setVisibility(View.GONE);
-                            holderHeader.privateSeparator.setVisibility(View.GONE);
                         }
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
@@ -395,9 +402,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
                 }
 
-                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants() ?
-                        groupChatInfoActivity.getString(R.string.inactive_chat) :
-                        groupChatInfoActivity.getString(R.string.number_of_participants, participantsCount));
+                holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants()
+                        ? groupChatInfoActivity.getString(R.string.inactive_chat)
+                        : groupChatInfoActivity.getResources().getQuantityString(R.plurals.subtitle_of_group_chat,
+                        (int) participantsCount, (int) participantsCount));
 
                 if (getChat().getNumPreviewers() < 1) {
                     holderHeader.observersSeparator.setVisibility(View.GONE);
