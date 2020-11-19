@@ -1688,7 +1688,14 @@
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
 
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
+    <string name="title_properties_manage_chat" context="Title of the section to manage chat history in the Contact Properties screen">Manage chat history</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Clear chat history</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the section to clear the chat content in the Manage chat history screen">History retention</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Automatically delete messages older than a certain amount of time</string>
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>

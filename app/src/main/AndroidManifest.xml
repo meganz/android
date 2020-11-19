@@ -506,6 +506,13 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.activities.ManageChatHistoryActivity"
+            android:label="@string/title_properties_manage_chat"
+            android:theme="@style/Theme.Megaactionbar"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
             android:name="mega.privacy.android.app.AuthenticityCredentialsActivity"
             android:label="@string/authenticity_credentials_label"
             android:theme="@style/Theme.Megaactionbar"

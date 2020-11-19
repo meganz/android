@@ -480,7 +480,7 @@
                 android:layout_gravity="left|center_vertical"
                 android:layout_marginLeft="32dp"
                 android:layout_toRightOf="@id/chat_contact_properties_clear_icon"
-                android:text="@string/title_properties_chat_clear"
+                android:text="@string/title_properties_manage_chat"
                 android:textSize="16dp"
                 android:textColor="@color/name_my_account"/>
 
