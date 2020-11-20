@@ -650,7 +650,8 @@ public class ChatUtil {
      * @param focusType Type of focus.
      * @return The AudioFocusRequest.
      */
-    public static AudioFocusRequest getRequest(AudioFocusListener listener, int focusType) {
+    public static AudioFocusRequest getRequest(AudioManager.OnAudioFocusChangeListener listener,
+                                               int focusType) {
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             AudioAttributes mAudioAttributes =
                     new AudioAttributes.Builder()
@@ -673,8 +674,10 @@ public class ChatUtil {
      *
      * @return True, if it has been successful. False, if not.
      */
-    public static boolean getAudioFocus(AudioManager mAudioManager, AudioFocusListener listener, AudioFocusRequest request, int focusType, int streamType) {
-        if (mAudioManager == null) {
+    public static boolean getAudioFocus(AudioManager audioManager,
+                                        AudioManager.OnAudioFocusChangeListener listener,
+                                        AudioFocusRequest request, int focusType, int streamType) {
+        if (audioManager == null) {
             logWarning("Audio Manager is NULL");
             return false;
         }
@@ -685,9 +688,9 @@ public class ChatUtil {
                 logWarning("Audio Focus Request is NULL");
                 return false;
             }
-            focusRequest = mAudioManager.requestAudioFocus(request);
+            focusRequest = audioManager.requestAudioFocus(request);
         } else {
-            focusRequest = mAudioManager.requestAudioFocus(listener, streamType, focusType);
+            focusRequest = audioManager.requestAudioFocus(listener, streamType, focusType);
         }
 
         return focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
@@ -696,13 +699,14 @@ public class ChatUtil {
     /**
      * Method for leaving the audio focus.
      */
-    public static void abandonAudioFocus(AudioFocusListener listener, AudioManager mAudioManager, AudioFocusRequest request) {
+    public static void abandonAudioFocus(AudioManager.OnAudioFocusChangeListener listener,
+                                         AudioManager audioManager, AudioFocusRequest request) {
         if (SHOULD_BUILD_FOCUS_REQUEST) {
             if(request != null) {
-                mAudioManager.abandonAudioFocusRequest(request);
+                audioManager.abandonAudioFocusRequest(request);
             }
         } else {
-            mAudioManager.abandonAudioFocus(listener);
+            audioManager.abandonAudioFocus(listener);
         }
     }
 

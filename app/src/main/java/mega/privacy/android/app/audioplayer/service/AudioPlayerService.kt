@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.AudioFocusRequest
+import android.media.AudioManager
+import android.media.AudioManager.OnAudioFocusChangeListener
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -25,6 +28,7 @@ import mega.privacy.android.app.audioplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
 import nz.mega.sdk.MegaApiAndroid
@@ -67,10 +71,27 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
+    private lateinit var audioManager: AudioManager
+    private lateinit var audioFocusRequest: AudioFocusRequest
+    private var audioFocusRequested = false
+    private val audioFocusListener =
+        OnAudioFocusChangeListener { focusChange ->
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                    exoPlayer.playWhenReady = false
+                    needPlayWhenGoForeground = false
+                    needPlayWhenReceiveResumeCommand = false
+                }
+            }
+        }
+
     override fun onCreate() {
         super.onCreate()
 
         viewModel = AudioPlayerServiceViewModel(this, megaApi, megaApiFolder, dbHandler)
+
+        audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
+        audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
 
         createPlayer()
         createPlayerControlNotification()
@@ -287,6 +308,14 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         newIndexForCurrentItem: Int,
         nameToDisplay: String?
     ) {
+        if (!audioFocusRequested) {
+            audioFocusRequested = true
+            getAudioFocus(
+                audioManager, audioFocusListener, audioFocusRequest, AUDIOFOCUS_DEFAULT,
+                STREAM_MUSIC_DEFAULT
+            )
+        }
+
         if (nameToDisplay != null) {
             _metadata.value = Metadata(null, null, null, nameToDisplay)
         }
@@ -321,6 +350,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         super.onDestroy()
 
         mainHandler.removeCallbacks(resumePlayRunnable)
+
+        abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
 
         viewModel.clear()
 
