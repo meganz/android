@@ -558,7 +558,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			dividerSharedFilesLayout = findViewById(R.id.divider_chat_files_shared_layout);
 
 			//Clear chat Layout
-			clearChatLayout = findViewById(R.id.chat_contact_properties_clear_layout);
+			clearChatLayout = findViewById(R.id.manage_chat_history_contact_properties_layout);
 			clearChatLayout.setOnClickListener(this);
 
 			dividerClearChatLayout = findViewById(R.id.divider_clear_chat_layout);
@@ -1248,11 +1248,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.chat_contact_properties_clear_layout:
+			case R.id.manage_chat_history_contact_properties_layout:
 				Intent intentManageChat = new Intent(this, ManageChatHistoryActivity.class);
 				intentManageChat.putExtra(EMAIL, user.getEmail());
 				startActivity(intentManageChat);
-//				showConfirmationClearChat();
 				break;
 
 			case R.id.chat_contact_properties_remove_contact_layout: {
@@ -1833,33 +1832,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 
-	public void showConfirmationClearChat(){
-		logDebug("showConfirmationClearChat");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						logDebug("Clear chat!");
-						logDebug("Clear history selected!");
-						chatC.clearHistory(chat);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		String message= getResources().getString(R.string.confirmation_clear_chat, getTitleChat(chat));
-		builder.setTitle(R.string.title_confirmation_clear_group_chat);
-		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
 
@@ -1873,19 +1845,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	@Override
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logDebug("onRequestFinish");
-
-		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-			logDebug("Truncate history request finish!!!");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Ok. Clear history done");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
-			}
-			else{
-				logWarning("Error clearing history: " + e.getErrorString());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			if (e.getErrorCode() == MegaChatError.ERROR_OK) {
 				logDebug("Chat created ---> open it!");
 

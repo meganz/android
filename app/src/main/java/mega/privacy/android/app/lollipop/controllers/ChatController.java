@@ -26,6 +26,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -168,19 +169,7 @@ public class ChatController {
 
     public void clearHistory(long chatId){
         logDebug("Chat ID: " + chatId);
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ChatActivityLollipop) context);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ContactInfoActivityLollipop) context);
-        }
-        else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (GroupChatInfoActivityLollipop) context);
-        }
-
+        megaChatApi.clearChatHistory(chatId, new TruncateHistoryListener(context));
         dbH.removePendingMessageByChatId(chatId);
     }
 

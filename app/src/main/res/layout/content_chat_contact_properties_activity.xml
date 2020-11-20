@@ -134,9 +134,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:tint="@color/accentColor"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/ic_call" />
+                        android:src="@drawable/ic_call"
+                        app:tint="@color/accentColor" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_call_label"
@@ -171,8 +171,8 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:tint="@color/accentColor"
-                        android:src="@drawable/ic_video" />
+                        android:src="@drawable/ic_video"
+                        app:tint="@color/accentColor" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_video_label"
@@ -332,7 +332,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_toRightOf="@id/chat_contact_properties_share_contact_icon"
                 android:text="@string/title_properties_chat_share_contact"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="@color/name_my_account"/>
 
         </RelativeLayout>
@@ -441,7 +441,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_toRightOf="@id/chat_contact_properties_chat_files_shared_icon"
                 android:text="@string/title_chat_shared_files_info"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="@color/name_my_account"/>
 
         </RelativeLayout>
@@ -457,40 +457,53 @@
         <!-- CLEAR LAYOUT -->
 
         <RelativeLayout
-            android:id="@+id/chat_contact_properties_clear_layout"
+            android:id="@+id/manage_chat_history_contact_properties_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_gravity="left|center_vertical">
+            android:layout_gravity="start|center_vertical">
 
             <ImageView
-                android:id="@+id/chat_contact_properties_clear_icon"
+                android:id="@+id/manage_chat_history_contact_properties_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
                 android:alpha="0.64"
                 android:src="@drawable/ic_clear_history" />
 
-            <TextView
-                android:id="@+id/chat_contact_properties_clear"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/chat_contact_properties_clear_icon"
-                android:text="@string/title_properties_manage_chat"
-                android:textSize="16dp"
-                android:textColor="@color/name_my_account"/>
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="32dp"
+                android:layout_toEndOf="@id/manage_chat_history_contact_properties_icon"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_properties_manage_chat"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/manage_chat_history_contact_properties_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp"
+                    android:visibility="gone"/>
+            </LinearLayout>
         </RelativeLayout>
 
         <View
             android:id="@+id/divider_clear_chat_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
+            android:layout_marginStart="72dp"
             android:background="@color/black_12_alpha" />
 
         <!-- REMOVE CONTACT LAYOUT -->
@@ -519,7 +532,7 @@
                 android:layout_marginLeft="32dp"
                 android:layout_toRightOf="@id/chat_contact_properties_remove_contact_icon"
                 android:text="@string/title_properties_remove_contact"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="@color/login_warning"/>
 
         </RelativeLayout>

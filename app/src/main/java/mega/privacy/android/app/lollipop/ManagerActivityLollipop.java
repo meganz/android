@@ -12742,17 +12742,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logDebug("onRequestFinish(CHAT): " + request.getRequestString()+"_"+e.getErrorCode());
 
-		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-			logDebug("Truncate history request finish.");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
-				logError("Error clearing history: "+e.getErrorString());
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			logDebug("Create chat request finish");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
 		}

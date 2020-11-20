@@ -944,4 +944,30 @@ public class ChatUtil {
                 return null;
         }
     }
+
+    /**
+     * Dialog to confirm if you want to delete the history of a chat.
+     *
+     * @param chat The MegaChatRoom
+     */
+    public static void showConfirmationClearChat(Context context, MegaChatRoom chat) {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    logDebug("Clear history selected!");
+                    new ChatController(context).clearHistory(chat);
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    dialog.dismiss();
+                    break;
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        String message = context.getResources().getString(R.string.confirmation_clear_chat, getTitleChat(chat));
+        builder.setTitle(R.string.title_confirmation_clear_group_chat);
+        builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+    }
 }

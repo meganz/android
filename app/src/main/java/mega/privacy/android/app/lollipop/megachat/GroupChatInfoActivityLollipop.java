@@ -814,15 +814,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             } else {
                 logError("ERROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
             }
-        } else if (request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY) {
-            logDebug("Truncate history request finish!!!");
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Ok. Clear history done");
-                showSnackbar(getString(R.string.clear_history_success));
-            } else {
-                logError("Error clearing history: " + e.getErrorString());
-                showSnackbar(getString(R.string.clear_history_error));
-            }
         } else if (request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM) {
             logDebug("Invite to chatroom request finish!!!");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {

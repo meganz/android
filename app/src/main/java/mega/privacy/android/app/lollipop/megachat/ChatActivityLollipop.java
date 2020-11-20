@@ -7478,17 +7478,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
         logDebug("onRequestFinish: " + request.getRequestString() + " " + request.getType());
 
-        if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-            logDebug("Truncate history request finish!!!");
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                logDebug("Ok. Clear history done");
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
-                hideMessageJump();
-            }else{
-                logError("Error clearing history: " + e.getErrorString());
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
+       if (request.getType() == MegaChatRequest.TYPE_HANG_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("The call has been successfully hung up");
                 MegaChatCall call = api.getChatCall(idChat);
