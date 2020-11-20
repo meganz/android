@@ -445,6 +445,7 @@
     <string name="context_send_contact" context="menu item">Share contact to chat</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
