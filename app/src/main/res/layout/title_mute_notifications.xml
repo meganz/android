@@ -6,6 +6,7 @@
     android:paddingStart="23dp"
     android:paddingTop="22dp">
     <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
@@ -17,6 +18,7 @@
         android:letterSpacing="0"
         android:textAlignment="gravity"/>
     <TextView
+        android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/mail_my_account"

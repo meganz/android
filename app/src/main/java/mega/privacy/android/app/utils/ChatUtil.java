@@ -970,4 +970,76 @@ public class ChatUtil {
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
+
+    /**
+     * Method to display a dialog to configure the history retention .
+     *
+     * @param context Context of Activity.
+     * @param chat  The MegaChatRoom.
+     */
+    public static void createHistoryRetentionAlertDialog(Activity context, MegaChatRoom chat) {
+
+        final AlertDialog historyRetentionDialog;
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+
+        View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
+        TextView title = view.findViewById(R.id.title);
+        title.setText(context.getString(R.string.title_properties_history_retention));
+        TextView subtitle = view.findViewById(R.id.subtitle);
+        subtitle.setText(context.getString(R.string.subtitle_properties_manage_chat));
+        dialogBuilder.setCustomTitle(view);
+
+        AtomicReference<Integer> itemClicked = new AtomicReference<>();
+
+        ArrayList<String> stringsArray = new ArrayList<>();
+        stringsArray.add(0, context.getString(R.string.history_retention_option_disabled));
+        stringsArray.add(1, context.getString(R.string.history_retention_option_one_day));
+        stringsArray.add(2, context.getString(R.string.history_retention_option_one_week));
+        stringsArray.add(3, context.getString(R.string.history_retention_option_one_month));
+        stringsArray.add(4, context.getString(R.string.history_retention_option_custom));
+
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+        ListView listView = new ListView(context);
+        listView.setAdapter(itemsAdapter);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, INVALID_POSITION, (dialog, item) -> {
+            itemClicked.set(item);
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+        });
+
+        dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
+                (dialog, which) -> {
+                    //MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeHistoryRetention(itemClicked.get()), chats);
+                    dialog.dismiss();
+                });
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
+
+        historyRetentionDialog = dialogBuilder.create();
+        historyRetentionDialog.show();
+        historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+    }
+
+    /**
+     * Method for getting the selected history retention option depending on the selected item.
+     *
+     * @param itemClicked   The selected item.
+     * @return The right option.
+     */
+    private static String getTypeHistoryRetention(int itemClicked) {
+        switch (itemClicked) {
+            case 0:
+                return HISTORY_RETENTION_DISABLED;
+            case 1:
+                return HISTORY_RETENTION_1_DAY;
+            case 2:
+                return HISTORY_RETENTION_1_WEEK;
+            case 3:
+                return HISTORY_RETENTION_1_MONTH;
+            case 4:
+                return HISTORY_RETENTION_CUSTOM;
+            default:
+                return NOTIFICATIONS_ENABLED;
+        }
+    }
+
 }

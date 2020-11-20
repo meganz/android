@@ -316,6 +316,12 @@ public class Constants {
     public static final int PRICING_MIN_DIFFERENCE = 720;
     public static final int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
 
+    public static final String HISTORY_RETENTION_DISABLED = "HISTORY_RETENTION_DISABLED";
+    public static final String HISTORY_RETENTION_1_DAY = "HISTORY_RETENTION_1_DAY";
+    public static final String HISTORY_RETENTION_1_WEEK = "HISTORY_RETENTION_1_WEEK";
+    public static final String HISTORY_RETENTION_1_MONTH = "HISTORY_RETENTION_1_MONTH";
+    public static final String HISTORY_RETENTION_CUSTOM = "HISTORY_RETENTION_CUSTOM";
+
     public static final int CONTACT_TYPE_MEGA = 0;
     public static final int CONTACT_TYPE_DEVICE = 1;
     public static final int CONTACT_TYPE_BOTH = 2;

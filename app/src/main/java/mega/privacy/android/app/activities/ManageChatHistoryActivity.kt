@@ -8,6 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -64,20 +65,16 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
         binding.clearChatHistoryLayout?.setOnClickListener(this)
         binding.historyRetentionLayout?.setOnClickListener(this)
-
-
     }
 
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.clear_chat_history_layout -> {
-                logDebug("**************** click in clear_chat_history_layout")
                 ChatUtil.showConfirmationClearChat(this, chat)
             }
 
             R.id.history_retention_layout -> {
-                logDebug("**************** click in history_retention_layout")
-
+                createHistoryRetentionAlertDialog(this, chat);
             }
         }
     }
