@@ -39,9 +39,13 @@ object CuSyncManager {
      */
     var isFinished = false
 
+    /**
+     * @see MegaApi.BACKUP_TYPE_INVALID
+     */
+    const val TYPE_BACKUP_INVALID = -1
     const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
     const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
-    private const val PROGRESS_INVALID = -1
+    const val INVALID_INT = -1
     private const val PROGRESS_FINISHED = 100
 
     /**
@@ -242,18 +246,12 @@ object CuSyncManager {
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
-            cuSync.apply {
-                updateBackup(
-                    backupId,
-                    backupType,
-                    newTargetNode,
-                    localFolder,
-                    backupName,
-                    state,
-                    subState,
-                    extraData
-                )
-            }
+            updateBackup(
+                cuSync.backupId,
+                newTargetNode,
+                null,
+                INVALID_INT
+            )
         }
     }
 
@@ -282,18 +280,12 @@ object CuSyncManager {
         if (muSync == null) {
             setSecondaryBackup()
         } else {
-            muSync.apply {
-                updateBackup(
-                    backupId,
-                    backupType,
-                    newTargetNode,
-                    localFolder,
-                    backupName,
-                    state,
-                    subState,
-                    extraData
-                )
-            }
+            updateBackup(
+                muSync.backupId,
+                newTargetNode,
+                null,
+                INVALID_INT,
+            )
         }
     }
 
@@ -318,18 +310,12 @@ object CuSyncManager {
         if (cuSync == null) {
             setPrimaryBackup()
         } else {
-            cuSync.apply {
-                updateBackup(
-                    backupId,
-                    backupType,
-                    targetNode,
-                    newLocalFolder!!,
-                    backupName,
-                    state,
-                    subState,
-                    extraData
-                )
-            }
+            updateBackup(
+                cuSync.backupId,
+                INVALID_HANDLE,
+                newLocalFolder!!,
+                INVALID_INT
+            )
         }
     }
 
@@ -354,48 +340,12 @@ object CuSyncManager {
         if (muSync == null) {
             setSecondaryBackup()
         } else {
-            muSync.apply {
-                updateBackup(
-                    backupId,
-                    backupType,
-                    targetNode,
-                    newLocalFolder!!,
-                    backupName,
-                    state,
-                    subState,
-                    extraData
-                )
-            }
-        }
-    }
-
-    /**
-     * Update CU backup's state.
-     *
-     * @see MegaApiJava
-     */
-    fun updateSecondaryBackupState(newState: Int) {
-        if (!CameraUploadUtil.isSecondaryEnabled()) {
-            logDebug("MU is not enabled, no need to update.")
-            return
-        }
-
-        val muSync = databaseHandler.muBackup
-        if (muSync == null) {
-            setSecondaryBackup()
-        } else {
-            muSync.apply {
-                updateBackup(
-                    backupId,
-                    backupType,
-                    targetNode,
-                    localFolder,
-                    backupName,
-                    newState,
-                    subState,
-                    extraData
-                )
-            }
+            updateBackup(
+                muSync.backupId,
+                INVALID_HANDLE,
+                newLocalFolder!!,
+                INVALID_INT
+            )
         }
     }
 
@@ -414,43 +364,55 @@ object CuSyncManager {
         if (cuSync == null) {
             setSecondaryBackup()
         } else {
-            cuSync.apply {
-                updateBackup(
-                    backupId,
-                    backupType,
-                    targetNode,
-                    localFolder,
-                    backupName,
-                    newState,
-                    subState,
-                    extraData
-                )
-            }
+            updateBackup(
+                cuSync.backupId,
+                INVALID_HANDLE,
+                null,
+                newState
+            )
+        }
+    }
+
+    /**
+     * Update CU backup's state.
+     *
+     * @see MegaApiJava
+     */
+    fun updateSecondaryBackupState(newState: Int) {
+        if (!CameraUploadUtil.isSecondaryEnabled()) {
+            logDebug("MU is not enabled, no need to update.")
+            return
+        }
+
+        val muSync = databaseHandler.muBackup
+        if (muSync == null) {
+            setSecondaryBackup()
+        } else {
+            updateBackup(
+                muSync.backupId,
+                INVALID_HANDLE,
+                null,
+                newState
+            )
         }
     }
 
     /**
      * Update a backup.
+     * For the values keep the same, pass invliad value to avoid to send to the server.
+     * @see MegaApiJava.updateBackup
      *
      * @param backupId ID of the backup which is to be updated.
-     * @param backupType Type of the backup,
      * should be MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD or MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
      * @param targetNode Handle of the MegaNode where the backup targets to.
      * @param localFolder Path of the local folder where the backup uploads from.
      * @param state state Current state of the backup.
-     * @param subState subState Valid value definitions
-     * @see MegaError
-     * @param extraData extraData
      */
     private fun updateBackup(
         backupId: Long,
-        backupType: Int,
         targetNode: Long,
-        localFolder: String,
-        backupName: String,
-        state: Int,
-        subState: Int,
-        extraData: String
+        localFolder: String?,
+        state: Int
     ) {
         if (isInvalid(backupId.toString())) {
             logWarning("Invalid sync id, value: $backupId")
@@ -459,13 +421,13 @@ object CuSyncManager {
 
         megaApi.updateBackup(
             backupId,
-            backupType,
+            TYPE_BACKUP_INVALID,
             targetNode,
             localFolder,
-            backupName,
+            null,
             state,
-            subState,
-            extraData,
+            INVALID_INT,
+            null,
             SyncListener(UpdateBackupCallback(), megaApplication)
         )
     }
@@ -645,7 +607,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                PROGRESS_INVALID,
+                INVALID_INT,
                 cuPendingUploads,
                 0,
                 cuLastActionTimestampSeconds,
@@ -661,7 +623,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                PROGRESS_INVALID,
+                INVALID_INT,
                 muPendingUploads,
                 0,
                 muLastActionTimestampSeconds,
@@ -692,7 +654,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                PROGRESS_INVALID,
+                INVALID_INT,
                 0,
                 0,
                 0,
@@ -706,7 +668,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                PROGRESS_INVALID,
+                INVALID_INT,
                 0,
                 0,
                 0,

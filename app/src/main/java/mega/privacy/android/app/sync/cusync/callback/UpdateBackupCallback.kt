@@ -24,10 +24,9 @@ class UpdateBackupCallback: SyncEventCallback {
 
             if (backup != null && !backup.outdated) {
                 backup.apply {
-                    targetNode = nodeHandle
-                    localFolder = file
-                    state = access
-                    subState = numDetails
+                    if(nodeHandle != MegaApiJava.INVALID_HANDLE) targetNode = nodeHandle
+                    if(file != null) localFolder = file
+                    if(access != INVALID_INT) state = access
                 }
                 getDatabase().updateBackup(backup)
                 logDebug("Successful callback: update $backup.")
