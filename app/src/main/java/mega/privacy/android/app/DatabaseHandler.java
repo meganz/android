@@ -35,7 +35,6 @@ import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_SEC
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -3005,6 +3004,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 
+		// Set or remove corresponding CU backup.
 		if (enabled) {
 			CuSyncManager.INSTANCE.setPrimaryBackup();
 		} else {
@@ -3027,6 +3027,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 
+		// Set or remove corresponding MU backup.
 		if (enabled) {
 			CuSyncManager.INSTANCE.setSecondaryBackup();
 		} else {
@@ -3050,6 +3051,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 
 		logDebug("Set new primary handle: " + handle);
+		//Update CU backup when CU target folder changed.
 		CuSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
 	}
 
@@ -3070,6 +3072,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 
 		logDebug("Set new secondary handle: " + handle);
+		//Update MU backup when MU target folder changed.
 		CuSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
 	}
 

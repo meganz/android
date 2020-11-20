@@ -13579,8 +13579,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			    // Update CU backup state.
                 boolean uploadPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD);
 			    if(uploadPaused) {
-                    CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP);
-                    CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP);
+                    CuSyncManager.INSTANCE.updatePrimaryBackupState(CU_SYNC_STATE_PAUSE_UP);
+                    CuSyncManager.INSTANCE.updateSecondaryBackupState(CU_SYNC_STATE_PAUSE_UP);
+                } else {
+			        // Reset as active, so that can continue to send heartbeat.
+                    CuSyncManager.INSTANCE.updatePrimaryBackupState(CU_SYNC_STATE_ACTIVE);
+                    CuSyncManager.INSTANCE.updateSecondaryBackupState(CU_SYNC_STATE_ACTIVE);
                 }
 			}
 		}
