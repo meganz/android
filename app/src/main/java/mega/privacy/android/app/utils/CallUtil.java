@@ -7,12 +7,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.SystemClock;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +17,10 @@ import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -33,7 +34,6 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -45,12 +45,34 @@ import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
+import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PICTURE;
+import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PROFILE_PICTURE;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE_CALLS;
+import static mega.privacy.android.app.utils.Constants.CALL_ID;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CALL_IN_PROGRESS;
+import static mega.privacy.android.app.utils.Constants.RECORD_AUDIO;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.START_CALL_PERMISSIONS;
+import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
+import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
+import static mega.privacy.android.app.utils.ContactUtil.getNicknameContact;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.Util.brandAlertDialog;
+import static mega.privacy.android.app.utils.Util.getCustomAlertBuilder;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static mega.privacy.android.app.utils.Util.showToast;
+import static mega.privacy.android.app.utils.Util.takePicture;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallUtil {
@@ -1054,8 +1076,7 @@ public class CallUtil {
             if (call == null)
                 return;
 
-            int notificationId = getCallNotificationId(call.getId());
-            notificationManager.cancel(notificationId);
+            notificationManager.cancel(getCallNotificationId(call.getId()));
         } catch (Exception e) {
             logError("EXCEPTION", e);
         }
