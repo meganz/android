@@ -410,19 +410,13 @@
 
                 <Button
                     android:id="@+id/join_button"
+                    style="@style/AccentButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:background="@color/accentColor"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:minHeight="36dp"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:text="@string/action_join"
-                    android:textColor="@color/white"
-                    android:tint="@android:color/white" />
+                    android:text="@string/action_join" />
 
             </RelativeLayout>
 
