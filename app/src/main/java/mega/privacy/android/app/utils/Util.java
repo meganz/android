@@ -1809,8 +1809,26 @@ public class Util {
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
 	}
 
+	/**
+	 * Judge if current mode is Dark mode
+	 * @param context
+	 * @return true if it is dark mode, false for light mode
+	 */
 	public static boolean isDarkMode(Context context) {
 		int currentNightMode = context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 		return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+	}
+
+	/**
+	 * Method for displaying a snack bar when is Offline.
+	 *
+	 * @return True, is is Offline. False it is Online.
+	 */
+	public static boolean isOffline(Context context) {
+		if (!isOnline(context)) {
+			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+			return true;
+		}
+		return false;
 	}
 }

@@ -7,7 +7,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/settings_advanced_features_cancel_account"
+        android:text="@string/settings_delete_account"
         android:textSize="16sp"
         android:layout_margin="16dp"
         android:textColor="@color/red_600_red_300"/>
