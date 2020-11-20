@@ -11,10 +11,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="@string/archived_chats_show_option"
-        android:textColor="@color/accentColor"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Accent"
         android:ellipsize="end"
-        android:textSize="12sp"
-        android:textStyle="bold"
         android:maxLines="1"/>
 
 </RelativeLayout>

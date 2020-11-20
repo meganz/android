@@ -110,6 +110,13 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <!-- Medium, Accent -->
+    <style name="TextAppearance.Mega.Body2.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
     <!-- ================== Button ====================== -->
 
     <!-- Medium, 14sp, 0px, textColorPrimary, AllCaps=true -->
@@ -135,6 +142,13 @@
     <!-- Regular, 12sp, 0.25px -->
     <style name="TextAppearance.Mega.Caption.Secondary.Variant">
         <item name="android:letterSpacing">0.020833333</item>
+    </style>
+
+    <!-- Medium, Accent -->
+    <style name="TextAppearance.Mega.Caption.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- ======== Password strength hint text ============ -->

@@ -436,9 +436,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_location"
                     android:layout_marginRight="20dp"
-                    android:paddingVertical="0dp"
-                    android:paddingHorizontal="0dp"
-                    style="?attr/borderlessButtonStyle" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+                    tools:text="CLOUD DRIVE" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -565,8 +564,8 @@
 
             <Button
                 android:id="@+id/file_properties_link_button"
-                android:layout_height="wrap_content"
-                style="?attr/materialButtonOutlinedStyle" />
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_height="wrap_content" />
         </RelativeLayout>
 
     </LinearLayout>
