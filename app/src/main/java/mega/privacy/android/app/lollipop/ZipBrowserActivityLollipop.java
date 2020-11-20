@@ -52,6 +52,8 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import nz.mega.sdk.MegaApiJava;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -191,7 +193,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			if (intent != null) {
 				position = intent.getIntExtra("position", -1);
 				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if (position != -1) {
 					if (adapterType == ZIP_ADAPTER) {
