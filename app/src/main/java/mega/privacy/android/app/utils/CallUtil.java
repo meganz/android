@@ -1054,7 +1054,7 @@ public class CallUtil {
             if (call == null)
                 return;
 
-            int notificationId = MegaApiJava.userHandleToBase64(chatIdIncomingCall).hashCode();
+            int notificationId = getCallNotificationId(call.getId());
             notificationManager.cancel(notificationId);
         } catch (Exception e) {
             logError("EXCEPTION", e);
