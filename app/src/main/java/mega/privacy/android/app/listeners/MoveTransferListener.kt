@@ -23,6 +23,8 @@ class MoveTransferListener(
         if (e.errorCode != API_OK) {
             logError("Error changing transfer priority: " + getTranslatedErrorString(e))
             moveTransferInterface.movementFailed(request.transferTag)
+        } else {
+            moveTransferInterface.movementSuccess(request.transferTag)
         }
     }
 }

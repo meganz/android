@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
@@ -50,6 +51,8 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 	private ActionMode actionMode;
 
+	private ItemTouchHelper itemTouchHelper;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
@@ -79,19 +82,24 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		listView.setAdapter(adapter);
 		listView.setItemAnimator(new DefaultItemAnimator());
 
-		ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+		itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
 			private boolean addElevation = true;
 			private boolean resetElevation = false;
+			private MegaTransfer draggedTransfer;
+			private int newPosition;
 
 
 			@Override
 			public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
 				int posDragged = viewHolder.getAdapterPosition();
-				int posTarget = target.getAdapterPosition();
+				newPosition = target.getAdapterPosition();
 
-				startMovementRequest(tL.get(posDragged), posTarget);
-				Collections.swap(tL, posDragged, posTarget);
-				adapter.moveItemData(tL, posDragged, posTarget);
+				if (draggedTransfer == null) {
+					draggedTransfer = tL.get(posDragged);
+				}
+
+				Collections.swap(tL, posDragged, newPosition);
+				adapter.moveItemData(tL, posDragged, newPosition);
 
 				return false;
 			}
@@ -131,9 +139,22 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 				// Drag finished, elevation should be removed.
 				resetElevation = true;
 			}
+
+			@Override
+			public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+				super.onSelectedChanged(viewHolder, actionState);
+
+				if (actionState != ItemTouchHelper.ACTION_STATE_IDLE
+						|| draggedTransfer == null) {
+					return;
+				}
+
+				startMovementRequest(draggedTransfer, newPosition);
+				draggedTransfer = null;
+			}
 		});
 
-		itemTouchHelper.attachToRecyclerView(listView);
+		enableDragAndDrop();
 
 		return v;
 	}
@@ -288,7 +309,19 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		} else if (newPosition == tL.size() - 1) {
 			megaApi.moveTransferToLast(transfer, moveTransferListener);
 		} else {
-			megaApi.moveTransferBefore(transfer, tL.get(newPosition - 1), moveTransferListener);
+			megaApi.moveTransferBefore(transfer, tL.get(newPosition + 1), moveTransferListener);
+		}
+	}
+
+	private void enableDragAndDrop() {
+		if (itemTouchHelper != null && listView != null) {
+			itemTouchHelper.attachToRecyclerView(listView);
+		}
+	}
+
+	private void disableDragAndDrop() {
+		if (itemTouchHelper != null) {
+			itemTouchHelper.attachToRecyclerView(null);
 		}
 	}
 
@@ -311,6 +344,8 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+
+		enableDragAndDrop();
 	}
 
 	@Override
@@ -329,6 +364,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			adapter.setMultipleSelect(true);
 			actionMode = ((AppCompatActivity) context).startSupportActionMode(new TransfersActionBarCallBack(this));
 			updateActionModeTitle();
+			disableDragAndDrop();
 		}
 	}
 
@@ -406,8 +442,26 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 	@Override
 	public void movementFailed(int transferTag) {
+		finishMovement(false, transferTag);
+	}
+
+	@Override
+	public void movementSuccess(int transferTag) {
+		finishMovement(true, transferTag);
+	}
+
+	/**
+	 * Updates the UI in consequence after a transfer movement.
+	 * The update depends on if the movement finished with or without success.
+	 * If it finished with success, simply update the transfer in the transfers list and in adapter.
+	 * If not, reverts the movement, leaving the transfer in the same position it has before made the change.
+	 *
+	 * @param success     True if the movement finished with success, false otherwise.
+	 * @param transferTag Identifier of the transfer.
+	 */
+	private void finishMovement(boolean success, int transferTag) {
 		MegaTransfer transfer = megaApi.getTransferByTag(transferTag);
-		if (transfer == null || transfer.getState() < STATE_COMPLETING) {
+		if (transfer == null || transfer.getState() >= STATE_COMPLETING) {
 			logWarning("The transfer doesn't exist, finished or is finishing.");
 			return;
 		}
@@ -415,6 +469,14 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		int transferPosition = tryToUpdateTransfer(transfer);
 		if (transferPosition == INVALID_POSITION) {
 			logWarning("The transfer doesn't exist.");
+			return;
+		}
+
+		if (success) {
+			if (adapter != null) {
+				adapter.notifyItemChanged(transferPosition);
+			}
+
 			return;
 		}
 

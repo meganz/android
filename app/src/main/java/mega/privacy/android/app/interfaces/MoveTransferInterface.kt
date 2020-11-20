@@ -8,4 +8,12 @@ interface MoveTransferInterface {
      * @param transferTag Identifier of the transfer.
      */
     fun movementFailed(transferTag: Int)
+
+    /**
+     * Notifies the change of priority of a transfer finished successfully.
+     * Updates the transfer on UI.
+     *
+     * @param transferTag Identifier of the transfer.
+     */
+    fun movementSuccess(transferTag: Int)
 }
