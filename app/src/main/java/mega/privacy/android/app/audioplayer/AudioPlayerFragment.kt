@@ -24,6 +24,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.RepeatModeUtil
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.playlist.PlaylistItem
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService
@@ -35,7 +36,9 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.SimpleAnimatorListener
+import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.autoCleared
+import java.util.*
 
 class AudioPlayerFragment : Fragment() {
     private var binding by autoCleared<FragmentAudioPlayerBinding>()
@@ -137,6 +140,25 @@ class AudioPlayerFragment : Fragment() {
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
                 togglePlaylistEnabled(it.first)
+            }
+
+            service.viewModel.retry.observe(viewLifecycleOwner) {
+                if (!it) {
+                    MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+                        .setCancelable(false)
+                        .setMessage(
+                            if (isOnline(requireContext()))
+                                R.string.unsupported_file_type
+                            else R.string.error_fail_to_open_file_no_network
+                        )
+                        .setPositiveButton(
+                            resources.getString(R.string.general_ok).toUpperCase(Locale.ROOT)
+                        ) { _, _ ->
+                            playerService?.stopAudioPlayer()
+                            requireActivity().finish()
+                        }
+                        .show()
+                }
             }
         }
     }

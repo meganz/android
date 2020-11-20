@@ -86,6 +86,9 @@ class AudioPlayerServiceViewModel(
     private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
     val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
 
+    private val _retry = MutableLiveData<Boolean>()
+    val retry: LiveData<Boolean> = _retry
+
     var currentIntent: Intent? = null
         private set
     var playlistTitle = ""
@@ -114,6 +117,8 @@ class AudioPlayerServiceViewModel(
             postPlaylistItems()
         }
 
+    private var playerRetry = 0
+
     init {
         compositeDisposable.add(
             createThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
@@ -126,6 +131,7 @@ class AudioPlayerServiceViewModel(
 
     fun buildPlayerSource(intent: Intent?): Boolean {
         if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
+            _retry.value = false
             return false
         }
 
@@ -133,6 +139,7 @@ class AudioPlayerServiceViewModel(
         val uri = intent.data
 
         if (type == INVALID_VALUE || uri == null) {
+            _retry.value = false
             return false
         }
 
@@ -141,10 +148,17 @@ class AudioPlayerServiceViewModel(
 
         val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
         if (firstPlayHandle == INVALID_HANDLE) {
+            _retry.value = false
             return false
         }
 
-        val firstPlayNodeName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: return false
+        val firstPlayNodeName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
+        if (firstPlayNodeName == null) {
+            _retry.value = false
+            return false
+        }
+
+        playerRetry = 0
 
         var displayNodeNameFirst = type != OFFLINE_ADAPTER
         if (samePlaylist && firstPlayHandle == playingHandle) {
@@ -351,6 +365,11 @@ class AudioPlayerServiceViewModel(
         }
 
         return true
+    }
+
+    fun onPlayerError() {
+        playerRetry++
+        _retry.value = playerRetry <= MAX_RETRY
     }
 
     private fun isSamePlaylist(type: Int, intent: Intent): Boolean {
@@ -842,11 +861,19 @@ class AudioPlayerServiceViewModel(
         megaApiFolder.httpServerStop()
     }
 
+    override fun onShuffleChanged(newShuffle: ShuffleOrder) {
+        shuffleOrder = newShuffle
+
+        postPlaylistItems()
+    }
+
     companion object {
         private const val SETTINGS_FILE = "audio_player_settings"
         private const val KEY_BACKGROUND_PLAY_ENABLED = "background_play_enabled"
         private const val KEY_SHUFFLE_ENABLED = "shuffle_enabled"
         private const val KEY_REPEAT_MODE = "repeat_mode"
+
+        private const val MAX_RETRY = 6
 
         fun clearSettings(context: Context) {
             context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
@@ -854,11 +881,5 @@ class AudioPlayerServiceViewModel(
                 .clear()
                 .apply()
         }
-    }
-
-    override fun onShuffleChanged(newShuffle: ShuffleOrder) {
-        shuffleOrder = newShuffle
-
-        postPlaylistItems()
     }
 }

@@ -129,6 +129,10 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                     state == Player.STATE_READY && viewModel.paused -> viewModel.paused = false
                 }
             }
+
+            override fun onPlayerError(error: ExoPlaybackException) {
+                viewModel.onPlayerError()
+            }
         })
 
         exoPlayer.setShuffleOrder(viewModel.shuffleOrder)
@@ -269,6 +273,12 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
         viewModel.playingThumbnail.observe(this, Observer {
             playerNotificationManager.invalidate()
+        })
+
+        viewModel.retry.observe(this, Observer {
+            if (it) {
+                exoPlayer.prepare()
+            }
         })
     }
 
