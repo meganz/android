@@ -224,4 +224,6 @@
 
     <color name="over_quota_yellow">#FFFFB42B</color>
     <color name="background_own_reaction_added">#0F00BFA5</color>
+
+    <color name="black_bottom_sheets_icon_tint">#8F000000</color>
 </resources>

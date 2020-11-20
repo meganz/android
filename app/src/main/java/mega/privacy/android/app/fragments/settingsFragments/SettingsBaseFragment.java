@@ -1,20 +1,16 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-
-public class SettingsBaseFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener {
+public class SettingsBaseFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
 
     protected Context context;
     protected MegaApiAndroid megaApi;
@@ -42,12 +38,15 @@ public class SettingsBaseFragment extends PreferenceFragmentCompat implements Pr
     }
 
     @Override
-    public void onCreatePreferences(Bundle bundle, String s) {
-
-    }
+    public void onCreatePreferences(Bundle bundle, String s) { }
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
+        return false;
+    }
+
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
         return false;
     }
 }

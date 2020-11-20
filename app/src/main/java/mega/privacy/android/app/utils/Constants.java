@@ -504,6 +504,8 @@ public class Constants {
     public static final String INCOMING_VIDEO_CALL = "INCOMING_VIDEO_CALL";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
+    public static final String COPIED_TEXT_LABEL = "Copied Text";
+    public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
