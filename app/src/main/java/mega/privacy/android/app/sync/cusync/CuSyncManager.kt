@@ -35,14 +35,9 @@ import java.util.concurrent.TimeUnit.SECONDS
 object CuSyncManager {
 
     /**
-     * If CU process finished.
-     */
-    var isFinished = false
-
-    /**
      * @see MegaApi.BACKUP_TYPE_INVALID
      */
-    const val TYPE_BACKUP_INVALID = -1
+    private const val TYPE_BACKUP_INVALID = -1
     const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
     const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
     const val INVALID_INT = -1
@@ -472,7 +467,6 @@ object CuSyncManager {
      * @param records Pending upload/copy files.
      */
     fun startActiveHeartbeat(records: List<SyncRecord>) {
-        isFinished = false
         if (records.isEmpty()) {
             return
         }
@@ -562,7 +556,6 @@ object CuSyncManager {
      * Callback when the process finished, report to server.
      */
     fun reportUploadFinish() {
-        isFinished = true
         val cuBackup = databaseHandler.cuBackup
         if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
             logDebug("CU sync finished at $cuLastActionTimestampSeconds, last uploaded handle is $cuLastUploadedHandle backup id:${cuBackup.backupId}")

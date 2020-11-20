@@ -265,8 +265,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         setAttrUserListener = null;
         createFolderListener = null;
 
-        // CU process didn't complete normally, but interrupted.
-        if(!CuSyncManager.INSTANCE.isFinished()) {
+        // CU process is running, but interrupted.
+        if(CuSyncManager.INSTANCE.isActive()) {
             //Update backups' state.
             CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED);
             CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED);
