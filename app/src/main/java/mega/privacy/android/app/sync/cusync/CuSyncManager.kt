@@ -545,7 +545,8 @@ object CuSyncManager {
         activeHeartbeatTask = Observable.interval(0L, ACTIVE_HEARTBEAT_INTERVAL_SECONDS, SECONDS)
             .subscribe({
                 val cuBackup = databaseHandler.cuBackup
-                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null && cuTotalUploadBytes != 0L) {
+                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null && cuTotalUploadBytes != 0L && cuBackup.state != State.CU_SYNC_STATE_PAUSE_UP) {
+                    logDebug("Send CU heartbeat.")
                     megaApi.sendBackupHeartbeat(
                         cuBackup.backupId,
                         Status.CU_SYNC_STATUS_SYNCING,
@@ -559,7 +560,8 @@ object CuSyncManager {
                 }
 
                 val muBackup = databaseHandler.muBackup
-                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null && muTotalUploadBytes != 0L) {
+                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null && muTotalUploadBytes != 0L && muBackup.state != State.CU_SYNC_STATE_PAUSE_UP) {
+                    logDebug("Send MU heartbeat.")
                     megaApi.sendBackupHeartbeat(
                         muBackup.backupId,
                         Status.CU_SYNC_STATUS_SYNCING,
