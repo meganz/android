@@ -155,8 +155,6 @@ public class CallService extends Service{
             return;
 
         int notificationId = getCallNotificationId(call.getId());
-        if (notificationId == INVALID_CALL)
-            return;
 
         Notification notif;
         String contentText = null;
