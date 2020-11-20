@@ -933,7 +933,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">このプロセスに予想以上時間がかかっています。お待ちください。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">無料アカウント</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Liteアカウント</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Liteアカウント</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO Iアカウント</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO IIアカウント</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO IIIアカウント</string>
@@ -1199,7 +1199,7 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">オンにするまで</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">チャット通知を%s間ミュートします</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">チャット通知を%1$s間ミュートします</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">チャット通知を%1$s間ミュートします</string>
     <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">チャット通知を%1$sの%2$sまでミュートします</string>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">チャット通知はミュートされています</string>
 
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">今日</string>
     <string name="label_yesterday" context="label yesterday">昨日</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">明日</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]共有ファイル[/A]が[B]ありません[/B][B]。[/B]</string>
 

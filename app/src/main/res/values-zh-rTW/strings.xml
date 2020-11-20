@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">這個過程花費的時間比預期的長。請稍候。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">免費帳戶</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite 精簡版帳戶</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I 專業版帳戶</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II 專業版帳戶</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III 專業版帳戶</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">PRO Lite 帳戶</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I 帳戶</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II 帳戶</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III 帳戶</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite 帳戶</string>
 
@@ -1199,7 +1199,7 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">直到我將它們重新開啟</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">聊天通知將靜音%s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">聊天通知將靜音到%1$s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">聊天通知將靜音到%1$s</string>
     <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">聊天通知將靜音到%1$s %2$s</string>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">聊天通知已靜音</string>
 
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]登出[/A]以使用另一個帳戶登入MEGA</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">您確定要登出目前帳戶嗎？</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">此訊息已被%1$s刪除</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">歷史聊天紀錄已清空</string>
+    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">聊天紀錄已清空</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">聊天記錄已被%1$s清除</string>
 
     <!--
@@ -1929,11 +1929,11 @@
     <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%sMB</string>
     <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%sGB</string>
     <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%sTB</string>
-    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/s</string>
-    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/s</string>
-    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/s</string>
-    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/s</string>
-    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/s</string>
+    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/秒</string>
+    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/秒</string>
+    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/秒</string>
+    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/秒</string>
+    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/秒</string>
     <string name="label_mega_byte" context="Size in megabytes.">MB</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">今天</string>
     <string name="label_yesterday" context="label yesterday">昨天</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">明天</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]沒有[/B][A]共享的檔案[/A][B]。[/B]</string>
 

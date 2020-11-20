@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Compte Gratuit</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Léger</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Compte PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Compte PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Compte PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Pro Léger</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Compte Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Compte Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Compte Pro III</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte PRO Léger</string>
 
@@ -1199,7 +1199,7 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Jusqu\'à ce que je les réactive</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Les notifications de la conversation seront mises en sourdine pendant %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Les notifications de la conversation seront mises en sourdine jusqu\'à %1$s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Les notifications de la conversation seront mises en sourdine jusqu\'à %1$s</string>
     <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Les notifications de la conversation seront mises en sourdine jusqu\'à %1$s à %2$s</string>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Les notifications des conversations sont en sourdine</string>
 
@@ -1929,11 +1929,11 @@
     <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Mo</string>
     <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s Go</string>
     <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s To</string>
-    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/s</string>
-    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/s</string>
-    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/s</string>
-    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/s</string>
-    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/s</string>
+    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s o/s</string>
+    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s Ko/s</string>
+    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s Mo/s</string>
+    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s Go/s</string>
+    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s To/s</string>
     <string name="label_mega_byte" context="Size in megabytes.">Mo</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Aujourd\'hui</string>
     <string name="label_yesterday" context="label yesterday">Hier</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Demain</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Il n\'y a aucun [/B][A]fichier partagé[/A][B].[/B]</string>
 

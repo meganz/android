@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este proceso está tardando más de lo esperado. Por favor espera.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Cuenta gratuita</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cuenta Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cuenta Pro Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cuenta Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cuenta Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cuenta Pro III</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Cuenta Pro Lite</string>
 
@@ -1199,7 +1199,7 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Hasta que las reactive</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Las notificaciones de chat se silenciarán durante %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Las notificaciones del chat se silenciarán hasta las %1$s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Las notificaciones del chat se silenciarán hasta las %1$s</string>
     <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Las notificaciones de chat se silenciarán hasta  %1$s a las %2$s</string>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Las notificaciones de chat están silenciadas</string>
 
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Hoy</string>
     <string name="label_yesterday" context="label yesterday">Ayer</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Mañana</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No hay [/B][A]archivos compartidos[/A][B].[/B]</string>
 
