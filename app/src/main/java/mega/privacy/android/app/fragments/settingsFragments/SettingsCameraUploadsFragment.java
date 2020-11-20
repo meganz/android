@@ -47,6 +47,7 @@ import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.*;
@@ -60,7 +61,6 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
-    private static final int CAM_SYNC_INVALID_HANDLE = -1;
     private SwitchPreferenceCompat cameraUploadOnOff;
     private ListPreference cameraUploadHow;
     private ListPreference cameraUploadWhat;
@@ -109,6 +109,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         addPreferencesFromResource(R.xml.preferences_cu);
 
         cameraUploadOnOff = findPreference(KEY_CAMERA_UPLOAD_ON_OFF);
+        cameraUploadOnOff.setEnabled(true);
         cameraUploadOnOff.setOnPreferenceChangeListener((preference, newValue) -> {
             if (isOffline(context)) {
                 return false;
@@ -147,6 +148,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         megaCameraFolder.setOnPreferenceClickListener(this);
 
         secondaryMediaFolderOn = findPreference(KEY_SECONDARY_MEDIA_FOLDER_ON);
+        secondaryMediaFolderOn.setEnabled(true);
         secondaryMediaFolderOn.setOnPreferenceClickListener(this);
         localSecondaryFolder = findPreference(KEY_LOCAL_SECONDARY_MEDIA_FOLDER);
         localSecondaryFolder.setOnPreferenceClickListener(this);
@@ -174,7 +176,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             if (tempHandle != null) {
                 camSyncHandle = Long.valueOf(tempHandle);
 
-                if (camSyncHandle != CAM_SYNC_INVALID_HANDLE) {
+                if (camSyncHandle != INVALID_HANDLE) {
                     camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);
 
                     if (camSyncMegaNode != null) {
@@ -385,8 +387,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
      * Method to control the changes needed when the node for CameraSync doesn't exist.
      */
     private void nodeForCameraSyncDoesNotExist() {
-        dbH.setCamSyncHandle(CAM_SYNC_INVALID_HANDLE);
-        camSyncHandle = (long) CAM_SYNC_INVALID_HANDLE;
+        dbH.setCamSyncHandle(Long.parseLong(INVALID_NON_NULL_VALUE));
+        camSyncHandle = Long.parseLong(INVALID_NON_NULL_VALUE);
         camSyncMegaPath = getString(R.string.section_photo_sync);
     }
 
@@ -409,7 +411,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     }
 
     private void setupPrimaryCloudFolder() {
-        if (camSyncHandle == null || camSyncHandle == CAM_SYNC_INVALID_HANDLE) {
+        if (camSyncHandle == null || camSyncHandle == INVALID_HANDLE) {
             camSyncMegaPath = getString(R.string.section_photo_sync);
         }
 
@@ -427,8 +429,10 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
         }
         if (cuEnabled) {
+            logDebug("Disable CU.");
             disableCameraUpload();
         } else {
+            logDebug("Enable CU.");
             String[] PERMISSIONS = {
                     android.Manifest.permission.READ_EXTERNAL_STORAGE
             };
@@ -507,6 +511,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 secondaryUpload = !secondaryUpload;
                 if (secondaryUpload) {
+                    logDebug("Enable MU.");
                     //If there is any possible secondary folder, set it as the default one
                     long setSecondaryFolderHandle = getSecondaryFolderHandle();
                     long possibleSecondaryFolderHandle = findDefaultFolder(getString(R.string.section_secondary_media_uploads));
@@ -517,14 +522,16 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                     restoreSecondaryTimestampsAndSyncRecordProcess();
                     dbH.setSecondaryUploadEnabled(true);
-
-                    if (handleSecondaryMediaFolder == null || handleSecondaryMediaFolder == CAM_SYNC_INVALID_HANDLE) {
+                    // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
+                    secondaryMediaFolderOn.setEnabled(false);
+                    if (handleSecondaryMediaFolder == null || handleSecondaryMediaFolder == INVALID_HANDLE) {
                         megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
                     }
 
                     prefs = dbH.getPreferences();
                     checkMediaUploadsPath();
                 } else {
+                    logDebug("Disable MU.");
                     resetMUTimestampsAndCache();
                     dbH.setSecondaryUploadEnabled(false);
                 }
@@ -560,18 +567,21 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private void checkMediaUploadsPath() {
         localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
 
-        if (isTextEmpty(localSecondaryFolderPath) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
+        if (isTextEmpty(localSecondaryFolderPath) || localSecondaryFolderPath.equals(INVALID_NON_NULL_VALUE) || (!isExternalSDCardMU && !isFileAvailable(new File(localSecondaryFolderPath)))) {
             logWarning("Secondary ON: invalid localSecondaryFolderPath");
             localSecondaryFolderPath = getString(R.string.settings_empty_folder);
             Toast.makeText(context, getString(R.string.secondary_media_service_error_local_folder), Toast.LENGTH_SHORT).show();
             if (!isFileAvailable(new File(localSecondaryFolderPath))) {
-                dbH.setSecondaryFolderPath(INVALID_PATH);
+                dbH.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
             }
         } else if (isExternalSDCardMU) {
             Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
             String pickedDirName = getSDCardDirName(uri);
             if (pickedDirName != null) {
                 localSecondaryFolderPath = pickedDirName;
+            } else {
+                localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+                dbH.setSecondaryFolderPath(INVALID_NON_NULL_VALUE);
             }
         }
     }
@@ -988,6 +998,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         getPreferenceScreen().addPreference(keepFileNames);
         getPreferenceScreen().addPreference(megaCameraFolder);
         getPreferenceScreen().addPreference(secondaryMediaFolderOn);
+        // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
+        cameraUploadOnOff.setEnabled(false);
 
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE));
     }
@@ -1084,15 +1096,15 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         if (secHandle != null) {
             if (!TextUtils.isEmpty(secHandle)) {
                 handleSecondaryMediaFolder = Long.valueOf(secHandle);
-                if (handleSecondaryMediaFolder != null && handleSecondaryMediaFolder != CAM_SYNC_INVALID_HANDLE) {
+                if (handleSecondaryMediaFolder != null && handleSecondaryMediaFolder != INVALID_HANDLE) {
                     megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
                     megaPathSecMediaFolder = megaNodeSecondaryMediaFolder == null ? getString(R.string.section_secondary_media_uploads) :
                             megaNodeSecondaryMediaFolder.getName();
                 }
             }
         } else {
-            dbH.setSecondaryFolderHandle(CAM_SYNC_INVALID_HANDLE);
-            handleSecondaryMediaFolder = (long) CAM_SYNC_INVALID_HANDLE;
+            dbH.setSecondaryFolderHandle(INVALID_HANDLE);
+            handleSecondaryMediaFolder = INVALID_HANDLE;
         }
     }
 
@@ -1137,6 +1149,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 localCameraUploadFolder.setSummary(camSyncLocalPath);
                 resetCUTimestampsAndCache();
                 rescheduleCameraUpload(context);
+                // Update sync when primary local folder changed.
+                CuSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
                 break;
 
             case REQUEST_MEGA_CAMERA_FOLDER:
@@ -1149,6 +1163,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 if (handle != INVALID_HANDLE) {
                     //set primary only
+                    logDebug("Set CU primary attribute: " + handle);
                     megaApi.setCameraUploadsFolders(handle, INVALID_HANDLE, setAttrUserListener);
                 } else {
                     logError("Error choosing the Mega folder to sync the Camera");
@@ -1171,6 +1186,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 dbH.setSecSyncTimeStamp(0);
                 dbH.setSecVideoSyncTimeStamp(0);
                 rescheduleCameraUpload(context);
+                // Update sync when secondary local folder changed.
+                CuSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
                 break;
 
             case REQUEST_MEGA_SECONDARY_MEDIA_FOLDER:
@@ -1182,6 +1199,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 }
 
                 if (secondaryHandle != INVALID_HANDLE) {
+                    logDebug("Set CU secondary attribute: " + secondaryHandle);
                     megaApi.setCameraUploadsFolders(INVALID_HANDLE, secondaryHandle, setAttrUserListener);
                 } else {
                     logError("Error choosing the Mega folder to sync the Camera");
