@@ -965,8 +965,8 @@ public class ChatUtil {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        String message = context.getResources().getString(R.string.confirmation_clear_chat, getTitleChat(chat));
-        builder.setTitle(R.string.title_confirmation_clear_group_chat);
+        String message = context.getResources().getString(R.string.confirmation_clear_chat_history, getTitleChat(chat));
+        builder.setTitle(R.string.title_confirmation_clear_chat_history);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }

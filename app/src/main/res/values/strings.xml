@@ -1283,6 +1283,8 @@
 
     <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">All messages and media in this conversation will be cleared.</string>
     <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear history?</string>
+    <string name="title_confirmation_clear_chat_history" context="Title of the confirmation dialog to clear the chat history from Manage chat history section">Clear chat history?</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">All messages and media in this conversation will be deleted for every participant.</string>
 
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">The participant is already included in this group chat</string>
