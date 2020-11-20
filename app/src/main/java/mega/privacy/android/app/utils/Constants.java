@@ -461,6 +461,7 @@ public class Constants {
     public static final int ERROR_LINK = -1;
     public static final int INVALID_CALL_STATUS = -1;
     public static final int MAX_PARTICIPANTS_GRID = 6;
+    public static final int INVALID_CALL = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
