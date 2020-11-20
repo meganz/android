@@ -1478,7 +1478,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void getImageView (int i, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
+        intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
@@ -1535,7 +1535,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         getImageView(i, handle);
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", SCROLL_TO_POSITION);
+        intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);

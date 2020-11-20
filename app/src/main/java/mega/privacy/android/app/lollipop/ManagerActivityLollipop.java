@@ -681,7 +681,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
 	private AlertDialog generalDialog;
-	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
 	private AlertDialog alertDialogSMSVerification;
@@ -878,7 +877,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     return;
 				}
 
-				int actionType = intent.getIntExtra("actionType", -1);
+				int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if(actionType == UPDATE_GET_PRICING){
 					logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
@@ -926,10 +925,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							} else {
 								upAFL.showAvailableAccount();
 							}
-						}
-
-						if(getSettingsFragment() != null){
-							sttFLol.setRubbishInfo();
 						}
 
 						checkBusinessStatus();
@@ -1000,11 +995,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					secondaryMediaUploadsClicked();
 				} else if (!isSecondary && drawerItem == DrawerItem.CAMERA_UPLOADS) {
 					cameraUploadsClicked();
-				}
-
-				//refresh settings if user is on that page
-				if (getSettingsFragment() != null) {
-					getSettingsFragment().setCUDestinationFolder(isSecondary, handleInUserAttr);
 				}
 
 				//update folder icon
@@ -1088,7 +1078,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			ImageView imageDrag = null;
 
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 				position = intent.getIntExtra("position", -1);
 				placeholderCount = intent.getIntExtra("placeholder", 0);
 				adapterType = intent.getIntExtra("adapterType", 0);
@@ -1365,38 +1355,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (getChatsFragment() != null) {
 					rChatFL.notifyPushChanged();
 				}
-				if(getSettingsFragment() != null){
-					sttFLol.updateNotifChat();
-				}
 			}
 		}
 	};
 
-    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null && intent.getAction() != null) {
-                switch (intent.getAction()) {
-                    case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-                        if (getSettingsFragment() != null) {
-                            sttFLol.refreshCameraUploadsSettings();
-                        }
-                        break;
-                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-                        // disable UI elements of media upload omly
-                        if (getSettingsFragment() != null) {
-                            sttFLol.disableMediaUploadUIProcess();
-                        }
-                        break;
-                    case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
-                        if (getSettingsFragment() != null) {
-                            sttFLol.taskGetSizeOffline();
-                        }
-                        break;
-                }
-            }
-        }
-    };
+	private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null && intent.getAction() != null && getSettingsFragment() != null
+					&& (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
+					|| intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE))) {
+				sttFLol.refreshCameraUploadsSettings();
+			}
+		}
+	};
 
     public void launchPayment(String productId) {
         //start purchase/subscription flow
@@ -2104,8 +2076,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
-		filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
@@ -3515,11 +3486,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     }
 
     private void enableCU() {
-        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_SETTINGS)) {
-            if (getSettingsFragment() != null) {
-                sttFLol.enableCameraUpload();
-            }
-        } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
+		sendBroadcast(new Intent(ACTION_UPDATE_ENABLE_CU_SETTING));
+
+        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
             cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
             if (cuFragment == null) {
@@ -4034,9 +4003,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
-									if(sttFLol != null  && sttFLol.isResumed()){
-										sttFLol.disableCameraUpload();
-									}
+                                    sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
 									if (cuFragment != null && cuFragment.isResumed()) {
 										cuFragment.resetSwitchButtonLabel();
 									}
@@ -5344,6 +5311,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (nVDisplayName != null) {
 				nVDisplayName.setText(megaChatApi.getMyFullname());
 			}
+
 			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
 					megaChatApi.getMyFullname());
 
@@ -7604,7 +7572,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		hideFabButton();
 	}
 
-
 	public void refreshAfterMovingToRubbish(){
 		logDebug("refreshAfterMovingToRubbish");
 
@@ -7664,9 +7631,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Back up timestamps and disabled MU upload.
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
-                if (getSettingsFragment() != null) {
-                    sttFLol.disableMediaUploadUIProcess();
-                }
             } else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
@@ -7678,10 +7642,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Disable both CU and MU.
                 backupTimestampsAndFolderHandle();
                 disableCameraUploadSettingProcess(false);
-                if (getSettingsFragment() != null) {
-                    sttFLol.disableCameraUploadUIProcess();
-                }
-            } else {
+				sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
+			} else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
             }
@@ -9826,331 +9788,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 	}
 
-	public void showRBNotDisabledDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = this.getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_two_vertical_buttons, null);
-		builder.setView(v);
-
-		TextView title = (TextView) v.findViewById(R.id.dialog_title);
-		title.setText(getString(R.string.settings_rb_scheduler_enable_title));
-		TextView text = (TextView) v.findViewById(R.id.dialog_text);
-		text.setText(getString(R.string.settings_rb_scheduler_alert_disabling));
-
-		Button firstButton = (Button) v.findViewById(R.id.dialog_first_button);
-		firstButton.setText(getString(R.string.button_plans_almost_full_warning));
-		firstButton.setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				generalDialog.dismiss();
-				//Show UpgradeAccountActivity
-				drawerItemPreUpgradeAccount = drawerItem;
-				drawerItem = DrawerItem.ACCOUNT;
-				accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
-				selectDrawerItemAccount();
-				setTabsVisibility();
-			}
-		});
-
-		Button secondButton = (Button) v.findViewById(R.id.dialog_second_button);
-		secondButton.setText(getString(R.string.button_not_now_rich_links));
-		secondButton.setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				generalDialog.dismiss();
-			}
-		});
-
-		generalDialog = builder.create();
-		generalDialog.show();
-	}
-
-	public void showRbSchedulerValueDialog(final boolean isEnabling){
-		logDebug("showRbSchedulerValueDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layout.addView(input, params);
-
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.hint_days));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-
-					try{
-						int daysCount = Integer.parseInt(value);
-
-						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-							//PRO account
-							if(daysCount>6){
-								//Set new value
-								setRBSchedulerValue(value);
-								newFolderDialog.dismiss();
-							}
-							else{
-								//Show again the dialog
-								input.setText("");
-								input.requestFocus();
-							}
-						}
-						else{
-							//PRO account
-							if(daysCount>6 && daysCount<31){
-								//Set new value
-								setRBSchedulerValue(value);
-								newFolderDialog.dismiss();
-							}
-							else{
-								//Show again the dialog
-								input.setText("");
-								input.requestFocus();
-							}
-						}
-					}
-					catch (Exception e){
-						//Show again the dialog
-						input.setText("");
-						input.requestFocus();
-					}
-
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		final TextView text = new TextView(ManagerActivityLollipop.this);
-
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-			text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
-		}
-		else{
-			text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
-		}
-
-		float density = getResources().getDisplayMetrics().density;
-		float scaleW = getScaleW(outMetrics, density);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (11*scaleW));
-		layout.addView(text);
-
-		LinearLayout.LayoutParams params_text_error = (LinearLayout.LayoutParams) text.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-//		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-//		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(25, outMetrics), 0,scaleWidthPx(25, outMetrics),0);
-		text.setLayoutParams(params_text_error);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
-		builder.setPositiveButton(getString(R.string.general_ok),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new android.content.DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if(isEnabling && getSettingsFragment() != null){
-					sttFLol.updateRBScheduler(0);
-				}
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-
-		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-
-				String value = input.getText().toString().trim();
-
-				if (value.length() == 0) {
-					return;
-				}
-
-				try{
-					int daysCount = Integer.parseInt(value);
-
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-						//PRO account
-						if(daysCount>6){
-							//Set new value
-							setRBSchedulerValue(value);
-							newFolderDialog.dismiss();
-						}
-						else{
-							//Show again the dialog
-							input.setText("");
-							input.requestFocus();
-						}
-					}
-					else{
-						//PRO account
-						if(daysCount>6 && daysCount<31){
-							//Set new value
-							setRBSchedulerValue(value);
-							newFolderDialog.dismiss();
-						}
-						else{
-							//Show again the dialog
-							input.setText("");
-							input.requestFocus();
-						}
-					}
-				}
-				catch (Exception e){
-					//Show again the dialog
-					input.setText("");
-					input.requestFocus();
-				}
-			}
-		});
-	}
-
-	public void setRBSchedulerValue(String value){
-		logDebug("Value: "+ value);
-		int intValue = Integer.parseInt(value);
-
-		if(megaApi!=null){
-			megaApi.setRubbishBinAutopurgePeriod(intValue, this);
-		}
-	}
-
-	public void enableLastGreen(boolean enable){
-		logDebug("Enable Last Green: "+ enable);
-
-		if(megaChatApi!=null){
-			megaChatApi.setLastGreenVisible(enable, this);
-		}
-	}
-
-	public void showAutoAwayValueDialog(){
-		logDebug("showAutoAwayValueDialog");
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View v = inflater.inflate(R.layout.dialog_autoaway, null);
-        builder.setView(v);
-
-        final EditText input = v.findViewById(R.id.autoaway_edittext);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = validateAutoAway(v.getText());
-					if (value != null) {
-						setAutoAwayValue(value, false);
-					}
-					newFolderDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
-		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
-		set.setOnClickListener(new OnClickListener() {
-            @Override
-			public void onClick(View v) {
-				String value = validateAutoAway(input.getText());
-				if (value != null) {
-					setAutoAwayValue(value, false);
-				}
-				newFolderDialog.dismiss();
-			}
-        });
-		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
-	    cancel.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAutoAwayValue("-1", true);
-				newFolderDialog.dismiss();
-            }
-        });
-
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-	}
-
-	private String validateAutoAway(CharSequence value) {
-		int timeout;
-		try {
-			timeout = Integer.parseInt(value.toString().trim());
-			if (timeout <= 0) {
-				timeout = 1;
-			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
-				timeout = MAX_AUTOAWAY_TIMEOUT;
-			}
-			return String.valueOf(timeout);
-		} catch (Exception e) {
-			logWarning("Unable to parse user input, user entered: '" + value + "'");
-			return null;
-		}
-	}
-
-	public void setAutoAwayValue(String value, boolean cancelled){
-		logDebug("Value: " + value);
-		if(cancelled){
-			if(getSettingsFragment() != null){
-				sttFLol.updatePresenceConfigChat(true, null);
-			}
-		}
-		else{
-			int timeout = Integer.parseInt(value);
-			if(megaChatApi!=null){
-				megaChatApi.setPresenceAutoaway(true, timeout*60);
-			}
-		}
-	}
-
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			MegaNode rootNode = megaApi.getRootNode();
@@ -10300,96 +9937,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		clearRubbishBinDialog = builder.create();
 		clearRubbishBinDialog.show();
-	}
-
-	public void showConfirmationClearAllVersions(){
-		logDebug("showConfirmationClearAllVersions");
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.settings_file_management_delete_versions));
-		builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
-
-		builder.setPositiveButton(getString(R.string.context_delete),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						nC.clearAllVersions();
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		clearRubbishBinDialog = builder.create();
-		clearRubbishBinDialog.show();
-	}
-
-	public void showPanelSetPinLock(){
-		logDebug("showPanelSetPinLock");
-
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
-
-		getSettingsFragment();
-
-		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				setPinDialog.dismiss();
-				switch(item) {
-					case 0:{
-						dbH.setPinLockType(PIN_4);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-					case 1:{
-						dbH.setPinLockType(PIN_6);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-					case 2:{
-						dbH.setPinLockType(PIN_ALPHANUMERIC);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-				}
-			}
-		});
-		dialogBuilder.setTitle(getString(R.string.pin_lock_type));
-
-		dialogBuilder.setOnKeyListener(new Dialog.OnKeyListener() {
-
-			@Override
-			public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
-				logDebug("onKeyListener: " + keyCode);
-				if (keyCode == KeyEvent.KEYCODE_BACK) {
-					logDebug("Cancel set pin action");
-					setPinDialog.dismiss();
-					if(sttFLol!=null){
-						sttFLol.cancelSetPinLock();
-					}
-				}
-				return true;
-			}
-		});
-
-		dialogBuilder.setOnCancelListener(
-				new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						logDebug("setOnCancelListener setPin");
-						setPinDialog.dismiss();
-						if(sttFLol!=null){
-							sttFLol.cancelSetPinLock();
-						}
-					}
-				}
-		);
-
-		setPinDialog = dialogBuilder.create();
-		setPinDialog.setCanceledOnTouchOutside(true);
-		setPinDialog.show();
 	}
 
 	public void chooseAddContactDialog(boolean isMegaContact) {
@@ -11552,10 +11099,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-
-                        if (getSettingsFragment() != null) {
-                        	sttFLol.taskGetSizeOffline();
-                        }
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -11586,9 +11129,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
-						if (getSettingsFragment() != null) {
-							sttFLol.taskGetSizeOffline();
-						}
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13557,15 +13097,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				}
 			}
-			else if (request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-				logDebug("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
-				if (e.getErrorCode() != MegaError.API_OK){
-					logError("ERROR:USER_ATTR_RICH_PREVIEWS");
-					if(getSettingsFragment() != null){
-						sttFLol.updateEnabledRichLinks();
-					}
-				}
-			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
 				if (e.getErrorCode() == MegaError.API_OK) {
@@ -13589,10 +13120,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-					if(getSettingsFragment() != null){
-						sttFLol.updateEnabledFileVersions();
-					}
-
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 					if(mStorageFLol!=null){
 						mStorageFLol.refreshVersionsInfo();
@@ -13600,17 +13127,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				else{
 					logDebug("File versioning attribute changed correctly");
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				logDebug("change RB scheduler - USER_ATTR_RUBBISH_TIME finished");
-				if(getSettingsFragment() != null){
-					if (e.getErrorCode() != MegaError.API_OK){
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-					}
-					else{
-						sttFLol.updateRBScheduler(request.getNumber());
-					}
 				}
 			}
 		}
@@ -13718,32 +13234,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 			}
-            else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
-
-				if(e.getErrorCode() == MegaError.API_ENOENT){
-					logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
-				}
-
-				if(request.getNumDetails()==1){
-					logDebug("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-
-					long counter = request.getNumber();
-					boolean flag = request.getFlag();
-
-					MegaApplication.setShowRichLinkWarning(request.getFlag());
-					MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
-				}
-				else if(request.getNumDetails()==0){
-
-					logDebug("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:" + request.getFlag());
-
-					MegaApplication.setEnabledRichLinks(request.getFlag());
-
-                    if(getSettingsFragment() != null){
-						sttFLol.updateEnabledRichLinks();
-                    }
-				}
-            }
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
 
 				if(e.getErrorCode() == MegaError.API_OK){
@@ -13789,28 +13279,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
-				if(getSettingsFragment() != null){
-					sttFLol.updateEnabledFileVersions();
-				}
-
 				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 				if(mStorageFLol!=null){
 					mStorageFLol.refreshVersionsInfo();
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				if(getSettingsFragment() != null){
-					if (e.getErrorCode() == MegaError.API_ENOENT){
-						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-							sttFLol.updateRBScheduler(30);
-						}
-						else{
-							sttFLol.updateRBScheduler(90);
-						}
-					}
-					else{
-						sttFLol.updateRBScheduler(request.getNumber());
-					}
 				}
 			}
 		}
@@ -14309,40 +13780,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logError("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
-				resetAccountDetailsTimeStamp();
-				if (getSettingsFragment() != null) {
-					sttFLol.resetRubbishInfo();
-				}
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_REMOVE_VERSIONS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_REMOVE_VERSIONS");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.success_delete_versions), -1);
-
-				if(getSettingsFragment() != null) {
-					sttFLol.resetVersionsInfo();
-				}
-				//Get info of the version again (after 10 seconds)
-				final Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						updateAccountStorageInfo();
-					}
-				}, 8000);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_delete_versions), -1);
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION");
@@ -14417,11 +13854,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if(mStorageFLol!=null){
 				mStorageFLol.refreshVersionsInfo();
 			}
-
-			//Refresh Settings if it is shown
-			if(getSettingsFragment() != null) {
-				sttFLol.setVersionsInfo();
-			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
@@ -14472,17 +13904,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						if(megaApi.getMyUser()!=null) {
 							if (user.getHandle() == megaApi.getMyUser().getHandle()) {
 								logDebug("Change on my account from another client");
-								if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
-									logDebug("Change on CHANGE_TYPE_DISABLE_VERSIONS");
-									megaApi.getFileVersionsOption(this);
-								}
+
 
 								if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
 									logDebug("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
 									megaApi.getContactLinksOption(this);
-								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
-									logDebug("Change on CHANGE_TYPE_RUBBISH_TIME");
-									megaApi.getRubbishBinAutopurgePeriod(this);
 								}
 							}
 						}
@@ -15720,30 +15146,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		logDebug("onChatPresenceConfigUpdate");
-		if(config!=null){
-			logDebug("Config status: " + config.getOnlineStatus());
-			logDebug("Config autoway: " + config.isAutoawayEnabled());
-			logDebug("Config persist: " + config.isPersist());
-			logDebug("Config lastGreen: " + config.isLastGreenVisible());
-			boolean isLastGreen = config.isLastGreenVisible();
-			if(config.isPending()){
-				logDebug("Config is pending - do not update UI");
-			}
-			else{
-				if(getSettingsFragment() != null){
-					sttFLol.updatePresenceConfigChat(false, config);
-				}
-				else{
-					logWarning("sttFLol no added or null");
-				}
-			}
-		}
-		else{
-			logWarning("Config is null");
-		}
-	}
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) { }
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {

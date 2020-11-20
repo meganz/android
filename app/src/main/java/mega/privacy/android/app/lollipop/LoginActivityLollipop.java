@@ -96,7 +96,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             int actionType;
 
             if (intent != null){
-                actionType = intent.getIntExtra("actionType", -1);
+                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
                 if(actionType == UPDATE_GET_PRICING){
                     logDebug("BROADCAST TO UPDATE AFTER GET PRICING");

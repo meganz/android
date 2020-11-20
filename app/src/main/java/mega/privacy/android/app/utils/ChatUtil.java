@@ -129,84 +129,55 @@ public class ChatUtil {
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
+
         if (context instanceof GroupChatInfoActivityLollipop) {
             inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
         } else if (context instanceof ChatActivityLollipop) {
             inflater = ((ChatActivityLollipop) context).getLayoutInflater();
         }
+
         View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
         builder.setView(v);
         final AlertDialog shareLinkDialog = builder.create();
 
         EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
         nameGroup.setText(getTitleChat(chat));
-        TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
+        TextView chatLinkText = v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
-        final boolean isModerator = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? true : false;
+        Button copyButton = v.findViewById(R.id.copy_button);
+        copyButton.setOnClickListener(v12 -> {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
+            clipboard.setPrimaryClip(clip);
+            if (context instanceof ChatActivityLollipop) {
+                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
 
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.copy_button: {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
-                        clipboard.setPrimaryClip(clip);
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
-
-                        }
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.share_button: {
-                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                        sharingIntent.setType("text/plain");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, chatLink);
-                        context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.delete_button: {
-                        if (isModerator) {
-                            showConfirmationRemoveChatLink(context);
-                        }
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.dismiss_button: {
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                }
             }
-        };
+            dismissShareChatLinkDialog(context, shareLinkDialog);
+        });
 
-        Button copyButton = (Button) v.findViewById(R.id.copy_button);
-        copyButton.setOnClickListener(clickListener);
-        Button shareButton = (Button) v.findViewById(R.id.share_button);
-        shareButton.setOnClickListener(clickListener);
-        Button deleteButton = (Button) v.findViewById(R.id.delete_button);
-        if (isModerator) {
-            deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            deleteButton.setVisibility(View.GONE);
-        }
-        deleteButton.setOnClickListener(clickListener);
-        Button dismissButton = (Button) v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(clickListener);
+        Button shareButton = v.findViewById(R.id.share_button);
+        shareButton.setOnClickListener(v13 -> {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType(PLAIN_TEXT_SHARE_TYPE);
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
+            context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
+            dismissShareChatLinkDialog(context, shareLinkDialog);
+        });
+
+        Button dismissButton = v.findViewById(R.id.dismiss_button);
+        dismissButton.setOnClickListener(v15 -> dismissShareChatLinkDialog(context, shareLinkDialog));
 
         shareLinkDialog.setCancelable(false);
         shareLinkDialog.setCanceledOnTouchOutside(false);
+
         try {
             shareLinkDialog.show();
         } catch (Exception e) {
+            logWarning("Exception showing share link dialog.", e);
         }
     }
 
@@ -221,31 +192,15 @@ public class ChatUtil {
     }
 
     public static void showConfirmationRemoveChatLink(final Context context) {
-        logDebug("showConfirmationRemoveChatLink");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).removeChatLink();
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).removeChatLink();
-                        }
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        builder.setTitle(R.string.action_delete_link);
-        builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.action_delete_link)
+                .setMessage(R.string.context_remove_chat_link_warning_text)
+                .setPositiveButton(R.string.delete_button, (dialog, which) -> {
+                    if (context instanceof GroupChatInfoActivityLollipop) {
+                        ((GroupChatInfoActivityLollipop) context).removeChatLink();
+                    }
+                })
+                .setNegativeButton(R.string.general_cancel, null).show();
     }
 
     public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {
