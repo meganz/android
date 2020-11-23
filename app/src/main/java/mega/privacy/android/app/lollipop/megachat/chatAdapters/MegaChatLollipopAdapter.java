@@ -2843,7 +2843,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
 
-        } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+        } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+            String invalidMetaMessage = getInvalidMetaMessage(message);
+
             if (message.getUserHandle() == myUserHandle) {
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
                 holder.titleOwnMessage.setGravity(Gravity.RIGHT);
@@ -2907,7 +2909,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
-                holder.contentOwnMessageText.setText(context.getString(R.string.error_meta_message_invalid));
+                holder.contentOwnMessageText.setText(invalidMetaMessage);
 
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
@@ -2975,7 +2977,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 //Color always status SENT
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
-                ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_meta_message_invalid));
+                holder.contentContactMessageText.setText(invalidMetaMessage);
             }
 
             checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
