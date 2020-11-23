@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="27dp"
                 android:text="@string/over_disk_quota_paywall_title"
-                android:textColor="@color/black_87_opacity"
+                android:textColor="@color/primary_text"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
                 android:text="We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have PRO Lite."
-                android:textColor="@color/black_87_opacity"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 tools:ignore="HardcodedText" />
 
@@ -80,7 +80,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
                     android:text="@string/over_disk_quota_paywall_deletion_warning"
-                    android:textColor="@color/black_87_opacity"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp" />
 
             </LinearLayout>
