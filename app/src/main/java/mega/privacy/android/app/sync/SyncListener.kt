@@ -13,7 +13,7 @@ import nz.mega.sdk.MegaRequest
  */
 class SyncListener(
     /**
-     * Callback executes when request finsished.
+     * Callback executes when request finished.
      */
     private val callback: SyncEventCallback,
     context: Context

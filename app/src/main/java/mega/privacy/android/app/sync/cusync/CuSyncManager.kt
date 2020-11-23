@@ -7,8 +7,6 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.utils.Constants.ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE
-import mega.privacy.android.app.utils.Constants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.jobservices.SyncRecord
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.sync.SyncListener
@@ -16,7 +14,7 @@ import mega.privacy.android.app.sync.cusync.callback.RemoveBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.SetBackupCallback
 import mega.privacy.android.app.sync.cusync.callback.UpdateBackupCallback
 import mega.privacy.android.app.utils.CameraUploadUtil
-import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -40,7 +38,6 @@ object CuSyncManager {
     private const val TYPE_BACKUP_INVALID = -1
     const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
     const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
-    const val INVALID_INT = -1
     private const val PROGRESS_FINISHED = 100
 
     /**
@@ -245,7 +242,7 @@ object CuSyncManager {
                 cuSync.backupId,
                 newTargetNode,
                 null,
-                INVALID_INT
+                INVALID_VALUE
             )
         }
     }
@@ -279,7 +276,7 @@ object CuSyncManager {
                 muSync.backupId,
                 newTargetNode,
                 null,
-                INVALID_INT,
+                INVALID_VALUE,
             )
         }
     }
@@ -309,7 +306,7 @@ object CuSyncManager {
                 cuSync.backupId,
                 INVALID_HANDLE,
                 newLocalFolder!!,
-                INVALID_INT
+                INVALID_VALUE
             )
         }
     }
@@ -339,7 +336,7 @@ object CuSyncManager {
                 muSync.backupId,
                 INVALID_HANDLE,
                 newLocalFolder!!,
-                INVALID_INT
+                INVALID_VALUE
             )
         }
     }
@@ -421,7 +418,7 @@ object CuSyncManager {
             localFolder,
             null,
             state,
-            INVALID_INT,
+            INVALID_VALUE,
             null,
             SyncListener(UpdateBackupCallback(), megaApplication)
         )
@@ -600,7 +597,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                INVALID_INT,
+                INVALID_VALUE,
                 cuPendingUploads,
                 0,
                 cuLastActionTimestampSeconds,
@@ -616,7 +613,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                INVALID_INT,
+                INVALID_VALUE,
                 muPendingUploads,
                 0,
                 muLastActionTimestampSeconds,
@@ -647,7 +644,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 cuBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                INVALID_INT,
+                INVALID_VALUE,
                 0,
                 0,
                 0,
@@ -661,7 +658,7 @@ object CuSyncManager {
             megaApi.sendBackupHeartbeat(
                 muBackup.backupId,
                 Status.CU_SYNC_STATUS_INACTIVE,
-                INVALID_INT,
+                INVALID_VALUE,
                 0,
                 0,
                 0,

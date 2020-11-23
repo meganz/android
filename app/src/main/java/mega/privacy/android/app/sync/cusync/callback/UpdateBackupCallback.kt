@@ -1,6 +1,7 @@
 package mega.privacy.android.app.sync.cusync.callback
 
 import mega.privacy.android.app.sync.SyncEventCallback
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -26,7 +27,7 @@ class UpdateBackupCallback: SyncEventCallback {
                 backup.apply {
                     if(nodeHandle != MegaApiJava.INVALID_HANDLE) targetNode = nodeHandle
                     if(file != null) localFolder = file
-                    if(access != INVALID_INT) state = access
+                    if(access != Constants.INVALID_VALUE) state = access
                 }
                 getDatabase().updateBackup(backup)
                 logDebug("Successful callback: update $backup.")

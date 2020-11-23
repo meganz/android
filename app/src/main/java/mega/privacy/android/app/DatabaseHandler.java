@@ -35,6 +35,7 @@ import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_SEC
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
