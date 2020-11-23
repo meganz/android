@@ -51,7 +51,7 @@
                 android:layout_marginRight="24dp"
                 android:text="@string/account_temporarily_suspended"
                 android:textSize="16sp"
-                android:textColor="@color/name_my_account"/>
+                android:textColor="@color/primary_text"/>
 
             <TextView
                 android:id="@+id/verify_email_text"
@@ -61,7 +61,7 @@
                 android:layout_marginLeft="24dp"
                 android:layout_marginRight="24dp"
                 android:textSize="16sp"
-                android:textColor="@color/name_my_account"/>
+                android:textColor="@color/primary_text"/>
 
             <RelativeLayout
                 android:id="@+id/why_am_i_seeing_this_layout"
