@@ -177,6 +177,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
+
+                if (isEmptyFolder(node)) {
+                    counterSave--;
+                    optionOffline.setVisibility(View.GONE);
+                }
+
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
             } else {
@@ -290,7 +296,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionInfoText.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
                     if (isOutShare(node)) {
-                        optionShareFolderText.setText(R.string.context_sharing_folder);
+                        optionShareFolderText.setText(R.string.manage_share);
                         optionClearShares.setVisibility(View.VISIBLE);
                     } else {
                         optionShareFolderText.setText(R.string.context_share_folder);
@@ -569,7 +575,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     if (node.isFolder()) {
                         optionInfoText.setText(R.string.general_folder_info);
                         optionShareFolder.setVisibility(View.VISIBLE);
-                        optionShareFolderText.setText(R.string.context_sharing_folder);
+                        optionShareFolderText.setText(R.string.manage_share);
                     } else {
                         optionInfoText.setText(R.string.general_file_info);
                         counterShares--;
@@ -627,7 +633,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionInfoText.setText(R.string.general_folder_info);
                         optionShareFolder.setVisibility(View.VISIBLE);
                         if (isOutShare(node)) {
-                            optionShareFolderText.setText(R.string.context_sharing_folder);
+                            optionShareFolderText.setText(R.string.manage_share);
                         } else {
                             optionShareFolderText.setText(R.string.context_share_folder);
                         }
