@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/chat_item_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -28,9 +27,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter"
-                rounded:border_color="@color/border_file_properties"
-                rounded:border_width="0dp"
-                rounded:corner_radius="20dp" />
+                app:border_width="0dp"
+                app:corner_radius="20dp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -46,9 +44,8 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                rounded:emojiSize="14sp"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:emojiSize="14sp"/>
 
             <ImageView
                 android:id="@+id/chat_list_contact_state"
@@ -65,10 +62,9 @@
                 android:id="@+id/chat_list_chat_mail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/chat_list_chat_name_text"
-                android:textSize="14sp"
                 android:singleLine="true"
                 android:maxLines="1"
                 android:ellipsize="middle"/>
@@ -80,7 +76,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/chat_sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -105,12 +101,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/info_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/chat_list_info_chat_text"
@@ -119,8 +115,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle2"/>
             </LinearLayout>
 
             <LinearLayout
@@ -129,7 +124,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/chat_sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/chat_list_clear_history_chat_layout"
@@ -143,12 +138,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.64"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_clear_history"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/chat_list_clear_history_chat_text"
@@ -158,8 +153,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/title_properties_chat_clear"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -177,9 +171,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:alpha="0.54"
                     android:src="@drawable/ic_mute"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/chat_list_mute_chat_text"
@@ -189,8 +183,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_mute"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -209,7 +202,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_archive"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/chat_list_archive_chat_text"
@@ -219,8 +213,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/archive_chat_option"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -239,7 +232,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_r_leave_chat"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="@color/red_600_red_300"/>
 
                 <TextView
                     android:id="@+id/chat_list_leave_chat_text"
@@ -249,8 +243,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_leave"
-                    android:textColor="@color/red_600_red_300"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

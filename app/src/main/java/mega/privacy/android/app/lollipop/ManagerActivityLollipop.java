@@ -15662,7 +15662,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
     private void refreshAddPhoneNumberButton(){
-//        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+        navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
         if(maFLol != null){
             maFLol.updateAddPhoneNumberLabel();
         }
@@ -15681,7 +15681,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
             navigationDrawerAddPhoneContainer.setVisibility(View.VISIBLE);
         } else {
-//            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
+            navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
         }
     }
 

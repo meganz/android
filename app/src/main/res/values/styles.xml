@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
-
     <style name="MEGAProgressBarLogin" parent="Widget.AppCompat.ProgressBar.Horizontal">
 		 <item name="android:indeterminateOnly">false</item>
           <item name="android:minHeight">10dip</item>
@@ -673,4 +671,8 @@
     <style name="ThemeOverlay.Mega.DefaultToolBar" parent="">
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
     </style>
+
+    <!--======= Legacy styles(may not be best practice, keep for quick development) ========= -->
+
+    <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
 </resources>
