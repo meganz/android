@@ -6,6 +6,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
+import mega.privacy.android.app.listeners.UpdatePreviewersListener
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
@@ -13,6 +14,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 
 class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
@@ -20,6 +22,9 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private var screenOrientation = 0
     private lateinit var binding: ActivityManageChatHistoryBinding
     private var chat: MegaChatRoom? = null
+    private var chatId = MEGACHAT_INVALID_HANDLE
+    private var listener: UpdatePreviewersListener? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +52,10 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             logError("Cannot init view, chat is null")
             finish()
         }
+        chatId = chat?.chatId!!
+        listener = UpdatePreviewersListener(this)
+
+        megaChatApi.openChatRoom(chatId, listener)
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -64,6 +73,17 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         screenOrientation = resources.configuration.orientation
 
         binding.clearChatHistoryLayout?.setOnClickListener(this)
+        binding.historyRetentionSwitch?.setOnClickListener(null)
+
+        binding.historyRetentionSwitch?.setOnCheckedChangeListener { switchCompat, isChecked ->
+            if (isChecked) {
+                logDebug("is Checked")
+            } else {
+                logDebug("no checked")
+
+            }
+        }
+
         binding.historyRetentionLayout?.setOnClickListener(this)
     }
 
@@ -87,4 +107,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroy() {
+        megaChatApi.closeChatRoom(chatId, listener)
+        super.onDestroy()
+    }
 }
