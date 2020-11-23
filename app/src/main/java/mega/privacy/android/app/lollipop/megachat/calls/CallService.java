@@ -150,14 +150,16 @@ public class CallService extends Service{
 
     private void updateNotificationContent() {
         logDebug("Updating notification");
+        MegaChatCall call = megaChatApi.getChatCall(currentChatId);
+        if (call == null)
+            return;
+
+        int notificationId = getCallNotificationId(call.getId());
+
         Notification notif;
-        int notificationId = getCurrentCallNotifId();
         String contentText = null;
 
-        MegaChatCall call = megaChatApi.getChatCall(currentChatId);
-        if (call == null) {
-            contentText = getString(R.string.action_notification_call_in_progress);
-        } else if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
+       if (call.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
             contentText = getString(R.string.outgoing_call_starting);
         } else if (call.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
             contentText = getString(R.string.title_notification_incoming_call);
@@ -185,6 +187,8 @@ public class CallService extends Service{
     private void showCallInProgressNotification() {
         logDebug("Showing the notification");
         int notificationId = getCurrentCallNotifId();
+        if(notificationId == INVALID_CALL)
+            return;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -294,7 +298,7 @@ public class CallService extends Service{
 
     private void updateCall(long newChatIdCall) {
         stopForeground(true);
-        mNotificationManager.cancel(getCurrentCallNotifId());
+        cancelNotification();
         currentChatId = newChatIdCall;
         if (MegaApplication.getOpenCallChatId() != currentChatId) {
             MegaApplication.setOpenCallChatId(currentChatId);
@@ -387,8 +391,25 @@ public class CallService extends Service{
         return getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
     }
 
-    private int getCurrentCallNotifId(){
-        return (MegaApiJava.userHandleToBase64(currentChatId)).hashCode();
+    /**
+     * Method for getting the call notification ID from the chat ID.
+     *
+     * @return call notification ID.
+     */
+    private int getCurrentCallNotifId() {
+        MegaChatCall call = megaChatApi.getChatCall(currentChatId);
+        if (call == null)
+            return INVALID_CALL;
+
+        return getCallNotificationId(call.getId());
+    }
+
+    private void cancelNotification(){
+        int notificationId = getCurrentCallNotifId();
+        if(notificationId == INVALID_CALL)
+            return;
+
+        mNotificationManager.cancel(notificationId);
     }
 
     /**
@@ -404,8 +425,7 @@ public class CallService extends Service{
     @Override
     public void onDestroy() {
         unregisterReceiver(chatCallUpdateReceiver);
-        mNotificationManager.cancel(getCurrentCallNotifId());
-
+        cancelNotification();
         MegaApplication.setOpenCallChatId(-1);
 
         super.onDestroy();

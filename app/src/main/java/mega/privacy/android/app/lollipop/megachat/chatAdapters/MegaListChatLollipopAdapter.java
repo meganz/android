@@ -2107,13 +2107,16 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				} else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
 					logWarning("Invalid meta message");
+
+					String invalidMetaMessage = getInvalidMetaMessage(message);
+
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
 						logDebug("The last message is mine: " + lastMsgSender);
 						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
 						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-						Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+						Spannable myMessage = new SpannableString(invalidMetaMessage);
 						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 						CharSequence indexedText = TextUtils.concat(me, myMessage);
 						((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
@@ -2151,14 +2154,14 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 							if(chat.getUnreadCount()==0){
 								logDebug("Message READ");
-								Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+								Spannable myMessage = new SpannableString(invalidMetaMessage);
 								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
 							else{
 								logDebug("Message NOT read");
-								Spannable myMessage = new SpannableString(context.getString(R.string.error_meta_message_invalid));
+								Spannable myMessage = new SpannableString(invalidMetaMessage);
 								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
@@ -2174,7 +2177,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
 							}
 
-							((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.error_meta_message_invalid));
+							((ViewHolderNormalChatList)holder).textViewContent.setText(invalidMetaMessage);
 						}
 					}
 				}

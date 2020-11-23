@@ -46,7 +46,7 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 rounded:emojiSize="14sp"/>
 
@@ -54,7 +54,7 @@
                 android:id="@+id/file_contact_list_contact_mail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/mail_my_account"
+                android:textColor="@color/secondary_text"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/file_contact_list_contact_name_text"
                 android:textSize="14sp"
@@ -106,7 +106,7 @@
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
                 android:text="@string/contact_properties_activity"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"/>
         </LinearLayout>
 
@@ -145,7 +145,7 @@
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
                 android:text="@string/file_properties_shared_folder_change_permissions"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"/>
         </LinearLayout>
 

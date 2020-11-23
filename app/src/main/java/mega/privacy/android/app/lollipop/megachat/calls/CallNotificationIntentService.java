@@ -120,30 +120,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
             default:
                 throw new IllegalArgumentException("Unsupported action: " + action);
         }
-
-    }
-
-    /**
-     * Method for removing the incoming call notification.
-     *
-     * @param chatIdIncomingCall The chat ID wit the call.
-     */
-    public void clearIncomingCallNotification(long chatIdIncomingCall) {
-        logDebug("Clear the notification in chat: " + chatIdIncomingCall);
-        try {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (megaChatApi == null)
-                return;
-
-            MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
-            if (call == null)
-                return;
-
-            int notificationId = MegaApiJava.userHandleToBase64(chatIdIncomingCall).hashCode();
-            notificationManager.cancel(notificationId);
-        } catch (Exception e) {
-            logError("EXCEPTION", e);
-        }
     }
 
     @Override

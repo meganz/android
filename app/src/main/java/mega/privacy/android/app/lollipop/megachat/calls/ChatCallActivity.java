@@ -272,6 +272,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
+        clearIncomingCallNotification(chatId);
+
         titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
 
@@ -622,7 +624,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
                     if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                         if(cameraFragmentFullScreen != null){
-                            cameraFragmentFullScreen.changeUser(chatId, callChat.getId(), peerId, clientId);
+                            cameraFragmentFullScreen.changeUser(chatId, callId, peerId, clientId);
                         }
                         hideReconnecting();
                         updateAVFlags(session);
@@ -1373,11 +1375,11 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
 
         if(!checkPermissions()){
-            rejectFAB.hide();
+            withoutCallPermissions();
             answerCallFAB.hide();
             microFAB.hide();
             videoFAB.hide();
-            hangFAB.show();
+            rejectFAB.hide();
             onHoldFAB.hide();
             return;
         }
@@ -2051,7 +2053,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * @return True, if there's less. False, if there's more.
      */
     private boolean lessThanSevenParticipants() {
-        return chat.isGroup() && peersOnCall != null && peersOnCall.size() <= MAX_PARTICIPANTS_GRID;
+        return chat != null && chat.isGroup() && peersOnCall != null && peersOnCall.size() <= MAX_PARTICIPANTS_GRID;
     }
 
     private void updateChangesAudio(int position) {
@@ -2094,11 +2096,18 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     showInitialFABConfiguration();
                 } else {
-                    rejectFAB.hide();
-                    hangFAB.show();
+                    withoutCallPermissions();
                 }
                 break;
         }
+    }
+
+    /**
+     * Method showing only the hang up button because you do not have the necessary permissions.
+     */
+    private void withoutCallPermissions() {
+        hangFAB.show();
+        displayLinearFAB(false);
     }
 
     /**

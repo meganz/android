@@ -70,7 +70,7 @@
                         android:paddingTop="2dp"
                         android:layout_marginLeft="32dp"
                         android:text="@string/message_option_retry"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="16sp"/>
                 </LinearLayout>
 
@@ -110,7 +110,7 @@
                         android:paddingTop="2dp"
                         android:layout_marginLeft="32dp"
                         android:text="@string/context_delete"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="16sp"/>
                 </LinearLayout>
 
