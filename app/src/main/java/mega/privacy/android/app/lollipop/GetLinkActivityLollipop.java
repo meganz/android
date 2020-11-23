@@ -18,13 +18,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.fragments.CopyrightFragment;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -52,7 +52,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 
 	//Fragments
 	GetLinkFragmentLollipop getLinkFragment;
-	CopyrightFragmentLollipop copyrightFragment;
+	CopyrightFragment copyrightFragment;
 
 	ActionBar aB;
 	Toolbar tB;
@@ -158,39 +158,18 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 
-		if(selectedNode.isExported()){
-
+		if (selectedNode.isExported()) {
 			visibleFragment = GET_LINK_FRAGMENT;
-		}
-		else{
+		} else {
+			List<MegaNode> nodeLinks = megaApi.getPublicLinks();
 
-			ArrayList<MegaNode> nodeLinks = megaApi.getPublicLinks();
-			if(nodeLinks==null){
-				boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-				logDebug("No public links: showCopyright = " + showCopyright);
-				if(showCopyright){
-					visibleFragment = COPYRIGHT_FRAGMENT;
-				}
-				else{
-					visibleFragment = GET_LINK_FRAGMENT;
-				}
-			}
-			else{
-				if(nodeLinks.size()==0){
-					boolean showCopyright = Boolean.parseBoolean(dbH.getShowCopyright());
-					logDebug("No public links: showCopyright = " + showCopyright);
-					if(showCopyright){
-						visibleFragment = COPYRIGHT_FRAGMENT;
-					}
-					else{
-						visibleFragment = GET_LINK_FRAGMENT;
-					}
-				}
-				else{
-					visibleFragment = GET_LINK_FRAGMENT;
-				}
+			if (nodeLinks == null || nodeLinks.size() == 0) {
+				visibleFragment = Boolean.parseBoolean(dbH.getShowCopyright())
+						? COPYRIGHT_FRAGMENT
+						: GET_LINK_FRAGMENT;
 			}
 		}
+
 		showFragment(visibleFragment);
 
 		if (isBusinessExpired()) {
@@ -312,7 +291,7 @@ public class GetLinkActivityLollipop extends PinActivityLollipop implements Mega
 				}
 
 				if(copyrightFragment==null){
-					copyrightFragment = new CopyrightFragmentLollipop();
+					copyrightFragment = new CopyrightFragment();
 				}
 
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

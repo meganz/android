@@ -1,109 +1,78 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:background="@color/white"
-	android:id="@+id/scroll_view_copyright">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view_copyright"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/copyright_main_linear_layout"
-        android:layout_width="match_parent"  
-    	android:layout_height="wrap_content" 
-    	android:orientation="vertical"
-    	android:background="@color/white">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@color/white"
+        android:orientation="vertical">
 
-		<ImageView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="center_horizontal"
-			android:layout_marginTop="46dp"
-			android:layout_marginBottom="32dp"
-			android:src="@drawable/ic_copyright"
-			android:tint="@color/dark_primary_color"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="46dp"
+            android:src="@drawable/ic_copyright"
+            app:tint="@color/dark_primary_color" />
 
-		<TextView
-			android:id="@+id/copyright_title"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="25dp"
-			android:layout_marginBottom="28dp"
-			android:text="@string/copyright_alert_title"
-			android:gravity="left"
-			android:textSize="20dp"
-			android:textColor="@color/dark_primary_color"
-			android:layout_gravity="left"/>
+        <TextView
+            android:id="@+id/copyright_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="33dp"
+            android:text="@string/copyright_alert_title"
+            android:textColor="@color/dark_primary_color"
+            android:textSize="20sp" />
 
-		<TextView
-			android:id="@+id/copyright_first_paragraph"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="25dp"
-			android:layout_marginRight="25dp"
-			android:layout_marginBottom="24dp"
-			android:lineSpacingMultiplier="1.4"
-			android:text="@string/copyright_alert_first_paragraph"
-			android:textSize="14dp"
-			android:textColor="@color/copyright_text"
-			android:gravity="left"
-			android:layout_gravity="left"/>
+        <TextView
+            android:id="@+id/copyright_first_paragraph"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:lineSpacingMultiplier="1.4"
+            android:text="@string/copyright_alert_first_paragraph"
+            android:textColor="@color/copyright_text"
+            android:textSize="14sp" />
 
-		<TextView
-			android:id="@+id/copyright_second_paragraph"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="25dp"
-			android:layout_marginRight="25dp"
-			android:layout_marginBottom="32dp"
-			android:lineSpacingMultiplier="1.4"
-			android:text="@string/copyright_alert_second_paragraph"
-			android:textSize="14dp"
-			android:textColor="@color/copyright_text"
-			android:gravity="left"
-			android:layout_gravity="left"/>
+        <TextView
+            android:id="@+id/copyright_second_paragraph"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="33dp"
+            android:lineSpacingMultiplier="1.4"
+            android:text="@string/copyright_alert_second_paragraph"
+            android:textColor="@color/copyright_text"
+            android:textSize="14sp" />
 
-		<LinearLayout
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_gravity="right"
-			android:layout_marginRight="20dp"
-			android:layout_marginBottom="4dp"
-			android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="46dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
 
-			<Button
-				android:id="@+id/disagree_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:paddingLeft="16dp"
-				android:paddingRight="16dp"
-				android:paddingTop="4dp"
-				android:paddingBottom="4dp"
-				android:layout_marginRight="10dp"
-				android:layout_marginBottom="4dp"
-				android:textColor="@color/white"
-				android:text="@string/copyright_alert_disagree_button"
-				android:background="@color/accentColor"
-				android:stateListAnimator="@anim/button_upgrade_elevation"
-				android:tint="@android:color/white" />
+            <Button
+                android:id="@+id/disagree_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
+                android:layout_marginEnd="16dp"
+                android:text="@string/copyright_alert_disagree_button" />
 
-			<Button
-				android:id="@+id/agree_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:paddingLeft="16dp"
-				android:paddingRight="16dp"
-				android:paddingTop="8dp"
-				android:paddingBottom="8dp"
-				android:layout_marginBottom="4dp"
-				android:layout_marginRight="4dp"
-				android:minWidth="0dp"
-				android:textColor="@color/white"
-				android:text="@string/copyright_alert_agree_button"
-				android:background="@color/accentColor"
-				android:stateListAnimator="@anim/button_upgrade_elevation"
-				android:tint="@android:color/white" />
-		</LinearLayout>
-    	
+            <Button
+                android:id="@+id/agree_button"
+                style="@style/AccentButton"
+				android:layout_marginEnd="10dp"
+                android:text="@string/copyright_alert_agree_button" />
+
+        </LinearLayout>
 
     </LinearLayout>
+
 </ScrollView>
