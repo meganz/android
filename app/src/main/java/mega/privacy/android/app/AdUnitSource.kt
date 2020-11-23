@@ -33,7 +33,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
     private var querying = false
 
     // The map of ad slot id to ad unit id. Given by the server
-    private var adUnitMap: MegaStringMap? = null
+    private var adUnitMap = mutableMapOf<String, String>()
 
     // True if need showing Ads for the user, false otherwise
     private var isAdsUser = true
@@ -96,8 +96,18 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
      * @return the ad unit id
      */
     fun getAdUnitBySlot(slotId: String): String {
-        if (needRequery(lastFetchTime) || adUnitMap == null) return INVALID_UNIT_ID
-        return adUnitMap?.get(slotId) ?: ""
+        Log.i("Alex", "crash 1")
+        if (needRequery(lastFetchTime)) return INVALID_UNIT_ID
+        Log.i("Alex", "crash 2: $slotId")
+//        val keys = adUnitMap!!.keys
+//        Log.i("Alex", "keys:$keys")
+//        for (i in 0..keys!!.size()) {
+//            Log.i("Alex", "key:${keys[i]}")
+//            if (keys[i] != null) {
+//                Log.i("Alex", "" + adUnitMap!!.get(keys[i]))
+//            }
+//        }
+        return adUnitMap[slotId] ?: ""
     }
 
     /**
@@ -147,22 +157,21 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
 
                 when (e.errorCode) {
                     API_OK -> {
-//                            adUnitMap = request.megaStringMap
-                        adUnitMap = MegaStringMap.createInstance()
-                        adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
-                        adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
+                        copyAdUnitsMap(request.megaStringMap)
+//                        adUnitMap = MegaStringMap.createInstance()
+//                        adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
+//                        adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
+//                        adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
+//                        adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
+//                        adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
+//                        adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
 
-                        if (adUnitMap == null) return
-
+                        if (adUnitMap.isEmpty()) return
                         callBackForFetch()
                     }
                     // -9 for the user is a non-Ad user (here SDK returns -9 for API -9)
                     API_ENOENT -> {
-                        adUnitMap = null
+                        adUnitMap.clear()
                         isAdsUser = false
                         callBackForFetch()
                     }
@@ -186,6 +195,17 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
     private fun callBackForFetch() {
         for (cb in callbacks) {
             cb.adUnitsFetched()
+        }
+    }
+
+    private fun copyAdUnitsMap(stringMap: MegaStringMap) {
+        adUnitMap.clear()
+        val keys = stringMap.keys
+
+        for (i in 0..keys.size()) {
+            if (keys[i] != null) {
+                adUnitMap[keys[i]] = stringMap.get(keys[i])
+            }
         }
     }
 }

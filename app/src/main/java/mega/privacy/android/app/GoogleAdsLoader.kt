@@ -102,6 +102,7 @@ class GoogleAdsLoader(
         // if had never been fetched or outdated
         val adUnitId = AdUnitSource.getAdUnitBySlot(slotId)
         if (adUnitId == AdUnitSource.INVALID_UNIT_ID) {
+            Log.i("Alex", "crash 3")
             AdUnitSource.fetchAdUnits()
             return
         }
