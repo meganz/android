@@ -1,14 +1,15 @@
-package mega.privacy.android.app.fragments
+package mega.privacy.android.app.fragments.getLinkFragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import mega.privacy.android.app.activities.GetLinkActivity.Companion.GET_LINK_FRAGMENT
 import mega.privacy.android.app.databinding.FragmentCopyrightBinding
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
-import mega.privacy.android.app.utils.Constants.GET_LINK_FRAGMENT
+import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.interfaces.GetLinkInterface
 
-class CopyrightFragment : BaseFragment() {
+class CopyrightFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment() {
 
     private lateinit var binding: FragmentCopyrightBinding
 
@@ -16,7 +17,7 @@ class CopyrightFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCopyrightBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -24,7 +25,7 @@ class CopyrightFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.agreeButton.setOnClickListener {
             dbH.setShowCopyright(false)
-            (activity as GetLinkActivityLollipop).showFragment(GET_LINK_FRAGMENT)
+            getLinkInterface.showFragment(GET_LINK_FRAGMENT)
         }
 
         binding.disagreeButton.setOnClickListener {

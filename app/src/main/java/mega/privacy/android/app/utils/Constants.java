@@ -121,9 +121,6 @@ public class Constants {
     public static final int CHOOSE_ACCOUNT_FRAGMENT = 6003;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
 
-    public static final int GET_LINK_FRAGMENT = 7000;
-    public static final int COPYRIGHT_FRAGMENT = 7001;
-
     public static final int ACHIEVEMENTS_FRAGMENT = 8000;
     public static final int BONUSES_FRAGMENT = 8001;
     public static final int INVITE_FRIENDS_FRAGMENT = 8002;

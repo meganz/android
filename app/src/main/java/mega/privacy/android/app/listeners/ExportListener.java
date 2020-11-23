@@ -4,6 +4,9 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import android.content.Intent;
+
+import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.interfaces.GetLinkInterface;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -26,6 +29,10 @@ public class ExportListener extends BaseListener {
     private int numberExport;
     private int pendingExport;
     private StringBuilder exportedLinks;
+
+    public ExportListener(Context context) {
+        super(context);
+    }
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -120,9 +127,16 @@ public class ExportListener extends BaseListener {
         if (e.getErrorCode() == MegaError.API_OK && request.getLink() != null) {
             if (shareIntent != null) {
                 startShareIntent(context, shareIntent, request.getLink());
+            } else if (context instanceof GetLinkActivity) {
+                ((GetLinkActivity) context).setLink(request.getLink());
             }
         } else {
             logError("Error exporting node: " + e.getErrorString());
+
+            if (context instanceof GetLinkActivity
+                    && e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
+                ((GetLinkActivity) context).showSnackbar(context.getString(R.string.context_no_link));
+            }
         }
     }
 }

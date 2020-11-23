@@ -106,6 +106,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
@@ -3051,8 +3052,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     public void showGetLinkActivity(){
         logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-        linkIntent.putExtra("handle", handle);
+        Intent linkIntent = new Intent(this, GetLinkActivity.class);
+        linkIntent.putExtra(HANDLE, handle);
         startActivity(linkIntent);
     }
 

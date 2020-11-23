@@ -92,12 +92,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -1481,8 +1481,8 @@ public class Util {
 			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof ContactInfoActivityLollipop) {
 			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof GetLinkActivityLollipop) {
-			((GetLinkActivityLollipop) context).showSnackbar(message);
+		} else if (context instanceof GetLinkActivity) {
+			((GetLinkActivity) context).showSnackbar(message);
 		} else if (context instanceof ChatFullScreenImageViewer) {
 			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof AudioVideoPlayerLollipop) {

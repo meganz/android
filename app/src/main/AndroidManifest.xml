@@ -298,7 +298,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:name="mega.privacy.android.app.activities.GetLinkActivity"
             android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu"
             android:theme="@style/Theme.Megaactionbar.Secondary">

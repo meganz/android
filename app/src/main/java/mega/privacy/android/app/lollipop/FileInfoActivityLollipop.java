@@ -75,6 +75,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -2151,8 +2152,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	public void showGetLinkActivity(long handle){
         logDebug("Handle: " + handle);
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
+		Intent linkIntent = new Intent(this, GetLinkActivity.class);
+		linkIntent.putExtra(HANDLE, handle);
 		startActivity(linkIntent);
 	}
 

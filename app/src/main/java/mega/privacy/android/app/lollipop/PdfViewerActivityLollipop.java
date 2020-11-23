@@ -82,6 +82,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -2166,8 +2167,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     public void showGetLinkActivity(){
         logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-        linkIntent.putExtra("handle", handle);
+        Intent linkIntent = new Intent(this, GetLinkActivity.class);
+        linkIntent.putExtra(HANDLE, handle);
         startActivity(linkIntent);
     }
 

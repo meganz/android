@@ -1,384 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view_get_link"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:id="@+id/scroll_view_get_link">
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/get_link_main_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/white">
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_marginTop="27dp"
-            android:layout_marginBottom="29dp"
-            android:id="@+id/link_layout">
+            android:id="@+id/node_info_layout"
+            android:layout_marginTop="8dp"
+            style="@style/GetLinkOptionsStyle">
 
             <ImageView
-                android:id="@+id/public_link_image"
+                android:id="@+id/node_thumbnail"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:scaleType="fitCenter"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:src="@drawable/ic_link_only"/>
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@+id/node_thumbnail"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/link"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="32dp"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/public_link_image"
-                android:gravity="left"
-                android:layout_centerVertical="true"
-                android:textColor="@color/mail_my_account"
-                android:textSize="14sp"/>
+                <TextView
+                    android:id="@+id/node_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:fontFamily="sans-serif"
+                    android:singleLine="true"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/node_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif"
+                    android:singleLine="true"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
 
         </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/separator_link"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+        <View
+            android:layout_width="wrap_content"
             android:layout_height="1dp"
-            android:background="@color/separator_grey"/>
+            android:background="@color/separator_grey" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <RelativeLayout
+            android:id="@+id/decrypted_key_layout"
+            style="@style/GetLinkOptionsStyle">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/advanced_options_layout">
+                android:layout_height="match_parent"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@+id/decrypted_key_switch"
+                android:orientation="vertical">
+
                 <TextView
-                    android:id="@+id/advanced_options_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/link_advanced_options"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/option_send_decrypted_key_separately"
+                    android:textAllCaps="true"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/explanation_send_decrypted_key_separately"
+                    android:textColor="@color/mail_my_account"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/learn_more_text_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/learn_more_option"
+                    android:textColor="@color/accentColor"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/decrypted_key_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="@color/separator_grey" />
+
+        <RelativeLayout
+            android:id="@+id/expiry_date_layout"
+            style="@style/GetLinkOptionsStyle">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@id/expiry_date_switch"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/expiry_date_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/title_set_expiry_date"
+                    android:textAllCaps="true"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/expiry_date_pro_only_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/subtitle_set_expiry_date"
                     android:textAllCaps="true"
                     android:textColor="@color/mail_my_account"
-                    android:layout_centerVertical="true"
-                    android:layout_marginTop="18dp"
-                    android:layout_marginBottom="18dp"
-                    android:layout_marginLeft="16dp"
-                    android:textSize="16sp"/>
-                <ImageView
-                    android:id="@+id/advanced_options_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:background="@null"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="16dp"
-                    android:src="@drawable/ic_collapse_acc"/>
-            </RelativeLayout>
+                    android:textSize="14sp" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:id="@+id/link_without_key_layout">
+            </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/link_without_key_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
-                    android:src="@drawable/ic_link_only"/>
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/expiry_date_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true" />
 
-                <CheckedTextView
-                    android:id="@+id/link_without_key"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableRight="?android:attr/listChoiceIndicatorSingle"
-                    android:ellipsize="marquee"
-                    android:gravity="center_vertical"
-                    android:layout_centerVertical="true"
-                    android:text="@string/option_link_without_key"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginRight="16dp"
-                    android:checked="false"
-                    android:layout_toRightOf="@id/link_without_key_image"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16dp"
-                    android:theme="@style/ColorControlStyle"/>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:id="@+id/link_decryption_key_layout">
-
-                <ImageView
-                    android:id="@+id/link_decryption_key_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
-                    android:src="@drawable/ic_key_only"/>
-
-                <CheckedTextView
-                    android:id="@+id/link_decryption_key"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:drawableRight="?android:attr/listChoiceIndicatorSingle"
-                    android:ellipsize="marquee"
-                    android:gravity="center_vertical"
-                    android:text="@string/option_decryption_key"
-                    android:layout_marginLeft="32dp"
-                    android:checked="false"
-                    android:layout_toRightOf="@id/link_decryption_key_image"
-                    android:layout_marginRight="16dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16dp"
-                    android:theme="@style/ColorControlStyle"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:id="@+id/link_with_key_layout">
-
-                <ImageView
-                    android:id="@+id/link_with_key_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
-                    android:src="@drawable/ic_link_w_key"/>
-
-                <CheckedTextView
-                    android:id="@+id/link_with_key"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableRight="?android:attr/listChoiceIndicatorSingle"
-                    android:layout_centerVertical="true"
-                    android:ellipsize="marquee"
-                    android:gravity="center_vertical"
-                    android:text="@string/option_full_link"
-                    android:layout_marginLeft="32dp"
-                    android:layout_toRightOf="@id/link_with_key_image"
-                    android:layout_marginRight="16dp"
-                    android:checked="true"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16dp"
-                    android:theme="@style/ColorControlStyle"/>
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/separator_expiry"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/separator_grey"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:gravity="center_vertical"
-                android:id="@+id/expiry_date_layout">
-
-                <RelativeLayout
-                    android:id="@+id/expiry_date_relative_layout"
-                    android:layout_alignParentLeft="true"
-                    android:gravity="center_vertical"
-                    android:layout_centerVertical="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/title_set_expiry_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:text="@string/title_set_expiry_date"
-                        android:textColor="@color/name_my_account"
-                        android:textSize="16dp"/>
-
-                    <TextView
-                        android:id="@+id/subtitle_set_expiry_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_below="@+id/title_set_expiry_date"
-                        android:text="@string/subtitle_set_expiry_date"
-                        android:textColor="@color/mail_my_account"
-                        android:textSize="14dp"/>
-
-                    <Button
-                        android:id="@+id/expiry_date_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/accentColor"
-                        android:layout_below="@+id/title_set_expiry_date"
-                        android:stateListAnimator="@null"
-                        android:layout_marginLeft="16dp"
-                        android:minHeight="0dp"
-                        android:minWidth="0dp"
-                        android:elevation="0dp"
-                        android:background="@color/white"
-                        android:visibility="invisible"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/expiry_date_relative_layout"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switch_set_expiry_date"
-                        android:layout_alignParentRight="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/transparent_key_layout_expiry_date"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/transparent_white"/>
-
-            </RelativeLayout>
+        </RelativeLayout>
 
 
-            <LinearLayout
-                android:id="@+id/separator_password"
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/separator_grey"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:gravity="center_vertical"
-                android:id="@+id/password_protection_layout">
-
-                <RelativeLayout
-                    android:id="@+id/password_protection_relative_layout"
-                    android:layout_alignParentLeft="true"
-                    android:gravity="center_vertical"
-                    android:layout_centerVertical="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/title_set_password_protection"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:text="@string/title_set_password_protection"
-                        android:textColor="@color/name_my_account"
-                        android:textSize="16dp"/>
-
-                    <TextView
-                        android:id="@+id/subtitle_set_password_protection"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_below="@+id/title_set_password_protection"
-                        android:text="@string/subtitle_set_expiry_date"
-                        android:textColor="@color/mail_my_account"
-                        android:textSize="14dp"/>
-
-                    <TextView
-                        android:id="@+id/password_protection_edit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/accentColor"
-                        android:layout_below="@+id/title_set_password_protection"
-                        android:stateListAnimator="@null"
-                        android:layout_marginLeft="16dp"
-                        android:minHeight="0dp"
-                        android:minWidth="0dp"
-                        android:elevation="0dp"
-                        android:inputType="textPassword"
-                        android:background="@color/white"
-                        android:visibility="invisible"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/password_protection_relative_layout"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true">
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switch_set_password_protection"
-                        android:layout_alignParentRight="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="16dp"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/transparent_key_layout_password_protection"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/transparent_white"/>
-
-            </RelativeLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/separator_buttons"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+        <View
+            android:layout_width="wrap_content"
             android:layout_height="1dp"
-            android:background="@color/separator_grey"/>
+            android:background="@color/separator_grey" />
+
+        <RelativeLayout
+            android:id="@+id/password_protection_layout"
+            style="@style/GetLinkOptionsStyle">
+
+            <TextView
+                android:id="@+id/password_protection_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/title_set_expiry_date"
+                android:textAllCaps="true"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/password_protection_pro_only_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/password_protection_text"
+                android:layout_marginTop="3dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/subtitle_set_expiry_date"
+                android:textAllCaps="true"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="@color/separator_grey" />
+
+        <RelativeLayout
+            android:id="@+id/dlink_layout"
+            style="@style/GetLinkOptionsStyle">
+
+            <TextView
+                android:id="@+id/link_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/file_properties_shared_folder_public_link_name"
+                android:textAllCaps="true"
+                android:textColor="@color/name_my_account"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/link_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/link_title_text"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif"
+                android:textAllCaps="true"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="@color/separator_grey" />
 
         <LinearLayout
-            android:id="@+id/buttons_layout"
-            android:layout_width="fill_parent"
-            android:layout_height="52dp"
-            android:gravity="right|center_vertical"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="horizontal">
 
             <Button
-                android:id="@+id/copy_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:stateListAnimator="@null"
-                android:minWidth="0dp"
-                android:layout_marginRight="33dp"
-                android:text="@string/context_copy"
-                android:background="@color/white"
-                android:gravity="center_vertical|center_horizontal"/>
+                android:id="@+id/copy_link_button"
+                style="@style/AccentBorderBackgroundBorderlessButton"
+                android:text="@string/button_copy_link" />
 
             <Button
-                android:id="@+id/send_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:stateListAnimator="@null"
-                android:minWidth="0dp"
-                android:layout_marginRight="24dp"
-                android:text="@string/context_send"
-                android:background="@color/white"
-                android:gravity="center_vertical|center_horizontal"/>
+                android:id="@+id/copy_key_button"
+                style="@style/AccentBorderBackgroundBorderlessButton"
+                android:layout_marginStart="16dp"
+                android:text="@string/button_copy_key" />
+
         </LinearLayout>
 
     </LinearLayout>
+
 </ScrollView>

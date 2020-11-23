@@ -126,133 +126,133 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         expiryDateLayout = (RelativeLayout) v.findViewById(R.id.expiry_date_layout);
         expiryDateLayout.setVisibility(View.GONE);
 
-        switchButtonExpiry = (SwitchCompat) v.findViewById(R.id.switch_set_expiry_date);
-        expiryDateButton = (Button) v.findViewById(R.id.expiry_date_button);
-
-        advancedOptionsLayout = (RelativeLayout) v.findViewById(R.id.advanced_options_layout);
-        advancedOptionsImage = (ImageView) v.findViewById(R.id.advanced_options_image);
-
-        //Set by default, link with key
-        linkWithoutKeyLayout = (RelativeLayout) v.findViewById(R.id.link_without_key_layout);
-        linkDecryptionKeyLayout= (RelativeLayout) v.findViewById(R.id.link_decryption_key_layout);
-        linkWithKeyLayout = (RelativeLayout) v.findViewById(R.id.link_with_key_layout);
-
-        linkWithoutKeyCheck = (CheckedTextView) v.findViewById(R.id.link_without_key);
-        linkDecryptionKeyCheck = (CheckedTextView) v.findViewById(R.id.link_decryption_key);
-        linkWithKeyCheck = (CheckedTextView) v.findViewById(R.id.link_with_key);
-
-        linkText = (TextView)v.findViewById(R.id.link);
-        subtitleProOnlyExpiry = (TextView)v.findViewById(R.id.subtitle_set_expiry_date);
-
-        advancedOptionsLayout.setOnClickListener(this);
-
-        linkWithoutKeyLayout.setOnClickListener(this);
-        linkDecryptionKeyLayout.setOnClickListener(this);
-        linkWithKeyLayout.setOnClickListener(this);
-
-        linkWithoutKeyLayout.setVisibility(View.GONE);
-        linkDecryptionKeyLayout.setVisibility(View.GONE);
-        linkWithKeyLayout.setVisibility(View.GONE);
-
-        sendButton = (Button) v.findViewById(R.id.send_button);
-        copyButton = (Button) v.findViewById(R.id.copy_button);
-
-        sendButton.setOnClickListener(this);
-        copyButton.setOnClickListener(this);
-
-        sendButton.setEnabled(false);
-        copyButton.setEnabled(false);
-
-        transparentKeyLayoutExpiry = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_expiry_date);
-
-        passwordProtectionLayout = (RelativeLayout) v.findViewById(R.id.password_protection_layout);
-        passwordProtectionLayout.setVisibility(View.GONE);
-        subtitleProOnlyProtection = (TextView)v.findViewById(R.id.subtitle_set_password_protection);
-        switchButtonProtection = (SwitchCompat) v.findViewById(R.id.switch_set_password_protection);
-        passwordProtectionEditText = (TextView) v.findViewById(R.id.password_protection_edit);
-        passwordProtectionEditText.setOnClickListener(this);
-
-        transparentKeyLayoutProtection = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_password_protection);
-
-        separatorExpiry = (LinearLayout) v.findViewById(R.id.separator_expiry);
-        separatorPass= (LinearLayout) v.findViewById(R.id.separator_password);
-        separatorExpiry.setVisibility(View.GONE);
-        separatorPass.setVisibility(View.GONE);
-
-        if(((GetLinkActivityLollipop)context).selectedNode.isExported()){
-            logDebug("Node is already exported: " + ((GetLinkActivityLollipop)context).selectedNode.getHandle());
-            logDebug("Node link: " + ((GetLinkActivityLollipop)context).selectedNode.getPublicLink());
-            link = ((GetLinkActivityLollipop)context).selectedNode.getPublicLink();
-
-            linkWithoutKeyCheck.setChecked(false);
-            linkDecryptionKeyCheck.setChecked(false);
-            linkWithKeyCheck.setChecked(true);
-            linkText.setText(link);
-            copyButton.setEnabled(true);
-            sendButton.setEnabled(true);
-        }
-        else{
-            nC.exportLink(((GetLinkActivityLollipop)context).selectedNode);
-            linkText.setText(getString(R.string.link_request_status));
-            copyButton.setEnabled(false);
-            sendButton.setEnabled(false);
-        }
-
-		if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE){
-            logDebug("The user is PRO - enable expiration date");
-
-            transparentKeyLayoutExpiry.setVisibility(View.GONE);
-
-			if(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime()<=0){
-                switchButtonExpiry.setChecked(false);
-				expiryDateButton.setVisibility(View.GONE);
-                subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
-			}
-			else{
-				switchButtonExpiry.setChecked(true);
-				java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-				Calendar cal = calculateDateFromTimestamp(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
-				TimeZone tz = cal.getTimeZone();
-				df.setTimeZone(tz);
-				Date date = cal.getTime();
-				String formattedDate = df.format(date);
-				expiryDateButton.setText(formattedDate);
-				expiryDateButton.setVisibility(View.VISIBLE);
-                subtitleProOnlyExpiry.setVisibility(View.GONE);
-                
-                //if previously selected expiry date then we need to expand advance section
-                showAdvanceSection();
-			}
-
-            switchButtonExpiry.setEnabled(true);
-            switchButtonExpiry.setOnCheckedChangeListener(this);
-            expiryDateButton.setOnClickListener(this);
-
-            //Check if the link has password
-            transparentKeyLayoutProtection.setVisibility(View.GONE);
-
-            switchButtonProtection.setChecked(false);
-            passwordProtectionEditText.setVisibility(View.GONE);
-            subtitleProOnlyProtection.setVisibility(View.VISIBLE);
-
-            switchButtonProtection.setEnabled(true);
-            switchButtonProtection.setOnCheckedChangeListener(this);
-            switchButtonProtection.setOnClickListener(this);
-		}
-		else{
-            logDebug("The user is not PRO");
-            transparentKeyLayoutExpiry.setVisibility(View.VISIBLE);
-
-            switchButtonExpiry.setEnabled(false);
-			expiryDateButton.setVisibility(View.GONE);
-            subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
-
-            transparentKeyLayoutProtection.setVisibility(View.VISIBLE);
-
-            switchButtonProtection.setEnabled(false);
-            passwordProtectionEditText.setVisibility(View.GONE);
-            subtitleProOnlyProtection.setVisibility(View.VISIBLE);
-		}
+//        switchButtonExpiry = (SwitchCompat) v.findViewById(R.id.switch_set_expiry_date);
+//        expiryDateButton = (Button) v.findViewById(R.id.expiry_date_button);
+//
+//        advancedOptionsLayout = (RelativeLayout) v.findViewById(R.id.advanced_options_layout);
+//        advancedOptionsImage = (ImageView) v.findViewById(R.id.advanced_options_image);
+//
+//        //Set by default, link with key
+//        linkWithoutKeyLayout = (RelativeLayout) v.findViewById(R.id.link_without_key_layout);
+//        linkDecryptionKeyLayout= (RelativeLayout) v.findViewById(R.id.link_decryption_key_layout);
+//        linkWithKeyLayout = (RelativeLayout) v.findViewById(R.id.link_with_key_layout);
+//
+//        linkWithoutKeyCheck = (CheckedTextView) v.findViewById(R.id.link_without_key);
+//        linkDecryptionKeyCheck = (CheckedTextView) v.findViewById(R.id.link_decryption_key);
+//        linkWithKeyCheck = (CheckedTextView) v.findViewById(R.id.link_with_key);
+//
+//        linkText = (TextView)v.findViewById(R.id.link);
+//        subtitleProOnlyExpiry = (TextView)v.findViewById(R.id.subtitle_set_expiry_date);
+//
+//        advancedOptionsLayout.setOnClickListener(this);
+//
+//        linkWithoutKeyLayout.setOnClickListener(this);
+//        linkDecryptionKeyLayout.setOnClickListener(this);
+//        linkWithKeyLayout.setOnClickListener(this);
+//
+//        linkWithoutKeyLayout.setVisibility(View.GONE);
+//        linkDecryptionKeyLayout.setVisibility(View.GONE);
+//        linkWithKeyLayout.setVisibility(View.GONE);
+//
+//        sendButton = (Button) v.findViewById(R.id.send_button);
+//        copyButton = (Button) v.findViewById(R.id.copy_button);
+//
+//        sendButton.setOnClickListener(this);
+//        copyButton.setOnClickListener(this);
+//
+//        sendButton.setEnabled(false);
+//        copyButton.setEnabled(false);
+//
+//        transparentKeyLayoutExpiry = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_expiry_date);
+//
+//        passwordProtectionLayout = (RelativeLayout) v.findViewById(R.id.password_protection_layout);
+//        passwordProtectionLayout.setVisibility(View.GONE);
+//        subtitleProOnlyProtection = (TextView)v.findViewById(R.id.subtitle_set_password_protection);
+//        switchButtonProtection = (SwitchCompat) v.findViewById(R.id.switch_set_password_protection);
+//        passwordProtectionEditText = (TextView) v.findViewById(R.id.password_protection_edit);
+//        passwordProtectionEditText.setOnClickListener(this);
+//
+//        transparentKeyLayoutProtection = (RelativeLayout) v.findViewById(R.id.transparent_key_layout_password_protection);
+//
+//        separatorExpiry = (LinearLayout) v.findViewById(R.id.separator_expiry);
+//        separatorPass= (LinearLayout) v.findViewById(R.id.separator_password);
+//        separatorExpiry.setVisibility(View.GONE);
+//        separatorPass.setVisibility(View.GONE);
+//
+//        if(((GetLinkActivityLollipop)context).selectedNode.isExported()){
+//            logDebug("Node is already exported: " + ((GetLinkActivityLollipop)context).selectedNode.getHandle());
+//            logDebug("Node link: " + ((GetLinkActivityLollipop)context).selectedNode.getPublicLink());
+//            link = ((GetLinkActivityLollipop)context).selectedNode.getPublicLink();
+//
+//            linkWithoutKeyCheck.setChecked(false);
+//            linkDecryptionKeyCheck.setChecked(false);
+//            linkWithKeyCheck.setChecked(true);
+//            linkText.setText(link);
+//            copyButton.setEnabled(true);
+//            sendButton.setEnabled(true);
+//        }
+//        else{
+//            nC.exportLink(((GetLinkActivityLollipop)context).selectedNode);
+//            linkText.setText(getString(R.string.link_request_status));
+//            copyButton.setEnabled(false);
+//            sendButton.setEnabled(false);
+//        }
+//
+//		if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE){
+//            logDebug("The user is PRO - enable expiration date");
+//
+//            transparentKeyLayoutExpiry.setVisibility(View.GONE);
+//
+//			if(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime()<=0){
+//                switchButtonExpiry.setChecked(false);
+//				expiryDateButton.setVisibility(View.GONE);
+//                subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
+//			}
+//			else{
+//				switchButtonExpiry.setChecked(true);
+//				java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
+//				Calendar cal = calculateDateFromTimestamp(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
+//				TimeZone tz = cal.getTimeZone();
+//				df.setTimeZone(tz);
+//				Date date = cal.getTime();
+//				String formattedDate = df.format(date);
+//				expiryDateButton.setText(formattedDate);
+//				expiryDateButton.setVisibility(View.VISIBLE);
+//                subtitleProOnlyExpiry.setVisibility(View.GONE);
+//
+//                //if previously selected expiry date then we need to expand advance section
+//                showAdvanceSection();
+//			}
+//
+//            switchButtonExpiry.setEnabled(true);
+//            switchButtonExpiry.setOnCheckedChangeListener(this);
+//            expiryDateButton.setOnClickListener(this);
+//
+//            //Check if the link has password
+//            transparentKeyLayoutProtection.setVisibility(View.GONE);
+//
+//            switchButtonProtection.setChecked(false);
+//            passwordProtectionEditText.setVisibility(View.GONE);
+//            subtitleProOnlyProtection.setVisibility(View.VISIBLE);
+//
+//            switchButtonProtection.setEnabled(true);
+//            switchButtonProtection.setOnCheckedChangeListener(this);
+//            switchButtonProtection.setOnClickListener(this);
+//		}
+//		else{
+//            logDebug("The user is not PRO");
+//            transparentKeyLayoutExpiry.setVisibility(View.VISIBLE);
+//
+//            switchButtonExpiry.setEnabled(false);
+//			expiryDateButton.setVisibility(View.GONE);
+//            subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
+//
+//            transparentKeyLayoutProtection.setVisibility(View.VISIBLE);
+//
+//            switchButtonProtection.setEnabled(false);
+//            passwordProtectionEditText.setVisibility(View.GONE);
+//            subtitleProOnlyProtection.setVisibility(View.VISIBLE);
+//		}
 
         return v;
     }
@@ -281,12 +281,12 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         datePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (which == DialogInterface.BUTTON_NEGATIVE) {
-                    MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
-                    if(node != null && node.getExpirationTime() > 0){
-                        switchButtonExpiry.setChecked(true);
-                    }else{
-                        switchButtonExpiry.setChecked(false);
-                    }
+//                    MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
+//                    if(node != null && node.getExpirationTime() > 0){
+//                        switchButtonExpiry.setChecked(true);
+//                    }else{
+//                        switchButtonExpiry.setChecked(false);
+//                    }
                 }
             }
         });
@@ -298,127 +298,127 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     @Override
     public void onClick(View v) {
         logDebug("onClick");
-        switch (v.getId()){
-            case R.id.expiry_date_button:{
-                showDatePicker(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
-                break;
-            }
-            case R.id.disagree_button:{
-                logDebug("DISAgree button");
-                ((GetLinkActivityLollipop)context).finish();
-                break;
-            }
-            case R.id.agree_button:{
-                logDebug("Agree button");
-                break;
-            }
-            case R.id.advanced_options_layout:{
-                if(linkWithKeyLayout.isShown()){
-                    hideAdvanceSection();
-                }else{
-                   showAdvanceSection();
-                }
-                break;
-            }
-            case R.id.link_without_key_layout:{
-                if(isInPasswordProtectionMode){
-                    return;
-                }
-                linkWithoutKeyCheck.setChecked(true);
-				linkDecryptionKeyCheck.setChecked(false);
-				linkWithKeyCheck.setChecked(false);
-
-                expiryDateLayout.setAlpha(ALPHA_VIEW_ENABLED);
-                passwordProtectionLayout.setAlpha(ALPHA_VIEW_ENABLED);
-				
-				//disable expiry/password options for decryption key option
-                if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                    switchButtonExpiry.setEnabled(true);
-                    switchButtonProtection.setEnabled(true);
-                }
-                if (link != null) {
-                    String urlString = "";
-                    if (link.contains("#!") || link.contains("#F!")) {
-                        //old file or folder link format
-                        String[] s = link.split("!");
-                        if (s.length == 3) {
-                            urlString = s[0] + "!" + s[1];
-                        }
-                    } else {
-                        // new file or folder link format
-                        String[] s = link.split("#");
-                        if (s.length == 2) {
-                            urlString = s[0];
-                        }
-                    }
-
-                    linkText.setText(urlString);
-                    copyButton.setEnabled(true);
-                    sendButton.setEnabled(true);
-                }
-                break;
-            }
-            case R.id.link_decryption_key_layout:{
-                if(isInPasswordProtectionMode){
-                    return;
-                }
-                
-                switchButtonProtection.setEnabled(false);
-                expiryDateLayout.setAlpha(ALPHA_VIEW_DISABLED);
-                passwordProtectionLayout.setAlpha(ALPHA_VIEW_DISABLED);
-                linkWithoutKeyCheck.setChecked(false);
-				linkDecryptionKeyCheck.setChecked(true);
-				linkWithKeyCheck.setChecked(false);
-                if (link != null) {
-                    String keyString = "";
-                    if (link.contains("#!") || link.contains("#F!")) {
-                        //old file or folder link format
-                        String[] s = link.split("!");
-                        if (s.length == 3) {
-                            keyString = s[2];
-                        }
-                    } else {
-                        // new file or folder link format
-                        String[] s = link.split("#");
-                        if (s.length == 2) {
-                            keyString = s[1];
-                        }
-                    }
-
-                    linkText.setText(keyString);
-                    copyButton.setEnabled(true);
-                    sendButton.setEnabled(true);
-                }
-                break;
-            }
-            case R.id.link_with_key_layout:{
-                if(isInPasswordProtectionMode){
-                    return;
-                }
-                linkWithoutKeyCheck.setChecked(false);
-				linkDecryptionKeyCheck.setChecked(false);
-				linkWithKeyCheck.setChecked(true);
-                expiryDateLayout.setAlpha(ALPHA_VIEW_ENABLED);
-                passwordProtectionLayout.setAlpha(ALPHA_VIEW_ENABLED);
-				linkText.setText(link);
-                if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                    switchButtonExpiry.setEnabled(true);
-                    switchButtonProtection.setEnabled(true);
-                }
-                break;
-            }
-            case R.id.copy_button:{
-                ((GetLinkActivityLollipop)context).copyLink(linkText.getText().toString());
-                break;
-            }
-            case R.id.send_button:{
-                ((GetLinkActivityLollipop)context).sendLink(linkText.getText().toString());
-                break;
-            }
-            case R.id.password_protection_edit:{
-                ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
-            }
-        }
+//        switch (v.getId()){
+//            case R.id.expiry_date_button:{
+//                showDatePicker(((GetLinkActivityLollipop)context).selectedNode.getExpirationTime());
+//                break;
+//            }
+//            case R.id.disagree_button:{
+//                logDebug("DISAgree button");
+//                ((GetLinkActivityLollipop)context).finish();
+//                break;
+//            }
+//            case R.id.agree_button:{
+//                logDebug("Agree button");
+//                break;
+//            }
+//            case R.id.advanced_options_layout:{
+//                if(linkWithKeyLayout.isShown()){
+//                    hideAdvanceSection();
+//                }else{
+//                   showAdvanceSection();
+//                }
+//                break;
+//            }
+//            case R.id.link_without_key_layout:{
+//                if(isInPasswordProtectionMode){
+//                    return;
+//                }
+//                linkWithoutKeyCheck.setChecked(true);
+//				linkDecryptionKeyCheck.setChecked(false);
+//				linkWithKeyCheck.setChecked(false);
+//
+//                expiryDateLayout.setAlpha(ALPHA_VIEW_ENABLED);
+//                passwordProtectionLayout.setAlpha(ALPHA_VIEW_ENABLED);
+//
+//				//disable expiry/password options for decryption key option
+//                if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+//                    switchButtonExpiry.setEnabled(true);
+//                    switchButtonProtection.setEnabled(true);
+//                }
+//                if (link != null) {
+//                    String urlString = "";
+//                    if (link.contains("#!") || link.contains("#F!")) {
+//                        //old file or folder link format
+//                        String[] s = link.split("!");
+//                        if (s.length == 3) {
+//                            urlString = s[0] + "!" + s[1];
+//                        }
+//                    } else {
+//                        // new file or folder link format
+//                        String[] s = link.split("#");
+//                        if (s.length == 2) {
+//                            urlString = s[0];
+//                        }
+//                    }
+//
+//                    linkText.setText(urlString);
+//                    copyButton.setEnabled(true);
+//                    sendButton.setEnabled(true);
+//                }
+//                break;
+//            }
+//            case R.id.link_decryption_key_layout:{
+//                if(isInPasswordProtectionMode){
+//                    return;
+//                }
+//
+//                switchButtonProtection.setEnabled(false);
+//                expiryDateLayout.setAlpha(ALPHA_VIEW_DISABLED);
+//                passwordProtectionLayout.setAlpha(ALPHA_VIEW_DISABLED);
+//                linkWithoutKeyCheck.setChecked(false);
+//				linkDecryptionKeyCheck.setChecked(true);
+//				linkWithKeyCheck.setChecked(false);
+//                if (link != null) {
+//                    String keyString = "";
+//                    if (link.contains("#!") || link.contains("#F!")) {
+//                        //old file or folder link format
+//                        String[] s = link.split("!");
+//                        if (s.length == 3) {
+//                            keyString = s[2];
+//                        }
+//                    } else {
+//                        // new file or folder link format
+//                        String[] s = link.split("#");
+//                        if (s.length == 2) {
+//                            keyString = s[1];
+//                        }
+//                    }
+//
+//                    linkText.setText(keyString);
+//                    copyButton.setEnabled(true);
+//                    sendButton.setEnabled(true);
+//                }
+//                break;
+//            }
+//            case R.id.link_with_key_layout:{
+//                if(isInPasswordProtectionMode){
+//                    return;
+//                }
+//                linkWithoutKeyCheck.setChecked(false);
+//				linkDecryptionKeyCheck.setChecked(false);
+//				linkWithKeyCheck.setChecked(true);
+//                expiryDateLayout.setAlpha(ALPHA_VIEW_ENABLED);
+//                passwordProtectionLayout.setAlpha(ALPHA_VIEW_ENABLED);
+//				linkText.setText(link);
+//                if(((GetLinkActivityLollipop)context).accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+//                    switchButtonExpiry.setEnabled(true);
+//                    switchButtonProtection.setEnabled(true);
+//                }
+//                break;
+//            }
+//            case R.id.copy_button:{
+//                ((GetLinkActivityLollipop)context).copyLink(linkText.getText().toString());
+//                break;
+//            }
+//            case R.id.send_button:{
+//                ((GetLinkActivityLollipop)context).sendLink(linkText.getText().toString());
+//                break;
+//            }
+//            case R.id.password_protection_edit:{
+//                ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
+//            }
+//        }
     }
 
     @Override
@@ -456,7 +456,7 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
         int timestamp = (int) calculateTimestamp(dateString);
         logDebug("The TIMESTAMP is: " + timestamp);
         isExpiredDateLink=true;
-        nC.exportLinkTimestamp(((GetLinkActivityLollipop)context).selectedNode, timestamp);
+//        nC.exportLinkTimestamp(((GetLinkActivityLollipop)context).selectedNode, timestamp);
     }
 
     public void enablePassProtection(boolean enable){
@@ -474,26 +474,26 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
 
         if (request.getType() == MegaRequest.TYPE_EXPORT) {
             logDebug("Export request finished");
-            MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
-            logDebug("EXPIRATION DATE: " + node.getExpirationTime());
+//            MegaNode node = ((GetLinkActivityLollipop)context).selectedNode;
+//            logDebug("EXPIRATION DATE: " + node.getExpirationTime());
             if (isExpiredDateLink) {
-                logDebug("Change the expiration date");
-                if (node.getExpirationTime() <= 0) {
-                    switchButtonExpiry.setChecked(false);
-                    expiryDateButton.setVisibility(View.GONE);
-                    subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
-                } else {
-                    switchButtonExpiry.setChecked(true);
-                    java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
-                    Calendar cal = calculateDateFromTimestamp(node.getExpirationTime());
-                    TimeZone tz = cal.getTimeZone();
-                    df.setTimeZone(tz);
-                    Date date = cal.getTime();
-                    String formattedDate = df.format(date);
-                    expiryDateButton.setText(formattedDate);
-                    expiryDateButton.setVisibility(View.VISIBLE);
-                    subtitleProOnlyExpiry.setVisibility(View.GONE);
-                }
+//                logDebug("Change the expiration date");
+//                if (node.getExpirationTime() <= 0) {
+//                    switchButtonExpiry.setChecked(false);
+//                    expiryDateButton.setVisibility(View.GONE);
+//                    subtitleProOnlyExpiry.setVisibility(View.VISIBLE);
+//                } else {
+//                    switchButtonExpiry.setChecked(true);
+//                    java.text.DateFormat df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault());
+//                    Calendar cal = calculateDateFromTimestamp(node.getExpirationTime());
+//                    TimeZone tz = cal.getTimeZone();
+//                    df.setTimeZone(tz);
+//                    Date date = cal.getTime();
+//                    String formattedDate = df.format(date);
+//                    expiryDateButton.setText(formattedDate);
+//                    expiryDateButton.setVisibility(View.VISIBLE);
+//                    subtitleProOnlyExpiry.setVisibility(View.GONE);
+//                }
             } else {
                 link = request.getLink();
 
@@ -553,48 +553,48 @@ public class GetLinkFragmentLollipop extends Fragment implements View.OnClickLis
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         logDebug("isChecked: " + isChecked);
 
-        switch (buttonView.getId()){
-            case R.id.switch_set_expiry_date:{
-                logDebug("Set expiry date");
-                if(switchButtonExpiry.isChecked()){
-                    showDatePicker(-1);
-                }
-                else{
-                    isExpiredDateLink=true;
-                    nC.exportLink(((GetLinkActivityLollipop)context).selectedNode);
-                }
-                break;
-            }
-            case R.id.switch_set_password_protection:{
-                logDebug("Set password protection");
-                if(switchButtonProtection.isChecked()){
-                    ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
-                }
-                else{
-                    logDebug("Remove pass protection");
-                    if (linkWithKeyCheck.isChecked()) {
-                        linkText.setText(link);
-                    } else if (linkWithoutKeyCheck.isChecked()) {
-                        if(link!=null){
-                            String urlString="";
-                            String [] s = link.split("!");
-                            if (s.length == 3){
-                                urlString = s[0] + "!" + s[1];
-                            }
-                            linkText.setText(urlString);
-                        }
-                    }
-                    copyButton.setEnabled(true);
-                    sendButton.setEnabled(true);
-                    isInPasswordProtectionMode = false;
-                    enableCheckedTextView();
-                    passwordProtectionEditText.setVisibility(View.GONE);
-                    subtitleProOnlyProtection.setVisibility(View.VISIBLE);
-                }
-
-                break;
-            }
-        }
+//        switch (buttonView.getId()){
+//            case R.id.switch_set_expiry_date:{
+//                logDebug("Set expiry date");
+//                if(switchButtonExpiry.isChecked()){
+//                    showDatePicker(-1);
+//                }
+//                else{
+//                    isExpiredDateLink=true;
+//                    nC.exportLink(((GetLinkActivityLollipop)context).selectedNode);
+//                }
+//                break;
+//            }
+//            case R.id.switch_set_password_protection:{
+//                logDebug("Set password protection");
+//                if(switchButtonProtection.isChecked()){
+//                    ((GetLinkActivityLollipop)context).showSetPasswordDialog(null, link);
+//                }
+//                else{
+//                    logDebug("Remove pass protection");
+//                    if (linkWithKeyCheck.isChecked()) {
+//                        linkText.setText(link);
+//                    } else if (linkWithoutKeyCheck.isChecked()) {
+//                        if(link!=null){
+//                            String urlString="";
+//                            String [] s = link.split("!");
+//                            if (s.length == 3){
+//                                urlString = s[0] + "!" + s[1];
+//                            }
+//                            linkText.setText(urlString);
+//                        }
+//                    }
+//                    copyButton.setEnabled(true);
+//                    sendButton.setEnabled(true);
+//                    isInPasswordProtectionMode = false;
+//                    enableCheckedTextView();
+//                    passwordProtectionEditText.setVisibility(View.GONE);
+//                    subtitleProOnlyProtection.setVisibility(View.VISIBLE);
+//                }
+//
+//                break;
+//            }
+//        }
     }
     
     private void showAdvanceSection(){
