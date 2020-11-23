@@ -19,6 +19,7 @@ import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -341,6 +342,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 		if (megaApi.getRootNode().getHandle() == managerActivity.getParentHandleIncoming()
 				|| managerActivity.getParentHandleIncoming() == -1) {
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
+
 			if (isScreenInPortrait(context)) {
 				emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
 			} else {

@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
@@ -776,10 +777,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
 
         try {
-            text = text.replace("[A]", "<font color=\'#000000\'>");
-            text = text.replace("[/A]", "</font>");
-            text = text.replace("[B]", "<font color=\'#7a7a7a\'>");
-            text = text.replace("[/B]", "</font>");
+            text = text.replace("[A]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.black_white)
+                    + "\'>");
+            text = text.replace("[/A]","</font>");
+            text = text.replace("[B]","<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+                    + "\'>");
+            text = text.replace("[/B]","</font>");
         } catch (Exception e) {
             logWarning("Exception formatting text", e);
         }

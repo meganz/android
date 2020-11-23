@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -423,6 +424,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			recyclerView.setVisibility(View.GONE);
 
 			String textToShow;
+
+			ColorUtils.setImageViewAlphaIfDark(context, emptyImageView, ColorUtils.DARK_IMAGE_ALPHA);
 
 			if (parentHandle == -1) {
 				if (isScreenInPortrait(context)) {

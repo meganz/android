@@ -7,6 +7,7 @@ import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -17,8 +18,12 @@ import com.google.android.material.elevation.ElevationOverlayProvider
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
+import kotlin.math.roundToInt
 
 object ColorUtils {
+    /** The alpha applied to the image in dark mode */
+    const val DARK_IMAGE_ALPHA = 0.16f
+
     /**
      * Queries the theme of the given `context` for a theme color.
      *
@@ -136,5 +141,18 @@ object ColorUtils {
         } else {
             decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
+    }
+
+    /**
+     * Apply the alpha (between 0.0 and 1.0) to the imageView if in dark mode.
+     */
+    @JvmStatic
+    fun setImageViewAlphaIfDark(
+        context: Context,
+        imageView: ImageView,
+        alpha: Float = DARK_IMAGE_ALPHA
+    ) {
+        if (!Util.isDarkMode(context) || alpha < 0f || alpha > 1f) return
+        imageView.imageAlpha = (255 * alpha).roundToInt()
     }
 }
