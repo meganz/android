@@ -47,6 +47,7 @@ public class Constants {
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
+    public static final int REQUEST_CODE_PICK_GIF = 1034;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -59,6 +60,7 @@ public class Constants {
     public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
     public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
     public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
+    public static final String ACTION_PREVIEW_GIPHY = "ACTION_PREVIEW_GIPHY";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -461,9 +463,11 @@ public class Constants {
     public static final int ERROR_LINK = -1;
     public static final int INVALID_CALL_STATUS = -1;
     public static final int MAX_PARTICIPANTS_GRID = 6;
+    public static final int INVALID_CALL = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
-    public static final String CHAT_ID = "chatHandle";
+    public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
+    public static final String CHAT_ID = "CHAT_ID";
     public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
     public static final String CHAT_ID_OF_CURRENT_CALL = "chatHandleInProgress";
@@ -494,6 +498,8 @@ public class Constants {
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
     public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
+    public static final String COPIED_TEXT_LABEL = "Copied Text";
+    public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;

@@ -161,14 +161,20 @@ public class AppRTCAudioManager {
             if (isNear) {
                 // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
                 proximitySensor.turnOffScreen();
-                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+
+                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
+                        (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
+                        apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Disabling the speakerphone:");
                     selectAudioDevice(AudioDevice.EARPIECE, true);
                 }
             } else {
                 // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
                 proximitySensor.turnOnScreen();
-                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn && bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED) || apprtcContext instanceof ChatActivityLollipop) {
+
+                if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
+                        (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
+                        apprtcContext instanceof ChatActivityLollipop) {
                     logDebug("Enabling the speakerphone: ");
                     selectAudioDevice(AudioDevice.SPEAKER_PHONE, true);
                 }

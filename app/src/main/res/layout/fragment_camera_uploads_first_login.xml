@@ -39,7 +39,7 @@
             android:layout_gravity="start|center_vertical"
             android:layout_weight="5"
             android:text="@string/camera_uploads_upload_videos"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="16sp"
             />
 
@@ -68,7 +68,7 @@
             android:layout_gravity="start|center_vertical"
             android:layout_weight="5"
             android:text="@string/camera_uploads_cellular_connection"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="16sp"
             />
 
@@ -102,7 +102,7 @@
         android:elevation="@dimen/elevation_upgrade_low"
         android:stateListAnimator="@anim/button_upgrade_elevation"
         android:text="@string/general_skip"
-        android:textColor="@color/name_my_account"
+        android:textColor="@color/primary_text"
         />
 
     <Button
