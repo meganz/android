@@ -551,7 +551,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 								callStatus == MegaChatCall.CALL_STATUS_JOINING ||
 								callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
                             updateRTCAudioMangerTypeStatus(callStatus);
-							clearIncomingCallNotification(callId);
+							clearIncomingCallNotification(chatId);
 						}
 
 						if(megaApi.isChatNotifiable(chatId)) {
