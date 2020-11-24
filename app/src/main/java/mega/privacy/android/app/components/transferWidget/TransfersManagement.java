@@ -205,6 +205,11 @@ public class TransfersManagement {
 
         megaApi.enableTransferResumption();
 
+        if (app.getDbH().getTransferQueueStatus()) {
+            //Queue of transfers should be paused.
+            megaApi.pauseTransfers(true);
+        }
+
         new Handler().postDelayed(() -> {
             try {
                 if (megaApi.getNumPendingDownloads() > 0) {

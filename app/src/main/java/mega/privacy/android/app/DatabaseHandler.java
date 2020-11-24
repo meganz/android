@@ -35,7 +35,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 58;
+	private static final int DATABASE_VERSION = 59;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -217,6 +217,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_LAST_PUBLIC_HANDLE_TYPE = "lastpublichandletype";
 	private static final String KEY_STORAGE_STATE = "storagestate";
 	private static final String KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle";
+	private static final String KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus";
 
 	private static final String KEY_PENDING_MSG_ID_CHAT = "idchat";
 	private static final String KEY_PENDING_MSG_TIMESTAMP = "timestamp";
@@ -347,7 +348,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //17
 				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //18
 				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //19
-				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "'" 		    //20
+				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//20
+				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN"																					//21
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -831,6 +833,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ORIGINAL_PATH + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PARENT_HANDLE + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt(INVALID_HANDLE + "") + "';");
+		}
+
+		if (oldVersion <= 58) {
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN;");
+
+			boolean transferQueueStatus = false;
+			MegaApplication app = MegaApplication.getInstance();
+
+			if (app != null) {
+				MegaApiJava megaApi = app.getMegaApi();
+				if (megaApi != null) {
+					transferQueueStatus = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
+							|| megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+				}
+			}
+
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_TRANSFER_QUEUE_STATUS + " = '" + encrypt(transferQueueStatus + "") + "';");
 		}
 	}
 
@@ -1982,6 +2001,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_STORAGE_STATE, encrypt(Integer.toString(attr.getStorageState())));
 		values.put(KEY_LAST_PUBLIC_HANDLE_TYPE, encrypt(Integer.toString(attr.getLastPublicHandleType())));
 		values.put(KEY_MY_CHAT_FILES_FOLDER_HANDLE, encrypt(Long.toString(attr.getMyChatFilesFolderHandle())));
+		values.put(KEY_TRANSFER_QUEUE_STATUS, encrypt(attr.getTransferQueueStatus()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 
@@ -2012,6 +2032,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String storageState = decrypt(cursor.getString(18));
 			String lastPublicHandleType = decrypt(cursor.getString(19));
 			String myChatFilesFolderHandle = decrypt(cursor.getString(20));
+			String transferQueueStatus = decrypt(cursor.getString(21));
 
 			attr = new MegaAttributes(online,
 					intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
@@ -2021,7 +2042,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					staging, lastPublicHandle, lastPublicHandleTimeStamp,
 					lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
 					storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
-					myChatFilesFolderHandle);
+					myChatFilesFolderHandle, transferQueueStatus);
 		}
 		cursor.close();
 
@@ -3741,6 +3762,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setMyChatFilesFolderHandle(long myChatFilesFolderHandle) {
 		logInfo("Setting the storage state in the DB");
 		setLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, myChatFilesFolderHandle);
+	}
+
+	/**
+	 * Get the status of the transfer queue.
+	 *
+	 * @return True if the queue is paused, false otherwise.
+	 */
+	public boolean getTransferQueueStatus() {
+		logInfo("Getting the storage state from DB");
+		return getBooleanValue(TABLE_ATTRIBUTES, KEY_TRANSFER_QUEUE_STATUS, false);
+	}
+
+	/**
+	 * Set the status of the transfer queue.
+	 *
+	 * @param transferQueueStatus True if the queue is paused, false otherwise.
+	 */
+	public void setTransferQueueStatus(boolean transferQueueStatus) {
+		logInfo("Setting the storage state in the DB");
+		setStringValue(TABLE_ATTRIBUTES, KEY_TRANSFER_QUEUE_STATUS, transferQueueStatus + "");
 	}
 
 	public String getShowNotifOff (){
