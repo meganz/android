@@ -163,6 +163,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_ERROR = "transfererror";
 	private static final String KEY_TRANSFER_ORIGINAL_PATH = "transferoriginalpath";
 	private static final String KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle";
+	private static final String KEY_TRANSFER_APPDATA = "transferappdata";
 	public static final int MAX_TRANSFERS = 100;
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
@@ -379,10 +380,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
-				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT, " +
-				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT, " + KEY_TRANSFER_ERROR + " TEXT, " +
-				KEY_TRANSFER_ORIGINAL_PATH + " TEXT, " + KEY_TRANSFER_PARENT_HANDLE + " TEXT" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY, "						//0
+				+ KEY_TRANSFER_FILENAME + " TEXT, "						//1
+				+ KEY_TRANSFER_TYPE + " TEXT, "							//2
+				+ KEY_TRANSFER_STATE + " TEXT, "						//3
+				+ KEY_TRANSFER_SIZE + " TEXT, "							//4
+				+ KEY_TRANSFER_HANDLE + " TEXT, "						//5
+				+ KEY_TRANSFER_PATH + " TEXT, "							//6
+				+ KEY_TRANSFER_OFFLINE + " BOOLEAN, "					//7
+				+ KEY_TRANSFER_TIMESTAMP + " TEXT, "					//8
+				+ KEY_TRANSFER_ERROR + " TEXT, "						//9
+				+ KEY_TRANSFER_ORIGINAL_PATH + " TEXT, "				//10
+				+ KEY_TRANSFER_PARENT_HANDLE + " TEXT, "				//11
+				+ KEY_TRANSFER_APPDATA + " TEXT"						//12
+				+ ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -850,6 +861,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_TRANSFER_QUEUE_STATUS + " = '" + encrypt(transferQueueStatus + "") + "';");
+
+			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_APPDATA + " TEXT;");
 		}
 	}
 
@@ -1826,8 +1839,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String error = decrypt(cursor.getString(9));
 		String originalPath = decrypt(cursor.getString(10));
 		long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
+		String appData = decrypt(cursor.getString(12));
 
-		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
+		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path,
+				offline, timeStamp, error, originalPath, parentHandle, appData);
 	}
 
 	public long setCompletedTransfer(AndroidCompletedTransfer transfer){
@@ -1843,6 +1858,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_ERROR, encrypt(transfer.getError()));
 		values.put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.getOriginalPath()));
 		values.put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.getParentHandle() + ""));
+		values.put(KEY_TRANSFER_APPDATA, encrypt(transfer.getAppData()));
 
 		long id = db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 

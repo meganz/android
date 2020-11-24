@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Handler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DownloadService;
@@ -19,6 +17,7 @@ import nz.mega.sdk.MegaTransfer;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.SDCardUtils.checkSDCardCompletedTransfers;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
@@ -200,6 +199,8 @@ public class TransfersManagement {
      *
      */
     public static void enableTransfersResumption() {
+        checkSDCardCompletedTransfers();
+
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
 

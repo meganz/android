@@ -80,6 +80,8 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -103,10 +105,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
 	public static final String EXTRA_SERIALIZE_STRING = "SERIALIZE_STRING";
-
-	public static final int APP_DATA_TARGET_PATH_POSITION = 1;
-	public static final int APP_DATA_TARGET_URI_POSITION = 2;
-	public static final int APP_DATA_SD_CARD_PARTS = 2;
 
 	private static int errorEBloqued = 0;
 	private int errorCount = 0;
@@ -1461,16 +1459,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!isVoiceClip) transfersCount--;
 
-			AndroidCompletedTransfer completedTransfer = null;
 			String path = transfer.getPath();
-			String targetPath = getSDCardTargetPath(transfer);
+			String targetPath = getSDCardTargetPath(transfer.getAppData());
 
 			if (!transfer.isFolderTransfer()) {
 				if (!isVoiceClip) {
-					completedTransfer = new AndroidCompletedTransfer(transfer, error);
+					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
 					if (!isTextEmpty(targetPath)) {
 						completedTransfer.setPath(targetPath);
 					}
+
+					addCompletedTransfer(completedTransfer);
 				}
 
 				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
@@ -1516,26 +1515,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     //need to move downloaded file to a location on sd card.
                     if (targetPath != null) {
 						File source = new File(path);
-                        try {
-                            SDCardOperator sdCardOperator = new SDCardOperator(this);
-							String uri = getSDCardTargetUri(transfer);
-                            if (uri != null) {
-                                sdCardOperator.initDocumentFileRoot(uri);
-                            } else {
-                                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                            }
-                            //new path, after moving to target location.
-							path = sdCardOperator.move(targetPath, source);
-                            File newFile = new File(path);
-                            if(!newFile.exists() || newFile.length() != source.length()) {
-                                logError("Error moving file to the sd card path");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            logError("Error moving file to the sd card path with exception", e);
-                        } finally {
-                            source.delete();
-                        }
+
+						try {
+							SDCardOperator sdCardOperator = new SDCardOperator(this);
+							sdCardOperator.moveDownloadedFileToDestinationPath(source, targetPath,
+									getSDCardTargetUri(transfer.getAppData()));
+						} catch (Exception e) {
+							logError("Error moving file to the sd card path", e);
+						}
                     }
 					//To update thumbnails for videos
 					if(isVideoFile(transfer.getPath())){
@@ -1633,48 +1620,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 			}
 
-			if (completedTransfer != null) {
-				addCompletedTransfer(completedTransfer);
-			}
-
 			if(isVoiceClip) return;
 
 			if (megaApi.getNumPendingDownloads() == 0 && transfersCount==0){
 				onQueueComplete(transfer.getNodeHandle());
 			}
 		}
-	}
-
-	private String getSDCardTargetPath(MegaTransfer transfer) {
-		String[] appDataParts = getSDCardAppDataParts(transfer);
-		if (appDataParts == null) {
-			return null;
-		}
-
-		return appDataParts[APP_DATA_TARGET_PATH_POSITION];
-	}
-
-	private String getSDCardTargetUri(MegaTransfer transfer) {
-		String[] appDataParts = getSDCardAppDataParts(transfer);
-		if (appDataParts == null || appDataParts.length <= APP_DATA_SD_CARD_PARTS) {
-			return null;
-		}
-
-		return appDataParts[APP_DATA_TARGET_URI_POSITION];
-	}
-
-	private String[] getSDCardAppDataParts(MegaTransfer transfer) {
-		String appData = transfer.getAppData();
-		if (isTextEmpty(appData) || !appData.contains(APP_DATA_SD_CARD)) {
-			return null;
-		}
-
-		String[] appDataParts = appData.split(APP_DATA_INDICATOR);
-		if (appDataParts != null && appDataParts.length >= APP_DATA_SD_CARD_PARTS) {
-			return appDataParts;
-		}
-
-		return null;
 	}
 
 	private void resultTransfersVoiceClip(long nodeHandle, int result){

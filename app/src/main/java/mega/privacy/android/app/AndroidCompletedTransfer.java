@@ -31,8 +31,12 @@ public class AndroidCompletedTransfer implements Parcelable {
     private String error;
     private String originalPath;
     private long parentHandle;
+    private String appData;
 
-    public AndroidCompletedTransfer(long id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error, String originalPath, long parentHandle) {
+    public AndroidCompletedTransfer(long id, String fileName, int type, int state, String size,
+                                    String nodeHandle, String path, boolean isOfflineFile,
+                                    long timeStamp, String error, String originalPath,
+                                    long parentHandle, String appData) {
         this.id = id;
         this.fileName = fileName;
         this.type = type;
@@ -45,6 +49,7 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.error = error;
         this.originalPath = originalPath;
         this.parentHandle = parentHandle;
+        this.appData = appData;
     }
 
     public AndroidCompletedTransfer (MegaTransfer transfer, MegaError error) {
@@ -58,6 +63,7 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.error = getTranslatedErrorString(error);
         this.originalPath = transfer.getPath();
         this.parentHandle = transfer.getParentHandle();
+        this.appData = transfer.getAppData();
     }
 
     public String getFileName() {
@@ -154,6 +160,14 @@ public class AndroidCompletedTransfer implements Parcelable {
 
     public void setParentHandle(long parentHandle) {
         this.parentHandle = parentHandle;
+    }
+
+    public String getAppData() {
+        return appData;
+    }
+
+    public void setAppData(String appData) {
+        this.appData = appData;
     }
 
     /**
