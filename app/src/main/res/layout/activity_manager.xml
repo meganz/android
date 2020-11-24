@@ -228,7 +228,7 @@
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="80dp"
-            android:src="@drawable/ic_chat"
+            android:src="@drawable/ic_add_white"
             android:tint="@color/white"
             android:visibility="invisible"
             app:backgroundTint="@color/accentColor"

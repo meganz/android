@@ -14,7 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.listeners.DefaultMegaRequestListener
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.AvatarUtil.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
@@ -99,7 +99,7 @@ class HomePageViewModel @ViewModelInject constructor(
         megaApi.getUserAvatar(
             megaApi.myUser,
             buildAvatarFile(context, megaApi.myEmail + FileUtil.JPG_EXTENSION).absolutePath,
-            object : DefaultMegaRequestListener {
+            object : BaseListener(context) {
                 override fun onRequestFinish(
                     api: MegaApiJava,
                     request: MegaRequest,

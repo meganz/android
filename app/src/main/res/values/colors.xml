@@ -234,6 +234,8 @@
     <color name="homepage_content">#89000000</color>
     <color name="homepage_fab_label_text_color">#ff373737</color>
 
+    <color name="black_bottom_sheets_icon_tint">#8F000000</color>
+
     <!-- colors for audio player -->
     <color name="audio_player_main_bg">#333333</color>
     <color name="audio_player_controller_bg">#222222</color>
@@ -243,4 +245,5 @@
     <color name="white_70_opacity">#B2FFFFFF</color>
     <color name="black_60_opacity">#99000000</color>
     <color name="teal_300">#00BFA5</color>
+
 </resources>

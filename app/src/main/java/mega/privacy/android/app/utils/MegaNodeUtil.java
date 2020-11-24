@@ -717,18 +717,35 @@ public class MegaNodeUtil {
                 .setNegativeButton(R.string.general_cancel, null).show();
     }
 
-    public static String[] getSerializedNodesFromBucket(MegaRecentActionBucket bucket) {
-        if (bucket != null) {
-            MegaNodeList nodeList = bucket.getNodes();
-            if (nodeList != null) {
-                String[] serializedNodes = new String[nodeList.size()];
-                for (int i = 0; i < nodeList.size(); i++) {
-                    serializedNodes[i] = nodeList.get(i).serialize();
+    /**
+     * Checks if a folder node is empty.
+     * If a folder is empty means although contains more folders inside,
+     * all of them don't contain any file.
+     *
+     * @param node  MegaNode to check.
+     * @return  True if the folder is folder and is empty, false otherwise.
+     */
+    public static boolean isEmptyFolder(MegaNode node) {
+        if (node == null || node.isFile()) {
+            return false;
+        }
+
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        List<MegaNode> children = megaApi.getChildren(node);
+
+        if (children != null && !children.isEmpty()) {
+            for (MegaNode child : children) {
+                if (child == null) {
+                    continue;
                 }
-                return serializedNodes;
+
+                if (child.isFile() || !isEmptyFolder(child)) {
+                    return false;
+                }
             }
         }
-        return null;
+
+        return true;
     }
 
     /**

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -111,7 +112,7 @@ fun getRoundingParams(context: Context): RoundingParams? {
 
     roundingParams?.apply {
         setBorder(
-            context.resources.getColor(R.color.accentColor), Util.dp2px(
+            ContextCompat.getColor(context, R.color.accentColor), Util.dp2px(
                 context.resources.getDimension(R.dimen.photo_selected_border_width),
                 context.resources.displayMetrics
             ).toFloat()

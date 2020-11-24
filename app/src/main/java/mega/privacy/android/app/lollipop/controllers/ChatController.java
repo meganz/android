@@ -11,7 +11,6 @@ import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-
 import android.text.Html;
 import android.text.Spanned;
 
@@ -25,8 +24,8 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
+import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -348,7 +347,7 @@ public class ChatController {
      * @param option     The selected mute option.
      */
     public void muteChat(String option) {
-        if (context instanceof ChatPreferencesActivity)
+        if (context instanceof ChatNotificationsPreferencesActivity)
             return;
 
         switch (option) {

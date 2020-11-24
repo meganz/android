@@ -19,8 +19,8 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 334
-        versionName "3.8.1 (334)"
+        versionCode 335
+        versionName "3.8.1 (335)"
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
@@ -95,10 +95,6 @@ dependencies {
     implementation "com.google.code.gson:gson:$gsonVersion"
 
     // Architecture Components
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-ktx:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
-
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"

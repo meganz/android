@@ -1,8 +1,6 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
@@ -56,6 +54,22 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
                 api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS) && isMyChange) {
+                api.shouldShowRichLinkWarning(new GetAttrUserListener(megaApplication));
+                api.isRichPreviewsEnabled(new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME) && isMyChange) {
+                api.getRubbishBinAutopurgePeriod(new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
+                api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
                 break;
             }
         }

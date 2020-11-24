@@ -68,7 +68,7 @@ class AlertsAndWarnings {
 
             // If app is doing login, the ODQ will be displayed at login finish
             if (app.currentActivity is LoginActivityLollipop && !loginFinished) {
-                return;
+                return
             }
 
             if (app.currentActivity is OverDiskQuotaPaywallActivity) {
@@ -108,7 +108,7 @@ class AlertsAndWarnings {
             resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
                 .setMessage(R.string.warning_message_resume_transfers)
                 .setCancelable(false)
-                .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, which ->
+                .setPositiveButton(R.string.button_resume_individual_transfer) { dialog, _ ->
                     MegaApplication.getInstance().megaApi.pauseTransfers(false)
 
                     if (context is ChatActivityLollipop) {
@@ -117,9 +117,9 @@ class AlertsAndWarnings {
 
                     dialog.dismiss()
                 }
-                .setNegativeButton(R.string.general_cancel) { dialog, which ->
+                .setNegativeButton(R.string.general_cancel) { dialog, _ ->
                     dialog.dismiss()
-                }.setOnDismissListener { dialog ->
+                }.setOnDismissListener {
                     if (context is BaseActivity) {
                         context.setIsResumeTransfersWarningShown(false)
                     }

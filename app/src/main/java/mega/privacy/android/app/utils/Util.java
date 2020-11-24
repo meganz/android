@@ -38,7 +38,6 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -46,6 +45,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -1704,8 +1704,7 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
+	public static Spanned getSpannedHtmlText(String string) {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
 		}
@@ -1826,5 +1825,18 @@ public class Util {
 	public static LocalDate fromEpoch(long seconds) {
 		return LocalDate.from(
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
+	}
+
+	/**
+	 * Method for displaying a snack bar when is Offline.
+	 *
+	 * @return True, is is Offline. False it is Online.
+	 */
+	public static boolean isOffline(Context context) {
+		if (!isOnline(context)) {
+			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+			return true;
+		}
+		return false;
 	}
 }
