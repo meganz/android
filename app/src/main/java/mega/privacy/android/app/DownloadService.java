@@ -173,6 +173,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		app = MegaApplication.getInstance();
 		megaApi = app.getMegaApi();
+		megaApi.addTransferListener(this);
+		megaApi.addRequestListener(this);
 		megaApiFolder = app.getMegaApiFolder();
 		megaChatApi = app.getMegaChatApi();
 
@@ -255,7 +257,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
 			logDebug("Cancel intent");
 			canceled = true;
-			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 			return START_NOT_STICKY;
 		}
 
@@ -275,7 +277,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		this.intent = intent;
 
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
-			megaApi.addTransferListener(this);
 			MegaTransferData transferData = megaApi.getTransferData(null);
 			if (transferData == null) {
 				return;
@@ -357,7 +358,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						updateProgressNotification();
 					}
 
-					megaApi.fastLogin(gSession, this);
+					megaApi.fastLogin(gSession);
 					return;
 				}
 				else{
@@ -399,7 +400,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             if (currentDir != null){
                 currentDir.mkdirs();
             }
-            megaApi.getPublicNode(url, this);
+            megaApi.getPublicNode(url);
             return;
         }
 
@@ -478,11 +479,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			logDebug("CurrentDocument is not null");
 			if (highPriority) {
 				String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
-				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
+				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
 			} else if (!isTextEmpty(appData)) {
-				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData, this);
+				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData);
 			} else {
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/");
 			}
 		} else {
 			logWarning("currentDir is not a directory");
@@ -1441,7 +1442,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		rxSubscriptions.add(Single.just(true)
+ 		rxSubscriptions.add(Single.just(true)
 				.observeOn(Schedulers.single())
 				.subscribe(ignored -> doOnTransferFinish(transfer, error),
 						throwable -> logError("doOnTransferFinish onError", throwable)));
@@ -1833,7 +1834,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
-				megaApi.fetchNodes(this);
+				megaApi.fetchNodes();
 			}
 			else{
 				logError("ERROR: " + e.getErrorString());
@@ -1885,9 +1886,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					if (currentDir.isDirectory()){
 						logDebug("To downloadPublic(dir)");
 						if (!isTextEmpty(appData)) {
-							megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData, this);
+							megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
 						} else {
-							megaApi.startDownload(node, currentDir.getAbsolutePath() + "/", this);
+							megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
 						}
 					}
 				}

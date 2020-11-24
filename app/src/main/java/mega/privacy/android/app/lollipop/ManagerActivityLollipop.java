@@ -14302,20 +14302,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		updateNavigationToolbarIcon();
 	}
 
-	////TRANSFERS/////
-
-	public void changeTransfersStatus(){
-		logDebug("changeTransfersStatus");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			logDebug("Show PLAY button");
-			megaApi.pauseTransfers(false, this);
-		}
-		else{
-			logDebug("Transfers are play -> pause");
-			megaApi.pauseTransfers(true, this);
-		}
-	}
-
 	/**
 	 * Pauses a transfer.
 	 *
