@@ -96,17 +96,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
      * @return the ad unit id
      */
     fun getAdUnitBySlot(slotId: String): String {
-        Log.i("Alex", "crash 1")
         if (needRequery(lastFetchTime)) return INVALID_UNIT_ID
-        Log.i("Alex", "crash 2: $slotId")
-//        val keys = adUnitMap!!.keys
-//        Log.i("Alex", "keys:$keys")
-//        for (i in 0..keys!!.size()) {
-//            Log.i("Alex", "key:${keys[i]}")
-//            if (keys[i] != null) {
-//                Log.i("Alex", "" + adUnitMap!!.get(keys[i]))
-//            }
-//        }
         return adUnitMap[slotId] ?: ""
     }
 
@@ -132,6 +122,13 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
         megaApi.fetchGoogleAds(AD_FLAG, adSlotIds, INVALID_HANDLE, this)
     }
 
+    /**
+     * Query the server by the public handle if should show Ads for the shared file
+     * Typically, the file/folder shared by Pro user should not show any Ads even if
+     * the receiver is an Ads user
+     *
+     * @param publicHandle the public handle of the shared file/folder
+     */
     fun queryShowOrNotByHandle(publicHandle: Long) {
         if (publicHandle == INVALID_HANDLE || querying) return
 
@@ -145,6 +142,12 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
         }
     }
 
+    /**
+     * Return if need a re-query of Ads info from server
+     * This is for throttling the requests to the server
+     *
+     * @param lastTime The time of the last request in milliseconds
+     */
     private fun needRequery(lastTime: Long) =
         System.currentTimeMillis() - lastTime > TIME_THRESHOLD
 
@@ -154,7 +157,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
             MegaRequest.TYPE_FETCH_GOOGLE_ADS -> {
                 fetching = false
                 lastFetchTime = System.currentTimeMillis()
-
+                Log.i("Alex", "onRequestFinish:$e")
                 when (e.errorCode) {
                     API_OK -> {
                         copyAdUnitsMap(request.megaStringMap)
@@ -171,6 +174,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
                     }
                     // -9 for the user is a non-Ad user (here SDK returns -9 for API -9)
                     API_ENOENT -> {
+                        Log.i("Alex", "not ads user")
                         adUnitMap.clear()
                         isAdsUser = false
                         callBackForFetch()
@@ -192,12 +196,19 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
         }
     }
 
+    /**
+     * Call callbacks when the fetching operation has done
+     */
     private fun callBackForFetch() {
         for (cb in callbacks) {
             cb.adUnitsFetched()
         }
     }
 
+    /**
+     * Copy the Ad slot/unit Id map from SDK returned MegaStringMap to a local
+     * map. Because directly using the SDK MegaStringMap may cause some crash.
+     */
     private fun copyAdUnitsMap(stringMap: MegaStringMap) {
         adUnitMap.clear()
         val keys = stringMap.keys

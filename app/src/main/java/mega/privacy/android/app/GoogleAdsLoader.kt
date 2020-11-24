@@ -19,7 +19,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.TextUtil
 
 /**
- * Load Google advertisement banners to the Activity/Fragment.
+ * Load Google advertisement banners to the Activity/Fragment.https://github.com/meganz/android2/pull/1549
  * Act as a LifecycleObserver to pause/resume/destroy the PublisherAdView in time
  */
 class GoogleAdsLoader(
@@ -102,7 +102,6 @@ class GoogleAdsLoader(
         // if had never been fetched or outdated
         val adUnitId = AdUnitSource.getAdUnitBySlot(slotId)
         if (adUnitId == AdUnitSource.INVALID_UNIT_ID) {
-            Log.i("Alex", "crash 3")
             AdUnitSource.fetchAdUnits()
             return
         }
@@ -221,6 +220,7 @@ class GoogleAdsLoader(
         setUpBanner()
     }
 
+    /** The account update receiver, for re-fetching the Ad units and user status */
     private val updateAccountDetailsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.i("Alex", "receive update account detail")
