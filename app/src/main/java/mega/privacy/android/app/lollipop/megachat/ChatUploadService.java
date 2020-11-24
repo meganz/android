@@ -1251,17 +1251,29 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	 * @return True if the list is empty, false otherwise.
 	 */
 	private boolean arePendingMessagesEmpty(int id, MegaTransfer transfer) {
-		if (pendingMessages != null && pendingMessages.size() > 0) {
+		if (pendingMessages != null && !pendingMessages.isEmpty()) {
 			return false;
 		}
 
+		attachMessageFromDB(id, transfer);
+
+		return true;
+	}
+
+	/**
+	 * Attaches a message to a chat conversation getting it from DB.
+	 *
+	 * @param id       Identifier of PendingMessageSingle.
+	 * @param transfer Current MegaTransfer.
+	 */
+	private void attachMessageFromDB(int id, MegaTransfer transfer) {
 		PendingMessageSingle pendingMessage = dbH.findPendingMessageById(id);
 		if (pendingMessage != null) {
 			pendingMessages.add(pendingMessage);
 			attach(pendingMessage, transfer);
+		} else {
+			logError("Message not found and not attached.");
 		}
-
-		return true;
 	}
 
 	public void attachNodes(MegaTransfer transfer){
@@ -1281,23 +1293,16 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		String fingerprint = megaApi.getFingerprint(transfer.getPath());
-		if (fingerprint != null) {
-			for(int i=0; i<pendingMessages.size();i++) {
-				PendingMessageSingle pendMsg = pendingMessages.get(i);
-				if (pendMsg.getId() == id || pendMsg.getFingerprint().equals(fingerprint)) {
-					attach(pendMsg, transfer);
-				}
-			}
-		}
-		else {
-			for(int i=0; i<pendingMessages.size();i++) {
-				PendingMessageSingle pendMsg = pendingMessages.get(i);
-				if (pendMsg.getId() == id) {
-					attach(pendMsg, transfer);
-				}
+
+		for (PendingMessageSingle pendMsg : pendingMessages) {
+			if (pendMsg.getId() == id || pendMsg.getFingerprint().equals(fingerprint)) {
+				attach(pendMsg, transfer);
+				return;
 			}
 		}
 
+		//Message not found, try to attach from DB
+		attachMessageFromDB(id, transfer);
 	}
 
 	public void attach (PendingMessageSingle pendMsg, MegaTransfer transfer) {
@@ -1343,14 +1348,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			return;
 		}
 
-		for(int i=0; i<pendingMessages.size();i++) {
-			PendingMessageSingle pendMsg = pendingMessages.get(i);
+		for (PendingMessageSingle pendMsg : pendingMessages) {
 			if (pendMsg.getId() == id) {
 				pendMsg.setNodeHandle(transfer.getNodeHandle());
 				pendMsg.setState(PendingMessageSingle.STATE_ATTACHING);
 				megaChatApi.attachVoiceMessage(pendMsg.getChatId(), transfer.getNodeHandle(), this);
+				return;
 			}
 		}
+
+		//Message not found, try to attach from DB
+		attachMessageFromDB(id, transfer);
 	}
 
 
@@ -1382,11 +1390,20 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
 
-		if (pendingMessages == null || pendingMessages.isEmpty()) {
-			PendingMessageSingle pendingMessage = dbH.findPendingMessageById(id);
-			if (pendingMessage != null) {
-				pendingMessages.add(pendingMessage);
+		if (pendingMessages != null && !pendingMessages.isEmpty()) {
+			for (PendingMessageSingle pendMsg : pendingMessages) {
+				if (pendMsg.getId() == id) {
+					return;
+				}
 			}
+		}
+
+		//Message not found, try to get it from DB.
+		PendingMessageSingle pendingMessage = dbH.findPendingMessageById(id);
+		if (pendingMessage != null) {
+			pendingMessages.add(pendingMessage);
+		} else {
+			logError("Message not found, not added");
 		}
 	}
 
