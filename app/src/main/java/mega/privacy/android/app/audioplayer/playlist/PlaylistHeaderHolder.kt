@@ -2,6 +2,9 @@ package mega.privacy.android.app.audioplayer.playlist
 
 import mega.privacy.android.app.databinding.ItemPlaylistHeaderBinding
 
+/**
+ * ViewHolder for Previous, Playing, Next headers.
+ */
 class PlaylistHeaderHolder(private val binding: ItemPlaylistHeaderBinding) :
     PlaylistViewHolder(binding) {
     override fun bind(item: PlaylistItem, itemOperation: PlaylistItemOperation) {

@@ -6,6 +6,9 @@ import com.facebook.drawee.view.SimpleDraweeView
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import java.io.File
 
+/**
+ * DataBinding implementation for set thumbnail and defaultThumbnail.
+ */
 @BindingAdapter("thumbnail", "defaultThumbnail")
 fun setPlaylistItemThumbnail(
     imageView: SimpleDraweeView,

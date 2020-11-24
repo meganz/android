@@ -17,7 +17,6 @@ import mega.privacy.android.app.audioplayer.service.Metadata
 import mega.privacy.android.app.audioplayer.service.MetadataExtractor
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
@@ -37,6 +36,9 @@ import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
+/**
+ * ViewModel for track (audio node) info UI logic.
+ */
 class TrackInfoViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler,

@@ -16,6 +16,9 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
+/**
+ * NodeSaver implementation for MegaNode.
+ */
 class MegaNodeSaver @Inject constructor(
     @ActivityContext context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -23,7 +26,7 @@ class MegaNodeSaver @Inject constructor(
 ) : NodeSaver(context, dbHandler) {
 
     /**
-     * Save a MegaNode into device.
+     * Save a list of MegaNode into device.
      *
      * @param handles the handle list of nodes to save
      * @param highPriority whether this download is high priority or not
@@ -132,12 +135,6 @@ class MegaNodeSaver @Inject constructor(
 
                     service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink)
 
-                    // TODO
-//                    if (context is AudioVideoPlayerLollipop
-//                        || context is PdfViewerActivityLollipop
-//                        || context is FullScreenImageViewerLollipop) {
-//                        service.putExtra("fromMV", true)
-//                    }
                     context.startService(service)
                 }
             }

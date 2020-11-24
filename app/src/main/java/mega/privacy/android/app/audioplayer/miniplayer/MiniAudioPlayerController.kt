@@ -23,6 +23,13 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 
 private val audioPlayerPlaying = MutableLiveData<Boolean>()
 
+/**
+ * A helper class containing UI logic of mini player, it help us keep ManagerActivity clean.
+ *
+ * @param playerView the ExoPlayer view
+ * @param context Android context
+ * @param onPlayerVisibilityChanged a callback for mini player view visibility change
+ */
 class MiniAudioPlayerController(
     private val playerView: PlayerView,
     private val context: Context,
@@ -102,6 +109,9 @@ class MiniAudioPlayerController(
         }
     }
 
+    /**
+     * activity onResume event.
+     */
     fun onResume() {
         val service = playerService
         if (service != null) {
@@ -109,6 +119,9 @@ class MiniAudioPlayerController(
         }
     }
 
+    /**
+     * activity onDestroy event.
+     */
     fun onDestroy() {
         audioPlayerPlaying.removeObserver(audioPlayerPlayingObserver)
         onAudioPlayerServiceStopped()
@@ -148,6 +161,11 @@ class MiniAudioPlayerController(
     }
 
     companion object {
+        /**
+         * Notify if audio player is playing or closed.
+         *
+         * @param playing true if player is playing, false if player is closed
+         */
         fun notifyAudioPlayerPlaying(playing: Boolean) {
             audioPlayerPlaying.value = playing
         }

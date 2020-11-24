@@ -171,7 +171,8 @@ import static mega.privacy.android.app.utils.Util.isOnline;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 /**
- * Note: this class is only used to play video, audio will be played by AudioPlayerActivity.
+ * Note: this class is only used to play video, audio will be played by
+ * {@link mega.privacy.android.app.audioplayer.AudioPlayerActivity}.
  */
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {

@@ -53,9 +53,7 @@ import java.util.concurrent.Callable
  * The initiation API of save should also be added by sub-classes, because it's usually
  * related with the final download step.
  *
- * It simplifies code in activity/fragment where a node need to be saved,
- * currently it's only used by OfflineFragment, we could use it in more screens
- * when new screens need this feature.
+ * It simplifies code in activity/fragment where a node need to be saved.
  */
 abstract class NodeSaver(
     protected val context: Context,

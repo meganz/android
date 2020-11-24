@@ -25,6 +25,9 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.util.*
 
+/**
+ * ViewModel for main audio player UI logic.
+ */
 class AudioPlayerViewModel @ViewModelInject constructor(
     @ActivityContext private val context: Context,
     private val offlineNodeSaver: OfflineNodeSaver,
@@ -42,14 +45,34 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     private val _itemToRemove = MutableLiveData<Long>()
     val itemToRemove: LiveData<Long> = _itemToRemove
 
+    /**
+     * Save an offline node to device.
+     *
+     * @param handle node handle
+     * @param activityStarter function to start activity
+     */
     fun saveOfflineNode(handle: Long, activityStarter: (Intent, Int) -> Unit) {
         offlineNodeSaver.save(handle, false, activityStarter)
     }
 
+    /**
+     * Save a mega node to device.
+     *
+     * @param handle node handle
+     * @param isFolderLink if this node is a folder link node
+     * @param activityStarter function to start activity
+     */
     fun saveMegaNode(handle: Long, isFolderLink: Boolean, activityStarter: (Intent, Int) -> Unit) {
         megaNodeSaver.save(listOf(handle), false, isFolderLink, activityStarter)
     }
 
+    /**
+     * Handle activity result launched by NodeSaver.
+     *
+     * @param requestCode requestCode of onActivityResult
+     * @param resultCode resultCode of onActivityResult
+     * @param data data of onActivityResult
+     */
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (offlineNodeSaver.handleActivityResult(requestCode, resultCode, data)
             || megaNodeSaver.handleActivityResult(requestCode, resultCode, data)

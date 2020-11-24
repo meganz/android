@@ -15,6 +15,9 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * NodeSaver implementation for offline node.
+ */
 class OfflineNodeSaver @Inject constructor(
     @ActivityContext context: Context,
     dbHandler: DatabaseHandler

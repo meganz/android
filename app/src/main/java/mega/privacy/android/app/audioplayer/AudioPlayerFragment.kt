@@ -133,9 +133,12 @@ class AudioPlayerFragment : Fragment() {
         requireContext().unbindService(connection)
     }
 
+    /**
+     * Observe playlist LiveData when view is created and service is connected.
+     */
     private fun tryObservePlaylist() {
         val service = playerService
-        if (!playlistObserved && service != null) {
+        if (!playlistObserved && service != null && view != null) {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
@@ -172,7 +175,6 @@ class AudioPlayerFragment : Fragment() {
         setupButtons()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     private fun setupPlayerView(player: SimpleExoPlayer) {
         binding.playerView.player = player
 
@@ -188,15 +190,12 @@ class AudioPlayerFragment : Fragment() {
 
         binding.playerView.setControlDispatcher(CallAwareControlDispatcher())
 
-        binding.playerView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                if (toolbarVisible) {
-                    hideToolbar()
-                } else {
-                    showToolbar()
-                }
+        binding.playerView.setOnClickListener {
+            if (toolbarVisible) {
+                hideToolbar()
+            } else {
+                showToolbar()
             }
-            true
         }
 
         binding.loading.isVisible = player.playbackState == Player.STATE_BUFFERING

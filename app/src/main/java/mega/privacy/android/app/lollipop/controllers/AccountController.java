@@ -443,7 +443,7 @@ public class AccountController {
 
         new LastShowSMSDialogTimeChecker(context).reset();
         AudioPlayerService.stopAudioPlayer(context);
-        AudioPlayerServiceViewModel.Companion.clearSettings(context);
+        AudioPlayerServiceViewModel.clearSettings(context);
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();

@@ -88,9 +88,12 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         requireContext().unbindService(connection)
     }
 
+    /**
+     * Observe playlist LiveData when view is created and service is connected.
+     */
     private fun tryObservePlaylist() {
         val service = playerService
-        if (!playlistObserved && service != null) {
+        if (!playlistObserved && service != null && view != null) {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
@@ -126,7 +129,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         (requireActivity() as AudioPlayerActivity).closeSearch()
     }
 
-    override fun openItemRemove(item: PlaylistItem) {
+    override fun removeItem(item: PlaylistItem) {
         playerService?.viewModel?.removeItem(item.nodeHandle)
     }
 }

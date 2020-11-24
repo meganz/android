@@ -4,6 +4,9 @@ import com.google.android.exoplayer2.DefaultControlDispatcher
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.utils.CallUtil
 
+/**
+ * A DefaultControlDispatcher which only dispatch control if there is no ongoing call.
+ */
 class CallAwareControlDispatcher : DefaultControlDispatcher(0, 0) {
     override fun dispatchSeekTo(player: Player, windowIndex: Int, positionMs: Long): Boolean {
         if (CallUtil.participatingInACall()) {

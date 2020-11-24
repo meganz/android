@@ -403,6 +403,11 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
         const val SINGLE_PLAYLIST_SIZE = 2
 
+        /**
+         * Pause the audio player when play video, play/record audio clip, start/receive call.
+         *
+         * @param context Android context
+         */
         @JvmStatic
         fun pauseAudioPlayer(context: Context) {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
@@ -410,6 +415,11 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             context.startService(audioPlayerIntent)
         }
 
+        /**
+         * Resume the audio player when go back from pauseAudioPlayer.
+         *
+         * @param context Android context
+         */
         @JvmStatic
         fun resumeAudioPlayer(context: Context) {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
@@ -417,6 +427,12 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             context.startService(audioPlayerIntent)
         }
 
+        /**
+         * Resume the audio player when go back from pauseAudioPlayer, and when there is no ongoing
+         * call.
+         *
+         * @param context Android context
+         */
         @JvmStatic
         fun resumeAudioPlayerIfNotInCall(context: Context) {
             if (!CallUtil.participatingInACall()) {
@@ -424,6 +440,11 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             }
         }
 
+        /**
+         * Stop the audio player, e.g. when logout.
+         *
+         * @param context Android context
+         */
         @JvmStatic
         fun stopAudioPlayer(context: Context) {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)

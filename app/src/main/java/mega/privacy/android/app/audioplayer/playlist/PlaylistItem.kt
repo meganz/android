@@ -6,6 +6,15 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import java.io.File
 import java.util.*
 
+/**
+ * UI data class for playlist screen.
+ *
+ * @property nodeHandle node handle
+ * @property nodeName node name
+ * @property thumbnail thumbnail file path, null if not available
+ * @property index the index used for seek to this item
+ * @property type item type
+ */
 data class PlaylistItem(
     val nodeHandle: Long,
     val nodeName: String,
@@ -13,6 +22,12 @@ data class PlaylistItem(
     val index: Int,
     val type: Int,
 ) {
+    /**
+     * Create a new instance with the specified item type, and nullify thumbnail if it's not exist.
+     *
+     * @param type item type
+     * @return the new instance
+     */
     fun finalizeThumbnailAndType(type: Int): PlaylistItem {
         return PlaylistItem(
             nodeHandle, nodeName,
@@ -21,6 +36,12 @@ data class PlaylistItem(
         )
     }
 
+    /**
+     * Create a new instance with new node name.
+     *
+     * @param newName new node name
+     * @return the new instance
+     */
     fun updateNodeName(newName: String) = PlaylistItem(nodeHandle, newName, thumbnail, index, type)
 
     companion object {
@@ -39,6 +60,13 @@ data class PlaylistItem(
         private val playingHeaderHandle = UUID.randomUUID().leastSignificantBits
         private val nextHeaderHandle = UUID.randomUUID().leastSignificantBits
 
+        /**
+         * Create an item for headers.
+         *
+         * @param context Android context
+         * @param type item type
+         * @param paused if the audio player is paused, only used for TYPE_PLAYING_HEADER
+         */
         fun headerItem(context: Context, type: Int, paused: Boolean = false): PlaylistItem {
             val name = context.getString(
                 when (type) {

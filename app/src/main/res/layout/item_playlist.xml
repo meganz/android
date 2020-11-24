@@ -54,7 +54,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|end"
             android:background="@null"
-            android:onClick="@{() -> itemOperation.openItemRemove(item)}"
+            android:onClick="@{() -> itemOperation.removeItem(item)}"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_close_grey"

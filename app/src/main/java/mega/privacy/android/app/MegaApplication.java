@@ -914,6 +914,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
+	/**
+	 * Setup the MegaApiAndroid instance for folder link.
+	 */
 	private void setupMegaApiFolder() {
 		megaApiFolder.retrySSLerrors(true);
 

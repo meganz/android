@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.databinding.ItemPlaylistBinding
 import mega.privacy.android.app.databinding.ItemPlaylistHeaderBinding
 
+/**
+ * RecyclerView adapter for playlist screen.
+ */
 class PlaylistAdapter(private val itemOperation: PlaylistItemOperation) :
     ListAdapter<PlaylistItem, PlaylistViewHolder>(PlaylistItemDiffCallback()) {
     override fun getItemViewType(position: Int): Int {

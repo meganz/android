@@ -165,6 +165,9 @@ class AudioPlayerActivity : BaseActivity() {
         handleNavigateUp()
     }
 
+    /**
+     * Handle navigate up event (toolbar go back button, system back menu).
+     */
     private fun handleNavigateUp() {
         if (!navController.navigateUp()) {
             playerService?.mainPlayerUIClosed()
@@ -428,6 +431,12 @@ class AudioPlayerActivity : BaseActivity() {
         return false
     }
 
+    /**
+     * Update node name if current displayed fragment is TrackInfoFragment.
+     *
+     * @param handle node handle
+     * @param newName new node name
+     */
     private fun updateTrackInfoNodeNameIfNeeded(handle: Long, newName: String) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) ?: return
@@ -437,6 +446,11 @@ class AudioPlayerActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Show alert dialog to confirm move a node to rubbish bin.
+     *
+     * @param node node to be moved to rubbish bin
+     */
     private fun moveToRubbishBin(node: MegaNode) {
         logDebug("moveToRubbishBin")
         if (!isOnline(this)) {

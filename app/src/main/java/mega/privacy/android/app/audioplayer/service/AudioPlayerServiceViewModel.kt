@@ -42,6 +42,10 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+/**
+ * A class containing audio player service logic, because using ViewModel in Service
+ * is not the standard scenario, so this class is actually not a subclass of ViewModel.
+ */
 class AudioPlayerServiceViewModel(
     private val context: Context,
     private val megaApi: MegaApiAndroid,
@@ -129,6 +133,12 @@ class AudioPlayerServiceViewModel(
         )
     }
 
+    /**
+     * Build player source from start intent.
+     *
+     * @param intent intent received from onStartCommand
+     * @return if there is no error
+     */
     fun buildPlayerSource(intent: Intent?): Boolean {
         if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
             _retry.value = false
@@ -367,11 +377,21 @@ class AudioPlayerServiceViewModel(
         return true
     }
 
+    /**
+     * Handle player error.
+     */
     fun onPlayerError() {
         playerRetry++
         _retry.value = playerRetry <= MAX_RETRY
     }
 
+    /**
+     * Check if the new intent would create the same playlist as current one.
+     *
+     * @param type new adapter type
+     * @param intent new intent
+     * @return if the new intent would create the same playlist as current one
+     */
     private fun isSamePlaylist(type: Int, intent: Intent): Boolean {
         val oldIntent = currentIntent ?: return false
         val oldType = oldIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
@@ -433,6 +453,11 @@ class AudioPlayerServiceViewModel(
         }
     }
 
+    /**
+     * Setup SDK HTTP streaming server.
+     *
+     * @param api MegaApiAndroid instance to use
+     */
     private fun setupStreamingServer(api: MegaApiAndroid) {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
@@ -855,6 +880,9 @@ class AudioPlayerServiceViewModel(
             .apply()
     }
 
+    /**
+     * Clear the state and flying task of this class, should be called in onDestroy.
+     */
     fun clear() {
         compositeDisposable.dispose()
         megaApi.httpServerStop()
@@ -875,6 +903,12 @@ class AudioPlayerServiceViewModel(
 
         private const val MAX_RETRY = 6
 
+        /**
+         * Clear saved audio player settings.
+         *
+         * @param context Android context
+         */
+        @JvmStatic
         fun clearSettings(context: Context) {
             context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
                 .edit()
