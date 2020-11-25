@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">免费账户</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite 账号</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I 账号</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II 账号</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III 账号</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro精简版帐户</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 帐户</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 帐户</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 帐户</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite 账户</string>
 
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]登出[/A]，使用其他帐户登录</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">确定要退出当前帐户吗？</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">%1$s 删除了信息</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">聊天记录已清空</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">聊天记录已清空</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s 清空了聊天记录</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">服务器正忙，请稍等。</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">请求太多。请稍候。</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">正在取消登录进程。请等待&#8230;&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">正在取消登录进程。请等待&#8230;&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">不支持的文件类型</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">出错了。文件损坏或不存在。</string>

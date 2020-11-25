@@ -25,7 +25,7 @@
     <string name="general_add" context="button">Hinzufügen</string>
     <string name="general_move" context="Item menu option upon right click on one or multiple files.">Verschieben</string>
     <string name="general_remove" context="Menu option to delete one or multiple selected items.">Entfernen</string>
-    <string name="general_share" context="button">Daten teilen</string>
+    <string name="general_share" context="button">Ordner freigeben</string>
     <!--
     <string name="general_confirm" context="button">Confirm</string>
     -->
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to use MEGA with another account</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to log out of the current account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Diese Nachricht wurde von %1$s gelöscht</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chatverlauf gelöscht</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Chatverlauf gelöscht</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Der Chatverlauf wurde von %1$s gelöscht</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Unsere Server sind leider überlastet - es geht gleich weiter&#8230;</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Der Vorgang dauert länger als erwartet. Bitte warten Sie.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Zuviele Anfragen - bitte warten.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Login wird abgebrochen. Bitte warten&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Login wird abgebrochen. Bitte warten&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Fehler: Die Datei ist beschädigt oder existiert nicht</string>

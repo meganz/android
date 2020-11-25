@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]登出[/A]以使用另一個帳戶登入MEGA</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">您確定要登出目前帳戶嗎？</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">此訊息已被%1$s刪除</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">聊天紀錄已清空</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">聊天紀錄已清空</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">聊天記錄已被%1$s清除</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">系統繁忙，請稍等。</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">這個過程花費的時間比預期的長。請稍候。</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">太多程序進行中。請稍候。</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">取消登入中。請耐心等待&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">取消登入中。請耐心等待&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">不支援的檔案類型。</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">錯誤。檔案已損毀或不存在。</string>

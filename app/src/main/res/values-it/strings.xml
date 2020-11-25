@@ -242,7 +242,7 @@
     -->
     <string name="cancel_transfer_confirmation">Annullare questo trasferimento?</string>
     <string name="cancel_all_transfer_confirmation">Annullare tutti i trasferimenti?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Annulla tutto</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Recenti</string>
@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Il processo sta prendendo più tempo del previsto. Per favore, aspetta.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Account free</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Account Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Account PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Account PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Account PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Account Pro Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Account Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Account Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Account Pro III</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Account PRO Lite</string>
 
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Effettua il logout[/A] per utilizzare MEGA con un altro account</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Sei sicuro di voler effettuare il logout dall\'account corrente?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Questo messaggio è stato eliminato da %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">La storia della chat è stata pulita</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">La storia della chat è stata pulita</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">La storia della chat è stata cancellata da %1$s</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">I server sono troppo impegnati. Per favore, aspetta.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Il processo sta prendendo più tempo del previsto. Per favore, aspetta.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Troppe richieste. Per favore, aspetta.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Annullamento del processo di login in corso. Per favore, attendi&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Annullamento del processo di login in corso. Per favore, attendi&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Tipo di file non supportato.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Errore. Il file è corrotto o non esiste.</string>
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Oggi</string>
     <string name="label_yesterday" context="label yesterday">Ieri</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Domani</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Nessun[/B] [A]file condiviso[/A][B].[/B]</string>
 
