@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -301,6 +302,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 checkScroll()
             }
         })
+
+        val animator = rv.itemAnimator
+        if (animator is SimpleItemAnimator) {
+            // prevent item blink when uiDirty
+            animator.supportsChangeAnimations = false
+        }
     }
 
     private fun observeLiveData() {
