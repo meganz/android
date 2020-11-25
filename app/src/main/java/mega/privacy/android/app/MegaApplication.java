@@ -111,7 +111,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.2_338";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.2_340";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -551,7 +551,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 								callStatus == MegaChatCall.CALL_STATUS_JOINING ||
 								callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
                             updateRTCAudioMangerTypeStatus(callStatus);
-							clearIncomingCallNotification(callId);
+							clearIncomingCallNotification(chatId);
 						}
 
 						if(megaApi.isChatNotifiable(chatId)) {

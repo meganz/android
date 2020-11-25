@@ -1012,7 +1012,7 @@
     <string name="text_reset_pass_logged_in" context="Text of the alert after opening the recovery link to reset pass being logged.">Ваш ключ восстановления будет использован для сброса пароля. Пожалуйста, введите новый пароль.</string>
     <string name="email_verification_text_change_pass" context="Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass">Вы получите ссылку восстановления, которая позволит сбросить пароль.</string>
 
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Повысить</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account in My Account Section">Улучшить</string>
     <string name="my_account_upgrade_pro_panel" context="Button to upgrade the account to PRO account in the panel that appears randomly">Улучшить</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Улучшите своё облако![A]Получите больше пространства и квоты передач с учетной записью PRO!</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Ключ восстановления был сохранён в: %1s. [A]Пока файл хранится по этому адресу, вы найдёте его в разделе «Сохранён локально». [A]Примечание: Он будет удалён, если вы выйдете из системы, пожалуйста, сохраните его в надёжном месте.</string>
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Выйти[/A] для входа в другой аккаунт MEGA</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Действительно выйти из аккаунта?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Сообщение удалено пользователем %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">История чата очищена</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">История чата очищена</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">История чата очищена пользователем %1$s</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Серверы заняты. Пожалуйста, подождите.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Процесс длится дольше ожидаемого. Пожалуйста, подождите.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Слишком много запросов. Пожалуйста, подождите.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Отмена процесса входа. Пожалуйста, подождите&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Отмена процесса входа. Пожалуйста, подождите&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Неподдерживаемый тип файла</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Ошибка. Файл повреждён или не существует.</string>

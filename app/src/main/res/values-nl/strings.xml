@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Dit process duurt langer dan verwacht. Wacht alstublieft.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Gratis Account</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I Account</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II Account</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III Account</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite Account</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
 
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Uitloggen [/A] om MEGA met een ander account te gebruiken</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Weet u zeker dat u zich wilt afmelden bij de huidige account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Dit bericht werd verwijderd door %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">De gespreksgeschiedenis werd gewist</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">De gespreksgeschiedenis werd gewist</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Gespreksgeschiedenis gewist door %1$s</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">De servers zijn te druk.Wacht a.u.b.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Dit process duurt langer dan verwacht. Wacht alstublieft.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Te veel verzoeken. Wacht a.u.b.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Inlogproces annuleren. Even geduld aub&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Inlogproces annuleren. Even geduld aub&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Niet ondersteund bestandstype.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Fout. Het bestand is corrupt of bestaat niet.</string>
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Vandaag</string>
     <string name="label_yesterday" context="label yesterday">Gisteren</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Morgen</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Geen [/B][A]Gedeelde Bestanden[/A][B].[/B]</string>
 
