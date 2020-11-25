@@ -362,10 +362,18 @@ class HomepageFragment : Fragment() {
         })
     }
 
-    private fun changeTabElevation(withElevation: Boolean) = if (withElevation) {
-        tabLayout.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
-    } else {
-        tabLayout.elevation = 0f
+    private fun changeTabElevation(withElevation: Boolean) {
+        if (withElevation) {
+            tabLayout.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
+        } else {
+            tabLayout.elevation = 0f
+        }
+
+        if (withElevation && bottomSheetBehavior.state == HomepageBottomSheetBehavior.STATE_EXPANDED) {
+            tabLayout.setBackgroundResource(R.drawable.bg_cardview_white)
+        } else {
+            tabLayout.setBackgroundResource(R.drawable.bg_cardview_white_top)
+        }
     }
 
     private fun setupFabs() {
