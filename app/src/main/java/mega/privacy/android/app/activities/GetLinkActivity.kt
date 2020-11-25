@@ -56,12 +56,9 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val thereAreNoPublicLinks = megaApi.publicLinks == null || megaApi.publicLinks.size == 0
-        val showCopyright = dbH.showCopyright.toBoolean()
-
         val visibleFragment =
-            if (node.isExported || (thereAreNoPublicLinks && !showCopyright)) GET_LINK_FRAGMENT
-            else COPYRIGHT_FRAGMENT
+            if (dbH.showCopyright.toBoolean() && (megaApi.publicLinks == null || megaApi.publicLinks.size == 0)) COPYRIGHT_FRAGMENT
+            else GET_LINK_FRAGMENT
 
         showFragment(visibleFragment)
     }
