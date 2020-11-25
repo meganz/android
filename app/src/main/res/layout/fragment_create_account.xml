@@ -38,7 +38,7 @@
                         android:layout_gravity="left"
                         android:text="@string/create_account_title"
                         android:layout_marginTop="17dp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="16sp"
                         android:textAllCaps="true"
                         android:fontFamily="sans-serif-light"
@@ -261,7 +261,7 @@
                                 android:textSize="14sp"
                                 android:layout_marginTop="6dp"
                                 android:layout_marginLeft="5dp"
-                                android:textColor="@color/name_my_account"
+                                android:textColor="@color/primary_text"
                                 android:text="@string/passwd_weak"/>
 
                         </LinearLayout>

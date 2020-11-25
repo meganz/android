@@ -410,19 +410,13 @@
 
                 <Button
                     android:id="@+id/join_button"
+                    style="@style/AccentButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:background="@color/accentColor"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:minHeight="36dp"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:text="@string/action_join"
-                    android:textColor="@color/white"
-                    android:tint="@android:color/white" />
+                    android:text="@string/action_join" />
 
             </RelativeLayout>
 
@@ -448,7 +442,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="20dp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:textSize="16sp" />
 
                 <ProgressBar
@@ -534,7 +528,7 @@
                         android:layout_marginRight="16dp"
                         android:ellipsize="middle"
                         android:singleLine="true"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="10sp" />
                 </RelativeLayout>
 
