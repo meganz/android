@@ -81,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="14sp"
             android:fontFamily="sans-serif-light"
             android:layout_marginTop="8dp"

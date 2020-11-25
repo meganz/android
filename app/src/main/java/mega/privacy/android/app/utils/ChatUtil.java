@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -57,9 +58,11 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
@@ -68,10 +71,11 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatUtil {
     private static final int MIN_WIDTH = 44;
@@ -127,84 +131,55 @@ public class ChatUtil {
     }
 
     public static void showShareChatLinkDialog (final Context context, MegaChatRoom chat, final String chatLink) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
         LayoutInflater inflater = null;
+
         if (context instanceof GroupChatInfoActivityLollipop) {
             inflater = ((GroupChatInfoActivityLollipop) context).getLayoutInflater();
         } else if (context instanceof ChatActivityLollipop) {
             inflater = ((ChatActivityLollipop) context).getLayoutInflater();
         }
+
         View v = inflater.inflate(R.layout.chat_link_share_dialog, null);
         builder.setView(v);
         final AlertDialog shareLinkDialog = builder.create();
 
         EmojiTextView nameGroup = v.findViewById(R.id.group_name_text);
         nameGroup.setText(getTitleChat(chat));
-        TextView chatLinkText = (TextView) v.findViewById(R.id.chat_link_text);
+        TextView chatLinkText = v.findViewById(R.id.chat_link_text);
         chatLinkText.setText(chatLink);
 
-        final boolean isModerator = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR ? true : false;
+        Button copyButton = v.findViewById(R.id.copy_button);
+        copyButton.setOnClickListener(v12 -> {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink);
+            clipboard.setPrimaryClip(clip);
+            if (context instanceof ChatActivityLollipop) {
+                ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), MEGACHAT_INVALID_HANDLE);
 
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.copy_button: {
-                        android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", chatLink);
-                        clipboard.setPrimaryClip(clip);
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).showSnackbar(context.getString(R.string.chat_link_copied_clipboard));
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.chat_link_copied_clipboard), -1);
-
-                        }
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.share_button: {
-                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                        sharingIntent.setType("text/plain");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, chatLink);
-                        context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.delete_button: {
-                        if (isModerator) {
-                            showConfirmationRemoveChatLink(context);
-                        }
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                    case R.id.dismiss_button: {
-                        dismissShareChatLinkDialog(context, shareLinkDialog);
-                        break;
-                    }
-                }
             }
-        };
+            dismissShareChatLinkDialog(context, shareLinkDialog);
+        });
 
-        Button copyButton = (Button) v.findViewById(R.id.copy_button);
-        copyButton.setOnClickListener(clickListener);
-        Button shareButton = (Button) v.findViewById(R.id.share_button);
-        shareButton.setOnClickListener(clickListener);
-        Button deleteButton = (Button) v.findViewById(R.id.delete_button);
-        if (isModerator) {
-            deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            deleteButton.setVisibility(View.GONE);
-        }
-        deleteButton.setOnClickListener(clickListener);
-        Button dismissButton = (Button) v.findViewById(R.id.dismiss_button);
-        dismissButton.setOnClickListener(clickListener);
+        Button shareButton = v.findViewById(R.id.share_button);
+        shareButton.setOnClickListener(v13 -> {
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType(PLAIN_TEXT_SHARE_TYPE);
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
+            context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
+            dismissShareChatLinkDialog(context, shareLinkDialog);
+        });
+
+        Button dismissButton = v.findViewById(R.id.dismiss_button);
+        dismissButton.setOnClickListener(v15 -> dismissShareChatLinkDialog(context, shareLinkDialog));
 
         shareLinkDialog.setCancelable(false);
         shareLinkDialog.setCanceledOnTouchOutside(false);
+
         try {
             shareLinkDialog.show();
         } catch (Exception e) {
+            logWarning("Exception showing share link dialog.", e);
         }
     }
 
@@ -219,31 +194,15 @@ public class ChatUtil {
     }
 
     public static void showConfirmationRemoveChatLink(final Context context) {
-        logDebug("showConfirmationRemoveChatLink");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (context instanceof GroupChatInfoActivityLollipop) {
-                            ((GroupChatInfoActivityLollipop) context).removeChatLink();
-                        } else if (context instanceof ChatActivityLollipop) {
-                            ((ChatActivityLollipop) context).removeChatLink();
-                        }
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(context);
-        builder.setTitle(R.string.action_delete_link);
-        builder.setMessage(R.string.context_remove_chat_link_warning_text).setPositiveButton(R.string.delete_button, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(R.string.action_delete_link)
+                .setMessage(R.string.context_remove_chat_link_warning_text)
+                .setPositiveButton(R.string.delete_button, (dialog, which) -> {
+                    if (context instanceof GroupChatInfoActivityLollipop) {
+                        ((GroupChatInfoActivityLollipop) context).removeChatLink();
+                    }
+                })
+                .setNegativeButton(R.string.general_cancel, null).show();
     }
 
     public static MegaChatMessage getMegaChatMessage(Context context, MegaChatApiAndroid megaChatApi, long chatId, long messageId) {
@@ -469,8 +428,15 @@ public class ChatUtil {
         if (!(context instanceof ChatActivityLollipop))
             return;
 
-        MegaApplication.setIsReactionFromKeyboard(isFromKeyboard);
-        MegaApplication.getInstance().getMegaChatApi().addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+
+        if (isMyOwnReaction(chatId, messageId, reaction)) {
+            if (!isFromKeyboard) {
+                megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+            }
+        } else {
+            megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
+        }
     }
 
     public static boolean shouldReactionBeClicked(MegaChatRoom chatRoom) {
@@ -497,6 +463,27 @@ public class ChatUtil {
         }
 
         return list;
+    }
+
+    /**
+     * Method for know if I have a concrete reaction to a particular message
+     *
+     * @param chatId   The chat ID.
+     * @param msgId    The message ID.
+     * @param reaction The reaction.
+     * @return True, if I have reacted. False otherwise.
+     */
+    public static boolean isMyOwnReaction(long chatId, long msgId, String reaction) {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, msgId, reaction);
+
+        for (int i = 0; i < handleList.size(); i++) {
+            if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -932,5 +919,59 @@ public class ChatUtil {
         return isContact(userHandle)
                 ? MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(userHandle)
                 : MegaChatApi.STATUS_INVALID;
+    }
+
+    /**
+     * Method for obtaining the contact status bitmap.
+     *
+     * @param userStatus The contact status.
+     * @return The final bitmap.
+     */
+    public static Bitmap getStatusBitmap(int userStatus) {
+        switch (userStatus) {
+            case MegaChatApi.STATUS_ONLINE:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_online);
+
+            case MegaChatApi.STATUS_AWAY:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_away);
+
+            case MegaChatApi.STATUS_BUSY:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_busy);
+
+            case MegaChatApi.STATUS_OFFLINE:
+                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_offline);
+
+            case MegaChatApi.STATUS_INVALID:
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
+     *
+     * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
+     * @return String to show for invalid meta message.
+     */
+    public static String getInvalidMetaMessage(MegaChatMessage message) {
+        String invalidMetaMessage = getString(R.string.error_meta_message_invalid);
+
+        if (message == null) {
+            return invalidMetaMessage;
+        }
+
+        String contentMessage = message.getContent();
+        if (!isTextEmpty(contentMessage)) {
+            return contentMessage;
+        }
+
+        MegaChatContainsMeta meta = message.getContainsMeta();
+
+        String metaTextMessage = meta != null ? meta.getTextMessage() : null;
+        if (!isTextEmpty(metaTextMessage)) {
+            return metaTextMessage;
+        }
+
+        return invalidMetaMessage;
     }
 }

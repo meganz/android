@@ -706,7 +706,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             case R.id.call_in_progress_layout: {
                 logDebug("call_in_progress_layout");
                 if (checkPermissionsCall()) {
-                    returnCall(context);
+                    returnActiveCall(context);
                 }
                 break;
             }
@@ -838,7 +838,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             logDebug("Open chat: Position: " + position + ", Chat ID: " + chats.get(position).getChatId());
             Intent intent = new Intent(context, ChatActivityLollipop.class);
             intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", adapterList.getChatAt(position).getChatId());
+            intent.putExtra(CHAT_ID, adapterList.getChatAt(position).getChatId());
             this.startActivity(intent);
             if (context instanceof ManagerActivityLollipop) {
                 if (((ManagerActivityLollipop) context).getSearchQuery() != null && !((ManagerActivityLollipop) context).getSearchQuery().isEmpty()) {
@@ -1604,7 +1604,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("REQUEST_CAMERA -> returnTheCall");
-                        returnCall(context);
+                        returnActiveCall(context);
                     }
                 }
                 break;
@@ -1613,7 +1613,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
-                        returnCall(context);
+                        returnActiveCall(context);
                     }
                 }
                 break;

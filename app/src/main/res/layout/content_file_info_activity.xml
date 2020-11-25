@@ -62,7 +62,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="3dp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="16sp"
                         app:emojiSize="14sp"
                         android:fontFamily="sans-serif-light"
@@ -98,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_owner_linear"
                     android:textSize="16sp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:singleLine="true"/>
@@ -130,7 +130,7 @@
                 android:layout_weight="5"
                 android:layout_marginLeft="72dp"
                 android:text="@string/file_properties_available_offline"
-                android:textColor="@color/mail_my_account"
+                android:textColor="@color/secondary_text"
                 android:textSize="16sp"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -144,9 +144,10 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/available_offline_separator"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
+            android:layout_marginStart="72dp"
             android:background="@color/separator_grey" />
 
         <!-- VERSIONS LAYOUT -->
@@ -205,7 +206,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="left|center_vertical"
                 android:text="@string/file_properties_shared_folder_select_contact"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16dp"/>
 
             <Button
@@ -300,14 +301,14 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"/>
+                    android:textColor="@color/primary_text"/>
 
                 <TextView
                     android:id="@+id/file_properties_info_data_size"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 ¡
         </RelativeLayout>
@@ -336,14 +337,14 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"/>
+                    android:textColor="@color/primary_text"/>
 
                 <TextView
                     android:id="@+id/file_properties_info_data_content"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -372,7 +373,7 @@
                     android:textSize="14sp"
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="8dp"/>
 
                 <TextView
@@ -380,7 +381,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -409,7 +410,7 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="8dp"/>
 
                 <TextView
@@ -417,7 +418,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -446,7 +447,7 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="8dp"/>
 
                 <TextView
@@ -454,7 +455,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -485,7 +486,7 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="8dp"/>
 
                 <TextView
@@ -527,7 +528,7 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="8dp"/>
 
                 <TextView
@@ -536,7 +537,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_added"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -565,7 +566,7 @@
                     android:fontFamily="sans-serif-light"
                     android:textStyle="bold"
                     android:textAllCaps="true"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="8dp"/>
 
                 <TextView
@@ -574,7 +575,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_created"
                     android:textSize="14sp"
-                    android:textColor="@color/mail_my_account" />
+                    android:textColor="@color/secondary_text" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -602,7 +603,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/file_properties_shared_folder_public_link_name"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="14sp"
                 android:fontFamily="sans-serif-light"
                 android:textStyle="bold"
@@ -616,7 +617,7 @@
                 android:layout_marginRight="20dp"
                 android:maxWidth="250dp"
                 android:textSize="14sp"
-                android:textColor="@color/mail_my_account" />
+                android:textColor="@color/secondary_text" />
 
             <TextView
                 android:id="@+id/file_properties_link_date"
@@ -627,7 +628,7 @@
                 android:layout_marginRight="20dp"
                 android:maxWidth="250dp"
                 android:textSize="14sp"
-                android:textColor="@color/name_my_account" />
+                android:textColor="@color/primary_text" />
 
         </RelativeLayout>
 

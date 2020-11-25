@@ -79,7 +79,7 @@
                     rounded:emojiSize="12sp"
                     android:gravity="left|center_vertical"
                     android:layout_centerVertical="true"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="@color/secondary_text"/>
 
             </RelativeLayout>
         </RelativeLayout>
@@ -249,7 +249,7 @@
                                 android:gravity="left"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:textColor="@color/name_my_account"
+                                android:textColor="@color/primary_text"
                                 android:textSize="16sp"
                                 rounded:emojiSize="16sp"
                                 android:background="@android:color/transparent"
@@ -265,7 +265,7 @@
                                 android:ellipsize="end"
                                 android:background="@android:color/transparent"
                                 android:layout_below="@+id/url_own_message_title"
-                                android:textColor="@color/name_my_account"
+                                android:textColor="@color/primary_text"
                                 android:textSize="14sp"
                                 android:layout_marginBottom="12dp"
                                 android:layout_gravity="left"/>
@@ -301,7 +301,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:textColor="@color/mail_my_account"
+                            android:textColor="@color/secondary_text"
                             android:textSize="14sp"/>
 
                     </LinearLayout>
@@ -619,7 +619,7 @@
                                     android:text="@string/title_geolocation_message"
                                     android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
-                                    android:textColor="@color/name_my_account"/>
+                                    android:textColor="@color/primary_text"/>
 
                                 <TextView
                                     android:id="@+id/own_info_pinned_location"
@@ -627,7 +627,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/own_title_pinned_location"
                                     android:textSize="14dp"
-                                    android:textColor="@color/name_my_account"/>
+                                    android:textColor="@color/primary_text"/>
 
                             </RelativeLayout>
 
@@ -720,16 +720,27 @@
                         android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_portrait_rl">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_own_message_thumb_portrait_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/secondary_text"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="152dp"
-                            android:maxHeight="350dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_portrait_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_own_message_thumb_portrait_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -865,16 +876,27 @@
                         android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_landscape_rl">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_own_message_thumb_landscape_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/secondary_text"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="152dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_own_message_thumb_landscape_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_own_message_thumb_landscape_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1263,7 +1285,7 @@
                     android:textSize="12sp"
                     rounded:emojiSize="10sp"
                     android:text="name of the contact"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:layout_marginRight="4dp"
                     android:maxLines="1"
                     android:singleLine="true"
@@ -1316,7 +1338,7 @@
                         rounded:emojiSize="12sp"
                         android:gravity="left|center_vertical"
                         android:layout_centerVertical="true"
-                        android:textColor="@color/mail_my_account" />
+                        android:textColor="@color/secondary_text" />
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -1377,7 +1399,7 @@
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     app:emojiSize="18sp"
                     android:inputType="textMultiLine|textNoSuggestions"
@@ -1489,7 +1511,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="left"
                                 android:text="@string/title_enable_rich_links"
-                                android:textColor="@color/name_my_account"
+                                android:textColor="@color/primary_text"
                                 android:textSize="16sp"
                                 rounded:emojiSize="16sp"
                                 android:ellipsize="end"
@@ -1507,7 +1529,7 @@
                                 android:ellipsize="end"
                                 android:layout_below="@+id/url_contact_message_title"
                                 android:background="@android:color/transparent"
-                                android:textColor="@color/mail_my_account"
+                                android:textColor="@color/secondary_text"
                                 android:text="@string/text_enable_rich_links"
                                 android:textSize="14sp"
                                 android:layout_marginBottom="12dp"
@@ -1544,7 +1566,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:textColor="@color/mail_my_account"
+                            android:textColor="@color/secondary_text"
                             android:textSize="14sp"/>
                     </LinearLayout>
 
@@ -1711,7 +1733,7 @@
                                     android:text="Pinned Location"
                                     android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
-                                    android:textColor="@color/name_my_account"/>
+                                    android:textColor="@color/primary_text"/>
 
                                 <TextView
                                     android:id="@+id/contact_info_pinned_location"
@@ -1719,7 +1741,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/contact_title_pinned_location"
                                     android:textSize="14dp"
-                                    android:textColor="@color/name_my_account"/>
+                                    android:textColor="@color/primary_text"/>
 
                             </RelativeLayout>
 
@@ -1764,16 +1786,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_contact_message_thumb_portrait_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/secondary_text"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="152dp"
-                            android:maxHeight="350dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_portrait_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_contact_message_thumb_portrait_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1850,16 +1883,27 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <!--Image with preview-->
+                        <!--Image with preview or Giphy-->
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/content_contact_message_thumb_landscape_gif_view"
+                            style="@style/SimpleDraweeViewMessages"
+                            rounded:roundWithOverlayColor="@color/white"
+                            rounded:roundedCornerRadius="10dp"
+                            rounded:roundingBorderColor="@color/secondary_text"
+                            rounded:roundingBorderWidth="1px" />
+
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxWidth="212dp"
-                            android:maxHeight="350dp"
-                            android:adjustViewBounds="true"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            style="@style/PreviewMessage" />
+
+                        <ImageView
+                            android:id="@+id/content_contact_message_thumb_landscape_gif"
+                            style="@style/IconGifMessage" />
+
+                        <ProgressBar
+                            android:id="@+id/content_contact_message_thumb_landscape_gif_progressbar"
+                            style="@style/ProgressBarGifMessage"
+                            android:theme="?android:attr/progressBarStyleLargeInverse" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1961,7 +2005,7 @@
                                 android:id="@+id/content_contact_message_file_name"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/name_my_account"
+                                android:textColor="@color/primary_text"
                                 android:textSize="14sp"
                                 android:layout_marginTop="11dp"
                                 android:layout_marginBottom="2dp"
@@ -1973,7 +2017,7 @@
                                 android:id="@+id/content_contact_message_file_size"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/mail_my_account"
+                                android:textColor="@color/secondary_text"
                                 android:layout_below="@+id/content_contact_message_file_name"
                                 android:textSize="12sp"
                                 android:layout_marginBottom="11dp"
@@ -2059,7 +2103,7 @@
                             android:id="@+id/content_contact_message_contact_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="@color/primary_text"
                             android:textSize="14sp"
                             rounded:emojiSize="12sp"
                             android:layout_marginTop="11dp"
@@ -2070,7 +2114,7 @@
                             android:id="@+id/content_contact_message_contact_email"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/mail_my_account"
+                            android:textColor="@color/secondary_text"
                             android:layout_below="@+id/content_contact_message_contact_name"
                             android:textSize="12sp"
                             rounded:emojiSize="10sp"

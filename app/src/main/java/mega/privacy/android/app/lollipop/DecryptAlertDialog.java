@@ -217,7 +217,7 @@ public class DecryptAlertDialog extends DialogFragment {
         if (mEdit == null || mErrorView == null) return;
 
         mErrorView.setVisibility(View.GONE);
-        mEdit.setTextColor(ContextCompat.getColor(mContext, R.color.name_my_account));
+        mEdit.setTextColor(ContextCompat.getColor(mContext, R.color.primary_text));
         mEdit.getBackground().mutate().clearColorFilter();
         mEdit.getBackground().mutate().setColorFilter(ContextCompat.getColor(
                 mContext, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);

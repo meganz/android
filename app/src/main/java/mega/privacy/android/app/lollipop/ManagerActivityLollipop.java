@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -31,9 +30,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -110,7 +111,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,7 +141,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -203,6 +202,10 @@ import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaViewHolder;
+import mega.privacy.android.app.psa.PsaViewModel;
+import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -230,7 +233,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -246,7 +248,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -395,6 +396,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public Toolbar tB;
     ActionBar aB;
     AppBarLayout abL;
+	private AppBarLayout toolbarLayout;
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
@@ -672,7 +674,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
 	private AlertDialog generalDialog;
-	private AlertDialog setPinDialog;
 	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
 	private AlertDialog alertDialogSMSVerification;
@@ -793,6 +794,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+	private PsaViewModel psaViewModel;
+	private PsaViewHolder psaViewHolder;
 
 
 	/**
@@ -916,10 +919,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							}
 						}
 
-						if(getSettingsFragment() != null){
-							sttFLol.setRubbishInfo();
-						}
-
 						checkBusinessStatus();
 
 						if (megaApi.isBusinessAccount()) {
@@ -988,11 +987,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					secondaryMediaUploadsClicked();
 				} else if (!isSecondary && drawerItem == DrawerItem.CAMERA_UPLOADS) {
 					cameraUploadsClicked();
-				}
-
-				//refresh settings if user is on that page
-				if (getSettingsFragment() != null) {
-					getSettingsFragment().setCUDestinationFolder(isSecondary, handleInUserAttr);
 				}
 
 				//update folder icon
@@ -1300,13 +1294,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (intent == null || intent.getAction() == null)
 				return;
 
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+				return;
+
 			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, -1);
-
-				if (chatIdReceived == -1)
-					return;
-
-				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, -1);
+				int callStatus = intent.getIntExtra(UPDATE_CALL_STATUS, INVALID_CALL_STATUS);
 				switch (callStatus) {
 					case MegaChatCall.CALL_STATUS_REQUEST_SENT:
 					case MegaChatCall.CALL_STATUS_RING_IN:
@@ -1315,19 +1309,30 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					case MegaChatCall.CALL_STATUS_JOINING:
 					case MegaChatCall.CALL_STATUS_DESTROYED:
 					case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-						rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-						if (rChatFL != null && rChatFL.isVisible()) {
-							rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
-						}
-
-						if (isScreenInPortrait(ManagerActivityLollipop.this)) {
-							setCallWidget();
-						} else {
-							supportInvalidateOptionsMenu();
-						}
-
+						updateVisibleCallElements(chatIdReceived);
 						break;
 				}
+			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
+				updateVisibleCallElements(chatIdReceived);
+			}
+		}
+	};
+
+	private BroadcastReceiver chatSessionUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null)
+				return;
+
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
+			if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
+				return;
+
+			if (intent.getAction().equals(ACTION_CHANGE_SESSION_ON_HOLD)) {
+				updateVisibleCallElements(chatIdReceived);
 			}
 		}
 	};
@@ -1342,38 +1347,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (getChatsFragment() != null) {
 					rChatFL.notifyPushChanged();
 				}
-				if(getSettingsFragment() != null){
-					sttFLol.updateNotifChat();
-				}
 			}
 		}
 	};
 
-    private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null && intent.getAction() != null) {
-                switch (intent.getAction()) {
-                    case ACTION_REFRESH_CAMERA_UPLOADS_SETTING:
-                        if (getSettingsFragment() != null) {
-                            sttFLol.refreshCameraUploadsSettings();
-                        }
-                        break;
-                    case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-                        // disable UI elements of media upload omly
-                        if (getSettingsFragment() != null) {
-                            sttFLol.disableMediaUploadUIProcess();
-                        }
-                        break;
-                    case ACTION_REFRESH_CLEAR_OFFLINE_SETTING:
-                        if (getSettingsFragment() != null) {
-                            sttFLol.taskGetSizeOffline();
-                        }
-                        break;
-                }
-            }
-        }
-    };
+	private BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null && intent.getAction() != null && getSettingsFragment() != null
+					&& (intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
+					|| intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE))) {
+				sttFLol.refreshCameraUploadsSettings();
+			}
+		}
+	};
 
     public void launchPayment(String productId) {
         //start purchase/subscription flow
@@ -1527,6 +1514,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
+	/**
+	 * Method for updating the visible elements related to a call.
+	 *
+	 * @param chatIdReceived The chat ID of a call.
+	 */
+	private void updateVisibleCallElements(long chatIdReceived) {
+		if (getChatsFragment() != null && rChatFL.isVisible()) {
+			rChatFL.refreshNode(megaChatApi.getChatListItem(chatIdReceived));
+		}
+
+		if (isScreenInPortrait(ManagerActivityLollipop.this)) {
+			setCallWidget();
+		} else {
+			supportInvalidateOptionsMenu();
+		}
+	}
+
 	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
 		Purchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
@@ -1593,6 +1597,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					}
+
 				} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
@@ -1737,7 +1742,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (checkPermissionsCall(this, typesCameraPermission)) {
 			switch (typesCameraPermission) {
 				case RETURN_CALL_PERMISSIONS:
-					returnCall(this);
+					returnActiveCall(this);
 					break;
 
 				case START_CALL_PERMISSIONS:
@@ -2045,15 +2050,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		registerReceiver(refreshAddPhoneNumberButtonReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
 
-		IntentFilter filterCall = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-		filterCall.addAction(ACTION_CALL_STATUS_UPDATE);
-		registerReceiver(chatCallUpdateReceiver, filterCall);
-
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
 		registerReceiver(transferOverQuotaUpdateReceiver, filterTransfers);
 
 		registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
+
+		registerReceiver(chatSessionUpdateReceiver, new IntentFilter(ACTION_CHANGE_SESSION_ON_HOLD));
+		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
+		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
+		registerReceiver(chatCallUpdateReceiver, filterCall);
+
 		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
         registerReceiver(cameraUploadLauncherReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
 
@@ -2061,8 +2068,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         IntentFilter filterUpdateCUSettings = new IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED);
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING);
-		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING);
-		filterUpdateCUSettings.addAction(ACTION_REFRESH_CLEAR_OFFLINE_SETTING);
+		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
@@ -2220,10 +2226,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		logDebug("Set view");
 		setContentView(R.layout.activity_manager);
-//		long num = 11179220468180L;
-//		dbH.setSecondaryFolderHandle(num);
+
+		observePsa();
+
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
+		toolbarLayout = (AppBarLayout) findViewById(R.id.toolbar_and_tabs_layout);
 
 		tB = (Toolbar) findViewById(R.id.toolbar);
 		if(tB==null){
@@ -2314,15 +2322,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         upgradeAccount.setOnClickListener(this);
 
         navigationDrawerAddPhoneContainer = findViewById(R.id.navigation_drawer_add_phone_number_container);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) navigationDrawerAddPhoneContainer.getLayoutParams();
-        if (isScreenInPortrait(this)) {
-        	params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        	params.removeRule(RelativeLayout.BELOW);
-		} else {
-        	params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			params.addRule(RelativeLayout.BELOW, R.id.sections_layout);
-		}
-        navigationDrawerAddPhoneContainer.setLayoutParams(params);
 
         addPhoneNumberButton = (TextView)findViewById(R.id.navigation_drawer_add_phone_number_button);
         addPhoneNumberButton.setOnClickListener(this);
@@ -2559,6 +2558,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
+		changeToolbarLayoutElevation();
 
 		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this);
 
@@ -2979,12 +2979,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						logDebug("Chat notitificacion received");
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
-						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 						if (getIntent().getBooleanExtra("moveToChatSection", false)){
 							moveToChatSection(chatId);
 						}
 						else {
-							String text = getIntent().getStringExtra("showSnackbar");
+							String text = getIntent().getStringExtra(SHOW_SNACKBAR);
 							if (chatId != -1) {
 								openChat(chatId, text);
 							}
@@ -3103,7 +3103,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						update2FASetting();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
-						long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 						showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
 						getIntent().setAction(null);
 						setIntent(null);
@@ -3477,11 +3477,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     }
 
     private void enableCU() {
-        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_SETTINGS)) {
-            if (getSettingsFragment() != null) {
-                sttFLol.enableCameraUpload();
-            }
-        } else if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
+		sendBroadcast(new Intent(ACTION_UPDATE_ENABLE_CU_SETTING));
+
+        if (businessCUF.equals(BUSINESS_CU_FRAGMENT_CU)) {
             cuFragment = (CameraUploadsFragment) getSupportFragmentManager()
 					.findFragmentByTag(FragmentTag.CAMERA_UPLOADS.getTag());
             if (cuFragment == null) {
@@ -3996,9 +3994,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     stopRunningCameraUploadService(ManagerActivityLollipop.this);
                                     dbH.setCamSyncEnabled(false);
-									if(sttFLol != null  && sttFLol.isResumed()){
-										sttFLol.disableCameraUpload();
-									}
+                                    sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
 									if (cuFragment != null && cuFragment.isResumed()) {
 										cuFragment.resetSwitchButtonLabel();
 									}
@@ -4040,12 +4036,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
 
-					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 					if (getIntent().getBooleanExtra("moveToChatSection", false)){
 						moveToChatSection(chatId);
 					}
 					else {
-						String text = getIntent().getStringExtra("showSnackbar");
+						String text = getIntent().getStringExtra(SHOW_SNACKBAR);
 						if (chatId != -1) {
 							openChat(chatId, text);
 						}
@@ -4105,7 +4101,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					selectDrawerItemLollipop(drawerItem);
 				}
 				else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
-					long chatId = getIntent().getLongExtra("CHAT_ID", -1);
+					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 					showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
 				}
 
@@ -4168,27 +4164,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setToolbarTitle();
 					break;
 				}
-				case CHAT:{
+				case CHAT:
 					setBottomNavigationMenuItemChecked(CHAT_BNV);
-					rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-					if (rChatFL != null){
+					if (getChatsFragment() != null && rChatFL.isVisible()) {
 						rChatFL.setChats();
 						rChatFL.setStatus();
-
-						try {
-							ChatAdvancedNotificationBuilder notificationBuilder;
-							notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-
-							notificationBuilder.removeAllChatNotifications();
-						}
-						catch (Exception e){
-							logError("Exception NotificationManager - remove all notifications", e);
-						}
-
-						MegaApplication.setRecentChatVisible(true);
 					}
+					MegaApplication.setRecentChatVisible(true);
 					break;
-				}
 				case ACCOUNT:{
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					setToolbarTitle();
@@ -4226,10 +4209,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("Open chat with id: " + chatId);
 				Intent intentToChat = new Intent(this, ChatActivityLollipop.class);
 				intentToChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intentToChat.putExtra("CHAT_ID", chatId);
-				if(text!=null){
-					intentToChat.putExtra("showSnackbar", text);
-				}
+				intentToChat.putExtra(CHAT_ID, chatId);
+				intentToChat.putExtra(SHOW_SNACKBAR, text);
 				this.startActivity(intentToChat);
 			}
 			else{
@@ -4680,6 +4661,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 		isStorageStatusDialogShown = false;
 
+		unregisterReceiver(chatCallUpdateReceiver);
+		unregisterReceiver(chatSessionUpdateReceiver);
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(receiverUpdatePosition);
@@ -4690,7 +4673,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(chatArchivedReceiver);
         unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
-		unregisterReceiver(chatCallUpdateReceiver);
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
@@ -4832,6 +4814,43 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setFirstTime(false);
 		}
         checkBeforeShow();
+
+        psaViewModel.checkPsa();
+    }
+
+    /**
+	 * Observe LiveData for PSA, and show PSA view when get it.
+	 */
+    private void observePsa() {
+        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
+                .get(PsaViewModel.class);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+
+        psaViewModel.getPsa().observe(this, this::showPsa);
+    }
+
+	/**
+	 * Show PSA view.
+	 *
+	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
+	 * directly. Otherwise, show the normal PSA view.
+	 *
+	 * @param psa the PSA to show
+	 */
+    private void showPsa(Psa psa) {
+        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+            return;
+        }
+
+        if (!TextUtils.isEmpty(psa.getUrl())) {
+            Intent intent = new Intent(this, WebViewActivityLollipop.class);
+            intent.setData(Uri.parse(psa.getUrl()));
+            startActivity(intent);
+            psaViewModel.dismissPsa(psa.getId());
+            return;
+        }
+
+        psaViewHolder.bind(psa);
     }
 
     public void checkBeforeShow() {
@@ -5283,6 +5302,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (nVDisplayName != null) {
 				nVDisplayName.setText(megaChatApi.getMyFullname());
 			}
+
 			setOfflineAvatar(megaChatApi.getMyEmail(), megaChatApi.getMyUserHandle(),
 					megaChatApi.getMyFullname());
 
@@ -5422,19 +5442,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch (tabSelected) {
 			case OUTGOING_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
 				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
 				break;
 			case LINKS_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
 				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.link_ic, R.color.dark_primary_color));
 				break;
 			default:
 				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
 
 		}
 	}
@@ -5697,20 +5717,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void selectDrawerItemChat(){
-		logDebug("selectDrawerItemChat");
-
-		MegaApplication.setRecentChatVisible(true);
-
-		try {
-			ChatAdvancedNotificationBuilder notificationBuilder;
-			notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-
-			notificationBuilder.removeAllChatNotifications();
-		}
-		catch (Exception e){
-			logError("Exception NotificationManager - remove all notifications", e);
-		}
-
+		((MegaApplication)getApplication()).setRecentChatVisible(true);
 		setToolbarTitle();
 
 		rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
@@ -5751,6 +5758,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		viewPagerTransfers.setVisibility(View.GONE);
 
     	fragmentContainer.setVisibility(View.GONE);
+
+    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
@@ -6040,8 +6049,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     			drawerItem = DrawerItem.SEARCH;
 				if (getSearchFragment() == null) {
 					sFLol = SearchFragmentLollipop.newInstance();
-				} else {
-					refreshFragment(FragmentTag.SEARCH.getTag());
 				}
 
 				replaceFragment(sFLol, FragmentTag.SEARCH.getTag());
@@ -6315,7 +6322,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (idChat != -1) {
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intent.putExtra("CHAT_ID", idChat);
+			intent.putExtra(CHAT_ID, idChat);
 			this.startActivity(intent);
 		}
     	drawerItem = DrawerItem.CHAT;
@@ -6454,8 +6461,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				} else {
 					resetActionBar(aB);
 				}
-				hideCallMenuItem();
-				hideCallWidget();
+
+				hideCallMenuItem(chronometerMenuItem, returnCallMenuItem);
+				hideCallWidget(ManagerActivityLollipop.this, callInProgressChrono, callInProgressLayout);
 				return true;
 			}
 
@@ -6464,7 +6472,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logDebug("onMenuItemActionCollapse()");
 				searchExpand = false;
 				setCallWidget();
-				setCallMenuItem();
+				setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
 				if (drawerItem == DrawerItem.CHAT) {
 					if (getChatsFragment() != null) {
 						rChatFL.closeSearch();
@@ -6508,7 +6516,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setToolbarTitle();
 					logDebug("Search query: " + query);
 					textSubmitted = true;
-					showFabButton();
 					supportInvalidateOptionsMenu();
 				}
 				return true;
@@ -6582,12 +6589,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
 		chronometerMenuItem.setVisibility(View.GONE);
 
-		rootView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onOptionsItemSelected(returnCallMenuItem);
-			}
-		});
+		rootView.setOnClickListener(v1 -> onOptionsItemSelected(returnCallMenuItem));
 
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 
@@ -6604,7 +6606,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-		setCallMenuItem();
+		setCallMenuItem(returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
 
 		if (isOnline(this)) {
 			switch (drawerItem) {
@@ -6748,6 +6750,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				case SEARCH:
 					if (searchExpand) {
 						openSearchView();
+						sFLol.checkSelectMode();
 					} else {
 						rubbishBinMenuItem.setVisible(true);
 						if (getSearchFragment() != null
@@ -7439,7 +7442,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-			returnCall(this);
+			returnActiveCall(this);
 		}
 	}
 
@@ -7545,7 +7548,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		hideFabButton();
 	}
 
-
 	public void refreshAfterMovingToRubbish(){
 		logDebug("refreshAfterMovingToRubbish");
 
@@ -7605,9 +7607,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Back up timestamps and disabled MU upload.
                 backupTimestampsAndFolderHandle();
                 disableMediaUploadProcess();
-                if (getSettingsFragment() != null) {
-                    sttFLol.disableMediaUploadUIProcess();
-                }
             } else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
@@ -7619,10 +7618,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 // Disable both CU and MU.
                 backupTimestampsAndFolderHandle();
                 disableCameraUploadSettingProcess(false);
-                if (getSettingsFragment() != null) {
-                    sttFLol.disableCameraUploadUIProcess();
-                }
-            } else {
+				sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING));
+			} else {
                 // Just stop the upload process.
                 stopRunningCameraUploadService(app);
             }
@@ -9184,12 +9181,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 	}
 
 	void verifyShowError(){
@@ -9241,13 +9238,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
                     switch (error) {
                         case CHAT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case CONTACT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
                             break;
@@ -9269,7 +9266,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 					openLinkText.getBackground().mutate().clearColorFilter();
 					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 					openLinkError.setVisibility(View.GONE);
@@ -9767,331 +9764,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 	}
 
-	public void showRBNotDisabledDialog() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LayoutInflater inflater = this.getLayoutInflater();
-		View v = inflater.inflate(R.layout.dialog_two_vertical_buttons, null);
-		builder.setView(v);
-
-		TextView title = (TextView) v.findViewById(R.id.dialog_title);
-		title.setText(getString(R.string.settings_rb_scheduler_enable_title));
-		TextView text = (TextView) v.findViewById(R.id.dialog_text);
-		text.setText(getString(R.string.settings_rb_scheduler_alert_disabling));
-
-		Button firstButton = (Button) v.findViewById(R.id.dialog_first_button);
-		firstButton.setText(getString(R.string.button_plans_almost_full_warning));
-		firstButton.setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				generalDialog.dismiss();
-				//Show UpgradeAccountActivity
-				drawerItemPreUpgradeAccount = drawerItem;
-				drawerItem = DrawerItem.ACCOUNT;
-				accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
-				selectDrawerItemAccount();
-				setTabsVisibility();
-			}
-		});
-
-		Button secondButton = (Button) v.findViewById(R.id.dialog_second_button);
-		secondButton.setText(getString(R.string.button_not_now_rich_links));
-		secondButton.setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				generalDialog.dismiss();
-			}
-		});
-
-		generalDialog = builder.create();
-		generalDialog.show();
-	}
-
-	public void showRbSchedulerValueDialog(final boolean isEnabling){
-		logDebug("showRbSchedulerValueDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		input.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layout.addView(input, params);
-
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.hint_days));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-
-					try{
-						int daysCount = Integer.parseInt(value);
-
-						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-							//PRO account
-							if(daysCount>6){
-								//Set new value
-								setRBSchedulerValue(value);
-								newFolderDialog.dismiss();
-							}
-							else{
-								//Show again the dialog
-								input.setText("");
-								input.requestFocus();
-							}
-						}
-						else{
-							//PRO account
-							if(daysCount>6 && daysCount<31){
-								//Set new value
-								setRBSchedulerValue(value);
-								newFolderDialog.dismiss();
-							}
-							else{
-								//Show again the dialog
-								input.setText("");
-								input.requestFocus();
-							}
-						}
-					}
-					catch (Exception e){
-						//Show again the dialog
-						input.setText("");
-						input.requestFocus();
-					}
-
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		final TextView text = new TextView(ManagerActivityLollipop.this);
-
-		if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-			text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
-		}
-		else{
-			text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
-		}
-
-		float density = getResources().getDisplayMetrics().density;
-		float scaleW = getScaleW(outMetrics, density);
-		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (11*scaleW));
-		layout.addView(text);
-
-		LinearLayout.LayoutParams params_text_error = (LinearLayout.LayoutParams) text.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-//		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-//		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(25, outMetrics), 0,scaleWidthPx(25, outMetrics),0);
-		text.setLayoutParams(params_text_error);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
-		builder.setPositiveButton(getString(R.string.general_ok),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new android.content.DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if(isEnabling && getSettingsFragment() != null){
-					sttFLol.updateRBScheduler(0);
-				}
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-
-		newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-
-				String value = input.getText().toString().trim();
-
-				if (value.length() == 0) {
-					return;
-				}
-
-				try{
-					int daysCount = Integer.parseInt(value);
-
-					if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()>MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-						//PRO account
-						if(daysCount>6){
-							//Set new value
-							setRBSchedulerValue(value);
-							newFolderDialog.dismiss();
-						}
-						else{
-							//Show again the dialog
-							input.setText("");
-							input.requestFocus();
-						}
-					}
-					else{
-						//PRO account
-						if(daysCount>6 && daysCount<31){
-							//Set new value
-							setRBSchedulerValue(value);
-							newFolderDialog.dismiss();
-						}
-						else{
-							//Show again the dialog
-							input.setText("");
-							input.requestFocus();
-						}
-					}
-				}
-				catch (Exception e){
-					//Show again the dialog
-					input.setText("");
-					input.requestFocus();
-				}
-			}
-		});
-	}
-
-	public void setRBSchedulerValue(String value){
-		logDebug("Value: "+ value);
-		int intValue = Integer.parseInt(value);
-
-		if(megaApi!=null){
-			megaApi.setRubbishBinAutopurgePeriod(intValue, this);
-		}
-	}
-
-	public void enableLastGreen(boolean enable){
-		logDebug("Enable Last Green: "+ enable);
-
-		if(megaChatApi!=null){
-			megaChatApi.setLastGreenVisible(enable, this);
-		}
-	}
-
-	public void showAutoAwayValueDialog(){
-		logDebug("showAutoAwayValueDialog");
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View v = inflater.inflate(R.layout.dialog_autoaway, null);
-        builder.setView(v);
-
-        final EditText input = v.findViewById(R.id.autoaway_edittext);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-		input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = validateAutoAway(v.getText());
-					if (value != null) {
-						setAutoAwayValue(value, false);
-					}
-					newFolderDialog.dismiss();
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		builder.setTitle(getString(R.string.title_dialog_set_autoaway_value));
-		Button set = (Button) v.findViewById(R.id.autoaway_set_button);
-		set.setOnClickListener(new OnClickListener() {
-            @Override
-			public void onClick(View v) {
-				String value = validateAutoAway(input.getText());
-				if (value != null) {
-					setAutoAwayValue(value, false);
-				}
-				newFolderDialog.dismiss();
-			}
-        });
-		Button cancel = (Button) v.findViewById(R.id.autoaway_cancel_button);
-	    cancel.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAutoAwayValue("-1", true);
-				newFolderDialog.dismiss();
-            }
-        });
-
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-	}
-
-	private String validateAutoAway(CharSequence value) {
-		int timeout;
-		try {
-			timeout = Integer.parseInt(value.toString().trim());
-			if (timeout <= 0) {
-				timeout = 1;
-			} else if (timeout > MAX_AUTOAWAY_TIMEOUT) {
-				timeout = MAX_AUTOAWAY_TIMEOUT;
-			}
-			return String.valueOf(timeout);
-		} catch (Exception e) {
-			logWarning("Unable to parse user input, user entered: '" + value + "'");
-			return null;
-		}
-	}
-
-	public void setAutoAwayValue(String value, boolean cancelled){
-		logDebug("Value: " + value);
-		if(cancelled){
-			if(getSettingsFragment() != null){
-				sttFLol.updatePresenceConfigChat(true, null);
-			}
-		}
-		else{
-			int timeout = Integer.parseInt(value);
-			if(megaChatApi!=null){
-				megaChatApi.setPresenceAutoaway(true, timeout*60);
-			}
-		}
-	}
-
 	public long getParentHandleBrowser() {
 		if (parentHandleBrowser == -1) {
 			MegaNode rootNode = megaApi.getRootNode();
@@ -10241,96 +9913,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		clearRubbishBinDialog = builder.create();
 		clearRubbishBinDialog.show();
-	}
-
-	public void showConfirmationClearAllVersions(){
-		logDebug("showConfirmationClearAllVersions");
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.settings_file_management_delete_versions));
-		builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
-
-		builder.setPositiveButton(getString(R.string.context_delete),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						nC.clearAllVersions();
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		clearRubbishBinDialog = builder.create();
-		clearRubbishBinDialog.show();
-	}
-
-	public void showPanelSetPinLock(){
-		logDebug("showPanelSetPinLock");
-
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-		final CharSequence[] items = {getString(R.string.four_pin_lock), getString(R.string.six_pin_lock), getString(R.string.AN_pin_lock)};
-
-		getSettingsFragment();
-
-		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				setPinDialog.dismiss();
-				switch(item) {
-					case 0:{
-						dbH.setPinLockType(PIN_4);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-					case 1:{
-						dbH.setPinLockType(PIN_6);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-					case 2:{
-						dbH.setPinLockType(PIN_ALPHANUMERIC);
-						if(sttFLol!=null){
-							sttFLol.intentToPinLock();
-						}
-						break;
-					}
-				}
-			}
-		});
-		dialogBuilder.setTitle(getString(R.string.pin_lock_type));
-
-		dialogBuilder.setOnKeyListener(new Dialog.OnKeyListener() {
-
-			@Override
-			public boolean onKey(DialogInterface arg0, int keyCode, KeyEvent event) {
-				logDebug("onKeyListener: " + keyCode);
-				if (keyCode == KeyEvent.KEYCODE_BACK) {
-					logDebug("Cancel set pin action");
-					setPinDialog.dismiss();
-					if(sttFLol!=null){
-						sttFLol.cancelSetPinLock();
-					}
-				}
-				return true;
-			}
-		});
-
-		dialogBuilder.setOnCancelListener(
-				new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						logDebug("setOnCancelListener setPin");
-						setPinDialog.dismiss();
-						if(sttFLol!=null){
-							sttFLol.cancelSetPinLock();
-						}
-					}
-				}
-		);
-
-		setPinDialog = dialogBuilder.create();
-		setPinDialog.setCanceledOnTouchOutside(true);
-		setPinDialog.show();
 	}
 
 	public void chooseAddContactDialog(boolean isMegaContact) {
@@ -11020,7 +10602,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
 				}
-				spaceTV.setText(getSpannedHtmlText(textToShow));
+				spaceTV.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 				int progress = info.getUsedPerc();
 				long usedSpace = info.getUsedStorage();
 				logDebug("Progress: " + progress + ", Used space: " + usedSpace);
@@ -11493,10 +11075,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-
-                        if (getSettingsFragment() != null) {
-                        	sttFLol.taskGetSizeOffline();
-                        }
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -11527,9 +11105,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							nC.deleteOffline(documents.get(i));
 						}
 						updateOfflineView(documents.get(0));
-						if (getSettingsFragment() != null) {
-							sttFLol.taskGetSizeOffline();
-						}
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -12191,7 +11766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 			this.startActivity(intentOpenChat);
 		}
 	}
@@ -12419,7 +11994,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void resetNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 		}
 
 		if (inboxSection != null){
@@ -12432,7 +12007,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(hasChildren){
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12446,7 +12021,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (contactsSectionText == null) {
 				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 			setContactTitleSection();
 		}
 
@@ -12455,7 +12030,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (notificationsSectionText == null) {
 				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 			setNotificationsTitleSection();
 		}
 
@@ -13339,7 +12914,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Open new chat: " + chatHandle);
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
 			intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intent.putExtra("CHAT_ID", chatHandle);
+			intent.putExtra(CHAT_ID, chatHandle);
 			this.startActivity(intent);
 		}
 		else{
@@ -13498,15 +13073,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				}
 			}
-			else if (request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS) {
-				logDebug("change isRickLinkEnabled - USER_ATTR_RICH_PREVIEWS finished");
-				if (e.getErrorCode() != MegaError.API_OK){
-					logError("ERROR:USER_ATTR_RICH_PREVIEWS");
-					if(getSettingsFragment() != null){
-						sttFLol.updateEnabledRichLinks();
-					}
-				}
-			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
 				if (e.getErrorCode() == MegaError.API_OK) {
@@ -13530,10 +13096,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-					if(getSettingsFragment() != null){
-						sttFLol.updateEnabledFileVersions();
-					}
-
 					mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 					if(mStorageFLol!=null){
 						mStorageFLol.refreshVersionsInfo();
@@ -13541,17 +13103,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 				else{
 					logDebug("File versioning attribute changed correctly");
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				logDebug("change RB scheduler - USER_ATTR_RUBBISH_TIME finished");
-				if(getSettingsFragment() != null){
-					if (e.getErrorCode() != MegaError.API_OK){
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-					}
-					else{
-						sttFLol.updateRBScheduler(request.getNumber());
-					}
 				}
 			}
 		}
@@ -13659,32 +13210,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 			}
-            else if(request.getParamType() == MegaApiJava.USER_ATTR_RICH_PREVIEWS){
-
-				if(e.getErrorCode() == MegaError.API_ENOENT){
-					logWarning("Attribute USER_ATTR_RICH_PREVIEWS not set");
-				}
-
-				if(request.getNumDetails()==1){
-					logDebug("USER_ATTR_RICH_PREVIEWS:shouldShowRichLinkWarning:");
-
-					long counter = request.getNumber();
-					boolean flag = request.getFlag();
-
-					MegaApplication.setShowRichLinkWarning(request.getFlag());
-					MegaApplication.setCounterNotNowRichLinkWarning((int) request.getNumber());
-				}
-				else if(request.getNumDetails()==0){
-
-					logDebug("USER_ATTR_RICH_PREVIEWS:isRichPreviewsEnabled:" + request.getFlag());
-
-					MegaApplication.setEnabledRichLinks(request.getFlag());
-
-                    if(getSettingsFragment() != null){
-						sttFLol.updateEnabledRichLinks();
-                    }
-				}
-            }
 			else if(request.getParamType() == MegaApiJava.USER_ATTR_GEOLOCATION){
 
 				if(e.getErrorCode() == MegaError.API_OK){
@@ -13730,28 +13255,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
-				if(getSettingsFragment() != null){
-					sttFLol.updateEnabledFileVersions();
-				}
-
 				mStorageFLol = (MyStorageFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_STORAGE.getTag());
 				if(mStorageFLol!=null){
 					mStorageFLol.refreshVersionsInfo();
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_RUBBISH_TIME){
-				if(getSettingsFragment() != null){
-					if (e.getErrorCode() == MegaError.API_ENOENT){
-						if(((MegaApplication) getApplication()).getMyAccountInfo().getAccountType()==MegaAccountDetails.ACCOUNT_TYPE_FREE){
-							sttFLol.updateRBScheduler(30);
-						}
-						else{
-							sttFLol.updateRBScheduler(90);
-						}
-					}
-					else{
-						sttFLol.updateRBScheduler(request.getNumber());
-					}
 				}
 			}
 		}
@@ -14258,40 +13764,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logError("PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")");
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_CLEAN_RUBBISH_BIN){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_CLEAN_RUBBISH_BIN");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_emptied), -1);
-				resetAccountDetailsTimeStamp();
-				if (getSettingsFragment() != null) {
-					sttFLol.resetRubbishInfo();
-				}
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.rubbish_bin_no_emptied), -1);
-			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_REMOVE_VERSIONS){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("OK MegaRequest.TYPE_REMOVE_VERSIONS");
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.success_delete_versions), -1);
-
-				if(getSettingsFragment() != null) {
-					sttFLol.resetVersionsInfo();
-				}
-				//Get info of the version again (after 10 seconds)
-				final Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						updateAccountStorageInfo();
-					}
-				}, 8000);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_delete_versions), -1);
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION");
@@ -14366,11 +13838,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if(mStorageFLol!=null){
 				mStorageFLol.refreshVersionsInfo();
 			}
-
-			//Refresh Settings if it is shown
-			if(getSettingsFragment() != null) {
-				sttFLol.setVersionsInfo();
-			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE) {
 			maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
@@ -14421,17 +13888,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						if(megaApi.getMyUser()!=null) {
 							if (user.getHandle() == megaApi.getMyUser().getHandle()) {
 								logDebug("Change on my account from another client");
-								if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS)) {
-									logDebug("Change on CHANGE_TYPE_DISABLE_VERSIONS");
-									megaApi.getFileVersionsOption(this);
-								}
+
 
 								if (user.hasChanged(MegaUser.CHANGE_TYPE_CONTACT_LINK_VERIFICATION)) {
 									logDebug("Change on CHANGE_TYPE_CONTACT_LINK_VERIFICATION");
 									megaApi.getContactLinksOption(this);
-								} else if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME)) {
-									logDebug("Change on CHANGE_TYPE_RUBBISH_TIME");
-									megaApi.getRubbishBinAutopurgePeriod(this);
 								}
 							}
 						}
@@ -15663,30 +15124,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	@Override
-	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-		logDebug("onChatPresenceConfigUpdate");
-		if(config!=null){
-			logDebug("Config status: " + config.getOnlineStatus());
-			logDebug("Config autoway: " + config.isAutoawayEnabled());
-			logDebug("Config persist: " + config.isPersist());
-			logDebug("Config lastGreen: " + config.isLastGreenVisible());
-			boolean isLastGreen = config.isLastGreenVisible();
-			if(config.isPending()){
-				logDebug("Config is pending - do not update UI");
-			}
-			else{
-				if(getSettingsFragment() != null){
-					sttFLol.updatePresenceConfigChat(false, config);
-				}
-				else{
-					logWarning("sttFLol no added or null");
-				}
-			}
-		}
-		else{
-			logWarning("Config is null");
-		}
-	}
+	public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) { }
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
@@ -15767,7 +15205,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		else if (option == COLOR_STATUS_BAR_ZERO_DELAY){
 			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
-
 	}
 
 	public void setDrawerLockMode (boolean locked) {
@@ -15778,6 +15215,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
     }
+
+	/**
+	 * This method is used to change the elevation of the toolbar when a call is in progress.
+	 */
+	public void changeToolbarLayoutElevation() {
+		toolbarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
+				px2dp(16, outMetrics) : 0);
+	}
 
 	public void changeActionBarElevation(boolean withElevation){
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -15904,6 +15349,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			callBadge.setVisibility(View.GONE);
 			return;
 		}
+
 		callBadge.setVisibility(View.VISIBLE);
 	}
 
@@ -16111,6 +15557,20 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				searchView.setQuery(querySaved, false);
 			}
 		}
+	}
+
+	public void clearSearchViewFocus() {
+		if (searchView != null) {
+			searchView.clearFocus();
+		}
+	}
+
+	public void requestSearchViewFocus() {
+		if (searchView == null || textSubmitted) {
+			return;
+		}
+
+		searchView.setIconified(false);
 	}
 
 	public boolean checkPermission(String permission) {
@@ -16342,64 +15802,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private void setCallWidget() {
 		setCallBadge();
 
-		if (drawerItem != DrawerItem.CLOUD_DRIVE && drawerItem != DrawerItem.SHARED_ITEMS && drawerItem != DrawerItem.CHAT || !isScreenInPortrait(this)) {
-			hideCallWidget();
+		if (drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.ACCOUNT ||
+				drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.TRANSFERS ||
+				drawerItem == DrawerItem.NOTIFICATIONS || !isScreenInPortrait(this)) {
+			hideCallWidget(this, callInProgressChrono, callInProgressLayout);
 			return;
+
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
-	}
-
-	private void hideCallWidget() {
-		if (callInProgressChrono != null) {
-			activateChrono(false, callInProgressChrono, null);
-		}
-		if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
-			callInProgressLayout.setVisibility(View.GONE);
-		}
-	}
-
-	/**
-	 * This method shows or hides the toolbar icon to return a call when a call is in progress
-	 * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
-	 */
-	private void setCallMenuItem(){
-		if((drawerItem == DrawerItem.CHAT || drawerItem == DrawerItem.CLOUD_DRIVE || drawerItem == DrawerItem.SHARED_ITEMS)
-				&& !isScreenInPortrait(this) && participatingInACall() && getChatCallInProgress() != -1){
-			returnCallMenuItem.setVisible(true);
-
-			MegaChatCall call = megaChatApi.getChatCall(getChatCallInProgress());
-			int callStatus = call.getStatus();
-
-			if(callStatus == MegaChatCall.CALL_STATUS_RECONNECTING){
-				layoutCallMenuItem.setBackground(ContextCompat.getDrawable(this,R.drawable.reconnection_rounded));
-			}else{
-				layoutCallMenuItem.setBackground(ContextCompat.getDrawable(this,R.drawable.dark_rounded_chat_own_message));
-			}
-
-			if(chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)){
-				if(chronometerMenuItem.getVisibility() == View.VISIBLE) return;
-				chronometerMenuItem.setVisibility(View.VISIBLE);
-				chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
-				chronometerMenuItem.start();
-				chronometerMenuItem.setFormat(" %s");
-			}else{
-				if(chronometerMenuItem.getVisibility() == View.GONE) return;
-				chronometerMenuItem.stop();
-				chronometerMenuItem.setVisibility(View.GONE);
-			}
-		}else {
-			hideCallMenuItem();
-		}
-	}
-
-	private void hideCallMenuItem() {
-		if (chronometerMenuItem != null) {
-			chronometerMenuItem.stop();
-		}
-		if (returnCallMenuItem != null) {
-			returnCallMenuItem.setVisible(false);
-		}
 	}
 
 	public String getSearchQuery() {

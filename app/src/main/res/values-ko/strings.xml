@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA는 모바일 기기를 위한 전용 앱과 함께 표준 웹 브라우저를 통하여 이용자가 제어하는 암호화된 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 절대 우리가 아닌 당신의 클아이언트 기기를 통해서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드한 후 어디서든, 어떤 기기에서든, 아무때나 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 파일을 공유하고 그들의 업데이트를 실시간으로 보세요. 암호화 과정은 우리가 당신의 비밀번호에 접근하거나 재설정할 수 없다는 뜻이기 때문에 반드시 기억해야 하지 않으면 (복구 키를 백업하지 않았다면) 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 암호화 MEGA 영상 대화는 완전한 프라이버시가 가능하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이것은 우리의 모바일 앱에도 확장되어 여러 기기를 통하여 대화 기록에 접근할 수 있습니다. 이용자들은 또한 그들의 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 모든 가입자들에게 보너스 도전과제와 함께 넉넉한 50 GB의 무료 저장 공간을 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPRO LITE 요금제: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 제공합니다.\nPRO I 요금제: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 제공합니다.\nPRO II 요금제: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장 공간과 월 8 TB의 전송 할당량을 제공합니다.\nPRO III 요금제: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 제공합니다.\n\n구독은 처임 선택했던 기간과 동일한 기간과 동일한 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭하고, Google ID로 로그인하고 (만약 하지 않았다면) 그리고 MEGA 앱을 클릭합니다. 당신의 구독을 그 곳에서 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 MEGA에 당신의 사진을 업로드합니다\n연락처 읽기 -> 당신의 기기에서 쉽게 연락처를 MEGA 연락처로 추가합니다\n녹음 &amp; 녹화 (마이크와 카메라) -> MEGA는 종단간 암호화된 음성/영상 통화를 제공합니다\n\n\nMEGA 시세틈에 대한 이용들의 확신을 높이기 위하여, 모든 클라이언트 사이드 코드는 공개되어 있으므로, 흥미 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱 코드는 다음에 있습니다: https://github.com/meganz/android\n\n더 많은 정보는, 우리의 웹사이트에서 확인하세요:\nhttps://mega.nz/terms\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA는 휴대 기기를 위한 전용 앱과 함께 이용자 제어 암호화 클라우드 저장소와 대화를 표준 웹 브라우저를 통해 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 당신의 클라이언트 기기에서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로그하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제하세요. 당신의 지인들과 폴더를 공유하고 그들의 변경 사항을 실시간으로 보세요. 암호화 과정은 당신의 비밀번호를 재설정하거나 접근할 수 없다는 것을 의미하며 당신은 반드시 비밀번호를 기억해야하며 (복구 키를 백업하지 않았다면) 그렇지 않았다면 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 암호화 MEGA 영상 대화는 완전한 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 우리의 모바일 앱으로도 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 그들의 MEGA 클라우드 드라이브로부터 파일을 대화에 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전과제와 함께 가입한 모든 이용자에게 50 GB의 넉넉한 무료 용량을 제공하며, 훨씬 높은 한도의 유료 요금제를 제공합니다:\n\n\nPRO LITE 구독: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 받을 수 있습니다.\nPRO I 구독: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 받을 수 있습니다.\nPRO II 구독: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장  공간과 월 8 TB의 전송 할당량을 받을 수 있습니다.\nPRO III 구독: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭한 후, Google ID로 로그인(만약 하지 않았다면)한 후 MEGA 앱을 클릭하세요. 그곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -> MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드합니다\n카메라 -> 사진을 찍고 당신의 사진을 MEGA에 업로드합니다\n연락처 읽기 -> 당신의 기기의 연락처를 쉽게 MEGA 연락처로 추가합니다\n오디오 녹음과 영상 출력 캡처 (마이크와 카메라) -> MEGA는 종단간 암호화 음성/영상 통화를 제공합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰 향상을 위해, 모든 클라이언트측 코드는 공개되며, 흥미있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android\n\n자세한 정보는, 우리의 웹사이트를 확인하세요: \nhttps://mega.nz/terms를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 뷰어</string>
@@ -240,9 +240,9 @@
 
     <!--<string name="cancel_transfer_title">Delete Transfer</string>
     -->
-    <string name="cancel_transfer_confirmation">이 전송을 삭제할까요?</string>
-    <string name="cancel_all_transfer_confirmation">모든 전송을 삭제할까요?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_transfer_confirmation">이 전송을 취소할까요?</string>
+    <string name="cancel_all_transfer_confirmation">모든 전송을 취소할까요?</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">모두 취소</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">클라우드 드라이브</string>
     <string name="section_recents" context="Label to reference a recents section">최근</string>
@@ -750,8 +750,8 @@
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</item>
     </string-array>
 
-    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</string>
-    <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">External storage</string>
+    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">내부 저장소</string>
+    <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">외부 저장소</string>
 
     <string-array name="add_contact_array">
         <item context="title of the dialog shown when sending or sharing a folder">이용자의 이메일을 쓰세요</item>
@@ -1187,24 +1187,24 @@
 
     <string name="general_mute" context="button">조용히</string>
     <string name="general_unmute" context="button">음소거 해제</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">방해 금지</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">다음의 기간 동안 대화 알림을 끕니다</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
-    <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">On</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">알림 끄기</string>
+    <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">켬</string>
 
-    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
-    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">Until tomorrow morning</string>
-    <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Until this morning</string>
-    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn it back on</string>
+    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">끔</string>
+    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">내일 아침까지</string>
+    <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">오늘 아침까지</string>
+    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">내가 다시 켤 때까지</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">%s 동안 대화 알림을 끕니다</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">%1$s까지 대화 알림을 끕니다</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">%1$s %2$s까지 대화 알림을 끕니다</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">대화 알림이 꺼져있습니다</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">대화 알림 활성화됨</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">%1$s까지 조용히</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">알림</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">메시지 소리</string>
@@ -1296,7 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s님이[/A][B] 단체 대화를 떠났습니다[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">메시지가 발송되지 않았습니다. 옵션을 보려면 탭하세요</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">전송 일시중단됨. 재개하려면 탭하세요.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1461,8 +1461,8 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">보기</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">모든 전송 일시정지</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">모든 전송 재개</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">완료된 항목 삭제</string>
-    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">모든 전송 삭제</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">모든 전송 재시도</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">전송을 일시정지 할까요?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">전송을 재개 할까요?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">재개</string>
@@ -1474,9 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">일시정지됨</string>
     <string name="transfer_queued" context="Possible state of a transfer">대기열</string>
-    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
-    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">완료중</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">재시도중</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">취소됨</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1564,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">전송 할당량 부족</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">대기중인 전송이 현재 IP 주소에 할당된 전송 할당량을 초과하며 전송이 중단될 수 있습니다.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">당신의 IP 주소에 대해 이용가능한 전송 할당량이 부족합니다. 다운로드를 계속하려면 계정을 업그레이드하거나 %s 동안 기다리세요.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">요금제 보기</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">계정 없이 계속하기</string>
 
@@ -1657,7 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">읽기 전용</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">읽기와 쓰기</string>
 
-    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">전송 일시정지됨!</string>
     <string name="attachment_uploading_state_uploading">업로드 중&#8230;</string>
     <string name="attachment_uploading_state_error">오류. 전송되지 않음.</string>
 
@@ -2008,14 +2008,14 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">대화</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">비밀번호가 기억났나요?</string>
-    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요.\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">당신이 비밀번호를 기억하는지 확실하게 하기 위해 비밀번호를 시험해보세요. 만약 비밀번호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="general_do_not_show" context="Dialog option that permits user do not show it again">다시 보여주지 마세요</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">비밀번호 시험</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">비밀번호를 시험하세요</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">비밀번호 확인됨</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">잘못된 비밀번호.\n최대한 빨리 복구 키를 백업하세요!</string>
-    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요.\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">클립보드로 복사됨</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">복구 키 내보내기</string>
     <string name="proceed_to_logout" context="Option that permits user logout">로그아웃 진행</string>
@@ -2556,6 +2556,7 @@
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">이 통화가 최대 참가자 수에 도달했기 때문에 참여할 수 없습니다.</string>
     <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">단체 대화의 최대 참여자 수에 도달하였기 때문에 이 통화에 참여할 수 없습니다.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">이 통화의 최대 영상 사용 참가자 수에 도달했기 때문에 영상을 활성화할 수 없습니다.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">오류. 파일을 열 수 없습니다.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">전화 수신중&#8230;</string>
@@ -2657,6 +2658,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">진행중인 통화</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s님이 그룹 통화를 시작하였습니다. 참여하려면 탭하세요.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">통화로 돌아가려면 탭하세요</string>
+    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A]님이[B] 단체 대화에 참여하였습니다.[/B]</string>
 
@@ -2675,11 +2677,18 @@
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">무시</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s님이 이 통화를 음소거 하였습니다</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">음소거됨</string>
+    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Call on hold</string>
+    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold &amp; Answer</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold &amp; Join</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End &amp; Answer</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End &amp; Join</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">파일이 이미 다운로드 되었습니다. 선택한 경로로 복사하였습니다.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">통화 참여</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">이 통화에 참여하려면 현재 통화를 마쳐야합니다</string>
+    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">대화 링크 입력</string>
 
@@ -2752,6 +2761,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">음성 메시지 업로드를 시도하던 중 오류 발생.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">전화 수신중</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">불러오는중</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">잠시만 기다리세요&#8230;</string>
@@ -2778,9 +2790,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 조직 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만, 추가 비용 없이, 자동으로 증가됩니다</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">무제한 [A]전송 할당량[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">무제한 [A]전송 할당량[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
@@ -2816,6 +2828,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">다시 연결중</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">돌아왔습니다.</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Poor internet connection</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">녹음중&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">새 파일 만들기</string>
@@ -2900,10 +2913,17 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s님의 자격증명</string>
 
+    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 </resources>
