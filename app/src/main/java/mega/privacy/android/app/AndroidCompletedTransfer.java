@@ -6,13 +6,14 @@ import android.os.Parcelable;
 
 import java.io.File;
 
-import nz.mega.sdk.MegaApiAndroid;
+import mega.privacy.android.app.objects.SDTransfer;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -31,12 +32,11 @@ public class AndroidCompletedTransfer implements Parcelable {
     private String error;
     private String originalPath;
     private long parentHandle;
-    private String appData;
 
     public AndroidCompletedTransfer(long id, String fileName, int type, int state, String size,
                                     String nodeHandle, String path, boolean isOfflineFile,
                                     long timeStamp, String error, String originalPath,
-                                    long parentHandle, String appData) {
+                                    long parentHandle) {
         this.id = id;
         this.fileName = fileName;
         this.type = type;
@@ -49,7 +49,6 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.error = error;
         this.originalPath = originalPath;
         this.parentHandle = parentHandle;
-        this.appData = appData;
     }
 
     public AndroidCompletedTransfer (MegaTransfer transfer, MegaError error) {
@@ -63,7 +62,17 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.error = getTranslatedErrorString(error);
         this.originalPath = transfer.getPath();
         this.parentHandle = transfer.getParentHandle();
-        this.appData = transfer.getAppData();
+    }
+
+    public AndroidCompletedTransfer (SDTransfer transfer) {
+        this.fileName = transfer.getName();
+        this.type = MegaTransfer.TYPE_DOWNLOAD;
+        this.state = MegaTransfer.STATE_COMPLETED;
+        this.path = removeLastFileSeparator(getSDCardTargetUri(transfer.getAppData()));
+        this.timeStamp = System.currentTimeMillis();
+        this.error = getString(R.string.api_ok);
+        this.originalPath = transfer.getPath();
+        setIsOfflineFile(false);
     }
 
     public String getFileName() {
@@ -160,14 +169,6 @@ public class AndroidCompletedTransfer implements Parcelable {
 
     public void setParentHandle(long parentHandle) {
         this.parentHandle = parentHandle;
-    }
-
-    public String getAppData() {
-        return appData;
-    }
-
-    public void setAppData(String appData) {
-        this.appData = appData;
     }
 
     /**

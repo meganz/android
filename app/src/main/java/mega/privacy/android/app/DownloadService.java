@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
+import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1432,6 +1433,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+			String appData = transfer.getAppData();
+
+			if (!isTextEmpty(appData) && appData.contains(APP_DATA_SD_CARD)) {
+				dbH.addSDTransfer(new SDTransfer(transfer.getTag(), transfer.getFileName(),
+						transfer.getPath(), appData));
+			}
+
 			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 			transfersCount++;
 			updateProgressNotification();
@@ -1519,7 +1527,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						try {
 							SDCardOperator sdCardOperator = new SDCardOperator(this);
 							sdCardOperator.moveDownloadedFileToDestinationPath(source, targetPath,
-									getSDCardTargetUri(transfer.getAppData()));
+									getSDCardTargetUri(transfer.getAppData()), transfer.getTag());
 						} catch (Exception e) {
 							logError("Error moving file to the sd card path", e);
 						}

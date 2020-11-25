@@ -321,13 +321,15 @@ public class SDCardOperator {
      * @param downloadedFile Downloaded file to move.
      * @param targetPath     Path where the file has to be moved.
      * @param uri            Uri to init SD card operator.
+     * @param tag            Identifier of the SD transfer on DB.
      */
-    public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri) {
+    public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri, int tag) {
+        MegaApplication app = MegaApplication.getInstance();
         try {
             if (uri != null) {
                 initDocumentFileRoot(uri);
             } else {
-                initDocumentFileRoot(MegaApplication.getInstance().getDbH().getSDCardUri());
+                initDocumentFileRoot(app.getDbH().getSDCardUri());
             }
 
             moveFile(targetPath, downloadedFile);
@@ -336,6 +338,8 @@ public class SDCardOperator {
             File newFile = new File(targetPath + File.separator + downloadedFile.getName());
             if(!newFile.exists() || newFile.length() != downloadedFile.length()) {
                 logError("Error moving file to the sd card path");
+            } else {
+                app.getDbH().removeSDTransfer(tag);
             }
         } catch (Exception e) {
             logError("Error moving file to the sd card path", e);

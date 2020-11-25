@@ -23,6 +23,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
@@ -53,6 +54,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle";
 	private static final String TABLE_SYNC_RECORDS = "syncrecords";
 	private static final String TABLE_MEGA_CONTACTS = "megacontacts";
+	private static final String TABLE_SD_TRANSFERS = "sdtransfers";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -163,7 +165,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_TRANSFER_ERROR = "transfererror";
 	private static final String KEY_TRANSFER_ORIGINAL_PATH = "transferoriginalpath";
 	private static final String KEY_TRANSFER_PARENT_HANDLE = "transferparenthandle";
-	private static final String KEY_TRANSFER_APPDATA = "transferappdata";
 	public static final int MAX_TRANSFERS = 100;
 
 	private static final String KEY_FIRST_LOGIN_CHAT = "firstloginchat";
@@ -242,6 +243,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_MEGA_CONTACTS_LOCAL_NAME + " TEXT,"
             + KEY_MEGA_CONTACTS_EMAIL + " TEXT,"
             + KEY_MEGA_CONTACTS_PHONE_NUMBER + " TEXT)";
+
+	private static final String KEY_SD_TRANSFERS_TAG = "transfertag";
+	private static final String KEY_SD_TRANSFERS_NAME = "transfername";
+	private static final String KEY_SD_TRANSFERS_APP_DATA = "appdata";
+    private static final String KEY_SD_TRANSFERS_PATH = "sdpath";
+	private static final String CREATE_SD_TRANSFERS_TABLE = "CREATE TABLE IF NOT EXISTS "
+			+ TABLE_SD_TRANSFERS + "("
+			+ KEY_ID + " INTEGER PRIMARY KEY, "		//0
+			+ KEY_SD_TRANSFERS_TAG + " INTEGER, "	//1
+			+ KEY_SD_TRANSFERS_NAME + " TEXT, "		//2
+			+ KEY_SD_TRANSFERS_PATH + " TEXT, "		//3
+			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";	//4
 
     private static DatabaseHandler instance;
 
@@ -391,8 +404,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_TRANSFER_TIMESTAMP + " TEXT, "					//8
 				+ KEY_TRANSFER_ERROR + " TEXT, "						//9
 				+ KEY_TRANSFER_ORIGINAL_PATH + " TEXT, "				//10
-				+ KEY_TRANSFER_PARENT_HANDLE + " TEXT, "				//11
-				+ KEY_TRANSFER_APPDATA + " TEXT"						//12
+				+ KEY_TRANSFER_PARENT_HANDLE + " TEXT"					//11
 				+ ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
@@ -420,6 +432,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_SYNC_RECORDS_TABLE);
 
         db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
+
+        db.execSQL(CREATE_SD_TRANSFERS_TABLE);
 	}
 
 	@Override
@@ -862,7 +876,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_TRANSFER_QUEUE_STATUS + " = '" + encrypt(transferQueueStatus + "") + "';");
 
-			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_APPDATA + " TEXT;");
+			db.execSQL(CREATE_SD_TRANSFERS_TABLE);
 		}
 	}
 
@@ -1839,10 +1853,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String error = decrypt(cursor.getString(9));
 		String originalPath = decrypt(cursor.getString(10));
 		long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
-		String appData = decrypt(cursor.getString(12));
 
 		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path,
-				offline, timeStamp, error, originalPath, parentHandle, appData);
+				offline, timeStamp, error, originalPath, parentHandle);
 	}
 
 	public long setCompletedTransfer(AndroidCompletedTransfer transfer){
@@ -1858,7 +1871,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_TRANSFER_ERROR, encrypt(transfer.getError()));
 		values.put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.getOriginalPath()));
 		values.put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.getParentHandle() + ""));
-		values.put(KEY_TRANSFER_APPDATA, encrypt(transfer.getAppData()));
 
 		long id = db.insert(TABLE_COMPLETED_TRANSFERS, null, values);
 
@@ -4189,4 +4201,41 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         cursor.close();
     }
+
+	public ArrayList<SDTransfer> getSDTransfers() {
+		ArrayList<SDTransfer> sdTransfers = new ArrayList<>();
+		String selectQuery = "SELECT * FROM " + TABLE_SD_TRANSFERS;
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor != null && cursor.moveToLast()) {
+			do {
+				int tag = Integer.parseInt(decrypt(cursor.getString(1)));
+				String name = decrypt(cursor.getString(2));
+				String path = decrypt(cursor.getString(3));
+				String appData = decrypt(cursor.getString(4));
+
+				sdTransfers.add(new SDTransfer(tag, name, path, appData));
+			} while (cursor.moveToPrevious());
+
+			cursor.close();
+		}
+
+		return sdTransfers;
+	}
+
+	public long addSDTransfer(SDTransfer transfer) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_SD_TRANSFERS_TAG, encrypt(Integer.toString(transfer.getTag())));
+		values.put(KEY_SD_TRANSFERS_NAME, encrypt(transfer.getName()));
+		values.put(KEY_SD_TRANSFERS_PATH, encrypt(transfer.getPath()));
+		values.put(KEY_SD_TRANSFERS_APP_DATA, encrypt(transfer.getAppData()));
+
+		return db.insert(TABLE_SD_TRANSFERS, null, values);
+	}
+
+	public void removeSDTransfer(int tag) {
+		db.delete(TABLE_SD_TRANSFERS,
+				KEY_SD_TRANSFERS_TAG + "=" + encrypt(Integer.toString(tag)),
+				null);
+	}
 }

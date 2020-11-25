@@ -9,7 +9,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.objects.SDTransfer;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_SD_CARD;
@@ -94,37 +98,51 @@ public class SDCardUtils {
      * Checks if there are incomplete movements of SD card downloads and tries to complete them.
      */
     public static void checkSDCardCompletedTransfers() {
-        ArrayList<AndroidCompletedTransfer> completedTransfers = MegaApplication.getInstance().getDbH().getCompletedTransfers();
-        if (completedTransfers == null || completedTransfers.isEmpty()) {
+        MegaApplication app = MegaApplication.getInstance();
+        MegaApiJava megaApi = app.getMegaApi();
+        DatabaseHandler dbH = app.getDbH();
+        ArrayList<SDTransfer> sdTransfers = dbH.getSDTransfers();
+        if (sdTransfers == null || sdTransfers.isEmpty()) {
             return;
         }
 
-        for (AndroidCompletedTransfer transfer : completedTransfers) {
-            String appData = transfer.getAppData();
-            if (isTextEmpty(appData) || !appData.contains(APP_DATA_SD_CARD)) {
-                continue;
-            }
+        new Thread(() -> {
+            for (SDTransfer sdtransfer : sdTransfers) {
+                if (megaApi == null) {
+                    return;
+                }
 
-            File originalDownload = new File(transfer.getOriginalPath());
-            if (!isFileAvailable(originalDownload)) {
-                continue;
-            }
+                MegaTransfer transfer = megaApi.getTransferByTag(sdtransfer.getTag());
+                if (transfer != null && transfer.getState() < MegaTransfer.STATE_COMPLETED) {
+                    continue;
+                }
 
-            String targetPath = getSDCardTargetPath(appData);
-            File finalDownload = new File(targetPath + File.separator + originalDownload.getName());
-            if (finalDownload.exists() && finalDownload.length() == originalDownload.length()) {
-                originalDownload.delete();
-            }
+                File originalDownload = new File(sdtransfer.getPath());
+                if (!isFileAvailable(originalDownload)) {
+                    dbH.removeSDTransfer(sdtransfer.getTag());
+                    continue;
+                }
 
-            logWarning("Movement incomplete");
+                String appData = sdtransfer.getAppData();
+                String targetPath = getSDCardTargetPath(appData);
+                File finalDownload = new File(targetPath + File.separator + originalDownload.getName());
+                if (finalDownload.exists() && finalDownload.length() == originalDownload.length()) {
+                    originalDownload.delete();
+                    dbH.removeSDTransfer(sdtransfer.getTag());
+                }
 
-            try {
-                SDCardOperator sdCardOperator = new SDCardOperator(MegaApplication.getInstance());
-                sdCardOperator.moveDownloadedFileToDestinationPath(originalDownload, targetPath,
-                        getSDCardTargetUri(transfer.getAppData()));
-            } catch (Exception e) {
-                logError("Error moving file to the sd card path", e);
+                logWarning("Movement incomplete");
+
+                try {
+                    SDCardOperator sdCardOperator = new SDCardOperator(MegaApplication.getInstance());
+                    sdCardOperator.moveDownloadedFileToDestinationPath(originalDownload, targetPath,
+                            getSDCardTargetUri(appData), sdtransfer.getTag());
+                } catch (Exception e) {
+                    logError("Error moving file to the sd card path", e);
+                }
+
+                dbH.setCompletedTransfer(new AndroidCompletedTransfer(sdtransfer));
             }
-        }
+        }).start();
     }
 }

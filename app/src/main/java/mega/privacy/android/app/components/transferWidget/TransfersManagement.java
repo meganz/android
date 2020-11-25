@@ -199,10 +199,12 @@ public class TransfersManagement {
      *
      */
     public static void enableTransfersResumption() {
-        checkSDCardCompletedTransfers();
-
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
+
+        if (megaApi.getRootNode() != null) {
+            checkSDCardCompletedTransfers();
+        }
 
         megaApi.enableTransferResumption();
 
