@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este processo está demorando mais do que o esperado. Por favor, espere.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Conta Gratuita</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Conta PRO Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Conta PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Conta PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Conta PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Conta Pro Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Conta Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Conta Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Conta Pro III</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Conta PRO Lite</string>
 
@@ -1204,7 +1204,7 @@
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">As notificações do chat foram silenciadas</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">As notificações do chat foram ativadas</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Silenciado até as %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notificações</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Som das mensagens</string>
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Fazer logout[/A] para usar o MEGA com outra conta</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Você tem certeza de que quer fazer logout desta conta?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Esta mensagem foi deletada por %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">O histórico do chat foi deletado</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">O histórico do chat foi deletado</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">O histórico do chat foi deletado por %1$s</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Servidores ocupados. Por favor, aguarde.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este processo está demorando mais do que o esperado. Por favor, espere.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Solicitações em excesso. Por favor, aguarde.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Cancelando o processo de login. Por favor, espere&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Cancelando o processo de login. Por favor, espere&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Formato de arquivo não suportado</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Erro. O arquivo é corrupto ou não existe.</string>
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">Hoje</string>
     <string name="label_yesterday" context="label yesterday">Ontem</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Amanhã</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Não há [/B][A]arquivos compartilhados[/A][B].[/B]</string>
 

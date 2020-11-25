@@ -933,10 +933,10 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">무료 계정</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite 계정</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I 계정</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II 계정</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III 계정</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite 계정</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I 계정</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 계정</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 계정</string>
 
     <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite 계정</string>
 
@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">다른 계정으로 MEGA를 이용하려면 [A]로그아웃[/A]하세요</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">현재 계정에서 로그아웃 하시겠습니까?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">이 메시지는 %1$s님에 의해 삭제되었습니다.</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">대화 기록이 지워졌습니다</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">대화 기록이 지워졌습니다</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s님에 의해 기록이 삭제되었습니다</string>
 
     <!--
@@ -1718,7 +1718,7 @@
 
     <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">초대 보너스</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">모바일 앱 설치</string>
-    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">휴대전화 번호 추가</string>
+    <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">휴대 전화 번호 추가</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">가입 보너스</string>
     <string name="title_install_desktop" context="title of the section for install a mobile app bonuses in achivements section (maximum 24 chars)">MEGA 데스크톱 앱 설치</string>
     <string name="title_base_quota" context="title of the section for base quota in achivements section">계정 기본 할당량</string>
@@ -1733,7 +1733,7 @@
     <string name="first_paragraph_achievement_invite_friends" context="first paragraph of screen to invite friends and get an achievement">친구가 무료 MEGA 계정을 만들고 우리의 모바일 앱을 설치하도록 초대하세요. 성공적으로 가입하고 앱을 설치할 때마다 당신은 보너스 저장소와 전송 할당량을 받습니다.</string>
     <string name="second_paragraph_achievement_invite_friends" context="second paragraph of screen to invite friends and get an achievement">MEGA를 이전에 사용했던 사람을 초대하면 보상을 받지 못하게 되며 이러한 거절은 통보되지 않습니다. 초대된 연락처는 반드시 MEGA 모바일 앱 또는 MEGA 데스크톱 앱을 기기에 설치하여야 합니다.</string>
 
-    <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">휴대전화 연락처 목록에서 선택하거나 여러 이메일 주소를 입력하세요.</string>
+    <string name="card_title_invite_friends" context="explanation of screen to invite friends and get an achievement">휴대 전화 연락처 목록에서 선택하거나 여러 이메일 주소를 입력하세요.</string>
 
     <string name="title_confirmation_invite_friends" context="title of the dialog to confirm the contact request">MEGA에 친구 초대</string>
     <string name="subtitle_confirmation_invite_friends" context="Text shown when the user sends a contact invitation">초대 발송됨</string>
@@ -1917,7 +1917,7 @@
     <string name="button_notification_call_in_progress" context="Button in the notification shown on the action bar when there is a call in progress">통화로 돌아옴</string>
 
     <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list’s header">MEGA에서</string>
-    <string name="contacts_phone" context="When it lists contacts of phone, the title of list’s header">휴대전화 연락처</string>
+    <string name="contacts_phone" context="When it lists contacts of phone, the title of list’s header">휴대 전화 연락처</string>
 
     <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">당신의 계정은 타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 제거되었습니다.</string>
@@ -1992,7 +1992,7 @@
     </plurals>
 
     <string name="turn_on_notifications_title" context="The title of fragment Turn on Notifications">알림 켜기</string>
-    <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">이 방법으로, 새 메시지를 Android 휴대전화에서\n바로 볼 수 있습니다.</string>
+    <string name="turn_on_notifications_subtitle" context="The subtitle of fragment Turn on Notifications">이 방법으로, 새 메시지를 Android 휴대 전화에서\n바로 볼 수 있습니다.</string>
     <string name="turn_on_notifications_first_step" context="First step to turn on notifications">Android 기기 [A]설정[/A]을 엽니다</string>
     <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">[A]앱 &amp; 알림[/A]을 엽니다</string>
     <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">[A]MEGA[/A]를 선택합니다</string>
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">서버가 너무 바쁩니다. 잠시만 기다리세요.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">과정이 예상보다 오래 걸립니다. 기다려주세요.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">요청이 너무 많습니다. 기다려주세요.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">로그인 과정 취소중. 잠시만 기다리세요&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">로그인 과정 취소중. 잠시만 기다리세요&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">지원하지 않는 파일 유형.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">오류. 파일이 손상되었거나 존재하지 않습니다.</string>
@@ -2137,7 +2137,7 @@
     <string name="no_authentication_apps_title" context="Title of dialog shown when it tries to open an authentication app and there is no installed">인증기 앱</string>
     <string name="open_play_store_2fa" context="Message shown to ask user if wants to open Google Play to install some authenticator app">인증기 앱 설치를 위해 Google Play를 여시겠습니까?</string>
     <string name="play_store_label" context="Label Play Store">Play Store</string>
-    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">MEGA에서 2단계 인증을 활성화하려면 인증기 앱이 필요합니다. 당신의 휴대전화 또는 태블릿용 Google 인증기, Duo Mobile, Authy 또는 Microsoft 인증기 앱을 다운로드하고 설치할 수 있습니다.</string>
+    <string name="text_2fa_help" context="Text shown in an alert explaining how to continue to enable Two-Factor Authentication">MEGA에서 2단계 인증을 활성화하려면 인증기 앱이 필요합니다. 당신의 휴대 전화 또는 태블릿용 Google 인증기, Duo Mobile, Authy 또는 Microsoft 인증기 앱을 다운로드하고 설치할 수 있습니다.</string>
 
 
     <string name="number_correctly_imported_from_chat" context="success message when importing multiple files from">%d개의 파일이 성공적으로 공유됨</string>
@@ -2545,7 +2545,7 @@
 
     <string name="label_today" context="label today">오늘</string>
     <string name="label_yesterday" context="label yesterday">어제</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">내일</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[A]공유된 파일[/A] [B]없음[/B][B].[/B]</string>
 
@@ -2904,8 +2904,8 @@
     <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">당신의 계정이 관리자에 의해 삭제되었습니다. 자세한 사항은 당신의 비즈니스 계정 관리자에게 문의하세요.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">수정</string>
-    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">휴대전화 번호 수정</string>
-    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">휴대전화 번호 제거</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">휴대 전화 번호 수정</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">휴대 전화 번호 제거</string>
     <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">이 행동은 현재 전화 번호를 삭제하고 새 전화번호를 계정과 연결하는 과정을 시작합니다.</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">이것은 당신의 계정에 연결된 전화번호를 삭제합니다. 만약 나중에 전화번호를 추가하려면 전화번호를 인증해야합니다.</string>
 
