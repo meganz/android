@@ -111,7 +111,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.1_335";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.2_340";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -551,7 +551,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 								callStatus == MegaChatCall.CALL_STATUS_JOINING ||
 								callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
                             updateRTCAudioMangerTypeStatus(callStatus);
-							clearIncomingCallNotification(callId);
+							clearIncomingCallNotification(chatId);
 						}
 
 						if(megaApi.isChatNotifiable(chatId)) {
@@ -1614,7 +1614,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 return;
             }
             logDebug("Creating RTC Audio Manager");
-            rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
+			removeRTCAudioManagerRingIn();
+			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
 			startProximitySensor();
         }
     }
@@ -1758,21 +1759,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		logDebug("Launch call: " + getTitleChat(chatRoom));
 		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
 			setCallLayoutStatus(call.getChatid(), true);
-		}
-	}
-
-	public void clearIncomingCallNotification(long chatCallId) {
-		logDebug("Chat ID: " + chatCallId);
-
-		try {
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-			String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
-			int notificationId = (notificationCallId).hashCode();
-
-			notificationManager.cancel(notificationId);
-		} catch (Exception e) {
-			logError("EXCEPTION", e);
 		}
 	}
 

@@ -59,6 +59,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -71,10 +72,11 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatUtil {
     private static final int MIN_WIDTH = 44;
@@ -947,11 +949,39 @@ public class ChatUtil {
     }
 
     /**
+    * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
+            *
+            * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
+     * @return String to show for invalid meta message.
+     */
+    public static String getInvalidMetaMessage(MegaChatMessage message) {
+        String invalidMetaMessage = getString(R.string.error_meta_message_invalid);
+
+        if (message == null) {
+            return invalidMetaMessage;
+        }
+
+        String contentMessage = message.getContent();
+        if (!isTextEmpty(contentMessage)) {
+            return contentMessage;
+        }
+
+        MegaChatContainsMeta meta = message.getContainsMeta();
+
+        String metaTextMessage = meta != null ? meta.getTextMessage() : null;
+        if (!isTextEmpty(metaTextMessage)) {
+            return metaTextMessage;
+        }
+
+        return invalidMetaMessage;
+    }
+
+    /**
      * Dialog to confirm if you want to delete the history of a chat.
      *
      * @param chat The MegaChatRoom
      */
-    public static void showConfirmationClearChat(Context context, MegaChatRoom chat) {
+    public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
@@ -966,7 +996,7 @@ public class ChatUtil {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        String message = context.getResources().getString(R.string.confirmation_clear_chat_history, getTitleChat(chat));
+        String message = context.getString(R.string.confirmation_clear_chat_history);
         builder.setTitle(R.string.title_confirmation_clear_chat_history);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -1042,5 +1072,4 @@ public class ChatUtil {
                 return DISABLED_RETENTION_TIME;
         }
     }
-
 }

@@ -50,7 +50,7 @@
                     android:singleLine="true"
                     android:maxLines="1"
                     android:ellipsize="middle"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
 
                 <RelativeLayout
@@ -93,7 +93,7 @@
                     android:id="@+id/node_info_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:textSize="14sp"
                     android:singleLine="true"
                     android:layout_toRightOf="@id/node_info_versions_icon"
@@ -164,7 +164,7 @@
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:layout_marginLeft="18dp"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="16sp"/>
                 </LinearLayout>
 
@@ -202,7 +202,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -234,7 +234,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"
                     />
 
@@ -282,7 +282,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_get_link_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -313,7 +313,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_remove_link_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -345,7 +345,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_share"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -376,7 +376,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_share_folder"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -407,7 +407,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_send_file_to_chat"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -438,7 +438,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_clean_shares_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -477,7 +477,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_rename"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -508,7 +508,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_move_to"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -539,7 +539,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_copy"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -569,7 +569,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_restore"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -608,7 +608,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/external_play"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -639,7 +639,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/search_open_location"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 

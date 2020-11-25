@@ -22,7 +22,7 @@
         android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/mail_my_account"
+        android:textColor="@color/secondary_text"
         android:text="@string/subtitle_dialog_mute_chat_notifications"
         android:textSize="16sp"
         android:fontFamily="Roboto"

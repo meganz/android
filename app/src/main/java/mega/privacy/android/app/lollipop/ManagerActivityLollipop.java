@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -31,7 +30,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -113,7 +111,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -144,7 +141,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -237,7 +233,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
@@ -253,7 +248,6 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -5448,19 +5442,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch (tabSelected) {
 			case OUTGOING_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
 				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
 				break;
 			case LINKS_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
 				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.link_ic, R.color.dark_primary_color));
 				break;
 			default:
 				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
 
 		}
 	}
@@ -9187,12 +9181,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 	}
 
 	void verifyShowError(){
@@ -9244,13 +9238,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
                     switch (error) {
                         case CHAT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case CONTACT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
                             break;
@@ -9272,7 +9266,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 					openLinkText.getBackground().mutate().clearColorFilter();
 					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 					openLinkError.setVisibility(View.GONE);
@@ -12000,7 +11994,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void resetNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 		}
 
 		if (inboxSection != null){
@@ -12013,7 +12007,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(hasChildren){
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12027,7 +12021,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (contactsSectionText == null) {
 				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 			setContactTitleSection();
 		}
 
@@ -12036,7 +12030,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (notificationsSectionText == null) {
 				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 			setNotificationsTitleSection();
 		}
 
