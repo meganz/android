@@ -1,16 +1,25 @@
 package mega.privacy.android.app.activities
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.core.content.ContextCompat
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
-import mega.privacy.android.app.listeners.UpdatePreviewersListener
+import mega.privacy.android.app.listeners.RetentionTimeListener
+import mega.privacy.android.app.listeners.SetRetentionTimeListener
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil
@@ -23,8 +32,18 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private lateinit var binding: ActivityManageChatHistoryBinding
     private var chat: MegaChatRoom? = null
     private var chatId = MEGACHAT_INVALID_HANDLE
-    private var listener: UpdatePreviewersListener? = null
+    private var listener: RetentionTimeListener? = null
 
+    private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == null || intent.action != ACTION_UPDATE_RETENTION_TIME) {
+                return
+            }
+
+            val seconds = intent.getLongExtra(BroadcastConstants.RETENTION_TIME, 0)
+            updateRetentionTimeUI(seconds)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,15 +66,10 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             finish()
         }
 
-        chat = megaChatApi.getChatRoomByUser(contact.handle)
-        if (chat == null) {
-            logError("Cannot init view, chat is null")
-            finish()
-        }
-        chatId = chat?.chatId!!
-        listener = UpdatePreviewersListener(this)
-
-        megaChatApi.openChatRoom(chatId, listener)
+        registerReceiver(
+            retentionTimeReceiver,
+            IntentFilter(ACTION_UPDATE_RETENTION_TIME)
+        )
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -72,19 +86,36 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase()
         screenOrientation = resources.configuration.orientation
 
-        binding.clearChatHistoryLayout?.setOnClickListener(this)
-        binding.historyRetentionSwitch?.setOnClickListener(null)
+        chat = megaChatApi.getChatRoomByUser(contact.handle)
+        binding.historyRetentionSwitch.isClickable = false;
+        binding.historyRetentionSwitch.isChecked = false
 
-        binding.historyRetentionSwitch?.setOnCheckedChangeListener { switchCompat, isChecked ->
-            if (isChecked) {
-                logDebug("is Checked")
-            } else {
-                logDebug("no checked")
-
+        if(chat == null){
+            logDebug("The chat does not exist")
+            binding.clearChatHistoryLayout?.setOnClickListener(null)
+            binding.historyRetentionLayout?.setOnClickListener(null)
+        }else{
+            logDebug("The chat exists")
+            chatId = chat?.chatId!!
+            listener = RetentionTimeListener(this)
+            megaChatApi.closeChatRoom(chatId, listener)
+            if (megaChatApi.openChatRoom(chatId, listener)) {
+                logDebug("Successful open chat");
             }
-        }
 
-        binding.historyRetentionLayout?.setOnClickListener(this)
+            binding.historyRetentionLayout?.setOnClickListener(this)
+            binding.clearChatHistoryLayout?.setOnClickListener(this)
+
+            val seconds = chat!!.retentionTime
+            updateRetentionTimeUI(seconds)
+        }
+    }
+
+    /**
+     * Method for updating the UI when the retention time is updated.
+     */
+    private fun updateRetentionTimeUI(seconds: Long) {
+        binding.historyRetentionSwitch.isChecked = seconds != DISABLED_RETENTION_TIME
     }
 
     override fun onClick(v: View?) {
@@ -94,11 +125,19 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             }
 
             R.id.history_retention_layout -> {
-                createHistoryRetentionAlertDialog(this, chat);
+                if (binding.historyRetentionSwitch.isChecked) {
+                    MegaApplication.getInstance().megaChatApi.setChatRetentionTime(
+                        chat!!.chatId,
+                        DISABLED_RETENTION_TIME,
+                        SetRetentionTimeListener(this)
+                    )
+
+                } else {
+                    createHistoryRetentionAlertDialog(this, chat)
+                }
             }
         }
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home)
@@ -108,7 +147,11 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     }
 
     override fun onDestroy() {
-        megaChatApi.closeChatRoom(chatId, listener)
+        if (chatId != MEGACHAT_INVALID_HANDLE && listener != null) {
+            megaChatApi.closeChatRoom(chatId, listener)
+        }
+
+        unregisterReceiver(retentionTimeReceiver)
         super.onDestroy()
     }
 }

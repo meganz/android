@@ -53,6 +53,7 @@ public class BroadcastConstants {
     public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE";
     public static final String ACTION_UPDATE_RB_SCHEDULER = "ACTION_UPDATE_RB_SCHEDULER";
     public static final String ACTION_UPDATE_FILE_VERSIONS = "ACTION_UPDATE_FILE_VERSIONS";
+    public static final String ACTION_UPDATE_RETENTION_TIME = "ACTION_UPDATE_RETENTION_TIME";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -86,5 +87,5 @@ public class BroadcastConstants {
     public static final String PRIMARY_HANDLE = "PRIMARY_HANDLE";
     public static final String ACTION_TYPE = "actionType";
     public static final String DAYS_COUNT = "DAYS_COUNT";
-
+    public static final String RETENTION_TIME = "RETENTION_TIME";
 }

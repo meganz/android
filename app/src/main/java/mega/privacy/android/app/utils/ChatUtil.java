@@ -47,6 +47,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
@@ -1009,7 +1010,11 @@ public class ChatUtil {
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
-                    //MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, getTypeHistoryRetention(itemClicked.get()), chats);
+                    if (itemClicked.get() == 4) {
+                        logDebug("Custom option");
+                    } else {
+                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(chat.getChatId(), getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
+                    }
                     dialog.dismiss();
                 });
         dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
@@ -1020,25 +1025,21 @@ public class ChatUtil {
     }
 
     /**
-     * Method for getting the selected history retention option depending on the selected item.
+     * Method for getting the seconds from an selected option.
      *
-     * @param itemClicked   The selected item.
-     * @return The right option.
+     * @param itemClicked The selected item.
+     * @return The seconds
      */
-    private static String getTypeHistoryRetention(int itemClicked) {
+    private static long getSecondsFromOption(int itemClicked) {
         switch (itemClicked) {
-            case 0:
-                return HISTORY_RETENTION_DISABLED;
             case 1:
-                return HISTORY_RETENTION_1_DAY;
+                return SECONDS_IN_DAY;
             case 2:
-                return HISTORY_RETENTION_1_WEEK;
+                return SECONDS_IN_WEEK;
             case 3:
-                return HISTORY_RETENTION_1_MONTH;
-            case 4:
-                return HISTORY_RETENTION_CUSTOM;
+                return SECONDS_IN_MONTH_31;
             default:
-                return NOTIFICATIONS_ENABLED;
+                return DISABLED_RETENTION_TIME;
         }
     }
 

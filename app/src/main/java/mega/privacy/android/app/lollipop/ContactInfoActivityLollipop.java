@@ -71,6 +71,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.listeners.RetentionTimeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -200,8 +201,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private MarqueeTextView secondLineTextToolbar;
 	private State stateToolbar = State.IDLE;
 
-	RelativeLayout clearChatLayout;
-	View dividerClearChatLayout;
+	private RelativeLayout clearChatLayout;
+	private TextView retentionTimeLayout;
+	private View dividerClearChatLayout;
 	RelativeLayout removeContactChatLayout;
 
 	Toolbar toolbar;
@@ -254,6 +256,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
+
+	private RetentionTimeListener retentionTimeListener;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -346,17 +350,29 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	};
 
 
-		private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if (intent == null || intent.getAction() == null)
-					return;
+	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null ||
+					!intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING))
+				return;
 
-				if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
-					checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
-				}
-			}
-		};
+			checkSpecificChatNotifications(chatHandle, notificationsSwitch, notificationsSubTitle);
+		}
+	};
+
+	private BroadcastReceiver retentionTimeReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || intent.getAction() == null ||
+					!intent.getAction().equals(ACTION_UPDATE_RETENTION_TIME))
+				return;
+
+			long seconds = intent.getLongExtra(RETENTION_TIME, 0);
+			updateRetentionTimeLayout(seconds);
+		}
+	};
+
 
 	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
 		@Override
@@ -523,7 +539,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			notificationsSwitch = findViewById(R.id.chat_contact_properties_switch);
 			notificationsSwitch.setClickable(false);
 
-
 			dividerNotificationsLayout = findViewById(R.id.divider_notifications_layout);
 
 			//Verify credentials layout
@@ -560,6 +575,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Clear chat Layout
 			clearChatLayout = findViewById(R.id.manage_chat_history_contact_properties_layout);
 			clearChatLayout.setOnClickListener(this);
+			retentionTimeLayout = findViewById(R.id.manage_chat_history_contact_properties_subtitle);
+			retentionTimeLayout.setVisibility(View.GONE);
 
 			dividerClearChatLayout = findViewById(R.id.divider_clear_chat_layout);
 
@@ -572,6 +589,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			if (megaChatApi == null) {
 				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 			}
+
 			if (chatHandle != -1) {
 				logDebug("From chat!!");
 				fromContacts = false;
@@ -623,6 +641,18 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 
 
+			}
+
+			if (chat != null) {
+				retentionTimeListener = new RetentionTimeListener(this);
+				megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
+				if (megaChatApi.openChatRoom(chat.getChatId(), retentionTimeListener)) {
+					logDebug("Successful open chat");
+				}
+
+				updateRetentionTimeLayout(chat.getRetentionTime());
+			} else {
+				retentionTimeLayout.setVisibility(View.GONE);
 			}
 
 			updateVerifyCredentialsLayout();
@@ -704,9 +734,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.showDialog();
         }
 
-		registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+		registerReceiver(manageShareReceiver,
+				new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
-		registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+		registerReceiver(chatRoomMuteUpdateReceiver,
+				new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
+
+		registerReceiver(retentionTimeReceiver,
+				new IntentFilter(ACTION_UPDATE_RETENTION_TIME));
 
 		IntentFilter userNameUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
 		userNameUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
@@ -723,6 +758,21 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
+	}
+
+	/**
+	 * Method for updating the Time retention layout.
+	 *
+	 * @param time The retention time in seconds.
+	 */
+	private void updateRetentionTimeLayout(long time) {
+		if(time == DISABLED_RETENTION_TIME){
+			retentionTimeLayout.setVisibility(View.GONE);
+		}else{
+			String subtitleText = getString(R.string.subtitle_properties_manage_chat);
+			retentionTimeLayout.setText(subtitleText);
+			retentionTimeLayout.setVisibility(View.VISIBLE);
+		}
 	}
 
 	private void visibilityStateIcon() {
@@ -1791,9 +1841,14 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.recycle();
         }
 
+		if (chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE && retentionTimeListener != null) {
+			megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
+		}
+
 		unregisterReceiver(chatCallUpdateReceiver);
 		unregisterReceiver(chatSessionUpdateReceiver);
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
+		unregisterReceiver(retentionTimeReceiver);
 		unregisterReceiver(manageShareReceiver);
 		unregisterReceiver(userNameReceiver);
 		unregisterReceiver(destroyActionModeReceiver);
