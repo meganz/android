@@ -5,15 +5,13 @@
     android:id="@+id/fragment_container_chat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:fitsSystemWindows="true"
     android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/activity_chat_content_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -45,12 +43,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="left"
-                            android:fontFamily="sans-serif-light"
                             android:gravity="center_vertical|left"
-                            android:textSize="17sp"
-                            app:emojiSize="17sp"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
+                            android:textAppearance="?attr/textAppearanceSubtitle1"
+                            app:emojiSize="16sp"
                             android:singleLine="true"
                             android:maxLines="1"
                             android:layout_alignParentLeft="true"/>
@@ -76,9 +71,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:background="@null"
                                 android:src="@drawable/ic_private_chat"
-                                android:tint="@color/white"
+                                app:tint="?attr/colorControlNormal"
                                 android:visibility="gone" />
                             <ImageView
                                 android:id="@+id/mute_icon_toolbar"
@@ -87,7 +81,7 @@
                                 android:layout_marginTop="2dp"
                                 android:background="@null"
                                 android:src="@drawable/ic_mute_small"
-                                android:tint="@color/white"
+                                app:tint="?attr/colorControlNormal"
                                 android:visibility="gone" />
                         </LinearLayout>
                     </RelativeLayout>
@@ -98,8 +92,7 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="none"
                         android:singleLine="true"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                         android:visibility="gone" />
 
                     <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -112,8 +105,7 @@
                         android:marqueeRepeatLimit="marquee_forever"
                         android:scrollHorizontally="true"
                         android:singleLine="true"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                         app:emojiSize="10sp"
                         android:visibility="gone" />
 
@@ -128,8 +120,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="8dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                             android:visibility="gone" />
 
                         <LinearLayout
@@ -144,13 +135,13 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginRight="4dp"
-                                android:textColor="@color/white"
-                                android:textSize="14sp" />
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
 
                             <ImageView
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
-                                android:src="@drawable/ic_videocam_white" />
+                                android:src="@drawable/ic_videocam_white"
+                                app:tint="?android:attr/textColorPrimary"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -165,7 +156,8 @@
                 android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -246,7 +238,7 @@
                                 android:layout_marginRight="8dp"
                                 android:background="@null"
                                 android:src="@drawable/ic_send_black"
-                                android:tint="@color/accentColor"
+                                android:tint="?attr/colorSecondary"
                                 android:visibility="visible" />
 
                             <mega.privacy.android.app.components.twemoji.EmojiEditText
@@ -273,7 +265,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignTop="@id/linear_layout_options"
-                        android:background="@color/black_12_alpha"
+                        android:background="@color/grey_012_white_012"
                         android:orientation="horizontal"
                         android:visibility="gone" />
 
@@ -282,7 +274,6 @@
                         android:id="@+id/linear_layout_options"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
-                        android:background="@color/white"
                         android:orientation="horizontal">
 
                         <RelativeLayout
@@ -298,7 +289,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_emojicon"
-                                android:tint="@color/transparent_black" />
+                                android:tint="?attr/colorControlNormal" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -314,7 +305,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_media"
-                                android:tint="@color/transparent_black" />
+                                android:tint="?attr/colorControlNormal" />
 
                         </RelativeLayout>
 
@@ -330,7 +321,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:src="@drawable/ic_b_select_image" />
+                                android:src="@drawable/ic_b_select_image"
+                                android:tint="?attr/colorControlNormal" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -346,7 +338,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/attach_file"
-                                android:tint="@color/transparent_black" />
+                                app:tint="?android:attr/textColorPrimary" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -362,7 +354,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_gif_toolbar"
-                                android:tint="@color/transparent_black" />
+                                android:tint="?attr/colorControlNormal" />
                         </RelativeLayout>
 
                     </LinearLayout>
@@ -461,15 +453,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar_chat"
-                android:background="@color/background_chat"
                 android:orientation="vertical">
 
                 <!--Empty messages -->
                 <RelativeLayout
                     android:id="@+id/empty_messages_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/background_chat">
+                    android:layout_height="match_parent">
 
                     <ImageView
                         android:id="@+id/empty_image_view_chat"
@@ -496,8 +486,7 @@
                 <RelativeLayout
                     android:id="@+id/relative_chat_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/background_chat">
+                    android:layout_height="match_parent">
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/messages_chat_list_view"
@@ -512,8 +501,7 @@
                     android:id="@+id/user_typing_layout"
                     android:layout_width="match_parent"
                     android:layout_height="22dp"
-                    android:layout_alignParentBottom="true"
-                    android:background="@color/background_chat">
+                    android:layout_alignParentBottom="true">
 
                     <TextView
                         android:id="@+id/user_typing_text"
@@ -661,7 +649,8 @@
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_mic_vc_off"
-                                android:visibility="visible" />
+                                android:visibility="visible"
+                                app:tint="?attr/colorControlNormal"/>
                         </RelativeLayout>
 
                         <LinearLayout

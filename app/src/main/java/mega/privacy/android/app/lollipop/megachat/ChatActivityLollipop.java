@@ -3926,7 +3926,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
         hideInputText();
         fileStorageLayout.setVisibility(View.VISIBLE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
+//        pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
     }
 
