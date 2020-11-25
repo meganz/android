@@ -55,7 +55,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start|center_vertical"
-                            android:textColor="@color/name_my_account"
+                            android:textColor="@color/primary_text"
                             android:text="@string/title_properties_history_retention"
                             android:textSize="16sp" />
                     </RelativeLayout>
@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
                     android:text="@string/subtitle_properties_history_retention"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:layout_marginBottom="16dp"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -116,7 +116,7 @@
                     android:layout_gravity="start|center_vertical"
                     android:layout_marginBottom="17dp"
                     android:text="@string/subtitle_properties_chat_clear"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:textSize="14sp" />
             </LinearLayout>
 
