@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 
@@ -32,6 +33,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private lateinit var binding: ActivityManageChatHistoryBinding
     private var chat: MegaChatRoom? = null
     private var chatId = MEGACHAT_INVALID_HANDLE
+    private var contactHandle = INVALID_HANDLE
+
     private var listener: RetentionTimeListener? = null
 
     private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -66,6 +69,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             finish()
         }
 
+        contactHandle = contact?.handle!!
+
         registerReceiver(
             retentionTimeReceiver,
             IntentFilter(ACTION_UPDATE_RETENTION_TIME)
@@ -76,7 +81,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
         window.statusBarColor = ContextCompat.getColor(
             applicationContext,
-            R.color.status_bar_red_alert
+            R.color.dark_primary_color
         )
 
         setSupportActionBar(binding.manageChatToolbar)
@@ -86,16 +91,24 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase()
         screenOrientation = resources.configuration.orientation
 
-        chat = megaChatApi.getChatRoomByUser(contact.handle)
-        binding.historyRetentionSwitch.isClickable = false;
-        binding.historyRetentionSwitch.isChecked = false
+        chat = megaChatApi.getChatRoomByUser(contactHandle)
+        binding.historyRetentionSwitch?.isClickable = false;
+        binding.historyRetentionSwitch?.isChecked = false
+
 
         if(chat == null){
             logDebug("The chat does not exist")
+            binding.historyRetentionSwitchLayout?.setOnClickListener(null)
             binding.clearChatHistoryLayout?.setOnClickListener(null)
-            binding.historyRetentionLayout?.setOnClickListener(null)
+            binding.retentionTimeTextLayout?.setOnClickListener(null)
+
+            binding.retentionTimeTitle?.text =  getString(R.string.title_properties_history_retention)
+            binding.retentionTimeSubtitle?.text =  getString(R.string.subtitle_properties_history_retention)
+            binding.retentionTime?.visibility = View.GONE
         }else{
             logDebug("The chat exists")
+            binding.historyRetentionSwitchLayout?.setOnClickListener(this)
+            binding.clearChatHistoryLayout?.setOnClickListener(this)
             chatId = chat?.chatId!!
             listener = RetentionTimeListener(this)
             megaChatApi.closeChatRoom(chatId, listener)
@@ -103,10 +116,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 logDebug("Successful open chat");
             }
 
-            binding.historyRetentionLayout?.setOnClickListener(this)
-            binding.clearChatHistoryLayout?.setOnClickListener(this)
-
             val seconds = chat!!.retentionTime
+
             updateRetentionTimeUI(seconds)
         }
     }
@@ -115,7 +126,23 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      * Method for updating the UI when the retention time is updated.
      */
     private fun updateRetentionTimeUI(seconds: Long) {
-        binding.historyRetentionSwitch.isChecked = seconds != DISABLED_RETENTION_TIME
+        val timeFormatted = ChatUtil.transformSecondsInString(seconds)
+        if(TextUtil.isTextEmpty(timeFormatted)){
+            binding.retentionTimeTextLayout?.setOnClickListener(null)
+
+            binding.historyRetentionSwitch?.isChecked = false
+            binding.retentionTimeTitle?.text =  getString(R.string.title_properties_history_retention)
+            binding.retentionTimeSubtitle?.text =  getString(R.string.subtitle_properties_history_retention)
+            binding.retentionTime?.visibility = View.GONE
+        }else{
+            binding.retentionTimeTextLayout?.setOnClickListener(this)
+
+            binding.historyRetentionSwitch.isChecked = true
+            binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention_activated)
+            binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_manage_chat)
+            binding.retentionTime.text = timeFormatted
+            binding.retentionTime.visibility = View.VISIBLE
+        }
     }
 
     override fun onClick(v: View?) {
@@ -124,7 +151,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 ChatUtil.showConfirmationClearChat(this, chat)
             }
 
-            R.id.history_retention_layout -> {
+            R.id.history_retention_switch_layout -> {
                 if (binding.historyRetentionSwitch.isChecked) {
                     MegaApplication.getInstance().megaChatApi.setChatRetentionTime(
                         chat!!.chatId,
@@ -133,8 +160,12 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                     )
 
                 } else {
-                    createHistoryRetentionAlertDialog(this, chat)
+                    createHistoryRetentionAlertDialog(this, chat, true)
                 }
+            }
+
+            R.id.retention_time_text_layout -> {
+                createHistoryRetentionAlertDialog(this, chat, false)
             }
         }
     }

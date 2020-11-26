@@ -202,7 +202,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private State stateToolbar = State.IDLE;
 
 	private RelativeLayout clearChatLayout;
-	private TextView retentionTimeLayout;
+	private TextView retentionTimeText;
 	private View dividerClearChatLayout;
 	RelativeLayout removeContactChatLayout;
 
@@ -575,9 +575,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			//Clear chat Layout
 			clearChatLayout = findViewById(R.id.manage_chat_history_contact_properties_layout);
 			clearChatLayout.setOnClickListener(this);
-			retentionTimeLayout = findViewById(R.id.manage_chat_history_contact_properties_subtitle);
-			retentionTimeLayout.setVisibility(View.GONE);
-
+			retentionTimeText = findViewById(R.id.manage_chat_history_contact_properties_subtitle);
+			retentionTimeText.setVisibility(View.GONE);
 			dividerClearChatLayout = findViewById(R.id.divider_clear_chat_layout);
 
 			//Remove contact Layout
@@ -652,7 +651,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 				updateRetentionTimeLayout(chat.getRetentionTime());
 			} else {
-				retentionTimeLayout.setVisibility(View.GONE);
+				retentionTimeText.setVisibility(View.GONE);
 			}
 
 			updateVerifyCredentialsLayout();
@@ -766,12 +765,13 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	 * @param time The retention time in seconds.
 	 */
 	private void updateRetentionTimeLayout(long time) {
-		if(time == DISABLED_RETENTION_TIME){
-			retentionTimeLayout.setVisibility(View.GONE);
-		}else{
-			String subtitleText = getString(R.string.subtitle_properties_manage_chat);
-			retentionTimeLayout.setText(subtitleText);
-			retentionTimeLayout.setVisibility(View.VISIBLE);
+		String timeFormatted = transformSecondsInString(time);
+		if (isTextEmpty(timeFormatted)) {
+			retentionTimeText.setVisibility(View.GONE);
+		} else {
+			String subtitleText = getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
+			retentionTimeText.setText(subtitleText);
+			retentionTimeText.setVisibility(View.VISIBLE);
 		}
 	}
 

@@ -38,7 +38,8 @@
                 android:orientation="vertical"
                 android:paddingTop="16dp"
                 android:paddingStart="16dp"
-                android:paddingEnd="19dp">
+                android:paddingEnd="19dp"
+                android:paddingBottom="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -52,16 +53,17 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center">
                         <TextView
+                            android:id="@+id/retention_time_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start|center_vertical"
                             android:textColor="@color/primary_text"
-                            android:text="@string/title_properties_history_retention"
                             android:textSize="16sp" />
                     </RelativeLayout>
 
                     <RelativeLayout
-                        android:layout_width="0dp"
+                        android:id="@+id/history_retention_switch_layout"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
@@ -71,18 +73,33 @@
                             android:id="@+id/history_retention_switch"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:gravity="end|center_vertical"
                             android:clickable="false" />
                     </RelativeLayout>
                 </LinearLayout>
 
-                <TextView
+                <RelativeLayout
+                    android:id="@+id/retention_time_text_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="start|center_vertical"
-                    android:text="@string/subtitle_properties_history_retention"
-                    android:textColor="@color/secondary_text"
-                    android:layout_marginBottom="16dp"
-                    android:textSize="14sp" />
+                    android:layout_gravity="start|center_vertical">
+                    <TextView
+                        android:id="@+id/retention_time_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subtitle_properties_history_retention"
+                        android:textColor="@color/secondary_text"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/retention_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/retention_time_subtitle"
+                        android:textColor="@color/accentColor"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"
+                        android:textSize="14sp" />
+                </RelativeLayout>
             </LinearLayout>
 
             <LinearLayout

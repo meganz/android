@@ -1008,7 +1008,7 @@ public class ChatUtil {
      * @param context Context of Activity.
      * @param chat  The MegaChatRoom.
      */
-    public static void createHistoryRetentionAlertDialog(Activity context, MegaChatRoom chat) {
+    public static void createHistoryRetentionAlertDialog(Activity context, MegaChatRoom chat, boolean selectedOption) {
 
         final AlertDialog historyRetentionDialog;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
@@ -1032,16 +1032,29 @@ public class ChatUtil {
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
+        if(selectedOption) {
+            dialogBuilder.setSingleChoiceItems(itemsAdapter, 0, (dialog, item) -> {
+                itemClicked.set(item);
+                if(item == 0){
+                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(0.30f);
+                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }else{
+                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(1f);
+                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
+            });
+        }else{
+            dialogBuilder.setSingleChoiceItems(itemsAdapter, INVALID_POSITION, (dialog, item) -> {
+                itemClicked.set(item);
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(1f);
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+            });
 
-        dialogBuilder.setSingleChoiceItems(itemsAdapter, INVALID_POSITION, (dialog, item) -> {
-            itemClicked.set(item);
-            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-        });
+        }
 
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
-                        logDebug("Custom option");
                     } else {
                         MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(chat.getChatId(), getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
                     }
@@ -1052,6 +1065,8 @@ public class ChatUtil {
         historyRetentionDialog = dialogBuilder.create();
         historyRetentionDialog.show();
         historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(0.30f);
+
     }
 
     /**
@@ -1071,5 +1086,47 @@ public class ChatUtil {
             default:
                 return DISABLED_RETENTION_TIME;
         }
+    }
+
+    private static boolean isInteger(long number){
+        return number - Math.floor(number) == 0;
+    }
+
+    public static String transformSecondsInString(long seconds){
+        if(seconds == DISABLED_RETENTION_TIME)
+            return "";
+
+        long hours = seconds / SECONDS_IN_HOUR;
+        long days = seconds / SECONDS_IN_DAY;
+        long weeks = seconds / SECONDS_IN_WEEK;
+        long months = seconds / SECONDS_IN_MONTH_31;
+        long years = seconds / SECONDS_IN_YEAR;
+
+        if(years > 0 && isInteger(years)){
+            int year = (int) years;
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_years, year, year);
+        }
+
+        if(months > 0 && isInteger(months)){
+            int month = (int) months;
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_months, month, month);
+        }
+
+        if(weeks > 0 && isInteger(weeks)){
+            int week = (int) weeks;
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_weeks, week, week);
+        }
+
+        if(days > 0 && isInteger(days)){
+            int day = (int) days;
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_days, day, day);
+        }
+
+        if(hours > 0 && isInteger(hours)){
+            int hour = (int) hours;
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
+        }
+
+        return " ";
     }
 }

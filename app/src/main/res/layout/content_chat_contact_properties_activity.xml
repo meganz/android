@@ -453,47 +453,51 @@
 
 
         <!-- CLEAR LAYOUT -->
-
         <RelativeLayout
             android:id="@+id/manage_chat_history_contact_properties_layout"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="start|center_vertical">
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:minHeight="56dp"
+            android:paddingTop="17dp"
+            android:paddingBottom="15dp">
 
-            <ImageView
-                android:id="@+id/manage_chat_history_contact_properties_icon"
+            <RelativeLayout
+                android:id="@+id/manage_chat_history_contact_properties"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="16dp"
-                android:alpha="0.64"
-                android:src="@drawable/ic_clear_history" />
+                android:layout_marginStart="20dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="start|center_vertical"
-                android:layout_marginStart="32dp"
-                android:layout_toEndOf="@id/manage_chat_history_contact_properties_icon"
-                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:layout_marginEnd="32dp"
+                    android:alpha="0.64"
+                    android:src="@drawable/ic_clear_history"
+                    android:contentDescription="@string/todo" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="52dp"
+                    android:layout_marginEnd="56dp"
                     android:text="@string/title_properties_manage_chat"
                     android:textColor="@color/primary_text"
                     android:textSize="16sp" />
+            </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/manage_chat_history_contact_properties_subtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    android:visibility="gone"/>
-            </LinearLayout>
+            <TextView
+                android:id="@+id/manage_chat_history_contact_properties_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="56dp"
+                android:layout_below="@id/manage_chat_history_contact_properties"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="72dp"
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <View
