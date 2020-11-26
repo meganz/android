@@ -86,6 +86,12 @@ public class ChatUtil {
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
 
+    public static final int RETENTION_TIME_DIALOG_OPTION_DISABLED = 0;
+    public static final int RETENTION_TIME_DIALOG_OPTION_DAY = 1;
+    public static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
+    public static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
+    public static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
+
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
     }
@@ -1005,10 +1011,13 @@ public class ChatUtil {
     /**
      * Method to display a dialog to configure the history retention .
      *
-     * @param context Context of Activity.
-     * @param chat  The MegaChatRoom.
+     * @param context    Context of Activity.
+     * @param idChat     The chat ID.
+     * @param isDisabled True, if the Retention Time is disabled. False, otherwise.
      */
-    public static void createHistoryRetentionAlertDialog(Activity context, MegaChatRoom chat, boolean selectedOption) {
+    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled) {
+        if (idChat == MEGACHAT_INVALID_HANDLE)
+            return;
 
         final AlertDialog historyRetentionDialog;
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
@@ -1032,22 +1041,18 @@ public class ChatUtil {
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
-        if(selectedOption) {
-            dialogBuilder.setSingleChoiceItems(itemsAdapter, 0, (dialog, item) -> {
+        if (isDisabled) {
+            itemClicked.set(RETENTION_TIME_DIALOG_OPTION_DISABLED);
+            dialogBuilder.setSingleChoiceItems(itemsAdapter, RETENTION_TIME_DIALOG_OPTION_DISABLED, (dialog, item) -> {
                 itemClicked.set(item);
-                if(item == 0){
-                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(0.30f);
-                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                }else{
-                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(1f);
-                    ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                }
+                updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), item != 0);
             });
-        }else{
-            dialogBuilder.setSingleChoiceItems(itemsAdapter, INVALID_POSITION, (dialog, item) -> {
+        } else {
+            int positionSelected = getPositionSelectedFromRetentionTime(idChat);
+            itemClicked.set(positionSelected);
+            dialogBuilder.setSingleChoiceItems(itemsAdapter, positionSelected, (dialog, item) -> {
                 itemClicked.set(item);
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(1f);
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), true);
             });
 
         }
@@ -1056,7 +1061,7 @@ public class ChatUtil {
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
                     } else {
-                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(chat.getChatId(), getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
+                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat, getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
                     }
                     dialog.dismiss();
                 });
@@ -1064,9 +1069,37 @@ public class ChatUtil {
 
         historyRetentionDialog = dialogBuilder.create();
         historyRetentionDialog.show();
-        historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-        historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE).setAlpha(0.30f);
+        updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE), !isDisabled);
+    }
 
+    private static int getPositionSelectedFromRetentionTime(long idChat){
+        MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(idChat);
+        long seconds = chat.getRetentionTime();
+
+        if (seconds == DISABLED_RETENTION_TIME)
+            return RETENTION_TIME_DIALOG_OPTION_DISABLED;
+
+        long days = seconds / SECONDS_IN_DAY;
+        if (isInteger(days) && days == 1) {
+            return RETENTION_TIME_DIALOG_OPTION_DAY;
+        }
+
+        long weeks = seconds / SECONDS_IN_WEEK;
+        if (isInteger(weeks) && weeks == 1) {
+            return RETENTION_TIME_DIALOG_OPTION_WEEK;
+        }
+
+        long months = seconds / SECONDS_IN_MONTH_31;
+        if (isInteger(months) && months == 1) {
+            return RETENTION_TIME_DIALOG_OPTION_MONTH;
+        }
+
+        return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+    }
+
+    private static void updatePositiveButton(final Button buttonPositive, boolean isEnabled) {
+        buttonPositive.setEnabled(isEnabled);
+        buttonPositive.setAlpha(isEnabled ? 1f : 0.30f);
     }
 
     /**

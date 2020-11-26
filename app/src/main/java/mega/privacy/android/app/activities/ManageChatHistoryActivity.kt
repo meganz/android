@@ -160,12 +160,12 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                     )
 
                 } else {
-                    createHistoryRetentionAlertDialog(this, chat, true)
+                    createHistoryRetentionAlertDialog(this, chatId, true)
                 }
             }
 
             R.id.retention_time_text_layout -> {
-                createHistoryRetentionAlertDialog(this, chat, false)
+                createHistoryRetentionAlertDialog(this, chatId, false)
             }
         }
     }
