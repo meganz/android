@@ -244,17 +244,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_MEGA_CONTACTS_EMAIL + " TEXT,"
             + KEY_MEGA_CONTACTS_PHONE_NUMBER + " TEXT)";
 
-	private static final String KEY_SD_TRANSFERS_TAG = "transfertag";
-	private static final String KEY_SD_TRANSFERS_NAME = "transfername";
-	private static final String KEY_SD_TRANSFERS_APP_DATA = "appdata";
-    private static final String KEY_SD_TRANSFERS_PATH = "sdpath";
+	private static final String KEY_SD_TRANSFERS_TAG = "sdtransfertag";
+	private static final String KEY_SD_TRANSFERS_NAME = "sdtransfername";
+	private static final String KEY_SD_TRANSFERS_SIZE = "sdtransfersize";
+	private static final String KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle";
+	private static final String KEY_SD_TRANSFERS_PARENT_HANDLE = "sdtransferparenthandle";
+	private static final String KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata";
+    private static final String KEY_SD_TRANSFERS_PATH = "sdtransferpath";
 	private static final String CREATE_SD_TRANSFERS_TABLE = "CREATE TABLE IF NOT EXISTS "
 			+ TABLE_SD_TRANSFERS + "("
-			+ KEY_ID + " INTEGER PRIMARY KEY, "		//0
-			+ KEY_SD_TRANSFERS_TAG + " INTEGER, "	//1
-			+ KEY_SD_TRANSFERS_NAME + " TEXT, "		//2
-			+ KEY_SD_TRANSFERS_PATH + " TEXT, "		//3
-			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";	//4
+			+ KEY_ID + " INTEGER PRIMARY KEY, "             //0
+			+ KEY_SD_TRANSFERS_TAG + " INTEGER, "           //1
+			+ KEY_SD_TRANSFERS_SIZE + " TEXT, "             //2
+			+ KEY_SD_TRANSFERS_HANDLE + " TEXT, "           //3
+			+ KEY_SD_TRANSFERS_PARENT_HANDLE + " TEXT, "	//4
+			+ KEY_SD_TRANSFERS_NAME + " TEXT, "             //5
+			+ KEY_SD_TRANSFERS_PATH + " TEXT, "             //6
+			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";         //7
 
     private static DatabaseHandler instance;
 
@@ -4211,10 +4217,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			do {
 				int tag = Integer.parseInt(decrypt(cursor.getString(1)));
 				String name = decrypt(cursor.getString(2));
-				String path = decrypt(cursor.getString(3));
-				String appData = decrypt(cursor.getString(4));
+				String size = decrypt(cursor.getString(3));
+				String nodeHandle = decrypt(cursor.getString(4));
+				long parentHandle = Long.parseLong(decrypt(cursor.getString(5)));
+				String path = decrypt(cursor.getString(6));
+				String appData = decrypt(cursor.getString(7));
 
-				sdTransfers.add(new SDTransfer(tag, name, path, appData));
+				sdTransfers.add(new SDTransfer(tag, name, size, nodeHandle, parentHandle, path, appData));
 			} while (cursor.moveToPrevious());
 
 			cursor.close();
@@ -4227,6 +4236,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(KEY_SD_TRANSFERS_TAG, encrypt(Integer.toString(transfer.getTag())));
 		values.put(KEY_SD_TRANSFERS_NAME, encrypt(transfer.getName()));
+		values.put(KEY_SD_TRANSFERS_SIZE, encrypt(transfer.getSize()));
+		values.put(KEY_SD_TRANSFERS_HANDLE, encrypt(transfer.getNodeHandle()));
+		values.put(KEY_SD_TRANSFERS_PARENT_HANDLE, encrypt(Long.toString(transfer.getParentHandle())));
 		values.put(KEY_SD_TRANSFERS_PATH, encrypt(transfer.getPath()));
 		values.put(KEY_SD_TRANSFERS_APP_DATA, encrypt(transfer.getAppData()));
 

@@ -68,10 +68,13 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.fileName = transfer.getName();
         this.type = MegaTransfer.TYPE_DOWNLOAD;
         this.state = MegaTransfer.STATE_COMPLETED;
+        this.size = transfer.getSize();
+        this.nodeHandle = transfer.getNodeHandle();
         this.path = removeLastFileSeparator(getSDCardTargetUri(transfer.getAppData()));
         this.timeStamp = System.currentTimeMillis();
         this.error = getString(R.string.api_ok);
         this.originalPath = transfer.getPath();
+        this.parentHandle = transfer.getParentHandle();
         setIsOfflineFile(false);
     }
 

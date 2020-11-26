@@ -1436,8 +1436,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			String appData = transfer.getAppData();
 
 			if (!isTextEmpty(appData) && appData.contains(APP_DATA_SD_CARD)) {
-				dbH.addSDTransfer(new SDTransfer(transfer.getTag(), transfer.getFileName(),
-						transfer.getPath(), appData));
+				dbH.addSDTransfer(new SDTransfer(
+						transfer.getTag(),
+						transfer.getFileName(),
+						getSizeString(transfer.getTotalBytes()),
+						Long.toString(transfer.getNodeHandle()),
+						transfer.getParentHandle(),
+						transfer.getPath(),
+						appData));
 			}
 
 			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
