@@ -128,7 +128,7 @@ public class ExportListener extends BaseListener {
             if (shareIntent != null) {
                 startShareIntent(context, shareIntent, request.getLink());
             } else if (context instanceof GetLinkActivity) {
-                ((GetLinkActivity) context).setLink(request.getLink());
+                ((GetLinkActivity) context).setLink();
             }
         } else {
             logError("Error exporting node: " + e.getErrorString());

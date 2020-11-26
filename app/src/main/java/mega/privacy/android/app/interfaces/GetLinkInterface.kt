@@ -6,7 +6,8 @@ interface GetLinkInterface {
     fun showFragment(visibleFragment: Int)
     fun getNode(): MegaNode
     fun shareLink(link: String)
-    fun copyLink(link: String)
+    fun copyLinkOrKey(linkOrKey: String, isLink: Boolean)
     fun startSetPassword()
-    fun setLink(link: String)
+    fun setLink()
+    fun exportNode()
 }

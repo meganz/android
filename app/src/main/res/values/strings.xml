@@ -2937,4 +2937,6 @@
     <string name="explanation_send_decrypted_key_separately" context="Explanation option to send separated the link and decrypted key">Export link and decrypted key separately.</string>
     <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Learn more</string>
     <string name="button_copy_key" context="Button which action is copy the key of a link">Copy key</string>
+    <string name="link_copied_clipboard" context="Confirmation show informing a link it’s copied to the clipboard">Link ready to be pasted.</string>
+    <string name="key_copied_clipboard" context="Confirmation show informing a key link it’s copied to the clipboard">Key ready to be pasted.</string>
 </resources>

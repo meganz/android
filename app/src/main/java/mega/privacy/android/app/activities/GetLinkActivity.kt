@@ -13,6 +13,7 @@ import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.fragments.getLinkFragments.CopyrightFragment
 import mega.privacy.android.app.fragments.getLinkFragments.GetLinkFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
+import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
 import mega.privacy.android.app.utils.Constants.HANDLE
@@ -30,8 +31,8 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
     private var getLinkFragment: GetLinkFragment? = null
     private var copyrightFragment: CopyrightFragment? = null
 
+    private lateinit var nC: NodeController
     private lateinit var node: MegaNode
-    private lateinit var link: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +48,8 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
             finish()
             return
         }
+
+        nC = NodeController(this)
 
         node = megaApi.getNodeByHandle(handle)
 
@@ -115,19 +118,29 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
         startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)))
     }
 
-    override fun copyLink(link: String) {
+    override fun copyLinkOrKey(linkOrKey: String, isLink: Boolean) {
         val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, link)
+        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, linkOrKey)
         clipManager.setPrimaryClip(clip)
-        showSnackbar(getString(R.string.file_properties_get_link))
+        showSnackbar(
+            getString(
+                if (isLink) R.string.link_copied_clipboard
+                else R.string.key_copied_clipboard
+            )
+        )
     }
 
     override fun startSetPassword() {
 
     }
 
-    override fun setLink(link: String) {
-        this.link = link
+    override fun setLink() {
+        node = megaApi.getNodeByHandle(node.handle)
+        getLinkFragment?.updateLink()
+    }
+
+    override fun exportNode() {
+        nC.exportLink(node)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
