@@ -5,7 +5,6 @@ data class SDTransfer(
     val name: String,
     val size: String,
     val nodeHandle: String,
-    val parentHandle: Long,
     val path: String,
     val appData: String
 )

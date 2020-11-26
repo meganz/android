@@ -13,10 +13,11 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AndroidCompletedTransfer implements Parcelable {
 
@@ -70,11 +71,11 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.state = MegaTransfer.STATE_COMPLETED;
         this.size = transfer.getSize();
         this.nodeHandle = transfer.getNodeHandle();
-        this.path = removeLastFileSeparator(getSDCardTargetUri(transfer.getAppData()));
+        this.path = removeLastFileSeparator(getSDCardTargetPath(transfer.getAppData()));
         this.timeStamp = System.currentTimeMillis();
         this.error = getString(R.string.api_ok);
         this.originalPath = transfer.getPath();
-        this.parentHandle = transfer.getParentHandle();
+        this.parentHandle = INVALID_HANDLE;
         setIsOfflineFile(false);
     }
 

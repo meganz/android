@@ -248,19 +248,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_SD_TRANSFERS_NAME = "sdtransfername";
 	private static final String KEY_SD_TRANSFERS_SIZE = "sdtransfersize";
 	private static final String KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle";
-	private static final String KEY_SD_TRANSFERS_PARENT_HANDLE = "sdtransferparenthandle";
 	private static final String KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata";
     private static final String KEY_SD_TRANSFERS_PATH = "sdtransferpath";
 	private static final String CREATE_SD_TRANSFERS_TABLE = "CREATE TABLE IF NOT EXISTS "
 			+ TABLE_SD_TRANSFERS + "("
-			+ KEY_ID + " INTEGER PRIMARY KEY, "             //0
-			+ KEY_SD_TRANSFERS_TAG + " INTEGER, "           //1
-			+ KEY_SD_TRANSFERS_SIZE + " TEXT, "             //2
-			+ KEY_SD_TRANSFERS_HANDLE + " TEXT, "           //3
-			+ KEY_SD_TRANSFERS_PARENT_HANDLE + " TEXT, "	//4
-			+ KEY_SD_TRANSFERS_NAME + " TEXT, "             //5
-			+ KEY_SD_TRANSFERS_PATH + " TEXT, "             //6
-			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";         //7
+			+ KEY_ID + " INTEGER PRIMARY KEY, " 	//0
+			+ KEY_SD_TRANSFERS_TAG + " INTEGER, "	//1
+			+ KEY_SD_TRANSFERS_NAME + " TEXT, "		//2
+			+ KEY_SD_TRANSFERS_SIZE + " TEXT, "		//3
+			+ KEY_SD_TRANSFERS_HANDLE + " TEXT, "	//4
+			+ KEY_SD_TRANSFERS_PATH + " TEXT, "		//5
+			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";	//6
 
     private static DatabaseHandler instance;
 
@@ -1885,6 +1883,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		return id;
+	}
+
+	/**
+	 * Checks if a completed transfer exists before add it to DB.
+	 * If so, does nothing. If not, adds the transfer to the DB.
+	 *
+	 * @param transfer The transfer to check and add.
+	 */
+	public void setCompletedTransferWitCheck(AndroidCompletedTransfer transfer){
+		if (alreadyExistsAsCompletedTransfer(transfer)) {
+			return;
+		}
+
+		setCompletedTransfer(transfer);
+	}
+
+	/**
+	 * Checks if a completed transfer exists.
+	 *
+	 * @param transfer The completed transfer to check.
+	 * @return True if the transfer already exists, false otherwise.
+	 */
+	private boolean alreadyExistsAsCompletedTransfer(AndroidCompletedTransfer transfer) {
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS
+				+ " WHERE " + KEY_TRANSFER_FILENAME + " = '" + encrypt(transfer.getFileName())
+				+ "' AND " + KEY_TRANSFER_TYPE + " = '" + encrypt(transfer.getType() + "")
+				+ "' AND " + KEY_TRANSFER_STATE + " = '" + encrypt(transfer.getState() + "")
+				+ "' AND " + KEY_TRANSFER_SIZE + " = '" + encrypt(transfer.getSize())
+				+ "' AND " + KEY_TRANSFER_HANDLE + " = '" + encrypt(transfer.getNodeHandle())
+				+ "' AND " + KEY_TRANSFER_PATH + " = '" + encrypt(transfer.getPath())
+				+ "' AND " + KEY_TRANSFER_OFFLINE + " = '" + encrypt(transfer.getIsOfflineFile() + "")
+				+ "' AND " + KEY_TRANSFER_ERROR + " = '" + encrypt(transfer.getError())
+				+ "' AND " + KEY_TRANSFER_ORIGINAL_PATH + " = '" + encrypt(transfer.getOriginalPath())
+				+ "' AND " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt(transfer.getParentHandle() + "") + "'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		return cursor != null && cursor.getCount() > 0;
 	}
 
 	public void emptyCompletedTransfers(){
@@ -4215,15 +4250,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor != null && cursor.moveToLast()) {
 			do {
-				int tag = Integer.parseInt(decrypt(cursor.getString(1)));
+				int tag = Integer.parseInt(cursor.getString(1));
 				String name = decrypt(cursor.getString(2));
 				String size = decrypt(cursor.getString(3));
 				String nodeHandle = decrypt(cursor.getString(4));
-				long parentHandle = Long.parseLong(decrypt(cursor.getString(5)));
-				String path = decrypt(cursor.getString(6));
-				String appData = decrypt(cursor.getString(7));
+				String path = decrypt(cursor.getString(5));
+				String appData = decrypt(cursor.getString(6));
 
-				sdTransfers.add(new SDTransfer(tag, name, size, nodeHandle, parentHandle, path, appData));
+				sdTransfers.add(new SDTransfer(tag, name, size, nodeHandle, path, appData));
 			} while (cursor.moveToPrevious());
 
 			cursor.close();
@@ -4234,11 +4268,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public long addSDTransfer(SDTransfer transfer) {
 		ContentValues values = new ContentValues();
-		values.put(KEY_SD_TRANSFERS_TAG, encrypt(Integer.toString(transfer.getTag())));
+		values.put(KEY_SD_TRANSFERS_TAG, transfer.getTag());
 		values.put(KEY_SD_TRANSFERS_NAME, encrypt(transfer.getName()));
 		values.put(KEY_SD_TRANSFERS_SIZE, encrypt(transfer.getSize()));
 		values.put(KEY_SD_TRANSFERS_HANDLE, encrypt(transfer.getNodeHandle()));
-		values.put(KEY_SD_TRANSFERS_PARENT_HANDLE, encrypt(Long.toString(transfer.getParentHandle())));
 		values.put(KEY_SD_TRANSFERS_PATH, encrypt(transfer.getPath()));
 		values.put(KEY_SD_TRANSFERS_APP_DATA, encrypt(transfer.getAppData()));
 
@@ -4247,7 +4280,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public void removeSDTransfer(int tag) {
 		db.delete(TABLE_SD_TRANSFERS,
-				KEY_SD_TRANSFERS_TAG + "=" + encrypt(Integer.toString(tag)),
+				KEY_SD_TRANSFERS_TAG + "=" + tag,
 				null);
 	}
 }

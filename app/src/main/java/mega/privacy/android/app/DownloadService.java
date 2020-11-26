@@ -1441,7 +1441,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						transfer.getFileName(),
 						getSizeString(transfer.getTotalBytes()),
 						Long.toString(transfer.getNodeHandle()),
-						transfer.getParentHandle(),
 						transfer.getPath(),
 						appData));
 			}

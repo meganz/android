@@ -129,6 +129,7 @@ public class SDCardUtils {
                 if (finalDownload.exists() && finalDownload.length() == originalDownload.length()) {
                     originalDownload.delete();
                     dbH.removeSDTransfer(sdtransfer.getTag());
+                    continue;
                 }
 
                 logWarning("Movement incomplete");
@@ -141,7 +142,7 @@ public class SDCardUtils {
                     logError("Error moving file to the sd card path", e);
                 }
 
-                dbH.setCompletedTransfer(new AndroidCompletedTransfer(sdtransfer));
+                dbH.setCompletedTransferWitCheck(new AndroidCompletedTransfer(sdtransfer));
             }
         }).start();
     }
