@@ -148,8 +148,8 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private int getPeekHeight() {
         int numOptions = items_layout.getChildCount();
         int numOptionsVisibles = 0;
-        int heightChild = px2dp(HEIGHT_CHILD, outMetrics);
-        int peekHeight = px2dp(heightHeader, outMetrics);
+        int heightChild = dp2px(HEIGHT_CHILD, outMetrics);
+        int peekHeight = dp2px(heightHeader, outMetrics);
 
         for (int i = 0; i < numOptions; i++) {
             if (getItemsLayoutChildAt(i).getVisibility() == VISIBLE) {

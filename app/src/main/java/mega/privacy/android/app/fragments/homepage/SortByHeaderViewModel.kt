@@ -7,20 +7,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_MODIFICATION_DESC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_ASC
-import nz.mega.sdk.MegaApiJava.ORDER_SIZE_DESC
+import nz.mega.sdk.MegaApiJava.*
 
 class SortByHeaderViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
     var order = ORDER_DEFAULT_ASC
         private set
     var isList = true
@@ -57,7 +52,7 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     fun switchListGrid() {
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_VIEW)
         intent.putExtra(Constants.INTENT_EXTRA_KEY_IS_LIST, !isList)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        context.sendBroadcast(intent)
     }
 
     override fun onCleared() {

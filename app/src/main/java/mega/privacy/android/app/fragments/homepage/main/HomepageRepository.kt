@@ -2,21 +2,21 @@ package mega.privacy.android.app.fragments.homepage.main
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.listeners.DefaultMegaChatListener
-import mega.privacy.android.app.listeners.DefaultMegaGlobalListener
-import mega.privacy.android.app.listeners.DefaultMegaRequestListener
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import java.util.*
 import javax.inject.Inject
@@ -25,74 +25,25 @@ class HomepageRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context
-) : DefaultMegaGlobalListener, DefaultMegaChatListener {
+) {
 
-    private val notification = MutableLiveData<Int>()
     private val chatStatus = MutableLiveData<Int>()
     private val bannerList = MutableLiveData<MegaBannerList>()
 
-    fun getNotificationLiveData(): LiveData<Int> {
-        updateNotificationCount()
-        return notification
-    }
-
-    fun getChatStatusLiveData(): LiveData<Int> {
-        updateChatStatus(megaChatApi.onlineStatus)
-        return chatStatus
-    }
 
     fun getBannerListLiveData(): LiveData<MegaBannerList?> {
         return bannerList
     }
 
-    private fun updateNotificationCount() {
-        notification.value =
-            megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
-    }
+    fun getNotificationCount(): Int =
+        megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
 
-    fun registerDataListeners() {
-        megaApi.addGlobalListener(this)
-        megaChatApi.addChatListener(this)
-    }
-
-    fun unregisterDataListeners() {
-        megaApi.removeGlobalListener(this)
-        megaChatApi.removeChatListener(this)
-    }
-
-    override fun onUserAlertsUpdate(
-        api: MegaApiJava,
-        userAlerts: ArrayList<MegaUserAlert>?
-    ) {
-        updateNotificationCount()
-    }
-
-    override fun onContactRequestsUpdate(
-        api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?
-    ) {
-        updateNotificationCount()
-    }
-
-    override fun onChatOnlineStatusUpdate(
-        api: MegaChatApiJava,
-        userhandle: Long,
-        status: Int,
-        inProgress: Boolean
-    ) {
-        if (userhandle == megaChatApi.myUserHandle) {
-            updateChatStatus(status)
-        }
-    }
-
-    private fun updateChatStatus(status: Int) {
-        chatStatus.value = when (status) {
-            MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online
-            MegaChatApi.STATUS_AWAY -> R.drawable.ic_away
-            MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy
-            MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline
-            else -> 0
-        }
+    fun getChatStatusDrawableId(status: Int) = when (status) {
+        MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online
+        MegaChatApi.STATUS_AWAY -> R.drawable.ic_away
+        MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy
+        MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline
+        else -> 0
     }
 
     suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
@@ -102,10 +53,10 @@ class HomepageRepository @Inject constructor(
     }
 
     suspend fun loadAvatar(): Pair<Boolean, Bitmap>? = withContext(Dispatchers.IO) {
-        Util.getCircleAvatar(context, megaApi.myEmail)
+        getCircleAvatar(context, megaApi.myEmail)
     }
 
-    suspend fun createAvatar(listener: DefaultMegaRequestListener) = withContext(Dispatchers.IO) {
+    suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
             CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
@@ -114,18 +65,34 @@ class HomepageRepository @Inject constructor(
     }
 
     suspend fun loadBannerList() = withContext(Dispatchers.IO) {
-        megaApi.getBanners(object : DefaultMegaRequestListener {
+        megaApi.getBanners(object : BaseListener(MegaApplication.getInstance()) {
             override fun onRequestFinish(
                 api: MegaApiJava,
                 request: MegaRequest,
                 e: MegaError
             ) {
+                Log.i("Alex", "error:${e.errorString}")
                 if (e.errorCode == MegaError.API_OK) {
+                    Log.i("Alex", "bannerlistsize:${request.megaBannerList.size()}")
+//                    for (i in 0 until request.megaBannerList.size()) {
+//                        bannerList.value[i] = request.megaBannerList[i]
+//                    }
                     bannerList.value = request.megaBannerList
                 }
             }
         })
     }
+
+//    fun recentActionsToArray(recentActionList: MegaRecentActionBucketList?): ArrayList<MegaRecentActionBucket>? {
+//        if (recentActionList == null) {
+//            return null
+//        }
+//        val result = ArrayList<MegaRecentActionBucket>(recentActionList.size())
+//        for (i in 0 until recentActionList.size()) {
+//            result.add(recentActionList[i].copy())
+//        }
+//        return result
+//    }
 
     fun isRootNodeNull() = (megaApi.rootNode == null)
 }

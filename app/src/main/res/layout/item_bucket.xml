@@ -125,7 +125,7 @@
                     android:choiceMode="multipleChoice"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingLeft="70dp" />
+                    android:paddingStart="70dp" />
             </mega.privacy.android.app.components.NestedScrollableHost>
 
         </LinearLayout>

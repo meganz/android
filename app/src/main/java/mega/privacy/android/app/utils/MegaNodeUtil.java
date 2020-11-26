@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -39,7 +39,7 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -219,6 +219,34 @@ public class MegaNodeUtil {
 
             return dialog;
         }
+    }
+
+    /**
+     * Gets the root parent folder of a node.
+     *
+     * @param node  MegaNode to get its root parent path
+     * @return The path of the root parent of the node.
+     */
+    public static String getParentFolderPath(MegaNode node) {
+        if (node != null) {
+            MegaApplication app = MegaApplication.getInstance();
+            MegaApiAndroid megaApi = app.getMegaApi();
+            String path = megaApi.getNodePath(node);
+
+            while (megaApi.getParentNode(node) != null) {
+                node = megaApi.getParentNode(node);
+            }
+
+            if (node.getHandle() == megaApi.getRootNode().getHandle()) {
+                return app.getString(R.string.section_cloud_drive) + path;
+            } else if (node.getHandle() == megaApi.getRubbishNode().getHandle()) {
+                return app.getString(R.string.section_rubbish_bin) + path.replace("bin" + SEPARATOR, "");
+            } else if (node.isInShare()) {
+                return app.getString(R.string.title_incoming_shares_explorer) + SEPARATOR + path.substring(path.indexOf(":") + 1);
+            }
+        }
+
+        return "";
     }
 
     /**
@@ -490,6 +518,22 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Gets the parent MegaNode of the highest level in tree of the node passed by param.
+     *
+     * @param node  MegaNode to check
+     * @return The root parent MegaNode
+     */
+    public static MegaNode getRootParentNode(MegaNode node) {
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+
+        while (megaApi.getParentNode(node) != null) {
+            node = megaApi.getParentNode(node);
+        }
+
+        return node;
+    }
+
+    /**
      * Checks if it is on Links section and in root level.
      *
      * @param adapterType   current section
@@ -545,6 +589,41 @@ public class MegaNodeUtil {
     }
 
     /**
+     * Gets the parent outgoing or incoming MegaNode folder of a node.
+     *
+     * @param node  MegaNode to get its parent
+     * @return The outgoing or incoming parent folder.
+     */
+    public static MegaNode getOutgoingOrIncomingParent(MegaNode node) {
+        if (isOutgoingOrIncomingFolder(node)) {
+            return node;
+        }
+
+        MegaNode parentNode = node;
+        MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
+
+        while (megaApi.getParentNode(parentNode) != null) {
+            parentNode = megaApi.getParentNode(parentNode);
+
+            if (isOutgoingOrIncomingFolder(parentNode)) {
+                return parentNode;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if a node is an outgoing or an incoming folder.
+     *
+     * @param node  MegaNode to check
+     * @return  True if the node is an outgoing or incoming folder, false otherwise.
+     */
+    private static boolean isOutgoingOrIncomingFolder(MegaNode node) {
+        return node.isOutShare() || node.isInShare();
+    }
+
+    /*
      * Check if all nodes can be moved to rubbish bin.
      *
      * @param nodes nodes to check
@@ -637,17 +716,34 @@ public class MegaNodeUtil {
                 .setNegativeButton(R.string.general_cancel, null).show();
     }
 
-    public static String[] getSerializedNodesFromBucket(MegaRecentActionBucket bucket) {
-        if (bucket != null) {
-            MegaNodeList nodeList = bucket.getNodes();
-            if (nodeList != null) {
-                String[] serializedNodes = new String[nodeList.size()];
-                for (int i = 0; i < nodeList.size(); i++) {
-                    serializedNodes[i] = nodeList.get(i).serialize();
+    /**
+     * Checks if a folder node is empty.
+     * If a folder is empty means although contains more folders inside,
+     * all of them don't contain any file.
+     *
+     * @param node  MegaNode to check.
+     * @return  True if the folder is folder and is empty, false otherwise.
+     */
+    public static boolean isEmptyFolder(MegaNode node) {
+        if (node == null || node.isFile()) {
+            return false;
+        }
+
+        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+        List<MegaNode> children = megaApi.getChildren(node);
+
+        if (children != null && !children.isEmpty()) {
+            for (MegaNode child : children) {
+                if (child == null) {
+                    continue;
                 }
-                return serializedNodes;
+
+                if (child.isFile() || !isEmptyFolder(child)) {
+                    return false;
+                }
             }
         }
-        return null;
+
+        return true;
     }
 }

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -15,7 +14,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -24,7 +22,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.ExifInterface;
@@ -36,13 +33,11 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
-import android.util.Pair;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -50,6 +45,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -57,8 +53,6 @@ import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +93,6 @@ import java.util.regex.Pattern;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import dagger.hilt.android.qualifiers.ApplicationContext;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -124,7 +117,6 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.isFileAvailable;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -174,36 +166,29 @@ public class Util {
 		if(activity == null){
 			return;
 		}
-		
-		try{ 
+
+		try{
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
-			dialogBuilder.setPositiveButton(
-				activity.getString(android.R.string.ok),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-						if (finish) {
-							activity.finish();
-						}
-					}
-				});
-			dialogBuilder.setOnCancelListener(new OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					if (finish) {
-						activity.finish();
-					}
+			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
+				dialog.dismiss();
+				if (finish) {
+					activity.finish();
 				}
 			});
-		
-		
+			dialogBuilder.setOnCancelListener(dialog -> {
+				if (finish) {
+					activity.finish();
+				}
+			});
+
 			AlertDialog dialog = dialogBuilder.create();
-			dialog.show(); 
+			dialog.setCanceledOnTouchOutside(false);
+			dialog.setCancelable(false);
+			dialog.show();
 			brandAlertDialog(dialog);
 		}
 		catch(Exception ex){
-			Util.showToast(activity, message); 
+			Util.showToast(activity, message);
 		}
 	}
 	
@@ -451,22 +436,14 @@ public class Util {
 	/**
 	 * Convert dp to px.
 	 *
-	 * Note: the name of this function is wrong since the beginning, we should rename it in
-	 * the future.
-	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
-	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
+	public static int dp2px(float dp, DisplayMetrics outMetrics) {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 
-	public static int dp2px (float dp, DisplayMetrics outMetrics) {
-		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
-	}
-	
 	/*
 	 * AES encryption
 	 */
@@ -529,34 +506,54 @@ public class Util {
 	    }
 	    return false;
 	}
-	
-	public static String getSizeString(long size){
-		String sizeString = "";
-		DecimalFormat decf = new DecimalFormat("###.##");
+
+	/**
+	 * Gets a speed or size string.
+	 *
+	 * @param unit		the unit to show in the string
+	 * @param isSpeed	true if the string is a speed, false if it is a size
+	 * @return The speed or size string.
+	 */
+	private static String getUnitString(long unit, boolean isSpeed) {
+		Context context = MegaApplication.getInstance().getApplicationContext();
+		DecimalFormat df = new DecimalFormat("#.##");
 
 		float KB = 1024;
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
 
-		Context context = MegaApplication.getInstance().getApplicationContext();
-		if (size < KB){
-			sizeString = context.getString(R.string.label_file_size_byte, Long.toString(size));
+		if (unit < KB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+		} else if (unit < MB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+		} else if (unit < GB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+		} else if (unit < TB) {
+			return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+		} else {
+			return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
 		}
-		else if (size < MB){
-			sizeString = context.getString(R.string.label_file_size_kilo_byte, decf.format(size/KB));
-		}
-		else if (size < GB){
-			sizeString = context.getString(R.string.label_file_size_mega_byte, decf.format(size/MB));
-		}
-		else if (size < TB){
-			sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(size/GB));
-		}
-		else{
-			sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(size/TB));
-		}
-		
-		return sizeString;
+	}
+
+	/**
+	 * Gets a speed string.
+	 *
+	 * @param speed	the speed to show in the string
+	 * @return The speed string.
+	 */
+	public static String getSpeedString (long speed){
+		return getUnitString(speed, true);
+	}
+
+	/**
+	 * Gets a size string.
+	 *
+	 * @param size	the size to show in the string
+	 * @return The size string.
+	 */
+	public static String getSizeString(long size){
+		return getUnitString(size, false);
 	}
 
     public static String getSizeStringGBBased(long gbSize){
@@ -633,37 +630,6 @@ public class Util {
 				Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 		return sb;
 	}
-
-	public static String getSpeedString (long speed){
-		String speedString = "";
-		double speedDouble = 0;
-		DecimalFormat df = new DecimalFormat("#.##");
-		
-		if (speed > 1024){
-			if (speed > 1024*1024){
-				if (speed > 1024*1024*1024){
-					speedDouble = speed / (1024.0*1024.0*1024.0);
-					speedString = df.format(speedDouble) + " GB/s";
-				}
-				else{
-					speedDouble = speed / (1024.0*1024.0);
-					speedString = df.format(speedDouble) + " MB/s";
-				}
-			}
-			else{
-				speedDouble = speed / 1024.0;
-				speedString = df.format(speedDouble) + " KB/s";	
-			}
-		}
-		else{
-			speedDouble = speed;
-			speedString = df.format(speedDouble) + " B/s";
-		}
-		
-		return speedString;
-	}
-
-
 
 	public static String getPhotoSyncName (long timeStamp, String fileName){
         DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN,Locale.getDefault());
@@ -1296,46 +1262,6 @@ public class Util {
 	    return hasNotVerified && allowVerify;
     }
 
-    @Nullable
-    public static Pair<Boolean, Bitmap> getCircleAvatar(Context context, String email) {
-		File avatar = buildAvatarFile(context, email + ".jpg");
-		if (!(isFileAvailable(avatar) && avatar.length() > 0)) {
-			return Pair.create(false, null);
-		}
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-
-		// Calculate inSampleSize
-		options.inSampleSize = calculateInSampleSize(options, 250, 250);
-		// Decode bitmap with inSampleSize set
-		options.inJustDecodeBounds = false;
-
-		Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
-		if (bitmap == null) {
-			avatar.delete();
-			return Pair.create(false, null);
-		}
-
-		Bitmap circleBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(),
-				Bitmap.Config.ARGB_8888);
-		BitmapShader shader = new BitmapShader(bitmap, Shader.TileMode.CLAMP,
-				Shader.TileMode.CLAMP);
-		Paint paint = new Paint();
-		paint.setShader(shader);
-
-		Canvas canvas = new Canvas(circleBitmap);
-		int radius;
-		if (bitmap.getWidth() < bitmap.getHeight()) {
-			radius = bitmap.getWidth() / 2;
-		} else {
-			radius = bitmap.getHeight() / 2;
-		}
-
-		canvas.drawCircle(bitmap.getWidth() / 2F, bitmap.getHeight() / 2F, radius, paint);
-		return Pair.create(true, circleBitmap);
-	}
-
 	public static Bitmap getCircleBitmap(Bitmap bitmap) {
 		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
 				bitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -1478,7 +1404,7 @@ public class Util {
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: px2dp(24, context.getResources().getDisplayMetrics());
+				: dp2px(24, context.getResources().getDisplayMetrics());
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
@@ -1778,8 +1704,7 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
+	public static Spanned getSpannedHtmlText(String string) {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
 		}
@@ -1838,6 +1763,14 @@ public class Util {
 		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
 	}
 
+	public static boolean isAndroidOreoOrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+	}
+
+	public static boolean isAndroidNougatOrUpper() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+	}
+
 	public static void setPasswordToggle(TextInputLayout textInputLayout, boolean focus){
 		if (focus) {
 			textInputLayout.setEndIconMode(END_ICON_PASSWORD_TOGGLE);
@@ -1866,7 +1799,7 @@ public class Util {
 	 * @param outMetrics	DisplayMetrics of the current device.
 	 */
 	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
-		float elevation = px2dp(4, outMetrics);
+		float elevation = dp2px(4, outMetrics);
 
 		if (withElevation) {
 			aB.setElevation(elevation);
@@ -1892,5 +1825,18 @@ public class Util {
 	public static LocalDate fromEpoch(long seconds) {
 		return LocalDate.from(
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
+	}
+
+	/**
+	 * Method for displaying a snack bar when is Offline.
+	 *
+	 * @return True, is is Offline. False it is Online.
+	 */
+	public static boolean isOffline(Context context) {
+		if (!isOnline(context)) {
+			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+			return true;
+		}
+		return false;
 	}
 }

@@ -6,11 +6,7 @@ import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
-import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -50,7 +46,7 @@ class ActionModeCallback constructor(
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 LogUtil.logDebug("Public link option")
                 if (selectedNodes.size == 1) {
-                    selectedNodes[0]?.let {
+                    selectedNodes[0].let {
                         if (it.handle != MegaApiJava.INVALID_HANDLE) {
                             mainActivity.showGetLinkActivity(it.handle)
                         }

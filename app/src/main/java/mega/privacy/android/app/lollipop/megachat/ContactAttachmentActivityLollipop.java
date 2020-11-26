@@ -240,7 +240,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
 		contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-		LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+		registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 
 	@Override
@@ -263,7 +263,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
     		megaApi.removeRequestListener(this);
     	}
 
-    	LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
+    	unregisterReceiver(contactUpdateReceiver);
     }
 
 	public void showOptionsPanel(String email){
@@ -383,8 +383,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 					for(int i=0;i<contacts.size();i++){
 						String handle = contacts.get(i).getHandle();
-						long userHandle = megaApi.base64ToUserHandle(handle);
-						contactHandles.add(userHandle);
+						contactHandles.add(Long.parseLong(handle));
 					}
 
 					startGroupConversation(contactHandles);
@@ -428,23 +427,21 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			logDebug("There is already a chat, open it!");
 			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
 			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+			intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
 			finish();
 //			intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			this.startActivity(intentOpenChat);
 		}
 	}
 
-	public void startGroupConversation(ArrayList<Long> userHandles){
-		logDebug("startGroupConversation");
+	private void startGroupConversation(ArrayList<Long> userHandles){
 		MegaChatPeerList peers = MegaChatPeerList.createInstance();
 
-		for(int i=0;i<userHandles.size();i++){
-			long handle = userHandles.get(i);
+		for (long handle : userHandles) {
 			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
 		}
 
-		megaChatApi.createChat(false, peers, this);
+		megaChatApi.createChat(true, peers, this);
 	}
 
 	@Override
@@ -467,7 +464,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 				logDebug("Open new chat");
 				Intent intent = new Intent(this, ChatActivityLollipop.class);
 				intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-				intent.putExtra("CHAT_ID", request.getChatHandle());
+				intent.putExtra(CHAT_ID, request.getChatHandle());
 				finish();
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				this.startActivity(intent);

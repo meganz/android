@@ -33,21 +33,26 @@ class OfflineAdapter(
 
     fun getThumbnailLocationOnScreen(holder: ViewHolder): IntArray? {
         var thumbnail: View? = null
+
         if (holder is OfflineGridFileViewHolder) {
             thumbnail = holder.getThumbnailView()
         } else if (holder is OfflineListViewHolder) {
             thumbnail = holder.getThumbnailView()
         }
+
         if (thumbnail == null) {
             return null
         }
+
         val topLeft = IntArray(2)
         thumbnail.getLocationOnScreen(topLeft)
+
         return intArrayOf(topLeft[0], topLeft[1], thumbnail.width, thumbnail.height)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OfflineViewHolder {
         val inflater = LayoutInflater.from(parent.context)
+
         return when (viewType) {
             TYPE_GRID_FOLDER -> OfflineGridFolderViewHolder(
                 OfflineItemGridFolderBinding.inflate(inflater, parent, false),
@@ -70,6 +75,7 @@ class OfflineAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val node = getItem(position)
+
         return when {
             node == OfflineNode.HEADER -> TYPE_HEADER
             isList -> TYPE_LIST
@@ -80,6 +86,7 @@ class OfflineAdapter(
 
     override fun getItemId(position: Int): Long {
         val node = getItem(position)
+
         return if (node == OfflineNode.HEADER || node == OfflineNode.PLACE_HOLDER) {
             // id for real node should be positive integer, let's use negative for placeholders
             -position.toLong()

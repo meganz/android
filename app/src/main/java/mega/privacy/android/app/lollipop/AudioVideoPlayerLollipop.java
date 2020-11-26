@@ -31,7 +31,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -40,6 +39,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -57,7 +57,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -92,7 +91,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import java.io.File;
-import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -155,6 +153,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -165,13 +164,13 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHand
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static android.graphics.Color.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class AudioVideoPlayerLollipop extends DownloadableActivity implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
@@ -179,6 +178,16 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
             = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
+
+    private static final int DIALOG_VIEW_MARGIN_LEFT_DP = 20;
+    private static final int DIALOG_VIEW_MARGIN_RIGHT_DP = 17;
+    private static final int DIALOG_VIEW_MARGIN_TOP_DP = 10;
+    private static final int DIALOG_VIEW_MARGIN_TOP_LARGE_DP = 20;
+    private static final int FILE_NAME_MAX_WIDTH_DP = 300;
+    private static final int RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT_DP = 3;
+    private static final int REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_LEFT_DP = 25;
+    private static final int REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_TOP_DP = 20;
+    private static final int REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_RIGHT_DP = 10;
 
     private boolean fromChatSavedInstance = false;
     private int[] screenPosition;
@@ -399,12 +408,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         audioVideoPlayerLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
-
-        IntentFilter filter = new IntentFilter(BROADCAST_ACTION_INTENT_CALL_UPDATE);
-        filter.addAction(ACTION_CALL_STATUS_UPDATE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(chatCallUpdateReceiver, filter);
+        registerReceiver(chatCallUpdateReceiver, new IntentFilter(ACTION_CALL_STATUS_UPDATE));
+        registerReceiver(receiver, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG));
+        registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         downloadLocationDefaultPath = getDownloadLocation();
 
@@ -544,12 +550,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
         exoPlayerName = (TextView) findViewById(R.id.exo_name_file);
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
-        }
-        else{
-            exoPlayerName.setMaxWidth(mega.privacy.android.app.utils.Util.scaleWidthPx(300, outMetrics));
-        }
+        exoPlayerName.setMaxWidth(scaleWidthPx(FILE_NAME_MAX_WIDTH_DP, outMetrics));
 
         if (fileName == null) {
             fileName = getFileName(uri);
@@ -577,17 +578,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         containerControls = (RelativeLayout) findViewById(R.id.container_exo_controls);
         controlsButtonsLayout = (RelativeLayout) findViewById(R.id.container_control_buttons);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
-            RelativeLayout.LayoutParams params2 = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
-            RelativeLayout.LayoutParams params3 = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
-            params1.setMargins(0, 0, 0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params2.setMargins(0,0,0, mega.privacy.android.app.utils.Util.px2dp(5, outMetrics));
-            params3.addRule(RelativeLayout.ABOVE, containerControls.getId());
-            exoPlayerName.setLayoutParams(params1);
-            controlsButtonsLayout.setLayoutParams(params2);
-            audioContainer.setLayoutParams(params3);
-        }
+        setControllerLayoutParam();
 
         previousButton = (ImageButton) findViewById(R.id.exo_prev);
         previousButton.setOnTouchListener(this);
@@ -764,14 +755,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
 
-                logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
-                if(megaApi.getBandwidthOverquotaDelay()>0){
-                    if(alertDialogTransferOverquota==null){
-                        showTransferOverquotaDialog();
-                    }
-                    else if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
+                if (isOnTransferOverQuota()) {
+                    showGeneralTransferOverQuotaWarning();
                 }
             }
         }
@@ -841,6 +826,42 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         }
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        setControllerLayoutParam();
+    }
+
+    /**
+     * Update controller layout parameters according to screen orientation.
+     */
+    private void setControllerLayoutParam() {
+        RelativeLayout.LayoutParams paramsName = (RelativeLayout.LayoutParams) exoPlayerName.getLayoutParams();
+        RelativeLayout.LayoutParams paramsControlButtons = (RelativeLayout.LayoutParams) controlsButtonsLayout.getLayoutParams();
+        RelativeLayout.LayoutParams paramsAudioContainer = (RelativeLayout.LayoutParams) audioContainer.getLayoutParams();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            paramsName.setMargins(0, 0, 0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_file_name_margin_bottom_landscape));
+            paramsControlButtons.setMargins(0, 0, 0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_control_buttons_margin_bottom_landscape));
+            paramsAudioContainer.addRule(RelativeLayout.ABOVE, containerControls.getId());
+        } else {
+            paramsName.setMargins(0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_file_name_margin_top_portrait),
+                    0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_file_name_margin_bottom_portrait));
+            paramsControlButtons.setMargins(0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_control_buttons_margin_top_portrait),
+                    0,
+                    getResources().getDimensionPixelSize(R.dimen.av_player_control_buttons_margin_bottom_portrait));
+            paramsAudioContainer.removeRule(RelativeLayout.ABOVE);
+        }
+        exoPlayerName.setLayoutParams(paramsName);
+        controlsButtonsLayout.setLayoutParams(paramsControlButtons);
+        audioContainer.setLayoutParams(paramsAudioContainer);
+    }
+
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -890,12 +911,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 long[] handles = getIntent().getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH);
                 getMediaHandles(getSearchedNodes(handles));
             } else if (adapterType == AUDIO_BROWSE_ADAPTER) {
-                getMediaHandles(megaApi.searchByType(null, null, null, true, orderGetChildren,
-                        MegaApiJava.NODE_AUDIO, MegaApiJava.TARGET_ROOTNODES));
+                getMediaHandles(megaApi.searchByType(orderGetChildren, MegaApiJava.FILE_TYPE_AUDIO, MegaApiJava.SEARCH_TARGET_ROOTNODE));
             } else if (adapterType == VIDEO_BROWSE_ADAPTER) {
-                getMediaHandles(megaApi.searchByType(null, null, null, true, orderGetChildren,
-                        MegaApiJava.NODE_VIDEO, MegaApiJava.TARGET_ROOTNODES));
-            }else if (adapterType == FILE_LINK_ADAPTER) {
+                getMediaHandles(megaApi.searchByType(orderGetChildren, MegaApiJava.FILE_TYPE_VIDEO, MegaApiJava.SEARCH_TARGET_ROOTNODE));
+            } else if (adapterType == FILE_LINK_ADAPTER) {
                 if (currentDocument != null) {
                     logDebug("File link node NOT null");
                     size = 1;
@@ -1471,7 +1490,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public void updateScrollPosition(){
@@ -1528,7 +1547,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     public void setImageDragVisibility(int visibility){
@@ -1985,7 +2004,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         shareMenuItem = menu.findItem(R.id.full_video_viewer_share);
         downloadMenuItem = menu.findItem(R.id.full_video_viewer_download);
         chatMenuItem = menu.findItem(R.id.full_video_viewer_chat);
-        chatMenuItem.setIcon(mega.privacy.android.app.utils.Util.mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
+        chatMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_send_to_contact, R.color.white));
         propertiesMenuItem = menu.findItem(R.id.full_video_viewer_properties);
         getlinkMenuItem = menu.findItem(R.id.full_video_viewer_get_link);
         renameMenuItem = menu.findItem(R.id.full_video_viewer_rename);
@@ -1997,7 +2016,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         loopMenuItem = menu.findItem(R.id.full_video_viewer_loop);
         importMenuItem = menu.findItem(R.id.chat_full_video_viewer_import);
         saveForOfflineMenuItem = menu.findItem(R.id.chat_full_video_viewer_save_for_offline);
-        saveForOfflineMenuItem.setIcon(mega.privacy.android.app.utils.Util.mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
+        saveForOfflineMenuItem.setIcon(mutateIconSecondary(this, R.drawable.ic_b_save_offline, R.color.white));
         chatRemoveMenuItem = menu.findItem(R.id.chat_full_video_viewer_remove);
 
         if (nC == null) {
@@ -2567,21 +2586,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
          final long sizeC = size;
          final ChatController chatC = new ChatController(this);
 
-         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-         LinearLayout confirmationLayout = new LinearLayout(this);
-         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-         params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+         Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
+         AlertDialog.Builder builder = pair.first;
+         CheckBox dontShowAgain = pair.second;
 
-         final CheckBox dontShowAgain =new CheckBox(this);
-         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-         dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-         confirmationLayout.addView(dontShowAgain, params);
-
-         builder.setView(confirmationLayout);
-
-         builder.setMessage(getString(R.string.alert_larger_file, mega.privacy.android.app.utils.Util.getSizeString(sizeC)));
+         builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
          builder.setPositiveButton(getString(R.string.general_save_to_device),
                  new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -2601,6 +2610,34 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
          downloadConfirmationDialog = builder.create();
          downloadConfirmationDialog.show();
+    }
+
+    /**
+     * Create an AlertDialog.Builder with a "Do not show again" CheckBox.
+     *
+     * @return the first is AlertDialog.Builder, the second is CheckBox
+     */
+    private Pair<AlertDialog.Builder, CheckBox> confirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        LinearLayout confirmationLayout = new LinearLayout(this);
+        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(
+                scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics),
+                scaleHeightPx(DIALOG_VIEW_MARGIN_TOP_DP, outMetrics),
+                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics),
+                0);
+
+        CheckBox dontShowAgain =new CheckBox(this);
+        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
+        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+
+        confirmationLayout.addView(dontShowAgain, params);
+
+        builder.setView(confirmationLayout);
+
+        return Pair.create(builder, dontShowAgain);
     }
 
     void releasePlaylist(){
@@ -2779,8 +2816,11 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
-        //	    layout.setLayoutParams(params);
+        params.setMargins(
+                scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics),
+                scaleHeightPx(DIALOG_VIEW_MARGIN_TOP_LARGE_DP, outMetrics),
+                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics),
+                0);
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
@@ -2823,7 +2863,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         layout.addView(input, params);
 
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), 0, mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        params1.setMargins(scaleWidthPx(DIALOG_VIEW_MARGIN_LEFT_DP, outMetrics), 0,
+                scaleWidthPx(DIALOG_VIEW_MARGIN_RIGHT_DP, outMetrics), 0);
 
         final RelativeLayout error_layout = new RelativeLayout(AudioVideoPlayerLollipop.this);
         layout.addView(error_layout, params1);
@@ -2845,7 +2886,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
         params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(3, outMetrics), 0, 0, 0);
+        params_text_error.setMargins(scaleWidthPx(RENAME_DIALOG_ERROR_TEXT_MARGIN_LEFT_DP, outMetrics),
+                0, 0, 0);
         textError.setLayoutParams(params_text_error);
 
         textError.setTextColor(ContextCompat.getColor(AudioVideoPlayerLollipop.this, R.color.login_warning));
@@ -3005,7 +3047,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
         TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
 
-        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(25, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(10, outMetrics), 0);
+        ((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(
+                scaleWidthPx(REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_LEFT_DP, outMetrics),
+                scaleHeightPx(REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_TOP_DP, outMetrics),
+                scaleWidthPx(REMOVE_LINK_DIALOG_REMOVE_TEXT_MARGIN_RIGHT_DP, outMetrics), 0);
 
         url.setVisibility(View.GONE);
         key.setVisibility(View.GONE);
@@ -3019,8 +3064,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         display.getMetrics(outMetrics);
         float density = getResources().getDisplayMetrics().density;
 
-        float scaleW = mega.privacy.android.app.utils.Util.getScaleW(outMetrics, density);
-        float scaleH = mega.privacy.android.app.utils.Util.getScaleH(outMetrics, density);
+        float scaleW = getScaleW(outMetrics, density);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
         }else{
@@ -3236,8 +3280,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                     }
                 }
             }
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, (adapterType == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
@@ -3470,9 +3512,9 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
             handler.removeCallbacksAndMessages(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(chatCallUpdateReceiver);
+        unregisterReceiver(receiver);
+        unregisterReceiver(receiverToFinish);
+        unregisterReceiver(chatCallUpdateReceiver);
 
         DRAGGING_THUMBNAIL_CALLBACKS.clear();
 
@@ -3635,15 +3677,7 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
             if (e.getValue() != 0) {
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
-                }
+                showGeneralTransferOverQuotaWarning();
             }
         } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
             showTakenDownAlert(this);
@@ -3653,68 +3687,6 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
         return false;
-    }
-
-
-    public void showTransferOverquotaDialog(){
-        logDebug("showTransferOverquotaDialog");
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-        dialogBuilder.setView(dialogView);
-
-        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-        title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-        icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
-
-        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-
-        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-        paymentButton.setText(getString(R.string.action_upgrade_account));
-
-        alertDialogTransferOverquota = dialogBuilder.create();
-
-        alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                transferOverquota = true;
-                showActionStatusBar();
-            }
-        });
-
-        continueButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-            }
-
-        });
-
-        paymentButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-                showUpgradeAccount();
-            }
-        });
-
-        alertDialogTransferOverquota.setCancelable(false);
-        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-        alertDialogTransferOverquota.show();
-    }
-
-    public void showUpgradeAccount(){
-        logDebug("showUpgradeAccount");
-        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
-        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
-        startActivity(upgradeIntent);
     }
 
     @Override
@@ -3743,8 +3715,8 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
                 handler.removeCallbacksAndMessages(null);
             }
 
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+            unregisterReceiver(receiver);
+            unregisterReceiver(receiverToFinish);
 
             setImageDragVisibility(View.VISIBLE);
         }
@@ -3847,15 +3819,13 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){
         logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
-//		handleToDownload = handle;
-        String externalPath = mega.privacy.android.app.utils.Util.getExternalCardPath();
+        String externalPath = getExternalCardPath();
 
         if(externalPath!=null){
             logDebug("ExternalPath for advancedDevices: " + externalPath);
             MegaNode node = megaApi.getNodeByHandle(handleToDownload);
             if(node!=null){
 
-//				File newFile =  new File(externalPath+"/"+node.getName());
                 File newFile =  new File(node.getName());
                 logDebug("File: " + newFile.getPath());
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -3898,23 +3868,12 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
 
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
+        AlertDialog.Builder builder = pair.first;
+        CheckBox dontShowAgain = pair.second;
 
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-        builder.setMessage(getString(R.string.alert_larger_file, mega.privacy.android.app.utils.Util.getSizeString(sizeC)));
+        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
         builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -3962,21 +3921,10 @@ public class AudioVideoPlayerLollipop extends DownloadableActivity implements Vi
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(mega.privacy.android.app.utils.Util.scaleWidthPx(20, outMetrics), mega.privacy.android.app.utils.Util.scaleHeightPx(10, outMetrics), mega.privacy.android.app.utils.Util.scaleWidthPx(17, outMetrics), 0);
+        Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
+        AlertDialog.Builder builder = pair.first;
+        CheckBox dontShowAgain = pair.second;
 
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
         builder.setPositiveButton(getString(R.string.general_save_to_device),
                 new DialogInterface.OnClickListener() {

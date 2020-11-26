@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/node_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -172,7 +173,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="72dp"
-                    android:background="@color/divider_upgrade_account"/>
+                    android:background="@color/black_12_alpha"/>
             </LinearLayout>
 
             <LinearLayout
@@ -248,12 +249,43 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/view_in_folder_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible"
+                >
+
+                <ImageView
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_view_in_folder"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/view_in_folder_label"
+                    android:layout_marginStart="18dp"
+                    android:textColor="@color/name_my_account"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/separator_download_options"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_link_layout"
@@ -448,7 +480,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
@@ -579,7 +611,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -649,7 +681,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_leave_share_layout"

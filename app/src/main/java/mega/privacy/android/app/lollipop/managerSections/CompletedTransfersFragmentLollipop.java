@@ -1,252 +1,154 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import androidx.core.text.HtmlCompat;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
-import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
-import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.DatabaseHandler.MAX_TRANSFERS;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
-public class CompletedTransfersFragmentLollipop extends Fragment {
-
-	Context context;
-	RecyclerView listView;
-	MegaCompletedTransfersAdapter adapter;
-	
-	MegaApiAndroid megaApi;
-	TextView contentText;
-	ImageView emptyImage;
-	TextView emptyText;
-
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
-	
-	LinearLayoutManager mLayoutManager;
-
-	DatabaseHandler dbH;
-	
-	CompletedTransfersFragmentLollipop transfersFragment = this;
-	
-//	SparseArray<TransfersHolder> transfersListArray = null;
-
-	public ArrayList<AndroidCompletedTransfer> tL = null;
-
-	private Handler handler;
-	
-	@Override
-	public void onCreate (Bundle savedInstanceState){
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-
-		tL = new ArrayList<AndroidCompletedTransfer>();
-		dbH = DatabaseHandler.getDbHandler(context);
-
-		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
-	}
+public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
+	private MegaCompletedTransfersAdapter adapter;
+	public ArrayList<AndroidCompletedTransfer> tL = new ArrayList<>();
 
 	public static CompletedTransfersFragmentLollipop newInstance() {
-		logDebug("newInstance");
-		CompletedTransfersFragmentLollipop fragment = new CompletedTransfersFragmentLollipop();
-		return fragment;
+		return new CompletedTransfersFragmentLollipop();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {  
-		
+							 Bundle savedInstanceState) {
+
 		super.onCreateView(inflater, container, savedInstanceState);
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-	    
-		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
-		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-		mLayoutManager = new LinearLayoutManager(context);
-		listView.setHasFixedSize(true);
-		listView.setItemAnimator(new DefaultItemAnimator());
-		listView.setLayoutManager(mLayoutManager);
-		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				super.onScrolled(recyclerView, dx, dy);
-				if (listView != null) {
-					if (listView.canScrollVertically(-1)) {
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
-				}
-			}
-		});
+		View v = initView(inflater, container);
 
-		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
-		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
+		emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.ic_zero_portrait_transfers : R.drawable.ic_zero_landscape_saved_for_offline);
 
-//		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
-//		emptyText.setText(getString(R.string.completed_transfers_empty));
-
-
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImage.setImageResource(R.drawable.ic_zero_landscape_saved_for_offline);
-		}else{
-			emptyImage.setImageResource(R.drawable.ic_zero_portrait_transfers);
-		}
-
-		String textToShow = String.format(context.getString(R.string.completed_transfers_empty_new));
-		try{
+		String textToShow = context.getString(R.string.completed_transfers_empty_new);
+		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting string", e);
 		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
-		emptyText.setText(result);
-
+		emptyText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		setCompletedTransfers();
 
-		adapter = new MegaCompletedTransfersAdapter(context, this, tL, listView);
-
+		adapter = new MegaCompletedTransfersAdapter(context, tL);
 		listView.setAdapter(adapter);
 
 		return v;
 	}
 
-	public void setCompletedTransfers(){
-		logDebug("setCompletedTransfers");
+	private void setCompletedTransfers() {
 		tL.clear();
 		tL.addAll(dbH.getCompletedTransfers());
+		setEmptyView(tL.size());
+	}
 
-		if(tL!=null){
-			if (tL.size() == 0){
-				emptyImage.setVisibility(View.VISIBLE);
-				emptyText.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
+	/**
+	 * Adds new completed transfer.
+	 *
+	 * @param transfer	the transfer to add
+	 */
+	public void transferFinish(AndroidCompletedTransfer transfer) {
+		if (tL != null) {
+			tL.add(0, transfer);
+
+			if (tL.size() >= MAX_TRANSFERS) {
+				tL.remove(tL.size() - 1);
 			}
-			else{
-				emptyImage.setVisibility(View.GONE);
-				emptyText.setVisibility(View.GONE);
-				listView.setVisibility(View.VISIBLE);
-			}
-		}
-		else{
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-	}
-
-	public void updateCompletedTransfers(){
-		logDebug("updateCompletedTransfers");
-
-		setCompletedTransfers();
-		adapter.notifyDataSetChanged();
-	}
-
-	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
-
-	public int onBackPressed(){
-		
-		if (adapter == null){
-			return 0;
-		}
-		
-		if (adapter.getPositionClicked() != -1){
-			adapter.setPositionClicked(-1);
-			adapter.notifyDataSetChanged();
-			return 1;
-		}
-		else{
-			return 0;
-		}
-	}
-
-    public void transferFinish(AndroidCompletedTransfer transfer){
-		logDebug("transferFinish");
-		if(tL!=null){
-			tL.add(0,transfer);
-		}
-		else{
-			tL = new ArrayList<AndroidCompletedTransfer>();
+		} else {
+			tL = new ArrayList<>();
 			tL.add(transfer);
 		}
 
-		if(tL.size()==1){
-			((ManagerActivityLollipop)context).invalidateOptionsMenu();
+		if (tL.size() == 1) {
+			managerActivity.invalidateOptionsMenu();
 		}
 
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-		else{
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
-		}
+		setEmptyView(tL.size());
 		adapter.notifyDataSetChanged();
+		managerActivity.supportInvalidateOptionsMenu();
 	}
 
-	public boolean isAnyTransferCompleted (){
-		if(tL!=null){
-			if(tL.isEmpty()){
-				return false;
-			}
-			else{
-				return true;
+	/**
+	 * Checks if there is any completed transfer.
+	 *
+	 * @return True if there is any completed transfer, false otherwise.
+	 */
+	public boolean isAnyTransferCompleted() {
+		return !tL.isEmpty();
+	}
+
+	/**
+	 * Removes a completed transfer.
+	 *
+	 * @param transfer	transfer to remove
+	 */
+	public void transferRemoved(AndroidCompletedTransfer transfer) {
+		for (int i = 0; i < tL.size(); i++) {
+			AndroidCompletedTransfer completedTransfer = tL.get(i);
+			if (completedTransfer == null) continue;
+
+			if (areTheSameTransfer(transfer, completedTransfer)) {
+				tL.remove(i);
+				adapter.removeItemData(i);
+				break;
 			}
 		}
-		else{
-			return false;
-		}
+
+		setEmptyView(tL.size());
+        managerActivity.supportInvalidateOptionsMenu();
+	}
+
+	/**
+	 * Compares both transfers received and checks if are the same.
+	 *
+	 * @param transfer1	first AndroidCompletedTransfer to compare and check.
+	 * @param transfer2	second AndroidCompletedTransfer to compare and check.
+	 * @return True if both transfers are the same, false otherwise.
+	 */
+	private boolean areTheSameTransfer(AndroidCompletedTransfer transfer1, AndroidCompletedTransfer transfer2) {
+        return transfer1.getId() == transfer2.getId()
+                || (isValidHandle(transfer1) && isValidHandle(transfer2) && transfer1.getNodeHandle().equals(transfer2.getNodeHandle()))
+                || (transfer1.getError().equals(transfer2.getError()) && transfer1.getFileName().equals(transfer2.getFileName()) && transfer1.getSize().equals(transfer2.getSize()));
+    }
+
+	/**
+	 * Checks if a transfer has a valid handle.
+	 *
+	 * @param transfer	AndroidCompletedTransfer to check.
+	 * @return True if the transfer has a valid handle, false otherwise.
+	 */
+	private boolean isValidHandle(AndroidCompletedTransfer transfer) {
+	    return !isTextEmpty(transfer.getNodeHandle()) && !transfer.getNodeHandle().equals(Long.toString(INVALID_HANDLE));
+    }
+
+	/**
+	 * Removes all completed transfers.
+	 */
+	public void clearCompletedTransfers() {
+		tL.clear();
+		adapter.setTransfers(tL);
+		setEmptyView(tL.size());
 	}
 }

@@ -4,10 +4,9 @@ import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.fragments.homepage.avatarChange
-import mega.privacy.android.app.fragments.homepage.scrolling
-import mega.privacy.android.app.listeners.DefaultMegaRequestListener
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBannerList
@@ -19,12 +18,14 @@ class HomePageViewModel @ViewModelInject constructor(
 ) : ViewModel() {
     private var lastGetBannerTime = 0L
 
+    private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
+    private val _chatStatusDrawableId = MutableLiveData<Int>()
     private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
 
-    val notification: LiveData<Int> = repository.getNotificationLiveData()
+    val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
-    val chatStatus: LiveData<Int> = repository.getChatStatusLiveData()
+    val chatStatusDrawableId: LiveData<Int> = _chatStatusDrawableId
     val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
     val bannerList: LiveData<MegaBannerList?> = repository.getBannerListLiveData()
 
@@ -36,11 +37,22 @@ class HomePageViewModel @ViewModelInject constructor(
         _isScrolling.value = it
     }
 
+    private val notificationCountObserver = androidx.lifecycle.Observer<Int> {
+        _notificationCount.value = it
+    }
+
+    private val chatOnlineStatusObserver = androidx.lifecycle.Observer<Int> {
+        _chatStatusDrawableId.value = repository.getChatStatusDrawableId(it)
+    }
+
     init {
-        repository.registerDataListeners()
+//        repository.registerDataListeners()
+//        _notificationCount.value = repository.getNotificationCount()
 
         avatarChange.observeForever(avatarChangeObserver)
         scrolling.observeForever(scrollingObserver)
+        notificationCountChange.observeForever(notificationCountObserver)
+        chatOnlineStatusChange.observeForever(chatOnlineStatusObserver)
 
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
@@ -50,10 +62,12 @@ class HomePageViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        repository.unregisterDataListeners()
+//        repository.unregisterDataListeners()
 
         avatarChange.removeObserver(avatarChangeObserver)
         scrolling.removeObserver(scrollingObserver)
+        notificationCountChange.removeObserver(notificationCountObserver)
+        chatOnlineStatusChange.removeObserver(chatOnlineStatusObserver)
     }
 
     private fun showDefaultAvatar() = viewModelScope.launch {
@@ -65,7 +79,7 @@ class HomePageViewModel @ViewModelInject constructor(
             repository.loadAvatar()?.also {
                 when {
                     it.first -> _avatar.value = it.second
-                    retry -> repository.createAvatar(object : DefaultMegaRequestListener {
+                    retry -> repository.createAvatar(object : BaseListener(MegaApplication.getInstance()) {
                         override fun onRequestFinish(
                             api: MegaApiJava,
                             request: MegaRequest,
@@ -92,9 +106,8 @@ class HomePageViewModel @ViewModelInject constructor(
     fun updateBannersIfNeeded() {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastGetBannerTime > TimeUtils.DAY) {
+            lastGetBannerTime = currentTime
             viewModelScope.launch { repository.loadBannerList() }
         }
-
-        lastGetBannerTime = currentTime
     }
 }

@@ -32,12 +32,14 @@ class RecentsBucketViewModel @ViewModelInject constructor(
 
     fun getItemPositionByHandle(handle: Long): Int {
         var index = INVALID_POSITION
+
         items.value?.forEachIndexed { i, megaNode ->
             if (megaNode.handle == handle) {
                 index = i
                 return@forEachIndexed
             }
         }
+
         return index
     }
 

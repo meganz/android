@@ -43,7 +43,7 @@ import nz.mega.sdk.MegaChatRoom;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -140,9 +140,9 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         holder.participantsText = v.findViewById(R.id.chat_explorer_list_participants);
 
         if(isScreenInPortrait(context)){
-            holder.titleText.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_PORT, outMetrics));
+            holder.titleText.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_PORT, outMetrics));
         }else{
-            holder.titleText.setMaxWidthEmojis(px2dp(MAX_WIDTH_TITLE_LAND, outMetrics));
+            holder.titleText.setMaxWidthEmojis(dp2px(MAX_WIDTH_TITLE_LAND, outMetrics));
         }
 
         v.setTag(holder);

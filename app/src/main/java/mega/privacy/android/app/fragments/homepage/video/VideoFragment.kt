@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +27,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentVideoBinding
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
@@ -36,9 +37,10 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -100,10 +102,23 @@ class VideoFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.setImageResource(
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                R.drawable.ic_zero_data_recents_portrait
+            } else {
+                R.drawable.ic_zero_data_recents_landscape
+            }
+        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
             getString(R.string.homepage_empty_hint_video).toUpperCase(Locale.ROOT)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
     }
 
     override fun onDestroy() {
@@ -123,6 +138,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -145,7 +161,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 it.showSnackbar(
                     SNACKBAR_TYPE,
                     getString(R.string.error_server_connection_problem),
-                    -1
+                    MEGACHAT_INVALID_HANDLE
                 )
             }
         }
@@ -156,21 +172,29 @@ class VideoFragment : Fragment(), HomepageSearchable {
             NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
         gridAdapter =
             NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
 
         switchListGridView(sortByHeaderViewModel.isList)
     }
 
+    private fun autoScrollToTop() {
+        if (!viewModel.skipNextAutoScroll) {
+            listView.layoutManager?.scrollToPosition(0)
+        }
+        viewModel.skipNextAutoScroll = false
+    }
+
     private fun switchListGridView(isList: Boolean) {
+        viewModel.isList = isList
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
@@ -268,8 +292,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
-                            itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
+                            itemView.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                                R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
@@ -339,7 +364,12 @@ class VideoFragment : Fragment(), HomepageSearchable {
         sortByHeaderViewModel.listGridChangeEvent.observe(
             viewLifecycleOwner,
             EventObserver { isList ->
-                switchListGridView(isList)
+                if (isList != viewModel.isList) {
+                    // change adapter will cause lose scroll position,
+                    // to avoid that, we only change adapter when the list/grid view
+                    // really change.
+                    switchListGridView(isList)
+                }
                 viewModel.refreshUi()
             })
     }
@@ -347,7 +377,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
     private fun openNode(node: MegaNode, index: Int) {
         val file: MegaNode = node
 
-        val internalIntent = FileUtils.isInternalIntent(node)
+        val internalIntent = FileUtil.isInternalIntent(node)
         val intent = if (internalIntent) {
             Intent(context, AudioVideoPlayerLollipop::class.java)
         } else {
@@ -371,14 +401,14 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
             }
 
-        val localPath = FileUtils.getLocalFile(context, file.name, file.size)
-        var paramsSetSuccessfully = if (FileUtils.isLocalFile(context, node, megaApi, localPath)) {
-            FileUtils.setLocalIntentParams(context, node, intent, localPath, false)
+        val localPath = FileUtil.getLocalFile(context, file.name, file.size)
+        var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
+            FileUtil.setLocalIntentParams(context, node, intent, localPath, false)
         } else {
-            FileUtils.setStreamingIntentParams(context, node, megaApi, intent)
+            FileUtil.setStreamingIntentParams(context, node, megaApi, intent)
         }
 
-        if (paramsSetSuccessfully && FileUtils.isOpusFile(node)) {
+        if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
             intent.setDataAndType(intent.data, "audio/*")
         }
 
@@ -388,7 +418,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 context,
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
         }
 
@@ -407,7 +437,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 context,
                 SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
             val nC = NodeController(context)
             nC.prepareForDownload(arrayListOf(node.handle), true)
@@ -509,6 +539,6 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        requireContext().sendBroadcast(intent)
     }
 }

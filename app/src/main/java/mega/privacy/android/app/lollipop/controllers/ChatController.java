@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -25,6 +24,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -42,13 +42,10 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
-import mega.privacy.android.app.utils.DownloadChecker;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SelectDownloadLocationDialog;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -63,18 +60,19 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.DownloadUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -343,55 +341,34 @@ public class ChatController {
         }
     }
 
-    public void muteChats(ArrayList<MegaChatListItem> chats){
-        for(int i=0; i<chats.size();i++){
-            muteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
-        }
-    }
+    /**
+     * Method to silence notifications for all chats or for a specific chat.
+     *
+     * @param option     The selected mute option.
+     */
+    public void muteChat(String option) {
+        if (context instanceof ChatNotificationsPreferencesActivity)
+            return;
 
-    public void muteChat(long chatHandle){
-        logDebug("Chat handle: " + chatHandle);
-        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if(chatPrefs==null){
+        switch (option) {
+            case NOTIFICATIONS_ENABLED:
+                showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+                break;
 
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), "");
-            dbH.setChatItemPreferences(chatPrefs);
+            case NOTIFICATIONS_DISABLED:
+                showSnackbar(context, context.getString(R.string.notifications_are_already_muted));
+                break;
 
-        }
-        else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(false));
-            dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chatHandle));
-        }
-    }
+            case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
+            case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
+                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+                break;
 
-    public void muteChat(MegaChatListItem chat){
-        logDebug("Chat ID:" + chat.getChatId());
-        muteChat(chat.getChatId());
-    }
-
-    public void unmuteChats(ArrayList<MegaChatListItem> chats){
-        for(int i=0; i<chats.size();i++){
-            unmuteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
-        }
-    }
-
-    public void unmuteChat(MegaChatListItem chat){
-        logDebug("Chat ID: " + chat.getChatId());
-        unmuteChat(chat.getChatId());
-    }
-
-    public void unmuteChat(long chatHandle){
-        logDebug("Chant handle: " + chatHandle);
-        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if(chatPrefs==null){
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "");
-            dbH.setChatItemPreferences(chatPrefs);
-        }
-        else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(true));
-            dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chatHandle));
+            default:
+                String text = getMutedPeriodString(option);
+                if (!isTextEmpty(text)) {
+                    showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+                }
         }
     }
 
@@ -1135,16 +1112,13 @@ public class ChatController {
 
     }
 
-    public void requestLocalFolder (long size, ArrayList<String> serializedNodes,@Nullable String sdRoot) {
+    public void requestLocalFolder (long size, ArrayList<String> serializedNodes) {
         Intent intent = new Intent(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select));
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
         intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
         intent.setClass(context, FileStorageActivityLollipop.class);
         intent.putStringArrayListExtra(FileStorageActivityLollipop.EXTRA_SERIALIZED_NODES, serializedNodes);
-        if (sdRoot != null) {
-            intent.putExtra(FileStorageActivityLollipop.EXTRA_SD_ROOT, sdRoot);
-        }
 
         if(context instanceof ChatActivityLollipop){
             ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
@@ -1243,27 +1217,11 @@ public class ChatController {
 
         boolean askMe = askMe(context);
         if (askMe){
-            showSelectDownloadLocationDialog(nodeList, size);
+            requestLocalFolder(size, serializeNodes(nodeList));
         }
         else{
             logDebug("NOT askMe");
             filePathDefault(downloadLocationDefaultPath,nodeList);
-        }
-    }
-
-    public void showSelectDownloadLocationDialog(ArrayList<MegaNode> nodeList, long size) {
-        logDebug("askMe");
-        File[] fs = context.getExternalFilesDirs(null);
-        final ArrayList<String> serializedNodes = serializeNodes(nodeList);
-        if (fs.length <= 1 || fs[1] == null) {
-            requestLocalFolder(size, serializedNodes, null);
-        } else {
-            SelectDownloadLocationDialog selector = new SelectDownloadLocationDialog(context,SelectDownloadLocationDialog.From.CHAT);
-            selector.setChatController(this);
-            selector.setSize(size);
-            selector.setNodeList(nodeList);
-            selector.setSerializedNodes(serializedNodes);
-            selector.show();
         }
     }
 
@@ -1394,23 +1352,10 @@ public class ChatController {
             size += nodeList.get(i).getSize();
         }
 
-        ArrayList<String> serializedNodes = serializeNodes(nodeList);
-        boolean downloadToSDCard = false;
-        String downloadRoot = null;
-        SDCardOperator sdCardOperator = null;
-        if(SDCardOperator.isSDCardPath(parentPath)) {
-            DownloadChecker checker = new DownloadChecker(context, parentPath, SelectDownloadLocationDialog.From.CHAT);
-            checker.setChatController(this);
-            checker.setSize(size);
-            checker.setNodeList(nodeList);
-            checker.setSerializedNodes(serializedNodes);
-            if (checker.check()) {
-                downloadRoot = checker.getDownloadRoot();
-                downloadToSDCard = downloadRoot != null;
-                sdCardOperator = checker.getSdCardOperator();
-            } else {
-                return;
-            }
+        SDCardOperator sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath);
+        if(sdCardOperator == null) {
+            requestLocalFolder(size, serializeNodes(nodeList));
+            return;
         }
 
         if(nodeList.size() == 1) {
@@ -1428,7 +1373,7 @@ public class ChatController {
                 //Check if the file is already downloaded
                 MegaApplication app = MegaApplication.getInstance();
                 if (localPath != null) {
-                    checkDownload(context, tempNode, localPath, parentPath, true, downloadToSDCard, sdCardOperator);
+                    checkDownload(context, tempNode, localPath, parentPath, true, sdCardOperator);
 
                     if (!Boolean.parseBoolean(dbH.getAutoPlayEnabled()) || isVoiceClip(nodeList.get(0).getName())) {
                         return;
@@ -1561,9 +1506,9 @@ public class ChatController {
                 Map<MegaNode, String> dlFiles = new HashMap<>();
                 Map<Long, String> targets = new HashMap<>();
 
-                if (downloadToSDCard) {
+                if (sdCardOperator.isSDCardDownload()) {
                     targets.put(nodeToDownload.getHandle(), parentPath);
-                    dlFiles.put(nodeToDownload, downloadRoot);
+                    dlFiles.put(nodeToDownload, sdCardOperator.getDownloadRoot());
                 } else {
                     dlFiles.put(nodeToDownload, parentPath);
                 }
@@ -1605,7 +1550,7 @@ public class ChatController {
                         } else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer) {
                             service.putExtra("fromMV", true);
                         }
-                        if (downloadToSDCard) {
+                        if (sdCardOperator.isSDCardDownload()) {
                             service = NodeController.getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);

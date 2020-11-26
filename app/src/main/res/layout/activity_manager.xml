@@ -28,52 +28,55 @@
                 android:layout_height="wrap_content"
                 android:theme="@style/Theme.Megaactionbar">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/toolbar_and_tabs_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorPrimary"
-                    android:minHeight="?attr/actionBarSize"
-                    app:popupTheme="@style/Theme.Megaactionbar"
-                    app:subtitleTextAppearance="@style/ToolbarSubtitle"
-                    app:theme="@style/Theme.Megaactionbar"
-                    app:titleTextAppearance="@style/ToolbarTitle"
-                    tools:context=".ManagerActivityLollipop" />
+                    android:theme="@style/Theme.Megaactionbar">
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_contacts"
-                    style="@style/MyCustomTabLayout"
-                    android:layout_marginStart="@dimen/standard_margin"
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="?attr/actionBarSize"
+                        android:background="?attr/colorPrimary"
+                        app:popupTheme="@style/Theme.Megaactionbar"
+                        app:titleTextAppearance="@style/ToolbarTitle"
+                        app:subtitleTextAppearance="@style/ToolbarSubtitle"
+                        app:theme="@style/Theme.Megaactionbar"
+                        tools:context=".ManagerActivityLollipop"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_contacts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        style="@style/MyCustomTabLayout"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_shares"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/MyCustomTabLayout"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_my_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/MyCustomTabLayout"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_transfers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/MyCustomTabLayout"/>
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <include layout="@layout/item_call_in_progress_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_shares"
-                    style="@style/MyCustomTabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_my_account"
-                    style="@style/MyCustomTabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_transfers"
-                    style="@style/MyCustomTabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include layout="@layout/item_transfers_overview" />
-
-                <include
-                    layout="@layout/item_call_in_progress_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:layout_alignParentTop="true" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -123,17 +126,35 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize">
 
+            <include
+                layout="@layout/transfers_widget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/floating_button"
+                android:layout_alignParentEnd="true" />
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
-                android:layout_above="@+id/bottom_navigation_view"
-                android:layout_alignParentRight="true"
-                android:layout_margin="16dp"
+                android:layout_above="@id/psa_layout"
+                android:layout_alignParentEnd="true"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="16dp"
                 android:elevation="@dimen/elevation_low"
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white" />
+
+            <include
+                android:id="@+id/psa_layout"
+                layout="@layout/psa_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/bottom_navigation_view"
+                android:visibility="gone"
+                tools:visibility="visible"
+                />
 
             <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
                 android:id="@+id/bottom_navigation_view"
@@ -171,7 +192,7 @@
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="200dp"
             android:src="@drawable/ic_add_white"
             android:visibility="invisible"
@@ -184,7 +205,7 @@
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="140dp"
             android:src="@drawable/ic_add_white"
             android:visibility="invisible"
@@ -197,9 +218,9 @@
             android:layout_width="@dimen/fab_button_diameter"
             android:layout_height="@dimen/fab_button_diameter"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="80dp"
-            android:src="@drawable/ic_chat"
+            android:src="@drawable/ic_add_white"
             android:tint="@color/white"
             android:visibility="invisible"
             app:backgroundTint="@color/accentColor"
@@ -226,14 +247,7 @@
         android:layout_gravity="start"
         android:background="#ffffff">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
-
-            <include layout="@layout/navigation_view_layout" />
-
-        </ScrollView>
+        <include layout="@layout/navigation_view_layout"/>
 
     </com.google.android.material.navigation.NavigationView>
 

@@ -46,7 +46,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -126,17 +125,18 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class PdfViewerActivityLollipop extends DownloadableActivity implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
 
     private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
             = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -274,7 +274,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
 
         pdfViewerActivityLollipop = this;
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
+        registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         final Intent intent = getIntent();
         if (intent == null){
@@ -310,7 +310,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
         fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
-//        handle = intent.getLongExtra("HANDLE", -1);
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
@@ -473,16 +472,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 }
             }
 
-            logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
-            if(megaApi.getBandwidthOverquotaDelay()>0){
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
-                }
+            if (isOnTransferOverQuota()) {
+                showGeneralTransferOverQuotaWarning();
             }
         }
 
@@ -789,16 +780,8 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                 megaApi.addTransferListener(this);
                 megaApi.addGlobalListener(this);
 
-                logDebug("Overquota delay: " + megaApi.getBandwidthOverquotaDelay());
-                if(megaApi.getBandwidthOverquotaDelay()>0){
-                    if(alertDialogTransferOverquota==null){
-                        showTransferOverquotaDialog();
-                    }
-                    else {
-                        if (!(alertDialogTransferOverquota.isShowing())) {
-                            showTransferOverquotaDialog();
-                        }
-                    }
+                if (isOnTransferOverQuota()) {
+                    showGeneralTransferOverQuotaWarning();
                 }
             }
 
@@ -989,7 +972,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         protected void onPostExecute(InputStream inputStream) {
             logDebug("onPostExecute");
             try {
-                pdfView.fromStream(inputStream)
+                pdfView.fromStream(inputStream, String.valueOf(handle))
                         .defaultPage(currentPage-1)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
@@ -2331,8 +2314,6 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
                     }
                 }
             }
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, (type == FROM_CHAT), nC);
         }
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
@@ -2806,73 +2787,9 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
             handler.removeCallbacksAndMessages(null);
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiverToFinish);
+        unregisterReceiver(receiverToFinish);
 
         super.onDestroy();
-    }
-
-    public void showTransferOverquotaDialog(){
-        logDebug("showTransferOverquotaDialog");
-
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(PdfViewerActivityLollipop.this);
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.transfer_overquota_layout, null);
-        dialogBuilder.setView(dialogView);
-
-        TextView title = (TextView) dialogView.findViewById(R.id.transfer_overquota_title);
-        title.setText(getString(R.string.title_depleted_transfer_overquota));
-
-        ImageView icon = (ImageView) dialogView.findViewById(R.id.image_transfer_overquota);
-        icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.transfer_quota_empty));
-
-        TextView text = (TextView) dialogView.findViewById(R.id.text_transfer_overquota);
-        text.setText(getString(R.string.text_depleted_transfer_overquota));
-
-        Button continueButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);
-
-        Button paymentButton = (Button) dialogView.findViewById(R.id.transfer_overquota_button_payment);
-        paymentButton.setText(getString(R.string.action_upgrade_account));
-
-        alertDialogTransferOverquota = dialogBuilder.create();
-
-        alertDialogTransferOverquota.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog) {
-                transferOverquota = true;
-                progressBar.setVisibility(View.GONE);
-            }
-        });
-
-        continueButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-                if (loading && !transferOverquota){
-                    progressBar.setVisibility(View.VISIBLE);
-                }
-            }
-
-        });
-
-        paymentButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                alertDialogTransferOverquota.dismiss();
-                transferOverquota = false;
-                showUpgradeAccount();
-            }
-        });
-
-        alertDialogTransferOverquota.setCancelable(false);
-        alertDialogTransferOverquota.setCanceledOnTouchOutside(false);
-        alertDialogTransferOverquota.show();
-    }
-
-    public void showUpgradeAccount(){
-        logDebug("showUpgradeAccount");
-        Intent upgradeIntent = new Intent(this, ManagerActivityLollipop.class);
-        upgradeIntent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
-        startActivity(upgradeIntent);
     }
 
     @Override
@@ -2896,15 +2813,7 @@ public class PdfViewerActivityLollipop extends DownloadableActivity implements M
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
             if (e.getValue() != 0) {
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-
-                if(alertDialogTransferOverquota==null){
-                    showTransferOverquotaDialog();
-                }
-                else {
-                    if (!(alertDialogTransferOverquota.isShowing())) {
-                        showTransferOverquotaDialog();
-                    }
-                }
+                showGeneralTransferOverQuotaWarning();
             }
         } else if (e.getErrorCode() == MegaError.API_EBLOCKED) {
             showTakenDownAlert(this);

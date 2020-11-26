@@ -171,7 +171,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
     public void changeActionBarElevation(boolean whitElevation){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (whitElevation) {
-                abL.setElevation(px2dp(4, outMetrics));
+                abL.setElevation(dp2px(4, outMetrics));
             }
             else {
                 abL.setElevation(0);

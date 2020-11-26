@@ -37,6 +37,8 @@
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 
@@ -244,7 +246,7 @@
             android:name="mega.privacy.android.app.lollipop.FileStorageActivityLollipop"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:theme="@style/Theme.Megaactionbar">
         </activity>
 
         <activity
@@ -364,8 +366,8 @@
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
-        </activity>
+            android:theme="@style/Theme.Megaactionbar.InfoScreens"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
@@ -418,7 +420,8 @@
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Swipe.BackFullScreen"
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
@@ -452,8 +455,29 @@
 	              android:theme="@style/SMSVerificationReceiveTxtActivityTheme"/>
 
         <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"
+            android:label="@string/settings_advanced_features"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity"
+            android:label="@string/section_photo_sync"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity"
+            android:label="@string/title_properties_chat_notifications_contact"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity"
-            android:label="@string/contact_properties_activity"
+            android:label="@string/section_chat"
             android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
@@ -461,6 +485,20 @@
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity"
             android:label="@string/download_location"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity"
+            android:label="@string/settings_file_management_category"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity"
+            android:label="@string/settings_pin_lock_switch"
             android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
@@ -476,6 +514,22 @@
             android:name="mega.privacy.android.app.AuthenticityCredentialsActivity"
             android:label="@string/authenticity_credentials_label"
             android:theme="@style/Theme.Megaactionbar"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.GiphyPickerActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/search_giphy_title"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Giphy"
+            android:windowSoftInputMode="adjustNothing">
+
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.activities.GiphyViewerActivity"
+            android:theme="@style/Theme.Giphy"
             android:launchMode="singleTop">
         </activity>
 
@@ -496,6 +550,11 @@
 
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name="mega.privacy.android.app.notifications.DownloadNotificationIntentService"
             android:exported="false" >
         </service>
 

@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.BucketSaved;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -30,7 +29,6 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
-import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -38,9 +36,9 @@ import nz.mega.sdk.MegaRecentActionBucket;
 
 import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -89,8 +87,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
         public void setImageThumbnail(Bitmap image) {
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.imageThumbnail.getLayoutParams();
-            params.width = params.height = px2dp(36, outMetrics);
-            int margin = px2dp(18, outMetrics);
+            params.width = params.height = dp2px(36, outMetrics);
+            int margin = dp2px(18, outMetrics);
             params.setMargins(margin, margin, margin, 0);
 
             this.imageThumbnail.setLayoutParams(params);
@@ -163,7 +161,12 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             MegaNode parentNode = megaApi.getNodeByHandle(bucket.getParentHandle());
             if (parentNode == null) return;
 
-            holder.subtitle.setText(parentNode.getName());
+            String parentName = parentNode.getName();
+            if (!isTextEmpty(parentName) && parentName.equals("Cloud Drive")) {
+                parentName = context.getString(R.string.section_cloud_drive);
+            }
+
+            holder.subtitle.setText(parentName);
 
             String mail = bucket.getUserEmail();
             String user;
@@ -181,7 +184,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.actionBy.setText(formatUserAction(userAction));
             }
 
-            parentNode = getOutgoingOrIncomingParent(megaApi, parentNode);
+            parentNode = getOutgoingOrIncomingParent(parentNode);
 
             if (parentNode == null) {
 //              No outShare, no inShare
@@ -198,8 +201,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             holder.time.setText(item.getTime());
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageThumbnail.getLayoutParams();
-            params.width = params.height = px2dp(48, outMetrics);
-            int margin = px2dp(12, outMetrics);
+            params.width = params.height = dp2px(48, outMetrics);
+            int margin = dp2px(12, outMetrics);
             params.setMargins(margin, margin, margin, 0);
             holder.imageThumbnail.setLayoutParams(params);
             holder.imageThumbnail.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());

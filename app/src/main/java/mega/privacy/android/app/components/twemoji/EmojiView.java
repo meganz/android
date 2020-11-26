@@ -57,7 +57,7 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
     final ViewPager emojisPager = findViewById(R.id.emojis_pager);
 
     final View emojiDivider = findViewById(R.id.emoji_divider);
-    emojiDivider.setBackgroundColor(ContextCompat.getColor(context, R.color.divider_upgrade_account));
+    emojiDivider.setBackgroundColor(ContextCompat.getColor(context, R.color.black_12_alpha));
 
     final LinearLayout emojisTab = findViewById(R.id.emojis_tab);
     emojisPager.addOnPageChangeListener(this);

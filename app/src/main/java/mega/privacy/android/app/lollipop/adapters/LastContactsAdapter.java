@@ -17,10 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.UserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -29,7 +27,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -98,7 +96,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         } else {
             Intent intentOpenChat = new Intent(context,ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID",chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID,chat.getChatId());
             intentOpenChat.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intentOpenChat);
         }

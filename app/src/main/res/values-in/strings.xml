@@ -242,6 +242,7 @@
     -->
     <string name="cancel_transfer_confirmation">Hapus transfer ini?</string>
     <string name="cancel_all_transfer_confirmation">Hapus semua transfer?</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Baru-baru ini</string>
@@ -363,7 +364,10 @@
         <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime." quantity="other">%1$d unggahan telah selesai</item>
     </plurals>
 
-    <string name="folder_empty" context="Warning shown when it tries to download an empty folder">Folder is empty</string>
+    <plurals name="empty_folders">
+        <item context="Warning shown when it tries to download an empty folder. Singular" quantity="one">Folder kosong.</item>
+        <item context="Warning shown when it tries to download some empty folders. Plural" quantity="other">Folder kosong.</item>
+    </plurals>
     <!--
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     -->
@@ -489,7 +493,7 @@
     <string name="context_no_copied" context="error message">Error. Belum ter-copy</string>
     <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder">Silahkan pilih folder tujuan</string>
     <string name="context_correctly_moved" context="success message when moving a node">Berhasil dipindahkan</string>
-    <string name="number_correctly_moved" context="success message when moving a node">%d item berhasil dipindahkan</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d item berhasil dipindahkan.</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">%d item tidak berhasil dipindahkan</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Pindah ke sampah dengan sukses</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d item berhasil dipindahkan ke Sampah</string>
@@ -507,7 +511,7 @@
     <string name="context_no_removed" context="error message">Error. Belum dipindahkan dari MEGA</string>
     <string name="number_correctly_removed" context="success message when moving a node">%d item berhasil dihapus dari MEGA</string>
     <string name="number_no_removed" context="error message when moving a node">%d item tidak berhasil dihapus</string>
-    <string name="number_correctly_leaved" context="success message when moving a node">%d folder berhasil ditinggalkan</string>
+    <string name="number_correctly_leaved" context="Success message when left shared folders">%d folder berhasil ditinggalkan.</string>
     <string name="share_left" context="Message shown when a share has been left">Berbagi ditinggalkan</string>
     <string name="number_no_leaved" context="error message when moving a node">%d folder tidak berhasil dibiarkan</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">File dikirim ke %d kontak dengan sukses</string>
@@ -615,7 +619,6 @@
     <!--
     <string name="warning_out_space" context="Warning in Cloud drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
     -->
-    <!--<string name="overquota_alert_title" context="Title dialog overquota error">Storage over quota</string>-->
     <string name="overquota_alert_text" context="Dialog text overquota error">Anda telah melampaui batas penyimpanan Anda. Apakah Anda ingin meningkatkan akun Anda?</string>
 
     <!--
@@ -674,7 +677,7 @@
     <!--
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
     -->
-    <string name="menu_cancel_all_transfers" context="menu item">Hapus semua transfer</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Batalkan semua transfer</string>
 
     <string name="menu_take_picture" context="Option of the sliding panel to change the avatar by taking a new picture">Ambil foto</string>
 
@@ -722,7 +725,7 @@
 	<string name="verify_account_title" context="enter verification code page title">verifikasi akun anda</string>
 	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Akun Anda telah ditangguhkan sementara karena kemungkinan penyalahgunaan. Harap verifikasi nomor telepon Anda untuk membuka kunci akun Anda.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Negara</string>
-    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
+    <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Wilayah</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Nomor telepon Anda</string>
     <string name="general_back_button" context="Button label - go to previous page">Kembali</string>
 	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Tidak sekarang</string>
@@ -746,6 +749,9 @@
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Penyimpanan internal</item>
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Penyimpanan luar</item>
     </string-array>
+
+    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</string>
+    <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">External storage</string>
 
     <string-array name="add_contact_array">
         <item context="title of the dialog shown when sending or sharing a folder">Tulis e-mail pengguna</item>
@@ -892,7 +898,7 @@
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Alamat 1</string>
     <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Alamat 2 (optional)</string>
     <string name="city_cc" context="Hint text of the city edittext for billing purposes">Kota</string>
-    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State / Provinsi</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Negara Bagian / Provinsi</string>
     <string name="country_cc" context="Hint text of the country edittext for billing purposes">Negara</string>
     <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Kode pos</string>
 
@@ -1112,6 +1118,7 @@
     <string name="section_chat_with_notification" context="Item of the navigation title for the chat section when there is any unread message">Chat [A](%1$d)[/A]</string>
 
     <string name="tab_archive_chat" context="Confirmation button of the dialog to archive a chat">Arsipkan</string>
+
     <!--
     <string name="tab_recent_chat" context="Title of the recent chats tab. Capital letters">RECENT</string>
     -->
@@ -1180,6 +1187,24 @@
 
     <string name="general_mute" context="button">Matikan Suara</string>
     <string name="general_unmute" context="button">Nyalakan suara</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">On</string>
+
+    <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
+    <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">Until tomorrow morning</string>
+    <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Until this morning</string>
+    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn it back on</string>
+
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Pemberitahuan</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Pesan suara</string>
@@ -1271,6 +1296,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] keluar dari obrolan grup [/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Pesan tidak terkirim. Tap untuk opsi</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1436,6 +1462,7 @@
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Hentikan seluruh transfer</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Lanjutkan seluruh transfer</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Hapus selesai</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Hentikan transfer?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Lanjutkan transfer?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Lanjutkan</string>
@@ -1447,6 +1474,9 @@
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Berhenti sementara</string>
     <string name="transfer_queued" context="Possible state of a transfer">Dimasukan antrian</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1533,7 +1563,8 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Kuota transfer tidak cukup</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted">Transfer antri Anda melebihi kuota transfer saat ini yang tersedia untuk alamat IP Anda dan oleh karena itu dapat terganggu.</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Transfer antri Anda melebihi kuota transfer saat ini yang tersedia untuk alamat IP Anda dan oleh karena itu dapat terganggu.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Lihat plan kami</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Lanjutkan tanpa akun</string>
 
@@ -1546,7 +1577,6 @@
     <string name="add_to_cloud" context="Menu option to choose to add file or folders to Cloud Drive">Import</string>
     <string name="save_for_offline" context="Menu option to choose save to Offline section">Simpan untuk offline</string>
     <string name="add_to_cloud_node_chat" context="Menu option to choose to add file to Cloud Drive in the chat">Tambah ke Cloud Drive</string>
-    <string name="save_to_offline" context="Menu option to choose save to Offline section">Simpan untuk offline</string>
 
     <string name="general_view_contacts" context="Menu option">Lihat kontak</string>
 
@@ -1627,6 +1657,7 @@
     <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Hanya-baca</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Read &amp; write</string>
 
+    <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused</string>
     <string name="attachment_uploading_state_uploading">Mengupload&#8230;</string>
     <string name="attachment_uploading_state_error">Error. Tidak dikirim.</string>
 
@@ -1728,7 +1759,7 @@
 
     <plurals name="confirmation_leave_share_folder">
         <item context="Confirmation message before leaving an incoming shared folder" quantity="one">Jika anda meninggalkan folder, anda tidak akan dapat untuk melihatnya kembali</item>
-        <item context="confirmation message before leaving some incoming shared folders" quantity="other">If you leave the folders, you will not be able to see them again.</item>
+        <item context="confirmation message before leaving some incoming shared folders" quantity="other">Jika anda meninggalkan folder ini, anda tidak akan dapat melihatnya lagi.</item>
     </plurals>
 
     <string name="no_folders_shared" context="Info of a contact if there is no folders shared with him">Tidak ada folder dibagikan</string>
@@ -1898,6 +1929,11 @@
     <string name="label_file_size_mega_byte" context="Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s MB</string>
     <string name="label_file_size_giga_byte" context="Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s GB</string>
     <string name="label_file_size_tera_byte" context="Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics">%s TB</string>
+    <string name="label_file_speed_byte" context="Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s B/s</string>
+    <string name="label_file_speed_kilo_byte" context="Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s KB/s</string>
+    <string name="label_file_speed_mega_byte" context="Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s MB/s</string>
+    <string name="label_file_speed_giga_byte" context="Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s GB/s</string>
+    <string name="label_file_speed_tera_byte" context="Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics">%s TB/s</string>
     <string name="label_mega_byte" context="Size in megabytes.">MB</string>
 
     <plurals name="number_of_versions" formatted="false">
@@ -2021,7 +2057,7 @@
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Terlalu banyak permintaan. Mohon tunggu.</string>
     <string name="login_in_progress" context="message when previous login is being canceled">Membatalkan proses login. Tunggu sebentar&#8230;</string>
 
-    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
+    <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Tipe file tidak didukung.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Kesalahan. File rusak atau tidak ada.</string>
 
 
@@ -2109,7 +2145,7 @@
     <string name="preview_content" context="button’s text to open a full screen image">Lihat Konten</string>
 
     <string name="no_network_connection_on_play_file" context="message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded">Streaming tidak dapat dijalankan dan file belum diunduh</string>
-    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">We were not able to open the file due to the lack of network connection.</string>
+    <string name="error_fail_to_open_file_no_network" context="message shown when the user open a file, there is no network connection and the file is not been downloaded">Kami tidak dapat membuka file karena tidak ada koneksi jaringan.</string>
     <string name="file_already_exists" context="message when trying to save for offline a file that already exists">File sudah ada di Disimpan untuk Offline</string>
 
     <plurals name="error_forwarding_messages">
@@ -2208,7 +2244,7 @@
     <string name="confirmation_invite_contact_already_added" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before">Anda sudah menambahkan kontak %s.</string>
     <string name="confirmation_share_contact" context="Text of the confirm dialog shown when it wants to add a contact from a QR scaned">Bagikan dengan %s?</string>
     <string name="new_group_chat_label" context="Text button for init a group chat">Obrolan grup baru</string>
-    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Send contacts</string>
+    <string name="send_contacts" context="Label shown when the user wants to add contacts into a chat conversation">Kirim kontak</string>
 
     <string name="title_alert_logged_out" context="Title of the alert when the account have been logged out from another client">Keluar</string>
     <string name="account_confirmed" context="Text shown to indicate user that his account has already been confirmed">Akun anda telah di-aktifasi. Silahkan masuk akun anda</string>
@@ -2259,7 +2295,7 @@
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]dari %2$s digunakan[/B]</string>
 
     <string name="staging_api_url_title" context="title of the alert dialog when the user is changing the API URL to staging">Ubah ke server uji?</string>
-    <string name="staging_api_url_text" context="text of the alert dialog when the user is changing the API URL to staging">Anda yakin ingin berganti ke server uji? Akun Anda mungkin mengalami masalah yang tidak dapat diperbaiki</string>
+    <string name="staging_api_url_text" context="Text of the alert dialog when the user is changing the API URL to staging">Anda yakin ingin mengubah ke server pengujian? Akun anda mungkin mengalami masalah yang tidak dapat dipulihkan.</string>
 
     <string name="title_confirmation_open_camera_on_chat" context="Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Buka kamera?</string>
     <string name="confirmation_open_camera_on_chat" context="Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call">Jika Anda membuka kamera, transmisi video Anda akan dijeda dalam panggilan saat ini.</string>
@@ -2290,7 +2326,7 @@
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Nyalakan Encrypted Key Rotation</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">Rotasi kunci dinonaktifkan untuk percakapan dengan lebih dari 100 peserta.</string>
-    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Unable to convert this chat to private because the participants limit was exceeded.</string>
+    <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Tak dapat mengubah obrolan ini menjadi pribadi karena batas peserta telah terlampaui.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] membuat Tautan Obrolan.[/B]</string>
     <string name="message_deleted_chat_link" context="Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] menghapus tautan obrolan.[/B]</string>
@@ -2454,7 +2490,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d peserta</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more”&gt;%1$s and %2$d more.">%1$s dan %2$d lebih</string>
+    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s dan %2$d lebih</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Sebelum Anda dapat membuat tautan untuk obrolan ini, Anda perlu menetapkan deskripsi:</string>
 
@@ -2509,15 +2545,16 @@
 
     <string name="label_today" context="label today">Hari ini</string>
     <string name="label_yesterday" context="label yesterday">Kemarin</string>
+    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Tidak ada [/B][A]File Berbagi[/A][B].[/B]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s bergabung dengan panggilan itu</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s meninggalkan panggilan</string>
 
-    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">You are not allowed to start a call because the participants limit was exceeded.</string>
+    <string name="call_error_too_many_participants_start" context="Warning show when a call cannot start because there are too many participants in the group chat">Anda tidak diizinkan untuk memulai panggilan karena batas peserta telah terlampaui.</string>
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Anda tidak diizinkan untuk bergabung dengan panggilan ini karena telah mencapai jumlah maksimum peserta.</string>
-    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">You are not allowed to join this call as the group has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Anda tidak diizinkan untuk bergabung dengan panggilan ini karena grup telah mencapai jumlah peserta maksimum dalam obrolan.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Anda tidak diizinkan untuk mengaktifkan video karena panggilan ini telah mencapai jumlah maksimum peserta menggunakan video.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Kesalahan. File tidak dapat dibuka.</string>
@@ -2742,11 +2779,11 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ada yang salah</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Hubungi administrator akun bisnis Anda untuk menyelesaikan masalah dan aktifkan akun Anda.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Untuk tujuan bisnis asli.</string>
-    <string name="unlimited_space" context="Label to indicate an unlimited space. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">UNLIMITED [A]Penyimpanan[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">TANPA BATAS [A]Kuota transfer[/A] **</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">TANPA BATAS [A]Kuota transfer[/A] **</string>
 
-    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Saat Anda keluar, file dari bagian Offline Anda akan dihapus dari perangkat Anda.</string>
-    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Saat Anda keluar, transfer yang sedang berlangsung akan dibatalkan.</string>
+    <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Saat anda keluar, file dari bagian Offline anda akan dihapus dari perangkat anda.</string>
+    <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Saat anda keluar, transfer yang sedang berlangsung akan dibatalkan.</string>
     <string name="logout_warning_offline_and_transfers" context="Warning message to alert user about logout in My Account section if has offline files and transfers in progress.">Saat Anda keluar, file dari bagian Offline Anda akan dihapus dari perangkat Anda dan transfer yang sedang berlangsung akan dibatalkan.</string>
 
     <string name="unknown_name_label" context="Label to indicate that a name has not been possible to obtain for some reason">Nama tidak dikenal</string>
@@ -2793,25 +2830,41 @@
     <string name="download_location" context="Download location label">Download lokasi</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Selalu simpan ke lokasi ini?</string>
 
+    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+
     <string name="file_provider_title" context="Title of the File Provider activity">Lampirkan dari &#8230;</string>
+
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Obrolan dibuat pada %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Pilih pesan</string>
+
+    <string name="storage_root_label" context="Storage root label">Storage root</string>
+
+    <string name="failed_label" context="Label describing some action failed">Failed</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
+    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Storage Penuh</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Data anda berisiko!</string>
     <plurals name="over_disk_quota_paywall_text">
-        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have %5$s.</item>
-        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">We have contacted you by email to %1$s on %2$s and %3$s, but you still have %4$s files taking up %5$s in your MEGA account, which requires you to have %6$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with only one email notification. Placeholders: 1 user email, 2 email notification date, 3 number of files, 4 files size (including units) and 5 required PRO plan" quantity="one">Kami telah menghubungi anda melalui email ke %1$s di %2$s, tetapi anda masih memiliki %3$s file yang menggunakan %4$s di akun MEGA anda, yang mengharuskan anda memiliki %5$s.</item>
+        <item context="Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan" quantity="other">Kami telah menghubungi anda melalui email ke %1$s di %2$s dan %3$s, tetapi anda masih memiliki %4$s file yang menggunakan %5$s di akun MEGA snda, yang mengharuskan snda memiliki %6$s.</item>
     </plurals>
-    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">We have contacted you by email to %1$s, but you still have %2$s files taking up %3$s in your MEGA account, which requires you to have %4$s.</string>
-    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]You have [M]%s[/M] left to upgrade[/B]. After that, your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]You have to upgrade[/B]. Your data is subject to deletion.</string>
-    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left">[B]You must act immediately to save your data[/B].</string>
+    <string name="over_disk_quota_paywall_text_no_warning_dates_info" context="Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan">Kami telah menghubungi anda melalui email ke %1$s, tetapi anda masih memiliki %2$s file yang menggunakan %3$s di akun MEGA anda, yang mengharuskan anda memiliki %4$s.</string>
+    <string name="over_disk_quota_paywall_deletion_warning" context="Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color">[B]Anda memiliki [M]%s[/M] tersisa untuk ditingkatkan [/B]. Setelah itu, data anda akan dihapus.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data" context="Text of deletion alert of the Over Disk Quota Paywall warning if no data available">[B]Anda harus meningkatkan[/B]. Data anda saat ini dapat dihapus.</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Anda harus segera bertindak untuk menyimpan data anda.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 day</item>
+        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 hari</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d hari</item>
     </plurals>
+
     <string name="label_time_in_hours" context="Time in hours. The placeholder is for the time value, please adjust the position based on linguistics">%dh</string>
     <string name="label_time_in_minutes" context="Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics">%dm</string>
     <string name="label_time_in_seconds" context="Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics">%ds</string>
@@ -2823,7 +2876,7 @@
     <string name="authenticity_credentials_explanation" context="”Verify user” dialog description">Ini dapat dilakukan pada kehidupan nyata melalui bertemu langsung. Jika ana memiliki channel lain yang sudah ter-verifikasi seperti OTR atau PGP, anda mungkin mau menggunakan itu.</string>
     <string name="label_your_credentials" context="Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity">Kredensial Anda</string>
     <string name="action_reset" context="Button to reset credentials">Ubah</string>
-    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Updating credentials. Try again later</string>
+    <string name="already_verifying_credentials" context="Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running.">Memperbarui kredensial. Silakan coba lagi nanti.</string>
 
     <string name="joining_label" context="Info message displayed when the user is joining a chat conversation">Bergabung&#8230;</string>
     <string name="leaving_label" context="Info message displayed when the user is leaving a chat conversation">Keluar&#8230;</string>
@@ -2834,14 +2887,23 @@
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Akun yang anda coba untuk reset telah diblokir</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Akun anda telah di-blok. Harap kontak support&#64;mega.nz</string>
+    <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Akun Anda telah dinonaktifkan oleh administrator Anda. Anda dapat menghubungi administrator akun bisnis Anda untuk rincian lebih lanjut.</string>
+    <string name="error_business_removed" context="An error message which appears to sub-users of a business account when they try to login and they are deleted.">Akun Anda telah dihapus oleh administrator Anda. Silakan hubungi administrator akun bisnis Anda untuk rincian lebih lanjut.</string>
 
     <string name="option_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Memodifikasi</string>
-    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Modify phone number</string>
-    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Remove phone number</string>
+    <string name="title_modify_phone_number" context="Option in bottom sheet dialog for modifying the associated phone number of current account.">Ubah nomor telepon</string>
+    <string name="title_remove_phone_number" context="Option in bottom sheet dialog for removing the associated phone number of current account.">Hapus nomor telepon</string>
     <string name="modify_phone_number_message" context="Message showing to explain what will happen when the operation of">Operasi ini akan menghapus nomor telepon anda saat ini dan memulai proses mengaitkan nomor telepon baru dengan akun anda.</string>
     <string name="remove_phone_number_message" context="Message for action to remove the registered phone number.">Ini akan menghapus nomor telepon anda yang terkait dari akun anda. Jika nanti anda memilih untuk menambahkan nomor telepon, anda akan diminta untuk memverifikasinya.</string>
 
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Lihat</string>
+
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s kredensial</string>
 
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
+    <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
+    <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
+
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
 </resources>

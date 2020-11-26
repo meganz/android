@@ -32,7 +32,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -45,17 +45,25 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
-    /* The "modes" are defined to allow the client to specify the dialog style more flexibly.
-    At the same time, compatible with old code.For which mode corresponds to which dialog style,
+    /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
+    At the same time, compatible with old code. For which mode corresponds to which dialog style,
      please refer to the code */
-    public static final int MODE0 = 0;  // No definite mode, map the drawerItem to a specific mode
+    /** No definite mode, map the drawerItem to a specific mode */
+    public static final int MODE0 = 0;
+    /** For Cloud Drive */
     public static final int MODE1 = 1;
+    /** For Rubbish Bin */
     public static final int MODE2 = 2;
+    /** For Inbox */
     public static final int MODE3 = 3;
+    /** For Shared items */
     public static final int MODE4 = 4;
+    /** For Search */
     public static final int MODE5 = 5;
-    // For recent
+    /** For Recents */
     public static final int MODE6 = 6;
+
+    private static final String SAVED_STATE_KEY_MODE = "MODE";
 
     private int mMode;
 
@@ -86,6 +94,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             if (context instanceof ManagerActivityLollipop) {
                 drawerItem = ManagerActivityLollipop.getDrawerItem();
             }
+            mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, MODE0);
         } else {
             if (context instanceof ManagerActivityLollipop) {
                 node = ((ManagerActivityLollipop) context).getSelectedNode();
@@ -160,6 +169,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionOpenFolder.setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
 
+        LinearLayout viewInFolder = contentView.findViewById(R.id.view_in_folder_layout);
+        if (mMode == MODE6) {
+            viewInFolder.setVisibility(View.VISIBLE);
+            viewInFolder.setOnClickListener(this);
+        }
+
         int counterSave = 2;
         int counterShares = 6;
         int counterModify = 4;
@@ -201,6 +216,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
+
+                if (isEmptyFolder(node)) {
+                    counterSave--;
+                    optionOffline.setVisibility(View.GONE);
+                }
+
                 counterShares--;
                 optionSendChat.setVisibility(View.GONE);
             } else {
@@ -973,6 +994,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 ((ManagerActivityLollipop) context).showGetLinkActivity(node.getHandle());
                 break;
 
+            case R.id.view_in_folder_layout:
+                ((ManagerActivityLollipop) context).viewNodeInFolder(node);
+                break;
+
             case R.id.option_remove_link_layout:
                 ((ManagerActivityLollipop) context).showConfirmationRemovePublicLink(node);
                 break;
@@ -1114,7 +1139,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         // Save the new file to offline
-        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context, megaApi);
+        saveOffline(offlineParent, node, context, (ManagerActivityLollipop) context);
     }
 
     @Override
@@ -1122,6 +1147,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onSaveInstanceState(outState);
         long handle = node.getHandle();
         outState.putLong(HANDLE, handle);
+        outState.putInt(SAVED_STATE_KEY_MODE, mMode);
     }
 
     private void mapDrawerItemToMode(ManagerActivityLollipop.DrawerItem drawerItem) {

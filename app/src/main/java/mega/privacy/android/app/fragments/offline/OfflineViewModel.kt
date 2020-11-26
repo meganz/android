@@ -20,15 +20,10 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
-import mega.privacy.android.app.utils.Constants.BACK_PRESS_HANDLED
-import mega.privacy.android.app.utils.Constants.BACK_PRESS_NOT_HANDLED
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.Constants.OFFLINE_ROOT
-import mega.privacy.android.app.utils.FileUtils.isFileAvailable
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.OfflineUtils.getFolderInfo
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
+import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -38,8 +33,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
-import java.util.Locale
-import java.util.Stack
+import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
 
 class OfflineViewModel @ViewModelInject constructor(
@@ -47,6 +41,7 @@ class OfflineViewModel @ViewModelInject constructor(
     private val repo: MegaNodeRepo,
     private val nodeSaver: OfflineNodeSaver
 ) : BaseRxViewModel() {
+
     private var order = ORDER_DEFAULT_ASC
     private var searchQuery: String? = null
     private var historySearchQuery: String? = null
@@ -98,6 +93,7 @@ class OfflineViewModel @ViewModelInject constructor(
         private set
     var placeholderCount = 0
         private set
+    var skipNextAutoScroll = false
 
     init {
         add(
@@ -128,15 +124,16 @@ class OfflineViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-
         nodeSaver.destroy()
     }
 
     fun getSelectedNodes(): List<MegaOffline> {
         val list = ArrayList<MegaOffline>()
+
         for (i in 0 until selectedNodes.size()) {
             list.add(selectedNodes.valueAt(i))
         }
+
         return list
     }
 
@@ -146,19 +143,11 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun getDisplayedNodesCount(): Int = nodes.value?.first?.size ?: 0
 
-    fun folderSelected(): Boolean {
-        for (i in 0 until selectedNodes.size()) {
-            if (selectedNodes.valueAt(i).isFolder) {
-                return true
-            }
-        }
-        return false
-    }
-
     fun selectAll() {
         val nodeList = nodes.value?.first ?: return
 
         val animNodeIndices = mutableSetOf<Int>()
+
         for ((position, node) in nodeList.withIndex()) {
             if (node == OfflineNode.HEADER || node == OfflineNode.PLACE_HOLDER) {
                 continue
@@ -170,6 +159,7 @@ class OfflineViewModel @ViewModelInject constructor(
             node.uiDirty = true
             selectedNodes.put(node.node.id, node.node)
         }
+
         _nodesToAnimate.value = animNodeIndices
         selecting = true
         _nodes.value = Pair(ArrayList(nodeList), -1)
@@ -187,6 +177,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         val animNodeIndices = mutableSetOf<Int>()
         val nodeList = nodes.value?.first ?: return
+
         for ((position, node) in nodeList.withIndex()) {
             if (node.selected) {
                 animNodeIndices.add(position)
@@ -194,6 +185,7 @@ class OfflineViewModel @ViewModelInject constructor(
             node.selected = false
             node.uiDirty = true
         }
+
         _nodesToAnimate.value = animNodeIndices
         _nodes.value = Pair(ArrayList(nodeList), -1)
     }
@@ -203,6 +195,7 @@ class OfflineViewModel @ViewModelInject constructor(
             handleSelection(position, node)
         } else {
             val nodeFile = getOfflineFile(context, node.node)
+
             if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
                 navigateIn(node.node, firstVisiblePosition)
             } else if (isFileAvailable(nodeFile) && nodeFile.isFile) {
@@ -215,6 +208,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (!rootFolderOnly) {
             selecting = true
         }
+
         onNodeClicked(position, node, INVALID_POSITION)
     }
 
@@ -228,6 +222,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     private fun handleSelection(position: Int, node: OfflineNode) {
         val nodes = _nodes.value?.first
+
         if (nodes == null || position < 0 || position >= nodes.size
             || nodes[position].node.id != node.node.id
         ) {
@@ -235,11 +230,13 @@ class OfflineViewModel @ViewModelInject constructor(
         }
 
         nodes[position].selected = !nodes[position].selected
+
         if (nodes[position].selected) {
             selectedNodes.put(node.node.id, node.node)
         } else {
             selectedNodes.remove(node.node.id)
         }
+
         nodes[position].uiDirty = true
         selecting = !selectedNodes.isEmpty
         _actionMode.value = selecting
@@ -255,6 +252,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
         val query = searchQuery
         searchQuery = null
+
         // submit search query and push search action into back stack when click folder
         when {
             query != null -> {
@@ -263,6 +261,7 @@ class OfflineViewModel @ViewModelInject constructor(
                 navigationDepthInSearch++
                 _submitSearchQuery.value = true
             }
+
             historySearchQuery != null -> {
                 navigationDepthInSearch++
             }
@@ -288,21 +287,23 @@ class OfflineViewModel @ViewModelInject constructor(
 
         val query = searchQuery
         searchQuery = null
+
         // has active search, should exit search mode
         if (query != null) {
-            logDebug("navigateOut exit search mode, path $path")
+            logDebug("navigateOut exit search mode")
             navigateTo(path, titleFromPath(path), 0)
             return BACK_PRESS_HANDLED
         }
 
         val searchPath = historySearchPath
+
         // has search action in back stack, should pop back stack
         if (navigationDepthInSearch > 0 && searchPath != null) {
             navigationDepthInSearch--
             // and if back stack is empty, then should re-enter search mode
             if (navigationDepthInSearch == 0) {
                 searchQuery = historySearchQuery
-                logDebug("navigateOut from searchPath $searchPath")
+                logDebug("navigateOut from searchPath")
                 path = searchPath
                 historySearchQuery = null
                 historySearchPath = null
@@ -311,15 +312,16 @@ class OfflineViewModel @ViewModelInject constructor(
             }
         }
 
-        logDebug("navigateOut from $path")
         // if back stack isn't empty, or no search action in back stack, just navigate out
         path = path.substring(0, path.length - 1)
         path = path.substring(0, path.lastIndexOf("/") + 1)
+
         val autoScrollPos = if (!searchMode() && firstVisiblePositionStack.isNotEmpty()) {
             firstVisiblePositionStack.pop()
         } else {
             -1
         }
+
         navigateTo(path, titleFromPath(path), autoScrollPos)
 
         return BACK_PRESS_HANDLED
@@ -327,12 +329,13 @@ class OfflineViewModel @ViewModelInject constructor(
 
     private fun titleFromPath(path: String): String {
         val query = searchQuery
+
         return when {
             query != null -> {
                 context.getString(R.string.action_search).toUpperCase(Locale.ROOT) + ": " + query
             }
             path == OFFLINE_ROOT || path == "" -> {
-                context.getString(R.string.tab_offline).toUpperCase(Locale.ROOT)
+                context.getString(R.string.section_saved_for_offline_new).toUpperCase(Locale.ROOT)
             }
             else -> {
                 val pathWithoutLastSlash = path.substring(0, path.length - 1)
@@ -344,8 +347,6 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     private fun navigateTo(path: String, title: String, autoScrollPos: Int = -1) {
-        logDebug("navigateTo path $path, title $title")
-
         this.path = path
         _pathLiveData.value = path
         _actionBarTitle.value = title
@@ -383,12 +384,13 @@ class OfflineViewModel @ViewModelInject constructor(
         path: String,
         order: Int
     ) {
-        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList, path $path")
+        logDebug("setDisplayParam rootFolderOnly $rootFolderOnly, isList $isList")
 
         this.rootFolderOnly = rootFolderOnly
         this.isList = isList
         gridSpanCount = spanCount
         this.path = path
+
         if (!rootFolderOnly) {
             this.order = order
         }
@@ -399,6 +401,7 @@ class OfflineViewModel @ViewModelInject constructor(
 
     fun refreshActionBarTitle() {
         val title = _actionBarTitle.value
+
         if (title != null) {
             _actionBarTitle.value = title
         }
@@ -444,6 +447,7 @@ class OfflineViewModel @ViewModelInject constructor(
         if (path == "") {
             return
         }
+
         add(Single.fromCallable { repo.loadOfflineNodes(path, order, searchQuery) }
             .map {
                 val nodes = ArrayList<OfflineNode>()

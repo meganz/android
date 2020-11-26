@@ -24,7 +24,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -112,10 +111,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
-import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -130,7 +129,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 @SuppressLint("NewApi")
-public class FileInfoActivityLollipop extends DownloadableActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
+public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -596,7 +595,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
         Rect rect = new Rect();
         getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
-        params.setMargins(px2dp(16, outMetrics), px2dp(90, outMetrics) + rect.top, 0, px2dp(14, outMetrics));
+        params.setMargins(dp2px(16, outMetrics), dp2px(90, outMetrics) + rect.top, 0, dp2px(14, outMetrics));
         iconToolbarLayout.setLayoutParams(params);
 
         imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
@@ -628,11 +627,11 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
         ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
         if(!isScreenInPortrait(this)){
-            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
-            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
+            ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_LAND, outMetrics));
+            ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
         }else{
-            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
-            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
+            ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_PORT, outMetrics));
+            ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
         }
         ownerLayout.setVisibility(View.GONE);
 
@@ -693,6 +692,12 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (adapterType == OFFLINE_ADAPTER){
             collapsingToolbar.setTitle(getIntent().getStringExtra(NAME).toUpperCase());
             availableOfflineLayout.setVisibility(View.GONE);
+
+            View view = findViewById(R.id.available_offline_separator);
+            if (view != null) {
+                view.setVisibility(View.GONE);
+            }
+
             sharedLayout.setVisibility(View.GONE);
             dividerSharedLayout.setVisibility(View.GONE);
             dividerLinkLayout.setVisibility(View.GONE);
@@ -777,6 +782,15 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 
                 if (node.isFolder()) {
                     modifiedLayout.setVisibility(View.GONE);
+
+                    if (isEmptyFolder(node)) {
+                        availableOfflineLayout.setVisibility(View.GONE);
+
+                        View view = findViewById(R.id.available_offline_separator);
+                        if (view != null) {
+                            view.setVisibility(View.GONE);
+                        }
+                    }
                 } else {
                     modifiedLayout.setVisibility(View.VISIBLE);
                 }
@@ -898,15 +912,14 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             }
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(manageShareReceiver,
-                new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
+        registerReceiver(manageShareReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE));
 
         IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
         contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
-        LocalBroadcastManager.getInstance(this).registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+        registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
@@ -1737,7 +1750,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
-                        saveOffline(destination, node, this, fileInfoActivityLollipop, megaApi);
+                        saveOffline(destination, node, this, fileInfoActivityLollipop);
 
 						supportInvalidateOptionsMenu();
 					}
@@ -1772,7 +1785,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
 									return;
 								}
 							}
-							saveOffline(destination, node, this, fileInfoActivityLollipop, megaApi);
+							saveOffline(destination, node, this, fileInfoActivityLollipop);
 						}
 						else{
                             logWarning("result=findIncomingParentHandle NOT result!");
@@ -2251,7 +2264,7 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved), -1);
                 Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN);
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                sendBroadcast(intent);
                 finish();
             } else{
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved), -1);
@@ -2390,8 +2403,6 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
                 nC = new NodeController(this);
             }
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
-        } else if (requestCode == REQUEST_CODE_TREE) {
-            onRequestSDCardWritePermission(intent, resultCode, false, nC);
         }
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 
@@ -2827,8 +2838,8 @@ public class FileInfoActivityLollipop extends DownloadableActivity implements On
         if (drawableLeave != null) drawableLeave.setColorFilter(null);
         if (drawableCopy != null) drawableCopy.setColorFilter(null);
         if (drawableChat != null) drawableChat.setColorFilter(null);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(contactUpdateReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(manageShareReceiver);
+        unregisterReceiver(contactUpdateReceiver);
+        unregisterReceiver(manageShareReceiver);
     }
 
 	@Override

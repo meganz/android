@@ -25,5 +25,5 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView_category"
         app:layout_constraintStart_toStartOf="@+id/imageView_category"
         app:layout_constraintTop_toBottomOf="@+id/imageView_category"
-        tools:text="@string/category_photos" />
+        tools:text="@string/sortby_type_photo_first" />
 </merge>

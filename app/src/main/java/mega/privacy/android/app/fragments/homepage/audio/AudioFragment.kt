@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,52 +26,25 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentAudioBinding
-import mega.privacy.android.app.fragments.homepage.ActionModeCallback
-import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
-import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.HomepageSearchable
-import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
-import mega.privacy.android.app.fragments.homepage.NodeGridAdapter
-import mega.privacy.android.app.fragments.homepage.NodeItem
-import mega.privacy.android.app.fragments.homepage.NodeListAdapter
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
-import mega.privacy.android.app.fragments.homepage.getLocationAndDimen
+import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
-import mega.privacy.android.app.utils.Constants.AUDIO_SEARCH_ADAPTER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
-import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.DraggingThumbnailCallback
-import mega.privacy.android.app.utils.FileUtils.getLocalFile
-import mega.privacy.android.app.utils.FileUtils.isInternalIntent
-import mega.privacy.android.app.utils.FileUtils.isLocalFile
-import mega.privacy.android.app.utils.FileUtils.isOpusFile
-import mega.privacy.android.app.utils.FileUtils.setLocalIntentParams
-import mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
-import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
-import mega.privacy.android.app.utils.callManager
-import mega.privacy.android.app.utils.displayMetrics
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -91,14 +64,15 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
-    @Inject lateinit var megaApi: MegaApiAndroid
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
     private var draggingNodeHandle = INVALID_HANDLE
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         binding = FragmentAudioBinding.inflate(inflater, container, false).apply {
             viewModel = this@AudioFragment.viewModel
@@ -132,10 +106,23 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.setImageResource(
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                R.drawable.ic_zero_data_recents_portrait
+            } else {
+                R.drawable.ic_zero_data_recents_landscape
+            }
+        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
-            getString(R.string.homepage_empty_hint_audio).toUpperCase(Locale.ROOT)
+                getString(R.string.homepage_empty_hint_audio).toUpperCase(Locale.ROOT)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
     }
 
     override fun onDestroy() {
@@ -150,9 +137,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
             callManager {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
                 it.showSnackbar(
-                    SNACKBAR_TYPE,
-                    getString(R.string.error_server_connection_problem),
-                    -1
+                        SNACKBAR_TYPE,
+                        getString(R.string.error_server_connection_problem),
+                        MEGACHAT_INVALID_HANDLE
                 )
             }
         }
@@ -167,7 +154,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             doIfOnline {
                 callManager { manager ->
                     manager.showNodeOptionsPanel(
-                        it.node, if (viewModel.searchMode) MODE5 else MODE1
+                            it.node, if (viewModel.searchMode) MODE5 else MODE1
                     )
                 }
             }
@@ -184,17 +171,24 @@ class AudioFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(
-            viewLifecycleOwner,
-            EventObserver { isList ->
-                switchListGridView(isList)
-                viewModel.refreshUi()
-            })
+                viewLifecycleOwner,
+                EventObserver { isList ->
+                    if (isList != viewModel.isList) {
+                        // change adapter will cause lose scroll position,
+                        // to avoid that, we only change adapter when the list/grid view
+                        // really change.
+                        switchListGridView(isList)
+                    }
+                    viewModel.refreshUi()
+                })
     }
 
     private fun switchListGridView(isList: Boolean) {
+        viewModel.isList = isList
         if (isList) {
             listView.switchToLinear()
             listView.adapter = listAdapter
+
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
@@ -213,6 +207,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         if (node == null) {
             return
         }
+
         val file: MegaNode = node
 
         val internalIntent = isInternalIntent(node)
@@ -235,12 +230,12 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
 
         listView.findViewHolderForLayoutPosition(index)?.itemView?.findViewById<ImageView>(R.id.thumbnail)
-            ?.let {
-                intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
-            }
+                ?.let {
+                    intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, it.getLocationAndDimen())
+                }
 
         val localPath = getLocalFile(context, file.name, file.size)
-        var paramsSetSuccessfully = if (isLocalFile(context, node, megaApi, localPath)) {
+        var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
             setLocalIntentParams(activity, node, intent, localPath, false)
         } else {
             setStreamingIntentParams(activity, node, megaApi, intent)
@@ -252,7 +247,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         if (!isIntentAvailable(context, intent)) {
             paramsSetSuccessfully = false
-            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
+            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available),
+                    MEGACHAT_INVALID_HANDLE)
         }
 
         if (paramsSetSuccessfully) {
@@ -266,7 +262,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
             }
         } else {
             logWarning("itemClick:noAvailableIntent")
-            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available), -1)
+            showSnackbar(activity, SNACKBAR_TYPE, getString(R.string.intent_not_available),
+                    MEGACHAT_INVALID_HANDLE)
             val nC = NodeController(context)
             nC.prepareForDownload(arrayListOf(node.handle), true)
         }
@@ -277,6 +274,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<NodeItem>(it)
+
         if (sortByHeaderViewModel.isList) {
             listAdapter.submitList(newList)
         } else {
@@ -286,13 +284,14 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
     }
 
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
-        listView
+            listView
     ) { v: View?, _, _, _, _ ->
         callManager { manager ->
             manager.changeActionBarElevation(v!!.canScrollVertically(-1))
@@ -311,7 +310,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     private fun setupActionMode() {
         actionModeCallback = ActionModeCallback(
-            requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
+                requireActivity() as ManagerActivityLollipop, actionModeViewModel, megaApi
         )
 
         observeItemLongClick()
@@ -321,33 +320,33 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     private fun observeItemLongClick() =
-        actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline { actionModeViewModel.enterActionMode(it) }
-        })
+            actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
+                doIfOnline { actionModeViewModel.enterActionMode(it) }
+            })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty()) {
-                actionMode?.apply {
-                    finish()
-                }
-            } else {
-                actionModeCallback.nodeCount = viewModel.getRealNodeCount()
-
-                if (actionMode == null) {
-                    callManager { manager ->
-                        manager.hideKeyboardSearch()
+            actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
+                if (it.isEmpty()) {
+                    actionMode?.apply {
+                        finish()
                     }
-                    actionMode = (activity as AppCompatActivity).startSupportActionMode(
-                        actionModeCallback
-                    )
                 } else {
-                    actionMode?.invalidate()  // Update the action items based on the selected nodes
-                }
+                    actionModeCallback.nodeCount = viewModel.getRealNodeCount()
 
-                actionMode?.title = it.size.toString()
-            }
-        })
+                    if (actionMode == null) {
+                        callManager { manager ->
+                            manager.hideKeyboardSearch()
+                        }
+                        actionMode = (activity as AppCompatActivity).startSupportActionMode(
+                                actionModeCallback
+                        )
+                    } else {
+                        actionMode?.invalidate()  // Update the action items based on the selected nodes
+                    }
+
+                    actionMode?.title = it.size.toString()
+                }
+            })
 
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
@@ -387,12 +386,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView: ImageView? = if (sortByHeaderViewModel.isList) {
-                        if (listAdapter.getItemViewType(pos) != NodeListAdapter.TYPE_HEADER) {
-                            itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        if (listAdapter.getItemViewType(pos) != TYPE_HEADER) {
+                            itemView.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                                R.color.new_multiselect_color))
                         }
                         itemView.findViewById(R.id.thumbnail)
                     } else {
-                        if (gridAdapter.getItemViewType(pos) != NodeGridAdapter.TYPE_HEADER) {
+                        if (gridAdapter.getItemViewType(pos) != TYPE_HEADER) {
                             itemView.setBackgroundResource(R.drawable.background_item_grid_selected)
                         }
                         itemView.findViewById(R.id.ic_selected)
@@ -403,7 +403,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
                         visibility = View.VISIBLE
 
                         val animator =
-                            AnimatorInflater.loadAnimator(context, R.animator.icon_select)
+                                AnimatorInflater.loadAnimator(context, R.animator.icon_select)
                         animator.setTarget(this)
                         animatorList.add(animator)
                     }
@@ -416,33 +416,40 @@ class AudioFragment : Fragment(), HomepageSearchable {
     }
 
     private fun observeActionModeDestroy() =
-        actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
-            actionMode = null
-            callManager { manager ->
-                manager.showKeyboardForSearch()
-            }
-        })
+            actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
+                actionMode = null
+                callManager { manager ->
+                    manager.showKeyboardForSearch()
+                }
+            })
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
     private fun setupListAdapter() {
         listAdapter =
-            NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+                NodeListAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         listAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
 
         gridAdapter =
-            NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
+                NodeGridAdapter(actionModeViewModel, itemOperationViewModel, sortByHeaderViewModel)
         gridAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                autoScrollToTop()
             }
         })
 
         switchListGridView(sortByHeaderViewModel.isList)
+    }
+
+    private fun autoScrollToTop() {
+        if (!viewModel.skipNextAutoScroll) {
+            listView.layoutManager?.scrollToPosition(0)
+        }
+        viewModel.skipNextAutoScroll = false
     }
 
     override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
@@ -476,6 +483,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
+
         viewModel.searchQuery = query
         viewModel.loadAudio()
     }
@@ -490,13 +498,14 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {
         val position = viewModel.getNodePositionByHandle(handle)
         val viewHolder = listView.findViewHolderForLayoutPosition(position) ?: return null
+
         return viewHolder.itemView.findViewById(R.id.thumbnail)
     }
 
     private fun setupDraggingThumbnailCallback() =
-        AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
-            AudioFragment::class.java, AudioDraggingThumbnailCallback(WeakReference(this))
-        )
+            AudioVideoPlayerLollipop.addDraggingThumbnailCallback(
+                    AudioFragment::class.java, AudioDraggingThumbnailCallback(WeakReference(this))
+            )
 
     fun scrollToPhoto(handle: Long) {
         val position = viewModel.getNodePositionByHandle(handle)
@@ -520,17 +529,18 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val intent = Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(requireContext()).sendBroadcast(intent)
+        requireContext().sendBroadcast(intent)
     }
 
     companion object {
-        private class AudioDraggingThumbnailCallback(private val fragmentRef: WeakReference<AudioFragment>) :
-            DraggingThumbnailCallback {
+        private class AudioDraggingThumbnailCallback(
+                private val fragmentRef: WeakReference<AudioFragment>
+        ) : DraggingThumbnailCallback {
 
             override fun setVisibility(visibility: Int) {
                 val fragment = fragmentRef.get() ?: return
                 fragment.getThumbnailViewByHandle(fragment.draggingNodeHandle)
-                    ?.apply { this.visibility = visibility }
+                        ?.apply { this.visibility = visibility }
             }
 
             override fun getLocationOnScreen(location: IntArray) {

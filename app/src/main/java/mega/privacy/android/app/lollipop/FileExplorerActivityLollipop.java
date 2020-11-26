@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
@@ -16,7 +15,6 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
@@ -103,7 +101,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -304,13 +302,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					intent.setAction(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE);
 					if (chatListItems.size() == 1) {
-						intent.putExtra("CHAT_ID", chatListItems.get(0).getChatId());
+						intent.putExtra(CHAT_ID, chatListItems.get(0).getChatId());
 					}
 					startActivity(intent);
 				}
 				else {
 					showSnackbar(getString(R.string.files_send_to_chat_error));
 				}
+
 				finishFileExplorer();
 			}
 		}
@@ -847,7 +846,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
 		if (!isCurrentFragment(fragmentIndex)) return;
 
-		abL.setElevation(elevate ? px2dp(4, outMetrics) : 0);
+		abL.setElevation(elevate ? dp2px(4, outMetrics) : 0);
 	}
 
 	private boolean isCurrentFragment(int index) {
@@ -1389,12 +1388,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void finishActivity(){
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			super.finishAndRemoveTask();
-		}
-		else {
-			super.finish();
-		}
+		finishAndRemoveTask();
 	}
 
 	@Override
@@ -1545,91 +1539,93 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return idMessage;
 	}
 
-	private void startChatUploadService () {
+	/**
+	 * Checks if should start ChatUploadService to share the content or only attach it.
+	 * If the ChatUploadService has to start, it also checks if the content is already
+	 * available on Cloud to avoid start upload existing files.
+	 */
+	private void startChatUploadService() {
+		if (chatListItems == null || chatListItems.isEmpty()) {
+			logWarning("ERROR null chats to upload");
+			filePreparedInfos = null;
+			openManagerAndFinish();
+			return;
+		}
+
 		logDebug("Launch chat upload with files " + filePreparedInfos.size());
 
+		boolean notEmptyAttachedNodes = attachNodes != null && !attachNodes.isEmpty();
+		boolean notEmptyUploadInfo = uploadInfos != null && !uploadInfos.isEmpty();
 		filesChecked = 0;
-		long[] attachNodeHandles;
-		ArrayList<Long> pendMsgArray = new ArrayList<>();
+
+		if (notEmptyAttachedNodes && !notEmptyUploadInfo) {
+			// All files exists, not necessary start ChatUploadService
+			pendingToAttach = attachNodes.size() * chatListItems.size();
+			for (MegaNode node : attachNodes) {
+				for (MegaChatRoom item : chatListItems) {
+					megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
+				}
+			}
+
+			return;
+		}
+
 		Intent intent = new Intent(this, ChatUploadService.class);
 
-		if (chatListItems != null && !chatListItems.isEmpty()) {
-			long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
-			HashMap<String, String> filesToUploadFingerPrint= new HashMap<>();
-			if (attachNodes != null && !attachNodes.isEmpty()) {
-//			There are exists files
-				if (uploadInfos != null && uploadInfos.size() > 0) {
-//					There are exist files and files for upload
-					attachNodeHandles = new long[attachNodes.size()];
-					for (int i=0; i<attachNodes.size(); i++) {
-						attachNodeHandles[i] = attachNodes.get(i).getHandle();
-					}
+		if (notEmptyAttachedNodes) {
+			// There are exist files and files for upload
+			long[] attachNodeHandles = new long[attachNodes.size()];
 
-					long[] attachIdChats = new long[chatListItems.size()];
-					for (int i=0; i<chatListItems.size(); i++) {
-						attachIdChats[i] = chatListItems.get(i).getChatId();
-					}
-					intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
-					intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles);
-
-					int pos = 0;
-					for (ShareInfo info : uploadInfos) {
-						long timestamp = System.currentTimeMillis()/1000;
-						String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-						filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
-						for(MegaChatRoom item : chatListItems){
-							idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
-							pos++;
-						}
-					}
-					intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
-					intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
-					intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
-					intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
-					startService(intent);
-
-					finishFileExplorer();
-				}
-				else {
-//					All files exists, not necessary start ChatUploadService
-					pendingToAttach = attachNodes.size() * chatListItems.size();
-					for (MegaNode node : attachNodes) {
-						for (MegaChatRoom item : chatListItems) {
-							megaChatApi.attachNode(item.getChatId(), node.getHandle(), this);
-						}
-					}
-				}
+			for (int i = 0; i < attachNodes.size(); i++) {
+				attachNodeHandles[i] = attachNodes.get(i).getHandle();
 			}
-			else {
-//			All files for upload
-				int pos = 0;
-				for (ShareInfo info : filePreparedInfos) {
-					long timestamp = System.currentTimeMillis()/1000;
-					String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
-					if (fingerprint == null) {
-						logWarning("Error, fingerprint == NULL is not possible to access file for some reason");
-						continue;
-					}
-					filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
-					for(MegaChatRoom item : chatListItems){
-						idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
-						pos++;
-					}
-				}
-				intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
-				intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
-				intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
-				intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
-				startService(intent);
 
-				finishFileExplorer();
+			intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles);
+		}
+
+		long[] attachIdChats = new long[chatListItems.size()];
+		for (int i = 0; i < chatListItems.size(); i++) {
+			attachIdChats[i] = chatListItems.get(i).getChatId();
+		}
+		intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats);
+
+		List<ShareInfo> infoToShare = notEmptyUploadInfo ? uploadInfos : filePreparedInfos;
+		long[] idPendMsgs = new long[uploadInfos.size() * chatListItems.size()];
+		HashMap<String, String> filesToUploadFingerPrint = new HashMap<>();
+		int pos = 0;
+
+		for (ShareInfo info : infoToShare) {
+			long timestamp = System.currentTimeMillis() / 1000;
+			String fingerprint = megaApi.getFingerprint(info.getFileAbsolutePath());
+			if (fingerprint == null) {
+				logWarning("Error, fingerprint == NULL is not possible to access file for some reason");
+				continue;
+			}
+
+			filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
+
+			for (MegaChatRoom item : chatListItems) {
+				idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+				pos++;
 			}
 		}
-		else{
-			filePreparedInfos = null;
-			logWarning("ERROR null files to upload");
-			finishActivity();
-		}
+
+		intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, nameFiles);
+		intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint);
+		intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs);
+		intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true);
+		intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode.serialize());
+		startService(intent);
+
+		openManagerAndFinish();
+	}
+
+	private void openManagerAndFinish() {
+		Intent intent = new Intent(this, ManagerActivityLollipop.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+
+		finish();
 	}
 
 	private void finishFileExplorer () {
@@ -1946,6 +1942,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		logDebug("handle: " + handle);
 
 		Intent startIntent = new Intent(this, ManagerActivityLollipop.class)
+				.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 				.putExtra(SHOW_MESSAGE_UPLOAD_STARTED, true)
 				.putExtra(NUMBER_UPLOADS, numberUploads);
 		if(handle!=-1){
@@ -2705,7 +2702,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-						intent.putExtra("CHAT_ID", idChat);
+						intent.putExtra(CHAT_ID, idChat);
 						startActivity(intent);
 					}
 				}
@@ -3310,7 +3307,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void updateManagerView () {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_VIEW);
 		intent.putExtra("isList", isList);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+		sendBroadcast(intent);
 	}
 
 	public void collapseSearchView () {

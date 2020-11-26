@@ -49,8 +49,6 @@
     
     <color name="green_free_account">#31B404</color>
 
-    <color name="divider_upgrade_account">#1F000000</color>
-
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -137,7 +135,6 @@
     <color name="camera_uploads_list_view">#FFF5F5F5</color>
     <color name="transparent_black2">#99000000</color>
 
-    <color name="keyboard_chat_separator">#1F000000</color>
     <color name="background_chat">#FFFFFFFF</color>
     <color name="disable_fab_chat_call">#444444</color>
     <color name="disable_fab_invite_contact">#A9E3D8</color>
@@ -153,6 +150,8 @@
 
     <color name="turn_on_notifications_background">#FF00A38C</color>
     <color name="turn_on_notifications_statusbar">#FF008270</color>
+    <color name="call_on_hold_banner">#60008270</color>
+
     <color name="turn_on_notifications_text">#B3000000</color>
 
 
@@ -207,7 +206,9 @@
     <color name="expired_business_user">#44BCE6</color>
     <color name="business_color">#2BA6DE</color>
 
+    <color name="black_12_alpha">#1F000000</color>
     <color name="black_40_alpha">#66000000</color>
+    <color name="black_54_alpha">#89000000</color>
 
     <color name="red_alert">#FF6464</color>
     <color name="status_bar_red_alert">#CF4949</color>
@@ -215,7 +216,14 @@
     <color name="reconnecting_bar">#FFF5A623</color>
     <color name="voice_clip_bubble">#323232</color>
     <color name="background_recording">#78252525</color>
-    
+
+    <color name="light_toolbar_title">#A8A8A8</color>
+    <color name="giphy_search_text">#121212</color>
+    <color name="giphy_loading_background">#ECECEC</color>
+
+    <color name="border_avatar_call">#4DFFFFFF</color>
+
+    <color name="over_quota_yellow">#FFFFB42B</color>
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
     <color name="pressed_color">#E7E7E7</color>
@@ -225,4 +233,6 @@
     <color name="homepage_title">#dd000000</color>
     <color name="homepage_content">#89000000</color>
     <color name="homepage_fab_label_text_color">#ff373737</color>
+
+    <color name="black_bottom_sheets_icon_tint">#8F000000</color>
 </resources>

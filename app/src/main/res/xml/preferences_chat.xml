@@ -1,30 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
+    <!--  Chat notification  -->
+    <androidx.preference.Preference
+        android:key="settings_chat_notification_chat"
+        android:title="@string/title_properties_contact_notifications_for_chat"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <!--  Set status  -->
+    <androidx.preference.ListPreference
+        android:key="settings_chat_list_status"
+        android:title="@string/set_status_option_label"
+        android:entries="@array/settings_status_entries"
+        android:entryValues="@array/settings_chat_status_values"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <!--  Auto-away  -->
     <androidx.preference.SwitchPreferenceCompat
-        android:key="settings_chat_notifications"
-        android:title="@string/title_properties_chat_contact_notifications"
-        android:defaultValue="true"
+        android:key="settings_chat_autoaway_switch"
+        android:title="@string/settings_autoaway_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
     <androidx.preference.Preference
-        android:key="settings_chat_sound"
-        android:title="@string/title_properties_chat_contact_message_sound"
+        android:key="settings_chat_autoaway_preference"
+        android:title="@string/settings_autoaway_subtitle"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
+    <!--  Status persistence  -->
+    <mega.privacy.android.app.components.TwoLineCheckPreference
+        android:key="settings_chat_persistence"
+        android:title="@string/settings_persistence_title"
+        android:summary="@string/settings_persistence_subtitle"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <!--  Show Last seen ...   -->
     <androidx.preference.SwitchPreferenceCompat
-        android:key="settings_chat_vibrate"
-        android:title="@string/settings_chat_vibration"
-        android:defaultValue="true"
+        android:key="settings_chat_last_green"
+        android:title="@string/option_enable_last_green_chat"
+        android:summary="@string/subtitle_option_enable_last_green_chat"
+        android:defaultValue="false"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
+    <!--  Chat video quality   -->
+    <androidx.preference.ListPreference
+        android:key="settings_chat_send_originals"
+        android:title="@string/settings_chat_upload_quality"
+        android:entries="@array/settings_chat_upload_quality_entries"
+        android:entryValues="@array/settings_chat_upload_quality_values"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
+    <!--  Rich URL Previews   -->
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_chat_rich_links_enable"
+        android:title="@string/option_enable_chat_rich_preview"
+        android:defaultValue="false"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>

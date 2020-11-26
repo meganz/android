@@ -9,8 +9,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
+
 import java.util.ArrayList;
 
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -33,6 +36,8 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
+import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -105,7 +110,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         LinearLayout infoFileSeparator = contentView.findViewById(R.id.info_file_separator);
         RelativeLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         RelativeLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
-        RelativeLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
+        LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
+        SwitchMaterial offlineSwitch = contentView.findViewById(R.id.file_properties_switch);
         LinearLayout deleteSeparator = contentView.findViewById(R.id.delete_separator);
         RelativeLayout optionDelete = contentView.findViewById(R.id.delete_layout);
         TextView textDelete = contentView.findViewById(R.id.delete_text);
@@ -200,10 +206,12 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionShare.setVisibility(typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT || !isOnline(context) || chatC.isInAnonymousMode() || message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() ? View.GONE : View.VISIBLE);
                 optionForward.setVisibility(!isOnline(context) || chatC.isInAnonymousMode() ? View.GONE : View.VISIBLE);
 
-                if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isEditable() || typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                    optionEdit.setVisibility(View.GONE);
+                if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()
+                        && message.getMessage().isEditable()
+                        && (typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META)) {
+                    optionEdit.setVisibility(View.VISIBLE);
                 } else {
-                    optionEdit.setVisibility(typeMessage == MegaChatMessage.TYPE_NORMAL || typeMessage == MegaChatMessage.TYPE_CONTAINS_META ? View.VISIBLE : View.GONE);
+                    optionEdit.setVisibility(View.GONE);
                 }
 
                 if (message.getMessage().getUserHandle() != megaChatApi.getMyUserHandle() || !message.getMessage().isDeletable()) {
@@ -229,7 +237,13 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
             optionImport.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
-            optionSaveOffline.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
+            boolean shouldShowOfflineOption = typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode();
+            if (shouldShowOfflineOption) {
+                offlineSwitch.setChecked(availableOffline(context, node));
+                optionSaveOffline.setVisibility(View.VISIBLE);
+            } else {
+                optionSaveOffline.setVisibility(View.GONE);
+            }
 
             if (typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                 long userCount = message.getMessage().getUsersCount();
@@ -303,6 +317,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionSelect.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
 
         deleteSeparator.setVisibility(optionDelete.getVisibility());
+
+        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
@@ -443,14 +459,21 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 chatC.importNode(messageId, chatId);
                 break;
 
+            case R.id.file_properties_switch:
             case R.id.option_save_offline_layout:
                 if (message == null) {
                     logWarning("Message is NULL");
                     return;
                 }
-                ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-                messages.add(message);
-                chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
+
+                if (availableOffline(context, node)) {
+                    MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
+                    removeOffline(mOffDelete, dbH, context);
+                } else {
+                    ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+                    messages.add(message);
+                    chatC.saveForOfflineWithAndroidMessages(messages, megaChatApi.getChatRoom(chatId));
+                }
                 break;
 
             case R.id.delete_layout:

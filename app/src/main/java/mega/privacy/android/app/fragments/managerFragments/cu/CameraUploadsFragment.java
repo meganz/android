@@ -25,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
@@ -70,9 +69,9 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
 import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.FileUtils.findVideoLocalPath;
-import static mega.privacy.android.app.utils.FileUtils.setLocalIntentParams;
-import static mega.privacy.android.app.utils.FileUtils.setStreamingIntentParams;
+import static mega.privacy.android.app.utils.FileUtil.findVideoLocalPath;
+import static mega.privacy.android.app.utils.FileUtil.setLocalIntentParams;
+import static mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.JobUtil.stopRunningCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -80,9 +79,10 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
     public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
@@ -216,7 +216,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         res[1] += res[3] / 2;
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG);
         intent.putExtra("screenPosition", res);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     private void skipInitialCUSetup() {
@@ -602,11 +602,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             if (!enabled) {
                 FrameLayout.LayoutParams params =
                         (FrameLayout.LayoutParams) mBinding.cuList.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
+                params.bottomMargin = dp2px(48, outMetrics);
                 mBinding.cuList.setLayoutParams(params);
 
                 params = (FrameLayout.LayoutParams) mBinding.scroller.getLayoutParams();
-                params.bottomMargin = px2dp(48, outMetrics);
+                params.bottomMargin = dp2px(48, outMetrics);
                 mBinding.scroller.setLayoutParams(params);
             }
         });
@@ -666,8 +666,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             setDraggingThumbnailCallback();
             launchNodeViewer(intent, node.getHandle());
         } else if (mime.isVideoReproducible()) {
-            String mimeType = mime.getType();
-
             Intent mediaIntent;
             boolean internalIntent;
             if (mime.isVideoNotSupported()) {
@@ -699,7 +697,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
             if (!isIntentAvailable(context, mediaIntent)) {
                 mManagerActivity.showSnackbar(SNACKBAR_TYPE,
-                        getString(R.string.intent_not_available), -1);
+                        getString(R.string.intent_not_available), MEGACHAT_INVALID_HANDLE);
                 paramsSetSuccessfully = false;
             }
             if (paramsSetSuccessfully) {

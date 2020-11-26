@@ -1,153 +1,58 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.text.Html;
-import android.text.Spanned;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import androidx.core.text.HtmlCompat;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaTransfersLollipopAdapter;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.*;
 
 
-public class TransfersFragmentLollipop extends Fragment {
+public class TransfersFragmentLollipop extends TransfersBaseFragment {
 
-	Context context;
-	RecyclerView listView;
-	MegaTransfersLollipopAdapter adapter;
-	
-	MegaApiAndroid megaApi;
-	TextView contentText;
-	ImageView emptyImage;
-	TextView emptyText;
+	private MegaTransfersLollipopAdapter adapter;
 
-	float density;
-	DisplayMetrics outMetrics;
-	Display display;
-	
-	LinearLayoutManager mLayoutManager;
-	
-	TransfersFragmentLollipop transfersFragment = this;
-	
-//	SparseArray<TransfersHolder> transfersListArray = null;
-
-	ArrayList<MegaTransfer> tL = null;
-
-	private Handler handler;
-	
-	@Override
-	public void onCreate (Bundle savedInstanceState){
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		handler = new Handler();
-
-		tL = new ArrayList<MegaTransfer>();
-
-		super.onCreate(savedInstanceState);
-		logDebug("onCreate");
-	}
+	private ArrayList<MegaTransfer> tL = new ArrayList<>();
 
 	public static TransfersFragmentLollipop newInstance() {
-		logDebug("newInstance");
-		TransfersFragmentLollipop fragment = new TransfersFragmentLollipop();
-		return fragment;
+		return new TransfersFragmentLollipop();
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {  
-		
+							 Bundle savedInstanceState) {
+
 		super.onCreateView(inflater, container, savedInstanceState);
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-	    
-		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
+		View v = initView(inflater, container);
 
-		listView = (RecyclerView) v.findViewById(R.id.transfers_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
-		mLayoutManager = new LinearLayoutManager(context);
-		listView.setLayoutManager(mLayoutManager);
-		listView.setHasFixedSize(true);
-		listView.setItemAnimator(null);
-		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-			@Override
-			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-				super.onScrolled(recyclerView, dx, dy);
-				if (listView != null) {
-					if (listView.canScrollVertically(-1)) {
-						((ManagerActivityLollipop) context).changeActionBarElevation(true);
-					}
-					else {
-						((ManagerActivityLollipop) context).changeActionBarElevation(false);
-					}
-				}
-			}
-		});
+		emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.ic_zero_portrait_transfers : R.drawable.ic_zero_landscape_saved_for_offline);
 
-		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
-		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
-
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImage.setImageResource(R.drawable.ic_zero_landscape_saved_for_offline);
-		}else{
-			emptyImage.setImageResource(R.drawable.ic_zero_portrait_transfers);
-		}
-
-//		emptyText.setText(getString(R.string.transfers_empty));
-
-		String textToShow = String.format(context.getString(R.string.transfers_empty_new));
-		try{
+		String textToShow = context.getString(R.string.transfers_empty_new);
+		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting string", e);
 		}
-		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
-		emptyText.setText(result);
+		emptyText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		setTransfers();
-		
-//		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
-		adapter = new MegaTransfersLollipopAdapter(context, this, tL, listView);
+
+		adapter = new MegaTransfersLollipopAdapter(context, tL, listView);
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
@@ -155,94 +60,59 @@ public class TransfersFragmentLollipop extends Fragment {
 		return v;
 	}
 
-	public void setTransfers(){
-		logDebug("setTransfers");
-
-		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
-			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgress.get(i));
-			if (transfer != null) {
-				if (!transfer.isStreamingTransfer()) {
-					tL.add(transfer);
-				}
-			}
-		}
-
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-		else{
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
-		}
-	}
-
-	public void refreshAllTransfers(){
-		logDebug("refreshAllTransfers");
+	private void setTransfers() {
 		tL.clear();
 
-		for(int i=0; i<((ManagerActivityLollipop)context).transfersInProgress.size();i++){
-			MegaTransfer transfer = megaApi.getTransferByTag(((ManagerActivityLollipop)context).transfersInProgress.get(i));
-			if(!transfer.isStreamingTransfer()){
+		for (int i = 0; i < managerActivity.transfersInProgress.size(); i++) {
+			MegaTransfer transfer = megaApi.getTransferByTag(managerActivity.transfersInProgress.get(i));
+			if (transfer != null && !transfer.isStreamingTransfer()) {
 				tL.add(transfer);
 			}
 		}
 
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-		else{
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
-		}
-
-		adapter.notifyDataSetChanged();
+		setEmptyView(tL.size());
 	}
-	
-	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-    }
 
-	public void transferUpdate(MegaTransfer transfer){
-		logDebug("Node handle: " + transfer.getNodeHandle());
-        try{
+	/**
+	 * Updates the state of a transfer.
+	 *
+	 * @param transfer	transfer to update
+	 */
+	public void transferUpdate(MegaTransfer transfer) {
+		try {
 			ListIterator li = tL.listIterator();
 			int index = 0;
-			while(li.hasNext()) {
+			while (li.hasNext()) {
 				MegaTransfer next = (MegaTransfer) li.next();
-				if(next!=null){
-					if(next.getTag() == transfer.getTag()){
-						index=li.previousIndex();
-						break;
-					}
+				if (next != null && next.getTag() == transfer.getTag()) {
+					index = li.previousIndex();
+					break;
 				}
 			}
 			tL.set(index, transfer);
-			logDebug("Update the transfer with index: " + index + ", left: " + tL.size());
 
 			adapter.updateProgress(index, transfer);
-		}
-        catch(IndexOutOfBoundsException e){
+		} catch (IndexOutOfBoundsException e) {
 			logError("EXCEPTION", e);
 		}
-    }
+	}
 
-	public void changeStatusButton(int tag){
+	/**
+	 * Changes the status (play/pause) of the button of a transfer.
+	 *
+	 * @param tag	identifier of the transfer to change the status of the button
+	 */
+	public void changeStatusButton(int tag) {
 		logDebug("tag: " + tag);
 
 		ListIterator li = tL.listIterator();
 		int index = 0;
-		while(li.hasNext()) {
+		while (li.hasNext()) {
 			MegaTransfer next = (MegaTransfer) li.next();
-			if(next.getTag() == tag){
-				index=li.previousIndex();
+			if (next == null) continue;
+
+			if (next.getTag() == tag) {
+				index = li.previousIndex();
 				break;
 			}
 		}
@@ -253,51 +123,53 @@ public class TransfersFragmentLollipop extends Fragment {
 		adapter.notifyItemChanged(index);
 	}
 
-    public void transferFinish(int transferTag){
-		logDebug("transferTag is " + transferTag);
-		int position = -1;
-        for (int i=0; i<tL.size(); i++) {
-            MegaTransfer transfer = tL.get(i);
-            if(transfer != null && transfer.getTag() == transferTag){
-                position = i;
-                break;
-            }
-        }
-
-		if(position == -1){
-		    return;
-        }
-
-		if(!tL.isEmpty() && position < tL.size()){
-			tL.remove(position);
+	/**
+	 * Removes a transfer when finishes.
+	 *
+	 * @param transferTag	identifier of the transfer to remove
+	 */
+	public void transferFinish(int transferTag) {
+		for (int i = 0; i < tL.size(); i++) {
+			MegaTransfer transfer = tL.get(i);
+			if (transfer != null && transfer.getTag() == transferTag) {
+				tL.remove(i);
+				adapter.removeItemData(i);
+				break;
+			}
 		}
 
-		adapter.removeItemData(position);
+		setEmptyView(tL.size());
 
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
+		if (tL.isEmpty()) {
+			managerActivity.supportInvalidateOptionsMenu();
 		}
 	}
 
-	public void transferStart(MegaTransfer transfer){
-		logDebug("Node handle: " + transfer.getNodeHandle());
-		if(!transfer.isStreamingTransfer()){
-			tL.add(transfer);
+	/**
+	 * Adds a transfer when starts.
+	 *
+	 * @param transfer	transfer to add
+	 */
+	public void transferStart(MegaTransfer transfer) {
+		if (transfer.isStreamingTransfer()) {
+			return;
 		}
 
-		adapter.notifyItemInserted(tL.size()-1);
+		if (tL.isEmpty()) {
+			managerActivity.supportInvalidateOptionsMenu();
+		}
 
-		if (tL.size() == 0){
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			listView.setVisibility(View.GONE);
-		}
-		else{
-			emptyImage.setVisibility(View.GONE);
-			emptyText.setVisibility(View.GONE);
-			listView.setVisibility(View.VISIBLE);
-		}
+		tL.add(transfer);
+		adapter.notifyItemInserted(tL.size() - 1);
+		setEmptyView(tL.size());
+	}
+
+	/**
+	 * Checks if there is any transfer in progress.
+	 *
+	 * @return True if there is not any transfer, false otherwise.
+	 */
+	public boolean isEmpty() {
+		return tL.isEmpty();
 	}
 }

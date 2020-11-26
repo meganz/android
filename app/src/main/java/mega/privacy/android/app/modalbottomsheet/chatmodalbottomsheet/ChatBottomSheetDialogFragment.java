@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -41,11 +43,8 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     private ChatController chatC;
     private MegaChatListItem chat = null;
     private long chatId;
-
-    private boolean notificationsEnabled;
-    private ChatItemPreferences chatPrefs;
-
     private RoundedImageView chatImageView;
+    private TextView optionMuteChatText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,17 +90,17 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         LinearLayout optionClearHistory = contentView.findViewById(R.id.chat_list_clear_history_chat_layout);
         LinearLayout optionMuteChat = contentView.findViewById(R.id.chat_list_mute_chat_layout);
         ImageView optionMuteChatIcon = contentView.findViewById(R.id.chat_list_mute_chat_image);
-        TextView optionMuteChatText = contentView.findViewById(R.id.chat_list_mute_chat_text);
+        optionMuteChatText = contentView.findViewById(R.id.chat_list_mute_chat_text);
         LinearLayout optionArchiveChat = contentView.findViewById(R.id.chat_list_archive_chat_layout);
         TextView archiveChatText = contentView.findViewById(R.id.chat_list_archive_chat_text);
         ImageView archiveChatIcon = contentView.findViewById(R.id.file_archive_chat_image);
 
         if (isScreenInPortrait(context)) {
-            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
         } else {
-            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
         optionInfoChat.setOnClickListener(this);
@@ -190,18 +189,16 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), iconStateChatPanel);
             }
 
-            chatPrefs = dbH.findChatPreferencesByHandle(String.valueOf(chat.getChatId()));
-            if (chatPrefs != null) {
-                notificationsEnabled = true;
-                if (chatPrefs.getNotificationsEnabled() != null) {
-                    notificationsEnabled = Boolean.parseBoolean(chatPrefs.getNotificationsEnabled());
-                }
+            if (isEnableChatNotifications(chat.getChatId())) {
+                optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_mute));
+                optionMuteChatText.setText(getString(R.string.general_mute));
+            }else{
+                optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
+                optionMuteChatText.setText(getString(R.string.general_unmute));
+            }
 
-                if (!notificationsEnabled) {
-                    optionMuteChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unmute));
-                    optionMuteChatText.setText(getString(R.string.general_unmute));
-                }
-            } else {
+            ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chat.getChatId()));
+            if(chatPrefs == null) {
                 MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(chat.getPeerHandle());
                 if (chatRoom != null) {
                     String email = chatC.getParticipantEmail(chatRoom.getPeerHandle(0));
@@ -209,7 +206,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                     addAvatarChatPanel(email, chat);
                 }
             }
-
             if (chat.isArchived()) {
                 archiveChatText.setText(getString(R.string.unarchive_chat_option));
                 archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_unarchive));
@@ -284,16 +280,13 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.chat_list_mute_chat_layout:
-                if (chatPrefs == null) {
-                    chatPrefs = new ChatItemPreferences(Long.toString(chat.getChatId()), Boolean.toString(notificationsEnabled), "");
-                    dbH.setChatItemPreferences(chatPrefs);
-                } else if (notificationsEnabled) {
-                    chatC.muteChat(chat);
-                } else {
-                    chatC.unmuteChat(chat);
+                if (context instanceof ManagerActivityLollipop) {
+                    if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
+                        createMuteNotificationsAlertDialogOfAChat((Activity) context, chat.getChatId());
+                    } else {
+                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(context, NOTIFICATIONS_ENABLED, chat.getChatId());
+                    }
                 }
-
-                ((ManagerActivityLollipop) context).showMuteIcon(chat);
                 break;
 
             case R.id.chat_list_archive_chat_layout:

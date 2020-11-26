@@ -84,6 +84,15 @@
                                 android:src="@drawable/ic_private_chat"
                                 android:tint="@color/white"
                                 android:visibility="gone" />
+                            <ImageView
+                                android:id="@+id/mute_icon_toolbar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_mute_small"
+                                android:tint="@color/white"
+                                android:visibility="gone" />
                         </LinearLayout>
                     </RelativeLayout>
 
@@ -169,6 +178,47 @@
                     android:orientation="vertical">
 
                     <RelativeLayout
+                        android:id="@+id/call_on_hold_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@drawable/border_call_on_hold"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="21dp"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="horizontal">
+                            <ImageView
+                                android:id="@+id/call_on_hold_icon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="15dp"
+                                android:src="@drawable/ic_transfers_pause"/>
+                            <TextView
+                                android:id="@+id/call_on_hold_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:gravity="center_vertical"
+                                android:text="@string/call_on_hold"
+                                android:textColor="@color/accentColor"
+                                android:textAllCaps="true"
+                                android:textSize="15sp"
+                                android:fontFamily="Roboto"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
                         android:id="@+id/write_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -180,7 +230,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
                             android:layout_alignTop="@id/writing_linear_layout_chat"
-                            android:background="@color/keyboard_chat_separator"
+                            android:background="@color/black_12_alpha"
                             android:orientation="horizontal"
                             android:visibility="visible" />
 
@@ -227,7 +277,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignTop="@id/linear_layout_options"
-                        android:background="@color/keyboard_chat_separator"
+                        android:background="@color/black_12_alpha"
                         android:orientation="horizontal"
                         android:visibility="gone" />
 
@@ -302,6 +352,23 @@
                                 android:src="@drawable/attach_file"
                                 android:tint="@color/transparent_black" />
                         </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/rl_gif_chat"
+                            android:layout_width="56dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageButton
+                                android:id="@+id/gif_chat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:background="@null"
+                                android:src="@drawable/ic_gif_toolbar"
+                                android:tint="@color/transparent_black" />
+                        </RelativeLayout>
+
                     </LinearLayout>
 
                     <mega.privacy.android.app.components.twemoji.EmojiKeyboard
@@ -338,24 +405,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/keyboard_chat_separator"
+                    android:background="@color/black_12_alpha"
                     android:orientation="horizontal" />
 
                 <Button
                     android:id="@+id/join_button"
+                    style="@style/AccentButton"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:background="@color/accentColor"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:minHeight="36dp"
-                    android:stateListAnimator="@anim/button_upgrade_elevation"
-                    android:text="@string/action_join"
-                    android:textColor="@color/white"
-                    android:tint="@android:color/white" />
+                    android:text="@string/action_join" />
 
             </RelativeLayout>
 
@@ -370,7 +431,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/keyboard_chat_separator"
+                    android:background="@color/black_12_alpha"
                     android:orientation="horizontal" />
 
                 <TextView

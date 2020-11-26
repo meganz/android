@@ -57,7 +57,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -147,6 +147,15 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public TextView textViewFileNameForFile;
         public ImageView takenDownImageForFile;
         public ImageView fileGridSelected;
+    }
+
+    public static class ViewHolderOverQuotaBanner extends ViewHolderBrowser {
+
+        private ViewHolderOverQuotaBanner(View v) {
+            super(v);
+        }
+
+        TextView transferOverQuotaBannerText;
     }
 
     @Override
@@ -532,9 +541,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holderList.textViewFileSize = v.findViewById(R.id.file_list_filesize);
             if (isScreenInPortrait(context)) {
-                holderList.textViewFileSize.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+                holderList.textViewFileSize.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
             } else {
-                holderList.textViewFileSize.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+                holderList.textViewFileSize.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
             }
 
             holderList.threeDotsLayout = v.findViewById(R.id.file_list_three_dots_layout);
@@ -1259,7 +1268,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     /*
      * Get document at specified position
      */
-    public MegaNode getNodeAt(int position) {
+    private MegaNode getNodeAt(int position) {
         try {
             if (nodes != null) {
                 return nodes.get(position);

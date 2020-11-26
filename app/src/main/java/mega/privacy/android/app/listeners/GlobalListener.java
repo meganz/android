@@ -1,13 +1,13 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -43,6 +43,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
+                MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
+            }
+
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
                 api.getMyChatFilesFolder(new GetAttrUserListener(megaApplication, true));
             }
@@ -52,12 +56,36 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
                 break;
             }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS) && isMyChange) {
+                api.shouldShowRichLinkWarning(new GetAttrUserListener(megaApplication));
+                api.isRichPreviewsEnabled(new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME) && isMyChange) {
+                api.getRubbishBinAutopurgePeriod(new GetAttrUserListener(megaApplication));
+                break;
+            }
+
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
+                api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
+                break;
+            }
         }
     }
 
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
         megaApplication.updateAppBadge();
+
+        notifyNotificationCountChange(api);
+    }
+
+    private void notifyNotificationCountChange(MegaApiJava api) {
+        ArrayList<MegaContactRequest> incomingContactRequests = api.getIncomingContactRequests();
+        EventNotifierKt.notifyNotificationCountChange(api.getNumUnreadUserAlerts()
+                + (incomingContactRequests == null ? 0 : incomingContactRequests.size()));
     }
 
     @Override
@@ -83,7 +111,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-        LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+        MegaApplication.getInstance().sendBroadcast(intent);
 
         api.getPaymentMethods(null);
         api.getAccountDetails(null);
@@ -97,6 +125,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         if (requests == null) return;
 
         megaApplication.updateAppBadge();
+
+        notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);
@@ -127,6 +157,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onEvent(MegaApiJava api, MegaEvent event) {
         logDebug("Event received: " + event.getText());
 
+        if (megaApplication == null) {
+            megaApplication = MegaApplication.getInstance();
+        }
+
         switch (event.getType()) {
             case MegaEvent.EVENT_STORAGE:
                 logDebug("EVENT_STORAGE: " + event.getNumber());
@@ -143,7 +177,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
                     intent.setAction(ACTION_STORAGE_STATE_CHANGED);
                     intent.putExtra(EXTRA_STORAGE_STATE, state);
-                    LocalBroadcastManager.getInstance(megaApplication).sendBroadcast(intent);
+                    megaApplication.sendBroadcast(intent);
                 }
                 break;
 

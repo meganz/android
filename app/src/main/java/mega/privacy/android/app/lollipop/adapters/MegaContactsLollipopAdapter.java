@@ -44,7 +44,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -158,12 +158,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			if(!isScreenInPortrait(context)){
 				logDebug("Landscape configuration");
-				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
@@ -188,7 +188,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderGrid.contactSelectedIcon = v.findViewById(R.id.contact_grid_selected_icon);
 
 			if(!isScreenInPortrait(context)){
-				holderGrid.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_GRID_LAND, outMetrics));
+				holderGrid.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_GRID_LAND, outMetrics));
 			}
 			else{
 				holderGrid.textViewContactName.setMaxWidthEmojis(scaleWidthPx(MAX_WIDTH_CONTACT_NAME_GRID_PORT, outMetrics));
@@ -216,12 +216,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.declineLayout.setVisibility(View.GONE);
 
 			if(!isScreenInPortrait(context)){
-				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
 			holderList.threeDotsLayout = v.findViewById(R.id.contact_list_three_dots_layout);
@@ -253,12 +253,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			holderList.declineLayout.setVisibility(View.VISIBLE);
 
 			if(!isScreenInPortrait(context)){
-				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
-				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
+				holderList.textViewContent.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, outMetrics));
 			}
 			else{
-				holderList.textViewContactName.setMaxWidthEmojis(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
-				holderList.textViewContent.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContactName.setMaxWidthEmojis(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
+				holderList.textViewContent.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, outMetrics));
 			}
 
 			holderList.threeDotsLayout = v.findViewById(R.id.contact_list_three_dots_layout);
@@ -929,24 +929,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		notifyItemChanged(position);
 	}
-
-	/*public void startOneToOneChat(MegaUser user){
-		log("startOneToOneChat");
-		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
-		MegaChatPeerList peers = MegaChatPeerList.createInstance();
-		if(chat==null){
-			log("No chat, create it!");
-			peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-			megaChatApi.createChat(false, peers, this);
-		}
-		else{
-			log("There is already a chat, open it!");
-			Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
-			intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-			intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
-			this.startActivity(intentOpenChat);
-		}
-	}*/
 
 	public ArrayList<MegaContactAdapter> getContacts() {
 		return contacts;

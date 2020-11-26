@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
@@ -38,8 +38,9 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.ref.WeakReference
-import java.util.Locale
+import java.util.*
 
 @AndroidEntryPoint
 class PhotosFragment : BaseFragment(), HomepageSearchable {
@@ -57,8 +58,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
-
-    private lateinit var activity: ManagerActivityLollipop
 
     private var draggingPhotoHandle = INVALID_HANDLE
 
@@ -79,7 +78,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
-        activity = getActivity() as ManagerActivityLollipop
 
         setupEmptyHint()
         setupListView()
@@ -91,7 +89,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
-                activity.invalidateOptionsMenu()  // Hide the search icon if no photo
+                activity?.invalidateOptionsMenu()  // Hide the search icon if no photo
             }
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
@@ -99,6 +97,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupEmptyHint() {
+        binding.emptyHint.emptyHintImage.setImageResource(
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                R.drawable.ic_zero_data_recents_portrait
+            } else {
+                R.drawable.ic_zero_data_recents_landscape
+            }
+        )
         binding.emptyHint.emptyHintImage.isVisible = false
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
@@ -109,11 +114,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         if (Util.isOnline(context)) {
             operation()
         } else {
+            val activity = activity as ManagerActivityLollipop
+
             activity.hideKeyboardSearch()  // Make the snack bar visible to the user
             activity.showSnackbar(
                 SNACKBAR_TYPE,
                 context.getString(R.string.error_server_connection_problem),
-                -1
+                MEGACHAT_INVALID_HANDLE
             )
         }
     }
@@ -125,7 +132,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
-                activity.showNodeOptionsPanel(
+                (activity as ManagerActivityLollipop).showNodeOptionsPanel(
                     it.node,
                     MODE5
                 )
@@ -144,6 +151,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
         val newList = ArrayList<PhotoNodeItem>(it)
+
         if (viewModel.searchMode) {
             searchAdapter.submitList(newList)
         } else {
@@ -153,6 +161,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun preventListItemBlink() {
         val animator = listView.itemAnimator
+
         if (animator is SimpleItemAnimator) {
             animator.supportsChangeAnimations = false
         }
@@ -161,13 +170,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        activity.changeActionBarElevation(v!!.canScrollVertically(-1))
+        (activity as ManagerActivityLollipop).changeActionBarElevation(v!!.canScrollVertically(-1))
     }
 
     private fun setupListView() {
         listView = binding.photoList
         preventListItemBlink()
         elevateToolbarWhenScrolling()
+
         itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
 
@@ -176,7 +186,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun setupActionMode() {
-        actionModeCallback = ActionModeCallback(activity, actionModeViewModel, megaApi)
+        actionModeCallback =
+            ActionModeCallback(activity as ManagerActivityLollipop, actionModeViewModel, megaApi)
 
         observeItemLongClick()
         observeSelectedItems()
@@ -199,7 +210,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
 
                 if (actionMode == null) {
-                    activity.hideKeyboardSearch()
+                    (activity as ManagerActivityLollipop).hideKeyboardSearch()
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
@@ -249,7 +260,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                     val itemView = viewHolder.itemView
 
                     val imageView = if (viewModel.searchMode) {
-                        itemView.setBackgroundColor(resources.getColor(R.color.new_multiselect_color))
+                        itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color))
                         itemView.findViewById(R.id.thumbnail)
                     } else {
                         // Draw the green outline for the thumbnail view at once
@@ -282,7 +293,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
-            activity.showKeyboardForSearch()
+            (activity as ManagerActivityLollipop).showKeyboardForSearch()
         })
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
@@ -293,7 +304,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                listView.layoutManager?.scrollToPosition(0)
+                if (!viewModel.skipNextAutoScroll) {
+                    listView.layoutManager?.scrollToPosition(0)
+                }
+                viewModel.skipNextAutoScroll = false
             }
         })
 
@@ -311,8 +325,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            RunOnUIThreadUtils.post { activity.hideKeyboardSearch() }
+            RunOnUIThreadUtils.post { (activity as ManagerActivityLollipop).hideKeyboardSearch() }
         }
+
         if (viewModel.searchMode) return
 
         listView.switchToLinear()
@@ -351,6 +366,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
+
         viewModel.searchQuery = query
         viewModel.loadPhotos()
     }
@@ -389,6 +405,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        viewModel.skipNextAutoScroll = true
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         FullScreenImageViewerLollipop.removeDraggingThumbnailCallback(PhotosFragment::class.java)
@@ -416,7 +438,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         val intent = Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG)
         intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, location)
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+        context.sendBroadcast(intent)
     }
 
     private fun getThumbnailViewByHandle(handle: Long): ImageView? {

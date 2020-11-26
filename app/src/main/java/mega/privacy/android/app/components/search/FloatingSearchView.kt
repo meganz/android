@@ -150,6 +150,9 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         fun onFocusCleared()
     }
 
+    /**
+     * The Listener of the hamburger navigation drawer
+     */
     inner class DrawerListener : DrawerLayout.DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             setMenuIconProgress(slideOffset)
@@ -166,7 +169,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
      *
      * @param listener
      */
-    fun setOnLeftMenuClickListener(listener: OnLeftMenuClickListener?) {
+    private fun setOnLeftMenuClickListener(listener: OnLeftMenuClickListener?) {
         menuClickListener = listener
     }
 
@@ -185,6 +188,11 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         focusChangeListener = listener
     }
 
+    /**
+     * Set the notification count shown on the badge of the hamburger icon
+     *
+     * @param count notification count
+     */
     fun setLeftNotificationCount(count: Int) {
         menuBtnShowDot = count > 0
         val searchInputHasFocus = searchInput.hasFocus()
@@ -193,10 +201,21 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
             if (count > MAX_NOTIFICATION_COUNT) MAX_NOTIFICATION_COUNT_TEXT else count.toString()
     }
 
+    /**
+     * Set the avatar shown on the right side
+     *
+     * @param avatar the avatar bitmap
+     */
     fun setAvatar(avatar: Bitmap) {
         binding.avatarImage.setImageBitmap(avatar)
     }
 
+    /**
+     * Set the icon for indicating current chat status
+     *
+     * @param visible true if the icon is visible
+     * @param icon the dot icon for indicating the status
+     */
     fun setChatStatus(visible: Boolean, icon: Int) {
         if (visible) {
             binding.chatStatusIcon.visibility = View.VISIBLE
@@ -271,11 +290,14 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         }
     }
 
+    /**
+     * Init the drawable and the click listener for the left icon
+     */
     private fun initLeftAction() {
         leftAction.setImageDrawable(menuBtnDrawable)
         menuBtnDrawable?.progress = MENU_BUTTON_PROGRESS_HAMBURGER
 
-        leftAction.setOnClickListener { _ ->
+        leftAction.setOnClickListener {
             if (isInputFocused) {
                 setSearchFocusedInternal(false)
             } else {
@@ -288,6 +310,11 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         if (menuOpen) closeMenu(true) else openMenu(true)
     }
 
+    /**
+     * Make the clear button visible or invisible according to the input text
+     *
+     * @param textIsEmpty true if the input text is empty
+     */
     private fun changeClearButton(textIsEmpty: Boolean) {
         clearBtn.apply {
             if (!textIsEmpty && visibility == View.INVISIBLE) {
@@ -306,6 +333,12 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         queryListener?.onSearchTextChanged(query, text)
     }
 
+    /**
+     * Set the status of the input EditText, clear button, etc. when
+     * the edit text gaining or losing focus
+     *
+     * @param focused is the input EditText gained the input focus
+     */
     private fun setSearchFocusedInternal(focused: Boolean) {
         isInputFocused = focused
 
@@ -313,16 +346,22 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
             searchInput.requestFocus()
             Util.showKeyboardDelayed(searchInput)
             changeMenuDrawable(withAnim = true, isOpen = true)
-            if (menuOpen) closeMenu(false)
+
+            if (menuOpen) {
+                closeMenu(false)
+            }
+
             searchInput.apply {
                 isLongClickable = true
                 clearBtn.visibility = if (text!!.isEmpty()) View.INVISIBLE else View.VISIBLE
             }
+
             focusChangeListener?.onFocus()
         } else {
             searchInput.apply {
                 setText("")
             }
+
             getHostActivity()?.let { Util.hideKeyboard(it) }
             searchInput.clearFocus()
             changeMenuDrawable(withAnim = true, isOpen = false)
@@ -340,18 +379,25 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         return query
     }
 
-    private fun changeMenuDrawable(
-        withAnim: Boolean, isOpen: Boolean
-    ) {
+    /**
+     * Switch the icon of the left action button  between arrow and hamburger
+     * with animation
+     *
+     * @param withAnim true for playing the transition animation
+     * @param isOpen true for showing arrow icon, false for showing hamburger icon
+     */
+    private fun changeMenuDrawable(withAnim: Boolean, isOpen: Boolean) {
         val startValue = if (isOpen) MENU_BUTTON_PROGRESS_HAMBURGER else MENU_BUTTON_PROGRESS_ARROW
         val endValue = if (isOpen) MENU_BUTTON_PROGRESS_ARROW else MENU_BUTTON_PROGRESS_HAMBURGER
 
         if (withAnim) {
             val anim = ValueAnimator.ofFloat(startValue, endValue)
+
             anim.addUpdateListener { animation ->
                 val value = animation.animatedValue as Float
                 menuBtnDrawable?.progress = value
             }
+
             anim.duration = MENU_ICON_ANIM_DURATION
             anim.start()
         } else {
@@ -413,10 +459,12 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
 
     private fun getHostActivity(): Activity? {
         var context = context
+
         while (context is ContextWrapper) {
             if (context is Activity) {
                 return context
             }
+
             context = context.baseContext
         }
 

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
@@ -71,7 +70,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         holder.itemLayout = v.findViewById(R.id.chip_layout);
         holder.inviteMore = v.findViewById(R.id.invite_more);
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidth(px2dp(60, outMetrics));
+        holder.textViewName.setMaxWidth(dp2px(60, outMetrics));
         holder.avatar = v.findViewById(R.id.add_rounded_avatar);
         holder.addIcon = v.findViewById(R.id.add_icon_chip);
         holder.clickableArea.setOnClickListener(this);

@@ -99,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.54"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/info_ic"
@@ -111,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
             </LinearLayout>
@@ -120,7 +120,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_delete_offline_layout"
@@ -168,7 +168,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_share_layout"
@@ -183,7 +183,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.54"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:tint="@color/black"
@@ -196,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/general_share"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
@@ -207,7 +207,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -222,7 +222,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="0.54"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_open_with"
@@ -234,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/external_play"
                     android:textColor="@color/name_my_account"
                     android:textSize="16sp"/>
@@ -245,7 +245,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/divider_upgrade_account"/>
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_download_layout"

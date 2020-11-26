@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,7 +59,7 @@ import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtils.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
@@ -144,6 +145,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
                     nC.prepareForDownload(handleList, false);
+                    hideActionMode();
                     break;
 
                 case R.id.cab_menu_rename:
@@ -746,7 +748,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     private void setRecyclerView() {
-        recyclerView.setPadding(0, 0, 0, px2dp(MARGIN_BOTTOM_LIST, outMetrics));
+        recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -784,7 +786,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             logWarning("Exception formatting text", e);
         }
 
-        emptyTextViewFirst.setText(getSpannedHtmlText(text));
+        emptyTextViewFirst.setText(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));
         checkEmptyView();
     }
 

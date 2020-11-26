@@ -47,6 +47,7 @@ public class Constants {
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
+    public static final int REQUEST_CODE_PICK_GIF = 1034;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -59,6 +60,7 @@ public class Constants {
     public static final String ACTION_OPEN_QR = "ACTION_OPEN_QR";
     public static final String ACTION_TAKE_PICTURE = "ACTION_TAKE_PICTURE";
     public static final String ACTION_TAKE_PROFILE_PICTURE = "ACTION_TAKE_PROFILE_PICTURE";
+    public static final String ACTION_PREVIEW_GIPHY = "ACTION_PREVIEW_GIPHY";
 
     public static final String SHOW_REPEATED_UPLOAD = "SHOW_REPEATED_UPLOAD";
 
@@ -194,8 +196,6 @@ public class Constants {
     public static final String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLDER";
     public static final String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
     public static final String ACTION_OVERQUOTA_STORAGE = "OVERQUOTA_STORAGE";
-    public static final String ACTION_CHILD_UPLOADED_OK = "ACTION_CHILD_UPLOADED_OK";
-    public static final String ACTION_CHILD_UPLOADED_FAILED = "ACTION_CHILD_UPLOADED_FAILED";
     public static final String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
     public static final String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
     public static final String ACTION_EXPORT_MASTER_KEY = "EXPORT_MASTER_KEY";
@@ -220,6 +220,7 @@ public class Constants {
     public static final String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
     public static final String ACTION_LOG_OUT = "ACTION_LOG_OUT";
+    public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
     public static final String ACTION_OPEN_CHAT_LINK = "OPEN_CHAT_LINK";
@@ -317,6 +318,15 @@ public class Constants {
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
 
 
+    public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
+    public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";
+    public static final String NOTIFICATIONS_1_HOUR = "NOTIFICATIONS_1_HOUR";
+    public static final String NOTIFICATIONS_6_HOURS = "NOTIFICATIONS_6_HOURS";
+    public static final String NOTIFICATIONS_24_HOURS = "NOTIFICATIONS_24_HOURS";
+    public static final String NOTIFICATIONS_DISABLED_X_TIME = "NOTIFICATIONS_DISABLED_X_TIME";
+    public static final String NOTIFICATIONS_DISABLED = "NOTIFICATIONS_DISABLED";
+    public static final String NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING = "NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING";
+    public static final String NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING = "NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING";
     public static final int ACCOUNT_DETAILS_MIN_DIFFERENCE = 5;
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
     public static final int PRICING_MIN_DIFFERENCE = 720;
@@ -415,10 +425,18 @@ public class Constants {
     public static final String HIGH_PRIORITY_TRANSFER = "HIGH_PRIORITY_TRANSFER";
 
     public static final String UPLOAD_APP_DATA_CHAT = "CHAT_UPLOAD";
+    public static final String CU_UPLOAD = "CU_UPLOAD";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";
     public static final String AVATAR_PHONE_COLOR = "AVATAR_PHONE_COLOR";
+
+    public static final int MAX_REACTIONS_PER_USER = 24;
+    public static final int MAX_REACTIONS_PER_MESSAGE = 50;
+
+    public static final int REACTION_ERROR_TYPE_MESSAGE = -1;
+    public static final int REACTION_ERROR_DEFAULT_VALUE = 0;
+    public static final int REACTION_ERROR_TYPE_USER = 1;
 
     /**
      * A phone number pattern, which length should be in 5-22, and the beginning can have a '+'.
@@ -442,6 +460,7 @@ public class Constants {
 
     public static final int SNACKBAR_TYPE = 0;
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
+    public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
 
     public static final int INFO_ANIMATION = 3000;
@@ -456,17 +475,19 @@ public class Constants {
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
-    public static final int INVALID_STATE_CALL = -1;
+    public static final int INVALID_CALL_STATUS = -1;
+    public static final int MAX_PARTICIPANTS_GRID = 6;
 
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
-    public static final String CHAT_ID = "chatHandle";
+    public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
+    public static final String CHAT_ID = "CHAT_ID";
     public static final String MESSAGE_ID = "messageId";
     public static final String CALL_ID = "callId";
-    public static final String CHAT_ID_IN_PROGRESS = "chatHandleInProgress";
-    public static final String CHAT_ID_TO_ANSWER = "chatHandleToAnswer";
+    public static final String CHAT_ID_OF_CURRENT_CALL = "chatHandleInProgress";
+    public static final String CHAT_ID_OF_INCOMING_CALL = "chatHandleToAnswer";
     public static final String SECOND_CALL = "SECOND_CALL";
     public static final String PEER_ID = "peerId";
     public static final String CLIENT_ID = "clientId";
@@ -484,14 +505,22 @@ public class Constants {
     public static final String USER_HANDLES = "USER_HANDLES";
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
+    public static final String TYPE_CAMERA = "TYPE_CAMERA";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
     public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
     public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
+    public static final String INCOMING_VIDEO_CALL = "INCOMING_VIDEO_CALL";
+    public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
+    public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
+    public static final String COPIED_TEXT_LABEL = "Copied Text";
+    public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
+    public static final String INVALID_OPTION = "-1";
     public static final int INVALID_TYPE_PERMISSIONS = -1;
+    public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
@@ -514,8 +543,9 @@ public class Constants {
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
     public static final int MAX_WIDTH_ADD_CONTACTS = 60;
-    public static final int AVATAR_SIZE = 150;
+    public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
+    public static final int AVATAR_SIZE = 150;
 
     public static final String SEPARATOR = File.separator;
 
@@ -649,4 +679,20 @@ public class Constants {
     public static final int LOCATION_INDEX_TOP = 1;
 
     public static final String OFFLINE_ROOT = "/";
+
+    public static final int SEARCH_BY_DATE_FILTER_POS_TYPE = 0;
+    public static final int SEARCH_BY_DATE_FILTER_POS_THE_DAY = 1;
+    public static final int SEARCH_BY_DATE_FILTER_POS_MONTH_OR_YEAR = 2;
+    public static final int SEARCH_BY_DATE_FILTER_POS_START_DAY = 3;
+    public static final int SEARCH_BY_DATE_FILTER_POS_END_DAY = 4;
+
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_ONE_DAY = 1;
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_LAST_MONTH_OR_YEAR = 2;
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_BETWEEN_TWO_DAYS = 3;
+
+    public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
+    public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
+
+    // 15360 GB = 15TB
+    public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 }
