@@ -14,7 +14,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
         android:text="@string/action_sort_by"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_54_alpha"
         android:textSize="16sp" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_87_opacity"
         android:textSize="16sp"
         tools:text="Name     Ascending"
         tools:textColor="@color/accentColor" />
@@ -42,7 +42,7 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_87_opacity"
         android:textSize="16sp"
         tools:text="Name     Descending" />
 
@@ -60,7 +60,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_newest_date"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_87_opacity"
         android:textSize="16sp" />
 
     <View
@@ -77,7 +77,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_oldest_date"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_87_opacity"
         android:textSize="16sp" />
 
     <View
@@ -95,7 +95,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_largest_size"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_87_opacity"
         android:textSize="16sp" />
 
     <View
@@ -113,7 +113,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/sort_by_smallest_size"
-        android:textColor="@color/homepage_content"
+        android:textColor="@color/black_87_opacity"
         android:textSize="16sp" />
 
 </LinearLayout>
