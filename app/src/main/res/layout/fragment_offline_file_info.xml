@@ -23,10 +23,8 @@
         app:layout_scrollFlags="scroll|exitUntilCollapsed"
         app:collapsedTitleTextAppearance="@style/ToolbarTitle"
         app:contentScrim="?attr/colorPrimary"
-        app:expandedTitleGravity="start|top"
-        app:expandedTitleMarginBottom="14dp"
+        app:expandedTitleGravity="center_vertical"
         app:expandedTitleMarginStart="72dp"
-        app:expandedTitleMarginTop="65dp"
         app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
         app:lineSpacingMultiplier="1.2"
         app:maxLines="3"
@@ -37,10 +35,10 @@
           android:layout_width="24dp"
           android:layout_height="24dp"
           android:layout_marginStart="16dp"
-          android:layout_marginTop="93dp"
           android:visibility="gone"
           app:layout_collapseMode="pin"
           tools:src="@drawable/ic_folder_list"
+          tools:layout_gravity="center_vertical"
           tools:visibility="visible"
           />
 

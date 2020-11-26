@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,6 +23,8 @@ import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.Util.getStatusBarHeight
 import mega.privacy.android.app.utils.autoCleared
 import kotlin.math.abs
 
@@ -68,6 +71,29 @@ class OfflineFileInfoFragment : Fragment() {
                     )
 
                     binding.toolbarNodeIcon.isVisible = true
+                    RunOnUIThreadUtils.post {
+                        // since collapseToolbar fits system window, we need center the node
+                        // icon in the area exclude status bar, like below:
+                        // ----------------
+                        // |  status bar  |
+                        // ----------------
+                        // |              |
+                        // |desired center|
+                        // |              |
+                        // ----------------
+                        // so the desired center position is:
+                        // statusBarHeight + (totalHeight - statusBarHeight) / 2
+                        // and the top margin of node icon is: desiredCenter - iconHeight / 2
+
+                        val desiredCenter = getStatusBarHeight() +
+                                (binding.collapseToolbar.measuredHeight - getStatusBarHeight()) / 2
+
+                        val params =
+                            binding.toolbarNodeIcon.layoutParams as FrameLayout.LayoutParams
+                        params.topMargin =
+                            desiredCenter - binding.toolbarNodeIcon.measuredHeight / 2
+                        binding.toolbarNodeIcon.layoutParams = params
+                    }
 
                     if (it.node.isFolder) {
                         binding.containsTitle.isVisible = true
