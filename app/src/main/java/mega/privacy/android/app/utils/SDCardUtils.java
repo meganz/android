@@ -142,7 +142,7 @@ public class SDCardUtils {
                     logError("Error moving file to the sd card path", e);
                 }
 
-                dbH.setCompletedTransferWitCheck(new AndroidCompletedTransfer(sdtransfer));
+                dbH.setCompletedTransferWithCheck(new AndroidCompletedTransfer(sdtransfer));
             }
         }).start();
     }
