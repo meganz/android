@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -86,11 +87,11 @@ public class ChatUtil {
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
 
-    public static final int RETENTION_TIME_DIALOG_OPTION_DISABLED = 0;
-    public static final int RETENTION_TIME_DIALOG_OPTION_DAY = 1;
-    public static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
-    public static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
-    public static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
+    private static final int RETENTION_TIME_DIALOG_OPTION_DISABLED = 0;
+    private static final int RETENTION_TIME_DIALOG_OPTION_DAY = 1;
+    private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
+    private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
+    private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -1060,6 +1061,9 @@ public class ChatUtil {
         dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
+                        if(context instanceof ManageChatHistoryActivity){
+                            ((ManageChatHistoryActivity)context).showInitPicker();
+                        }
                     } else {
                         MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat, getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
                     }

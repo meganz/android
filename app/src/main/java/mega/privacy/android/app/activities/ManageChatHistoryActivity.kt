@@ -7,6 +7,8 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.NumberPicker.OnValueChangeListener
+import androidx.annotation.IntegerRes
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -27,7 +29,14 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 
+
 class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
+
+    private val OPTION_HOURS = 0
+    private val OPTION_DAYS = 1
+    private val OPTION_WEEKS = 2
+    private val OPTION_MONTHS = 3
+    private val OPTION_YEARS = 4
 
     private var screenOrientation = 0
     private lateinit var binding: ActivityManageChatHistoryBinding
@@ -92,23 +101,23 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         screenOrientation = resources.configuration.orientation
 
         chat = megaChatApi.getChatRoomByUser(contactHandle)
-        binding.historyRetentionSwitch?.isClickable = false;
-        binding.historyRetentionSwitch?.isChecked = false
-
+        binding.historyRetentionSwitch.isClickable = false;
+        binding.historyRetentionSwitch.isChecked = false
+        binding.pickerLayout.visibility= View.GONE
 
         if(chat == null){
             logDebug("The chat does not exist")
-            binding.historyRetentionSwitchLayout?.setOnClickListener(null)
-            binding.clearChatHistoryLayout?.setOnClickListener(null)
-            binding.retentionTimeTextLayout?.setOnClickListener(null)
+            binding.historyRetentionSwitchLayout.setOnClickListener(null)
+            binding.clearChatHistoryLayout.setOnClickListener(null)
+            binding.retentionTimeTextLayout.setOnClickListener(null)
 
-            binding.retentionTimeTitle?.text =  getString(R.string.title_properties_history_retention)
-            binding.retentionTimeSubtitle?.text =  getString(R.string.subtitle_properties_history_retention)
-            binding.retentionTime?.visibility = View.GONE
+            binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention)
+            binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_history_retention)
+            binding.retentionTime.visibility = View.GONE
         }else{
             logDebug("The chat exists")
-            binding.historyRetentionSwitchLayout?.setOnClickListener(this)
-            binding.clearChatHistoryLayout?.setOnClickListener(this)
+            binding.historyRetentionSwitchLayout.setOnClickListener(this)
+            binding.clearChatHistoryLayout.setOnClickListener(this)
             chatId = chat?.chatId!!
             listener = RetentionTimeListener(this)
             megaChatApi.closeChatRoom(chatId, listener)
@@ -122,20 +131,74 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         }
     }
 
+    fun showInitPicker(){
+        binding.pickerLayout.visibility = View.VISIBLE
+        binding.pickerButton.setOnClickListener(this)
+
+        binding.pickerNumber.minValue = 1
+        binding.pickerNumber.maxValue = 24
+        binding.pickerNumber.wrapSelectorWheel = true
+        binding.pickerNumber.value = 1
+        binding.pickerNumber.setOnValueChangedListener(onValueChangeListenerPickerNumber)
+
+        val arrayString = arrayOf(
+            app.getString(R.string.retention_time_picker_hours),
+            app.getString(R.string.hint_days),
+            app.getString(R.string.retention_time_picker_weeks),
+            app.getString(R.string.retention_time_picker_months),
+            app.getString(R.string.retention_time_picker_years)
+        )
+
+        binding.pickerText.minValue = 0;
+        binding.pickerText.maxValue = 4
+
+        binding.pickerText.setFormatter { value ->
+            arrayString[value]
+        }
+
+        binding.pickerText.setOnValueChangedListener(onValueChangeListenerPickerText)
+
+        binding.pickerNumber.value
+    }
+
+    private fun updateNumberPicker(typePicketTextOption: IntegerRes){
+
+    }
+
+    var onValueChangeListenerPickerText =
+        OnValueChangeListener { textPicker, i, i1 ->
+        }
+
+    var onValueChangeListenerPickerNumber =
+        OnValueChangeListener { numberPicker, i, i1 ->
+            when (numberPicker.value) {
+                OPTION_HOURS -> {
+                }
+                OPTION_DAYS -> {
+                }
+                OPTION_WEEKS -> {
+                }
+                OPTION_MONTHS -> {
+                }
+                OPTION_YEARS -> {
+                }
+            }
+        }
+
     /**
      * Method for updating the UI when the retention time is updated.
      */
     private fun updateRetentionTimeUI(seconds: Long) {
         val timeFormatted = ChatUtil.transformSecondsInString(seconds)
         if(TextUtil.isTextEmpty(timeFormatted)){
-            binding.retentionTimeTextLayout?.setOnClickListener(null)
+            binding.retentionTimeTextLayout.setOnClickListener(null)
 
-            binding.historyRetentionSwitch?.isChecked = false
-            binding.retentionTimeTitle?.text =  getString(R.string.title_properties_history_retention)
-            binding.retentionTimeSubtitle?.text =  getString(R.string.subtitle_properties_history_retention)
-            binding.retentionTime?.visibility = View.GONE
+            binding.historyRetentionSwitch.isChecked = false
+            binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention)
+            binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_history_retention)
+            binding.retentionTime.visibility = View.GONE
         }else{
-            binding.retentionTimeTextLayout?.setOnClickListener(this)
+            binding.retentionTimeTextLayout.setOnClickListener(this)
 
             binding.historyRetentionSwitch.isChecked = true
             binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention_activated)
@@ -167,6 +230,11 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             R.id.retention_time_text_layout -> {
                 createHistoryRetentionAlertDialog(this, chatId, false)
             }
+
+            R.id.picker_button -> {
+                binding.pickerLayout?.visibility = View.GONE
+            }
+
         }
     }
 

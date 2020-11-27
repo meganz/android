@@ -1732,6 +1732,12 @@
     <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
     <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
 
+    <string name="retention_time_picker_hours" context="Label for picker option to configure custom retention time. This option indicates days">hours</string>
+    <string name="retention_time_picker_weeks" context="Label for picker option to configure custom retention time. This option indicates weeks">weeks</string>
+    <string name="retention_time_picker_months" context="Label for picker option to configure custom retention time. This option indicates months">months</string>
+    <string name="retention_time_picker_years" context="Label for picker option to configure custom retention time. This option indicates years">years</string>
+
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>

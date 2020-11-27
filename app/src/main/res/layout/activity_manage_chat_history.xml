@@ -63,7 +63,7 @@
 
                     <RelativeLayout
                         android:id="@+id/history_retention_switch_layout"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
@@ -108,6 +108,47 @@
                 android:layout_marginStart="16dp"
                 android:background="@color/chat_sliding_panel_separator"
                 android:orientation="vertical" />
+
+            <LinearLayout
+                android:id="@+id/picker_layout"
+                android:layout_width="match_parent"
+                android:layout_height="187dp"
+                android:paddingTop="18dp"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="136dp"
+                    android:gravity="center_horizontal">
+                    <NumberPicker
+                        android:id="@+id/picker_number"
+                        android:theme="@style/AppTheme.Picker"
+                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_marginEnd="34dp"
+                        android:selectionDividerHeight="1dp"
+                        android:showDividers="none"/>
+                    <NumberPicker
+                        android:id="@+id/picker_text"
+                        android:theme="@style/AppTheme.Picker"
+                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_toEndOf="@id/picker_number"
+                        android:selectionDividerHeight="1dp"
+                        android:showDividers="middle"/>
+                    </RelativeLayout>
+                <Button
+                    android:id="@+id/picker_button"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/accentColor"
+                    android:stateListAnimator="@null"
+                    android:background="@null"
+                    android:layout_marginEnd="8dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:text="@string/general_ok"
+                    android:textSize="14sp"
+                    android:gravity="center"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/clear_chat_history_layout"

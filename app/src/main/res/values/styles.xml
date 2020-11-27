@@ -249,6 +249,13 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:colorControlNormal">@color/accentColor</item>
+        <item name="android:background">@null</item>
+    </style>
+
     <style name="MyCustomTabLayoutKeyboard" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/accentColor</item>
         <item name="tabIndicatorHeight">2dp</item>
