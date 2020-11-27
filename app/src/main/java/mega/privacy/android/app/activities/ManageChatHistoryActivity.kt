@@ -39,11 +39,14 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private val OPTION_MONTHS = 3
     private val OPTION_YEARS = 4
 
-    private val MAXIMUM_VALUE_HOURS = 24
-    private val MAXIMUM_VALUE_DAYS = 31
-    private val MAXIMUM_VALUE_WEEKS = 4
-    private val MAXIMUM_VALUE_MONTHS = 12
-    private val MINIMUM_VALUE = 1
+    private val MAXIMUM_VALUE_NUMBER_PICKER_HOURS = 24
+    private val MAXIMUM_VALUE_NUMBER_PICKER_DAYS = 31
+    private val MAXIMUM_VALUE_NUMBER_PICKER_WEEKS = 4
+    private val MAXIMUM_VALUE_NUMBER_PICKER_MONTHS = 12
+    private val MINIMUM_VALUE_NUMBER_PICKER = 1
+
+    private val MINIMUM_VALUE_TEXT_PICKER = 0
+    private val MAXIMUM_VALUE_TEXT_PICKER = 4
 
     private var screenOrientation = 0
     private lateinit var binding: ActivityManageChatHistoryBinding
@@ -142,51 +145,94 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     fun showInitPicker(seconds: Long){
         binding.pickerLayout.visibility = View.VISIBLE
         binding.separator.visibility = View.VISIBLE
-        binding.pickerNumber.disableTextEditing(true)
-        binding.pickerText.disableTextEditing(true)
         binding.pickerButton.setOnClickListener(this)
 
+        binding.pickerNumber.disableTextEditing(true)
+        binding.pickerNumber.wrapSelectorWheel = true
+        binding.pickerNumber.minValue = MINIMUM_VALUE_NUMBER_PICKER
+
+        binding.pickerText.disableTextEditing(true)
+        binding.pickerText.wrapSelectorWheel = true
+        binding.pickerText.minValue = MINIMUM_VALUE_TEXT_PICKER;
+        binding.pickerText.maxValue = MAXIMUM_VALUE_TEXT_PICKER
+
+        var valueInNumberPicker = MINIMUM_VALUE_NUMBER_PICKER
+
         if(seconds == DISABLED_RETENTION_TIME){
-            logDebug("Initial values of the pickers:: seconds = "+seconds)
-            binding.pickerNumber.minValue = 1
-            binding.pickerNumber.maxValue = 24
-            binding.pickerNumber.wrapSelectorWheel = true
-            binding.pickerNumber.value = 1
+            binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+            binding.pickerNumber.value = MINIMUM_VALUE_NUMBER_PICKER
+            binding.pickerText.value = MINIMUM_VALUE_TEXT_PICKER
+        }else{
 
-            val arrayString = arrayOf(
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_hours,
-                    MINIMUM_VALUE
-                ),
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_days,
-                    MINIMUM_VALUE
-                ),
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_weeks,
-                    MINIMUM_VALUE
-                ),
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_months,
-                    MINIMUM_VALUE
-                ),
-                app.getString(R.string.retention_time_picker_year)
-            )
 
-            binding.pickerText.setFormatter { value ->
-                arrayString[value]
+            val numberYears = seconds / SECONDS_IN_YEAR
+            val years = seconds - numberYears * SECONDS_IN_YEAR
+            if (years == 0L) {
+                binding.pickerText.value = OPTION_YEARS
+                binding.pickerNumber.maxValue = MINIMUM_VALUE_NUMBER_PICKER
+                binding.pickerNumber.value = numberYears.toInt()
+            } else {
+                val numberMonths = seconds / SECONDS_IN_MONTH_31
+                val months = seconds - numberMonths * SECONDS_IN_MONTH_31
+                if (months == 0L) {
+                    binding.pickerText.value = OPTION_MONTHS
+                    binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
+                    binding.pickerNumber.value = numberMonths.toInt()
+                } else {
+                    val numberWeeks = seconds / SECONDS_IN_WEEK
+                    val weeks = seconds - numberWeeks * SECONDS_IN_WEEK
+                    if (weeks == 0L) {
+                        binding.pickerText.value = OPTION_WEEKS
+                        binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
+                        binding.pickerNumber.value = numberWeeks.toInt()
+                    } else {
+                        val numberDays = seconds / SECONDS_IN_DAY
+                        val days = seconds - numberDays * SECONDS_IN_DAY
+                        if (days == 0L) {
+                            binding.pickerText.value = OPTION_DAYS
+                            binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
+                            binding.pickerNumber.value = numberDays.toInt()
+                        } else {
+                            val numberHours = seconds / SECONDS_IN_HOUR
+                            val hours = seconds - numberHours * SECONDS_IN_HOUR
+                            if (hours == 0L) {
+                                binding.pickerText.value = OPTION_HOURS
+                                binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+                                binding.pickerNumber.value = numberHours.toInt()
+                            }
+                        }
+                    }
+                }
             }
 
-            binding.pickerText.minValue = 0;
-            binding.pickerText.maxValue = 4
-            binding.pickerText.wrapSelectorWheel = true
-            binding.pickerText.value = 0
-
-            binding.pickerText.setDisplayedValues(arrayString)
-
-        }else{
-            logDebug("Customised values of the pickers:: seconds = "+seconds)
+            valueInNumberPicker = binding.pickerNumber.value
         }
+
+        val arrayString = arrayOf(
+            app.baseContext.resources.getQuantityString(
+                R.plurals.retention_time_picker_hours,
+                valueInNumberPicker
+            ),
+            app.baseContext.resources.getQuantityString(
+                R.plurals.retention_time_picker_days,
+                valueInNumberPicker
+            ),
+            app.baseContext.resources.getQuantityString(
+                R.plurals.retention_time_picker_weeks,
+                valueInNumberPicker
+            ),
+            app.baseContext.resources.getQuantityString(
+                R.plurals.retention_time_picker_months,
+                valueInNumberPicker
+            ),
+            app.getString(R.string.retention_time_picker_year)
+        )
+
+        binding.pickerText.setFormatter { value ->
+            arrayString[value]
+        }
+
+        binding.pickerText.setDisplayedValues(arrayString)
 
         binding.pickerNumber.setOnValueChangedListener(onValueChangeListenerPickerNumber)
         binding.pickerText.setOnValueChangedListener(onValueChangeListenerPickerText)
@@ -234,20 +280,20 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private fun updateNumberPicker(value: Int) {
         var maximoValue = 0
         if (value == OPTION_HOURS) {
-            maximoValue = MAXIMUM_VALUE_HOURS
+            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
         } else if (value == OPTION_DAYS) {
-            maximoValue = MAXIMUM_VALUE_DAYS
+            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
         } else if (value == OPTION_WEEKS) {
-            maximoValue = MAXIMUM_VALUE_WEEKS
+            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
         } else if (value == OPTION_MONTHS) {
-            maximoValue = MAXIMUM_VALUE_MONTHS
+            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
         } else if (value == OPTION_YEARS) {
-            maximoValue = MINIMUM_VALUE
+            maximoValue = MINIMUM_VALUE_NUMBER_PICKER
         }
 
         if (binding.pickerNumber.value > maximoValue) {
-            updateTextPicker(binding.pickerNumber.value, MINIMUM_VALUE)
-            binding.pickerNumber.value = MINIMUM_VALUE
+            updateTextPicker(binding.pickerNumber.value, MINIMUM_VALUE_NUMBER_PICKER)
+            binding.pickerNumber.value = MINIMUM_VALUE_NUMBER_PICKER
         }
 
         binding.pickerNumber.maxValue = maximoValue
@@ -274,7 +320,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         val timeFormatted = ChatUtil.transformSecondsInString(seconds)
         if(TextUtil.isTextEmpty(timeFormatted)){
             binding.retentionTimeTextLayout.setOnClickListener(null)
-
             binding.historyRetentionSwitch.isChecked = false
             binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention)
             binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_history_retention)
@@ -328,7 +373,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 } else if (binding.pickerText.value == OPTION_YEARS) {
                     secondInOption = SECONDS_IN_YEAR
                 }
-                var totalSeconds =  binding.pickerNumber.value * secondInOption
+                var totalSeconds = binding.pickerNumber.value * secondInOption
 
                 megaChatApi.setChatRetentionTime(
                     chatId,

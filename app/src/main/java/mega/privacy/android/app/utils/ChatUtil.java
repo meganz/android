@@ -1150,10 +1150,6 @@ public class ChatUtil {
         }
     }
 
-    private static boolean isInteger(long number){
-        return number - Math.floor(number) == 0;
-    }
-
     public static String transformSecondsInString(long seconds){
         if(seconds == DISABLED_RETENTION_TIME)
             return "";
