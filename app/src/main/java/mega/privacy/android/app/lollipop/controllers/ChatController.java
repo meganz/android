@@ -50,6 +50,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
@@ -77,6 +78,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -1826,6 +1828,9 @@ public class ChatController {
         long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
         long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
         long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
+        String extraLink = intent.getStringExtra(EXTRA_LINK);
+
+
 
         if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
             if (contactHandles != null && contactHandles.length > 0) {
@@ -1852,11 +1857,13 @@ public class ChatController {
                 boolean createChats = false;
 
                 if (nodeHandles != null) {
-                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES, -1);
+                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES);
                     createChats = true;
                 } else if (userHandles != null) {
-                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS, -1);
+                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS);
                     createChats = true;
+                } else if (!isTextEmpty(extraLink)) {
+                    listener = new CreateChatListener(chats, users, extraLink, context, CreateChatListener.SEND_LINK);
                 } else {
                     logWarning("Error on sending to chat");
                 }
@@ -1878,11 +1885,29 @@ public class ChatController {
                 } else if (userHandles != null) {
                     logDebug("Send " + userHandles.length + " contacts");
                     sendContactsToChats(chatHandles, userHandles);
+                } else if (!isTextEmpty(extraLink)) {
+                    sendLinkToChats(context, chatHandles, extraLink);
                 } else {
                     logWarning("Error on sending to chat");
                 }
             }
         }
+    }
+
+    public static void sendLinkToChats(Context context, long[] chatHandles, String link) {
+        MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null) {
+            logError("MegaChatApi is null");
+            return;
+        }
+
+        for (Long chatId : chatHandles) {
+            megaChatApi.sendMessage(chatId, link);
+        }
+
+        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, chatHandles.length == 0
+                ? chatHandles[0]
+                : MEGACHAT_INVALID_HANDLE);
     }
 
     public void sendContactsToChats(long[] chatHandles, long[] userHandles) {

@@ -18,8 +18,10 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CreateChatListener extends ChatBaseListener {
 
@@ -30,6 +32,7 @@ public class CreateChatListener extends ChatBaseListener {
     public static final int SEND_CONTACTS = 5;
     public static final int SEND_MESSAGES = 6;
     public static final int SEND_FILE_EXPLORER_CONTENT = 7;
+    public static final int SEND_LINK = 8;
 
     private int counter;
     private int error;
@@ -42,6 +45,7 @@ public class CreateChatListener extends ChatBaseListener {
     private long[] handles;
     private int totalCounter;
     private long idChat;
+    private String link;
 
     public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long fileHandle, Context context, int action) {
         super(context);
@@ -65,6 +69,38 @@ public class CreateChatListener extends ChatBaseListener {
         this.handles = handles;
         this.action = action;
         this.idChat = idChat;
+    }
+
+    public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long[] handles, Context context, int action) {
+        super(context);
+        this.counter = usersNoChat.size();
+        if (chats != null && !chats.isEmpty()) {
+            this.totalCounter = usersNoChat.size() + chats.size();
+        } else {
+            this.totalCounter = this.counter;
+        }
+        this.chats = chats;
+        this.usersNoChat = usersNoChat;
+        this.handles = handles;
+        this.action = action;
+        this.idChat = MEGACHAT_INVALID_HANDLE;
+    }
+
+    public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, String link, Context context, int action) {
+        super(context);
+        this.counter = usersNoChat.size();
+
+        if (chats != null && !chats.isEmpty()) {
+            this.totalCounter = usersNoChat.size() + chats.size();
+        } else {
+            this.totalCounter = this.counter;
+        }
+
+        this.chats = chats;
+        this.usersNoChat = usersNoChat;
+        this.link = link;
+        this.action = action;
+        this.idChat = MEGACHAT_INVALID_HANDLE;
     }
 
     @Override
@@ -160,6 +196,14 @@ public class CreateChatListener extends ChatBaseListener {
                     }
                 }
                 break;
+
+            case SEND_LINK:
+                if (usersNoChat.size() == error && (chats == null || chats.isEmpty())) {
+                    //All send messages fail; Show error
+                    showSnackbar(context, context.getResources().getString(R.string.content_not_send, totalCounter));
+                } else {
+                    ChatController.sendLinkToChats(context, getChatHandles(), link);
+                }
         }
     }
 

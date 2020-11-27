@@ -60,6 +60,9 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
             )
         }
 
+        binding.keyLayout.visibility = GONE
+        binding.keySeparator.visibility = GONE
+
         binding.copyKeyButton.visibility = GONE
         binding.copyKeyButton.setOnClickListener { getLinkInterface.copyLinkOrKey(key, false) }
 
@@ -157,8 +160,11 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
 
     private fun clickDecryptedKeySeparately() {
        if (binding.decryptedKeySwitch.isChecked) {
+           binding.keyLayout.visibility = VISIBLE
+           binding.keySeparator.visibility = VISIBLE
            binding.copyKeyButton.visibility = VISIBLE
            binding.linkText.text = linkWithoutKey
+           binding.keyText.text = key
        } else {
            binding.copyKeyButton.visibility = GONE
            binding.linkText.text = linkWithKey

@@ -15,7 +15,7 @@
 
         <RelativeLayout
             android:id="@+id/node_info_layout"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="24dp"
             style="@style/GetLinkOptionsStyle">
 
             <ImageView
@@ -203,7 +203,7 @@
             android:background="@color/separator_grey" />
 
         <RelativeLayout
-            android:id="@+id/dlink_layout"
+            android:id="@+id/link_layout"
             style="@style/GetLinkOptionsStyle">
 
             <TextView
@@ -230,6 +230,39 @@
 
 
         <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="@color/separator_grey" />
+
+        <RelativeLayout
+            android:id="@+id/key_layout"
+            style="@style/GetLinkOptionsStyle">
+
+            <TextView
+                android:id="@+id/key_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/key_label"
+                android:textAllCaps="true"
+                android:textColor="@color/name_my_account"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/key_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/key_title_text"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/mail_my_account"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+
+        <View
+            android:id="@+id/key_separator"
             android:layout_width="wrap_content"
             android:layout_height="1dp"
             android:background="@color/separator_grey" />

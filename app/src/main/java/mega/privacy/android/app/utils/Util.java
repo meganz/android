@@ -1482,7 +1482,7 @@ public class Util {
 		} else if (context instanceof ContactInfoActivityLollipop) {
 			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof GetLinkActivity) {
-			((GetLinkActivity) context).showSnackbar(message);
+			((GetLinkActivity) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ChatFullScreenImageViewer) {
 			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof AudioVideoPlayerLollipop) {

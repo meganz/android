@@ -12,9 +12,11 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaError.*;
 import static nz.mega.sdk.MegaRequest.*;
 
@@ -135,7 +137,8 @@ public class ExportListener extends BaseListener {
 
             if (context instanceof GetLinkActivity
                     && e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
-                ((GetLinkActivity) context).showSnackbar(context.getString(R.string.context_no_link));
+                ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
+                        context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
             }
         }
     }

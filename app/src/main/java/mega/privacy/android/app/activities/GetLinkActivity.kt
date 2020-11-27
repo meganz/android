@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import androidx.core.content.ContextCompat
@@ -13,14 +14,15 @@ import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.fragments.getLinkFragments.CopyrightFragment
 import mega.privacy.android.app.fragments.getLinkFragments.GetLinkFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.controllers.NodeController
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
-import mega.privacy.android.app.utils.Constants.HANDLE
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
+import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 
-class GetLinkActivity: BaseActivity(), GetLinkInterface {
+class GetLinkActivity : BaseActivity(), GetLinkInterface {
     companion object {
         const val GET_LINK_FRAGMENT = 0
         const val COPYRIGHT_FRAGMENT = 1
@@ -66,10 +68,9 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
         showFragment(visibleFragment)
     }
 
-    fun showSnackbar(message: String) {
-        showSnackbar(binding.getLinkCoordinatorLayout, message)
+    fun showSnackbar(snackbarType: Int, message: String, chatId: Long) {
+        showSnackbar(snackbarType, binding.getLinkCoordinatorLayout, message, chatId)
     }
-
 
 
     override fun showFragment(visibleFragment: Int) {
@@ -111,22 +112,16 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
         return node
     }
 
-    override fun shareLink(link: String) {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = Constants.PLAIN_TEXT_SHARE_TYPE
-        intent.putExtra(Intent.EXTRA_TEXT, link)
-        startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)))
-    }
-
     override fun copyLinkOrKey(linkOrKey: String, isLink: Boolean) {
         val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, linkOrKey)
         clipManager.setPrimaryClip(clip)
         showSnackbar(
+            SNACKBAR_TYPE,
             getString(
                 if (isLink) R.string.link_copied_clipboard
                 else R.string.key_copied_clipboard
-            )
+            ), MEGACHAT_INVALID_HANDLE
         )
     }
 
@@ -134,18 +129,50 @@ class GetLinkActivity: BaseActivity(), GetLinkInterface {
 
     }
 
-    override fun setLink() {
-        node = megaApi.getNodeByHandle(node.handle)
-        getLinkFragment?.updateLink()
-    }
-
     override fun exportNode() {
         nC.exportLink(node)
     }
 
+    private fun shareLink(link: String) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = PLAIN_TEXT_SHARE_TYPE
+        intent.putExtra(Intent.EXTRA_TEXT, link)
+        startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)))
+    }
+
+    fun setLink() {
+        node = megaApi.getNodeByHandle(node.handle)
+        getLinkFragment?.updateLink()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
+            data?.putExtra(EXTRA_LINK, node.publicLink)
+            ChatController(this).checkIntentToShareSomething(data)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.activity_get_link, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish();
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish();
+            }
+            R.id.action_share -> {
+                shareLink(node.publicLink)
+            }
+            R.id.action_chat -> {
+                startActivityForResult(
+                    Intent(this, ChatExplorerActivity::class.java),
+                    REQUEST_CODE_SEND_LINK
+                )
+            }
         }
 
         return super.onOptionsItemSelected(item)
