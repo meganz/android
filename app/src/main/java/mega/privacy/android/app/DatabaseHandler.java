@@ -1891,7 +1891,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 *
 	 * @param transfer The transfer to check and add.
 	 */
-	public void setCompletedTransferWitCheck(AndroidCompletedTransfer transfer){
+	public void setCompletedTransferWithCheck(AndroidCompletedTransfer transfer){
 		if (alreadyExistsAsCompletedTransfer(transfer)) {
 			return;
 		}
