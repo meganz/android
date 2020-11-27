@@ -1042,30 +1042,21 @@ public class ChatUtil {
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
-        if (isDisabled) {
-            itemClicked.set(RETENTION_TIME_DIALOG_OPTION_DISABLED);
-            dialogBuilder.setSingleChoiceItems(itemsAdapter, RETENTION_TIME_DIALOG_OPTION_DISABLED, (dialog, item) -> {
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
-                        context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
-                                R.string.general_next :
-                                R.string.general_ok));
 
-                itemClicked.set(item);
-                updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), item != 0);
-            });
-        } else {
-            int positionSelected = getPositionSelectedFromRetentionTime(idChat);
-            itemClicked.set(positionSelected);
-            dialogBuilder.setSingleChoiceItems(itemsAdapter, positionSelected, (dialog, item) -> {
-                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
-                        context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
-                                R.string.general_next :
-                                R.string.general_ok));
+        int positionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getPositionSelectedFromRetentionTime(idChat);
 
-                itemClicked.set(item);
-                updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), true);
-            });
-        }
+        itemClicked.set(positionSelected);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, positionSelected, (dialog, item) -> {
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
+                    context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                            R.string.general_next :
+                            R.string.general_ok));
+
+            itemClicked.set(item);
+            boolean isEnabled = isDisabled ? (item != 0) : true;
+            updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), isEnabled);
+        });
 
         dialogBuilder.setPositiveButton(context.getString(itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
                         R.string.general_next : R.string.general_ok),
@@ -1150,37 +1141,42 @@ public class ChatUtil {
         if(seconds == DISABLED_RETENTION_TIME)
             return "";
 
-        long hours = seconds / SECONDS_IN_HOUR;
-        long days = seconds / SECONDS_IN_DAY;
-        long weeks = seconds / SECONDS_IN_WEEK;
-        long months = seconds / SECONDS_IN_MONTH_31;
-        long years = seconds / SECONDS_IN_YEAR;
+        long numberHours = seconds / SECONDS_IN_HOUR;
+        long numberDays = seconds / SECONDS_IN_DAY;
+        long numberWeeks = seconds / SECONDS_IN_WEEK;
+        long numberMonths = seconds / SECONDS_IN_MONTH_31;
+        long numberYears = seconds / SECONDS_IN_YEAR;
 
-        if(years > 0 && isInteger(years)){
-            int year = (int) years;
+        long hours = seconds - (numberHours*SECONDS_IN_HOUR);
+        long days = seconds - (numberDays*SECONDS_IN_DAY);
+        long weeks = seconds - (numberWeeks*SECONDS_IN_WEEK);
+        long months = seconds - (numberMonths*SECONDS_IN_MONTH_31);
+        long years = seconds - (numberYears*SECONDS_IN_YEAR);
+
+        if(years == 0){
+            int year = (int) numberYears;
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_years, year, year);
         }
 
-        if(months > 0 && isInteger(months)){
-            int month = (int) months;
+        if(months == 0){
+            int month = (int) numberMonths;
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_months, month, month);
         }
 
-        if(weeks > 0 && isInteger(weeks)){
-            int week = (int) weeks;
+        if(weeks == 0){
+            int week = (int) numberWeeks;
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_weeks, week, week);
         }
 
-        if(days > 0 && isInteger(days)){
-            int day = (int) days;
+        if(days == 0){
+            int day = (int) numberDays;
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_days, day, day);
         }
 
-        if(hours > 0 && isInteger(hours)){
-            int hour = (int) hours;
+        if(hours == 0){
+            int hour = (int) numberHours;
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
         }
-
         return " ";
     }
 }

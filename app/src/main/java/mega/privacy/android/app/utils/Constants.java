@@ -176,7 +176,7 @@ public class Constants {
     public static final int BUSINESS = 100;
 
     public static final long DISABLED_RETENTION_TIME = 0;
-    public static final long SECONDS_IN_YEAR = 31556900;
+    public static final int SECONDS_IN_YEAR = 31556900;
     public static final int SECONDS_IN_MONTH_28 = 2419200;
     public static final int SECONDS_IN_MONTH_29 = 2505600;
     public static final int SECONDS_IN_MONTH_30 = 2592000;

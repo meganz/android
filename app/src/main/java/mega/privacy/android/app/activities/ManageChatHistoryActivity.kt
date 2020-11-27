@@ -11,7 +11,6 @@ import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
 import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
-import androidx.annotation.IntegerRes
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -24,14 +23,13 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
-
 
 class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
@@ -149,17 +147,29 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         binding.pickerButton.setOnClickListener(this)
 
         if(seconds == DISABLED_RETENTION_TIME){
-            logDebug("Initial values of the pickers")
+            logDebug("Initial values of the pickers:: seconds = "+seconds)
             binding.pickerNumber.minValue = 1
             binding.pickerNumber.maxValue = 24
             binding.pickerNumber.wrapSelectorWheel = true
             binding.pickerNumber.value = 1
 
             val arrayString = arrayOf(
-                app.baseContext.resources.getQuantityString(R.plurals.retention_time_picker_hours, MINIMUM_VALUE),
-                app.baseContext.resources.getQuantityString(R.plurals.retention_time_picker_days, MINIMUM_VALUE),
-                app.baseContext.resources.getQuantityString(R.plurals.retention_time_picker_weeks, MINIMUM_VALUE),
-                app.baseContext.resources.getQuantityString(R.plurals.retention_time_picker_months, MINIMUM_VALUE),
+                app.baseContext.resources.getQuantityString(
+                    R.plurals.retention_time_picker_hours,
+                    MINIMUM_VALUE
+                ),
+                app.baseContext.resources.getQuantityString(
+                    R.plurals.retention_time_picker_days,
+                    MINIMUM_VALUE
+                ),
+                app.baseContext.resources.getQuantityString(
+                    R.plurals.retention_time_picker_weeks,
+                    MINIMUM_VALUE
+                ),
+                app.baseContext.resources.getQuantityString(
+                    R.plurals.retention_time_picker_months,
+                    MINIMUM_VALUE
+                ),
                 app.getString(R.string.retention_time_picker_year)
             )
 
@@ -175,7 +185,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.pickerText.setDisplayedValues(arrayString)
 
         }else{
-            logDebug("Customised picker values")
+            logDebug("Customised values of the pickers:: seconds = "+seconds)
         }
 
         binding.pickerNumber.setOnValueChangedListener(onValueChangeListenerPickerNumber)
@@ -306,8 +316,26 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             R.id.picker_button -> {
                 binding.pickerLayout.visibility = View.GONE
                 binding.separator.visibility = View.GONE
-            }
+                var secondInOption = 0
+                if (binding.pickerText.value == OPTION_HOURS) {
+                    secondInOption = SECONDS_IN_HOUR
+                } else if (binding.pickerText.value == OPTION_DAYS) {
+                    secondInOption = SECONDS_IN_DAY
+                } else if (binding.pickerText.value == OPTION_WEEKS) {
+                    secondInOption = SECONDS_IN_WEEK
+                } else if (binding.pickerText.value == OPTION_MONTHS) {
+                    secondInOption = SECONDS_IN_MONTH_31
+                } else if (binding.pickerText.value == OPTION_YEARS) {
+                    secondInOption = SECONDS_IN_YEAR
+                }
+                var totalSeconds =  binding.pickerNumber.value * secondInOption
 
+                megaChatApi.setChatRetentionTime(
+                    chatId,
+                    totalSeconds.toLong(),
+                    SetRetentionTimeListener(this)
+                )
+            }
         }
     }
 
