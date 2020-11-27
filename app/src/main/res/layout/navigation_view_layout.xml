@@ -81,7 +81,7 @@
                 android:layout_marginTop="7dp"
                 android:text="@string/business_label"
                 android:textColor="@color/business_color"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
