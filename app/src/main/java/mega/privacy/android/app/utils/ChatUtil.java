@@ -1045,6 +1045,11 @@ public class ChatUtil {
         if (isDisabled) {
             itemClicked.set(RETENTION_TIME_DIALOG_OPTION_DISABLED);
             dialogBuilder.setSingleChoiceItems(itemsAdapter, RETENTION_TIME_DIALOG_OPTION_DISABLED, (dialog, item) -> {
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
+                        context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                                R.string.general_next :
+                                R.string.general_ok));
+
                 itemClicked.set(item);
                 updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), item != 0);
             });
@@ -1052,13 +1057,18 @@ public class ChatUtil {
             int positionSelected = getPositionSelectedFromRetentionTime(idChat);
             itemClicked.set(positionSelected);
             dialogBuilder.setSingleChoiceItems(itemsAdapter, positionSelected, (dialog, item) -> {
+                ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
+                        context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                                R.string.general_next :
+                                R.string.general_ok));
+
                 itemClicked.set(item);
                 updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), true);
             });
-
         }
 
-        dialogBuilder.setPositiveButton(context.getString(R.string.general_ok),
+        dialogBuilder.setPositiveButton(context.getString(itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                        R.string.general_next : R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
                         if(context instanceof ManageChatHistoryActivity){
