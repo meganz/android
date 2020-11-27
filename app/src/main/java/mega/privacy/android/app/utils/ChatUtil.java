@@ -1091,19 +1091,36 @@ public class ChatUtil {
         if (seconds == DISABLED_RETENTION_TIME)
             return RETENTION_TIME_DIALOG_OPTION_DISABLED;
 
-        long days = seconds / SECONDS_IN_DAY;
-        if (isInteger(days) && days == 1) {
-            return RETENTION_TIME_DIALOG_OPTION_DAY;
+        long numberDays = seconds / SECONDS_IN_DAY;
+        long numberWeeks = seconds / SECONDS_IN_WEEK;
+        long numberMonths = seconds / SECONDS_IN_MONTH_31;
+        long numberYears = seconds / SECONDS_IN_YEAR;
+        long days = seconds - (numberDays*SECONDS_IN_DAY);
+        long weeks = seconds - (numberWeeks*SECONDS_IN_WEEK);
+        long months = seconds - (numberMonths*SECONDS_IN_MONTH_31);
+        long years = seconds - (numberYears*SECONDS_IN_YEAR);
+
+        if (years == 0) {
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
         }
 
-        long weeks = seconds / SECONDS_IN_WEEK;
-        if (isInteger(weeks) && weeks == 1) {
-            return RETENTION_TIME_DIALOG_OPTION_WEEK;
+        if (months == 0) {
+            if (numberMonths == 1)
+                return RETENTION_TIME_DIALOG_OPTION_MONTH;
+
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
         }
 
-        long months = seconds / SECONDS_IN_MONTH_31;
-        if (isInteger(months) && months == 1) {
-            return RETENTION_TIME_DIALOG_OPTION_MONTH;
+        if(weeks == 0){
+            if (numberWeeks == 1)
+                return RETENTION_TIME_DIALOG_OPTION_WEEK;
+
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
+
+        if(days == 0){
+            if(numberDays == 1)
+                return RETENTION_TIME_DIALOG_OPTION_DAY;
         }
 
         return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
