@@ -263,12 +263,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.offlineBrowserList.addItemDecoration(listDivider!!)
         }
 
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.emptyHintImage.setImageResource(R.drawable.offline_empty_landscape)
-        } else {
-            binding.emptyHintImage.setImageResource(R.drawable.ic_empty_offline)
-        }
-
         var textToShow = getString(R.string.context_empty_offline)
 
         try {
