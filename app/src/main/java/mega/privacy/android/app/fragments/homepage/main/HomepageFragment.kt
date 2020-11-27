@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -86,11 +87,13 @@ class HomepageFragment : Fragment() {
 
     var isFabExpanded = false
 
+    /** The broadcast receiver for network connectivity.
+     *  Switch the UI appearance between offline and online status
+     */
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) {
-                return
-            }
+            if (intent == null) return
+
             when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
                 GO_OFFLINE -> showOfflineMode()
                 GO_ONLINE -> showOnlineMode()
@@ -98,6 +101,8 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /** The click listener for clicking on the file category buttons.
+     *  Clicking to navigate to corresponding fragments */
     private val categoryClickListener = OnClickListener {
         with(viewDataBinding.category) {
             val direction = when (it) {
@@ -121,12 +126,13 @@ class HomepageFragment : Fragment() {
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
+        // Fully expand the BottomSheet if it had been, e.g. rotate screen
         rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
             OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (rootView.height > 0) {
                     if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
-                        fullyExpandBottomSheet(true)
+                        fullyExpandBottomSheet()
                     }
                     rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
@@ -171,17 +177,25 @@ class HomepageFragment : Fragment() {
         requireContext().unregisterReceiver(networkReceiver)
     }
 
+    /**
+     * Show the UI appearance for network connected status (normal UI)
+     */
     private fun showOnlineMode() {
         if (viewModel.isRootNodeNull()) return
 
         viewPager.isUserInputEnabled = true
         rootView.category.isVisible = true
         rootView.banner_view.isVisible = true
+
         fullyCollapseBottomSheet()
+        bottomSheetBehavior.isDraggable = true
 
         enableTabs(true)
     }
 
+    /**
+     * Show the UI appearance for network disconnected status
+     */
     private fun showOfflineMode() {
         viewPager.isUserInputEnabled = false
 
@@ -192,7 +206,8 @@ class HomepageFragment : Fragment() {
             viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
             rootView.category.isVisible = false
             rootView.banner_view.isVisible = false
-            fullyExpandBottomSheet(false)
+            fullyExpandBottomSheet()
+            bottomSheetBehavior.isDraggable = false
         }
 
         enableTabs(false)
@@ -213,24 +228,31 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun fullyExpandBottomSheet(draggable: Boolean) {
+    /**
+     * Expand the bottom sheet to the bottom of the search view
+     */
+    private fun fullyExpandBottomSheet() {
         val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
         bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_EXPANDED
-        bottomSheetBehavior.isDraggable = draggable
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
         val layoutParams = bottomSheetRoot.layoutParams
-        Log.i("Alex", "rootview height:${rootView.height}")
         layoutParams.height = rootView.height - searchInputView.bottom
         bottomSheetRoot.layoutParams = layoutParams
     }
 
-    private fun fullyCollapseBottomSheet() {
+    /**
+     * Collapse the bottom sheet to its initial position (its top is in the middle of the screen)
+     */
+    private fun fullyCollapseBottomSheet() =
         bottomSheetBehavior.setState(HomepageBottomSheetBehavior.STATE_COLLAPSED)
-        bottomSheetBehavior.isDraggable = true
-    }
 
+    /**
+     * Set up the UI elements of the Search view
+     * Associate the Search View hamburger icon with the Navigation Drawer
+     * Set click listeners, observe the changes of chat status, notification count
+     */
     private fun setupSearchView() {
         val activity = activity as ManagerActivityLollipop
 
@@ -260,6 +282,7 @@ class HomepageFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
             outState.putBoolean(
@@ -352,27 +375,38 @@ class HomepageFragment : Fragment() {
             })
             .create()
 
-//        viewModel.bannerList.observe(viewLifecycleOwner) {
-//            if (it == null) {
+        viewModel.bannerList.observe(viewLifecycleOwner) {
+            if (it == null) {
 //                Log.i("Alex", "null bannerlist")
-//                bannerViewPager.removeAllViews()
-//                bannerViewPager.visibility = View.GONE
-//            } else {
-//                val banners = mutableListOf<MegaBanner>()
-//                for (i in 0 until it.size()) {
-//                    banners.add(it[i])
-//                }
+                bannerViewPager.removeAllViews()
+                bannerViewPager.visibility = View.GONE
+            } else {
+                val banners = mutableListOf<MegaBanner>()
+                for (i in 0 until it.size()) {
+                    banners.add(it[i])
+                }
 //                Log.i("Alex", "banners.size:${banners.size}")
-//                if (banners.size > 0) bannerViewPager.refreshData(banners)
-//            }
-//        }
+                if (banners.size > 0) {
+                    bannerViewPager.refreshData(banners)
+//                    Log.i("Alex", "dismiss banner id: ${banners[0].id}")
+//                    megaApi.dismissBanner(banners[0].id)
+                }
+            }
+        }
     }
 
+    /**
+     * Inflate the layout of the full screen mask
+     * The mask will actually be shown after clicking to expand the FAB
+     */
     private fun setupMask() {
         windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
+    /**
+     * Set the click listeners for file categories buttons
+     */
     private fun setupCategories() {
         viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
@@ -380,6 +414,12 @@ class HomepageFragment : Fragment() {
         viewDataBinding.category.categoryVideo.setOnClickListener(categoryClickListener)
     }
 
+    /**
+     * Get the title of the bottom sheet tab
+     *
+     * @param position the tab index
+     * @return The title text or "" for invalid position param
+     */
     private fun getTabTitle(position: Int): String? {
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
@@ -396,6 +436,9 @@ class HomepageFragment : Fragment() {
         setBottomSheetExpandedTop()
     }
 
+    /**
+     * Set the initial height of the bottom sheet. The top is just below the banner view.
+     */
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener {
             bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
@@ -403,6 +446,11 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Set the topmost height of the bottom sheet(when expanded).
+     * The top of the bottom sheet would always below the search view.
+     * In addition, set the transition effect while dragging the bottom sheet to/away from the top
+     */
     private fun setBottomSheetExpandedTop() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             HomepageBottomSheetBehavior.BottomSheetCallback() {
@@ -419,6 +467,12 @@ class HomepageFragment : Fragment() {
                 if (bottomSheet.height > maxHeight) {
                     layoutParams.height = maxHeight
                     bottomSheet.layoutParams = layoutParams
+                }
+
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    tabLayout.setBackgroundResource(R.drawable.bg_cardview_white)
+                } else {
+                    tabLayout.setBackgroundResource(R.drawable.bg_cardview_white_top)
                 }
             }
 
@@ -443,20 +497,23 @@ class HomepageFragment : Fragment() {
         })
     }
 
+    /**
+     * Elevate the tab or not based on the scrolling in Recents/Offline fragments.
+     *
+     *
+     * @param withElevation elevate the tab if true, false otherwise
+     */
     private fun changeTabElevation(withElevation: Boolean) {
-        if (withElevation) {
-            tabLayout.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
+        tabLayout.elevation = if (withElevation) {
+            Util.dp2px(4f, resources.displayMetrics).toFloat()
         } else {
-            tabLayout.elevation = 0f
-        }
-
-        if (withElevation && bottomSheetBehavior.state == HomepageBottomSheetBehavior.STATE_EXPANDED) {
-            tabLayout.setBackgroundResource(R.drawable.bg_cardview_white)
-        } else {
-            tabLayout.setBackgroundResource(R.drawable.bg_cardview_white_top)
+            0f
         }
     }
 
+    /**
+     * Set up the Fab and Fabs in the expanded status
+     */
     private fun setupFabs() {
         fabMain = rootView.fab_home_main
         fabMaskMain = fabMaskLayout.fab_main
@@ -506,6 +563,12 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Do some operation if the network is connected, or show a snack bar for alerting the disconnection
+     *
+     * @param showSnackBar true for showing a snack bar for alerting the disconnection
+     * @param operation the operation to be executed if online
+     */
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
         if (isOnline(context) && !viewModel.isRootNodeNull()) {
             operation()
@@ -518,28 +581,22 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun openNewChatActivity() {
-        doIfOnline(true) {
-            val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
-                putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-            }
-
-            activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+    private fun openNewChatActivity() = doIfOnline(true) {
+        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+            putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
         }
+
+        activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
     }
 
-    private fun showUploadPanel() {
-        doIfOnline(true) {
-            (activity as ManagerActivityLollipop).showUploadPanel()
-        }
+    private fun showUploadPanel() = doIfOnline(true) {
+        (activity as ManagerActivityLollipop).showUploadPanel()
     }
 
-    private fun fabMainClickCallback() {
-        if (isFabExpanded) {
-            collapseFab()
-        } else {
-            expandFab()
-        }
+    private fun fabMainClickCallback() = if (isFabExpanded) {
+        collapseFab()
+    } else {
+        expandFab()
     }
 
     fun collapseFab() {
@@ -574,26 +631,62 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Present the expanded FABs with animated transition
+     */
     private fun showIn(vararg fabs: View) {
         for (fab in fabs) {
-            showIn(fab)
+            fab.visibility = View.VISIBLE
+            fab.alpha = ALPHA_TRANSPARENT
+            fab.translationY = fab.height.toFloat()
+
+            fab.animate()
+                .setDuration(FAB_ANIM_DURATION)
+                .translationY(0f)
+                .setListener(object :
+                    AnimatorListenerAdapter() {/* No need to override any methods here. */ })
+                .alpha(ALPHA_OPAQUE)
+                .start()
         }
     }
 
+    /**
+     * Hide the expanded FABs with animated transition
+     */
     private fun showOut(vararg fabs: View) {
         for (fab in fabs) {
-            showOut(fab)
+            fab.animate()
+                .setDuration(FAB_ANIM_DURATION)
+                .translationY(fab.height.toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        fab.visibility = View.GONE
+                        super.onAnimationEnd(animation)
+                    }
+                }).alpha(ALPHA_TRANSPARENT)
+                .start()
         }
     }
 
+    /**
+     * Showing the full screen mask by adding the mask layout to the window content
+     */
     private fun addMask() {
         windowContent?.addView(fabMaskLayout)
     }
 
+    /**
+     * Removing the full screen mask
+     */
     private fun removeMask() {
         windowContent?.removeView(fabMaskLayout)
     }
 
+    /**
+     * Animate the appearance of the main FAB when expanding and collapsing
+     *
+     * @param isExpand true if the FAB is being expanded, false for being collapsed
+     */
     private fun rotateFab(isExpand: Boolean) {
         val rotateAnim = ObjectAnimator.ofFloat(
             fabMaskMain, "rotation",
@@ -620,33 +713,6 @@ class HomepageFragment : Fragment() {
             playTogether(rotateAnim, backgroundTintAnim, tintAnim)
             start()
         }
-    }
-
-    private fun showIn(view: View) {
-        view.visibility = View.VISIBLE
-        view.alpha = ALPHA_TRANSPARENT
-        view.translationY = view.height.toFloat()
-
-        view.animate()
-            .setDuration(FAB_ANIM_DURATION)
-            .translationY(0f)
-            .setListener(object :
-                AnimatorListenerAdapter() {/* No need to override any methods here. */ })
-            .alpha(ALPHA_OPAQUE)
-            .start()
-    }
-
-    private fun showOut(view: View) {
-        view.animate()
-            .setDuration(FAB_ANIM_DURATION)
-            .translationY(view.height.toFloat())
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    view.visibility = View.GONE
-                    super.onAnimationEnd(animation)
-                }
-            }).alpha(ALPHA_TRANSPARENT)
-            .start()
     }
 
     companion object {

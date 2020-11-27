@@ -47,7 +47,7 @@ fun notifyAvatarChange(isSet: Boolean) {
     avatarChange_.value = isSet
 }
 
-fun onScrolling(scrollingFragment: Pair<Scrollable, Boolean>) {
+fun notifyScrolling(scrollingFragment: Pair<Scrollable, Boolean>) {
     scrolling_.value = scrollingFragment
 }
 

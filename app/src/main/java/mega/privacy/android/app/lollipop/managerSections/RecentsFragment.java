@@ -252,7 +252,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     @Override
     public void checkScroll() {
         if (listView == null) return;
-        EventNotifierKt.onScrolling(new Pair<>(this, listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
+        EventNotifierKt.notifyScrolling(new Pair<>(this, listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {
