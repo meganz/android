@@ -1732,11 +1732,27 @@
     <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
     <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
 
-    <string name="retention_time_picker_hours" context="Label for picker option to configure custom retention time. This option indicates days">hours</string>
-    <string name="retention_time_picker_weeks" context="Label for picker option to configure custom retention time. This option indicates weeks">weeks</string>
-    <string name="retention_time_picker_months" context="Label for picker option to configure custom retention time. This option indicates months">months</string>
-    <string name="retention_time_picker_years" context="Label for picker option to configure custom retention time. This option indicates years">years</string>
+    <plurals name="retention_time_picker_days">
+        <item context="menu item" quantity="one">day</item>
+        <item context="menu items" quantity="other">days</item>
+    </plurals>
 
+    <plurals name="retention_time_picker_hours">
+        <item context="menu item" quantity="one">hour</item>
+        <item context="menu items" quantity="other">hours</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="menu item" quantity="one">week</item>
+        <item context="menu items" quantity="other">weeks</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="menu item" quantity="one">month</item>
+        <item context="menu items" quantity="other">months</item>
+    </plurals>
+
+    <string name="retention_time_picker_year" context="Label for picker option to configure custom retention time. This option indicates year">year</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 

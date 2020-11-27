@@ -106,6 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="@color/chat_sliding_panel_separator"
                 android:orientation="vertical" />
 
@@ -117,7 +118,7 @@
                 android:orientation="vertical">
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="136dp"
+                    android:layout_height="126dp"
                     android:gravity="center_horizontal">
                     <NumberPicker
                         android:id="@+id/picker_number"
@@ -134,21 +135,31 @@
                         android:layout_width="wrap_content"
                         android:layout_toEndOf="@id/picker_number"
                         android:selectionDividerHeight="1dp"
-                        android:showDividers="middle"/>
+                        android:showDividers="none"/>
                     </RelativeLayout>
                 <Button
                     android:id="@+id/picker_button"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:textColor="@color/accentColor"
                     android:stateListAnimator="@null"
                     android:background="@null"
-                    android:layout_marginEnd="8dp"
-                    android:layout_gravity="end|center_vertical"
+                    android:layout_gravity="end"
                     android:text="@string/general_ok"
                     android:textSize="14sp"
                     android:gravity="center"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/chat_sliding_panel_separator"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:id="@+id/clear_chat_history_layout"
@@ -158,7 +169,6 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="19dp"
                 android:orientation="vertical">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -167,7 +177,6 @@
                     android:text="@string/title_properties_clear_chat_history"
                     android:textColor="@color/delete_account"
                     android:textSize="16sp" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -182,6 +191,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="@color/chat_sliding_panel_separator"
                 android:orientation="vertical" />
         </LinearLayout>

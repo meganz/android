@@ -1062,7 +1062,7 @@ public class ChatUtil {
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
                         if(context instanceof ManageChatHistoryActivity){
-                            ((ManageChatHistoryActivity)context).showInitPicker();
+                            ((ManageChatHistoryActivity)context).showInitPicker(isDisabled ? DISABLED_RETENTION_TIME : getUpdatedRetentionTimeFromAChat(idChat));
                         }
                     } else {
                         MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat, getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
@@ -1076,9 +1076,16 @@ public class ChatUtil {
         updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE), !isDisabled);
     }
 
-    private static int getPositionSelectedFromRetentionTime(long idChat){
+    public static long getUpdatedRetentionTimeFromAChat(long idChat){
         MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(idChat);
-        long seconds = chat.getRetentionTime();
+        if(chat != null)
+            return chat.getRetentionTime();
+
+        return DISABLED_RETENTION_TIME;
+    }
+
+    private static int getPositionSelectedFromRetentionTime(long idChat){
+        long seconds = getUpdatedRetentionTimeFromAChat(idChat);
 
         if (seconds == DISABLED_RETENTION_TIME)
             return RETENTION_TIME_DIALOG_OPTION_DISABLED;

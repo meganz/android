@@ -649,7 +649,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					logDebug("Successful open chat");
 				}
 
-				updateRetentionTimeLayout(chat.getRetentionTime());
+				updateRetentionTimeLayout(getUpdatedRetentionTimeFromAChat(chat.getChatId()));
 			} else {
 				retentionTimeText.setVisibility(View.GONE);
 			}

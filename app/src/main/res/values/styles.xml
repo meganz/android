@@ -252,6 +252,8 @@
     <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar" >
         <item name="android:textSize">20sp</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textAppearance">@android:attr/textAppearanceMedium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:colorControlNormal">@color/accentColor</item>
         <item name="android:background">@null</item>
     </style>
