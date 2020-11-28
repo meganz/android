@@ -1758,6 +1758,7 @@
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
+    <string name="retention_history_changed_by" context="Text shown when the chat retention history was changed by someone">[A]%1$s[/A][B] changed the message retention history for this conversation history to[/B][A] Delete all messages older than %2$s[/A]</string>
 
     <string name="number_messages_chat_notification" formatted="false" context="Notification title to show the number of unread chats, unread messages">%1$d unread chats</string>
 

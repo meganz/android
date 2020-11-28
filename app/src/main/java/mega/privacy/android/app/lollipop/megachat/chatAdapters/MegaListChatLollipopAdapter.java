@@ -52,8 +52,8 @@ import mega.privacy.android.app.lollipop.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -72,7 +72,6 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaChatCall.CALL_STATUS_DESTROYED;
@@ -1644,6 +1643,58 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
+				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+			} else if(messageType==MegaChatMessage.TYPE_SET_RETENTION_TIME){
+				logDebug("Message type SET_RETENTION_TIME");
+				String text;
+				String fullName;
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+				String timeFormatted = transformSecondsInString(chatRoom.getRetentionTime());
+
+				if(chat.getLastMessageSender() == megaChatApi.getMyUserHandle()){
+					String myFullName = megaChatApi.getMyFullname();
+					if(myFullName==null){
+						myFullName = "";
+					}
+					if(myFullName.trim().length()<=0){
+						myFullName = megaChatApi.getMyEmail();
+					}
+
+					fullName = toCDATA(myFullName);
+				} else{
+					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
+					if(isTextEmpty(fullNameAction)){
+						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+							logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
+							fullNameAction = context.getString(R.string.unknown_name_label);
+							((ViewHolderNormalChatList)holder).nameRequestedAction=true;
+							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+
+							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
+
+							megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+							megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
+							megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
+						}
+						else{
+							logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
+						}
+					}
+
+					fullName = toCDATA(fullNameAction);
+				}
+
+				text = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+				text = TextUtil.removeFormatPlaceholder(text);
+
+				Spanned result;
+				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+					result = Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+				} else {
+					result = Html.fromHtml(text);
+				}
+
+				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
 			else if(messageType==MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE) {
