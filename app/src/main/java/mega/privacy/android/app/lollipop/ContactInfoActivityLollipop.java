@@ -643,10 +643,12 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			if (chat != null) {
-				retentionTimeListener = new RetentionTimeListener(this);
-				megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
-				if (megaChatApi.openChatRoom(chat.getChatId(), retentionTimeListener)) {
-					logDebug("Successful open chat");
+				if(fromContacts) {
+					retentionTimeListener = new RetentionTimeListener(this);
+					megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
+					if (megaChatApi.openChatRoom(chat.getChatId(), retentionTimeListener)) {
+						logDebug("Successful open chat");
+					}
 				}
 
 				updateRetentionTimeLayout(getUpdatedRetentionTimeFromAChat(chat.getChatId()));
@@ -1301,6 +1303,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			case R.id.manage_chat_history_contact_properties_layout:
 				Intent intentManageChat = new Intent(this, ManageChatHistoryActivity.class);
 				intentManageChat.putExtra(EMAIL, user.getEmail());
+				intentManageChat.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+				intentManageChat.putExtra(IS_FROM_CONTACTS, fromContacts);
 				startActivity(intentManageChat);
 				break;
 
@@ -1841,7 +1845,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.recycle();
         }
 
-		if (chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE && retentionTimeListener != null) {
+		if (fromContacts && chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE && retentionTimeListener != null) {
 			megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
 		}
 
@@ -1855,10 +1859,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-
-	}
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) { }
 
 	@Override
 	protected void onResume() {

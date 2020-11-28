@@ -1003,8 +1003,8 @@ public class ChatUtil {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        String message = context.getString(R.string.confirmation_clear_chat_history);
-        builder.setTitle(R.string.title_confirmation_clear_chat_history);
+        String message = context.getString(chat.isGroup() ? R.string.confirmation_clear_group_chat : R.string.confirmation_clear_chat_history);
+        builder.setTitle(chat.isGroup() ? R.string.title_confirmation_clear_group_chat : R.string.title_confirmation_clear_chat_history);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
                 .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }

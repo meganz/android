@@ -5463,6 +5463,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("CHANGE_TYPE_UPDATE_PREVIEWERS for the chat: " + chat.getChatId());
             setPreviewersView();
         }
+        else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_RETENTION_TIME)) {
+            logDebug("CHANGE_TYPE_RETENTION_TIME for the chat: " + chat.getChatId());
+            Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
+            intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
+            MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
+        }
     }
 
     void setPreviewersView () {
@@ -6136,7 +6142,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             logDebug("Change content of the message");
 
             if(msg.getType()==MegaChatMessage.TYPE_TRUNCATE){
-                logDebug("TRUNCATE MESSAGE");
                 clearHistory(androidMsg);
             }
             else{
@@ -8402,6 +8407,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void scrollToMessage(long lastId){
+        if(messages == null || messages.isEmpty())
+            return;
+
         for(int i=messages.size()-1; i>=0;i--) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
 

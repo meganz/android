@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -153,6 +154,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private View privateSeparator;
         private RelativeLayout sharedFilesLayout;
         private RelativeLayout clearChatLayout;
+        private TextView retentionTimeText;
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
         private View dividerLeaveLayout;
@@ -217,8 +219,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.sharedFilesLayout.setOnClickListener(this);
 
                 //Clear chat Layout
-                holderHeader.clearChatLayout = v.findViewById(R.id.chat_group_contact_properties_clear_layout);
+                holderHeader.clearChatLayout =  v.findViewById(R.id.manage_chat_history_group_info_layout);
                 holderHeader.clearChatLayout.setOnClickListener(this);
+                holderHeader.retentionTimeText =  v.findViewById(R.id.manage_chat_history_group_info_subtitle);
+                holderHeader.retentionTimeText.setVisibility(View.GONE);
                 holderHeader.dividerClearLayout = v.findViewById(R.id.divider_clear_layout);
 
                 //Archive chat Layout
@@ -604,8 +608,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 groupChatInfoActivity.showConfirmationLeaveChat();
                 break;
 
-            case R.id.chat_group_contact_properties_clear_layout:
-                groupChatInfoActivity.showConfirmationClearChat();
+            case R.id.manage_chat_history_group_info_layout:
+                Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
+                intentManageChat.putExtra(CHAT_ID, chatId);
+                intentManageChat.putExtra(IS_FROM_CONTACTS, false);
+                groupChatInfoActivity.startActivity(intentManageChat);
                 break;
 
             case R.id.chat_group_contact_properties_archive_layout:

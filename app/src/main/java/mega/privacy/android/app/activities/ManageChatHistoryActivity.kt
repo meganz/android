@@ -22,7 +22,6 @@ import mega.privacy.android.app.listeners.SetRetentionTimeListener
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -53,7 +52,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private var chat: MegaChatRoom? = null
     private var chatId = MEGACHAT_INVALID_HANDLE
     private var contactHandle = INVALID_HANDLE
-
+    private var isFromContacts = false
     private var listener: RetentionTimeListener? = null
 
     private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -75,20 +74,32 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             finish()
         }
 
-        val email = intent.extras!!.getString(Constants.EMAIL)
+        chatId = intent.extras!!.getLong(CHAT_ID)
+        isFromContacts = intent.extras!!.getBoolean(IS_FROM_CONTACTS)
 
-        if (TextUtil.isTextEmpty(email)) {
-            logError("Cannot init view, contact' email is empty")
-            finish()
+        if(chatId != MEGACHAT_INVALID_HANDLE){
+            logDebug("Group info")
+            chat = megaChatApi.getChatRoom(chatId)
+        }else{
+            logDebug("Contact info")
+            val email = intent.extras!!.getString(EMAIL)
+
+            if (TextUtil.isTextEmpty(email)) {
+                logError("Cannot init view, contact' email is empty")
+                finish()
+            }
+
+            var contact = megaApi.getContact(email)
+            if (contact == null) {
+                logError("Cannot init view, contact is null")
+                finish()
+            }
+            contactHandle = contact?.handle!!
+
+            chat = megaChatApi.getChatRoomByUser(contactHandle)
+            if(chat != null)
+                chatId = chat?.chatId!!
         }
-
-        var contact = megaApi.getContact(email)
-        if (contact == null) {
-            logError("Cannot init view, contact is null")
-            finish()
-        }
-
-        contactHandle = contact?.handle!!
 
         registerReceiver(
             retentionTimeReceiver,
@@ -110,7 +121,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase()
         screenOrientation = resources.configuration.orientation
 
-        chat = megaChatApi.getChatRoomByUser(contactHandle)
         binding.historyRetentionSwitch.isClickable = false;
         binding.historyRetentionSwitch.isChecked = false
         binding.pickerLayout.visibility= View.GONE
@@ -121,23 +131,23 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.historyRetentionSwitchLayout.setOnClickListener(null)
             binding.clearChatHistoryLayout.setOnClickListener(null)
             binding.retentionTimeTextLayout.setOnClickListener(null)
-
             binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention)
             binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_history_retention)
             binding.retentionTime.visibility = View.GONE
         }else{
-            logDebug("The chat exists")
+            logDebug("The chat exists:: chatid "+chatId)
             binding.historyRetentionSwitchLayout.setOnClickListener(this)
             binding.clearChatHistoryLayout.setOnClickListener(this)
-            chatId = chat?.chatId!!
-            listener = RetentionTimeListener(this)
-            megaChatApi.closeChatRoom(chatId, listener)
-            if (megaChatApi.openChatRoom(chatId, listener)) {
-                logDebug("Successful open chat");
+
+            if (isFromContacts) {
+                listener = RetentionTimeListener(this)
+                megaChatApi.closeChatRoom(chatId, listener)
+                if (megaChatApi.openChatRoom(chatId, listener)) {
+                    logDebug("Successful open chat")
+                }
             }
 
             val seconds = chat!!.retentionTime
-
             updateRetentionTimeUI(seconds)
         }
     }
@@ -392,7 +402,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     }
 
     override fun onDestroy() {
-        if (chatId != MEGACHAT_INVALID_HANDLE && listener != null) {
+        if (isFromContacts && chatId != MEGACHAT_INVALID_HANDLE && listener != null) {
+            logDebug("Successful close chat");
             megaChatApi.closeChatRoom(chatId, listener)
         }
 
