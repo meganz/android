@@ -1,5 +1,8 @@
 package mega.privacy.android.app.utils;
 
+import android.text.Html;
+import android.text.Spanned;
+
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 
@@ -27,6 +30,30 @@ public class TextUtil {
             logWarning("Error replacing text. ", e);
         }
         return text;
+    }
+
+    public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
+        try {
+            textToShow = textToShow.replace("[A]", "<font color='#060000'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            if(isOwnMessage) {
+                textToShow = textToShow.replace("[B]", "<font color='#868686'>");
+            }else{
+                textToShow = textToShow.replace("[B]", "<font color='#00BFA5'>");
+            }
+            textToShow = textToShow.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Error replacing text. ", e);
+        }
+
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(textToShow);
+        }
+
+        return result;
     }
 
     public static boolean isEmail(String str) {

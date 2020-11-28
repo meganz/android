@@ -5689,6 +5689,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
+        logDebug("onMessageLoaded ");
 
         if (msg != null) {
             logDebug("STATUS: " + msg.getStatus());
@@ -5970,6 +5971,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
+        logDebug("onMessageReceived ");
 
         logDebug("CHAT CONNECTION STATE: " + api.getChatConnectionState(idChat));
         logDebug("STATUS: " + msg.getStatus());
@@ -6211,6 +6213,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("resultModify: " + resultModify);
             }
         }
+    }
+
+    @Override
+    public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
     }
 
     private void disableMultiselection(){

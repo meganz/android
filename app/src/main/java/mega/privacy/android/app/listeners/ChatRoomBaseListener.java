@@ -35,6 +35,11 @@ public class ChatRoomBaseListener implements MegaChatRoomListenerInterface {
     }
 
     @Override
+    public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
+
+    }
+
+    @Override
     public void onHistoryReloaded(MegaChatApiJava api, MegaChatRoom chat) {
 
     }

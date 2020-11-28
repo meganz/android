@@ -165,6 +165,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private final static int TYPE_HEADER = 0;
     private final static int TYPE_ITEM = 1;
 
+    private final static int INVALID_INFO = -1;
+
     private final static int LAYOUT_WIDTH = 330;
     private static int REACTION_SPACE = 8;
 
@@ -1735,11 +1737,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 bindChangeTitleMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
-            case MegaChatMessage.TYPE_TRUNCATE: {
+            case MegaChatMessage.TYPE_TRUNCATE:
                 logDebug("TYPE_TRUNCATE");
                 bindTruncateMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
-            }
+            case MegaChatMessage.TYPE_SET_RETENTION_TIME:
+                logDebug("TYPE_SET_RETENTION_TIME");
+                bindRetentionTimeMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+
             case MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT: {
                 logDebug("TYPE_REVOKE_NODE_ATTACHMENT");
                 bindRevokeNodeMessage((ViewHolderMessageChat) holder, androidMessage, position);
@@ -6040,6 +6046,80 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
+
+    public void bindRetentionTimeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        logDebug("bindRetentionTimeMessage");
+        holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
+        MegaChatMessage message = androidMessage.getMessage();
+
+        if (messages.get(position - 1).getInfoToShow() != INVALID_INFO) {
+            setInfoToShow(position, holder, isMyMessage(message), messages.get(position - 1).getInfoToShow(),
+                    formatDate(context, message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatTime(message));
+        }
+
+        String timeFormatted = transformSecondsInString(androidMessage.getMessage().getRetentionTime());
+
+        if (isMyMessage(message)) {
+            logDebug("MY message handle!!: " + message.getMsgId());
+
+            holder.titleOwnMessage.setGravity(Gravity.LEFT);
+            holder.titleOwnMessage.setPadding(scaleWidthPx(isScreenInPortrait(context) ?
+                    MANAGEMENT_MESSAGE_PORT :
+                    MANAGEMENT_MESSAGE_LAND, outMetrics), 0, 0, 0);
+
+
+            holder.ownMessageLayout.setVisibility(View.VISIBLE);
+            holder.contactMessageLayout.setVisibility(View.GONE);
+
+            holder.contentOwnMessageLayout.setVisibility(View.GONE);
+            holder.ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+            holder.ownManagementMessageText.setText(getRetentionTimeString(megaChatApi.getMyFullname(), timeFormatted));
+
+            holder.ownManagementMessageLayout.setVisibility(View.VISIBLE);
+            holder.ownManagementMessageIcon.setVisibility(View.GONE);
+            RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
+            paramsOwnManagement.leftMargin = scaleWidthPx(isScreenInPortrait(context) ? MANAGEMENT_MESSAGE_PORT : MANAGEMENT_MESSAGE_LAND, outMetrics);
+            holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
+
+        } else {
+            long userHandle = message.getUserHandle();
+            logDebug("Contact message!!: " + userHandle);
+
+            setContactMessageName(position, holder, userHandle, true);
+            holder.titleContactMessage.setPadding(scaleWidthPx(isScreenInPortrait(context) ?
+                    MANAGEMENT_MESSAGE_PORT :
+                    MANAGEMENT_MESSAGE_LAND, outMetrics), 0, 0, 0);
+
+            holder.ownMessageLayout.setVisibility(View.GONE);
+            holder.contactMessageLayout.setVisibility(View.VISIBLE);
+            holder.contentContactMessageLayout.setVisibility(View.GONE);
+            holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
+            holder.contactManagementMessageIcon.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+            paramsContactManagement.leftMargin = scaleWidthPx(isScreenInPortrait(context) ?
+                    MANAGEMENT_MESSAGE_PORT :
+                    MANAGEMENT_MESSAGE_LAND, outMetrics);
+            holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
+            holder.nameContactText.setVisibility(View.GONE);
+
+            holder.contactManagementMessageText.setText(getRetentionTimeString(holder.fullNameTitle, timeFormatted));
+        }
+    }
+
+    /**
+     * Method for obtaining the correct retention time changed message String.
+     *
+     * @param fullName      The name of the user
+     * @param timeFormatted The retention time
+     * @return The text of the msg
+     */
+    private Spanned getRetentionTimeString(String fullName, String timeFormatted) {
+        String textToShow = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+        return replaceFormatChatMessages(textToShow, true);
+    }
+
     public void bindTruncateMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindTruncateMessage");
         ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.VISIBLE);
@@ -6068,20 +6148,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).ownManagementMessageText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 
             String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
-            try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
-                textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
-                textToShow = textToShow.replace("[/B]", "</font>");
-            } catch (Exception e) {
-            }
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
-            ((ViewHolderMessageChat) holder).ownManagementMessageText.setText(result);
+            holder.ownManagementMessageText.setText(replaceFormatChatMessages(textToShow, true));
 
             ((ViewHolderMessageChat) holder).ownManagementMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setVisibility(View.GONE);
@@ -6129,21 +6196,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             ((ViewHolderMessageChat) holder).nameContactText.setVisibility(View.GONE);
 
             String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(holder.fullNameTitle));
-            try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
-                textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#00BFA5\'>");
-                textToShow = textToShow.replace("[/B]", "</font>");
-            } catch (Exception e) {
-            }
-            Spanned result = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-            } else {
-                result = Html.fromHtml(textToShow);
-            }
-
-            ((ViewHolderMessageChat) holder).contactManagementMessageText.setText(result);
+            holder.contactManagementMessageText.setText(replaceFormatChatMessages(textToShow, false));
         }
     }
 
