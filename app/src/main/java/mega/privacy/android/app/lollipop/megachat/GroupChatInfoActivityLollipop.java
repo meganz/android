@@ -156,6 +156,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     };
 
+    private BroadcastReceiver retentionTimeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null ||
+                    !intent.getAction().equals(ACTION_UPDATE_RETENTION_TIME))
+                return;
+
+            long seconds = intent.getLongExtra(RETENTION_TIME, 0);
+            if(adapter != null){
+                adapter.updateRetentionTimeUI(seconds);
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -236,6 +250,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
+            registerReceiver(retentionTimeReceiver,
+                    new IntentFilter(ACTION_UPDATE_RETENTION_TIME));
+
             IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
             contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
@@ -260,6 +277,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(retentionTimeReceiver);
         unregisterReceiver(contactUpdateReceiver);
     }
 

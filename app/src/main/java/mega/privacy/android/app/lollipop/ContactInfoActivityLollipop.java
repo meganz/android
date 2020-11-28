@@ -201,7 +201,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private MarqueeTextView secondLineTextToolbar;
 	private State stateToolbar = State.IDLE;
 
-	private RelativeLayout clearChatLayout;
+	private RelativeLayout manageChatLayout;
 	private TextView retentionTimeText;
 	private View dividerClearChatLayout;
 	RelativeLayout removeContactChatLayout;
@@ -369,10 +369,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 
 			long seconds = intent.getLongExtra(RETENTION_TIME, 0);
-			updateRetentionTimeLayout(seconds);
+			updateRetentionTimeLayout(retentionTimeText, seconds);
 		}
 	};
-
 
 	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
 		@Override
@@ -573,8 +572,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			dividerSharedFilesLayout = findViewById(R.id.divider_chat_files_shared_layout);
 
 			//Clear chat Layout
-			clearChatLayout = findViewById(R.id.manage_chat_history_contact_properties_layout);
-			clearChatLayout.setOnClickListener(this);
+			manageChatLayout = findViewById(R.id.manage_chat_history_contact_properties_layout);
+			manageChatLayout.setOnClickListener(this);
 			retentionTimeText = findViewById(R.id.manage_chat_history_contact_properties_subtitle);
 			retentionTimeText.setVisibility(View.GONE);
 			dividerClearChatLayout = findViewById(R.id.divider_clear_chat_layout);
@@ -651,7 +650,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					}
 				}
 
-				updateRetentionTimeLayout(getUpdatedRetentionTimeFromAChat(chat.getChatId()));
+				updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chat.getChatId()));
 			} else {
 				retentionTimeText.setVisibility(View.GONE);
 			}
@@ -672,10 +671,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					emailText.setText(user.getEmail());
 
 					if (chat != null) {
-						clearChatLayout.setVisibility(View.VISIBLE);
+						manageChatLayout.setVisibility(View.VISIBLE);
 						dividerClearChatLayout.setVisibility(View.VISIBLE);
 					} else {
-						clearChatLayout.setVisibility(View.GONE);
+						manageChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
 					}
 
@@ -693,10 +692,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 					if (chat != null) {
 						emailText.setText(user.getEmail());
-						clearChatLayout.setVisibility(View.VISIBLE);
+						manageChatLayout.setVisibility(View.VISIBLE);
 						dividerClearChatLayout.setVisibility(View.VISIBLE);
 					} else {
-						clearChatLayout.setVisibility(View.GONE);
+						manageChatLayout.setVisibility(View.GONE);
 						dividerClearChatLayout.setVisibility(View.GONE);
 					}
 
@@ -713,7 +712,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				}
 				sharedFoldersLayout.setVisibility(View.GONE);
 				dividerSharedFoldersLayout.setVisibility(View.GONE);
-				clearChatLayout.setVisibility(View.GONE);
+				manageChatLayout.setVisibility(View.GONE);
 				dividerClearChatLayout.setVisibility(View.GONE);
 
 				shareContactLayout.setVisibility(View.GONE);
@@ -759,22 +758,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		registerReceiver(destroyActionModeReceiver,
 				new IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE));
-	}
-
-	/**
-	 * Method for updating the Time retention layout.
-	 *
-	 * @param time The retention time in seconds.
-	 */
-	private void updateRetentionTimeLayout(long time) {
-		String timeFormatted = transformSecondsInString(time);
-		if (isTextEmpty(timeFormatted)) {
-			retentionTimeText.setVisibility(View.GONE);
-		} else {
-			String subtitleText = getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
-			retentionTimeText.setText(subtitleText);
-			retentionTimeText.setVisibility(View.VISIBLE);
-		}
 	}
 
 	private void visibilityStateIcon() {

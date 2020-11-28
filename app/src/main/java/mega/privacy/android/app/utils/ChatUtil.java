@@ -1192,4 +1192,20 @@ public class ChatUtil {
         }
         return " ";
     }
+
+    /**
+     * Method for updating the Time retention layout.
+     *
+     * @param time The retention time in seconds.
+     */
+    public static void updateRetentionTimeLayout(final TextView retentionTimeText, long time) {
+        String timeFormatted = transformSecondsInString(time);
+        if (isTextEmpty(timeFormatted)) {
+            retentionTimeText.setVisibility(View.GONE);
+        } else {
+            String subtitleText = getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
+            retentionTimeText.setText(subtitleText);
+            retentionTimeText.setVisibility(View.VISIBLE);
+        }
+    }
 }
