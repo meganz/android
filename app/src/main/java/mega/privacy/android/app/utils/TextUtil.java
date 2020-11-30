@@ -32,13 +32,20 @@ public class TextUtil {
         return text;
     }
 
+    /**
+     * Add the appropiate format in the  chat management messages.
+     *
+     * @param textToShow   The message text
+     * @param isOwnMessage If it is a sent or received message
+     * @return The formatted text
+     */
     public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
         try {
             textToShow = textToShow.replace("[A]", "<font color='#060000'>");
             textToShow = textToShow.replace("[/A]", "</font>");
-            if(isOwnMessage) {
+            if (isOwnMessage) {
                 textToShow = textToShow.replace("[B]", "<font color='#868686'>");
-            }else{
+            } else {
                 textToShow = textToShow.replace("[B]", "<font color='#00BFA5'>");
             }
             textToShow = textToShow.replace("[/B]", "</font>");

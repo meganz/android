@@ -1741,6 +1741,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("TYPE_TRUNCATE");
                 bindTruncateMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
+
             case MegaChatMessage.TYPE_SET_RETENTION_TIME:
                 logDebug("TYPE_SET_RETENTION_TIME");
                 bindRetentionTimeMessage((ViewHolderMessageChat) holder, androidMessage, position);
@@ -6046,9 +6047,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
-
     public void bindRetentionTimeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
-        logDebug("bindRetentionTimeMessage");
         holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
         MegaChatMessage message = androidMessage.getMessage();
 
@@ -6067,7 +6066,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.titleOwnMessage.setPadding(scaleWidthPx(isScreenInPortrait(context) ?
                     MANAGEMENT_MESSAGE_PORT :
                     MANAGEMENT_MESSAGE_LAND, outMetrics), 0, 0, 0);
-
 
             holder.ownMessageLayout.setVisibility(View.VISIBLE);
             holder.contactMessageLayout.setVisibility(View.GONE);

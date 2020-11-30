@@ -6,6 +6,7 @@ import android.content.Intent;
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatRoom;
+
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 

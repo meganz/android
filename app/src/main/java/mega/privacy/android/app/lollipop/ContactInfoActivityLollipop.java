@@ -201,6 +201,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private MarqueeTextView secondLineTextToolbar;
 	private State stateToolbar = State.IDLE;
 
+	private RetentionTimeListener retentionTimeListener;
 	private RelativeLayout manageChatLayout;
 	private TextView retentionTimeText;
 	private View dividerClearChatLayout;
@@ -256,8 +257,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
-
-	private RetentionTimeListener retentionTimeListener;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -368,7 +367,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					!intent.getAction().equals(ACTION_UPDATE_RETENTION_TIME))
 				return;
 
-			long seconds = intent.getLongExtra(RETENTION_TIME, 0);
+			long seconds = intent.getLongExtra(RETENTION_TIME, DISABLED_RETENTION_TIME);
 			updateRetentionTimeLayout(retentionTimeText, seconds);
 		}
 	};
@@ -1828,7 +1827,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.recycle();
         }
 
-		if (fromContacts && chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE && retentionTimeListener != null) {
+		if (fromContacts && chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE
+				&& retentionTimeListener != null) {
 			megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
 		}
 

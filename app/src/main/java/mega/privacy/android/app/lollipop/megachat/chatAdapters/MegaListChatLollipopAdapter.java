@@ -1643,40 +1643,35 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
-				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-			} else if(messageType==MegaChatMessage.TYPE_SET_RETENTION_TIME){
-				logDebug("Message type SET_RETENTION_TIME");
+				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+
+			} else if (messageType == MegaChatMessage.TYPE_SET_RETENTION_TIME) {
 				String text;
 				String fullName;
 				MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 				String timeFormatted = transformSecondsInString(chatRoom.getRetentionTime());
 
-				if(chat.getLastMessageSender() == megaChatApi.getMyUserHandle()){
+				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
 					String myFullName = megaChatApi.getMyFullname();
-					if(myFullName==null){
-						myFullName = "";
-					}
-					if(myFullName.trim().length()<=0){
+					if (isTextEmpty(myFullName)) {
 						myFullName = megaChatApi.getMyEmail();
 					}
-
 					fullName = toCDATA(myFullName);
-				} else{
+				} else {
 					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
-					if(isTextEmpty(fullNameAction)){
-						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
+					if (isTextEmpty(fullNameAction)) {
+						if (!(((ViewHolderNormalChatList) holder).nameRequestedAction)) {
 							logDebug("Call for nonContactHandle: " + chat.getLastMessageSender());
 							fullNameAction = context.getString(R.string.unknown_name_label);
-							((ViewHolderNormalChatList)holder).nameRequestedAction=true;
-							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageSender();
+							((ViewHolderNormalChatList) holder).nameRequestedAction = true;
+							((ViewHolderNormalChatList) holder).userHandle = chat.getLastMessageSender();
 
 							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageSender(), chat.isPreview());
 
 							megaChatApi.getUserFirstname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
 							megaChatApi.getUserLastname(chat.getLastMessageSender(), chatRoom.getAuthorizationToken(), listener);
 							megaChatApi.getUserEmail(chat.getLastMessageSender(), listener);
-						}
-						else{
+						} else {
 							logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
 						}
 					}

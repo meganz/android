@@ -32,28 +32,30 @@ import nz.mega.sdk.MegaChatRoom
 
 class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
-    private val OPTION_HOURS = 0
-    private val OPTION_DAYS = 1
-    private val OPTION_WEEKS = 2
-    private val OPTION_MONTHS = 3
-    private val OPTION_YEARS = 4
+    companion object {
+        private const val OPTION_HOURS = 0
+        private const val OPTION_DAYS = 1
+        private const val OPTION_MONTHS = 3
+        private const val OPTION_WEEKS = 2
+        private const val OPTION_YEARS = 4
 
-    private val MAXIMUM_VALUE_NUMBER_PICKER_HOURS = 24
-    private val MAXIMUM_VALUE_NUMBER_PICKER_DAYS = 31
-    private val MAXIMUM_VALUE_NUMBER_PICKER_WEEKS = 4
-    private val MAXIMUM_VALUE_NUMBER_PICKER_MONTHS = 12
-    private val MINIMUM_VALUE_NUMBER_PICKER = 1
+        private const val MINIMUM_VALUE_NUMBER_PICKER = 1
+        private const val MAXIMUM_VALUE_NUMBER_PICKER_HOURS = 24
+        private const val MAXIMUM_VALUE_NUMBER_PICKER_DAYS = 31
+        private const val MAXIMUM_VALUE_NUMBER_PICKER_WEEKS = 4
+        private const val MAXIMUM_VALUE_NUMBER_PICKER_MONTHS = 12
+        private const val MINIMUM_VALUE_TEXT_PICKER = 0
+        private const val MAXIMUM_VALUE_TEXT_PICKER = 4
+    }
 
-    private val MINIMUM_VALUE_TEXT_PICKER = 0
-    private val MAXIMUM_VALUE_TEXT_PICKER = 4
-
-    private var screenOrientation = 0
-    private lateinit var binding: ActivityManageChatHistoryBinding
+    private var screenOrientation: Int? = 0
     private var chat: MegaChatRoom? = null
     private var chatId = MEGACHAT_INVALID_HANDLE
     private var contactHandle = INVALID_HANDLE
-    private var isFromContacts = false
+    private var isFromContacts: Boolean? = false
     private var listener: RetentionTimeListener? = null
+
+    private lateinit var binding: ActivityManageChatHistoryBinding
 
     private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -61,7 +63,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 return
             }
 
-            val seconds = intent.getLongExtra(BroadcastConstants.RETENTION_TIME, DISABLED_RETENTION_TIME)
+            val seconds =
+                intent.getLongExtra(BroadcastConstants.RETENTION_TIME, DISABLED_RETENTION_TIME)
             updateRetentionTimeUI(seconds)
         }
     }
@@ -77,10 +80,10 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         chatId = intent.extras!!.getLong(CHAT_ID)
         isFromContacts = intent.extras!!.getBoolean(IS_FROM_CONTACTS)
 
-        if(chatId != MEGACHAT_INVALID_HANDLE){
+        if (chatId != MEGACHAT_INVALID_HANDLE) {
             logDebug("Group info")
             chat = megaChatApi.getChatRoom(chatId)
-        }else{
+        } else {
             logDebug("Contact info")
             val email = intent.extras!!.getString(EMAIL)
 
@@ -94,10 +97,11 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 logError("Cannot init view, contact is null")
                 finish()
             }
+
             contactHandle = contact?.handle!!
 
             chat = megaChatApi.getChatRoomByUser(contactHandle)
-            if(chat != null)
+            if (chat != null)
                 chatId = chat?.chatId!!
         }
 
@@ -121,25 +125,26 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase()
         screenOrientation = resources.configuration.orientation
 
-        binding.historyRetentionSwitch.isClickable = false;
+        binding.historyRetentionSwitch.isClickable = false
         binding.historyRetentionSwitch.isChecked = false
-        binding.pickerLayout.visibility= View.GONE
+        binding.pickerLayout.visibility = View.GONE
         binding.separator.visibility = View.GONE
 
-        if(chat == null){
+        if (chat == null) {
             logDebug("The chat does not exist")
             binding.historyRetentionSwitchLayout.setOnClickListener(null)
             binding.clearChatHistoryLayout.setOnClickListener(null)
             binding.retentionTimeTextLayout.setOnClickListener(null)
-            binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention)
-            binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_history_retention)
+            binding.retentionTimeTitle.text = getString(R.string.title_properties_history_retention)
+            binding.retentionTimeSubtitle.text =
+                getString(R.string.subtitle_properties_history_retention)
             binding.retentionTime.visibility = View.GONE
-        }else{
-            logDebug("The chat exists:: chatid "+chatId)
+        } else {
+            logDebug("The chat exists")
             binding.historyRetentionSwitchLayout.setOnClickListener(this)
             binding.clearChatHistoryLayout.setOnClickListener(this)
 
-            if (isFromContacts) {
+            if (isFromContacts as Boolean) {
                 listener = RetentionTimeListener(this)
                 megaChatApi.closeChatRoom(chatId, listener)
                 if (megaChatApi.openChatRoom(chatId, listener)) {
@@ -152,70 +157,34 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         }
     }
 
-    fun showInitPicker(seconds: Long){
+    /**
+     * Method that controls and shows the initial UI of the picket elements.
+     *
+     * @param seconds The time the retention time is enabled.
+     */
+    fun showInitPicker(seconds: Long) {
         binding.pickerLayout.visibility = View.VISIBLE
         binding.separator.visibility = View.VISIBLE
         binding.pickerButton.setOnClickListener(this)
 
-        binding.pickerNumber.disableTextEditing(true)
-        binding.pickerNumber.wrapSelectorWheel = true
-        binding.pickerNumber.minValue = MINIMUM_VALUE_NUMBER_PICKER
+        binding.numberPicker.disableTextEditing(true)
+        binding.numberPicker.wrapSelectorWheel = true
+        binding.numberPicker.minValue = MINIMUM_VALUE_NUMBER_PICKER
 
-        binding.pickerText.disableTextEditing(true)
-        binding.pickerText.wrapSelectorWheel = true
-        binding.pickerText.minValue = MINIMUM_VALUE_TEXT_PICKER;
-        binding.pickerText.maxValue = MAXIMUM_VALUE_TEXT_PICKER
+        binding.textPicker.disableTextEditing(true)
+        binding.textPicker.wrapSelectorWheel = true
+        binding.textPicker.minValue = MINIMUM_VALUE_TEXT_PICKER
+        binding.textPicker.maxValue = MAXIMUM_VALUE_TEXT_PICKER
 
         var valueInNumberPicker = MINIMUM_VALUE_NUMBER_PICKER
 
-        if(seconds == DISABLED_RETENTION_TIME){
-            binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
-            binding.pickerNumber.value = MINIMUM_VALUE_NUMBER_PICKER
-            binding.pickerText.value = MINIMUM_VALUE_TEXT_PICKER
-        }else{
-
-
-            val numberYears = seconds / SECONDS_IN_YEAR
-            val years = seconds - numberYears * SECONDS_IN_YEAR
-            if (years == 0L) {
-                binding.pickerText.value = OPTION_YEARS
-                binding.pickerNumber.maxValue = MINIMUM_VALUE_NUMBER_PICKER
-                binding.pickerNumber.value = numberYears.toInt()
-            } else {
-                val numberMonths = seconds / SECONDS_IN_MONTH_31
-                val months = seconds - numberMonths * SECONDS_IN_MONTH_31
-                if (months == 0L) {
-                    binding.pickerText.value = OPTION_MONTHS
-                    binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
-                    binding.pickerNumber.value = numberMonths.toInt()
-                } else {
-                    val numberWeeks = seconds / SECONDS_IN_WEEK
-                    val weeks = seconds - numberWeeks * SECONDS_IN_WEEK
-                    if (weeks == 0L) {
-                        binding.pickerText.value = OPTION_WEEKS
-                        binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
-                        binding.pickerNumber.value = numberWeeks.toInt()
-                    } else {
-                        val numberDays = seconds / SECONDS_IN_DAY
-                        val days = seconds - numberDays * SECONDS_IN_DAY
-                        if (days == 0L) {
-                            binding.pickerText.value = OPTION_DAYS
-                            binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
-                            binding.pickerNumber.value = numberDays.toInt()
-                        } else {
-                            val numberHours = seconds / SECONDS_IN_HOUR
-                            val hours = seconds - numberHours * SECONDS_IN_HOUR
-                            if (hours == 0L) {
-                                binding.pickerText.value = OPTION_HOURS
-                                binding.pickerNumber.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
-                                binding.pickerNumber.value = numberHours.toInt()
-                            }
-                        }
-                    }
-                }
-            }
-
-            valueInNumberPicker = binding.pickerNumber.value
+        if (seconds == DISABLED_RETENTION_TIME) {
+            binding.numberPicker.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+            binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
+            binding.textPicker.value = MINIMUM_VALUE_TEXT_PICKER
+        } else {
+            checkPickersValues(seconds)
+            valueInNumberPicker = binding.numberPicker.value
         }
 
         val arrayString = arrayOf(
@@ -238,22 +207,75 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             app.getString(R.string.retention_time_picker_year)
         )
 
-        binding.pickerText.setFormatter { value ->
+        binding.textPicker.setFormatter { value ->
             arrayString[value]
         }
 
-        binding.pickerText.setDisplayedValues(arrayString)
+        binding.textPicker.displayedValues = arrayString
 
-        binding.pickerNumber.setOnValueChangedListener(onValueChangeListenerPickerNumber)
-        binding.pickerText.setOnValueChangedListener(onValueChangeListenerPickerText)
-
+        binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
+        binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
     }
 
     /**
-     * Method that updates the values of the text picker according to the current value of the number picker.
+     * Updates the initial values of the pickers.
+     *
+     * @param textValue The current value of text picker
+     * @param maximumValue The maximum value of numbers picker
+     * @param numberValue The current value of number picker
+     */
+    private fun updatePickersValues(textValue: Int, maximumValue: Int, numberValue: Int) {
+        binding.textPicker.value = textValue
+        binding.numberPicker.maxValue = maximumValue
+        binding.numberPicker.value = numberValue
+    }
+
+    /**
+     * Controls the initial values of the pickers.
+     *
+     * @param seconds The retention time in seconds.
+     */
+    private fun checkPickersValues(seconds: Long) {
+        val numberYears = seconds / SECONDS_IN_YEAR
+        val years = seconds - numberYears * SECONDS_IN_YEAR
+        if (years == 0L) {
+            updatePickersValues(OPTION_YEARS, MINIMUM_VALUE_NUMBER_PICKER, numberYears.toInt())
+            return
+        }
+        val numberMonths = seconds / SECONDS_IN_MONTH_31
+        val months = seconds - numberMonths * SECONDS_IN_MONTH_31
+
+        if (months == 0L) {
+            updatePickersValues(OPTION_MONTHS, MAXIMUM_VALUE_NUMBER_PICKER_MONTHS, numberMonths.toInt())
+            return
+        }
+        val numberWeeks = seconds / SECONDS_IN_WEEK
+        val weeks = seconds - numberWeeks * SECONDS_IN_WEEK
+        if (weeks == 0L) {
+            updatePickersValues(OPTION_WEEKS, MAXIMUM_VALUE_NUMBER_PICKER_WEEKS, numberWeeks.toInt())
+            return
+        }
+        val numberDays = seconds / SECONDS_IN_DAY
+        val days = seconds - numberDays * SECONDS_IN_DAY
+        if (days == 0L) {
+            updatePickersValues(OPTION_DAYS, MAXIMUM_VALUE_NUMBER_PICKER_DAYS, numberDays.toInt())
+            return
+        }
+        val numberHours = seconds / SECONDS_IN_HOUR
+        val hours = seconds - numberHours * SECONDS_IN_HOUR
+        if (hours == 0L) {
+            updatePickersValues(OPTION_HOURS, MAXIMUM_VALUE_NUMBER_PICKER_HOURS, numberHours.toInt())
+        }
+    }
+
+    /**
+     * Updates the values of the text picker according to the current value of the number picker.
+     *
+     * @param oldValue the previous value of the number picker
+     * @param newValue the current value of the number picker
      */
     private fun updateTextPicker(oldValue: Int, newValue: Int) {
-        if (oldValue == 1 && newValue == 1 || oldValue > 1 && newValue > 1 || binding.pickerText.value == OPTION_YEARS)
+        if (oldValue == 1 && newValue == 1 || oldValue > 1 && newValue > 1 || binding.textPicker.value == OPTION_YEARS)
             return
 
         if (oldValue == 1 && newValue > 1 || newValue == 1 && oldValue > 1) {
@@ -277,69 +299,86 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 app.getString(R.string.retention_time_picker_year)
             )
 
-            binding.pickerText.setFormatter { value ->
+            binding.textPicker.setFormatter { value ->
                 newArrayString[value]
             }
-            binding.pickerText.displayedValues = newArrayString
+            binding.textPicker.displayedValues = newArrayString
         }
     }
 
     /**
      * Method that updates the values of the number picker according to the current value of the text picker.
+     *
+     * @param value the current value of the text picker
      */
     private fun updateNumberPicker(value: Int) {
         var maximoValue = 0
-        if (value == OPTION_HOURS) {
-            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
-        } else if (value == OPTION_DAYS) {
-            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
-        } else if (value == OPTION_WEEKS) {
-            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
-        } else if (value == OPTION_MONTHS) {
-            maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
-        } else if (value == OPTION_YEARS) {
-            maximoValue = MINIMUM_VALUE_NUMBER_PICKER
+
+        when (value) {
+            OPTION_HOURS -> {
+                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+            }
+            OPTION_DAYS -> {
+                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
+            }
+            OPTION_WEEKS -> {
+                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
+            }
+            OPTION_MONTHS -> {
+                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
+            }
+            OPTION_YEARS -> {
+                maximoValue = MINIMUM_VALUE_NUMBER_PICKER
+            }
         }
 
-        if (binding.pickerNumber.value > maximoValue) {
-            updateTextPicker(binding.pickerNumber.value, MINIMUM_VALUE_NUMBER_PICKER)
-            binding.pickerNumber.value = MINIMUM_VALUE_NUMBER_PICKER
+        if (binding.numberPicker.value > maximoValue) {
+            updateTextPicker(binding.numberPicker.value, MINIMUM_VALUE_NUMBER_PICKER)
+            binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
         }
 
-        binding.pickerNumber.maxValue = maximoValue
+        binding.numberPicker.maxValue = maximoValue
     }
 
-    fun NumberPicker.disableTextEditing(disable: Boolean) {
+    /**
+     * Method that updates the values of the number picker according to the current value of the text picker.
+     *
+     * @param value the current value of the text picker
+     */
+    private fun NumberPicker.disableTextEditing(disable: Boolean) {
         descendantFocusability = if (disable) FOCUS_BLOCK_DESCENDANTS else FOCUS_BEFORE_DESCENDANTS
     }
 
-    var onValueChangeListenerPickerNumber =
+    private var onValueChangeListenerPickerNumber =
         OnValueChangeListener { numberPicker, oldValue, newValue ->
             updateTextPicker(oldValue, newValue)
         }
 
-    var onValueChangeListenerPickerText =
+    private var onValueChangeListenerPickerText =
         OnValueChangeListener { textPicker, i, i1 ->
             updateNumberPicker(textPicker.value)
         }
 
     /**
      * Method for updating the UI when the retention time is updated.
+     *
+     * @param seconds The retention time in seconds
      */
     private fun updateRetentionTimeUI(seconds: Long) {
         val timeFormatted = ChatUtil.transformSecondsInString(seconds)
-        if(TextUtil.isTextEmpty(timeFormatted)){
+        if (TextUtil.isTextEmpty(timeFormatted)) {
             binding.retentionTimeTextLayout.setOnClickListener(null)
             binding.historyRetentionSwitch.isChecked = false
-            binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention)
-            binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_history_retention)
+            binding.retentionTimeTitle.text = getString(R.string.title_properties_history_retention)
+            binding.retentionTimeSubtitle.text =
+                getString(R.string.subtitle_properties_history_retention)
             binding.retentionTime.visibility = View.GONE
-        }else{
+        } else {
             binding.retentionTimeTextLayout.setOnClickListener(this)
-
             binding.historyRetentionSwitch.isChecked = true
-            binding.retentionTimeTitle.text =  getString(R.string.title_properties_history_retention_activated)
-            binding.retentionTimeSubtitle.text =  getString(R.string.subtitle_properties_manage_chat)
+            binding.retentionTimeTitle.text =
+                getString(R.string.title_properties_history_retention_activated)
+            binding.retentionTimeSubtitle.text = getString(R.string.subtitle_properties_manage_chat)
             binding.retentionTime.text = timeFormatted
             binding.retentionTime.visibility = View.VISIBLE
         }
@@ -372,18 +411,26 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 binding.pickerLayout.visibility = View.GONE
                 binding.separator.visibility = View.GONE
                 var secondInOption = 0
-                if (binding.pickerText.value == OPTION_HOURS) {
-                    secondInOption = SECONDS_IN_HOUR
-                } else if (binding.pickerText.value == OPTION_DAYS) {
-                    secondInOption = SECONDS_IN_DAY
-                } else if (binding.pickerText.value == OPTION_WEEKS) {
-                    secondInOption = SECONDS_IN_WEEK
-                } else if (binding.pickerText.value == OPTION_MONTHS) {
-                    secondInOption = SECONDS_IN_MONTH_31
-                } else if (binding.pickerText.value == OPTION_YEARS) {
-                    secondInOption = SECONDS_IN_YEAR
+
+                when (binding.textPicker.value) {
+                    OPTION_HOURS -> {
+                        secondInOption = SECONDS_IN_HOUR
+                    }
+                    OPTION_DAYS -> {
+                        secondInOption = SECONDS_IN_DAY
+                    }
+                    OPTION_WEEKS -> {
+                        secondInOption = SECONDS_IN_WEEK
+                    }
+                    OPTION_MONTHS -> {
+                        secondInOption = SECONDS_IN_MONTH_31
+                    }
+                    OPTION_YEARS -> {
+                        secondInOption = SECONDS_IN_YEAR
+                    }
                 }
-                var totalSeconds = binding.pickerNumber.value * secondInOption
+
+                var totalSeconds = binding.numberPicker.value * secondInOption
 
                 megaChatApi.setChatRetentionTime(
                     chatId,
@@ -402,8 +449,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     }
 
     override fun onDestroy() {
-        if (isFromContacts && chatId != MEGACHAT_INVALID_HANDLE && listener != null) {
-            logDebug("Successful close chat");
+        if (isFromContacts == true && chatId != MEGACHAT_INVALID_HANDLE && listener != null) {
+            logDebug("Successful close chat")
             megaChatApi.closeChatRoom(chatId, listener)
         }
 

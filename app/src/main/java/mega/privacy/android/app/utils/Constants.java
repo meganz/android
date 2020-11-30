@@ -177,15 +177,10 @@ public class Constants {
 
     public static final long DISABLED_RETENTION_TIME = 0;
     public static final int SECONDS_IN_YEAR = 31556900;
-    public static final int SECONDS_IN_MONTH_28 = 2419200;
-    public static final int SECONDS_IN_MONTH_29 = 2505600;
-    public static final int SECONDS_IN_MONTH_30 = 2592000;
     public static final int SECONDS_IN_MONTH_31 = 2678400;
     public static final int SECONDS_IN_WEEK = 604800;
     public static final int SECONDS_IN_DAY = 86400;
     public static final int SECONDS_IN_HOUR = 3600;
-    public static final int SECONDS_IN_MINUTE = 60;
-    public static final int MILLISECONDS_IN_DAY = 86400000;
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;

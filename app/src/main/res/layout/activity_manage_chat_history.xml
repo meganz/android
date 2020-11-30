@@ -74,6 +74,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="end|center_vertical"
+                            android:stateListAnimator="@null"
                             android:clickable="false" />
                     </RelativeLayout>
                 </LinearLayout>
@@ -116,27 +117,31 @@
                 android:layout_height="187dp"
                 android:paddingTop="18dp"
                 android:orientation="vertical">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="126dp"
                     android:gravity="center_horizontal">
+
                     <NumberPicker
-                        android:id="@+id/picker_number"
+                        android:id="@+id/number_picker"
                         android:theme="@style/AppTheme.Picker"
                         android:layout_height="match_parent"
                         android:layout_width="wrap_content"
                         android:layout_marginEnd="34dp"
                         android:selectionDividerHeight="1dp"
                         android:showDividers="none"/>
+
                     <NumberPicker
-                        android:id="@+id/picker_text"
+                        android:id="@+id/text_picker"
                         android:theme="@style/AppTheme.Picker"
                         android:layout_height="match_parent"
                         android:layout_width="wrap_content"
-                        android:layout_toEndOf="@id/picker_number"
+                        android:layout_toEndOf="@id/number_picker"
                         android:selectionDividerHeight="1dp"
                         android:showDividers="none"/>
                     </RelativeLayout>
+
                 <Button
                     android:id="@+id/picker_button"
                     android:layout_width="wrap_content"

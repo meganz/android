@@ -986,7 +986,7 @@ public class ChatUtil {
     /**
      * Dialog to confirm if you want to delete the history of a chat.
      *
-     * @param chat The MegaChatRoom
+     * @param chat The MegaChatRoom.
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
@@ -1010,7 +1010,7 @@ public class ChatUtil {
     }
 
     /**
-     * Method to display a dialog to configure the history retention .
+     * Method to display a dialog to configure the history retention.
      *
      * @param context    Context of Activity.
      * @param idChat     The chat ID.
@@ -1033,21 +1033,20 @@ public class ChatUtil {
         AtomicReference<Integer> itemClicked = new AtomicReference<>();
 
         ArrayList<String> stringsArray = new ArrayList<>();
-        stringsArray.add(0, context.getString(R.string.history_retention_option_disabled));
-        stringsArray.add(1, context.getString(R.string.history_retention_option_one_day));
-        stringsArray.add(2, context.getString(R.string.history_retention_option_one_week));
-        stringsArray.add(3, context.getString(R.string.history_retention_option_one_month));
-        stringsArray.add(4, context.getString(R.string.history_retention_option_custom));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_DISABLED, context.getString(R.string.history_retention_option_disabled));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_DAY, context.getString(R.string.history_retention_option_one_day));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_WEEK, context.getString(R.string.history_retention_option_one_week));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_MONTH, context.getString(R.string.history_retention_option_one_month));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_CUSTOM, context.getString(R.string.history_retention_option_custom));
 
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
 
-        int positionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getPositionSelectedFromRetentionTime(idChat);
+        int optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
+        itemClicked.set(optionSelected);
 
-        itemClicked.set(positionSelected);
-
-        dialogBuilder.setSingleChoiceItems(itemsAdapter, positionSelected, (dialog, item) -> {
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, optionSelected, (dialog, item) -> {
             ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
                     context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
                             R.string.general_next :
@@ -1077,55 +1076,66 @@ public class ChatUtil {
         updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE), !isDisabled);
     }
 
-    public static long getUpdatedRetentionTimeFromAChat(long idChat){
+    /**
+     * Gets retention time for a particular chat.
+     *
+     * @param idChat The chat ID.
+     * @return The retention time in seconds.
+     */
+    public static long getUpdatedRetentionTimeFromAChat(long idChat) {
         MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(idChat);
-        if(chat != null)
+        if (chat != null)
             return chat.getRetentionTime();
 
         return DISABLED_RETENTION_TIME;
     }
 
-    private static int getPositionSelectedFromRetentionTime(long idChat){
+    /**
+     * Gets the appropriate dialogue option from the chat ID.
+     *
+     * @param idChat The chat ID.
+     * @return The option.
+     */
+    private static int getOptionSelectedFromRetentionTime(long idChat) {
         long seconds = getUpdatedRetentionTimeFromAChat(idChat);
 
         if (seconds == DISABLED_RETENTION_TIME)
             return RETENTION_TIME_DIALOG_OPTION_DISABLED;
 
-        long numberDays = seconds / SECONDS_IN_DAY;
-        long numberWeeks = seconds / SECONDS_IN_WEEK;
-        long numberMonths = seconds / SECONDS_IN_MONTH_31;
-        long numberYears = seconds / SECONDS_IN_YEAR;
-        long days = seconds - (numberDays*SECONDS_IN_DAY);
-        long weeks = seconds - (numberWeeks*SECONDS_IN_WEEK);
-        long months = seconds - (numberMonths*SECONDS_IN_MONTH_31);
-        long years = seconds - (numberYears*SECONDS_IN_YEAR);
+        long days = seconds % SECONDS_IN_DAY;
+        long weeks = seconds % SECONDS_IN_WEEK;
+        long months = seconds % SECONDS_IN_MONTH_31;
+        long years = seconds % SECONDS_IN_YEAR;
 
-        if (years == 0) {
+        if (years == 0)
             return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
-        }
 
         if (months == 0) {
-            if (numberMonths == 1)
+            if (seconds / SECONDS_IN_MONTH_31 == 1)
                 return RETENTION_TIME_DIALOG_OPTION_MONTH;
 
             return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
         }
 
-        if(weeks == 0){
-            if (numberWeeks == 1)
+        if (weeks == 0) {
+            if (seconds / SECONDS_IN_WEEK == 1)
                 return RETENTION_TIME_DIALOG_OPTION_WEEK;
 
             return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
         }
 
-        if(days == 0){
-            if(numberDays == 1)
-                return RETENTION_TIME_DIALOG_OPTION_DAY;
-        }
+        if (days == 0 && seconds / SECONDS_IN_DAY == 1)
+            return RETENTION_TIME_DIALOG_OPTION_DAY;
 
         return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
     }
 
+    /**
+     * Update Retention Time Dialog Positive Button.
+     *
+     * @param buttonPositive The button
+     * @param isEnabled      True, if it must be enabled. False, if not.
+     */
     private static void updatePositiveButton(final Button buttonPositive, boolean isEnabled) {
         buttonPositive.setEnabled(isEnabled);
         buttonPositive.setAlpha(isEnabled ? 1f : 0.30f);
@@ -1135,7 +1145,7 @@ public class ChatUtil {
      * Method for getting the seconds from an selected option.
      *
      * @param itemClicked The selected item.
-     * @return The seconds
+     * @return The seconds.
      */
     private static long getSecondsFromOption(int itemClicked) {
         switch (itemClicked) {
@@ -1150,46 +1160,47 @@ public class ChatUtil {
         }
     }
 
-    public static String transformSecondsInString(long seconds){
-        if(seconds == DISABLED_RETENTION_TIME)
+    /**
+     * Method for getting the appropriate String from the seconds of rentention time.
+     *
+     * @param seconds The retention time in seconds
+     * @return The right text
+     */
+    public static String transformSecondsInString(long seconds) {
+        if (seconds == DISABLED_RETENTION_TIME)
             return "";
 
-        long numberHours = seconds / SECONDS_IN_HOUR;
-        long numberDays = seconds / SECONDS_IN_DAY;
-        long numberWeeks = seconds / SECONDS_IN_WEEK;
-        long numberMonths = seconds / SECONDS_IN_MONTH_31;
-        long numberYears = seconds / SECONDS_IN_YEAR;
+        long hours = seconds % SECONDS_IN_HOUR;
+        long days = seconds % SECONDS_IN_DAY;
+        long weeks = seconds % SECONDS_IN_WEEK;
+        long months = seconds % SECONDS_IN_MONTH_31;
+        long years = seconds % SECONDS_IN_YEAR;
 
-        long hours = seconds - (numberHours*SECONDS_IN_HOUR);
-        long days = seconds - (numberDays*SECONDS_IN_DAY);
-        long weeks = seconds - (numberWeeks*SECONDS_IN_WEEK);
-        long months = seconds - (numberMonths*SECONDS_IN_MONTH_31);
-        long years = seconds - (numberYears*SECONDS_IN_YEAR);
-
-        if(years == 0){
-            int year = (int) numberYears;
+        if (years == 0) {
+            int year = (int) (seconds / SECONDS_IN_YEAR);
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_years, year, year);
         }
 
-        if(months == 0){
-            int month = (int) numberMonths;
+        if (months == 0) {
+            int month = (int) (seconds / SECONDS_IN_MONTH_31);
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_months, month, month);
         }
 
-        if(weeks == 0){
-            int week = (int) numberWeeks;
+        if (weeks == 0) {
+            int week = (int) (seconds / SECONDS_IN_WEEK);
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_weeks, week, week);
         }
 
-        if(days == 0){
-            int day = (int) numberDays;
+        if (days == 0) {
+            int day = (int) (seconds / SECONDS_IN_DAY);
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_days, day, day);
         }
 
-        if(hours == 0){
-            int hour = (int) numberHours;
+        if (hours == 0) {
+            int hour = (int) (seconds / SECONDS_IN_HOUR);
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
         }
+
         return " ";
     }
 
