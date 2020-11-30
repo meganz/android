@@ -15,6 +15,7 @@ import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.fragments.getLinkFragments.CopyrightFragment
 import mega.privacy.android.app.fragments.getLinkFragments.DecryptionKeyFragment
 import mega.privacy.android.app.fragments.getLinkFragments.GetLinkFragment
+import mega.privacy.android.app.fragments.getLinkFragments.LinkPasswordFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
@@ -29,6 +30,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         const val GET_LINK_FRAGMENT = 0
         const val COPYRIGHT_FRAGMENT = 1
         const val DECRYPTION_KEY_FRAGMENT = 2
+        const val PASSWORD_FRAGMENT = 3
     }
 
     private lateinit var binding: GetLinkActivityLayoutBinding
@@ -36,8 +38,10 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     private var getLinkFragment: GetLinkFragment? = null
     private var copyrightFragment: CopyrightFragment? = null
     private var decryptionKeyFragment: DecryptionKeyFragment? = null
+    private var passwordFragment: LinkPasswordFragment? = null
 
     private lateinit var node: MegaNode
+    private var linkWithPassword: String? = null
 
     private var visibleFragment = COPYRIGHT_FRAGMENT
 
@@ -74,7 +78,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     fun showSnackbar(snackbarType: Int, message: String, chatId: Long) {
         showSnackbar(snackbarType, binding.getLinkCoordinatorLayout, message, chatId)
     }
-
 
     override fun showFragment(visibleFragment: Int) {
         this.visibleFragment = visibleFragment
@@ -123,6 +126,20 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
                 ft.replace(R.id.fragment_container_get_link, decryptionKeyFragment!!)
             }
+            PASSWORD_FRAGMENT -> {
+                supportActionBar?.title =
+                    if (linkWithPassword == null) getString(R.string.set_password_protection_dialog).toUpperCase(
+                        Locale.getDefault()
+                    ) else getString(R.string.reset_password_label).toUpperCase(
+                        Locale.getDefault()
+                    )
+
+                if (passwordFragment == null) {
+                    passwordFragment = LinkPasswordFragment(this)
+                }
+
+                ft.replace(R.id.fragment_container_get_link, passwordFragment!!)
+            }
         }
 
         ft.commitNowAllowingStateLoss()
@@ -165,6 +182,10 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
             }
 
         upgradeToProDialogBuilder.create().show()
+    }
+
+    override fun getLinkWithPassword(): String? {
+        return linkWithPassword
     }
 
     private fun shareLink(link: String) {

@@ -8,4 +8,5 @@ interface GetLinkInterface {
     fun copyLinkOrKey(linkOrKey: String, isLink: Boolean)
     fun startSetPassword()
     fun showUpgradeToProWarning()
+    fun getLinkWithPassword(): String?
 }
