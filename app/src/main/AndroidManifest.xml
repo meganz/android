@@ -459,7 +459,6 @@
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity"
             android:label="@string/section_photo_sync"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
