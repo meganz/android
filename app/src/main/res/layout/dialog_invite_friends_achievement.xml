@@ -17,7 +17,7 @@
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
         android:textStyle="bold"
-        android:textColor="@color/mail_my_account"
+        android:textColor="@color/secondary_text"
         android:text="@string/subtitle_confirmation_invite_friends" />
 
     <TextView

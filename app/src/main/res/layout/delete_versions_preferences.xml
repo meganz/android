@@ -11,9 +11,9 @@
         android:textSize="16sp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:textColor="@color/delete_account"/>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/black"/>
 
     <TextView
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,8 +22,8 @@
         android:text="@string/settings_file_management_subtitle_delete_versions"
         android:textSize="14sp"
         android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:textColor="@color/mail_my_account"/>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/secondary_text"/>
 
 </LinearLayout>
