@@ -151,6 +151,16 @@
                     android:textColor="@color/name_my_account"
                     android:textSize="14sp" />
 
+                <TextView
+                    android:id="@+id/expiry_date_set_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/title_set_password_protection"
+                    android:textAllCaps="true"
+                    android:textColor="@color/accentColor"
+                    android:textSize="14sp" />
+
             </LinearLayout>
 
             <androidx.appcompat.widget.SwitchCompat

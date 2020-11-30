@@ -7,5 +7,4 @@ interface GetLinkInterface {
     fun getNode(): MegaNode
     fun copyLinkOrKey(linkOrKey: String, isLink: Boolean)
     fun startSetPassword()
-    fun exportNode()
 }

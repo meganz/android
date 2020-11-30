@@ -1,11 +1,13 @@
 package mega.privacy.android.app.fragments.getLinkFragments
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.DatePicker
 import androidx.core.content.res.ResourcesCompat
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
@@ -15,15 +17,21 @@ import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.MegaApiUtils.getInfoFolder
 import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaAccountDetails.ACCOUNT_TYPE_FREE
 import nz.mega.sdk.MegaNode
+import java.text.SimpleDateFormat
+import java.util.*
 
-class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment() {
+
+class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment(),
+    DatePickerDialog.OnDateSetListener {
 
     companion object {
         private const val ALPHA_VIEW_DISABLED = 0.3f
         private const val ALPHA_VIEW_ENABLED = 1.0f
+
+        private const val INVALID_EXPIRATION_TIME = -1L
     }
 
     private lateinit var binding: FragmentGetLinkBinding
@@ -31,6 +39,11 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
     private lateinit var linkWithKey: String
     private lateinit var linkWithoutKey: String
     private lateinit var key: String
+
+    private var isPro: Boolean = false
+    private lateinit var node: MegaNode
+
+    private lateinit var nC: NodeController
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,8 +55,11 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        isPro = app.myAccountInfo.accountType > ACCOUNT_TYPE_FREE
 
-        val node = getLinkInterface.getNode()
+        node = getLinkInterface.getNode()
+
+        nC = NodeController(activity)
 
         setThumbnail(node)
         binding.nodeName.text = node.name
@@ -70,7 +86,7 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
 
         if (!node.isExported) {
             binding.linkText.text = getString(R.string.link_request_status)
-            getLinkInterface.exportNode()
+            nC.exportLink(node)
         }
 
         super.onViewCreated(view, savedInstanceState)
@@ -110,77 +126,141 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
      * @param isExported True if the node already has link, false if it is being request.
      */
     private fun setAvailableLayouts(isExported: Boolean) {
-        val isPro = app.myAccountInfo.accountType > ACCOUNT_TYPE_FREE
-        val alpha = if (isPro) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
+        val alpha = if (isExported) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
 
+        binding.decryptedKeyText.alpha = alpha
         binding.expiryDateText.alpha = alpha
-        binding.expiryDateSwitch.alpha = alpha
         binding.passwordProtectionText.alpha = alpha
 
         if (isExported) {
-            binding.decryptedKeyText.alpha = ALPHA_VIEW_ENABLED
-            binding.decryptedKeyLayout.setOnClickListener { clickDecryptedKeySeparately() }
-            binding.decryptedKeySwitch.alpha = ALPHA_VIEW_ENABLED
-            binding.decryptedKeySwitch.setOnClickListener { clickDecryptedKeySeparately() }
+            binding.decryptedKeyLayout.setOnClickListener { sendDecryptedKeySeparatelyClick(false) }
+            binding.decryptedKeySwitch.setOnClickListener { sendDecryptedKeySeparatelyClick(true) }
             binding.decryptedKeySwitch.isEnabled = true
 
-            if (isPro) {
-                binding.expiryDateProOnlyText.visibility = GONE
-                binding.expiryDateLayout.setOnClickListener { showSelectDateDialog() }
-                binding.expiryDateSwitch.setOnClickListener { showSelectDateDialog() }
-                binding.expiryDateSwitch.isEnabled = true
+            binding.expiryDateLayout.setOnClickListener { setExpiryDateClick(false) }
+            binding.expiryDateSwitch.setOnClickListener { setExpiryDateClick(true) }
 
-                binding.passwordProtectionProOnlyText.visibility = GONE
-                binding.passwordProtectionLayout.setOnClickListener { getLinkInterface.startSetPassword() }
+            if (node.expirationTime > 0) {
+                binding.expiryDateSwitch.isChecked = true
+                binding.expiryDateSetText.visibility = VISIBLE
+                binding.expiryDateSetText.text = getExpiredDateText()
             } else {
-                binding.expiryDateProOnlyText.visibility = VISIBLE
-                binding.expiryDateLayout.setOnClickListener(null)
-                binding.expiryDateSwitch.setOnClickListener(null)
-                binding.expiryDateSwitch.isEnabled = false
-
-                binding.passwordProtectionProOnlyText.visibility = VISIBLE
-                binding.passwordProtectionLayout.setOnClickListener(null)
+                binding.expiryDateSwitch.isChecked = false
+                binding.expiryDateSetText.visibility = GONE
+                binding.expiryDateSetText.text = null
             }
+
+            binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
+
+            binding.copyLinkButton.visibility = VISIBLE
         } else {
-            binding.decryptedKeyText.alpha = ALPHA_VIEW_DISABLED
             binding.decryptedKeyLayout.setOnClickListener(null)
-            binding.decryptedKeySwitch.alpha = ALPHA_VIEW_DISABLED
             binding.decryptedKeySwitch.setOnClickListener(null)
             binding.decryptedKeySwitch.isEnabled = false
 
-            binding.expiryDateProOnlyText.visibility = VISIBLE
             binding.expiryDateLayout.setOnClickListener(null)
             binding.expiryDateSwitch.setOnClickListener(null)
+
+            binding.passwordProtectionLayout.setOnClickListener(null)
+
+            binding.copyLinkButton.visibility = GONE
+        }
+
+        if (isPro) {
+            binding.expiryDateProOnlyText.visibility = GONE
+            binding.expiryDateSwitch.isEnabled = isExported
+
+            binding.passwordProtectionProOnlyText.visibility = GONE
+        } else {
+            binding.expiryDateProOnlyText.visibility = VISIBLE
             binding.expiryDateSwitch.isEnabled = false
 
             binding.passwordProtectionProOnlyText.visibility = VISIBLE
-            binding.passwordProtectionLayout.setOnClickListener(null)
         }
     }
 
-    private fun clickDecryptedKeySeparately() {
-       if (binding.decryptedKeySwitch.isChecked) {
-           binding.keyLayout.visibility = VISIBLE
-           binding.keySeparator.visibility = VISIBLE
-           binding.copyKeyButton.visibility = VISIBLE
-           binding.linkText.text = linkWithoutKey
-           binding.keyText.text = key
-       } else {
-           binding.copyKeyButton.visibility = GONE
-           binding.linkText.text = linkWithKey
-       }
+    private fun getExpiredDateText(): String {
+        val df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
+        val cal = calculateDateFromTimestamp(node.expirationTime)
+        val tz = cal.timeZone
+        df.timeZone = tz
+        val date = cal.time
+        return df.format(date)
+    }
+
+    private fun sendDecryptedKeySeparatelyClick(isSwitchClick: Boolean) {
+        if (!isSwitchClick) {
+            binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
+        }
+
+        val visibility = if (binding.decryptedKeySwitch.isChecked) VISIBLE else GONE
+
+        binding.keyLayout.visibility = visibility
+        binding.keySeparator.visibility = visibility
+        binding.copyKeyButton.visibility = visibility
+
+        if (binding.decryptedKeySwitch.isChecked) {
+            binding.linkText.text = linkWithoutKey
+            binding.keyText.text = key
+        } else {
+            binding.linkText.text = linkWithKey
+            binding.keyText.text = null
+        }
     }
 
     private fun clickLearnMore() {
 
     }
 
-    private fun showSelectDateDialog() {
+    private fun setExpiryDateClick(isSwitchClick: Boolean) {
+        if (!isPro || (isSwitchClick && node.expirationTime <= 0)) {
+            binding.expiryDateSwitch.isChecked = false
+        }
+
+        if (isPro && node.expirationTime > 0) {
+            if (!isSwitchClick) {
+                binding.expiryDateSwitch.isChecked = false
+            }
+
+            binding.expiryDateSetText.visibility = GONE
+            binding.expiryDateSetText.text = null
+
+            nC.exportLink(node)
+        } else if (isPro) {
+            showDatePicker()
+        } else {
+            showUpgradeToProDialog()
+        }
+    }
+
+    private fun showDatePicker() {
+        val calendar =
+            if (node.expirationTime == INVALID_EXPIRATION_TIME) Calendar.getInstance()
+            else calculateDateFromTimestamp(node.expirationTime)
+
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(context, this, year, month, day)
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+        datePickerDialog.show()
+    }
+
+    private fun showUpgradeToProDialog() {
 
     }
 
+    private fun setPasswordProtectionClick() {
+        if (isPro) {
+            getLinkInterface.startSetPassword()
+        } else {
+            showUpgradeToProDialog()
+        }
+    }
+
     fun updateLink() {
-        val node = getLinkInterface.getNode()
+        node = getLinkInterface.getNode()
 
         if (node.isExported) {
             linkWithKey = node.publicLink
@@ -205,5 +285,17 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
         }
 
         setAvailableLayouts(node.isExported)
+    }
+
+    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+        val cal = Calendar.getInstance()
+        cal.set(year, month, dayOfMonth)
+
+        val date = cal.time
+        val dfTimestamp = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+        val dateString = dfTimestamp.format(date) + "2359"
+        val timestamp = calculateTimestamp(dateString).toInt()
+
+        nC.exportLinkTimestamp(node, timestamp)
     }
 }

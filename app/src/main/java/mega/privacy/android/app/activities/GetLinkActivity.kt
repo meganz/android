@@ -33,7 +33,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     private var getLinkFragment: GetLinkFragment? = null
     private var copyrightFragment: CopyrightFragment? = null
 
-    private lateinit var nC: NodeController
     private lateinit var node: MegaNode
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,8 +49,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
             finish()
             return
         }
-
-        nC = NodeController(this)
 
         node = megaApi.getNodeByHandle(handle)
 
@@ -127,10 +124,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
     override fun startSetPassword() {
 
-    }
-
-    override fun exportNode() {
-        nC.exportLink(node)
     }
 
     private fun shareLink(link: String) {
