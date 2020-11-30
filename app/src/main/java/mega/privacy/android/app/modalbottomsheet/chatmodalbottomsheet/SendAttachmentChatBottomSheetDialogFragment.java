@@ -26,9 +26,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
         mainLinearLayout = contentView.findViewById(R.id.send_attachment_chat_bottom_sheet);
         items_layout = contentView.findViewById(R.id.send_attachment_chat_items_layout);
 
-        TextView titleSlidingPanel = contentView.findViewById(R.id.send_attachment_chat_title_text);
-        titleSlidingPanel.setText(getString(R.string.context_send));
-
         contentView.findViewById(R.id.send_attachment_chat_from_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.send_attachment_chat_from_filesystem_layout).setOnClickListener(this);
         contentView.findViewById(R.id.send_attachment_chat_contact_layout).setOnClickListener(this);

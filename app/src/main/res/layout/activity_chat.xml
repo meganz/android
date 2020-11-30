@@ -154,7 +154,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:background="@android:color/transparent"
                 android:orientation="vertical"
                 android:visibility="gone"
                 tools:visibility="visible">
@@ -162,7 +161,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
                     android:orientation="vertical">
 
                     <RelativeLayout
@@ -210,7 +208,6 @@
                         android:id="@+id/write_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
                         android:gravity="bottom">
 
                         <LinearLayout
@@ -226,7 +223,6 @@
                             android:id="@+id/writing_linear_layout_chat"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
                             android:gravity="center_vertical"
                             android:visibility="visible">
 
@@ -238,8 +234,8 @@
                                 android:layout_marginRight="8dp"
                                 android:background="@null"
                                 android:src="@drawable/ic_send_black"
-                                android:tint="?attr/colorSecondary"
-                                android:visibility="visible" />
+                                app:tint="@color/grey_054_white_054"
+                                tools:visibility="visible" />
 
                             <mega.privacy.android.app.components.twemoji.EmojiEditText
                                 android:id="@+id/edit_text_chat"
@@ -247,14 +243,12 @@
                                 android:layout_height="wrap_content"
                                 android:minHeight="48dp"
                                 android:layout_centerVertical="true"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginRight="58dp"
-                                android:background="@android:color/transparent"
-                                android:gravity="center_vertical|left"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginEnd="58dp"
+                                android:gravity="center_vertical|start"
                                 android:inputType="textMultiLine|textCapSentences"
                                 android:maxLines="5"
-                                android:textColor="@color/black"
-                                android:textSize="14sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Body2"
                                 app:emojiSize="18sp"/>
 
                         </RelativeLayout>
@@ -264,7 +258,6 @@
                         android:id="@+id/separator_layout_options"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_alignTop="@id/linear_layout_options"
                         android:background="@color/grey_012_white_012"
                         android:orientation="horizontal"
                         android:visibility="gone" />
@@ -289,7 +282,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_emojicon"
-                                android:tint="?attr/colorControlNormal" />
+                                app:tint="@color/grey_054_white_054" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -305,7 +298,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_media"
-                                android:tint="?attr/colorControlNormal" />
+                                app:tint="@color/grey_054_white_054" />
 
                         </RelativeLayout>
 
@@ -322,7 +315,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_b_select_image"
-                                android:tint="?attr/colorControlNormal" />
+                                app:tint="@color/grey_054_white_054" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -338,7 +331,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/attach_file"
-                                app:tint="?android:attr/textColorPrimary" />
+                                app:tint="@color/grey_054_white_054" />
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -354,7 +347,7 @@
                                 android:layout_centerInParent="true"
                                 android:background="@null"
                                 android:src="@drawable/ic_gif_toolbar"
-                                android:tint="?attr/colorControlNormal" />
+                                app:tint="@color/grey_054_white_054" />
                         </RelativeLayout>
 
                     </LinearLayout>
@@ -370,14 +363,12 @@
                         android:id="@+id/relative_layout_file_storage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:background="@android:color/transparent">
+                        android:layout_alignParentBottom="true">
 
                         <FrameLayout
                             android:id="@+id/fragment_container_file_storage"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@android:color/transparent" />
+                            android:layout_height="wrap_content" />
                     </RelativeLayout>
                 </LinearLayout>
             </RelativeLayout>
@@ -387,7 +378,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="96dp"
                 android:layout_alignParentBottom="true"
-                android:background="@android:color/transparent"
                 android:visibility="gone">
 
                 <LinearLayout
@@ -413,7 +403,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_alignParentBottom="true"
-                android:background="@android:color/transparent"
                 android:visibility="gone">
 
                 <LinearLayout
@@ -446,9 +435,7 @@
 
             </RelativeLayout>
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
+            <RelativeLayout
                 android:id="@+id/message_container_chat_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -648,9 +635,8 @@
                                 android:layout_height="24dp"
                                 android:layout_centerInParent="true"
                                 android:layout_gravity="center"
-                                android:src="@drawable/ic_mic_vc_off"
-                                android:visibility="visible"
-                                app:tint="?attr/colorControlNormal"/>
+                                android:src="@drawable/ic_mic_vc"
+                                android:visibility="visible" />
                         </RelativeLayout>
 
                         <LinearLayout
@@ -671,12 +657,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:fontFamily="Roboto"
                                 android:gravity="center"
                                 android:text="@string/recording_less_than_second"
-                                android:textColor="@color/white"
-                                android:textSize="12sp"
-                                android:textStyle="normal" />
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.OnSecondary" />
                         </LinearLayout>
                     </RelativeLayout>
                 </FrameLayout>

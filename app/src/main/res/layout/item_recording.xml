@@ -2,6 +2,7 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/recording_layout"
     android:layout_width="180dp"
     android:layout_height="180dp"
@@ -13,10 +14,8 @@
             android:id="@+id/recording_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.PrimaryColor"
             android:singleLine="true"
-            android:textSize="15sp"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"/>
         <RelativeLayout
@@ -33,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
                 android:layout_alignParentBottom="true"
-                android:src = "@drawable/ic_voice_clip_feedback"/>
+                android:src="@drawable/ic_voice_clip_feedback"
+                app:tint="@color/white_black"/>
             <RelativeLayout
                 android:id="@+id/amplitud_layout"
                 android:layout_width="wrap_content"
@@ -90,12 +90,9 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="26dp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:gravity="bottom"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.PrimaryColor"
             android:textAlignment="gravity"
             android:singleLine="true"
-            android:textSize="15sp"
             android:text="@string/recording_layout"/>
 
 </RelativeLayout>

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/send_attachment_chat_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:orientation="vertical"
         android:padding="0dp">
 
@@ -28,9 +27,9 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
-                android:textColor="@color/transparent_black"
-                android:textSize="16sp"/>
+                android:layout_marginStart="18dp"
+                android:text="@string/context_send"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
         </LinearLayout>
 
         <androidx.core.widget.NestedScrollView
@@ -56,10 +55,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
-                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_pick_cloud_drive"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:tint="?android:attr/textColorSecondary" />
 
                     <TextView
                         android:id="@+id/send_attachment_chat_from_cloud_text"
@@ -67,10 +67,9 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="32dp"
+                        android:layout_marginStart="32dp"
                         android:text="@string/attachment_upload_panel_from_cloud"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp"/>
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
                 </LinearLayout>
 
                 <!--From Cloud-->
@@ -86,10 +85,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
-                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_pick_file_system"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:tint="?android:attr/textColorSecondary" />
 
                     <TextView
                         android:id="@+id/send_attachment_chat_from_filesystem_text"
@@ -97,10 +97,9 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="32dp"
+                        android:layout_marginStart="32dp"
                         android:text="@string/attachment_upload_panel_from_device"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp"/>
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
                 </LinearLayout>
 
                 <!--Contact-->
@@ -115,11 +114,12 @@
                         android:id="@+id/send_attachment_chat_contact_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_send_contact"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:tint="?android:attr/textColorSecondary" />
 
                     <TextView
                         android:id="@+id/send_attachment_chat_contact_text"
@@ -127,10 +127,9 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="32dp"
+                        android:layout_marginStart="32dp"
                         android:text="@string/attachment_upload_panel_contact"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp"/>
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
                 </LinearLayout>
 
                 <!--Location-->
@@ -145,12 +144,12 @@
                         android:id="@+id/send_attachment_chat_location_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:alpha="0.54"
-                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_outline_location"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        app:tint="?android:attr/textColorSecondary" />
 
                     <TextView
                         android:id="@+id/send_attachment_chat_location_text"
@@ -158,10 +157,9 @@
                         android:layout_height="wrap_content"
                         android:paddingBottom="2dp"
                         android:paddingTop="2dp"
-                        android:layout_marginLeft="32dp"
+                        android:layout_marginStart="32dp"
                         android:text="@string/file_properties_info_location"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp"/>
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
                 </LinearLayout>
 
             </LinearLayout>

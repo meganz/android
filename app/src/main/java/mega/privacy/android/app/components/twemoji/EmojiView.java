@@ -31,8 +31,8 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
   private static final long INITIAL_INTERVAL = TimeUnit.SECONDS.toMillis(1) / 2;
   private static final int NORMAL_INTERVAL = 50;
 
-  @ColorInt private final int themeAccentColor;
-  @ColorInt private final int themeIconColor;
+  @ColorInt private final int selectedTintColor;
+  @ColorInt private final int notSelectedTintColor;
 
   private ImageButton[] emojiTabs = null;
   private final EmojiPagerAdapter emojiPagerAdapter;
@@ -46,18 +46,17 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
     this.type = typeView;
 
     View.inflate(context, type.equals(TYPE_EMOJI) ? R.layout.emoji_view : R.layout.reactions_view, this);
-    setBackgroundColor(ContextCompat.getColor(context, type.equals(TYPE_EMOJI) ? R.color.emoji_background : R.color.background_chat));
+    if (type.equals(TYPE_EMOJI)) {
+      setBackgroundColor(ContextCompat.getColor(context, R.color.grey_010_grey_800));
+    }
 
     setOrientation(VERTICAL);
-    themeIconColor = ContextCompat.getColor(context, R.color.emoji_icons);
+    notSelectedTintColor = ContextCompat.getColor(context, R.color.grey_054_white_038);
     final TypedValue value = new TypedValue();
-    context.getTheme().resolveAttribute(R.attr.colorAccent, value, true);
-    themeAccentColor = value.data;
+    context.getTheme().resolveAttribute(R.attr.colorSecondary, value, true);
+    selectedTintColor = value.data;
 
     final ViewPager emojisPager = findViewById(R.id.emojis_pager);
-
-    final View emojiDivider = findViewById(R.id.emoji_divider);
-    emojiDivider.setBackgroundColor(ContextCompat.getColor(context, R.color.black_12_alpha));
 
     final LinearLayout emojisTab = findViewById(R.id.emojis_tab);
     emojisPager.addOnPageChangeListener(this);
@@ -72,6 +71,7 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
         emojiTabs[i + 1] = inflateButton(context, categories[i].getIcon(), emojisTab);
       }
       emojiTabs[emojiTabs.length - 1] = inflateButton(context, R.drawable.emoji_backspace, emojisTab);
+      emojiTabs[emojiTabs.length - 1].setColorFilter(selectedTintColor, PorterDuff.Mode.SRC_IN);
     } else if (type.equals(TYPE_REACTION)) {
       emojiTabs = new ImageButton[categories.length + 1];
       emojiTabs[0] = inflateButton(context, R.drawable.emoji_recent, emojisTab);
@@ -115,7 +115,7 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
     final ImageButton button = (ImageButton) LayoutInflater.from(context).inflate(R.layout.emoji_category, parent, false);
 
     button.setImageDrawable(AppCompatResources.getDrawable(context, icon));
-    button.setColorFilter(themeIconColor, PorterDuff.Mode.SRC_IN);
+    button.setColorFilter(notSelectedTintColor, PorterDuff.Mode.SRC_IN);
 
     parent.addView(button);
 
@@ -129,11 +129,11 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
       }
       if (emojiTabLastSelectedIndex >= 0 && emojiTabLastSelectedIndex < emojiTabs.length) {
         emojiTabs[emojiTabLastSelectedIndex].setSelected(false);
-        emojiTabs[emojiTabLastSelectedIndex].setColorFilter(themeIconColor, PorterDuff.Mode.SRC_IN);
+        emojiTabs[emojiTabLastSelectedIndex].setColorFilter(notSelectedTintColor, PorterDuff.Mode.SRC_IN);
       }
 
       emojiTabs[i].setSelected(true);
-      emojiTabs[i].setColorFilter(themeAccentColor, PorterDuff.Mode.SRC_IN);
+      emojiTabs[i].setColorFilter(selectedTintColor, PorterDuff.Mode.SRC_IN);
 
       emojiTabLastSelectedIndex = i;
     }

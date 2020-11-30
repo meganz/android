@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="150dp"
     android:layout_gravity="bottom"
-    android:background="@null"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingBottom="10dp"
@@ -24,26 +23,21 @@
             android:id="@+id/text_cancel_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
             android:layout_centerInParent="true"
-            android:fontFamily="roboto"
-            android:textColor="@color/red_600_red_300"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.Mega.Button.Red" />
     </RelativeLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/layout_lock"
-        style="@style/CardViewTheme"
         android:layout_width="48dp"
         android:layout_height="175dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="20dp"
-        android:background="@color/white"
         android:translationZ="1dp"
         android:visibility="gone"
-        app:cardCornerRadius="15dp">
+        app:cardCornerRadius="15dp"
+        app:cardElevation="2dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -54,14 +48,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:src="@drawable/ic_lock" />
+                android:src="@drawable/ic_lock"
+                app:tint="?android:attr/textColorSecondary" />
             <ImageView
                 android:id="@+id/image_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:tint="@color/gradient_avatar_chat"
-                android:src="@drawable/ic_collapse_white" />
+                android:src="@drawable/ic_collapse_white"
+                app:tint="?android:attr/textColorSecondary" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -74,7 +69,7 @@
         android:layout_marginLeft="8dp"
         android:background="@null"
         android:src="@drawable/ic_mic_on"
-        android:tint="@color/accentColor" />
+        app:tint="?attr/colorSecondary" />
 
     <ImageView
         android:id="@+id/basket_img"
@@ -85,7 +80,7 @@
         android:layout_marginLeft="8dp"
         android:background="@null"
         android:src="@drawable/ic_basket"
-        android:tint="@color/accentColor"
+        app:tint="?attr/colorSecondary"
         android:visibility="gone" />
 
     <Chronometer
@@ -95,9 +90,7 @@
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/glowing_mic"
         android:layout_marginRight="20dp"
-        android:textColor="@color/accentColor"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
     <io.supercharge.shimmerlayout.ShimmerLayout
         android:id="@+id/shimmer_layout"
@@ -106,7 +99,6 @@
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/chrono_voice_clip"
         android:layout_marginLeft="20dp"
-        android:background="@null"
         app:shimmer_animation_duration="1500"
         app:shimmer_color="@color/white"
         app:shimmer_reverse_animation="true">
@@ -121,7 +113,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_slide_record_white"
-                android:tint="@color/transparent_black" />
+                app:tint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/slide_to_cancel"
