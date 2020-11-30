@@ -190,7 +190,7 @@ object CuSyncManager {
         }
 
         if (isInvalid(localFolder)) {
-            logWarning("Local path is invalid, value: $localFolder")
+            logWarning("Local path is invalid.")
             reEnableCameraUploadsPreference(backupType)
             return
         }
@@ -294,7 +294,7 @@ object CuSyncManager {
         }
 
         if (isInvalid(newLocalFolder)) {
-            logWarning("New local path is invalid, value: $newLocalFolder")
+            logWarning("New local path is invalid.")
             return
         }
 
@@ -324,7 +324,7 @@ object CuSyncManager {
         }
 
         if (isInvalid(newLocalFolder)) {
-            logWarning("New local path is invalid, value: $newLocalFolder")
+            logWarning("New local path is invalid.")
             return
         }
 

@@ -52,6 +52,6 @@ data class Backup(
     annotation class ClientOnly
 
     override fun toString(): String {
-        return "Backup(backupId=$backupId, backupType=$backupType, targetNode=$targetNode(${targetNode.name()}), state=$state, localFolder='$localFolder', backupName='$backupName', outdated=$outdated)"
+        return "Backup(backupId=$backupId, backupType=$backupType, targetNode=$targetNode, state=$state"
     }
 }
