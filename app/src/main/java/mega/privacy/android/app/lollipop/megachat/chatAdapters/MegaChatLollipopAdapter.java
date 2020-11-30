@@ -983,7 +983,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageThumbLand = v.findViewById(R.id.content_own_message_thumb_landscape);
             holder.contentOwnMessageThumbLand.setCornerRadius(radius);
             holder.contentOwnMessageThumbLand.setBorderWidth(1);
-            holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            holder.contentOwnMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.secondary_text));
             holder.contentOwnMessageThumbLand.setOval(false);
 
             holder.gifIconOwnMessageThumbLand = v.findViewById(R.id.content_own_message_thumb_landscape_gif);
@@ -1006,7 +1006,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageThumbPort = v.findViewById(R.id.content_own_message_thumb_portrait);
             holder.contentOwnMessageThumbPort.setCornerRadius(radius);
             holder.contentOwnMessageThumbPort.setBorderWidth(1);
-            holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            holder.contentOwnMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.secondary_text));
             holder.contentOwnMessageThumbPort.setOval(false);
 
             holder.gifIconOwnMessageThumbPort = v.findViewById(R.id.content_own_message_thumb_portrait_gif);
@@ -1136,7 +1136,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape);
             holder.contentContactMessageThumbLand.setCornerRadius(radius);
             holder.contentContactMessageThumbLand.setBorderWidth(1);
-            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            holder.contentContactMessageThumbLand.setBorderColor(ContextCompat.getColor(context, R.color.secondary_text));
             holder.contentContactMessageThumbLand.setOval(false);
 
             holder.gifIconContactMessageThumbLand = v.findViewById(R.id.content_contact_message_thumb_landscape_gif);
@@ -1180,7 +1180,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait);
             holder.contentContactMessageThumbPort.setCornerRadius(radius);
             holder.contentContactMessageThumbPort.setBorderWidth(1);
-            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.mail_my_account));
+            holder.contentContactMessageThumbPort.setBorderColor(ContextCompat.getColor(context, R.color.secondary_text));
             holder.contentContactMessageThumbPort.setOval(false);
 
             holder.gifIconContactMessageThumbPort = v.findViewById(R.id.content_contact_message_thumb_portrait_gif);
@@ -2795,7 +2795,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkEmojiSize(text, holder.urlContactMessageText);
 
                 //Color always status SENT
-                ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
                 holder.urlContactMessageText.setText(getFormattedText(text));
 
                     if (bitmapImage != null) {
@@ -2843,7 +2843,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
 
-        } else if (meta != null && meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+        } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
+            String invalidMetaMessage = getInvalidMetaMessage(message);
+
             if (message.getUserHandle() == myUserHandle) {
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
                 holder.titleOwnMessage.setGravity(Gravity.RIGHT);
@@ -2907,7 +2909,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 holder.contentOwnMessageText.setTextColor(ContextCompat.getColor(context, R.color.white));
-                holder.contentOwnMessageText.setText(context.getString(R.string.error_meta_message_invalid));
+                holder.contentOwnMessageText.setText(invalidMetaMessage);
 
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
@@ -2974,8 +2976,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
                 //Color always status SENT
-                ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-                ((ViewHolderMessageChat) holder).contentContactMessageText.setText(context.getString(R.string.error_meta_message_invalid));
+                ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+                holder.contentContactMessageText.setText(invalidMetaMessage);
             }
 
             checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
@@ -3088,8 +3090,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.transparentCoatingLocation.setVisibility(View.GONE);
                     holder.uploadingProgressBarLocation.setVisibility(View.GONE);
                     holder.triangleErrorLocation.setVisibility(View.VISIBLE);
-                    holder.pinnedOwnLocationInfoText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                    holder.pinnedLocationTitleText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                    holder.pinnedOwnLocationInfoText.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+                    holder.pinnedLocationTitleText.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
                     holder.forwardOwnMessageLocation.setVisibility(View.GONE);
                     break;
 
@@ -3098,8 +3100,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.transparentCoatingLocation.setVisibility(View.VISIBLE);
                     holder.uploadingProgressBarLocation.setVisibility(View.VISIBLE);
                     holder.triangleErrorLocation.setVisibility(View.GONE);
-                    holder.pinnedOwnLocationInfoText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
-                    holder.pinnedLocationTitleText.setTextColor(ContextCompat.getColor(context, R.color.mail_my_account));
+                    holder.pinnedOwnLocationInfoText.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
+                    holder.pinnedLocationTitleText.setTextColor(ContextCompat.getColor(context, R.color.secondary_text));
                     holder.forwardOwnMessageLocation.setVisibility(View.GONE);
                     break;
 
@@ -3108,8 +3110,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.transparentCoatingLocation.setVisibility(View.GONE);
                     holder.uploadingProgressBarLocation.setVisibility(View.GONE);
                     holder.triangleErrorLocation.setVisibility(View.GONE);
-                    holder.pinnedOwnLocationInfoText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-                    holder.pinnedLocationTitleText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                    holder.pinnedOwnLocationInfoText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+                    holder.pinnedLocationTitleText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
 
                     //Forwards element (own messages):
                     if (cC.isInAnonymousMode() || isMultipleSelect()) {
@@ -3123,7 +3125,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (message.isEdited()) {
                 Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                 edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.primary_text)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.pinnedLocationTitleText.setText(context.getString(R.string.title_geolocation_message) + " ");
                 holder.pinnedLocationTitleText.append(edited);
@@ -3164,7 +3166,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (message.isEdited()) {
                 Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                 edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.primary_text)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.pinnedContactLocationTitleText.setText(context.getString(R.string.title_geolocation_message) + " ");
                 holder.pinnedContactLocationTitleText.append(edited);
@@ -3463,18 +3465,18 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (message.isEdited()) {
                 logDebug("Message is edited");
                 Spannable content = new SpannableString(messageContent + " ");
-                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.primary_text)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                     edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.primary_text)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.urlContactMessageText.setText(getFormattedText(holder.urlContactMessageText.getText().toString()));
                 holder.urlContactMessageText.append(edited);
                 checkEmojiSize(messageContent, holder.urlContactMessageText);
 
             } else {
-                ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                ((ViewHolderMessageChat) holder).urlContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
                 holder.urlContactMessageText.setText(getFormattedText(messageContent));
             }
 
@@ -3948,12 +3950,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
 
                 Spannable content = new SpannableString(messageContent);
-                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.primary_text)), 0, content.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.contentContactMessageText.setText(content + " ");
 
                 Spannable edited = new SpannableString(context.getString(R.string.edited_message_text));
                 edited.setSpan(new RelativeSizeSpan(0.70f), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.name_my_account)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                edited.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.primary_text)), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 edited.setSpan(new android.text.style.StyleSpan(Typeface.ITALIC), 0, edited.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.contentContactMessageText.setText(getFormattedText(holder.contentContactMessageText.getText().toString()));
                 holder.contentContactMessageText.append(edited);
@@ -4040,7 +4042,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkEmojiSize(messageContent, holder.contentContactMessageText);
 
                 //Color always status SENT
-                ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+                ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
                 holder.contentContactMessageText.setText(getFormattedText(messageContent));
 
                 if (isOnline(context)) {

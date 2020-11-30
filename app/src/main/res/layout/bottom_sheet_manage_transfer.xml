@@ -108,7 +108,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/view_in_folder_label"
                     android:layout_marginStart="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -146,7 +146,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_get_link_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -176,7 +176,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/general_retry"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 

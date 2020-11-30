@@ -28,7 +28,7 @@
                 android:textSize="12sp"
                 android:paddingLeft="8dp"
                 android:includeFontPadding="false"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:fontFamily="Roboto"/>
 
             <TextView android:id="@id/exo_duration"
@@ -38,7 +38,7 @@
                 android:textSize="12sp"
                 android:paddingRight="8dp"
                 android:includeFontPadding="false"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:fontFamily="Roboto"/>
 
             <RelativeLayout
