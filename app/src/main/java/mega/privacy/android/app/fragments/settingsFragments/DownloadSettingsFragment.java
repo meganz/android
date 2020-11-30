@@ -17,7 +17,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 
-public class DownloadSettingsFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class DownloadSettingsFragment extends SettingsBaseFragment {
 
     private Preference downloadLocation;
     private TwoLineCheckPreference storageAskMeAlways;

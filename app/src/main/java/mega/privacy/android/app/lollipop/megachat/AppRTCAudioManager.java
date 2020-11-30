@@ -60,7 +60,6 @@ public class AppRTCAudioManager {
     private AudioManagerState amState;
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
-    private int savedAudioMode = AudioManager.MODE_INVALID;
     private boolean savedIsSpeakerPhoneOn = false;
     private boolean savedIsMicrophoneMute = false;
     private boolean hasWiredHeadset = false;
@@ -463,7 +462,6 @@ public class AppRTCAudioManager {
         amState = AudioManagerState.RUNNING;
 
         // Store current audio state so we can restore it when stop() is called.
-        savedAudioMode = audioManager.getMode();
         savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
         savedIsMicrophoneMute = audioManager.isMicrophoneMute();
         hasWiredHeadset = hasWiredHeadset();
@@ -582,7 +580,7 @@ public class AppRTCAudioManager {
         // Restore previously stored audio states.
         setSpeakerphoneOn(savedIsSpeakerPhoneOn);
         setMicrophoneMute(savedIsMicrophoneMute);
-        audioManager.setMode(savedAudioMode);
+        audioManager.setMode(AudioManager.MODE_NORMAL);
 
         // Abandon audio focus. Gives the previous focus owner, if any, focus.
         if(audioFocusChangeListener != null) audioManager.abandonAudioFocus(audioFocusChangeListener);

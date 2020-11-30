@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,16 +7,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
+
 import android.graphics.Bitmap;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
+
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,8 +36,11 @@ import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.MegaApplication;
@@ -51,14 +49,15 @@ import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoratio
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
+import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
+import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -92,7 +91,6 @@ import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
@@ -127,7 +125,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     private HashMap<Integer, MegaChatParticipant> pendingParticipantRequests = new HashMap<>();
 
-    private ParticipantBottomSheetDialogFragment bottomSheetDialogFragment;
+    private BottomSheetDialogFragment bottomSheetDialogFragment;
 
     private CountDownTimer countDownTimer;
 
@@ -545,6 +543,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
+    public void showGetChatLinkPanel() {
+        if (isTextEmpty(chatLink) || isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            return;
+        }
+
+        bottomSheetDialogFragment = new ManageChatLinkBottomSheetDialogFragment();
+        ((ManageChatLinkBottomSheetDialogFragment) bottomSheetDialogFragment).setValues(chatLink,
+                chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
+
     public MegaChatRoom getChat() {
         return chat;
     }
@@ -569,33 +578,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("Result Code: " + resultCode);
+
+        if (intent == null) {
+            logWarning("Intent is null");
+            return;
+        }
+
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             logDebug("Participants successfully added");
-            if (intent == null) {
-                logWarning("Return.....");
-                return;
-            }
 
-            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-            MultipleGroupChatRequestListener multipleListener = null;
-
+            final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
-
-                if (contactsData.size() == 1) {
-                    MegaUser user = megaApi.getContact(contactsData.get(0));
-                    if (user != null) {
-                        megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
-                    }
-                } else {
-                    logDebug("Add multiple participants " + contactsData.size());
-                    multipleListener = new MultipleGroupChatRequestListener(this);
-                    for (int i = 0; i < contactsData.size(); i++) {
-                        MegaUser user = megaApi.getContact(contactsData.get(i));
-                        if (user != null) {
-                            megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
-                        }
-                    }
-                }
+                new InviteToChatRoomListener(this).inviteToChat(chatHandle, contactsData);
             }
         } else {
             logError("Error adding participants");
@@ -817,34 +811,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 logError("Error clearing history: " + e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
             }
-        } else if (request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM) {
-            logDebug("Invite to chatroom request finish!!!");
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Ok. Invited");
-                showSnackbar(getString(R.string.add_participant_success));
-
-                if (request.getChatHandle() == chatHandle) {
-                    logDebug("Changes in my chat");
-                    chat = megaChatApi.getChatRoom(chatHandle);
-                    logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
-                    updateParticipants();
-                } else {
-                    logWarning("Changes NOT interested in");
-                }
-            } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
-                logError("Error inviting ARGS: " + e.getErrorString());
-                showSnackbar(getString(R.string.add_participant_error_already_exists));
-            } else {
-                logError("Error inviting: " + e.getErrorString() + " " + e.getErrorCode());
-                showSnackbar(getString(R.string.add_participant_error));
-            }
         } else if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             logDebug("Create chat request finish!!!");
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("Open new chat");
                 Intent intent = new Intent(this, ChatActivityLollipop.class);
                 intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-                intent.putExtra("CHAT_ID", request.getChatHandle());
+                intent.putExtra(CHAT_ID, request.getChatHandle());
                 this.startActivity(intent);
             } else {
                 logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
@@ -857,7 +830,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                    Query chat link
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = request.getText();
-                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        showGetChatLinkPanel();
                         return;
                     } else if (e.getErrorCode() == MegaChatError.ERROR_ARGS) {
                         logError("The chatroom isn't grupal or public");
@@ -881,7 +854,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 //                    Create chat link
                     if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                         chatLink = request.getText();
-                        showShareChatLinkDialog(groupChatInfoActivity, chat, chatLink);
+                        showGetChatLinkPanel();
                     } else {
                         logError("Error TYPE_CHAT_LINK_HANDLE " + e.getErrorCode());
                         showSnackbar(getString(R.string.general_error) + ": " + e.getErrorString());
@@ -1072,7 +1045,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void showConfirmationPrivateChatDialog() {
         logDebug("showConfirmationPrivateChatDialog");
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_chat_link_options, null);
@@ -1148,7 +1121,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         } else {
             Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
             intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intentOpenChat.putExtra("CHAT_ID", chat.getChatId());
+            intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
             this.startActivity(intentOpenChat);
         }
     }
@@ -1170,7 +1143,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         if (errorCode == MegaChatError.ERROR_OK) {
             Intent intent = new Intent(this, ChatActivityLollipop.class);
             intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-            intent.putExtra("CHAT_ID", chatHandle);
+            intent.putExtra(CHAT_ID, chatHandle);
             if (publicLink) {
                 intent.putExtra("PUBLIC_LINK", errorCode);
             }

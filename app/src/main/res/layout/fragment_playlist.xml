@@ -24,7 +24,7 @@
                 android:id="@+id/content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/mail_my_account"
+                android:textColor="@color/secondary_text"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="72dp"
                 android:textSize="14sp" />
