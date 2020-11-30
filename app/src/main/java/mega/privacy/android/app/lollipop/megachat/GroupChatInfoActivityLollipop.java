@@ -159,14 +159,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private BroadcastReceiver retentionTimeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null ||
+            if (intent == null || intent.getAction() == null || adapter == null ||
                     !intent.getAction().equals(ACTION_UPDATE_RETENTION_TIME))
                 return;
 
-            long seconds = intent.getLongExtra(RETENTION_TIME, 0);
-            if(adapter != null){
-                adapter.updateRetentionTimeUI(seconds);
-            }
+            long seconds = intent.getLongExtra(RETENTION_TIME, DISABLED_RETENTION_TIME);
+            adapter.updateRetentionTimeUI(seconds);
         }
     };
 

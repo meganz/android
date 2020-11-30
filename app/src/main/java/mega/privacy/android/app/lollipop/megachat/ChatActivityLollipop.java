@@ -6217,6 +6217,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
+        if (msg == null || messages == null || messages.isEmpty())
+            return;
+
+        for (AndroidMegaChatMessage message : messages) {
+            if (message != null && message.getMessage() != null && message.getMessage().getMsgId() == msg.getMsgId()) {
+                int position = messages.indexOf(message);
+                messages.clear();
+                if (position < messages.size() - 1) {
+                    List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
+                    for (int i = position + 1; i < messagesCopy.size(); i++) {
+                        messages.add(messagesCopy.get(i));
+                    }
+                }
+                updateMessages();
+                break;
+            }
+        }
     }
 
     private void disableMultiselection(){

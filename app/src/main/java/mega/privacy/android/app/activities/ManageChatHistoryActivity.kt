@@ -61,7 +61,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 return
             }
 
-            val seconds = intent.getLongExtra(BroadcastConstants.RETENTION_TIME, 0)
+            val seconds = intent.getLongExtra(BroadcastConstants.RETENTION_TIME, DISABLED_RETENTION_TIME)
             updateRetentionTimeUI(seconds)
         }
     }
