@@ -2940,4 +2940,7 @@
     <string name="button_copy_key" context="Button which action is copy the key of a link">Copy key</string>
     <string name="link_copied_clipboard" context="Confirmation show informing a link it’s copied to the clipboard">Link ready to be pasted.</string>
     <string name="key_copied_clipboard" context="Confirmation show informing a key link it’s copied to the clipboard">Key ready to be pasted.</string>
+    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Upgrade to Pro</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">Mega Pro users have exclusive access to additional link safety features making your account even more secure.\n</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file.\nA link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
 </resources>

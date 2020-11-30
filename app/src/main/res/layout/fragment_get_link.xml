@@ -15,8 +15,8 @@
 
         <RelativeLayout
             android:id="@+id/node_info_layout"
-            android:layout_marginTop="24dp"
-            style="@style/GetLinkOptionsStyle">
+            style="@style/GetLinkOptionsStyle"
+            android:layout_marginTop="24dp">
 
             <ImageView
                 android:id="@+id/node_thumbnail"
@@ -72,7 +72,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@+id/decrypted_key_switch"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
 
                 <TextView
                     android:id="@+id/decrypted_key_text"
@@ -126,6 +127,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@id/expiry_date_switch"
                 android:orientation="vertical">
