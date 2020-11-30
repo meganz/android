@@ -272,7 +272,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        clearIncomingCallNotification(chatId);
+        clearIncomingCallNotification(callChat.getId());
 
         titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
