@@ -81,7 +81,19 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
      */
     protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
-        mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
+        setBottomSheetBehavior(heightHeader, addBottomSheetCallBack, BottomSheetBehavior.from((View) contentView.getParent()));
+    }
+
+    /**
+     * Sets the initial state of a BottomSheet and its state.
+     *
+     * @param heightHeader              height of the header
+     * @param addBottomSheetCallBack    true if it should add a BottomsheetCallback, false otherwise
+     * @param behavior                  BottomSheetBehavior for this view
+     */
+    protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack, BottomSheetBehavior behavior) {
+        this.heightHeader = heightHeader;
+        mBehavior = behavior;
 
         int peekHeight = getPeekHeight();
         if (peekHeight < halfHeightDisplay) {

@@ -1,32 +1,26 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.FrameLayout;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
 
-public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragment {
-
-    private static final float HALF_EXPANDED_RATIO_OFFSET = 1.5f;
+public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
     private BottomSheetNodeLabelBinding binding;
     private MegaNode node = null;
@@ -53,22 +47,10 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
         getDialog().setOnShowListener(dialog -> {
-                    float displayHeight = getDisplayHeight();
-                    int itemHeight = getItemHeight();
-                    int viewHeight = view.getMeasuredHeight();
-                    float expandedRatio = (viewHeight - itemHeight * HALF_EXPANDED_RATIO_OFFSET) / displayHeight;
-
-                    BottomSheetBehavior<FrameLayout> behavior = ((BottomSheetDialog) dialog).getBehavior();
-                    behavior.setSkipCollapsed(true);
-                    behavior.setHalfExpandedRatio(expandedRatio);
-
-                    if (behavior.getState() != BottomSheetBehavior.STATE_HALF_EXPANDED) {
-                        behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-                    } else {
-                        view.requestLayout();
-                    }
-                }
-        );
+            mainLinearLayout = binding.nodeBottomSheet;
+            items_layout = binding.radioGroupLabel;
+            setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true, ((BottomSheetDialog) dialog).getBehavior());
+        });
     }
 
     private void showCurrentNodeLabel() {
@@ -133,17 +115,6 @@ public class NodeLabelBottomSheetDialogFragment extends BottomSheetDialogFragmen
         }
 
         dismiss();
-    }
-
-    private int getItemHeight() {
-        return binding.txtTitle.getMeasuredHeight();
-    }
-
-    private float getDisplayHeight() {
-        Rect rectangle = new Rect();
-        Window window = getActivity().getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-        return rectangle.bottom - rectangle.top;
     }
 
     private MegaApiAndroid getMegaApi() {
