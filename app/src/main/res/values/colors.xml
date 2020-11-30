@@ -230,27 +230,26 @@
      The "390" is simply deduced from the relative color saturation against red_400 -->
     <color name="white">#FFFFFF</color>
 
-    <color name="white_alpha_005">#0CFFFFFF</color>
-    <color name="white_alpha_009">#16FFFFFF</color>
-    <color name="white_alpha_012">#1EFFFFFF</color>
-    <color name="white_alpha_023">#3AFFFFFF</color>
+    <color name="white_alpha_005">#0DFFFFFF</color>
+    <color name="white_alpha_009">#17FFFFFF</color>
+    <color name="white_alpha_012">#1FFFFFFF</color>
+    <color name="white_alpha_023">#3BFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
-    <color name="white_alpha_038">#60FFFFFF</color>
-    <color name="white_alpha_054">#89FFFFFF</color>
+    <color name="white_alpha_038">#61FFFFFF</color>
+    <color name="white_alpha_054">#8AFFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
-    <color name="white_alpha_087">#DDFFFFFF</color>
+    <color name="white_alpha_087">#DEFFFFFF</color>
 
     <color name="black">#000000</color>
-    <color name="black_87_opacity">#DE000000</color>
     <color name="dark_grey">#121212</color>
-    <color name="grey_alpha_012">#1E000000</color>
+    <color name="grey_alpha_012">#1F000000</color>
     <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
     <color name="grey_alpha_033">#54000000</color>
-    <color name="grey_alpha_038">#60000000</color>
-    <color name="grey_alpha_054">#89000000</color>
+    <color name="grey_alpha_038">#61000000</color>
+    <color name="grey_alpha_054">#8A000000</color>
     <color name="grey_alpha_060">#99000000</color>
-    <color name="grey_alpha_087">#DD000000</color>
+    <color name="grey_alpha_087">#DE000000</color>
 
     <color name="teal_200">#6DD2BF</color>
     <color name="teal_300">#00BFA5</color>
@@ -262,8 +261,8 @@
     <color name="red_800">#D50004</color>
     <color name="red_900">#C70000</color>
 
-    <color name="red_600_alpha_038">#60F30C14</color>
-    <color name="red_300_alpha_038">#60F46762</color>
+    <color name="red_600_alpha_038">#61F30C14</color>
+    <color name="red_300_alpha_038">#61F46762</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
