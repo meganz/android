@@ -26,7 +26,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
@@ -36,11 +35,8 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -350,7 +346,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                             holderHeader.privateTitle.setText(R.string.private_chat);
                             holderHeader.privateTitle.setAllCaps(false);
                             holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.name_my_account));
+                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.primary_text));
                             holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                             holderHeader.privateLayout.setOnClickListener(null);
                         } else {

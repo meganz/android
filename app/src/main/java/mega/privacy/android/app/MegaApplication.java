@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -32,7 +31,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
@@ -107,11 +105,12 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+
 public class MegaApplication extends MultiDexApplication implements Application.ActivityLifecycleCallbacks, MegaChatRequestListenerInterface, MegaChatNotificationListenerInterface, NetworkStateReceiver.NetworkStateReceiverListener, MegaChatListenerInterface {
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.1_335";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.2_340";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -323,6 +322,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 					//Ask for MU and CU folder when App in init state
                     megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+
+					//Login transfers resumption
+					TransfersManagement.enableTransfersResumption();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -445,6 +447,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 					sendBroadcastUpdateAccountDetails();
 				}
+			} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
+				dbH.setTransferQueueStatus(request.getFlag());
 			}
 		}
 
@@ -551,7 +555,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 								callStatus == MegaChatCall.CALL_STATUS_JOINING ||
 								callStatus == MegaChatCall.CALL_STATUS_RECONNECTING) {
                             updateRTCAudioMangerTypeStatus(callStatus);
-							clearIncomingCallNotification(callId);
+							clearIncomingCallNotification(chatId);
 						}
 
 						if(megaApi.isChatNotifiable(chatId)) {
@@ -707,6 +711,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+
+		//Logout transfers resumption
+		TransfersManagement.enableTransfersResumption();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1614,7 +1621,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 return;
             }
             logDebug("Creating RTC Audio Manager");
-            rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
+			removeRTCAudioManagerRingIn();
+			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
 			startProximitySensor();
         }
     }
@@ -1758,21 +1766,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		logDebug("Launch call: " + getTitleChat(chatRoom));
 		if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
 			setCallLayoutStatus(call.getChatid(), true);
-		}
-	}
-
-	public void clearIncomingCallNotification(long chatCallId) {
-		logDebug("Chat ID: " + chatCallId);
-
-		try {
-			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-			String notificationCallId = MegaApiJava.userHandleToBase64(chatCallId);
-			int notificationId = (notificationCallId).hashCode();
-
-			notificationManager.cancel(notificationId);
-		} catch (Exception e) {
-			logError("EXCEPTION", e);
 		}
 	}
 

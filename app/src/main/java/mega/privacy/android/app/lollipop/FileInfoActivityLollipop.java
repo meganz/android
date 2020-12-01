@@ -24,7 +24,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -844,7 +843,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
                     offlineSwitch.setOnClickListener(this);
-                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                 }else{
                     offlineSwitch.setEnabled(false);
                     availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
@@ -1162,7 +1161,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         }
                     });
 
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.primary_text));
                     collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
                     collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
                 }

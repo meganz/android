@@ -26,7 +26,7 @@ import android.widget.Toast;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.widget.RemoteViews;
 
 import io.reactivex.rxjava3.core.Single;
@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -53,6 +52,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
+import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -68,6 +68,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
@@ -80,6 +81,8 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -131,8 +134,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	File currentFile;
 	File currentDir;
-	private Map<String,String> targetPaths = new HashMap<>();
-	private Map<String,String> targetUris = new HashMap<>();
 	MegaNode currentDocument;
 
 	DatabaseHandler dbH = null;
@@ -171,6 +172,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		app = MegaApplication.getInstance();
 		megaApi = app.getMegaApi();
+		megaApi.addTransferListener(this);
+		megaApi.addRequestListener(this);
 		megaApiFolder = app.getMegaApiFolder();
 		megaChatApi = app.getMegaChatApi();
 
@@ -253,7 +256,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
 			logDebug("Cancel intent");
 			canceled = true;
-			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD);
 			return START_NOT_STICKY;
 		}
 
@@ -265,12 +268,40 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private boolean isVoiceClipType(String value) {
-		return (value != null) && (value.contains(EXTRA_VOICE_CLIP));
+		return value != null && value.contains(APP_DATA_VOICE_CLIP);
 	}
 
-    protected void onHandleIntent(final Intent intent) {
-        logDebug("onHandleIntent");
-	    this.intent = intent;
+	protected void onHandleIntent(final Intent intent) {
+		logDebug("onHandleIntent");
+		this.intent = intent;
+
+		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
+			MegaTransferData transferData = megaApi.getTransferData(null);
+			if (transferData == null) {
+				return;
+			}
+
+			int uploadsInProgress = transferData.getNumDownloads();
+
+			for (int i = 0; i < uploadsInProgress; i++) {
+				MegaTransfer transfer = megaApi.getTransferByTag(transferData.getDownloadTag(i));
+				if (transfer == null) {
+					continue;
+				}
+
+				if (!isVoiceClipType(transfer.getAppData())) {
+					MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+					transfersCount++;
+				}
+			}
+
+			if (transfersCount > 0) {
+				updateProgressNotification();
+			}
+
+			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
+			return;
+		}
 
         long hash = intent.getLongExtra(EXTRA_HASH, -1);
         String url = intent.getStringExtra(EXTRA_URL);
@@ -326,7 +357,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						updateProgressNotification();
 					}
 
-					megaApi.fastLogin(gSession, this);
+					megaApi.fastLogin(gSession);
 					return;
 				}
 				else{
@@ -368,7 +399,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
             if (currentDir != null){
                 currentDir.mkdirs();
             }
-            megaApi.getPublicNode(url, this);
+            megaApi.getPublicNode(url);
             return;
         }
 
@@ -387,11 +418,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			currentFile = currentDir;
 		}
 
-        if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
-            targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
-            MegaApplication.getTransfersManagement().setTargetPaths(targetPaths);
-            targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
-        }
+		String appData = getSDCardAppData(intent);
 
 		if(!checkCurrentFile(currentDocument)){
 			logDebug("checkCurrentFile == false");
@@ -450,15 +477,46 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			logDebug("CurrentDocument is not null");
 			if (highPriority) {
-				String data = isVoiceClipType(type) ? EXTRA_VOICE_CLIP : "";
-				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data, this);
+				String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
+				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
+			} else if (!isTextEmpty(appData)) {
+				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData);
 			} else {
-				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/");
 			}
 		} else {
 			logWarning("currentDir is not a directory");
 		}
     }
+
+	/**
+	 * Checks if the download of the current Intent corresponds to a SD card download.
+	 * If so, stores the SD card paths on an app data String.
+	 * If not, do nothing.
+	 *
+	 * @param intent Current Intent.
+	 * @return The app data String.
+	 */
+	private String getSDCardAppData(Intent intent) {
+		if (intent == null
+				|| !intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
+			return null;
+		}
+
+		String sDCardAppData = APP_DATA_SD_CARD;
+
+		String targetPath = intent.getStringExtra(EXTRA_TARGET_PATH);
+		if (!isTextEmpty(targetPath)) {
+			sDCardAppData += APP_DATA_INDICATOR + targetPath;
+		}
+
+		String targetUri = intent.getStringExtra(EXTRA_TARGET_URI);
+		if (!isTextEmpty(targetUri)) {
+			sDCardAppData += APP_DATA_INDICATOR + targetUri;
+		}
+
+		return sDCardAppData;
+	}
 
 	private void onQueueComplete(long handle) {
 		logDebug("onQueueComplete");
@@ -1375,6 +1433,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if (isVoiceClipType(transfer.getAppData())) return;
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
+			String appData = transfer.getAppData();
+
+			if (!isTextEmpty(appData) && appData.contains(APP_DATA_SD_CARD)) {
+				dbH.addSDTransfer(new SDTransfer(
+						transfer.getTag(),
+						transfer.getFileName(),
+						getSizeString(transfer.getTotalBytes()),
+						Long.toString(transfer.getNodeHandle()),
+						transfer.getPath(),
+						appData));
+			}
+
 			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 			transfersCount++;
 			updateProgressNotification();
@@ -1383,7 +1453,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError error) {
-		rxSubscriptions.add(Single.just(true)
+ 		rxSubscriptions.add(Single.just(true)
 				.observeOn(Schedulers.single())
 				.subscribe(ignored -> doOnTransferFinish(transfer, error),
 						throwable -> logError("doOnTransferFinish onError", throwable)));
@@ -1402,16 +1472,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if(!isVoiceClip) transfersCount--;
 
-			AndroidCompletedTransfer completedTransfer = null;
 			String path = transfer.getPath();
-			String targetPath = targetPaths.get(path);
+			String targetPath = getSDCardTargetPath(transfer.getAppData());
 
 			if (!transfer.isFolderTransfer()) {
 				if (!isVoiceClip) {
-					completedTransfer = new AndroidCompletedTransfer(transfer, error);
+					AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
 					if (!isTextEmpty(targetPath)) {
 						completedTransfer.setPath(targetPath);
 					}
+
+					addCompletedTransfer(completedTransfer);
 				}
 
 				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
@@ -1454,29 +1525,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						resultTransfersVoiceClip(transfer.getNodeHandle(), SUCCESSFUL_VOICE_CLIP_TRANSFER);
 					}
 
-                    String uri = targetUris.get(path);
                     //need to move downloaded file to a location on sd card.
                     if (targetPath != null) {
 						File source = new File(path);
-                        try {
-                            SDCardOperator sdCardOperator = new SDCardOperator(this);
-                            if (uri != null) {
-                                sdCardOperator.initDocumentFileRoot(uri);
-                            } else {
-                                sdCardOperator.initDocumentFileRoot(dbH.getSDCardUri());
-                            }
-                            //new path, after moving to target location.
-							path = sdCardOperator.move(targetPath, source);
-                            File newFile = new File(path);
-                            if(!newFile.exists() || newFile.length() != source.length()) {
-                                logError("Error moving file to the sd card path");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            logError("Error moving file to the sd card path with exception", e);
-                        } finally {
-                            source.delete();
-                        }
+
+						try {
+							SDCardOperator sdCardOperator = new SDCardOperator(this);
+							sdCardOperator.moveDownloadedFileToDestinationPath(source, targetPath,
+									getSDCardTargetUri(transfer.getAppData()), transfer.getTag());
+						} catch (Exception e) {
+							logError("Error moving file to the sd card path", e);
+						}
                     }
 					//To update thumbnails for videos
 					if(isVideoFile(transfer.getPath())){
@@ -1572,10 +1631,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						file.delete();
 					}
 				}
-			}
-
-			if (completedTransfer != null) {
-				addCompletedTransfer(completedTransfer);
 			}
 
 			if(isVoiceClip) return;
@@ -1743,7 +1798,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
-				megaApi.fetchNodes(this);
+				megaApi.fetchNodes();
 			}
 			else{
 				logError("ERROR: " + e.getErrorString());
@@ -1787,17 +1842,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						currentFile = currentDir;
 					}
 
-                    if(intent.getBooleanExtra(EXTRA_DOWNLOAD_TO_SDCARD, false)) {
-                        targetPaths.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_PATH));
-						MegaApplication.getTransfersManagement().setTargetPaths(targetPaths);
-                        targetUris.put(currentFile.getAbsolutePath(), intent.getStringExtra(EXTRA_TARGET_URI));
-                    }
+					String appData = getSDCardAppData(intent);
+
                     logDebug("Public node download launched");
 					if(!wl.isHeld()) wl.acquire();
 					if(!lock.isHeld()) lock.acquire();
 					if (currentDir.isDirectory()){
 						logDebug("To downloadPublic(dir)");
-						megaApi.startDownload(node, currentDir.getAbsolutePath() + "/", this);
+						if (!isTextEmpty(appData)) {
+							megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
+						} else {
+							megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
+						}
 					}
 				}
 			}
