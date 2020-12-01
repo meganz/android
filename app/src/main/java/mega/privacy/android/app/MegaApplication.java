@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -32,7 +31,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
@@ -324,6 +322,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 					//Ask for MU and CU folder when App in init state
                     megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+
+					//Login transfers resumption
+					TransfersManagement.enableTransfersResumption();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -446,6 +447,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 					sendBroadcastUpdateAccountDetails();
 				}
+			} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
+				dbH.setTransferQueueStatus(request.getFlag());
 			}
 		}
 
@@ -708,6 +711,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+
+		//Logout transfers resumption
+		TransfersManagement.enableTransfersResumption();
 
 		boolean staging = false;
 		if (dbH != null) {
