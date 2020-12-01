@@ -135,7 +135,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.historyRetentionSwitchLayout.setOnClickListener(null)
             binding.clearChatHistoryLayout.setOnClickListener(null)
             binding.retentionTimeTextLayout.setOnClickListener(null)
-            binding.retentionTimeTitle.text = getString(R.string.title_properties_history_retention)
             binding.retentionTimeSubtitle.text =
                 getString(R.string.subtitle_properties_history_retention)
             binding.retentionTime.visibility = View.GONE
@@ -162,7 +161,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      *
      * @param seconds The time the retention time is enabled.
      */
-    fun showInitPicker(seconds: Long) {
+    fun showPickers(seconds: Long) {
         binding.pickerLayout.visibility = View.VISIBLE
         binding.separator.visibility = View.VISIBLE
         binding.pickerButton.setOnClickListener(this)
@@ -187,24 +186,36 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             valueInNumberPicker = binding.numberPicker.value
         }
 
-        val arrayString = arrayOf(
+        fillPickerText(valueInNumberPicker)
+
+        binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
+        binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
+    }
+
+    /**
+     * Method for filling the text picker array from the value of the picker number value.
+     *
+     * @param value The current value of number picker.
+     */
+    private fun fillPickerText(value: Int) {
+        val arrayString: Array<String> = arrayOf(
             app.baseContext.resources.getQuantityString(
                 R.plurals.retention_time_picker_hours,
-                valueInNumberPicker
+                value
             ),
             app.baseContext.resources.getQuantityString(
                 R.plurals.retention_time_picker_days,
-                valueInNumberPicker
+                value
             ),
             app.baseContext.resources.getQuantityString(
                 R.plurals.retention_time_picker_weeks,
-                valueInNumberPicker
+                value
             ),
             app.baseContext.resources.getQuantityString(
                 R.plurals.retention_time_picker_months,
-                valueInNumberPicker
+                value
             ),
-            app.getString(R.string.retention_time_picker_year)
+            app.getString(R.string.year_cc).toLowerCase()
         )
 
         binding.textPicker.setFormatter { value ->
@@ -212,9 +223,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         }
 
         binding.textPicker.displayedValues = arrayString
-
-        binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
-        binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
+        binding.textPicker.setWrapSelectorWheel(true);
     }
 
     /**
@@ -279,30 +288,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             return
 
         if (oldValue == 1 && newValue > 1 || newValue == 1 && oldValue > 1) {
-            val newArrayString = arrayOf(
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_hours,
-                    newValue
-                ),
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_days,
-                    newValue
-                ),
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_weeks,
-                    newValue
-                ),
-                app.baseContext.resources.getQuantityString(
-                    R.plurals.retention_time_picker_months,
-                    newValue
-                ),
-                app.getString(R.string.retention_time_picker_year)
-            )
-
-            binding.textPicker.setFormatter { value ->
-                newArrayString[value]
-            }
-            binding.textPicker.displayedValues = newArrayString
+            fillPickerText(newValue)
         }
     }
 
@@ -369,15 +355,12 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         if (TextUtil.isTextEmpty(timeFormatted)) {
             binding.retentionTimeTextLayout.setOnClickListener(null)
             binding.historyRetentionSwitch.isChecked = false
-            binding.retentionTimeTitle.text = getString(R.string.title_properties_history_retention)
             binding.retentionTimeSubtitle.text =
                 getString(R.string.subtitle_properties_history_retention)
             binding.retentionTime.visibility = View.GONE
         } else {
             binding.retentionTimeTextLayout.setOnClickListener(this)
             binding.historyRetentionSwitch.isChecked = true
-            binding.retentionTimeTitle.text =
-                getString(R.string.title_properties_history_retention_activated)
             binding.retentionTimeSubtitle.text = getString(R.string.subtitle_properties_manage_chat)
             binding.retentionTime.text = timeFormatted
             binding.retentionTime.visibility = View.VISIBLE

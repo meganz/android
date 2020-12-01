@@ -53,11 +53,11 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center">
                         <TextView
-                            android:id="@+id/retention_time_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="start|center_vertical"
                             android:textColor="@color/primary_text"
+                            android:text ="@string/title_properties_history_retention"
                             android:textSize="16sp" />
                     </RelativeLayout>
 

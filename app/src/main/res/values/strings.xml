@@ -1284,9 +1284,6 @@
 
     <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">All messages and media in this conversation will be cleared.</string>
     <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear history?</string>
-    <string name="title_confirmation_clear_chat_history" context="Title of the confirmation dialog to clear the chat history from Manage chat history section">Clear chat history?</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">All messages and media in this conversation will be deleted for every participant.</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">The participant is already included in this group chat</string>
 
@@ -1690,75 +1687,12 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">from</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
-
-    <string name="title_properties_manage_chat" context="Title of the section to manage chat history in the Contact Properties screen">Manage chat history</string>
-    <string name="subtitle_properties_manage_chat" context="Subtitle of the section to manage chat history in the Contact Properties screen">Automatically delete messages older than:</string>
-
-    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">%1$d hour</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
-    </plurals>
-    <plurals name="subtitle_properties_manage_chat_label_days" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a day will be automatically deleted." quantity="one">%1$d day</item>
-        <item context="Text on the label indicating that That the oldest messages of several days will be automatically deleted." quantity="other">%1$d days</item>
-    </plurals>
-
-    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">%1$d week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
-    </plurals>
-
-    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">%1$d month</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
-    </plurals>
-
-    <plurals name="subtitle_properties_manage_chat_label_years" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a year will be automatically deleted." quantity="one">%1$d year</item>
-        <item context="Text on the label indicating that That the oldest messages of several years will be automatically deleted." quantity="other">%1$d years</item>
-    </plurals>
-
-    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
-
-    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Manage chat history screen">Clear chat history</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the section to clear the chat content in the Manage chat history screen">History retention</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Automatically delete messages older than a certain amount of time</string>
-    <string name="title_properties_history_retention_activated" context="Title of the section to clear the chat content in the Manage chat history screen">Schedule retention history</string>
-
-    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-
-    <plurals name="retention_time_picker_days">
-        <item context="menu item" quantity="one">day</item>
-        <item context="menu items" quantity="other">days</item>
-    </plurals>
-
-    <plurals name="retention_time_picker_hours">
-        <item context="menu item" quantity="one">hour</item>
-        <item context="menu items" quantity="other">hours</item>
-    </plurals>
-
-    <plurals name="retention_time_picker_weeks">
-        <item context="menu item" quantity="one">week</item>
-        <item context="menu items" quantity="other">weeks</item>
-    </plurals>
-
-    <plurals name="retention_time_picker_months">
-        <item context="menu item" quantity="one">month</item>
-        <item context="menu items" quantity="other">months</item>
-    </plurals>
-
-    <string name="retention_time_picker_year" context="Label for picker option to configure custom retention time. This option indicates year">year</string>
+    <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
 
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
-    <string name="retention_history_changed_by" context="Text shown when the chat retention history was changed by someone">[A]%1$s[/A][B] changed the message retention history for this conversation history to[/B][A] Delete all messages older than %2$s[/A]</string>
 
     <string name="number_messages_chat_notification" formatted="false" context="Notification title to show the number of unread chats, unread messages">%1$d unread chats</string>
 
@@ -2997,4 +2931,56 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
+
+    <string name="retention_history_changed_by" context="Text shown in the chat room when the chat retention history was changed by someone">[A]%1$s[/A][B] changed the message retention history for this conversation history to[/B][A] Delete all messages older than %2$s[/A]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option ">History retention</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than&#58;</string>
+    <string name="title_confirmation_clear_chat_history" context="Title of the confirmation dialog to clear the chat history from Manage chat history section">Clear chat history&#63;</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">All messages and media in this conversation will be deleted for every participant.</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+    </plurals>
 </resources>

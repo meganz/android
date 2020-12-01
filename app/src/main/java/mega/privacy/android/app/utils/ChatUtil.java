@@ -1062,7 +1062,7 @@ public class ChatUtil {
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
                         if(context instanceof ManageChatHistoryActivity){
-                            ((ManageChatHistoryActivity)context).showInitPicker(isDisabled ? DISABLED_RETENTION_TIME : getUpdatedRetentionTimeFromAChat(idChat));
+                            ((ManageChatHistoryActivity)context).showPickers(isDisabled ? DISABLED_RETENTION_TIME : getUpdatedRetentionTimeFromAChat(idChat));
                         }
                     } else {
                         MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat, getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
@@ -1177,8 +1177,7 @@ public class ChatUtil {
         long years = seconds % SECONDS_IN_YEAR;
 
         if (years == 0) {
-            int year = (int) (seconds / SECONDS_IN_YEAR);
-            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_years, year, year);
+            return MegaApplication.getInstance().getBaseContext().getResources().getString(R.string.subtitle_properties_manage_chat_label_year);
         }
 
         if (months == 0) {
@@ -1193,7 +1192,7 @@ public class ChatUtil {
 
         if (days == 0) {
             int day = (int) (seconds / SECONDS_IN_DAY);
-            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_days, day, day);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.label_time_in_days_full, day, day);
         }
 
         if (hours == 0) {
