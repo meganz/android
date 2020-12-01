@@ -442,7 +442,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="20dp"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:textSize="16sp" />
 
                 <ProgressBar
@@ -528,7 +528,7 @@
                         android:layout_marginRight="16dp"
                         android:ellipsize="middle"
                         android:singleLine="true"
-                        android:textColor="@color/name_my_account"
+                        android:textColor="@color/primary_text"
                         android:textSize="10sp" />
                 </RelativeLayout>
 

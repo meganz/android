@@ -355,7 +355,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         if(option.equals("day")){
             tsDay = ts;
 
-            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
             relativeLayoutDay.setEnabled(true);
             textViewDay.setText(date);
             textViewDay.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
@@ -378,9 +378,9 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }else if (option.equals("from")){
             tsFrom = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
 
             if((tsTo == 0) || (tsTo > ts)){
 
@@ -405,9 +405,9 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
         }else if(option.equals("to")){
             tsTo = ts;
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
 
             if((tsFrom ==0 ) || (tsFrom < ts)){
 
@@ -466,16 +466,16 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             buttonLastYear.setEnabled(true);
             buttonLastYear.setTextColor(ContextCompat.getColor(this, R.color.black));
 
-            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewSetPeriod.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
 
             relativeLayoutFrom.setEnabled(true);
-            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewTitleFrom.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
             textViewFrom.setText(weekDay);
             textViewFrom.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodFrom.setVisibility(View.GONE);
 
             relativeLayoutTo.setEnabled(true);
-            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+            textViewTitleTo.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
             textViewTo.setText(weekDay);
             textViewTo.setTextColor(ContextCompat.getColor(this, R.color.black_12_alpha));
             removePeriodTo.setVisibility(View.GONE);
@@ -488,7 +488,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
             removePeriodFrom.setVisibility(View.GONE);
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);
@@ -507,7 +507,7 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
             if((optionPeriodFrom == false)&&(optionPeriodTo == false)){
 
-                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.mail_my_account));
+                textViewSetDay.setTextColor(ContextCompat.getColor(this, R.color.secondary_text));
                 relativeLayoutDay.setEnabled(true);
 
                 buttonLastMonth.setEnabled(true);

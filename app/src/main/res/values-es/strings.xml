@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Cierra sesión[/A] para usar MEGA con otra cuenta</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">¿Quieres cerrar sesión y salir de tu cuenta?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">%1$s ha eliminado el mensaje</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Se ha limpiado el historial del chat</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Se ha limpiado el historial del chat</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s ha limpiado el chat</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Servidores ocupados. Por favor espera.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Este proceso está tardando más de lo esperado. Por favor espera.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Demasiadas peticiones. Por favor espera.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Cancelando inicio de sesión. Por favor, espera&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Cancelando inicio de sesión. Por favor, espera&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Tipo de archivo no soportado.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. El archivo está dañado o no existe.</string>
@@ -2769,7 +2769,7 @@
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor espera&#8230;</string>
 
     <string name="account_label" context="Head label to show the business account type">Tipo de cuenta</string>
-    <string name="business_label" context="Label in My Account section to show user account type">Business</string>
+    <string name="business_label" context="Label in My Account section to show user account type">Empresas</string>
     <string name="admin_label" context="Business user role">Administrador</string>
     <string name="user_label" context="Business user role">Usuario</string>
     <string name="status_label" context="General label to show the status of something or someone">Estado</string>

@@ -1332,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A] تسجيل خروج[/A] لاستخدام ميغا MEGA مع حساب آخر</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">هل أنت متأكد أنك تريد تسجيل الخروج من الحساب الحالي؟</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">تم حذف هذه الرسالة من قبل %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">تاريخ المحادثة تم مسحه</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">تاريخ المحادثة تم مسحه</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">تم مسح سجل المحادثات من قبل %1$s</string>
 
     <!--
@@ -2055,7 +2055,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">المخدمات مشغولة جدا، يرجى الانتظار</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">هذه العملية تستغرق وقتا أطول من المتوقع. أرجو الإنتظار.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">تجاوز الحد الاعظمي للطلبات. من فضلك انتظر.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">إلغاء عملية تسجيل الدخول. يرجى الإنتظار&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">إلغاء عملية تسجيل الدخول. يرجى الإنتظار&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">نوع الملف غير مدعوم.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">حدث خطأ، الملف معطوب او غير موجود</string>

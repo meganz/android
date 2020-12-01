@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
                 android:singleLine="true"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 rounded:emojiSize="14sp" />
@@ -71,7 +71,7 @@
                 android:ellipsize="end"
                 android:fontFamily="roboto"
                 android:singleLine="true"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
             <TextView
@@ -80,9 +80,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:text="@string/business_label"
-                android:textAllCaps="true"
                 android:textColor="@color/business_color"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
@@ -142,7 +141,7 @@
                     android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_account"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -168,7 +167,7 @@
                     android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_contacts"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -195,7 +194,7 @@
                     android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_inbox"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -222,7 +221,7 @@
                     android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/title_properties_chat_contact_notifications"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -248,7 +247,7 @@
                     android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/section_transfers"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -274,7 +273,7 @@
                     android:fontFamily="sans-serif-light"
                     android:gravity="start|center_vertical"
                     android:text="@string/action_settings"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 

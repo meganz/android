@@ -51,14 +51,14 @@
 							android:id="@+id/monthly_annualy_integer_text"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:textColor="@color/name_my_account"
+							android:textColor="@color/primary_text"
 							android:textSize="28sp"/>
 
 						<TextView
 							android:id="@+id/monthly_annualy_decimal_text"
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
-							android:textColor="@color/name_my_account"
+							android:textColor="@color/primary_text"
 							android:layout_toRightOf="@id/monthly_annualy_integer_text"
 							android:layout_alignBottom="@id/monthly_annualy_integer_text"
 							android:textSize="14sp" />
@@ -188,7 +188,7 @@
 					   android:layout_height="wrap_content"
 					   android:text="@string/select_membership_1"
 					   android:textSize="14sp"
-					   android:textColor="@color/mail_my_account"
+					   android:textColor="@color/secondary_text"
 					   android:layout_centerHorizontal="true"
 					   android:layout_below="@id/monthly_annualy_select"/>
 
