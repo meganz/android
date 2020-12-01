@@ -1,15 +1,12 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
+import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -33,24 +30,24 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         return nodeLabelFragment;
     }
 
-    @Nullable
+    @SuppressLint("RestrictedApi")
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = BottomSheetNodeLabelBinding.inflate(inflater, container, false);
-        node = getMegaApi().getNodeByHandle(getArguments().getLong(HANDLE));
-        return binding.getRoot();
-    }
+    public void setupDialog(@NonNull Dialog dialog, int style) {
+        super.setupDialog(dialog, style);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        binding = BottomSheetNodeLabelBinding.inflate(getLayoutInflater());
+
+        node = getMegaApi().getNodeByHandle(getArguments().getLong(HANDLE));
         showCurrentNodeLabel();
+
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
-        getDialog().setOnShowListener(dialog -> {
-            mainLinearLayout = binding.nodeBottomSheet;
-            items_layout = binding.radioGroupLabel;
-            setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true, ((BottomSheetDialog) dialog).getBehavior());
-        });
+        contentView = binding.getRoot().getRootView();
+        mainLinearLayout = binding.nodeBottomSheet;
+        items_layout = binding.radioGroupLabel;
+
+        dialog.setContentView(contentView);
+        setRadioGroupViewBottomSheetBehaviour();
     }
 
     private void showCurrentNodeLabel() {
