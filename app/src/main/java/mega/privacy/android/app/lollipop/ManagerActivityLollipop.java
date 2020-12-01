@@ -876,7 +876,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					//UPGRADE_ACCOUNT_FRAGMENT
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
-						upAFL.setPricing();
+						upAFL.setPricingInfo();
 					}
 
 					//CENTILI_FRAGMENT
@@ -1373,19 +1373,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
-	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
-		if (list == null || list.isEmpty()) {
-			return null;
-		}
-
-		for (SkuDetails details : list) {
-			if (details.getSku().equals(key)) {
-				return details;
-			}
-		}
-		return null;
-	}
-
 	private void getInventory() {
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
@@ -1396,6 +1383,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (skuDetailsList != null && skuDetailsList.size() > 0) {
 					mSkuDetailsList = skuDetailsList;
 					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+
+					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+					if (upAFL != null) {
+						upAFL.setPricingInfo();
+					}
 				}
 			}
 		};
@@ -1510,7 +1502,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
-			upAFL.setPricing();
+			upAFL.setPricingInfo();
 		}
 	}
 
@@ -3269,6 +3261,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 								selectDrawerItemPending=false;
 								displayedAccountType = PRO_LITE;
+								selectDrawerItemLollipop(drawerItem);
+								return;
+							}
+							case BUSINESS:{
+								drawerItem = DrawerItem.ACCOUNT;
+								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+								selectDrawerItemPending=false;
+								displayedAccountType = BUSINESS;
 								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
