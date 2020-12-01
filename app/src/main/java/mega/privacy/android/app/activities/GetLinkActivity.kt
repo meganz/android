@@ -14,12 +14,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.fragments.getLinkFragments.CopyrightFragment
 import mega.privacy.android.app.fragments.getLinkFragments.DecryptionKeyFragment
-import mega.privacy.android.app.fragments.getLinkFragments.GetLinkFragment
+import mega.privacy.android.app.fragments.getLinkFragments.LinkFragment
 import mega.privacy.android.app.fragments.getLinkFragments.LinkPasswordFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -31,17 +32,22 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         const val COPYRIGHT_FRAGMENT = 1
         const val DECRYPTION_KEY_FRAGMENT = 2
         const val PASSWORD_FRAGMENT = 3
+
+        const val COPY_LINK = 0;
+        const val COPY_KEY = 1
+        const val COPY_PASSWORD = 2
     }
 
     private lateinit var binding: GetLinkActivityLayoutBinding
 
-    private var getLinkFragment: GetLinkFragment? = null
+    private var linkFragment: LinkFragment? = null
     private var copyrightFragment: CopyrightFragment? = null
     private var decryptionKeyFragment: DecryptionKeyFragment? = null
     private var passwordFragment: LinkPasswordFragment? = null
 
     private lateinit var node: MegaNode
     private var linkWithPassword: String? = null
+    private var passwordLink: String? = null
 
     private var visibleFragment = COPYRIGHT_FRAGMENT
 
@@ -99,11 +105,11 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
                 supportActionBar?.show()
 
-                if (getLinkFragment == null) {
-                    getLinkFragment = GetLinkFragment(this)
+                if (linkFragment == null) {
+                    linkFragment = LinkFragment(this)
                 }
 
-                ft.replace(R.id.fragment_container_get_link, getLinkFragment!!)
+                ft.replace(R.id.fragment_container_get_link, linkFragment!!)
             }
             COPYRIGHT_FRAGMENT -> {
                 window.statusBarColor = ContextCompat.getColor(this, R.color.transparent_black)
@@ -150,21 +156,20 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         return node
     }
 
-    override fun copyLinkOrKey(linkOrKey: String, isLink: Boolean) {
-        val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, linkOrKey)
-        clipManager.setPrimaryClip(clip)
-        showSnackbar(
-            SNACKBAR_TYPE,
-            getString(
-                if (isLink) R.string.link_copied_clipboard
-                else R.string.key_copied_clipboard
-            ), MEGACHAT_INVALID_HANDLE
-        )
+    override fun copyLink(link: String) {
+        copyToClipboard(link, COPY_LINK)
     }
 
-    override fun startSetPassword() {
+    override fun copyLinkKey(key: String) {
+        copyToClipboard(key, COPY_KEY)
+    }
 
+    override fun copyLinkPassword() {
+        if (isTextEmpty(passwordLink)) {
+            return
+        }
+
+        copyToClipboard(passwordLink!!, COPY_PASSWORD)
     }
 
     override fun showUpgradeToProWarning() {
@@ -188,6 +193,31 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         return linkWithPassword
     }
 
+    override fun getPasswordLink(): String? {
+        return passwordLink
+    }
+
+    override fun removeLinkWithPassword() {
+        linkWithPassword = null
+        passwordLink = null
+    }
+
+    private fun copyToClipboard(textToCopy: String, type: Int) {
+        val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, textToCopy)
+        clipManager.setPrimaryClip(clip)
+
+        showSnackbar(
+            SNACKBAR_TYPE, getString(
+                when (type) {
+                    COPY_KEY -> R.string.key_copied_clipboard
+                    COPY_PASSWORD -> R.string.password_copied_clipboard
+                    else -> R.string.link_copied_clipboard
+                }
+            ), MEGACHAT_INVALID_HANDLE
+        )
+    }
+
     private fun shareLink(link: String) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = PLAIN_TEXT_SHARE_TYPE
@@ -197,7 +227,18 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
     fun setLink() {
         node = megaApi.getNodeByHandle(node.handle)
-        getLinkFragment?.updateLink()
+        linkFragment?.updateLink()
+    }
+
+    override fun setPasswordLink(passwordLink: String) {
+        this.passwordLink = passwordLink
+    }
+
+    fun setLinkWithPassword(linkWithPassword: String) {
+        this.linkWithPassword = linkWithPassword
+        passwordFragment?.resetView()
+        showFragment(GET_LINK_FRAGMENT)
+        linkFragment?.updatePasswordLayouts()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -240,7 +281,11 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     }
 
     override fun onBackPressed() {
-        if (visibleFragment == DECRYPTION_KEY_FRAGMENT) {
+        if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
+            if (visibleFragment == PASSWORD_FRAGMENT) {
+                passwordFragment?.resetView()
+            }
+
             showFragment(GET_LINK_FRAGMENT)
         } else {
             finish()

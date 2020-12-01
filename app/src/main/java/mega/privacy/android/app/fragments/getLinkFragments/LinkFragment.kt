@@ -2,30 +2,35 @@ package mega.privacy.android.app.fragments.getLinkFragments
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.DatePicker
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GetLinkActivity.Companion.DECRYPTION_KEY_FRAGMENT
+import mega.privacy.android.app.activities.GetLinkActivity.Companion.PASSWORD_FRAGMENT
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.MegaApiUtils.getInfoFolder
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaAccountDetails.ACCOUNT_TYPE_FREE
 import nz.mega.sdk.MegaNode
+import org.jetbrains.anko.applyRecursively
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment(),
+class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment(),
     DatePickerDialog.OnDateSetListener {
 
     companion object {
@@ -45,6 +50,8 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
     private lateinit var node: MegaNode
 
     private lateinit var nC: NodeController
+
+    private var passwordVisible = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,32 +76,83 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
             else getSizeString(node.size)
 
         binding.learnMoreTextButton.setOnClickListener {
+            checkIfShouldHidePassword()
             getLinkInterface.showFragment(
                 DECRYPTION_KEY_FRAGMENT
             )
         }
 
+        binding.passwordProtectionSetToggle.setOnClickListener { toggleClick() }
+
+        binding.resetPasswordButton.setOnClickListener {
+            checkIfShouldHidePassword()
+            getLinkInterface.showFragment(
+                PASSWORD_FRAGMENT
+            )
+        }
+
+        binding.removePasswordButton.setOnClickListener { removePasswordClick() }
+
         binding.keyLayout.visibility = GONE
         binding.keySeparator.visibility = GONE
 
         binding.copyLinkButton.setOnClickListener {
-            getLinkInterface.copyLinkOrKey(
+            checkIfShouldHidePassword()
+            val linkWithPassword = getLinkInterface.getLinkWithPassword()
+
+            getLinkInterface.copyLink(
                 if (binding.decryptedKeySwitch.isChecked) linkWithoutKey
-                else linkWithKey, true
+                else if (!isTextEmpty(linkWithPassword)) linkWithPassword!!
+                else linkWithKey
             )
         }
 
+        binding.copyKeyButton.setOnClickListener { getLinkInterface.copyLinkKey(key) }
         binding.copyKeyButton.visibility = GONE
-        binding.copyKeyButton.setOnClickListener { getLinkInterface.copyLinkOrKey(key, false) }
+
+        binding.copyPasswordButton.setOnClickListener {
+            checkIfShouldHidePassword()
+            getLinkInterface.copyLinkPassword()
+        }
 
         updateLink()
 
         if (!node.isExported) {
             binding.linkText.text = getString(R.string.link_request_status)
             nC.exportLink(node)
+        } else {
+            updateLinkText()
         }
 
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        updateSendDecryptedKeySeparatelyLayouts()
+    }
+
+    private fun checkIfShouldHidePassword() {
+        if (passwordVisible) {
+            toggleClick()
+        }
+    }
+
+    private fun removePasswordClick() {
+        checkIfShouldHidePassword()
+        getLinkInterface.removeLinkWithPassword()
+        updatePasswordLayouts()
+        updateLinkText()
+    }
+
+    private fun updateLinkText() {
+        val linkWithPassword = getLinkInterface.getLinkWithPassword();
+
+        binding.linkText.text =
+            if (binding.decryptedKeySwitch.isChecked) linkWithoutKey
+            else if (!isTextEmpty(linkWithPassword)) linkWithPassword
+            else linkWithKey
     }
 
     private fun setThumbnail(node: MegaNode) {
@@ -154,8 +212,6 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
                 binding.expiryDateSetText.text = null
             }
 
-            binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
-
             binding.copyLinkButton.visibility = VISIBLE
         } else {
             binding.decryptedKeyLayout.setOnClickListener(null)
@@ -166,10 +222,13 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
             binding.expiryDateSwitch.setOnClickListener(null)
             binding.expiryDateSwitch.isEnabled = false
 
-            binding.passwordProtectionLayout.setOnClickListener(null)
+            binding.keySeparator.visibility = GONE
 
             binding.copyLinkButton.visibility = GONE
+            binding.copyKeyButton.visibility = GONE
         }
+
+        updatePasswordLayouts()
 
         if (isPro) {
             binding.expiryDateProOnlyText.visibility = GONE
@@ -196,22 +255,28 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
 
+        if (binding.decryptedKeySwitch.isChecked && !isTextEmpty(getLinkInterface.getLinkWithPassword())) {
+            removePasswordClick()
+        }
+
+        updateSendDecryptedKeySeparatelyLayouts()
+    }
+
+    private fun updateSendDecryptedKeySeparatelyLayouts() {
         val visibility = if (binding.decryptedKeySwitch.isChecked) VISIBLE else GONE
 
         binding.keyLayout.visibility = visibility
         binding.keySeparator.visibility = visibility
         binding.copyKeyButton.visibility = visibility
 
-        if (binding.decryptedKeySwitch.isChecked) {
-            binding.linkText.text = linkWithoutKey
-            binding.keyText.text = key
-        } else {
-            binding.linkText.text = linkWithKey
-            binding.keyText.text = null
-        }
+        updateLinkText()
+
+        binding.keyText.text = if (binding.decryptedKeySwitch.isChecked) key else null
     }
 
     private fun setExpiryDateClick(isSwitchClick: Boolean) {
+        checkIfShouldHidePassword()
+
         if (!isPro || (isSwitchClick && node.expirationTime <= 0)) {
             binding.expiryDateSwitch.isChecked = false
         }
@@ -248,10 +313,66 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
 
     private fun setPasswordProtectionClick() {
         if (isPro) {
-            getLinkInterface.startSetPassword()
+            checkIfShouldHidePassword()
+            getLinkInterface.showFragment(PASSWORD_FRAGMENT)
         } else {
             getLinkInterface.showUpgradeToProWarning()
         }
+    }
+
+    fun updatePasswordLayouts() {
+        val password = getLinkInterface.getPasswordLink();
+        val isPasswordSet = !isTextEmpty(password)
+        val visibility = if (isPasswordSet) VISIBLE else GONE
+
+        if (isPasswordSet) {
+            if (binding.decryptedKeySwitch.isChecked) {
+                sendDecryptedKeySeparatelyClick(false)
+            }
+
+            binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
+
+            binding.copyLinkButton.applyRecursively { R.style.AccentButton }
+        } else {
+            binding.copyLinkButton.applyRecursively { R.style.AccentBorderBackgroundBorderlessButton }
+        }
+
+        binding.passwordProtectionSetText.visibility = visibility
+        binding.passwordProtectionSetText.text = if (isPasswordSet) password else null
+        binding.passwordProtectionSetToggle.visibility = visibility
+
+        binding.resetPasswordButton.visibility = visibility
+        binding.removePasswordButton.visibility = visibility
+
+        binding.copyPasswordButton.visibility = visibility
+
+        if (isPasswordSet || !node.isExported) {
+            binding.passwordProtectionLayout.setOnClickListener(null)
+        } else {
+            binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
+        }
+    }
+
+    private fun toggleClick() {
+        if (passwordVisible) {
+            binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
+            binding.passwordProtectionSetToggle.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_b_shared_read
+                )
+            )
+        } else {
+            binding.passwordProtectionSetText.transformationMethod = null
+            binding.passwordProtectionSetToggle.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.ic_b_see
+                )
+            )
+        }
+
+        passwordVisible = !passwordVisible
     }
 
     fun updateLink() {
@@ -276,7 +397,7 @@ class GetLinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFrag
                 }
             }
 
-            binding.linkText.text = linkWithKey
+            updateLinkText()
         }
 
         setAvailableLayouts()

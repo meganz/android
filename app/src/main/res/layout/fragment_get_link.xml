@@ -70,10 +70,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_centerVertical="true"
                 android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@+id/decrypted_key_switch"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/decrypted_key_text"
@@ -206,8 +206,46 @@
                 android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
-        </RelativeLayout>
+            <TextView
+                android:id="@+id/password_protection_set_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/password_protection_text"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@+id/password_protection_set_toggle"
+                android:ellipsize="middle"
+                android:fontFamily="sans-serif-medium"
+                android:singleLine="true"
+                android:textSize="14sp" />
 
+            <ImageView
+                android:id="@+id/password_protection_set_toggle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_below="@id/password_protection_text"
+                android:layout_alignParentEnd="true"
+                android:src="@drawable/ic_b_shared_read"
+                tools:ignore="ContentDescription" />
+
+            <Button
+                android:id="@+id/reset_password_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
+                android:layout_below="@id/password_protection_set_text"
+                android:layout_marginStart="-16dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/action_reset" />
+
+            <Button
+                android:id="@+id/remove_password_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
+                android:layout_below="@id/password_protection_set_text"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_toEndOf="@+id/reset_password_button"
+                android:text="@string/general_remove" />
+
+        </RelativeLayout>
 
         <View
             android:layout_width="wrap_content"
@@ -297,6 +335,12 @@
                 style="@style/AccentBorderBackgroundBorderlessButton"
                 android:layout_marginStart="16dp"
                 android:text="@string/button_copy_key" />
+
+            <Button
+                android:id="@+id/copy_password_button"
+                style="@style/AccentBorderBackgroundBorderlessButton"
+                android:layout_marginStart="8dp"
+                android:text="@string/button_copy_password" />
 
         </LinearLayout>
 
