@@ -744,7 +744,7 @@ public class ChatUtil {
     public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
 
         final AlertDialog muteDialog;
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
         if (chats == null) {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
             dialogBuilder.setCustomTitle(view);
