@@ -1670,9 +1670,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Update video FAB status depending on the state of the local video.
      */
     private void updateVideoFABStatus() {
-        if (!videoFAB.isShown())
-            return;
-
         if (callChat.hasLocalVideo()) {
             //Enable video FAB
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
