@@ -242,7 +242,7 @@
     -->
     <string name="cancel_transfer_confirmation">Ștergi acest transfer?</string>
     <string name="cancel_all_transfer_confirmation">Ștergi toate transferurile?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Cancel all</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Anulează toate</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Unitate cloud</string>
     <string name="section_recents" context="Label to reference a recents section">Recente</string>
@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">Blocare prin PIN</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Blocare prin PIN</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotografii și videoclipuri</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">Blocare prin PIN</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Blocare prin PIN</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">Introdu</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Cod incorect</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">Introdu</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Cod incorect</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod PIN greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod PIN greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Codurile PIN nu coincid</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Introdu codul PIN</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Reintrodu codul PIN</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introdu noul cod PIN</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Reintrodu noul cod PIN</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Codurile PIN nu coincid</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu codul PIN</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu codul PIN</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu noul cod PIN</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu noul cod PIN</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Despre</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">Tipul codului PIN</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">PIN de 4 cifre</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">PIN de 6 cifre</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alfanumeric</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipul codului PIN</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">PIN de 4 cifre</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">PIN de 6 cifre</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">PIN alfanumeric</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Jurnalele sunt acum activate</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Jurnalele sunt acum dezactivate</string>
@@ -928,12 +928,12 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Cont gratuit</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cont Lite</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cont PRO I</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cont PRO II</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cont PRO III</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Cont Pro Lite</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Cont Pro I</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Cont Pro II</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Cont Pro III</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Cont PRO Lite</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Cont Pro Lite</string>
 
     <string name="backup_title" context="">Fă backup cheii de recuperare</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Parola îți deblochează cheia de recuperare</string>
@@ -1029,7 +1029,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">Rămâi fără spațiu!</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Beneficiază pe deplin de contul tău MEGA upgradându-l la PRO.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Beneficiază pe deplin de contul tău MEGA upgradându-l la Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editează poza de profil</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Realizează o fotografie</string>
@@ -1182,10 +1182,10 @@
 
     <string name="general_mute" context="button">Pune pe mut</string>
     <string name="general_unmute" context="button">Scoate de pe mut</string>
-    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
+    <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Nu deranja</string>
     <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Amuțește notificările de chat timp de</string>
 
-    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Amuțește notificările</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Activat</string>
 
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Dezactivat</string>
@@ -1193,13 +1193,13 @@
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Până în această dimineață</string>
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Până când le pornesc înapoi</string>
 
-    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
-    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
+    <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Notificările de chat vor fi amuțite timp de %s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Notificările de chat vor fi amuțite până la ora %1$s</string>
+    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Notificările de chat vor fi amuțite până %1$s la ora %2$s</string>
+    <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Notificările de chat sunt amuțite</string>
 
-    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Notificări de chat activate</string>
+    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Amuțește până la ora %1$s</string>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notificări</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Sunet la mesaje</string>
@@ -1291,7 +1291,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] a părăsit chatul de grup[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Mesaj netrimis. Apasă pentru opțiuni</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfers paused. Tap to resume.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Transferuri puse pe pauză. Atinge pentru a relua.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1456,22 +1456,22 @@
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Vezi</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pune pe pauză toate transferurile</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Reia toate transferurile</string>
-    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Șterge transferurile încheiate</string>
-    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Retry all transfers</string>
+    <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Șterge toate transferurile</string>
+    <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Reîncearcă toate transferurile</string>
     <string name="menu_pause_individual_transfer" context="Dialog to confirm the action of pausing one transfer">Pui pe pauză transferul?</string>
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Reiei transferul?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Reia</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Ștergi transferurile încheiate?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Ștergi transferurile finalizate?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">În curs</string>
-    <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Terminat</string>
+    <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Finalizate</string>
 
     <string name="transfer_paused" context="Text shown in playlist subtitle item when a file is reproducing but it is paused">Pus pe pauză</string>
     <string name="transfer_queued" context="Possible state of a transfer">În coada de așteptare</string>
-    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Completing</string>
-    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Retrying</string>
-    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Cancelled</string>
+    <string name="transfer_completing" context="Possible state of a transfer. When the transfer is finishing">Se finalizează</string>
+    <string name="transfer_retrying" context="Possible state of a transfer. When the transfer is retrying">Se reîncearcă</string>
+    <string name="transfer_cancelled" context="Possible state of a transfer. When the transfer was cancelled">Anulat</string>
     <!--
     <string name="transfer_canceled" context="Possible state of a transfer">Canceled</string>
     -->
@@ -1479,7 +1479,7 @@
 
     <string name="paused_transfers_title" context="Title of the panel where the progress of the transfers is shown">Transferuri puse pe pauză</string>
 
-    <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">Niciun transfer încheiat</string>
+    <string name="completed_transfers_empty" context="message shown in the screen when there are not any active transfer">Niciun transfer finalizate</string>
 
     <!--
     <string name="message_transfers_completed" context="Message shown when the pending transfers are completed">Transfers finished</string>
@@ -1559,7 +1559,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Cotă de transfer insuficientă</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">The transfer quota for this IP address has been exceeded. Upgrade your account or wait %s to continue your download.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Cota de transfer pentru această adresă IP a fost depășită. Upgradează contul sau așteaptă %s pentru a continua descărcarea.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Vezi planurile noastre</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continuă fără cont</string>
 
@@ -2092,10 +2092,11 @@
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrie un mesaj către „%s”&#8230;</string>
     <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer[/A] activ[B].[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer[/A] încheiat[B].[/B]</string>
+    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Niciun[/B] [A]transfer[/A] finalizat[B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]Folder[/A] [B]gol[/B][B].[/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrie un mesaj către „%s”&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Scrie un mesaj către %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autentificare cu doi factori</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Autentificarea cu doi factori reprezintă un al doilea strat de securitate pentru contul tău.</string>
@@ -2248,10 +2249,10 @@
 
     <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Cod nevalid</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Unitatea cloud este aproape plină. Upgradează la PRO și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Unitatea cloud este aproape plină. Upgradează la Pro și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Unitatea cloud este aproape plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Unitatea cloud este aproape plină. Dacă ai nevoie de mai mult spațiu de stocare, te rugăm să contactezi asistența MEGA pentru a obține un plan personalizat.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Unitatea cloud este plină. Upgradează la PRO și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Unitatea cloud este plină. Upgradează la Pro și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Unitatea cloud este plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Unitatea cloud este plină. Dacă ai nevoie de mai mult spațiu de stocare, te rugăm să contactezi asistența MEGA pentru a obține un plan personalizat.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Vezi planurile</string>
@@ -2540,7 +2541,7 @@
 
     <string name="label_today" context="label today">Astăzi</string>
     <string name="label_yesterday" context="label yesterday">Ieri</string>
-    <string name="label_tomorrow" context="label tomorrow">Tomorrow</string>
+    <string name="label_tomorrow" context="label tomorrow">Mâine</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Niciun [/B][A]fișier partajat[/A][B].[/B]</string>
 
@@ -2785,9 +2786,9 @@
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Deși MEGA nu are acces la datele tale, administratorii organizației tale pot controla și vedea încărcările cameră din contul tău de utilizator</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ceva a mers prost</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactează administratorul contului business pentru a rezolva problema și pentru a-ți activa contul.</string>
-    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Pentru scopurile de afaceri autentice.</string>
+    <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Va crește automat, fără costuri suplimentare, pentru scopurile de afaceri autentice.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
-    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Cotă de transfer[/A] NELIMITATĂ **</string>
+    <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Cotă de transfer[/A] nelimitată **</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Când te deconectezi, fișierele din secțiunea Offline vor fi șterse de pe dispozitiv.</string>
     <string name="logout_warning_transfers" context="Warning message to alert user about logout in My Account section if has transfers in progress.">Când te deconectezi, transferurile în curs vor fi anulate.</string>
@@ -2838,24 +2839,24 @@
     <string name="download_location" context="Download location label">Locație de descărcare</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvezi întotdeauna în această locație?</string>
 
-    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
-    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+    <string name="view_in_folder_label" context="Action to show any file in its location">Vezi în folder</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">Răsfoiește fișiere</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Atașează de pe&#8230;</string>
 
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat creat în %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Selectează mesajele</string>
 
-    <string name="storage_root_label" context="Storage root label">Storage root</string>
+    <string name="storage_root_label" context="Storage root label">Rădăcina spațiului de stocare</string>
 
-    <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="failed_label" context="Label describing some action failed">Eșuat</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Transferurile tale sunt întrerupte. Upgradează contul sau așteaptă %s pentru a continua.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
-    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">Stocare peste cotă</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Obține o cotă de transfer mai mare</string>
-    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">Folderul nu există.</string>
 
-    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">Fișierul nu există în unitatea cloud.</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Stocare plină</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Datele tale sunt în pericol!</string>
@@ -2912,12 +2913,12 @@
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
 
-    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Reiei transferurile?</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">Reia transferurile</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">Anulează transferul</string>
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% din %2$s</string>
 
     <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>

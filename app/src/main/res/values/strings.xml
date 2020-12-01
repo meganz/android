@@ -598,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Cannot open selected file</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">Filesystem problem</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">File system problem</string>
     <string name="general_error" context="error message while browsing the local filesystem">Error happened when executing the action</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">Image viewer</string>
@@ -800,8 +800,8 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode lock">Passcode Lock</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
@@ -917,7 +917,7 @@
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Passcode Type</string>
     <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
     <string name="six_pin_lock" context="Passcode with 6 digits">6 digit Passcode</string>
-    <string name="AN_pin_lock" context="Alphanumeric Passcode">Alphanumeric Passcode</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric Passcode</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
@@ -1216,8 +1216,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">The history of the chat has been cleared</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Error. The history of the chat has not been cleared successfully</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Chat history has been cleared</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">An error has occured. The chat history has not been successfully cleared.</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Add participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Remove participant</string>
@@ -2850,7 +2850,7 @@
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>

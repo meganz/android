@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">التخزين</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">كود التعريف الشخصي</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">كود التعريف الشخصي</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">ضغط الفيديو يستهلك الكثير من الطاقة. سوف تتطلب منك ميغا MEGA أن تشحن جهازك بشكل مستمر إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">في حالة التمكين، ستقوم بترفيع معلومات حول مكان التقاط الصو، لذا كن حذراً عند مشاركتها.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">الصور والفيديوهات</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">لم يتم التعيين</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">كود التعريف الشخصي</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">كود التعريف الشخصي</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">دخول</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">سيتم حذف الملفات المحلية وسيتم تسجيل خروجك بعد 10 محاولات فاشلة</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">رمز غير صحيح</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">دخول</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">سيتم حذف الملفات المحلية وسيتم تسجيل خروجك بعد 10 محاولات فاشلة</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">رمز غير صحيح</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">رمز شخصي PIN خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">رمز PIN خاطئ، يرجى إعادة المحاولة. تبقى لديك  %2d محاولات</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">رمز شخصي PIN خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">رمز PIN خاطئ، يرجى إعادة المحاولة. تبقى لديك  %2d محاولات</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">رمز PIN غير متطابق</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">أدخل رمز PIN</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">أعد إدخال رمز  PIN</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">أدخل رمز PIN الجديد</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">أعد إدخال رمز PIN</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">رمز PIN غير متطابق</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">أدخل رمز PIN</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">أعد إدخال رمز  PIN</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">أدخل رمز PIN الجديد</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">أعد إدخال رمز PIN</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">سيتم حذف جميع بياناتك المحلية وسيتم تسجيل خروجك خلال %1d ثانية</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">حول</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">نوع  كود PIN</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">رقم سري مكون من أربعة أرقام</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">رقم سري مكون من ستة أرقام</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">كود PIN مكون من أرقام وأحرف</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">نوع  كود PIN</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">رقم سري مكون من أربعة أرقام</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">رقم سري مكون من ستة أرقام</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">كود PIN مكون من أرقام وأحرف</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">السجلات تم تفعيلها</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">السجلات تم إيقافها</string>
@@ -933,7 +933,7 @@
     <string name="my_account_pro2" context="Label in My Account section to show user account type">حساب PRO II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">حساب PRO III</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">حساب برو لايت</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">حساب برو لايت Pro Lite</string>
 
     <string name="backup_title" context="">انسخ مفتاح الاستعادة احتياطيا</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">كلمة المرور تفتح مفتاح الاستعادة</string>
@@ -1029,7 +1029,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">قاربت مساحتك على الامتلاء</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">الاستفادة الكاملة من حساب MEGA عن طريق الترقية إلى PRO.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">الاستفادة الكاملة من حساب ميغا MEGA عن طريق الترقية إلى برو Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">تعديل صورتك الشخصية</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">التقاط صورة</string>
@@ -2095,7 +2095,8 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]لا توجد[/B][A] عمليات نقل[/A][B] منتهية[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]مجلد[/A] [B]فارغ[/B][B][/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">اكتب رسالة إلى “%s” &#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">اكتب رسالة إلى %s &#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">المصادقة المزدوجة Two-Factor</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">المصداقة المزدوجة 2FA هي طبقة إضافية من الحماية لحسابك.</string>
@@ -2849,7 +2850,7 @@
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">الحصول على المزيد من حصة النقل</string>

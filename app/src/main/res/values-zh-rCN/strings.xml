@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">PIN 锁定</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">密码锁</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">压缩视频会消耗电池电量，当压缩的视频大于%s时，MEGA会提醒您需为设备充电。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">开启后，您的相关照片的拍摄地点信息会被上传，分享前请谨慎选择。</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">照片和视频</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未设定</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN 锁定</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">密码锁</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">输入</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">代码错误</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">输入</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">代码错误</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN码错误，请再试一次，您还有1次尝试机会。</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">密码错误，请重试。您剩下％2d的尝试</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">PIN码错误，请再试一次，您还有1次尝试机会。</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">应用锁密码错误。请重试。您还剩余%2d次尝试</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN码不正确</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">请输入您的PIN码</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">请重新输入您的PIN码</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">请输入您的新PIN码</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">请重新输入您的新PIN码</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">应用锁密码不匹配</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">请输入您的应用锁密码</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">请重新输入您的应用锁密码</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">请输入您的新应用锁密码</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">请重新输入您的应用锁密码</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的所有本地数据将被删除，您将以％1d秒后注销</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">关于</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">PIN码型态</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">4位数的密码</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">6位动态密码</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">字母或数字密码</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">应用锁密码类型</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4位数字密码</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6位数字密码</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">字母数字密码</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日志已启用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日志已关闭</string>
@@ -933,7 +933,7 @@
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II 帐户</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III 帐户</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite 账户</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Pro精简版帐户</string>
 
     <string name="backup_title" context="">备份您的恢复密钥</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">您的密码可以解锁恢复密钥</string>
@@ -1029,7 +1029,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">您将快没有空间可以使用了!</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">升级到PRO专业版，以充分发挥您MEGA账户的功用。</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">升级至Pro帐户，尊享MEGA会员服务。</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">编辑个人照片</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">拍照</string>
@@ -2095,7 +2095,8 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]没有已完成[/B][A] 传输[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]空白[/B][A] 文件夹[/A][B].[/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">写信息给 "%s"&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">双重验证</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">双重验证是您账户的第二层安全保护。</string>
@@ -2849,7 +2850,7 @@
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">获取更多流量</string>

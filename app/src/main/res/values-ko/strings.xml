@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">PIN 잠금</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">PIN 잠금</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">사진과 동영상</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">설정되지 않음</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN 잠금</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">PIN 잠금</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">입력</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">10번의 실패 이후 모든 로컬 파일이 삭제되고 로그아웃 됩니다</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">잘못된 코드</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">입력</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">10번의 실패 이후 모든 로컬 파일이 삭제되고 로그아웃 됩니다</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">잘못된 코드</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">잘못된 PIN, 다시 시도하세요. 1번의 기회가 남았습니다</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">잘못된 PIN 코드, 다시 시도하세요. %2d번 남았습니다.</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">잘못된 PIN, 다시 시도하세요. 1번의 기회가 남았습니다</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">잘못된 PIN 코드, 다시 시도하세요. %2d번 남았습니다.</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN 코드가 일치하지 않습니다</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">PIN 코드를 입력하세요</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PIN 코드를 다시 입력하세요</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">새 PIN 코드를 입력하세요</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PIN 코드를 다시 입력하세요</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">PIN 코드가 일치하지 않습니다</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">PIN 코드를 입력하세요</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">PIN 코드를 다시 입력하세요</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">새 PIN 코드를 입력하세요</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">PIN 코드를 다시 입력하세요</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">PIN 코드 유형</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">4자리 PIN</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">6자리 PIN</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">영숫자 PIN</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">PIN 코드 유형</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4자리 PIN</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6자리 PIN</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">영숫자 PIN</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">로그가 활성화 되었습니다.</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
@@ -2095,7 +2095,8 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]완료된[/B] [A]전송[/A] [B]없음.[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]빈[/B] [A]폴더[/A][B].[/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">"%s"에게 메시지 쓰는 중&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">%s에게 메시지 쓰는 중&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">2단계 인증</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">2단계 인증은 당신의 계정을 위한 보안의 두번째 층입니다.</string>
@@ -2227,8 +2228,8 @@
     <string name="success_delete_versions" context="success message when deleting all the versions of the account">파일 버전이 성공적으로 삭제됨</string>
     <string name="error_delete_versions" context="error message when deleting all the versions of the account">당신의 파일의 모든 이전 버전을 삭제하던 중 오류가 발생했습니다, 나중에 다시 시도하세요.</string>
 
-    <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">파일 버전 기록</string>
-    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">계정 전체에 대한 파일 버전 기록을 활성화하거나 비활성화합니다.\n파일 버전 기록을 해제하면 지인이 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
+    <string name="settings_enable_file_versioning_title" context="Title of the option to enable or disable file versioning on Settings section">파일 버전 관리</string>
+    <string name="settings_enable_file_versioning_subtitle" context="Subtitle of the option to enable or disable file versioning on Settings section">계정 전체에 대한 파일 버전 관리를 활성화하거나 비활성화합니다.\n파일 버전 관리를 해제하는 것이 지인이 공유된 폴더에 새로운 버전을 만드는 것을 막을 수 없습니다.</string>
     <string name="choose_chat" context="section title to select a chat to send a file">대화 선택</string>
 
     <string name="type_mail" context="Hint shown to guide user on activity add contacts">탭하고, 이름 또는 이메일을 입력하세요</string>

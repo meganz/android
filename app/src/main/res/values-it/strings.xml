@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Archivio</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">Codice d\'accesso</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Codice d\'accesso</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compressione dei video consuma molta energia; MEGA ti chiederà di caricare il tuo dispositivo se i video da convertire sono più grandi di %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Se attiva, caricherai informazioni riguardo la posizione dove le tue foto sono state scattate, quindi sii attento quando le condividi.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto e video</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Non impostato</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">Codice d\'accesso</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Codice d\'accesso</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">Entra</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">I tuoi file locali verranno eliminati e verrà effettuato il tuo log out dopo 10 tentativi falliti</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Codice incorretto</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">Entra</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">I tuoi file locali verranno eliminati e verrà effettuato il tuo log out dopo 10 tentativi falliti</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Codice incorretto</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN errato, sei pregato di riprovare. Hai 1 tentativo rimanente</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Codice PIN errato, per favore riprova. Hai %2d tentativi rimanenti</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">PIN errato, sei pregato di riprovare. Hai 1 tentativo rimanente</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Codice PIN errato, per favore riprova. Hai %2d tentativi rimanenti</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">I due PIN non combaciano</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Inserisci il tuo PIN</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-inserisci il tuo PIN</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Inserisci il tuo nuovo PIN</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-inserisci il tuo nuovo PIN</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">I due PIN non combaciano</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Inserisci il tuo PIN</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-inserisci il tuo PIN</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Inserisci il tuo nuovo PIN</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-inserisci il tuo nuovo PIN</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Tutti i tuoi dati locali verranno eliminati e verrà effettuato il tuo log out tra %1d secondi</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Info</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">Tipo del PIN</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">PIN a 4 cifre</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">PIN a 6 cifre</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alfanumerico</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipo del PIN</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">PIN a 4 cifre</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">PIN a 6 cifre</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">PIN alfanumerico</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">I log ora sono attivati</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">I log ora sono disattivati</string>
@@ -2095,7 +2095,8 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Nessun[/B] [A]trasferimento[/A] [B]completato.[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]Cartella[/A] [B]vuota[/B][B].[/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Scrivi messaggio a "%s"&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Scrivi messaggio a %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autenticazione a due fattori</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">L\'autenticazione a due fattori è un secondo livello di sicurezza per il tuo account.</string>
@@ -2849,7 +2850,7 @@
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">I trasferimenti hanno superato la banda</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Ottieni più quota di trasferimento</string>

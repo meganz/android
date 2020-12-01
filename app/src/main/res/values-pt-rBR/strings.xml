@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Armazenamento</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">Bloqueio com PIN</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Bloqueio com PIN</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">A compressão de vídeos consome muita bateria. Por isso, o MEGA solicitará que você coloque o seu dispositivo para carregar se o tamanho dos vídeos a serem comprimidos for superior a %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Ao ativar, será feito o upload das informações sobre onde as suas fotos foram tiradas; portanto, tenha cuidado ao compartilhá-los.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotos e vídeos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Não definido</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueio com PIN</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Bloqueio com PIN</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">Enviar</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Todos os seus dados locais serão deletados e você será deslogado depois de 10 tentativas incorretas</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código incorreto</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">Enviar</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Todos os seus dados locais serão deletados e você será deslogado depois de 10 tentativas incorretas</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Código incorreto</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PIN incorreto - tente novamente. Você tem 1 tentativa restante.</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">PIN incorreto, tente novamente. Você ainda tem %2d tentativas</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">PIN incorreto - tente novamente. Você tem 1 tentativa restante.</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">PIN incorreto, tente novamente. Você ainda tem %2d tentativas</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Códigos PIN não coincidem</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Digite o seu código PIN</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-digite o código PIN</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Digite o novo código PIN</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-digite o novo código PIN</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Códigos PIN não coincidem</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Digite o seu código PIN</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-digite o código PIN</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Digite o novo código PIN</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-digite o novo código PIN</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Todos os seus dados locais serão deletados e você será desconectado em %1d segundos</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Sobre</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">Tipo de código PIN</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">PIN de 4 dígitos</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">PIN de 6 dígitos</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">PIN alfanumérico</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipo de código PIN</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">PIN de 4 dígitos</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">PIN de 6 dígitos</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">PIN alfanumérico</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Os logs estão ativos</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Os logs foram desativados</string>
@@ -933,7 +933,7 @@
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Conta Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Conta Pro III</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Conta PRO Lite</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Conta Pro Lite</string>
 
     <string name="backup_title" context="">Salve a sua chave de recuperação</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">A sua senha desbloqueia a sua chave de recuperação</string>
@@ -1029,7 +1029,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">Você  \'re funcionando fora do espaço!</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Tirar o máximo partido da sua conta MEGA atualizando para PRO.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Tirar o máximo partido da sua conta MEGA fazendo o upgrade a Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Editar foto de perfil</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Tirar foto</string>
@@ -1327,7 +1327,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Fazer logout[/A] para usar o MEGA com outra conta</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Você tem certeza de que quer fazer logout desta conta?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Esta mensagem foi deletada por %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Chat history has been cleared</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">O histórico do chat foi deletado.</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">O histórico do chat foi deletado por %1$s</string>
 
     <!--
@@ -1558,8 +1558,8 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Cota de transferência insuficiente</string>
-    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Não há cota de transferência suficiente disponível para o seu IP. Faça um upgrade ou aguarde %s para que o seu download continue.</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">O download foi interrompido por exceder a cota de transferência disponível para o seu IP. Faça um upgrade ou aguarde %s para que o seu download continue.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">A cota de transferência para este endereço IP foi excedida. Faça um upgrade ou aguarde %s para que o seu download continue.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Conheça os nossos planos</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continuar sem criar uma conta</string>
 
@@ -2095,7 +2095,8 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Não há[/B][A] transferências concluídas[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Pasta[/B][A] vazia[/A][B].[/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Escrever uma mensagem para "%s"&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Escrever mensagem para %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Autenticação de dois fatores</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">A autenticação de dois fatores é uma segunda camada de segurança para a sua conta.</string>
@@ -2248,10 +2249,10 @@
 
     <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Código inválido</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">A sua Nuvem de arquivos está quase cheia. Faça o upgrade a PRO e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">A sua Nuvem de arquivos está quase cheia. Faça o upgrade a Pro e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">A sua Nuvem de arquivos está quase cheia. Faça um upgrade agora e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">A sua Nuvem de arquivos está quase cheia. Se você precisar de mais espaço, entre em contato com o suporte do MEGA para obter um plano personalizado.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">A sua Nuvem de arquivos está cheia. Faça o upgrade a PRO e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">A sua Nuvem de arquivos está cheia. Faça o upgrade a Pro e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">A sua Nuvem de arquivos está cheia. Faça um upgrade agora e obtenha até %1$s de espaço de armazenamento e %2$s de cota de transferência.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">A sua Nuvem de arquivos está cheia. Se você precisar de mais espaço, entre em contato com o suporte do MEGA para obter um plano personalizado.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Veja os planos</string>
@@ -2551,7 +2552,7 @@
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Você não pode participar desta chamada porque o número máximo de participantes foi alcançado.</string>
     <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Não é possível participar desta chamada porque o número máximo de participantes no chat de grupo foi atingido.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Você não tem permissão para ativar o vídeo, pois essa chamada alcançou o número máximo de participantes usando o vídeo.</string>
-    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">Você não tem permissão para colocar a chamada em espera.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Erro. Não foi possível abrir o arquivo.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Chamada recebida&#8230;</string>
@@ -2653,7 +2654,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Chamada em andamento</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s iniciou uma chamada em grupo. Pressione para participar.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">Pressione para voltar à chamada</string>
-    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
+    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">Você está em uma chamada</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B] se uniu ao chat de grupo.[/B]</string>
 
@@ -2673,17 +2674,17 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s silenciou esta chamada</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Silenciado</string>
     <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Chamada em espera</string>
-    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
-    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold and Answer</string>
-    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold and Join</string>
-    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End and Answer</string>
-    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End and Join</string>
+    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s colocou a chamada em espera</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Colocar em espera e atender</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Colocar em espera e participar</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">Finalizar e atender</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">Finalizar e participar</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Este arquivo já foi baixado, e agora foi copiado para o destino selecionado.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Entrar na chamada</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Para participar dessa chamada, você precisa finalizar a sua chamada atual.</string>
-    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
+    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">Para participar dessa chamada, você precisa finalizar ou colocar em espera a chamada atual.</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Digite o link do chat</string>
 
@@ -2756,9 +2757,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Não foi possível fazer o upload da mensagem de voz.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Chamada recebida</string>
-    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
-    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
-    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Chamada em grupo recebida</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Chamada de vídeo recebida</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Chamada de áudio recebida</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Carregando</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Por favor, aguarde&#8230;</string>
@@ -2779,14 +2780,14 @@
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Você não pode remover a %1$s dos seus contatos, por fazer parte da sua conta Business.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Não foi possível processar o seu último pagamento. Por favor, acesse o MEGA usando um navegador em um computador para obter mais informações.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">A sua conta business expirou</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">A sua conta Business expirou</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Não foi possível processar o seu pagamento. O seu acesso será somente leitura até que o problema seja corrigido usando um navegador em um computador.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">A sua conta [B]expirou[/B]. Somente é possível visualizar os seus dados.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Embora o MEGA não tenha acesso a seus dados, os administradores de sua organização podem controlar e visualizar os Uploads da câmera na sua conta de usuário.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Algo deu errado</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Entre em contato com o administrador de conta Business, para que ele possa solucionar o problema e reativar a sua conta.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Aumentará automaticamente, sem custo adicional, para uso corporativo legítimo.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]de armazenamento[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Cota de transferência[/A] ilimitada</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quando você fizer logout, os arquivos da seção Offline serão deletados do seu dispositivo.</string>
@@ -2823,7 +2824,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconectando</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Você voltou.</string>
-    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Poor internet connection</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">A conexão à Internet é ruim</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Gravando&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Criar um novo arquivo</string>
@@ -2838,24 +2839,24 @@
     <string name="download_location" context="Download location label">Local do download</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Salvar sempre nesta pasta?</string>
 
-    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
-    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+    <string name="view_in_folder_label" context="Action to show any file in its location">Ver na pasta</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">Navegar entre os arquivos</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Anexar de&#8230;</string>
 
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chat criado em %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Selecionar mensagens</string>
 
-    <string name="storage_root_label" context="Storage root label">Storage root</string>
+    <string name="storage_root_label" context="Storage root label">Tipo de armazenamento</string>
 
-    <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
-    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
+    <string name="failed_label" context="Label describing some action failed">Cancelado</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">As suas transferências foram interrompidas. Faça um upgrade ou aguarde %s para continuar.</string>
+    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Cota de transferência excedida</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">Cota de armazenamento excedida</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Obter mais cota de transferência</string>
-    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">A pasta não existe.</string>
 
-    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">O arquivo não existe na Nuvem.</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Armazenamento completo</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Os seus dados estão em perigo!</string>
@@ -2909,18 +2910,18 @@
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenciais de %s</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Pesquisar em GIPHY</string>
-    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
-    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Não foram encontrados [A]GIFs[/A]</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]Fim[/A] dos resultados</string>
 
-    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Continuar transferências?</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">Continuar transferências</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancelar transferência</string>
-    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Retome as transferências para prosseguir com o upload.</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% de %2$s</string>
 
     <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
-    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
-    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Você atingiu o limite de %d reações.</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Esta mensagem atingiu o limite de %d reações.</string>
 </resources>
