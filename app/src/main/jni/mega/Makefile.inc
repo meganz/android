@@ -61,7 +61,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/mega_evt_tls.cpp \
     sdk/src/mega_ccronexpr.cpp\
     sdk/src/raid.cpp \
-    sdk/src/testhooks.cpp
+    sdk/src/testhooks.cpp \
+    sdk/src/heartbeats.cpp
     
 C_SOURCES = sdk/src/mega_glob.c
 
@@ -117,7 +118,8 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/mega_evt_tls.h \
 	    sdk/include/mega/mega_evt_queue.h \
 	    sdk/include/mega/raid.h \
-		sdk/include/mega/testhooks.h
+		sdk/include/mega/testhooks.h \
+		sdk/include/mega/heartbeats.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp

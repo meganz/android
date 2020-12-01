@@ -440,10 +440,9 @@ public class Util {
 	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
 	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 	
