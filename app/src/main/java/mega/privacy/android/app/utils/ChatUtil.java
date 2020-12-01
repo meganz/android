@@ -1168,7 +1168,7 @@ public class ChatUtil {
      */
     public static String transformSecondsInString(long seconds) {
         if (seconds == DISABLED_RETENTION_TIME)
-            return "";
+            return " ";
 
         long hours = seconds % SECONDS_IN_HOUR;
         long days = seconds % SECONDS_IN_DAY;

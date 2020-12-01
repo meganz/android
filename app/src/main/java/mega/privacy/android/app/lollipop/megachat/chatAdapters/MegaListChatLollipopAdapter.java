@@ -1679,17 +1679,19 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					fullName = toCDATA(fullNameAction);
 				}
 
-				text = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+				text = String.format(context.getString(isTextEmpty(timeFormatted) ?
+						R.string.retention_history_disabled :
+						R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
 				text = TextUtil.removeFormatPlaceholder(text);
 
 				Spanned result;
 				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+					result = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
 				} else {
 					result = Html.fromHtml(text);
 				}
 
-				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
+				((ViewHolderNormalChatList) holder).textViewContent.setText(result);
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
 			else if(messageType==MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE) {

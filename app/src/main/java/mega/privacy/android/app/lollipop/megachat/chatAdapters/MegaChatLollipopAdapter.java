@@ -6114,7 +6114,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return The text of the msg
      */
     private Spanned getRetentionTimeString(String fullName, String timeFormatted) {
-        String textToShow = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+        String textToShow;
+        if (isTextEmpty(timeFormatted)) {
+            textToShow = context.getString(R.string.retention_history_disabled);
+        } else {
+            textToShow = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+        }
         return replaceFormatChatMessages(textToShow, true);
     }
 
