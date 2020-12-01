@@ -12,6 +12,7 @@ import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import android.widget.NumberPicker
 import android.widget.NumberPicker.OnValueChangeListener
 import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_manage_chat_history.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -162,31 +163,26 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      * @param seconds The time the retention time is enabled.
      */
     fun showPickers(seconds: Long) {
+        logDebug("Show the pickers")
         binding.pickerLayout.visibility = View.VISIBLE
         binding.separator.visibility = View.VISIBLE
         binding.pickerButton.setOnClickListener(this)
 
         binding.numberPicker.disableTextEditing(true)
         binding.numberPicker.wrapSelectorWheel = true
-        binding.numberPicker.minValue = MINIMUM_VALUE_NUMBER_PICKER
-
         binding.textPicker.disableTextEditing(true)
         binding.textPicker.wrapSelectorWheel = true
+
+        binding.numberPicker.minValue = MINIMUM_VALUE_NUMBER_PICKER
+
         binding.textPicker.minValue = MINIMUM_VALUE_TEXT_PICKER
         binding.textPicker.maxValue = MAXIMUM_VALUE_TEXT_PICKER
 
-        var valueInNumberPicker = MINIMUM_VALUE_NUMBER_PICKER
-
         if (seconds == DISABLED_RETENTION_TIME) {
-            binding.numberPicker.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
-            binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
-            binding.textPicker.value = MINIMUM_VALUE_TEXT_PICKER
+            updatePickersValues(MINIMUM_VALUE_TEXT_PICKER, MAXIMUM_VALUE_NUMBER_PICKER_HOURS, MINIMUM_VALUE_NUMBER_PICKER)
         } else {
             checkPickersValues(seconds)
-            valueInNumberPicker = binding.numberPicker.value
         }
-
-        fillPickerText(valueInNumberPicker)
 
         binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
         binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
@@ -198,6 +194,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      * @param value The current value of number picker.
      */
     private fun fillPickerText(value: Int) {
+        binding.textPicker.displayedValues = null
         val arrayString: Array<String> = arrayOf(
             app.baseContext.resources.getQuantityString(
                 R.plurals.retention_time_picker_hours,
@@ -223,7 +220,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         }
 
         binding.textPicker.displayedValues = arrayString
-        binding.textPicker.setWrapSelectorWheel(true);
     }
 
     /**
@@ -237,6 +233,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         binding.textPicker.value = textValue
         binding.numberPicker.maxValue = maximumValue
         binding.numberPicker.value = numberValue
+        fillPickerText(binding.numberPicker.value)
     }
 
     /**
@@ -255,13 +252,21 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         val months = seconds - numberMonths * SECONDS_IN_MONTH_31
 
         if (months == 0L) {
-            updatePickersValues(OPTION_MONTHS, MAXIMUM_VALUE_NUMBER_PICKER_MONTHS, numberMonths.toInt())
+            updatePickersValues(
+                OPTION_MONTHS,
+                MAXIMUM_VALUE_NUMBER_PICKER_MONTHS,
+                numberMonths.toInt()
+            )
             return
         }
         val numberWeeks = seconds / SECONDS_IN_WEEK
         val weeks = seconds - numberWeeks * SECONDS_IN_WEEK
         if (weeks == 0L) {
-            updatePickersValues(OPTION_WEEKS, MAXIMUM_VALUE_NUMBER_PICKER_WEEKS, numberWeeks.toInt())
+            updatePickersValues(
+                OPTION_WEEKS,
+                MAXIMUM_VALUE_NUMBER_PICKER_WEEKS,
+                numberWeeks.toInt()
+            )
             return
         }
         val numberDays = seconds / SECONDS_IN_DAY
@@ -273,7 +278,11 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         val numberHours = seconds / SECONDS_IN_HOUR
         val hours = seconds - numberHours * SECONDS_IN_HOUR
         if (hours == 0L) {
-            updatePickersValues(OPTION_HOURS, MAXIMUM_VALUE_NUMBER_PICKER_HOURS, numberHours.toInt())
+            updatePickersValues(
+                OPTION_HOURS,
+                MAXIMUM_VALUE_NUMBER_PICKER_HOURS,
+                numberHours.toInt()
+            )
         }
     }
 
@@ -293,37 +302,71 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     }
 
     /**
+     * Method that transforms the chosen option into the most correct form:
+    If the option selected is 24 hours, it becomes 1 day.
+    If the selected option is 31 days, it becomes 1 month.
+    If the selected option is 12 months, it becomes 1 year.
+     */
+    private fun updateOptionsAccordingly(){
+        if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_HOURS &&
+                binding.textPicker.value == OPTION_HOURS){
+                    updatePickersValues(OPTION_DAYS, getMaximumValueOfNumberPicker(OPTION_DAYS), MINIMUM_VALUE_NUMBER_PICKER)
+            return
+        }
+
+        if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_DAYS &&
+            binding.textPicker.value == OPTION_DAYS){
+            updatePickersValues(OPTION_MONTHS, getMaximumValueOfNumberPicker(OPTION_MONTHS), MINIMUM_VALUE_NUMBER_PICKER)
+            return
+        }
+
+        if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_MONTHS &&
+            binding.textPicker.value == OPTION_MONTHS){
+            updatePickersValues(OPTION_YEARS, getMaximumValueOfNumberPicker(OPTION_YEARS), MINIMUM_VALUE_NUMBER_PICKER)
+            return
+        }
+    }
+
+    /**
+     *
+     * Method for getting the maximum value of the picker number from a value.
+     * @param value the value
+     */
+    private fun getMaximumValueOfNumberPicker(value: Int): Int {
+        var maximumValue = 0
+        when (value) {
+            OPTION_HOURS -> {
+                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+            }
+            OPTION_DAYS -> {
+                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
+            }
+            OPTION_WEEKS -> {
+                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
+            }
+            OPTION_MONTHS -> {
+                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
+            }
+            OPTION_YEARS -> {
+                maximumValue = MINIMUM_VALUE_NUMBER_PICKER
+            }
+        }
+        return maximumValue
+    }
+
+    /**
      * Method that updates the values of the number picker according to the current value of the text picker.
      *
      * @param value the current value of the text picker
      */
     private fun updateNumberPicker(value: Int) {
-        var maximoValue = 0
+        var maximumValue = getMaximumValueOfNumberPicker(value)
 
-        when (value) {
-            OPTION_HOURS -> {
-                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
-            }
-            OPTION_DAYS -> {
-                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
-            }
-            OPTION_WEEKS -> {
-                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
-            }
-            OPTION_MONTHS -> {
-                maximoValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
-            }
-            OPTION_YEARS -> {
-                maximoValue = MINIMUM_VALUE_NUMBER_PICKER
-            }
-        }
-
-        if (binding.numberPicker.value > maximoValue) {
+        if (binding.numberPicker.value > maximumValue) {
             updateTextPicker(binding.numberPicker.value, MINIMUM_VALUE_NUMBER_PICKER)
             binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
         }
-
-        binding.numberPicker.maxValue = maximoValue
+        binding.numberPicker.maxValue = maximumValue
     }
 
     /**
@@ -338,11 +381,13 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private var onValueChangeListenerPickerNumber =
         OnValueChangeListener { numberPicker, oldValue, newValue ->
             updateTextPicker(oldValue, newValue)
+            updateOptionsAccordingly()
         }
 
     private var onValueChangeListenerPickerText =
         OnValueChangeListener { textPicker, i, i1 ->
             updateNumberPicker(textPicker.value)
+            updateOptionsAccordingly()
         }
 
     /**
@@ -365,6 +410,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.retentionTime.text = timeFormatted
             binding.retentionTime.visibility = View.VISIBLE
         }
+        binding.pickerLayout.visibility = View.GONE
+        binding.separator.visibility = View.GONE
     }
 
     override fun onClick(v: View?) {
@@ -380,7 +427,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                         DISABLED_RETENTION_TIME,
                         SetRetentionTimeListener(this)
                     )
-
                 } else {
                     createHistoryRetentionAlertDialog(this, chatId, true)
                 }
