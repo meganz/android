@@ -354,7 +354,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private MegaChatMessage messageToEdit = null;
 
     private CoordinatorLayout fragmentContainer;
-    private RelativeLayout writingContainerLayout;
+    private LinearLayout writingContainerLayout;
     private RelativeLayout writingLayout;
 
     private RelativeLayout joinChatLinkLayout;
@@ -383,7 +383,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private FrameLayout rLPickAttachButton;
     private FrameLayout rlGifButton;
 
-    private RelativeLayout returnCallOnHoldButton;
+    private LinearLayout returnCallOnHoldButton;
     private ImageView returnCallOnHoldButtonIcon;
     private TextView returnCallOnHoldButtonText;
 
@@ -444,7 +444,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean isLocationDialogShown = false;
     private boolean isJoinCallDialogShown = false;
     private RelativeLayout inputTextLayout;
-    private LinearLayout separatorOptions;
+    private View separatorOptions;
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
