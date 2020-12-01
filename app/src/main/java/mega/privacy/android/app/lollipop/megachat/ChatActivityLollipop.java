@@ -376,12 +376,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ImageButton gifButton;
 
     private EmojiKeyboard emojiKeyboard;
-    private RelativeLayout rLKeyboardTwemojiButton;
+    private FrameLayout rLKeyboardTwemojiButton;
 
-    private RelativeLayout rLMediaButton;
-    private RelativeLayout rLPickFileStorageButton;
-    private RelativeLayout rLPickAttachButton;
-    private RelativeLayout rlGifButton;
+    private FrameLayout rLMediaButton;
+    private FrameLayout rLPickFileStorageButton;
+    private FrameLayout rLPickAttachButton;
+    private FrameLayout rlGifButton;
 
     private RelativeLayout returnCallOnHoldButton;
     private ImageView returnCallOnHoldButtonIcon;
@@ -423,8 +423,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     DatabaseHandler dbH = null;
 
-    FrameLayout fragmentContainerFileStorage;
-    RelativeLayout fileStorageLayout;
+    FrameLayout fileStorageLayout;
     private ChatFileStorageFragment fileStorageF;
 
     private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
@@ -978,8 +977,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         messageJumpLayout.setOnClickListener(this);
 
-        fragmentContainerFileStorage = findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout = findViewById(R.id.relative_layout_file_storage);
+        fileStorageLayout = findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
@@ -2646,7 +2644,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         disableButton(rlGifButton, gifButton);
     }
 
-    private void disableButton(final  RelativeLayout layout, final  ImageButton button){
+    private void disableButton(final  FrameLayout layout, final  ImageButton button){
         logDebug("disableButton");
         layout.setOnClickListener(null);
         button.setOnClickListener(null);
@@ -2666,7 +2664,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         enableButton(rlGifButton, gifButton);
     }
 
-    private void enableButton(RelativeLayout layout, ImageButton button){
+    private void enableButton(FrameLayout layout, ImageButton button){
         logDebug("enableButton");
         layout.setOnClickListener(this);
         button.setOnClickListener(this);

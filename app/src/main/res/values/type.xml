@@ -151,6 +151,8 @@
     <style name="TextAppearance.Mega.Caption.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
+
+    <!-- Regular, 12sp, 0px -->
     <style name="TextAppearance.Mega.Caption.OnSecondary">
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>

@@ -269,7 +269,7 @@
                         android:layout_height="48dp"
                         android:orientation="horizontal">
 
-                        <RelativeLayout
+                        <FrameLayout
                             android:id="@+id/rl_keyboard_twemoji_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
@@ -279,13 +279,13 @@
                                 android:id="@+id/keyboard_twemoji_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
                                 android:background="@null"
                                 android:src="@drawable/ic_emojicon"
                                 app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
+                        </FrameLayout>
 
-                        <RelativeLayout
+                        <FrameLayout
                             android:id="@+id/rl_media_icon_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
@@ -295,14 +295,14 @@
                                 android:id="@+id/media_icon_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
                                 android:background="@null"
                                 android:src="@drawable/ic_media"
                                 app:tint="@color/grey_054_white_054" />
 
-                        </RelativeLayout>
+                        </FrameLayout>
 
-                        <RelativeLayout
+                        <FrameLayout
                             android:id="@+id/rl_pick_file_storage_icon_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
@@ -312,13 +312,13 @@
                                 android:id="@+id/pick_file_storage_icon_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
                                 android:background="@null"
                                 android:src="@drawable/ic_b_select_image"
                                 app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
+                        </FrameLayout>
 
-                        <RelativeLayout
+                        <FrameLayout
                             android:id="@+id/rl_attach_icon_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
@@ -328,13 +328,13 @@
                                 android:id="@+id/pick_attach_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
                                 android:background="@null"
                                 android:src="@drawable/attach_file"
                                 app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
+                        </FrameLayout>
 
-                        <RelativeLayout
+                        <FrameLayout
                             android:id="@+id/rl_gif_chat"
                             android:layout_width="56dp"
                             android:layout_height="match_parent"
@@ -344,11 +344,11 @@
                                 android:id="@+id/gif_chat"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
                                 android:background="@null"
                                 android:src="@drawable/ic_gif_toolbar"
                                 app:tint="@color/grey_054_white_054" />
-                        </RelativeLayout>
+                        </FrameLayout>
 
                     </LinearLayout>
 
@@ -359,17 +359,11 @@
                         android:animateLayoutChanges="true"
                         android:visibility="gone" />
 
-                    <RelativeLayout
-                        android:id="@+id/relative_layout_file_storage"
+                    <FrameLayout
+                        android:id="@+id/fragment_container_file_storage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true">
-
-                        <FrameLayout
-                            android:id="@+id/fragment_container_file_storage"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </RelativeLayout>
+                        android:layout_alignParentBottom="true" />
                 </LinearLayout>
             </RelativeLayout>
 
