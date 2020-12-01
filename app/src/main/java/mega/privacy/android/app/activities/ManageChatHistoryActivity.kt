@@ -168,9 +168,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         binding.separator.visibility = View.VISIBLE
         binding.pickerButton.setOnClickListener(this)
 
-        binding.numberPicker.disableTextEditing(true)
         binding.numberPicker.wrapSelectorWheel = true
-        binding.textPicker.disableTextEditing(true)
         binding.textPicker.wrapSelectorWheel = true
 
         binding.numberPicker.minValue = MINIMUM_VALUE_NUMBER_PICKER
@@ -367,15 +365,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
         }
         binding.numberPicker.maxValue = maximumValue
-    }
-
-    /**
-     * Method that updates the values of the number picker according to the current value of the text picker.
-     *
-     * @param value the current value of the text picker
-     */
-    private fun NumberPicker.disableTextEditing(disable: Boolean) {
-        descendantFocusability = if (disable) FOCUS_BLOCK_DESCENDANTS else FOCUS_BEFORE_DESCENDANTS
     }
 
     private var onValueChangeListenerPickerNumber =

@@ -130,6 +130,7 @@
                         android:layout_width="wrap_content"
                         android:layout_marginEnd="34dp"
                         android:selectionDividerHeight="1dp"
+                        android:descendantFocusability="blocksDescendants"
                         android:showDividers="none"/>
 
                     <NumberPicker
@@ -139,6 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_toEndOf="@id/number_picker"
                         android:selectionDividerHeight="1dp"
+                        android:descendantFocusability="blocksDescendants"
                         android:showDividers="none"/>
                     </RelativeLayout>
 
