@@ -65,7 +65,7 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.parentHandle = transfer.getParentHandle();
     }
 
-    public AndroidCompletedTransfer (SDTransfer transfer) {
+    public AndroidCompletedTransfer(SDTransfer transfer) {
         this.fileName = transfer.getName();
         this.type = MegaTransfer.TYPE_DOWNLOAD;
         this.state = MegaTransfer.STATE_COMPLETED;

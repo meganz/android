@@ -326,17 +326,14 @@ public class SDCardOperator {
     public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri, int tag) {
         MegaApplication app = MegaApplication.getInstance();
         try {
-            if (uri != null) {
-                initDocumentFileRoot(uri);
-            } else {
-                initDocumentFileRoot(app.getDbH().getSDCardUri());
-            }
+            initDocumentFileRoot(uri != null ? uri
+                    : app.getDbH().getSDCardUri());
 
             moveFile(targetPath, downloadedFile);
 
             //New path, after moving to target location.
             File newFile = new File(targetPath + File.separator + downloadedFile.getName());
-            if(!newFile.exists() || newFile.length() != downloadedFile.length()) {
+            if (!newFile.exists() || newFile.length() != downloadedFile.length()) {
                 logError("Error moving file to the sd card path");
             } else {
                 app.getDbH().removeSDTransfer(tag);

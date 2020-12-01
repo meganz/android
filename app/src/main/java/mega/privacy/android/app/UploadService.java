@@ -513,18 +513,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void notifyProgressNotification(int progressPercent,String message,String info,String actionString,int notificationId,String notificationChannelId,String notificationChannelName){
         Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
         switch (isOverquota) {
-            case NOT_OVERQUOTA_STATE:
-            default:
-                intent.setAction(ACTION_SHOW_TRANSFERS);
-                intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
-                break;
-
             case OVERQUOTA_STORAGE_STATE:
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
                 break;
 
             case PRE_OVERQUOTA_STORAGE_STATE:
                 intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
+                break;
+
+            case NOT_OVERQUOTA_STATE:
+            default:
+                intent.setAction(ACTION_SHOW_TRANSFERS);
+                intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
                 break;
         }
 
