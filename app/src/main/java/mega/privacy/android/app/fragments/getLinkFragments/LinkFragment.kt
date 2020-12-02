@@ -19,6 +19,8 @@ import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.LinksUtil.getKeyLink
+import mega.privacy.android.app.utils.LinksUtil.getLinkWithoutKey
 import mega.privacy.android.app.utils.MegaApiUtils.getInfoFolder
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
@@ -382,27 +384,17 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         if (node.isExported) {
             linkWithKey = node.publicLink
-
-            if (linkWithKey.contains("#!") || linkWithKey.contains("#F!")) {
-                //old file or folder link format
-                val s = linkWithKey.split("!")
-                if (s.size == 3) {
-                    linkWithoutKey = s[0] + "!" + s[1]
-                    key = s[2];
-                }
-            } else {
-                // new file or folder link format
-                val s = linkWithKey.split("#")
-                if (s.size == 2) {
-                    linkWithoutKey = s[0]
-                    key = s[1];
-                }
-            }
+            linkWithoutKey = getLinkWithoutKey(linkWithKey)
+            key = getKeyLink(linkWithKey)
 
             updateLinkText()
         }
 
         setAvailableLayouts()
+    }
+
+    fun isSendDecryptedKeySeparatelyEnabled(): Boolean {
+        return binding.decryptedKeySwitch.isChecked
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {

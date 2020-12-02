@@ -202,7 +202,7 @@ public class CreateChatListener extends ChatBaseListener {
                     //All send messages fail; Show error
                     showSnackbar(context, context.getResources().getString(R.string.content_not_send, totalCounter));
                 } else {
-                    ChatController.sendLinkToChats(context, getChatHandles(), link);
+                    ChatController.sendLinkToChats(context, getChatHandles(), link, null, null);
                 }
         }
     }

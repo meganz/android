@@ -120,4 +120,56 @@ public class LinksUtil {
     public static void resetIsClickAlreadyIntercepted() {
         LinksUtil.isClickAlreadyIntercepted = false;
     }
+
+    /**
+     * Splits the link from its decryption key and returns the link.
+     *
+     * @param linkWithKey The link with the decryption key.
+     * @return The link without the decryption key.
+     */
+    public static String getLinkWithoutKey(String linkWithKey) {
+        if (linkWithKey.contains("#!") || linkWithKey.contains("#F!")) {
+            //old file or folder link format
+            String[] s = linkWithKey.split("!");
+
+            if (s.length == 3) {
+                return s[0] + "!" + s[1];
+            }
+        } else {
+            // new file or folder link format
+            String[] s = linkWithKey.split("#");
+
+            if (s.length == 2) {
+                return s[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Splits the link from its decryption key and returns the decryption key.
+     *
+     * @param linkWithKey The link with the decryption key
+     * @return The decryption key of the link.
+     */
+    public static String getKeyLink(String linkWithKey) {
+        if (linkWithKey.contains("#!") || linkWithKey.contains("#F!")) {
+            //old file or folder link format
+            String[] s = linkWithKey.split("!");
+
+            if (s.length == 3) {
+                return s[2];
+            }
+        } else {
+            // new file or folder link format
+            String[] s = linkWithKey.split("#");
+
+            if (s.length == 2) {
+                return s[1];
+            }
+        }
+
+        return null;
+    }
 }

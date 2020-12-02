@@ -79,6 +79,8 @@ public class Constants {
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
     public static final String EXTRA_LINK = "EXTRA_LINK";
+    public static final String EXTRA_KEY = "EXTRA_KEY";
+    public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;

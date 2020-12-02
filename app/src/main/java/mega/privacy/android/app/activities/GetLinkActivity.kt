@@ -20,6 +20,8 @@ import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LinksUtil.getKeyLink
+import mega.privacy.android.app.utils.LinksUtil.getLinkWithoutKey
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -33,9 +35,12 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         const val DECRYPTION_KEY_FRAGMENT = 2
         const val PASSWORD_FRAGMENT = 3
 
-        const val COPY_LINK = 0;
+        const val COPY_LINK = 0
         const val COPY_KEY = 1
         const val COPY_PASSWORD = 2
+
+        const val SHARE = 0
+        const val SEND_TO_CHAT = 1
     }
 
     private lateinit var binding: GetLinkActivityLayoutBinding
@@ -81,7 +86,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         showFragment(visibleFragment)
     }
 
-    fun showSnackbar(snackbarType: Int, message: String, chatId: Long) {
+    fun showSnackbar(snackbarType: Int, message: String?, chatId: Long) {
         showSnackbar(snackbarType, binding.getLinkCoordinatorLayout, message, chatId)
     }
 
@@ -176,7 +181,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         val upgradeToProDialogBuilder = AlertDialog.Builder(this, R.style.ResumeTransfersWarning)
 
         upgradeToProDialogBuilder.setTitle(R.string.upgrade_pro)
-            .setMessage(R.string.link_upgrade_pro_explanation)
+            .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
             .setCancelable(false)
             .setPositiveButton(R.string.button_plans_almost_full_warning) { _, _ ->
                 navigateToUpgradeAccount()
@@ -241,12 +246,83 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         linkFragment?.updatePasswordLayouts()
     }
 
+    private fun showShareKeyOrPasswordDialog(type: Int, data: Intent?) {
+        val shareKeyDialogBuilder = AlertDialog.Builder(this, R.style.ResumeTransfersWarning)
+
+        shareKeyDialogBuilder.setMessage(
+            getString(
+                if (!isTextEmpty(linkWithPassword)) R.string.share_password_warning
+                else R.string.share_key_warning
+            ) + "\n"
+        )
+            .setCancelable(false)
+            .setPositiveButton(
+                if (!isTextEmpty(linkWithPassword)) R.string.button_share_password
+                else R.string.button_share_key
+            ) { _, _ ->
+                if (type == SHARE) {
+                    shareLink(getLinkAndKeyOrPasswordToShare())
+                } else if (type == SEND_TO_CHAT) {
+                    sendToChat(data, getLinkToShare(), true)
+                }
+            }
+            .setNegativeButton(R.string.general_dismiss) { _, _ ->
+                if (type == SHARE) {
+                    shareLink(getLinkToShare())
+                } else if (type == SEND_TO_CHAT) {
+                    sendToChat(data, getLinkToShare(), false)
+                }
+            }
+
+        shareKeyDialogBuilder.create().show()
+    }
+
+    private fun getLinkAndKeyOrPasswordToShare(): String {
+        return if (!isTextEmpty(linkWithPassword)) getString(
+            R.string.share_link_with_password,
+            linkWithPassword,
+            passwordLink
+        ) else getString(
+            R.string.share_link_with_key,
+            getLinkWithoutKey(node.publicLink),
+            getKeyLink(node.publicLink)
+        )
+    }
+
+    private fun getLinkToShare(): String {
+        return if (!isTextEmpty(linkWithPassword)) linkWithPassword!!
+        else if (linkFragment?.isSendDecryptedKeySeparatelyEnabled() == true) getLinkWithoutKey(node.publicLink)
+        else node.publicLink
+    }
+
+    private fun shouldShowShareKeyOrPasswordDialog(): Boolean {
+        return !isTextEmpty(linkWithPassword)
+                || linkFragment?.isSendDecryptedKeySeparatelyEnabled() == true
+    }
+
+    private fun sendToChat(data: Intent?, link: String, shouldAttachKeyOrPassword: Boolean) {
+        data?.putExtra(EXTRA_LINK, link)
+
+        if (shouldAttachKeyOrPassword) {
+            if (!isTextEmpty(linkWithPassword)) {
+                data?.putExtra(EXTRA_PASSWORD, passwordLink)
+            } else {
+                data?.putExtra(EXTRA_KEY, getKeyLink(node.publicLink))
+            }
+        }
+
+        ChatController(this).checkIntentToShareSomething(data)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
-            data?.putExtra(EXTRA_LINK, node.publicLink)
-            ChatController(this).checkIntentToShareSomething(data)
+            if (shouldShowShareKeyOrPasswordDialog()) {
+                showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
+            } else {
+                sendToChat(data, node.publicLink, false)
+            }
         }
     }
 
@@ -267,7 +343,11 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
                 onBackPressed()
             }
             R.id.action_share -> {
-                shareLink(node.publicLink)
+                if (shouldShowShareKeyOrPasswordDialog()) {
+                    showShareKeyOrPasswordDialog(SHARE, null)
+                } else {
+                    shareLink(node.publicLink)
+                }
             }
             R.id.action_chat -> {
                 startActivityForResult(

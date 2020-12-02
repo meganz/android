@@ -1829,6 +1829,8 @@ public class ChatController {
         long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
         long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
         String extraLink = intent.getStringExtra(EXTRA_LINK);
+        String extraKey = intent.getStringExtra(EXTRA_KEY);
+        String extraPassword = intent.getStringExtra(EXTRA_PASSWORD);
 
 
 
@@ -1886,7 +1888,7 @@ public class ChatController {
                     logDebug("Send " + userHandles.length + " contacts");
                     sendContactsToChats(chatHandles, userHandles);
                 } else if (!isTextEmpty(extraLink)) {
-                    sendLinkToChats(context, chatHandles, extraLink);
+                    sendLinkToChats(context, chatHandles, extraLink, extraKey, extraPassword);
                 } else {
                     logWarning("Error on sending to chat");
                 }
@@ -1894,7 +1896,7 @@ public class ChatController {
         }
     }
 
-    public static void sendLinkToChats(Context context, long[] chatHandles, String link) {
+    public static void sendLinkToChats(Context context, long[] chatHandles, String link, String key, String password) {
         MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (megaChatApi == null) {
             logError("MegaChatApi is null");
@@ -1903,9 +1905,25 @@ public class ChatController {
 
         for (Long chatId : chatHandles) {
             megaChatApi.sendMessage(chatId, link);
+
+            if (!isTextEmpty(key)) {
+                megaChatApi.sendMessage(chatId, key);
+            } else if (!isTextEmpty(password)) {
+                megaChatApi.sendMessage(chatId, password);
+            }
         }
 
-        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, chatHandles.length == 0
+        String message;
+
+        if (!isTextEmpty(key)) {
+            message = context.getString(R.string.link_and_key_sent);
+        } else if (!isTextEmpty(password)) {
+            message = context.getString(R.string.link_and_password_sent);
+        } else {
+            message = context.getString(R.string.link_sent);
+        }
+
+        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, message, chatHandles.length == 1
                 ? chatHandles[0]
                 : MEGACHAT_INVALID_HANDLE);
     }
