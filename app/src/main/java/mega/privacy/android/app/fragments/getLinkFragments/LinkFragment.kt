@@ -332,9 +332,11 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
 
-            binding.copyLinkButton.applyRecursively { R.style.AccentButton }
+            binding.copyLinkButton.background = ContextCompat.getDrawable(context, R.drawable.background_accent_button)
+            binding.copyLinkButton.setTextColor(ContextCompat.getColor(context, R.color.white))
         } else {
-            binding.copyLinkButton.applyRecursively { R.style.AccentBorderBackgroundBorderlessButton }
+            binding.copyLinkButton.background = ContextCompat.getDrawable(context, R.drawable.background_button_border_accent)
+            binding.copyLinkButton.setTextColor(ContextCompat.getColor(context, R.color.accentColor))
         }
 
         binding.passwordProtectionSetText.visibility = visibility
