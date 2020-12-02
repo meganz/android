@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import android.util.Pair
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +17,6 @@ import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.*
-import java.util.*
 import javax.inject.Inject
 
 class HomepageRepository @Inject constructor(
@@ -27,16 +25,11 @@ class HomepageRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    private val chatStatus = MutableLiveData<Int>()
-    private val bannerList = MutableLiveData<MegaBannerList>()
+    private val bannerList = MutableLiveData<MutableList<MegaBanner>?>()
 
-
-    fun getBannerListLiveData(): LiveData<MegaBannerList?> {
+    fun getBannerListLiveData(): MutableLiveData<MutableList<MegaBanner>?> {
         return bannerList
     }
-
-    fun getNotificationCount(): Int =
-        megaApi.numUnreadUserAlerts + (megaApi.incomingContactRequests?.size ?: 0)
 
     fun getChatStatusDrawableId(status: Int) = when (status) {
         MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online
@@ -74,25 +67,15 @@ class HomepageRepository @Inject constructor(
                 Log.i("Alex", "error:${e.errorString}")
                 if (e.errorCode == MegaError.API_OK) {
                     Log.i("Alex", "bannerlistsize:${request.megaBannerList.size()}")
-//                    for (i in 0 until request.megaBannerList.size()) {
-//                        bannerList.value[i] = request.megaBannerList[i]
-//                    }
-                    bannerList.value = request.megaBannerList
+                    bannerList.value = MegaUtilsAndroid.bannersToArray(request.megaBannerList)
                 }
             }
         })
     }
 
-//    fun recentActionsToArray(recentActionList: MegaRecentActionBucketList?): ArrayList<MegaRecentActionBucket>? {
-//        if (recentActionList == null) {
-//            return null
-//        }
-//        val result = ArrayList<MegaRecentActionBucket>(recentActionList.size())
-//        for (i in 0 until recentActionList.size()) {
-//            result.add(recentActionList[i].copy())
-//        }
-//        return result
-//    }
-
     fun isRootNodeNull() = (megaApi.rootNode == null)
+
+    fun dismissBanner(id: Int) {
+        megaApi.dismissBanner(id)
+    }
 }

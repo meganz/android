@@ -7,11 +7,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.TimeUtils
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaBannerList
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.*
 
 class HomePageViewModel @ViewModelInject constructor(
     private val repository: HomepageRepository
@@ -22,12 +18,13 @@ class HomePageViewModel @ViewModelInject constructor(
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatusDrawableId = MutableLiveData<Int>()
     private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
+    private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> = repository.getBannerListLiveData()
 
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatusDrawableId: LiveData<Int> = _chatStatusDrawableId
     val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
-    val bannerList: LiveData<MegaBannerList?> = repository.getBannerListLiveData()
+    val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
         loadAvatar()
@@ -46,9 +43,6 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     init {
-//        repository.registerDataListeners()
-//        _notificationCount.value = repository.getNotificationCount()
-
         avatarChange.observeForever(avatarChangeObserver)
         scrolling.observeForever(scrollingObserver)
         notificationCountChange.observeForever(notificationCountObserver)
@@ -61,8 +55,6 @@ class HomePageViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-
-//        repository.unregisterDataListeners()
 
         avatarChange.removeObserver(avatarChangeObserver)
         scrolling.removeObserver(scrollingObserver)
@@ -105,9 +97,17 @@ class HomePageViewModel @ViewModelInject constructor(
 
     fun updateBannersIfNeeded() {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastGetBannerTime > TimeUtils.DAY) {
+        if (currentTime - lastGetBannerTime > 1000) {
             lastGetBannerTime = currentTime
             viewModelScope.launch { repository.loadBannerList() }
+        }
+    }
+
+    fun dismissBanner(banner: MegaBanner) {
+        repository.dismissBanner(banner.id)
+        _bannerList.value?.remove(banner)
+        _bannerList.value?.let {
+            _bannerList.value = it
         }
     }
 }

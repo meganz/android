@@ -109,7 +109,7 @@ class HomepageFragment : Fragment() {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
                 categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
                 categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
-                categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment();
+                categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
                 else -> return@with
             }
 
@@ -338,6 +338,8 @@ class HomepageFragment : Fragment() {
             viewDataBinding.bannerView as BannerViewPager<MegaBanner, BannerViewHolder>
         bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
             .setScrollDuration(800)
+            .setAutoPlay(false)
+//            .setCanLoop(false)
             .setLifecycleRegistry(lifecycle)
             .setIndicatorStyle(IndicatorStyle.CIRCLE)
             .setIndicatorSliderGap(Util.dp2px(6f, displayMetrics()))
@@ -356,7 +358,7 @@ class HomepageFragment : Fragment() {
                     parent: ViewGroup,
                     itemView: View?,
                     viewType: Int
-                ): BannerViewHolder? {
+                ): BannerViewHolder {
                     return BannerViewHolder(itemView!!)
                 }
 
@@ -366,6 +368,7 @@ class HomepageFragment : Fragment() {
                     position: Int,
                     pageSize: Int
                 ) {
+                    holder?.setViewModel(viewModel)
                     holder?.bindData(data, position, pageSize)
                 }
 
@@ -376,21 +379,16 @@ class HomepageFragment : Fragment() {
             .create()
 
         viewModel.bannerList.observe(viewLifecycleOwner) {
-            if (it == null) {
-//                Log.i("Alex", "null bannerlist")
+            if (it == null || it.isEmpty()) {
+                Log.i("Alex", "null bannerlist")
                 bannerViewPager.removeAllViews()
                 bannerViewPager.visibility = View.GONE
             } else {
-                val banners = mutableListOf<MegaBanner>()
-                for (i in 0 until it.size()) {
-                    banners.add(it[i])
-                }
-//                Log.i("Alex", "banners.size:${banners.size}")
-                if (banners.size > 0) {
-                    bannerViewPager.refreshData(banners)
+                Log.i("Alex", "banners.size:${it.size}")
+                bannerViewPager.visibility = View.VISIBLE
+                    bannerViewPager.refreshData(it)
 //                    Log.i("Alex", "dismiss banner id: ${banners[0].id}")
 //                    megaApi.dismissBanner(banners[0].id)
-                }
             }
         }
     }
@@ -420,7 +418,7 @@ class HomepageFragment : Fragment() {
      * @param position the tab index
      * @return The title text or "" for invalid position param
      */
-    private fun getTabTitle(position: Int): String? {
+    private fun getTabTitle(position: Int): String {
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
             BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.section_saved_for_offline_new)
