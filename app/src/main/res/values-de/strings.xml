@@ -805,7 +805,6 @@
     <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
     -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nicht eingestellt</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">PIN ändern</string>
     <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN-Lock</string>
 
     <string name="pin_lock_enter" context="Button after the pin code input field">Eingabe</string>
@@ -2099,9 +2098,6 @@
     <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Keine laufenden[/B][A] Transfers[/A][B].[/B]</string>
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Keine abgeschlossenen[/B][A] Transfers[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Leerer[/B][A] Ordner[/A][B].[/B]</string>
-
-    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Nachricht an “%s”&#8230;</string>
-    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Nachricht an %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Zwei-Faktor-Authentifizierung</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Zwei-Faktor-Authentfizierung ist eine zusätzliche Sicherheitsvorkehrung, die den Zugang zu Ihrem Account schützt.</string>
