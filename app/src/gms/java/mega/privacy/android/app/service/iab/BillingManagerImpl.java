@@ -486,9 +486,7 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
          * @return Generic MegaSku object.
          */
         public static MegaSku convert(SkuDetails sku) {
-            MegaSku megaSku = new MegaSku();
-            megaSku.setSku(sku.getSku());
-            return megaSku;
+            return new MegaSku(sku.getSku(), sku.getPriceAmountMicros(), sku.getPriceCurrencyCode());
         }
 
         /**

@@ -381,9 +381,7 @@ public class BillingManagerImpl implements BillingManager {
          * @return Generic MegaSku object.
          */
         public static MegaSku convert(ProductInfo sku) {
-            MegaSku megaSku = new MegaSku();
-            megaSku.setSku(sku.getProductId());
-            return megaSku;
+            return new MegaSku(sku.getProductId(), sku.getMicrosPrice(), sku.getCurrency());
         }
 
         /**
