@@ -329,6 +329,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public int showRichLinkWarning = RICH_WARNING_TRUE;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
+    private Drawable upArrow;
 
     ChatController chatC;
     boolean scrollingUp = false;
@@ -789,7 +790,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         if (megaApi == null) {
@@ -911,6 +911,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         muteIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext(),
                 R.color.pro_account, R.color.white_dark_grey, R.color.white_dark_grey);
+
+        upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white)
+                .mutate();
+        upArrow.setColorFilter(getResources().getColor(R.color.grey_087_white_087),
+                PorterDuff.Mode.SRC_ATOP);
 
         updateNavigationToolbarIcon();
 
@@ -8508,7 +8513,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 int numberUnread = megaChatApi.getUnreadChats();
 
                 if(numberUnread==0){
-                    aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                    aB.setHomeAsUpIndicator(upArrow);
                 }
                 else{
 
@@ -8525,11 +8530,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
-                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                aB.setHomeAsUpIndicator(upArrow);
             }
         }
         else{
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            aB.setHomeAsUpIndicator(upArrow);
         }
     }
 

@@ -920,8 +920,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
         registerReceiver(contactUpdateReceiver, contactUpdateFilter);
-
-        ColorUtils.setStatusBarTextColor(this);
 	}
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){

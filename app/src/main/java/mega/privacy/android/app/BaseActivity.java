@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -165,6 +166,8 @@ public class BaseActivity extends AppCompatActivity {
                 showResumeTransfersWarning(this);
             }
         }
+
+        ColorUtils.setStatusBarTextColor(this);
     }
 
     @Override

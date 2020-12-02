@@ -3352,8 +3352,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             showTransfersTransferOverQuotaWarning();
         }
 
-		ColorUtils.setStatusBarTextColor(this);
-
 		logDebug("END onCreate");
 	}
 

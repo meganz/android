@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_container_chat"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:orientation="horizontal">
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/activity_chat_content_layout"
@@ -22,48 +20,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="4dp"
-                android:minHeight="?attr/actionBarSize"
-                tools:context=".lollipop.megachat.ChatActivityLollipop">
+                android:minHeight="?attr/actionBarSize">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical|left"
+                    android:gravity="center_vertical|start"
                     android:orientation="vertical">
                     <RelativeLayout
                         android:id="@+id/toolbar_elements_inside"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical|left"
-                        android:layout_gravity="center_vertical|left">
+                        android:gravity="center_vertical|start"
+                        android:layout_gravity="center_vertical|start">
 
                         <mega.privacy.android.app.components.twemoji.EmojiTextView
                             android:id="@+id/title_toolbar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="left"
-                            android:gravity="center_vertical|left"
+                            android:layout_gravity="start"
+                            android:gravity="center_vertical|start"
                             android:textAppearance="?attr/textAppearanceSubtitle1"
                             app:emojiSize="16sp"
                             android:singleLine="true"
                             android:maxLines="1"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
                         <LinearLayout
                             android:id="@+id/icons_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentTop="true"
-                            android:layout_toRightOf="@id/title_toolbar"
+                            android:layout_toEndOf="@id/title_toolbar"
                             android:orientation="horizontal"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginRight="8dp">
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp">
                             <ImageView
                                 android:id="@+id/state_icon_toolbar"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:layout_marginRight="4dp"
+                                android:layout_marginEnd="4dp"
                                 android:background="@null"
                                 android:visibility="gone" />
                             <ImageView
@@ -119,7 +116,7 @@
                             android:id="@+id/chrono_call"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginEnd="8dp"
                             android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"
                             android:visibility="gone" />
 
@@ -134,7 +131,7 @@
                                 android:id="@+id/participants_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginRight="4dp"
+                                android:layout_marginEnd="4dp"
                                 android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant" />
 
                             <ImageView

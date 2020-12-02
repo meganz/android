@@ -139,7 +139,8 @@ object ColorUtils {
         if (Util.isDarkMode(activity)) {
             decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         } else {
-            decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            decor.systemUiVisibility = 0x00002000 or 0x00000010
         }
     }
 
