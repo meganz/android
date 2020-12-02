@@ -68,6 +68,8 @@ class HomepageRepository @Inject constructor(
                 if (e.errorCode == MegaError.API_OK) {
                     Log.i("Alex", "bannerlistsize:${request.megaBannerList.size()}")
                     bannerList.value = MegaUtilsAndroid.bannersToArray(request.megaBannerList)
+                } else if (e.errorCode == MegaError.API_ENOENT) {
+                    bannerList.value = null
                 }
             }
         })

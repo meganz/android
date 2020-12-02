@@ -30,6 +30,7 @@ import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_homepage.*
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.R
@@ -342,10 +343,10 @@ class HomepageFragment : Fragment() {
 //            .setCanLoop(false)
             .setLifecycleRegistry(lifecycle)
             .setIndicatorStyle(IndicatorStyle.CIRCLE)
-            .setIndicatorSliderGap(Util.dp2px(6f, displayMetrics()))
+            .setIndicatorSliderGap(Util.dp2px(6f))
             .setIndicatorSliderRadius(
-                Util.dp2px(4f, displayMetrics()),
-                Util.dp2px(4f, displayMetrics())
+                Util.dp2px(4f),
+                Util.dp2px(4f)
             )
             .setIndicatorGravity(IndicatorGravity.CENTER)
             .setIndicatorSliderColor(
@@ -381,12 +382,14 @@ class HomepageFragment : Fragment() {
         viewModel.bannerList.observe(viewLifecycleOwner) {
             if (it == null || it.isEmpty()) {
                 Log.i("Alex", "null bannerlist")
-                bannerViewPager.removeAllViews()
                 bannerViewPager.visibility = View.GONE
+                bottomSheetBehavior.peekHeight =
+                    rootView.height - category.bottom
             } else {
                 Log.i("Alex", "banners.size:${it.size}")
                 bannerViewPager.visibility = View.VISIBLE
-                    bannerViewPager.refreshData(it)
+                bannerViewPager.refreshData(it)
+                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
 //                    Log.i("Alex", "dismiss banner id: ${banners[0].id}")
 //                    megaApi.dismissBanner(banners[0].id)
             }
@@ -438,10 +441,13 @@ class HomepageFragment : Fragment() {
      * Set the initial height of the bottom sheet. The top is just below the banner view.
      */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver?.addOnPreDrawListener {
-            bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-            true
-        }
+        rootView.viewTreeObserver?.addOnPreDrawListener (object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+                rootView.viewTreeObserver?.removeOnPreDrawListener(this)
+                return true
+            }
+        })
     }
 
     /**
@@ -503,7 +509,7 @@ class HomepageFragment : Fragment() {
      */
     private fun changeTabElevation(withElevation: Boolean) {
         tabLayout.elevation = if (withElevation) {
-            Util.dp2px(4f, resources.displayMetrics).toFloat()
+            Util.dp2px(4f).toFloat()
         } else {
             0f
         }
