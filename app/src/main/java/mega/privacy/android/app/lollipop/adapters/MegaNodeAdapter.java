@@ -872,16 +872,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
-        if (type != RUBBISH_BIN_ADAPTER) {
-            holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
+        holder.imageFavourite.setVisibility(type != RUBBISH_BIN_ADAPTER && node.isFavourite() ? View.VISIBLE : View.GONE);
 
-            if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
-                Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
-                holder.imageLabel.setImageDrawable(drawable);
-                holder.imageLabel.setVisibility(View.VISIBLE);
-            } else {
-                holder.imageLabel.setVisibility(View.GONE);
-            }
+        if (type != RUBBISH_BIN_ADAPTER && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+            Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+            holder.imageLabel.setImageDrawable(drawable);
+            holder.imageLabel.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageLabel.setVisibility(View.GONE);
         }
 
         holder.publicLinkImage.setVisibility(View.INVISIBLE);
