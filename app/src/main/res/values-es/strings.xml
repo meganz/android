@@ -1217,7 +1217,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Se ha limpiado el historial del chat</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Error. El historial del chat no se ha limpiado correctamente</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">No se ha podido limpiar el historial del chat</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Añadir participantes</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Eliminar participante</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% de %2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 </resources>

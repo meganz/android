@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">แชร์รูปภาพ</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">แชร์ลิงก์</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">ลบลิงก์</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">รับลิงก์</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">แชร์ผู้ติดต่อเพื่อแชท</string>
     <string name="context_view_shared_folders" context="open a shared folder">ดูโฟลเดอร์ที่แชร์</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">แชร์</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">จัดการการแชร์</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -598,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">ไม่สามารถเปิดไฟล์ที่เลือกได้</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">กำลังแยกไฟล์</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">ไฟล์ระบบมีปัญหา</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">มีปัญหาของระบบไฟล์</string>
     <string name="general_error" context="error message while browsing the local filesystem">มีข้อผิดพลาดเกิดขึ้นเมื่อกำลังดำเนินการ</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">ดูตัวอย่างภาพ</string>
@@ -704,7 +704,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">การอัปโหลดกล้องเสร็จสมบูรณ์</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">ฟีเจอร์</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ที่เก็บข้อมูล</string>
     <string name="settings_pin_lock" context="Settings of the Passcode">ล็อกรหัสผ่าน</string>
@@ -1216,8 +1216,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">ประวัติการสนทนาถูกเคลียร์แล้ว</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">ผิดพลาด ประวัติการสนทนาไม่ได้ถูกเคลียร์ออกอย่างถูกต้อง</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">เคลียร์ประวัติแชทแล้ว</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">เกิดข้อผิดพลาด เคลียร์ประวัติแชทไม่สำเร็จ</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">เพิ่มผู้เข้าร่วม</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">นำผู้เข้าร่วมออก</string>
@@ -2319,7 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">จัดการลิงก์แชท</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">เปิดใช้งานเข้ารหัสการหมุนคีย์</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">เปิดใช้งานเข้ารหัสการหมุนคีย์แล้ว</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนคีย์ จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">การเข้ารหัสการหมุนคีย์ถูกปิดใช้งาน เมื่อการสนทนามีผู้เข้าร่วมมากกว่า 100 คน</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">ไม่สามารถแปลงแชทเป็นส่วนตัวได้เนื่องจากมีผู้เข้าร่วมถึงจำนวนสูงสุดแล้ว</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% จาก %2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">เปิดใช้ข้อมูลพิเศษสำหรับข้อความแชทแล้ว</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">ปิดใช้ข้อมูลพิเศษสำหรับข้อความแชทแล้ว</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">คุณแสดงความรู้ถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
 </resources>

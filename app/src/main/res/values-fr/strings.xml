@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">Supprimer le lien</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Obtenir le lien</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">Envoyer un contact vers la conversation</string>
     <string name="context_view_shared_folders" context="open a shared folder">Visualiser les dossiers partagés</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Partage</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">Gérer le partage</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -704,7 +704,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Les téléversements de l\'appareil photo sont terminés</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">Fonctions</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Espace de stockage</string>
     <string name="settings_pin_lock" context="Settings of the Passcode">Code d\'accès</string>
@@ -790,7 +790,7 @@
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Conserver les noms de fichier comme sur l\'appareil</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Dossier local de l\'appareil photo</string>
-    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA pour Téléversements de l\'appareil photo</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA des Téléversements de l\'appareil photo</string>
 
     <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Dossier local secondaire</string>
     <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Dossier MEGA secondaire</string>
@@ -1217,7 +1217,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">L\'historique de la conversation a été effacé</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Erreur. L\'historique de la conversation n\'a pas été effacé correctement</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Une erreur est survenue. L\'historique de la conversation n\'a pas été effacé avec succès</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Ajouter des participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Supprimer le participant</string>
@@ -2319,7 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gérer le lien de conversation</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Activer la rotation de la clé chiffrée</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">La rotation de la clé chiffrée est activée</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotation de clé est désactivée pour les conversations de plus de 100 participants.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Il est impossible de rendre cette conversation privée, car la limite de participants a été dépassée.</string>
@@ -2850,7 +2850,7 @@
     <string name="storage_root_label" context="Storage root label">Racine de la mémoire</string>
 
     <string name="failed_label" context="Label describing some action failed">Échec</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Vos transferts sont interrompus. Surclassez votre compte ou attendez %s afin de poursuivre.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Vos transferts ont été interrompus. Surclassez votre compte ou attendez %s afin de poursuivre</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Le quota de transfert est dépassé</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Le quota de stockage a été dépassé</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Obtenir plus de quota de transfert</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% sur %2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Les renseignements spéciaux sont activés pour les messages du dialogue en ligne</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Les renseignements spéciaux sont désactivés pour les messages du dialogue en ligne</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Vous avez atteint la limite maximale de %d réactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
 </resources>

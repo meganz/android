@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">イメージ共有方法</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">共有リンク</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">リンクを削除</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">リンクを取得</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">連絡先をチャットと共有</string>
     <string name="context_view_shared_folders" context="open a shared folder">共有フォルダを見る</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">共有する</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">共有を管理</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -598,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">選択したファイルを開くことができません</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">ファイル解凍中</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">ファイルシステムの問題です。</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">ファイルシステムの問題</string>
     <string name="general_error" context="error message while browsing the local filesystem">その操作の実行中にエラーが発生しました</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">画像ビューア</string>
@@ -704,7 +704,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">カメラアップロードが完了しました</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">各種機能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ストレージ</string>
     <string name="settings_pin_lock" context="Settings of the Passcode">パスコードロック</string>
@@ -1216,8 +1216,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">チャットの履歴がクリアされました</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">エラー。チャットの履歴が正しくクリアされていません</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">チャット履歴がクリアされました</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">エラーが発生しました。チャット履歴が正常にクリアされていません。</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">参加者を追加</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">参加者を削除</string>
@@ -2319,7 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">チャットリンクの管理</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">暗号化キーローテーションを有効にする</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">暗号化キーローテーションが有効になっています</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">キーローテーションは、100人を超える参加者との会話では無効になっています。</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">参加者の制限を超えたため、このチャットを非公開に変えられません。</string>
@@ -2850,7 +2850,7 @@
     <string name="storage_root_label" context="Storage root label">ストレージルート</string>
 
     <string name="failed_label" context="Label describing some action failed">失敗しました</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">転送が中断されています。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">あなたの転送が中断されました。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">容量を超えた転送</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">容量を超えたストレージ</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">転送容量を増やす</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% / %2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">チャットメッセージの特別情報を有効にしました</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">チャットメッセージの特別情報を無効にしました</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">反応の上限(%d)に達しました。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">このメッセージは、反応の上限（%d）に達しました。</string>
 </resources>
