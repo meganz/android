@@ -1015,8 +1015,9 @@ public class ChatUtil {
      * @param context    Context of Activity.
      * @param idChat     The chat ID.
      * @param isDisabled True, if the Retention Time is disabled. False, otherwise.
+     * @param option     If there was an option selected.
      */
-    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled) {
+    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled, int option) {
         if (idChat == MEGACHAT_INVALID_HANDLE)
             return;
 
@@ -1042,10 +1043,18 @@ public class ChatUtil {
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
+        int optionSelected;
 
-        int optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
+        if(option == INVALID_VALUE){
+            optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
+        }else{
+            optionSelected = option;
+        }
+
         itemClicked.set(optionSelected);
-
+        if (context instanceof ManageChatHistoryActivity) {
+            ((ManageChatHistoryActivity) context).setRetentionTimeSelected(optionSelected);
+        }
         dialogBuilder.setSingleChoiceItems(itemsAdapter, optionSelected, (dialog, item) -> {
             ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
                     context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
@@ -1053,8 +1062,12 @@ public class ChatUtil {
                             R.string.general_ok));
 
             itemClicked.set(item);
-            boolean isEnabled = isDisabled ? (item != 0) : true;
-            updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE), isEnabled);
+            if (context instanceof ManageChatHistoryActivity) {
+                ((ManageChatHistoryActivity) context).setRetentionTimeSelected(item);
+            }
+
+            updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE),
+                    checkIfPositiveButtonShouldBeShown(idChat, item));
         });
 
         dialogBuilder.setPositiveButton(context.getString(itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
@@ -1067,13 +1080,35 @@ public class ChatUtil {
                     } else {
                         MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat, getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
                     }
+                    if (context instanceof ManageChatHistoryActivity) {
+                        ((ManageChatHistoryActivity) context).setRTDialogShown(false);
+                    }
                     dialog.dismiss();
                 });
-        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) -> dialog.dismiss());
-
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) ->{
+            if (context instanceof ManageChatHistoryActivity) {
+                ((ManageChatHistoryActivity) context).setRTDialogShown(false);
+            }
+            dialog.dismiss();
+                });
         historyRetentionDialog = dialogBuilder.create();
         historyRetentionDialog.show();
-        updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE), !isDisabled);
+        updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE),
+                checkIfPositiveButtonShouldBeShown(idChat, itemClicked.get()));
+        if(context instanceof ManageChatHistoryActivity){
+            ((ManageChatHistoryActivity) context).setRTDialogShown(true);
+        }
+    }
+
+    /**
+     * Method for checking whether the positive button should be enabled or not.
+     *
+     * @param idChat        The chat ID.
+     * @param itemClicked   The option selected.
+     * @return              True, if it must be enabled. False, if not.
+     */
+    private static boolean checkIfPositiveButtonShouldBeShown(long idChat, int itemClicked) {
+        return getOptionSelectedFromRetentionTime(idChat) != RETENTION_TIME_DIALOG_OPTION_DISABLED || itemClicked != RETENTION_TIME_DIALOG_OPTION_DISABLED;
     }
 
     /**

@@ -6202,12 +6202,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         for (AndroidMegaChatMessage message : messages) {
             if (message != null && message.getMessage() != null && message.getMessage().getMsgId() == msg.getMsgId()) {
                 int position = messages.indexOf(message);
-                messages.clear();
                 if (position < messages.size() - 1) {
+                    messages.clear();
                     List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
                     for (int i = position + 1; i < messagesCopy.size(); i++) {
                         messages.add(messagesCopy.get(i));
                     }
+                }else{
+                    messages.clear();
                 }
                 updateMessages();
                 break;
