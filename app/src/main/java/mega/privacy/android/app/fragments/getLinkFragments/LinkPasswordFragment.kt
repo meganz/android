@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.getLinkFragments
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -26,6 +27,19 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
 
     private var isPasswordValid: Boolean = false
 
+    private lateinit var veryWeakShape: Drawable
+    private lateinit var weakShape: Drawable
+    private lateinit var mediumShape: Drawable
+    private lateinit var goodShape: Drawable
+    private lateinit var strongShape: Drawable
+    private lateinit var emptyShape: Drawable
+
+    private var veryWeakColor = 0
+    private var weakColor = 0
+    private var mediumColor = 0
+    private var goodColor = 0
+    private var strongColor = 0
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,9 +50,20 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(binding.passwordText) {
-            background.clearColorFilter()
+        veryWeakShape = ContextCompat.getDrawable(context, R.drawable.passwd_very_weak)!!
+        weakShape = ContextCompat.getDrawable(context, R.drawable.passwd_weak)!!
+        mediumShape = ContextCompat.getDrawable(context, R.drawable.passwd_medium)!!
+        goodShape = ContextCompat.getDrawable(context, R.drawable.passwd_good)!!
+        strongShape = ContextCompat.getDrawable(context, R.drawable.passwd_strong)!!
+        emptyShape = ContextCompat.getDrawable(context, R.drawable.shape_password)!!
 
+        veryWeakColor = ContextCompat.getColor(context, R.color.login_warning)
+        weakColor = ContextCompat.getColor(context, R.color.pass_weak)
+        mediumColor = ContextCompat.getColor(context, R.color.green_unlocked_rewards)
+        goodColor = ContextCompat.getColor(context, R.color.pass_good)
+        strongColor = ContextCompat.getColor(context, R.color.blue_unlocked_rewards)
+
+        with(binding.passwordText) {
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     charSequence: CharSequence,
@@ -60,7 +85,9 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 }
 
                 override fun afterTextChanged(editable: Editable) {
-                    quitError(this@with)
+                    if (editable.toString().isEmpty()) {
+                        quitError(this@with)
+                    }
                 }
             })
 
@@ -73,8 +100,6 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         }
 
         with(binding.confirmPasswordText) {
-            background.clearColorFilter()
-
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     charSequence: CharSequence,
@@ -121,96 +146,79 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
     }
 
     private fun checkPasswordStrength(s: String) {
-        val passwordStrength: Int = megaApi.getPasswordStrength(s)
-        val veryWeak = ContextCompat.getDrawable(context, R.drawable.passwd_very_weak)
-        val weak = ContextCompat.getDrawable(context, R.drawable.passwd_weak)
-        val medium = ContextCompat.getDrawable(context, R.drawable.passwd_medium)
-        val good = ContextCompat.getDrawable(context, R.drawable.passwd_good)
-        val strong = ContextCompat.getDrawable(context, R.drawable.passwd_strong)
-        val shape = ContextCompat.getDrawable(context, R.drawable.shape_password)
+        binding.passwordLayout.isErrorEnabled = false
 
-        when (passwordStrength) {
+        when (megaApi.getPasswordStrength(s)) {
             MegaApiJava.PASSWORD_STRENGTH_VERYWEAK -> {
-                binding.shapePasswordFirst.background = veryWeak
-                binding.shapePasswordSecond.background = shape
-                binding.shapePasswordThird.background = shape
-                binding.shapePasswordFourth.background = shape
-                binding.shapePasswordFifth.background = shape
+                binding.shapePasswordFirst.background = veryWeakShape
+                binding.shapePasswordSecond.background = emptyShape
+                binding.shapePasswordThird.background = emptyShape
+                binding.shapePasswordFourth.background = emptyShape
+                binding.shapePasswordFifth.background = emptyShape
                 binding.passwordType.text = getString(R.string.pass_very_weak)
-                binding.passwordType.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.login_warning
-                    )
-                )
+                binding.passwordType.setTextColor(veryWeakColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_weak)
                 isPasswordValid = false
+                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceVeryWeak)
+                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceVeryWeak)
             }
             MegaApiJava.PASSWORD_STRENGTH_WEAK -> {
-                binding.shapePasswordFirst.background = weak
-                binding.shapePasswordSecond.background = weak
-                binding.shapePasswordThird.background = shape
-                binding.shapePasswordFourth.background = shape
-                binding.shapePasswordFifth.background = shape
+                binding.shapePasswordFirst.background = weakShape
+                binding.shapePasswordSecond.background = weakShape
+                binding.shapePasswordThird.background = emptyShape
+                binding.shapePasswordFourth.background = emptyShape
+                binding.shapePasswordFifth.background = emptyShape
                 binding.passwordType.text = getString(R.string.pass_weak)
-                binding.passwordType.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.pass_weak
-                    )
-                )
+                binding.passwordType.setTextColor(weakColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_weak)
                 isPasswordValid = true
+                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceWeak)
+                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceWeak)
             }
             MegaApiJava.PASSWORD_STRENGTH_MEDIUM -> {
-                binding.shapePasswordFirst.background = medium
-                binding.shapePasswordSecond.background = medium
-                binding.shapePasswordThird.background = medium
-                binding.shapePasswordFourth.background = shape
-                binding.shapePasswordFifth.background = shape
+                binding.shapePasswordFirst.background = mediumShape
+                binding.shapePasswordSecond.background = mediumShape
+                binding.shapePasswordThird.background = mediumShape
+                binding.shapePasswordFourth.background = emptyShape
+                binding.shapePasswordFifth.background = emptyShape
                 binding.passwordType.text = getString(R.string.pass_medium)
-                binding.passwordType.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.green_unlocked_rewards
-                    )
-                )
+                binding.passwordType.setTextColor(mediumColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_medium)
                 isPasswordValid = true
+                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceMedium)
+                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceMedium)
             }
             MegaApiJava.PASSWORD_STRENGTH_GOOD -> {
-                binding.shapePasswordFirst.background = good
-                binding.shapePasswordSecond.background = good
-                binding.shapePasswordThird.background = good
-                binding.shapePasswordFourth.background = good
-                binding.shapePasswordFifth.background = shape
+                binding.shapePasswordFirst.background = goodShape
+                binding.shapePasswordSecond.background = goodShape
+                binding.shapePasswordThird.background = goodShape
+                binding.shapePasswordFourth.background = goodShape
+                binding.shapePasswordFifth.background = emptyShape
                 binding.passwordType.text = getString(R.string.pass_good)
-                binding.passwordType.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.pass_good
-                    )
-                )
+                binding.passwordType.setTextColor(goodColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_good)
                 isPasswordValid = true
+                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceGood)
+                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceGood)
             }
             else -> {
-                binding.shapePasswordFirst.background = strong
-                binding.shapePasswordSecond.background = strong
-                binding.shapePasswordThird.background = strong
-                binding.shapePasswordFourth.background = strong
-                binding.shapePasswordFifth.background = strong
+                binding.shapePasswordFirst.background = strongShape
+                binding.shapePasswordSecond.background = strongShape
+                binding.shapePasswordThird.background = strongShape
+                binding.shapePasswordFourth.background = strongShape
+                binding.shapePasswordFifth.background = strongShape
                 binding.passwordType.text = getString(R.string.pass_strong)
-                binding.passwordType.setTextColor(
-                    ContextCompat.getColor(
-                        context,
-                        R.color.blue_unlocked_rewards
-                    )
-                )
+                binding.passwordType.setTextColor(strongColor)
                 binding.passwordAdviceText.text = getString(R.string.passwd_strong)
                 isPasswordValid = true
+                binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceStrong)
+                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceStrong)
             }
         }
+
+        binding.passwordErrorIcon.visibility = GONE
+        binding.passwordLayout.error = " "
+        binding.passwordLayout.isErrorEnabled = true
     }
 
     private fun quitError(editText: AppCompatEditText) {
@@ -253,14 +261,21 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
 
         when (editText.id) {
             R.id.password_text -> {
+                binding.passwordLayout.isErrorEnabled = false
                 binding.passwordLayout.error = error
                 binding.passwordLayout.setHintTextAppearance(R.style.InputTextAppearanceError)
+                binding.passwordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError)
                 binding.passwordErrorIcon.visibility = VISIBLE
+                binding.passwordLayout.isErrorEnabled = true
             }
             R.id.confirm_password_text -> {
+                binding.confirmPasswordLayout.isErrorEnabled = false
                 binding.confirmPasswordLayout.error = error
                 binding.confirmPasswordLayout.setHintTextAppearance(R.style.InputTextAppearanceError)
+                binding.confirmPasswordLayout.setErrorTextAppearance(R.style.InputTextAppearanceError)
+                binding.confirmPasswordText.requestFocus()
                 binding.confirmPasswordErrorIcon.visibility = VISIBLE
+                binding.confirmPasswordLayout.isErrorEnabled = true
             }
         }
     }

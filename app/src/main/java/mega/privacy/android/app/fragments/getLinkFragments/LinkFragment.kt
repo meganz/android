@@ -118,7 +118,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         updateLink()
 
         if (!node.isExported) {
-            binding.linkText.text = getString(R.string.link_request_status)
             nC.exportLink(node)
         } else {
             updateLinkText()
@@ -150,7 +149,8 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         val linkWithPassword = getLinkInterface.getLinkWithPassword();
 
         binding.linkText.text =
-            if (binding.decryptedKeySwitch.isChecked) linkWithoutKey
+            if (!getLinkInterface.getNode().isExported) getString(R.string.link_request_status)
+            else if (binding.decryptedKeySwitch.isChecked) linkWithoutKey
             else if (!isTextEmpty(linkWithPassword)) linkWithPassword
             else linkWithKey
     }
