@@ -1679,9 +1679,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					fullName = toCDATA(fullNameAction);
 				}
 
-				text = String.format(context.getString(isTextEmpty(timeFormatted) ?
-						R.string.retention_history_disabled :
-						R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+				if(isTextEmpty(timeFormatted)){
+					text = String.format(context.getString(R.string.retention_history_disabled), toCDATA(fullName));
+				}else{
+					text = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
+				}
 				text = TextUtil.removeFormatPlaceholder(text);
 
 				Spanned result;

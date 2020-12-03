@@ -6116,7 +6116,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
     private Spanned getRetentionTimeString(String fullName, String timeFormatted) {
         String textToShow;
         if (isTextEmpty(timeFormatted)) {
-            textToShow = context.getString(R.string.retention_history_disabled);
+            textToShow = String.format(context.getString(R.string.retention_history_disabled), toCDATA(fullName));
         } else {
             textToShow = String.format(context.getString(R.string.retention_history_changed_by), toCDATA(fullName), timeFormatted);
         }
