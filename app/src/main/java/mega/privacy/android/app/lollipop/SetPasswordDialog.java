@@ -189,7 +189,7 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
             fourthShape.setBackground(shape);
             fifthShape.setBackground(shape);
             passwordType.setText(mContext.getString(R.string.pass_weak));
-            passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.password_weak));
+            passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.yellow_600_yellow_300));
             passwordAdvice.setText(mContext.getString(R.string.passwd_weak));
             isPasswordValid = true;
         } else if (passwordStrength == MegaApiJava.PASSWORD_STRENGTH_MEDIUM) {
@@ -209,7 +209,7 @@ public class SetPasswordDialog extends AlertDialog implements View.OnClickListen
             fourthShape.setBackground(good);
             fifthShape.setBackground(shape);
             passwordType.setText(mContext.getString(R.string.pass_good));
-            passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.password_good));
+            passwordType.setTextColor(ContextCompat.getColor(mContext, R.color.lime_green_500_200));
             passwordAdvice.setText(mContext.getString(R.string.passwd_good));
             isPasswordValid = true;
         } else {

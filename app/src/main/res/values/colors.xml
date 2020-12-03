@@ -244,6 +244,14 @@
     <color name="black">#000000</color>
     <color name="black_87_opacity">#DE000000</color>
     <color name="dark_grey">#121212</color>
+
+    <color name="grey_010">#FAFAFA</color>
+    <color name="grey_300">#9E9E9E</color>
+    <color name="grey_500">#757575</color>
+    <color name="grey_600">#6C6C6C</color>
+    <color name="grey_700">#4F4F4F</color>
+    <color name="grey_800">#2E2E2E</color>
+
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
@@ -266,6 +274,25 @@
 
     <color name="red_600_alpha_038">#60F30C14</color>
     <color name="red_300_alpha_038">#60F46762</color>
+
+    <color name="yellow_300">#FFEF67</color>
+    <color name="yellow_600">#FFD300</color>
+
+    <color name="orange_300">#FFB640</color>
+    <color name="orange_400">#FFA500</color>
+
+    <color name="green_400">#56C13E</color>
+    <color name="green_500">#31B500</color>
+
+    <color name="salmon_300">#F37476</color>
+    <color name="salmon_700">#E42930</color>
+
+    <color name="lime_green_200">#A9F2A5</color>
+    <color name="lime_green_300">#7FEC7E</color>
+    <color name="lime_green_500">#13E03C</color>
+
+    <color name="dark_blue_200">#85D2ED</color>
+    <color name="dark_blue_500">#2BA6DE</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
@@ -310,37 +337,45 @@
 
     <color name="white_black">@color/white</color>
 
-    <color name="grey_800">#2E2E2E</color>
-    <color name="grey_010">#FAFAFA</color>
-
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
 
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
-    <color name="password_weak">#FFD300</color>
-    <color name="password_medium">#31B500</color>
-    <color name="password_good">#13E03C</color>
-    <color name="password_strong">#2BA6DE</color>
+    <!-- Weak -->
+    <color name="yellow_600_yellow_300">@color/yellow_600</color>
+    <!-- Medium -->
+    <color name="green_500_green_400">@color/green_500</color>
+    <!-- Good -->
+    <color name="lime_green_500_200">@color/lime_green_500</color>
+    <!-- Strong -->
+    <color name="dark_blue_500_200">@color/dark_blue_500</color>
 
     <!-- Colors for empty content hint text. Must be non-alpha colors, for
       <font color=""> doesn't support alpha -->
-    <color name="empty_hint_text_normal">#7A7A7A</color>
+    <color name="grey_500_grey_600">@color/grey_500</color>
 
     <!-- app drawer related related colors -->
     <color name="drawer_add_phone_number_background">#F9F9F9</color>
-    <color name="drawer_add_phone_number_button_stroke">@color/teal_300</color>
+    <color name="teal_300_grey_087">@color/teal_300</color>
 
     <!-- choose & upgrade related colors -->
     <color name="free_account">#2BB200</color>
-    <color name="lite_account">#FFA500</color>
     <color name="pro_account">#F0373A</color>
 
     <color name="homepage_background">#EEF2F1</color>
 
     <color name="new_multiselect_color">#1A0ABFA5</color>
 
+    <color name="lite_account">#FFA500</color>
+
     <!-- chat status color -->
-    <color name="status_offline">#666666</color>
-    <color name="status_busy">#eb4444</color>
+    <!-- Offline -->
+    <color name="grey_700_grey_300">@color/grey_700</color>
+    <!-- Busy -->
+    <color name="salmon_700_salmon_300">@color/salmon_700</color>
+    <!-- Away -->
+    <color name="orange_400_orange_300">@color/orange_400</color>
+    <!-- Online -->
+    <color name="lime_green_500_300">@color/lime_green_500</color>
 </resources>

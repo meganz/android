@@ -33,14 +33,14 @@
     <color name="white_dark_grey">@color/dark_grey</color>
 
     <!-- password strength -->
-    <color name="password_weak">#F5F595</color>
-    <color name="password_medium">#4EB64E</color>
-    <color name="password_good">#9FF4A1</color>
-    <color name="password_strong">#5BB5DE</color>
+    <color name="yellow_600_yellow_300">@color/yellow_300</color>
+    <color name="green_500_green_400">@color/green_400</color>
+    <color name="lime_green_500_200">@color/lime_green_200</color>
+    <color name="dark_blue_500_200">@color/dark_blue_200</color>
 
     <!-- Colors for empty content hint text. Use non-alpha colors, for
      <font color=""> doesn't support alpha -->
-    <color name="empty_hint_text_normal">#A0A0A0</color>
+    <color name="grey_500_grey_600">@color/grey_600</color>
 
     <!-- Turn on camera uploads -->
     <color name="teal_300_dark_grey">@color/dark_grey</color>
@@ -56,11 +56,16 @@
     <color name="new_multiselect_color">@android:color/transparent</color>
 
     <color name="drawer_add_phone_number_background">@color/white_alpha_087</color>
-    <color name="drawer_add_phone_number_button_stroke">@color/grey_alpha_087</color>
+    <color name="teal_300_grey_087">@color/grey_alpha_087</color>
 
     <!-- choose & upgrade related colors -->
     <color name="free_account">#8CD670</color>
     <color name="pro_account">@color/red_300</color>
 
     <color name="homepage_background">@color/dark_grey</color>
+
+    <color name="grey_700_grey_300">@color/grey_300</color>
+    <color name="salmon_700_salmon_300">@color/salmon_300</color>
+    <color name="orange_400_orange_300">@color/orange_300</color>
+    <color name="lime_green_500_300">@color/lime_green_300</color>
 </resources>

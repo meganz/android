@@ -65,7 +65,6 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -1084,7 +1083,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
@@ -1110,7 +1109,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
@@ -1383,7 +1382,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
@@ -1409,7 +1408,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {

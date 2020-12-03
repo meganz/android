@@ -7,5 +7,5 @@
         android:color="@color/white"
         />
     <solid
-        android:color="@color/lite_account"/>
+        android:color="@color/orange_400_orange_300"/>
 </shape>

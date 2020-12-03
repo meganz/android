@@ -175,7 +175,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			}
 		} else if (transferType == TYPE_UPLOAD) {
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
-			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.password_strong));
+			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.dark_blue_500_200));
 			holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 			holder.currentPath = transfer.getPath();
 

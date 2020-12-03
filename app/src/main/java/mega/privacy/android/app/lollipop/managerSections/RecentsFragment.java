@@ -159,7 +159,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                     + "\'>");
             textToShow = textToShow.replace("[/A]","</font>");
             textToShow = textToShow.replace("[B]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
                     + "\'>");
             textToShow = textToShow.replace("[/B]","</font>");
         } catch (Exception e) {

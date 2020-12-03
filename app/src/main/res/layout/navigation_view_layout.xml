@@ -77,7 +77,7 @@
                 android:layout_marginTop="7dp"
                 android:text="@string/business_label"
                 android:textAllCaps="true"
-                android:textColor="@color/password_strong"
+                android:textColor="@color/dark_blue_500_200"
                 android:textSize="12sp" />
 
         </LinearLayout>

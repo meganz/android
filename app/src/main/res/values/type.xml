@@ -183,19 +183,19 @@
     </style>
 
     <style name="TextAppearance.InputHint.Weak">
-        <item name="android:textColor">@color/password_weak</item>
+        <item name="android:textColor">@color/yellow_600_yellow_300</item>
     </style>
 
     <style name="TextAppearance.InputHint.Medium">
-        <item name="android:textColor">@color/password_medium</item>
+        <item name="android:textColor">@color/green_500_green_400</item>
     </style>
 
     <style name="TextAppearance.InputHint.Good">
-        <item name="android:textColor">@color/password_good</item>
+        <item name="android:textColor">@color/lime_green_500_200</item>
     </style>
 
     <style name="TextAppearance.InputHint.Strong">
-        <item name="android:textColor">@color/password_strong</item>
+        <item name="android:textColor">@color/dark_blue_500_200</item>
     </style>
 
     <!-- Tab Layout -->

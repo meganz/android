@@ -70,7 +70,7 @@
                                 android:layout_below="@+id/image_lite"
                                 android:text="@string/lite_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/lite_account"
+                                android:textColor="@color/orange_400_orange_300"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -628,7 +628,7 @@
                                 android:layout_below="@+id/image_business"
                                 android:text="@string/business_label"
                                 android:textAllCaps="true"
-                                android:textColor="@color/password_strong"
+                                android:textColor="@color/dark_blue_500_200"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
