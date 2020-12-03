@@ -136,7 +136,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
 
         binding.buttonConfirmPassword.setOnClickListener { confirmClick() }
         binding.buttonConfirmPassword.text = getString(
-            if (isTextEmpty(getLinkInterface.getPasswordLink())) R.string.button_set
+            if (isTextEmpty(getLinkInterface.getLinkPassword())) R.string.button_set
             else R.string.action_reset
         )
 
@@ -145,6 +145,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         super.onViewCreated(view, savedInstanceState)
     }
 
+    /**
+     * Checks if the password is enough strong to allow set it and updates the UI in consequence.
+     *
+     * @param s Text containing the typed password.
+     */
     private fun checkPasswordStrength(s: String) {
         binding.passwordLayout.isErrorEnabled = false
 
@@ -221,6 +226,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         binding.passwordLayout.isErrorEnabled = true
     }
 
+    /**
+     * Removes the error from the view received as param.
+     *
+     * @param editText View from which the error has to be removed.
+     */
     private fun quitError(editText: AppCompatEditText) {
         when (editText.id) {
             R.id.password_text -> {
@@ -236,6 +246,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         }
     }
 
+    /**
+     * Checks if all the fields are right to allow set or not the password.
+     *
+     * @return True if the fields are right, false otherwise.
+     */
     private fun validateForm(): Boolean {
         val passwordError = getPasswordError()
         val passwordConfirmError = getPasswordConfirmError()
@@ -254,6 +269,13 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         return true
     }
 
+    /**
+     * Sets an error in a view received by param.
+     *
+     * @param editText The view to set the error.
+     * @param error    The error to set.
+     *
+     */
     private fun setError(editText: AppCompatEditText, error: String?) {
         if (isTextEmpty(error)) {
             return
@@ -280,6 +302,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         }
     }
 
+    /**
+     * Gets the error of the first password field if it is wrong.
+     *
+     * @return The error ir the field is wrong, null otherwise.
+     */
     private fun getPasswordError(): String? {
         val value: String = binding.passwordText.text.toString()
 
@@ -293,6 +320,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         return null
     }
 
+    /**
+     * Gets the error of the confirm password field if it is wrong.
+     *
+     * @return The error if the field is wrong, null otherwise.
+     */
     private fun getPasswordConfirmError(): String? {
         val password: String = binding.passwordText.text.toString()
         val confirm: String = binding.confirmPasswordText.text.toString()
@@ -306,10 +338,13 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         return null
     }
 
+    /**
+     * Manages the click on confirm button by validating the fields.
+     */
     private fun confirmClick() {
         if (validateForm()) {
             val password = binding.passwordText.text.toString();
-            getLinkInterface.setPasswordLink(password)
+            getLinkInterface.setLinkPassword(password)
 
             megaApi.encryptLinkWithPassword(
                 getLinkInterface.getNode().publicLink,
@@ -319,11 +354,17 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         }
     }
 
+    /**
+     * Manages the click on cancel button by resetting the screen.
+     */
     private fun cancelClick() {
         resetView()
         activity?.onBackPressed()
     }
 
+    /**
+     * Resets the view to the initial state.
+     */
     fun resetView() {
         binding.passwordText.text = null
         binding.confirmPasswordText.text = null

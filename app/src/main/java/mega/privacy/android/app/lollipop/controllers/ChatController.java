@@ -1865,7 +1865,7 @@ public class ChatController {
                     listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS);
                     createChats = true;
                 } else if (!isTextEmpty(extraLink)) {
-                    listener = new CreateChatListener(chats, users, extraLink, context, CreateChatListener.SEND_LINK);
+                    listener = new CreateChatListener(chats, users, extraLink, extraKey, extraPassword, context, CreateChatListener.SEND_LINK);
                 } else {
                     logWarning("Error on sending to chat");
                 }
@@ -1896,6 +1896,24 @@ public class ChatController {
         }
     }
 
+    /**
+     * Shares a link to chats. The link can be received along with its decryption key or with it.
+     * There are several possibilities to share a link:
+     * - Link along with decryption key:
+     *      * Without password protection. Here key and password params should be null.
+     *      * With password protection. Here key param should be null and password param:
+     *              + Can contain the password protection.
+     *              + Be null if only the protected link is shared.
+     * - Link without decryption key. Here password param should be always null and key param:
+     *      * Can contain the decryption key.
+     *      * Be null if only the link is shared.
+     *
+     * @param context      Current context.
+     * @param chatHandles List of chat identifiers to which the link has to be shared.
+     * @param link        Link to share.
+     * @param key         Decryption key of the link to share. It can be null.
+     * @param password    Password protection of the link to share. It can be null.
+     */
     public static void sendLinkToChats(Context context, long[] chatHandles, String link, String key, String password) {
         MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         if (megaChatApi == null) {

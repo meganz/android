@@ -46,6 +46,8 @@ public class CreateChatListener extends ChatBaseListener {
     private int totalCounter;
     private long idChat;
     private String link;
+    private String key;
+    private String password;
 
     public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long fileHandle, Context context, int action) {
         super(context);
@@ -86,7 +88,7 @@ public class CreateChatListener extends ChatBaseListener {
         this.idChat = MEGACHAT_INVALID_HANDLE;
     }
 
-    public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, String link, Context context, int action) {
+    public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, String link, String key, String password, Context context, int action) {
         super(context);
         this.counter = usersNoChat.size();
 
@@ -99,6 +101,8 @@ public class CreateChatListener extends ChatBaseListener {
         this.chats = chats;
         this.usersNoChat = usersNoChat;
         this.link = link;
+        this.key = key;
+        this.password = password;
         this.action = action;
         this.idChat = MEGACHAT_INVALID_HANDLE;
     }
@@ -202,7 +206,7 @@ public class CreateChatListener extends ChatBaseListener {
                     //All send messages fail; Show error
                     showSnackbar(context, context.getResources().getString(R.string.content_not_send, totalCounter));
                 } else {
-                    ChatController.sendLinkToChats(context, getChatHandles(), link, null, null);
+                    ChatController.sendLinkToChats(context, getChatHandles(), link, key, password);
                 }
         }
     }

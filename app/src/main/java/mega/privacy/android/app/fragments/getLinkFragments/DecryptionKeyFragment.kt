@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.databinding.FragmentDecryptionKeyBinding
 
-class DecryptionKeyFragment(): Fragment() {
+class DecryptionKeyFragment : Fragment() {
 
     private lateinit var binding: FragmentDecryptionKeyBinding
 

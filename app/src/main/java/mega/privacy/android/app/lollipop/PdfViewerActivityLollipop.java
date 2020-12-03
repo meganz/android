@@ -24,7 +24,6 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -82,7 +81,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -126,6 +124,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -1609,7 +1608,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     break;
                 }
 
-                showGetLinkActivity();
+                showGetLinkActivity(this, handle);
                 break;
             }
             case R.id.pdf_viewer_remove_link: {
@@ -2163,13 +2162,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         removeLinkDialog = builder.create();
         removeLinkDialog.show();
-    }
-
-    public void showGetLinkActivity(){
-        logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivity.class);
-        linkIntent.putExtra(HANDLE, handle);
-        startActivity(linkIntent);
     }
 
     public void updateFile (){

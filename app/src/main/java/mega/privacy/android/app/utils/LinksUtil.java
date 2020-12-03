@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,8 +12,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
+import static mega.privacy.android.app.utils.Constants.HANDLE;
 import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
 import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -171,5 +174,16 @@ public class LinksUtil {
         }
 
         return null;
+    }
+
+    /**
+     * Launches an intent to show get link activity.
+     *
+     * @param activity Activity which launches the intent.
+     * @param handle   identifier of the node to get or manage its link.
+     */
+    public static void showGetLinkActivity(Activity activity, long handle) {
+        activity.startActivity(new Intent(activity, GetLinkActivity.class)
+                .putExtra(HANDLE, handle));
     }
 }

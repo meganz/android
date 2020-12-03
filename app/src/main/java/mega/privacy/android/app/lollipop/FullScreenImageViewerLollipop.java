@@ -20,7 +20,6 @@ import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 import androidx.appcompat.app.ActionBar;
@@ -67,7 +66,6 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
@@ -118,6 +116,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -618,8 +617,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 						return false;
 					}
+
 					shareIt = false;
-			    	showGetLinkActivity(node.getHandle());
+			    	showGetLinkActivity(this, node.getHandle());
 					break;
 				}
 
@@ -1975,13 +1975,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
-	}
-
-	public void showGetLinkActivity(long handle){
-		logDebug("Handle: " + handle);
-		Intent linkIntent = new Intent(this, GetLinkActivity.class);
-		linkIntent.putExtra(HANDLE, handle);
-		startActivity(linkIntent);
 	}
 
 	public void setIsGetLink(boolean value){

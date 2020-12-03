@@ -45,12 +45,15 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
     private lateinit var binding: GetLinkActivityLayoutBinding
 
-    private var linkFragment: LinkFragment? = null
-    private var copyrightFragment: CopyrightFragment? = null
-    private var decryptionKeyFragment: DecryptionKeyFragment? = null
-    private var passwordFragment: LinkPasswordFragment? = null
+    private lateinit var linkFragmentTitle: String
+    private lateinit var linkFragment: LinkFragment
+    private lateinit var copyrightFragment: CopyrightFragment
+    private lateinit var decryptionKeyFragment: DecryptionKeyFragment
+    private lateinit var passwordFragment: LinkPasswordFragment
 
     private lateinit var node: MegaNode
+    private lateinit var linkWithoutKey: String
+    private lateinit var key: String
     private var linkWithPassword: String? = null
     private var passwordLink: String? = null
 
@@ -100,42 +103,45 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
                 window.statusBarColor =
                     ContextCompat.getColor(this, R.color.lollipop_dark_primary_color)
 
-                supportActionBar?.title =
-                    if (node.isExported) getString(R.string.edit_link_option).toUpperCase(
-                        Locale.getDefault()
-                    )
-                    else getString(R.string.context_get_link_menu).toUpperCase(
-                        Locale.getDefault()
-                    )
+                if (!this::linkFragmentTitle.isInitialized) {
+                    linkFragmentTitle =
+                        if (node.isExported) getString(R.string.edit_link_option).toUpperCase(
+                            Locale.getDefault()
+                        )
+                        else getString(R.string.context_get_link_menu).toUpperCase(
+                            Locale.getDefault()
+                        )
+                }
 
+                supportActionBar?.title = linkFragmentTitle
                 supportActionBar?.show()
 
-                if (linkFragment == null) {
+                if (!this::linkFragment.isInitialized) {
                     linkFragment = LinkFragment(this)
                 }
 
-                ft.replace(R.id.fragment_container_get_link, linkFragment!!)
+                ft.replace(R.id.fragment_container_get_link, linkFragment)
             }
             COPYRIGHT_FRAGMENT -> {
                 window.statusBarColor = ContextCompat.getColor(this, R.color.transparent_black)
                 supportActionBar?.hide()
 
-                if (copyrightFragment == null) {
+                if (!this::copyrightFragment.isInitialized) {
                     copyrightFragment = CopyrightFragment(this)
                 }
 
-                ft.replace(R.id.fragment_container_get_link, copyrightFragment!!)
+                ft.replace(R.id.fragment_container_get_link, copyrightFragment)
             }
             DECRYPTION_KEY_FRAGMENT -> {
                 supportActionBar?.title = getString(R.string.option_decryption_key).toUpperCase(
                     Locale.getDefault()
                 )
 
-                if (decryptionKeyFragment == null) {
+                if (!this::decryptionKeyFragment.isInitialized) {
                     decryptionKeyFragment = DecryptionKeyFragment()
                 }
 
-                ft.replace(R.id.fragment_container_get_link, decryptionKeyFragment!!)
+                ft.replace(R.id.fragment_container_get_link, decryptionKeyFragment)
             }
             PASSWORD_FRAGMENT -> {
                 supportActionBar?.title =
@@ -145,11 +151,11 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
                         Locale.getDefault()
                     )
 
-                if (passwordFragment == null) {
+                if (!this::passwordFragment.isInitialized) {
                     passwordFragment = LinkPasswordFragment(this)
                 }
 
-                ft.replace(R.id.fragment_container_get_link, passwordFragment!!)
+                ft.replace(R.id.fragment_container_get_link, passwordFragment)
             }
         }
 
@@ -161,11 +167,19 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         return node
     }
 
+    override fun getLinkWithoutKey(): String {
+        return linkWithoutKey
+    }
+
+    override fun getLinkKey(): String {
+        return key
+    }
+
     override fun copyLink(link: String) {
         copyToClipboard(link, COPY_LINK)
     }
 
-    override fun copyLinkKey(key: String) {
+    override fun copyLinkKey() {
         copyToClipboard(key, COPY_KEY)
     }
 
@@ -198,7 +212,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         return linkWithPassword
     }
 
-    override fun getPasswordLink(): String? {
+    override fun getLinkPassword(): String? {
         return passwordLink
     }
 
@@ -207,6 +221,16 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         passwordLink = null
     }
 
+    override fun setLinkPassword(passwordLink: String) {
+        this.passwordLink = passwordLink
+    }
+
+    /**
+     * Copies a link, decryption key or password into clipboard and shows a snackbar.
+     *
+     * @param textToCopy The content to copy.
+     * @param type       The type of content to copy. It can be: COPY_KEY, COPY_PASSWORD or COPY_LINK.
+     */
     private fun copyToClipboard(textToCopy: String, type: Int) {
         val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, textToCopy)
@@ -223,6 +247,11 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         )
     }
 
+    /**
+     * Launches an intent to share the link outside the app.
+     *
+     * @param link The link to share.
+     */
     private fun shareLink(link: String) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = PLAIN_TEXT_SHARE_TYPE
@@ -230,22 +259,40 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)))
     }
 
+    /**
+     * Updates the node from which the link is getting or managing.
+     * Gets the link without its decryption key and the key separately.
+     * Updates the UI of linkFragment.
+     */
     fun setLink() {
         node = megaApi.getNodeByHandle(node.handle)
-        linkFragment?.updateLink()
+        linkWithoutKey = getLinkWithoutKey(node.publicLink)
+        key = getKeyLink(node.publicLink)
+
+        linkFragment.updateLink()
     }
 
-    override fun setPasswordLink(passwordLink: String) {
-        this.passwordLink = passwordLink
-    }
-
+    /**
+     * Finish the action of set or reset the password protection, updates the UI resetting the set
+     * passwordFragment view and showing again the linkFragment view with the password protection
+     * enabled.
+     *
+     * @param linkWithPassword Link with password protection.
+     */
     fun setLinkWithPassword(linkWithPassword: String) {
         this.linkWithPassword = linkWithPassword
-        passwordFragment?.resetView()
+        passwordFragment.resetView()
         showFragment(GET_LINK_FRAGMENT)
-        linkFragment?.updatePasswordLayouts()
+        linkFragment.updatePasswordLayouts()
     }
 
+    /**
+     * Shows a warning before share link when the user has the Send decryption key separately or
+     * the password protection enabled, asking if they want to share also the key or the password.
+     *
+     * @param type Indicates if the share is send to chat or share outside the app.
+     * @param data Intent containing the info to share to chat or null if is sharing outside the app.
+     */
     private fun showShareKeyOrPasswordDialog(type: Int, data: Intent?) {
         val shareKeyDialogBuilder = AlertDialog.Builder(this, R.style.ResumeTransfersWarning)
 
@@ -277,29 +324,56 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         shareKeyDialogBuilder.create().show()
     }
 
+    /**
+     * Gets the string containing the link without its key and its key separately or the link
+     * protected with password and the password depending on the current enabled option.
+     *
+     * @return The string with the info described.
+     */
     private fun getLinkAndKeyOrPasswordToShare(): String {
         return if (!isTextEmpty(linkWithPassword)) getString(
             R.string.share_link_with_password,
             linkWithPassword,
             passwordLink
-        ) else getString(
+        )
+        else getString(
             R.string.share_link_with_key,
             getLinkWithoutKey(node.publicLink),
             getKeyLink(node.publicLink)
         )
     }
 
+    /**
+     * Gets the link to share depending on the current enabled option. It can be:
+     * - The link along with its decryption key
+     * - The link without the decryption key
+     * - The link along with its decryption key and with password protection
+     *
+     * @return The string with the info described.
+     */
     private fun getLinkToShare(): String {
         return if (!isTextEmpty(linkWithPassword)) linkWithPassword!!
-        else if (linkFragment?.isSendDecryptedKeySeparatelyEnabled() == true) getLinkWithoutKey(node.publicLink)
+        else if (linkFragment.isSendDecryptedKeySeparatelyEnabled()) getLinkWithoutKey(node.publicLink)
         else node.publicLink
     }
 
+    /**
+     * Checks if should show the warning to share the decryption key or password protection.
+     *
+     * @return True if password protection or send decryption key separately option is enabled.
+     *         False otherwise.
+     */
     private fun shouldShowShareKeyOrPasswordDialog(): Boolean {
-        return !isTextEmpty(linkWithPassword)
-                || linkFragment?.isSendDecryptedKeySeparatelyEnabled() == true
+        return !isTextEmpty(linkWithPassword) || linkFragment.isSendDecryptedKeySeparatelyEnabled()
     }
 
+    /**
+     * Shares the link and extra content if enabled (decryption key or password) to chat.
+     *
+     * @param data                      Intent containing the info to share the content to chats.
+     * @param link                      The link to share.
+     * @param shouldAttachKeyOrPassword True if should share the decryption key or password. False otherwise.
+     */
     private fun sendToChat(data: Intent?, link: String, shouldAttachKeyOrPassword: Boolean) {
         data?.putExtra(EXTRA_LINK, link)
 
@@ -363,7 +437,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     override fun onBackPressed() {
         if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
             if (visibleFragment == PASSWORD_FRAGMENT) {
-                passwordFragment?.resetView()
+                passwordFragment.resetView()
             }
 
             showFragment(GET_LINK_FRAGMENT)
