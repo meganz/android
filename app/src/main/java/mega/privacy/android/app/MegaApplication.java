@@ -567,7 +567,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-						clearIncomingCallNotification(chatId);
+						clearIncomingCallNotification(callId);
 						removeValues(chatId);
 						break;
 					case MegaChatCall.CALL_STATUS_DESTROYED:
@@ -1567,7 +1567,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			wakeLock.release();
 		}
 
-		clearIncomingCallNotification(chatId);
+		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 
