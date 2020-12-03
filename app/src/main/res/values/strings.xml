@@ -2751,7 +2751,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recents</string>
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No file activity to show in [/B][A]Recents[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
