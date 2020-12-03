@@ -356,7 +356,7 @@
     <color name="grey_500_grey_600">@color/grey_500</color>
 
     <!-- app drawer related related colors -->
-    <color name="drawer_add_phone_number_background">#F9F9F9</color>
+    <color name="grey_010_white_087">@color/grey_010</color>
     <color name="teal_300_grey_087">@color/teal_300</color>
 
     <!-- choose & upgrade related colors -->

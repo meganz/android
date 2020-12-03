@@ -55,7 +55,7 @@
 
     <color name="new_multiselect_color">@android:color/transparent</color>
 
-    <color name="drawer_add_phone_number_background">@color/white_alpha_087</color>
+    <color name="grey_010_white_087">@color/white_alpha_087</color>
     <color name="teal_300_grey_087">@color/grey_alpha_087</color>
 
     <!-- choose & upgrade related colors -->
