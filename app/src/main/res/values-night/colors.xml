@@ -2,6 +2,9 @@
 <resources>
     <color name="black_white">@color/white</color>
 
+    <!-- chat room message loading image tint  -->
+    <color name="grey_005_white_008">@color/white_alpha_008</color>
+
     <!-- Drawer item disabled text color  -->
     <color name="grey_038_white_038">@color/white_alpha_038</color>
 
@@ -13,6 +16,9 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/white_alpha_087</color>
+
+    <!-- call in progress text color -->
+    <color name="white_087_grey_087">@color/grey_alpha_087</color>
 
     <color name="white_black">@color/black</color>
 

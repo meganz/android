@@ -230,7 +230,8 @@
      The "390" is simply deduced from the relative color saturation against red_400 -->
     <color name="white">#FFFFFF</color>
 
-    <color name="white_alpha_005">#0CFFFFFF</color>
+    <color name="white_alpha_005">#0DFFFFFF</color>
+    <color name="white_alpha_008">#14FFFFFF</color>
     <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
@@ -253,6 +254,7 @@
     <color name="grey_700">#4F4F4F</color>
     <color name="grey_800">#2E2E2E</color>
 
+    <color name="grey_alpha_005">#0D000000</color>
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
@@ -325,6 +327,9 @@
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">?android:attr/colorBackground</color>
 
+    <!-- chat room message loading image tint  -->
+    <color name="grey_005_white_008">@color/grey_alpha_005</color>
+
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
@@ -336,6 +341,9 @@
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- call in progress text color -->
+    <color name="white_087_grey_087">@color/white_alpha_087</color>
 
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/grey_alpha_054</color>

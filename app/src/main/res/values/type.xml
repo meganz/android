@@ -130,6 +130,12 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Variant2">
+        <item name="android:textColor">@color/white_087_grey_087</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
