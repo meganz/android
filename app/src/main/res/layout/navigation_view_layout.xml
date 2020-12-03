@@ -38,7 +38,7 @@
                 android:layout_alignTop="@id/navigation_drawer_user_account_picture_profile"
                 android:layout_alignEnd="@id/navigation_drawer_user_account_picture_profile"
                 android:background="@null"
-                android:src="@drawable/ic_offline" />
+                android:src="@drawable/ic_offline_light" />
 
         </RelativeLayout>
 

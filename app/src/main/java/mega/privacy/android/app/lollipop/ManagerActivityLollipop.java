@@ -3650,25 +3650,33 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				case MegaChatApi.STATUS_ONLINE: {
 					logDebug("Online");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_online_dark_drawer
+									: R.drawable.ic_online_light));
 					break;
 				}
 				case MegaChatApi.STATUS_AWAY: {
 					logDebug("Away");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_away_dark_drawer
+									: R.drawable.ic_away_light));
 					break;
 				}
 				case MegaChatApi.STATUS_BUSY: {
 					logDebug("Busy");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_busy_dark_drawer
+									: R.drawable.ic_busy_light));
 					break;
 				}
 				case MegaChatApi.STATUS_OFFLINE: {
 					logDebug("Offline");
 					contactStatus.setVisibility(View.VISIBLE);
-					contactStatus.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
+					contactStatus.setImageDrawable(ContextCompat.getDrawable(this,
+							Util.isDarkMode(this) ? R.drawable.ic_offline_dark_drawer
+									: R.drawable.ic_offline_light));
 					break;
 				}
 				case MegaChatApi.STATUS_INVALID: {

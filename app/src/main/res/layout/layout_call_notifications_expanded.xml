@@ -51,7 +51,7 @@
                     android:layout_alignTop="@id/chat_title"
                     android:layout_toEndOf="@id/chat_title"
                     android:background="@null"
-                    android:src="@drawable/ic_offline"
+                    android:src="@drawable/ic_offline_light"
                     android:visibility="gone"/>
                 <ImageView
                     android:id="@+id/arrow"

@@ -139,6 +139,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttach
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -2104,29 +2105,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("This user is connected");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.online_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_online_dark_appbar
+                                : R.drawable.ic_online_light));
             }
             else if(state == MegaChatApi.STATUS_AWAY){
                 logDebug("This user is away");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_away_dark_appbar
+                                : R.drawable.ic_away_light));
             }
             else if(state == MegaChatApi.STATUS_BUSY){
                 logDebug("This user is busy");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_busy_dark_appbar
+                                : R.drawable.ic_busy_light));
             }
             else if(state == MegaChatApi.STATUS_OFFLINE){
                 logDebug("This user is offline");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_offline_dark_appbar
+                                : R.drawable.ic_offline_light));
             }
             else if(state == MegaChatApi.STATUS_INVALID){
                 logWarning("INVALID status: " + state);
