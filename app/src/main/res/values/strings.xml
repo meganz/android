@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA provides user-controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user-encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPRO LITE subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPRO I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPRO II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPRO III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA is Cloud Storage with Powerful Always-On Privacy.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF Viewer</string>
@@ -115,7 +115,7 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Clear selection</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Backup Recovery Key</string>
+    <string name="action_export_master_key" context="Title of the preference Recovery key on Settings section">Backup Recovery Key</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been cancelled</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">We were unable to cancel your subscription. Please contact support&#64;mega.nz for assistance</string>
@@ -445,6 +445,7 @@
     <string name="context_send_contact" context="menu item">Share contact to chat</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -597,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Cannot open selected file</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">Filesystem problem</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">File system problem</string>
     <string name="general_error" context="error message while browsing the local filesystem">Error happened when executing the action</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">Image viewer</string>
@@ -706,9 +707,9 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">PIN Lock</string>
-    <string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
-    <string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Passcode Lock</string>
+	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
+	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
     <string name="settings_advanced_features" context="Settings category title for cache and offline files">Advanced</string>
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Clear Cache</string>
@@ -798,32 +799,23 @@
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos only</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
 
-    <!--
-    <string name="settings_pin_lock_on" context="settings of the pin lock">Enable PIN Lock</string>
-    -->
-    <!--
-    <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
-    -->
-    <!--
-    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
-    -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">Passcode Lock</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode. Keep Passcode uppercase">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Your local files will be deleted and you will be logged out after 10 failed attempts</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Incorrect code</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Wrong PIN, please try again. You have 1 attempt left</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong PIN code, please try again. You have %2d attempts left</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Wrong Passcode, please try again. You have 1 attempt left</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong Passcode, please try again. You have %2d attempts left</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PIN Codes don’t match</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Enter your PIN Code</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-Enter your PIN Code</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Enter your new PIN Code</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-Enter your new PIN Code</string>
-    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">All your local data will be deleted and you will be logged out in %1d seconds</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your Passcode</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your Passcode</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new Passcode</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new Passcode</string>
+    <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All your local data will be deleted and you will be logged out in %1d seconds</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">About</string>
     <string name="settings_about_privacy_policy" context="App means “Application”">Privacy Policy</string>
@@ -927,10 +919,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">PIN Code Type</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">4 digit PIN</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">6 digit PIN</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">Alphanumeric PIN</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Passcode Type</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 digit Passcode</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric Passcode</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>
@@ -941,12 +933,12 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Free Account</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Lite Account</string>
-    <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I Account</string>
-    <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II Account</string>
-    <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III Account</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Pro Lite Account</string>
+    <string name="my_account_pro1" context="Label in My Account section to show user account type">Pro I Account</string>
+    <string name="my_account_pro2" context="Label in My Account section to show user account type">Pro II Account</string>
+    <string name="my_account_pro3" context="Label in My Account section to show user account type">Pro III Account</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">PRO Lite Account</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Pro Lite Account</string>
 
     <string name="backup_title" context="">Backup your Recovery Key</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Your password unlocks your Recovery Key</string>
@@ -1042,7 +1034,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">You’re running out of space!</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to PRO.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Take full advantage of your MEGA account by upgrading to Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Edit profile picture</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Take picture</string>
@@ -1096,7 +1088,7 @@
 
     <string name="error_incorrect_email_or_password" context="Error message when the credentials to login are incorrect.">Invalid email and/or password. Please try again.</string>
     <string name="error_account_suspended" context="Error message when trying to login and the account is suspended.">Your account has been suspended due to Terms of Service violations. Please contact support&#64;mega.nz</string>
-    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many failed attempts to login, please wait for an hour.</string>
+    <string name="too_many_attempts_login" context="Error message when to many attempts to login.">Too many failed attempts to log in, please wait for an hour.</string>
     <string name="account_not_validated_login" context="Error message when trying to login to an account not validated.">This account has not been validated yet. Please check your email.</string>
 
     <string name="general_error_folder_not_found" context="Error message shown when opening a folder link which doesn’t exist">Folder link unavailable</string>
@@ -1196,7 +1188,7 @@
     <string name="general_mute" context="button">Mute</string>
     <string name="general_unmute" context="button">Unmute</string>
     <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Do not disturb</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute all chat notifications for</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mute chat notifications for</string>
 
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mute notifications</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">On</string>
@@ -1204,10 +1196,10 @@
     <string name="mute_chatroom_notification_option_off" context="Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled.">Off</string>
     <string name="mute_chatroom_notification_option_until_tomorrow_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m.">Until tomorrow morning</string>
     <string name="mute_chatroom_notification_option_until_this_morning" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m.">Until this morning</string>
-    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn it back on</string>
+    <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn them back on</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: Chat notifications will be muted until 8">Chat notifications will be muted until %1$s</string>
+    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Chat notifications will be muted until %1$s</string>
     <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
 
@@ -1229,8 +1221,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">The history of the chat has been cleared</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Error. The history of the chat has not been cleared successfully</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Chat history has been cleared</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">An error has occured. The chat history has not been successfully cleared.</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Add participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Remove participant</string>
@@ -1340,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Logout[/A] to use MEGA with another account</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Are you sure that you want to log out of the current account?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">This message has been deleted by %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history was cleared by me">Chat history was cleared</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Chat history has been cleared</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Chat history cleared by %1$s</string>
 
     <!--
@@ -1572,7 +1564,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Insufficient transfer quota</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Not enough transfer quota available for your IP address. Upgrade your account or wait %s to continue your download.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">The transfer quota for this IP address has been exceeded. Upgrade your account or wait %s to continue your download.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">See our plans</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Continue without account</string>
 
@@ -2016,14 +2008,14 @@
     <string name="context_send_file_to_chat" context="menu option to send a file to a chat">Send to chat</string>
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Do you remember your password?</string>
-    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
+    <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">You are about to log out, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Please test your password to ensure you remember it. If you lose your password, you will lose access to your MEGA data.</string>
     <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Do not show again</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Test password</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Test your password</string>
     <string name="test_pwd_accepted" context="Message shown to the user when is testing her password and it is correct">Password accepted</string>
     <string name="test_pwd_wrong" context="Message shown to the user when is testing her password and it is wrong">Wrong password.\nBackup your Recovery Key as soon as possible!</string>
-    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">You are about to logout, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
+    <string name="recovery_key_exported_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">You are about to log out, please test your password to ensure you remember it.\nIf you lose your password, you will lose access to your MEGA data.</string>
     <string name="option_copy_to_clipboard" context="Option that permits user copy to clipboard">Copy to clipboard</string>
     <string name="option_export_recovery_key" context="Option that permits user export his recovery key">Export Recovery Key</string>
     <string name="proceed_to_logout" context="Option that permits user logout">Proceed to logout</string>
@@ -2056,14 +2048,14 @@
     <string name="context_loop_video" context="menu option to loop video or audio file">Loop</string>
 
     <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Security</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Backup recovery key</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Backup Recovery Key</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">Exporting the Recovery Key and keeping it in a secure location enables you to set a new password without data loss.</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Unable to reach MEGA. Please check your connectivity or try again later.</string>
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">Servers are too busy. Please wait.</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">This process is taking longer than expected. Please wait.</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">Too many requests. Please wait.</string>
-    <string name="login_in_progress" context="message when previous login is being canceled">Canceling login process. Please wait&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">Cancelling login process. Please wait&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">Unsupported file type.</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">Error. The file is corrupted or does not exist.</string>
@@ -2108,7 +2100,8 @@
     <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]No completed[/B][A] Transfers[/A][B].[/B]</string>
     <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[B]Empty[/B][A] Folder[/A][B].[/B]</string>
 
-    <string name="hint_message_in_chat" context="Hint shown in the field to write a message in the chat screen">Message&#8230;</string>
+    <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Write message to “%s”&#8230;</string>
+    <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Write message to %s&#8230;</string>
 
     <string name="settings_2fa" context="Title of setting Two-Factor Authentication">Two-Factor Authentication</string>
     <string name="setting_subtitle_2fa" context="Subtitle of setting Two-Factor Authentication when the preference is disabled">Two-Factor Authentication is a second layer of security for your account.</string>
@@ -2261,10 +2254,10 @@
 
     <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Invalid code</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Cloud Drive is almost full. Upgrade to PRO and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Cloud Drive is almost full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Cloud Drive is almost full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Cloud Drive is almost full. If you need more storage please contact MEGA support to get a custom plan.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to PRO and get up to %1$s of storage and %2$s of transfer quota.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Cloud Drive is full. Upgrade to Pro and get up to %1$s of storage and %2$s of transfer quota.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Cloud Drive is full. Upgrade now and get up to %1$s of storage and %2$s of transfer quota.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Cloud Drive is full. If you need more storage please contact MEGA support to get a custom plan.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">See plans</string>
@@ -2294,8 +2287,8 @@
 
     <string name="title_share_folder_explorer" context="Title of shared folder explorer to choose a folder to perform an action">Choose folder</string>
 
-    <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to login?</string>
-    <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to logout?</string>
+    <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to log in?</string>
+    <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">All transfers will be cancelled, do you want to log out?</string>
 
     <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
 
@@ -2498,7 +2491,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s and %2$d more</string>
+    <string name="custom_subtitle_of_group_chat" context="">%1$s and %2$d more</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Before you can generate a link for this chat, you need to set a description:</string>
 
@@ -2687,16 +2680,16 @@
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">Muted</string>
     <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Call on hold</string>
     <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
-    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold &#38; Answer</string>
-    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold &#38; Join</string>
-    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End &#38; Answer</string>
-    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End &#38; Join</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold and Answer</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold and Join</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End and Answer</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End and Join</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">File already downloaded. Copied to the selected path.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Join call</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">To join this call you have to end your current call.</string>
-    <string name="text_join__another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
+    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Enter chat link</string>
 
@@ -2745,7 +2738,7 @@
         <item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
     </plurals>
 
-    <string name="login_to_mega" context="Title of the login screen">Login to MEGA</string>
+    <string name="login_to_mega" context="Title of the login screen">Log in to MEGA</string>
     <string name="create_account_title" context="Title of the create account screen">Create your MEGA account</string>
 
     <string name="recents_label" context="Label to reference a recents section">Recents</string>
@@ -2862,13 +2855,13 @@
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
     <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
     <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
 
-    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud Drive.</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">Storage Full</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Your data is at risk!</string>
@@ -2943,8 +2936,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is enabled</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Action to show info of chat messages is disabled</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 </resources>

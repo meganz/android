@@ -71,7 +71,7 @@ class OfflineNodeSaver @Inject constructor(
         } else {
             if (externalSDCard && sdCardOperator != null) {
                 try {
-                    sdCardOperator.move(parentPath, file)
+                    sdCardOperator.moveFile(parentPath, file)
                 } catch (e: Exception) {
                     logError("Error moving file to the sd card path with exception", e);
                 }

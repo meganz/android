@@ -6,16 +6,18 @@ import android.os.Parcelable;
 
 import java.io.File;
 
-import nz.mega.sdk.MegaApiAndroid;
+import mega.privacy.android.app.objects.SDTransfer;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AndroidCompletedTransfer implements Parcelable {
 
@@ -32,7 +34,10 @@ public class AndroidCompletedTransfer implements Parcelable {
     private String originalPath;
     private long parentHandle;
 
-    public AndroidCompletedTransfer(long id, String fileName, int type, int state, String size, String nodeHandle, String path, boolean isOfflineFile, long timeStamp, String error, String originalPath, long parentHandle) {
+    public AndroidCompletedTransfer(long id, String fileName, int type, int state, String size,
+                                    String nodeHandle, String path, boolean isOfflineFile,
+                                    long timeStamp, String error, String originalPath,
+                                    long parentHandle) {
         this.id = id;
         this.fileName = fileName;
         this.type = type;
@@ -58,6 +63,20 @@ public class AndroidCompletedTransfer implements Parcelable {
         this.error = getTranslatedErrorString(error);
         this.originalPath = transfer.getPath();
         this.parentHandle = transfer.getParentHandle();
+    }
+
+    public AndroidCompletedTransfer(SDTransfer transfer) {
+        this.fileName = transfer.getName();
+        this.type = MegaTransfer.TYPE_DOWNLOAD;
+        this.state = MegaTransfer.STATE_COMPLETED;
+        this.size = transfer.getSize();
+        this.nodeHandle = transfer.getNodeHandle();
+        this.path = removeLastFileSeparator(getSDCardTargetPath(transfer.getAppData()));
+        this.timeStamp = System.currentTimeMillis();
+        this.error = getString(R.string.api_ok);
+        this.originalPath = transfer.getPath();
+        this.parentHandle = INVALID_HANDLE;
+        setIsOfflineFile(false);
     }
 
     public String getFileName() {
