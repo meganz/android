@@ -661,6 +661,15 @@
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
     </style>
 
+    <!-- For FAB above images or scrim -->
+    <style name="Widget.Mega.FAB.Variant" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.FAB.Variant</item>
+    </style>
+    <style name="ThemeOverlay.Mega.FAB.Variant" parent="">
+        <item name="colorSecondary">@color/white_teal_200</item>
+        <item name="colorOnSecondary">@color/teal_300_black</item>
+    </style>
+
     <!--======= Legacy styles(may not be best practice, keep for quick development) ========= -->
 
     <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>

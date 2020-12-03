@@ -312,6 +312,11 @@
     <!-- Turn on camera uploads button text, action mode bar color -->
     <color name="teal_300_dark_grey">@color/teal_300</color>
 
+    <!-- icon tint for FAB above images or scrim -->
+    <color name="teal_300_black">@color/teal_300</color>
+    <!-- background tint for FAB above images or scrim -->
+    <color name="white_teal_200">@color/white</color>
+
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 

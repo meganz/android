@@ -48,6 +48,11 @@
     <!-- Turn on camera uploads -->
     <color name="teal_300_dark_grey">@color/dark_grey</color>
 
+    <!-- icon tint for FAB above images or scrim -->
+    <color name="teal_300_black">@color/black</color>
+    <!-- background tint for FAB above images or scrim -->
+    <color name="white_teal_200">@color/teal_200</color>
+
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_300</color>
 

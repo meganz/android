@@ -37,10 +37,10 @@
             android:scaleType="center"
             android:visibility="gone"
             android:src="@drawable/ic_send_black"
+            style="@style/Widget.Mega.FAB.Variant"
             app:borderWidth="0dp"
             app:elevation="6dp"
             app:fabSize="normal"
             app:pressedTranslationZ="12dp" />
 
 </RelativeLayout>
-
