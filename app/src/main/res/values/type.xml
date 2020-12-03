@@ -130,6 +130,10 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.PrimaryColor">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
     <!-- ================== Button ====================== -->
 
     <!-- Medium, 14sp, 0px, textColorPrimary, AllCaps=true -->

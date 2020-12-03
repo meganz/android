@@ -470,7 +470,6 @@
                         android:textSize="10sp" />
                 </RelativeLayout>
 
-                <!--Jump and new messages-->
                 <RelativeLayout
                     android:id="@+id/observers_layout"
                     android:layout_width="wrap_content"
@@ -510,6 +509,7 @@
                     </LinearLayout>
                 </RelativeLayout>
 
+                <!--Jump and new messages-->
                 <RelativeLayout
                     android:id="@+id/message_jump_layout"
                     android:layout_width="163dp"
@@ -529,22 +529,21 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="12dp"
-                            android:src="@drawable/ic_new_messages" />
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ic_new_messages"
+                            app:tint="?attr/colorOnSecondary" />
 
                         <TextView
                             android:id="@+id/message_jump_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginRight="5dp"
+                            android:layout_marginEnd="5dp"
                             android:ellipsize="end"
-                            android:fontFamily="Roboto"
                             android:gravity="center_vertical"
                             android:singleLine="true"
                             android:text="@string/message_jump_latest"
-                            android:textColor="@color/white"
-                            android:textSize="14sp" />
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.PrimaryColor" />
                     </LinearLayout>
                 </RelativeLayout>
             </RelativeLayout>
