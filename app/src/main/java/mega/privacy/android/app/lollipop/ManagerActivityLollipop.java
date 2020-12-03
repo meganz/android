@@ -15358,7 +15358,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showEvaluatedAppDialog(){
-
 		LayoutInflater inflater = getLayoutInflater();
 		View dialoglayout = inflater.inflate(R.layout.evaluate_the_app_dialog, null);
 
@@ -15376,7 +15375,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		ViewGroup.MarginLayoutParams sendFeedbackMLP = (ViewGroup.MarginLayoutParams) sendFeedbackCheck.getLayoutParams();
 		sendFeedbackMLP.setMargins(scaleWidthPx(15, outMetrics), scaleHeightPx(10, outMetrics), 0, scaleHeightPx(10, outMetrics));
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setView(dialoglayout);
 
 		builder.setTitle(getString(R.string.title_evaluate_the_app_panel));
