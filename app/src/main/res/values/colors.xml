@@ -237,6 +237,7 @@
     <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
     <color name="white_alpha_045">#73FFFFFF</color>
+    <color name="white_alpha_050">#80FFFFFF</color>
     <color name="white_alpha_054">#89FFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
     <color name="white_alpha_087">#DDFFFFFF</color>
@@ -258,6 +259,7 @@
     <color name="grey_alpha_033">#54000000</color>
     <color name="grey_alpha_038">#60000000</color>
     <color name="grey_alpha_045">#73000000</color>
+    <color name="grey_alpha_050">#80000000</color>
     <color name="grey_alpha_054">#89000000</color>
     <color name="grey_alpha_060">#99000000</color>
     <color name="grey_alpha_087">#DD000000</color>
@@ -324,14 +326,14 @@
     <!-- Record voice clip audio level indicator -->
     <color name="white_045_grey_045">@color/white_alpha_045</color>
 
+    <!-- Chat observer layout background -->
+    <color name="grey_050_white_050">@color/grey_alpha_050</color>
+
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
 
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/grey_alpha_054</color>
-
-    <!-- Emoji keyboard not selected category tint -->
-    <color name="grey_054_white_038">@color/grey_alpha_054</color>
 
     <color name="grey_054_white_087">@color/grey_alpha_054</color>
 
@@ -339,6 +341,9 @@
 
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
+
+    <!-- Chat message unselected icon tint -->
+    <color name="grey_600_white_087">@color/grey_600</color>
 
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->

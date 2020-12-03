@@ -147,9 +147,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         emptyText = v.findViewById(R.id.empty_text_recents);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImage.setImageResource(R.drawable.empty_zero_data_recents_landscape);
+            emptyImage.setImageResource(R.drawable.empty_recents_landscape);
         } else {
-            emptyImage.setImageResource(R.drawable.empty_zero_data_recents_portrait);
+            emptyImage.setImageResource(R.drawable.empty_recents_portrait);
         }
 
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();

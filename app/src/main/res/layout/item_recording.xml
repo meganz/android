@@ -30,7 +30,7 @@
                 android:id="@+id/recording_micro_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_alignParentBottom="true"
                 android:src="@drawable/ic_voice_clip_feedback"
                 app:tint="@color/white_black"/>

@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -8532,15 +8533,23 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.ownMessageSelectLayout.setVisibility(View.VISIBLE);
                 if (this.isItemChecked(messageId)) {
                     holder.ownMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select_folder));
+                    holder.ownMessageSelectIcon.setColorFilter(null);
                 } else {
                     holder.ownMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unselect_chatroom));
+                    holder.ownMessageSelectIcon.setColorFilter(
+                            ContextCompat.getColor(holder.ownMessageSelectIcon.getContext(), R.color.grey_600_white_087),
+                            PorterDuff.Mode.SRC_IN);
                 }
             } else {
                 holder.contactMessageSelectLayout.setVisibility(View.VISIBLE);
                 if (this.isItemChecked(messageId)) {
                     holder.contactMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select_folder));
+                    holder.contactMessageSelectIcon.setColorFilter(null);
                 } else {
                     holder.contactMessageSelectIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_unselect_chatroom));
+                    holder.contactMessageSelectIcon.setColorFilter(
+                            ContextCompat.getColor(holder.ownMessageSelectIcon.getContext(), R.color.grey_600_white_087),
+                            PorterDuff.Mode.SRC_IN);
                 }
             }
 

@@ -74,6 +74,10 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
     <!--- 0.5px -->
     <style name="TextAppearance.Mega.Subtitle2.Variant" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="android:letterSpacing">0.035714286</item>

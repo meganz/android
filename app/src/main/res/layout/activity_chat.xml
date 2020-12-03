@@ -351,11 +351,10 @@
                 android:layout_alignParentBottom="true"
                 android:visibility="gone">
 
-                <LinearLayout
+                <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/black_12_alpha"
-                    android:orientation="horizontal" />
+                    android:background="@color/grey_012_white_012" />
 
                 <Button
                     android:id="@+id/join_button"
@@ -376,11 +375,10 @@
                 android:layout_alignParentBottom="true"
                 android:visibility="gone">
 
-                <LinearLayout
+                <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/black_12_alpha"
-                    android:orientation="horizontal" />
+                    android:background="@color/grey_012_white_012" />
 
                 <TextView
                     android:id="@+id/joining_leaving_text_chat_layout"
@@ -390,8 +388,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="20dp"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
                 <ProgressBar
                     android:id="@+id/add_contact_progress_bar"
@@ -436,7 +433,6 @@
                         android:layout_centerInParent="true"
                         android:layout_gravity="center_horizontal"
                         android:text="@string/chat_loading_messages"
-                        android:textColor="@color/adapters_background"
                         android:textSize="18sp" />
                 </RelativeLayout>
 
@@ -483,7 +479,8 @@
                     android:layout_marginTop="6dp"
                     android:animateLayoutChanges="true"
                     android:background="@drawable/dark_rounded_jump_to_latest"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -494,23 +491,22 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="12dp"
-                            android:src="@drawable/ic_w_shared_read" />
+                            android:layout_marginStart="12dp"
+                            android:src="@drawable/ic_w_shared_read"
+                            app:tint="?attr/colorPrimary" />
 
                         <TextView
                             android:id="@+id/observers_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="12dp"
-                            android:layout_marginRight="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
                             android:ellipsize="end"
-                            android:fontFamily="Roboto"
                             android:gravity="center_vertical"
                             android:singleLine="true"
-                            android:text="2"
-                            android:textColor="@color/white"
-                            android:textSize="14sp" />
+                            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.PrimaryColor"
+                            tools:text="2" />
                     </LinearLayout>
                 </RelativeLayout>
 

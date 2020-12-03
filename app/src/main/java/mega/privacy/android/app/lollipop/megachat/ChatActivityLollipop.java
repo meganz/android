@@ -137,6 +137,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -915,7 +916,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white)
                 .mutate();
         upArrow.setColorFilter(getResources().getColor(R.color.grey_087_white_087),
-                PorterDuff.Mode.SRC_ATOP);
+                PorterDuff.Mode.SRC_IN);
 
         updateNavigationToolbarIcon();
 
@@ -1557,15 +1558,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         String textToShowB = getString(R.string.chat_loading_messages);
 
         try {
-            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                    + "\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");
-            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[B]", "<font color=\'"
+                    + ColorUtils.getColorHexString(this, R.color.black_white)
+                    + "\'>");
             textToShowB = textToShowB.replace("[/B]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
         }
 
-        emptyScreen(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
+        emptyScreen(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
         if (!isTextEmpty(textSnackbar)) {
             String chatLink = getIntent().getStringExtra(CHAT_LINK_EXTRA);
@@ -1599,11 +1604,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    private void emptyScreen(String text){
+    private void emptyScreen(CharSequence text){
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+            emptyImageView.setImageResource(R.drawable.empty_chat_message_landscape);
         } else {
-            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+            emptyImageView.setImageResource(R.drawable.empty_chat_message_portrait);
         }
 
         emptyTextView.setText(text);

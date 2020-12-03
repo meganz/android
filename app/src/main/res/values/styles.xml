@@ -437,7 +437,7 @@
     </style>
 
     <style name="AccentButton" parent="ButtonStyle">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/white_dark_grey</item>
         <item name="android:background">@drawable/background_accent_button</item>
     </style>
 

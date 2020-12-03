@@ -8,6 +8,9 @@
     <!-- Record voice clip audio level indicator -->
     <color name="white_045_grey_045">@color/grey_alpha_045</color>
 
+    <!-- Chat observer layout background -->
+    <color name="grey_050_white_050">@color/white_alpha_050</color>
+
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/white_alpha_087</color>
 
@@ -16,6 +19,9 @@
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_800</color>
 
+    <!-- Chat message unselected icon tint -->
+    <color name="grey_600_white_087">@color/white_alpha_087</color>
+
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/white_alpha_054</color>
 
@@ -23,9 +29,6 @@
     <color name="grey_012_white_012">@color/white_alpha_012</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
-
-    <!-- Emoji keyboard not selected category tint -->
-    <color name="grey_054_white_038">@color/white_alpha_038</color>
 
     <color name="grey_054_white_087">@color/white_alpha_087</color>
 
