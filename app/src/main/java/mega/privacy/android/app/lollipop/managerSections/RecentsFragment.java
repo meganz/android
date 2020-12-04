@@ -131,17 +131,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyImage = v.findViewById(R.id.empty_image_recents);
 
-        RelativeLayout.LayoutParams params;
-        int size;
-        if (isScreenInPortrait(context)) {
-            size = dp2px(200, outMetrics);
-        } else {
-            size = dp2px(100, outMetrics);
-        }
-        params = new RelativeLayout.LayoutParams(size, size);
-        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        emptyImage.setLayoutParams(params);
-
         emptyText = v.findViewById(R.id.empty_text_recents);
 
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();

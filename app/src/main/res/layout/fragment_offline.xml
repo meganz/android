@@ -17,17 +17,18 @@
 
         <ImageView
             android:id="@+id/empty_hint_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
             android:src="@drawable/ic_empty_offline" />
 
         <TextView
             android:id="@+id/empty_hint_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:fontFamily="sans-serif"
             android:textColor="@color/text_secondary"
-            android:textSize="18sp"
+            android:textSize="14sp"
             tools:text="@string/context_empty_offline" />
     </LinearLayout>
 

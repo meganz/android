@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files in your [/B][A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B][/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]No [/B][A]Contacts[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>

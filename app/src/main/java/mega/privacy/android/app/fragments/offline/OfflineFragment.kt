@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -263,7 +262,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.offlineBrowserList.addItemDecoration(listDivider!!)
         }
 
-        var textToShow = getString(R.string.context_empty_offline)
+        var textToShow = getString(R.string.context_empty_offline).toUpperCase(Locale.ROOT)
 
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
