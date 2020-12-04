@@ -29,7 +29,7 @@
     <string name="api_essl" context="Error shown when SSL check has failed">SSL驗證失敗</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">配額不足</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">需要雙重驗證。</string>
-    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">非管理者用戶存取拒絕</string>
+    <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">非管理員拒絕存取</string>
     <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">您的商業帳戶已過期</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">信用卡被拒絕</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">付款失敗</string>

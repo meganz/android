@@ -821,10 +821,13 @@ public final class ChatAdvancedNotificationBuilder {
         long chatIdCallToAnswer = callToAnswer.getChatid();
         long chatIdCallInProgress = callInProgress.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
-        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
+        int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
 
         PendingIntent intentIgnore = getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
+        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
+
+        boolean hasPermissions = checkPermissionsCall(null, INVALID_TYPE_PERMISSIONS);
 
         /*Customize notification*/
         Bitmap avatarIcon = setUserAvatar(chatToAnswer);
@@ -907,7 +910,9 @@ public final class ChatAdvancedNotificationBuilder {
                 expandedView.setOnClickPendingIntent(R.id.decline_button_layout, getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.DECLINE, notificationId));
             }
 
-            expandedView.setOnClickPendingIntent(R.id.answer_button_layout, getPendingIntent(hasVideoInitialCall, isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId));
+            expandedView.setOnClickPendingIntent(R.id.answer_button_layout, hasPermissions ?
+                            getPendingIntent(hasVideoInitialCall, isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId) :
+                            callScreen);
 
         } else {
             expandedView.setViewVisibility(R.id.big_layout, View.VISIBLE);
@@ -919,23 +924,25 @@ public final class ChatAdvancedNotificationBuilder {
                 expandedView.setTextViewText(R.id.second_button_text, context.getString(R.string.hold_and_join_call_incoming));
                 expandedView.setTextViewText(R.id.third_button_text, context.getString(R.string.end_and_join_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.first_button_layout, intentIgnore);
-                expandedView.setOnClickPendingIntent(R.id.second_button_layout, getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_JOIN, notificationId));
-                expandedView.setOnClickPendingIntent(R.id.third_button_layout, getPendingIntent(hasVideoInitialCall, callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_JOIN, notificationId));
+                expandedView.setOnClickPendingIntent(R.id.second_button_layout, hasPermissions ?
+                        getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_JOIN, notificationId) : callScreen);
+                expandedView.setOnClickPendingIntent(R.id.third_button_layout, hasPermissions ?
+                        getPendingIntent(hasVideoInitialCall, callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_JOIN, notificationId) : callScreen);
             } else {
                 expandedView.setTextViewText(R.id.first_button_text, context.getString(R.string.contact_decline));
                 expandedView.setTextViewText(R.id.second_button_text, context.getString(R.string.hold_and_answer_call_incoming));
                 expandedView.setTextViewText(R.id.third_button_text, context.getString(R.string.end_and_answer_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.first_button_layout, getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.DECLINE, notificationId));
-                expandedView.setOnClickPendingIntent(R.id.second_button_layout, getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_ANSWER, notificationId));
-                expandedView.setOnClickPendingIntent(R.id.third_button_layout, getPendingIntent(hasVideoInitialCall, callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_ANSWER, notificationId));
+                expandedView.setOnClickPendingIntent(R.id.second_button_layout, hasPermissions ?
+                        getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_ANSWER, notificationId) : callScreen);
+                expandedView.setOnClickPendingIntent(R.id.third_button_layout, hasPermissions ?
+                        getPendingIntent(hasVideoInitialCall, callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_ANSWER, notificationId) : callScreen);
             }
 
             if (numberButtons.equals(VERTICAL_TWO_BUTTONS)) {
                 expandedView.setViewVisibility(R.id.second_button_layout, GONE);
             }
         }
-
-        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create a channel for android Oreo or higher
@@ -1013,7 +1020,7 @@ public final class ChatAdvancedNotificationBuilder {
 
         long chatIdCallToAnswer = callToAnswer.getChatid();
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
-        int notificationId = (MegaApiJava.userHandleToBase64(chatIdCallToAnswer)).hashCode();
+        int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
 
         Intent ignoreIntent = new Intent(context, CallNotificationIntentService.class);
@@ -1031,6 +1038,8 @@ public final class ChatAdvancedNotificationBuilder {
         answerIntent.setAction(CallNotificationIntentService.ANSWER);
         int requestCodeAnswer = notificationId + 1;
         PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
 
         /*Customize notification*/
         Bitmap avatarIcon = setUserAvatar(chatToAnswer);
@@ -1069,8 +1078,8 @@ public final class ChatAdvancedNotificationBuilder {
         expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming));
         expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
         expandedView.setOnClickPendingIntent(R.id.decline_button_layout, pendingIntentIgnore);
-        expandedView.setOnClickPendingIntent(R.id.answer_button_layout, pendingIntentAnswer);
-        PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
+        expandedView.setOnClickPendingIntent(R.id.answer_button_layout,
+                checkPermissionsCall(null, INVALID_TYPE_PERMISSIONS) ? pendingIntentAnswer : callScreen);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             //Create a channel for android Oreo or higher
@@ -1546,7 +1555,9 @@ public final class ChatAdvancedNotificationBuilder {
         removeAllChatNotifications();
         Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
 
-        if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
+        if (chatSettings == null ||
+                chatSettings.getNotificationsSound() == null ||
+                chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
             defaultSoundUri = null;
         } else if (chatSettings.getNotificationsSound() != null) {
             String soundString = chatSettings.getNotificationsSound();
@@ -1561,7 +1572,7 @@ public final class ChatAdvancedNotificationBuilder {
             }
         }
 
-        sendBundledNotification(defaultSoundUri, chatSettings.getVibrationEnabled(), chatid, handleListUnread);
+        sendBundledNotification(defaultSoundUri, chatSettings == null ? STRING_TRUE : chatSettings.getVibrationEnabled(), chatid, handleListUnread);
     }
 
     public void setIsUpdatingUserName() {

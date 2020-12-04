@@ -19,15 +19,14 @@
 				android:id="@+id/title_my_account_type"
 				android:layout_width="match_parent"
 				android:layout_height="36dp"
-				android:layout_gravity="center_vertical"
-				android:gravity="center_vertical"
-				android:background="@color/white"
-				android:paddingLeft="72dp">
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:background="@color/white">
 				<TextView
 					android:id="@+id/text_of_my_account"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/mail_my_account"
+					android:textColor="@color/secondary_text"
 					android:textSize="14sp"/>
 			</RelativeLayout>
 			<!-- Pro Lite -->
@@ -68,8 +67,8 @@
 								android:id="@+id/upgrade_prolite_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/upgrade_orange"
-								android:text="@string/lite_account"
+								android:textColor="@color/lite_account"
+								android:text="@string/prolite_account"
 								android:layout_below="@+id/image_lite"
 								android:textSize="18sp"/>
 						</RelativeLayout>
@@ -102,7 +101,7 @@
 										android:textStyle="bold"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/name_my_account"
+										android:textColor="@color/primary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -117,7 +116,7 @@
 										android:id="@+id/storage_lite"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp"/>
 								</RelativeLayout>
 							</TableRow>
@@ -132,7 +131,7 @@
 										android:id="@+id/bandwidth_lite"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp"/>
 								</RelativeLayout>
 							</TableRow>
@@ -229,7 +228,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
+										android:textColor="@color/primary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -244,7 +243,7 @@
 										android:id="@+id/storage_pro_i"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -259,7 +258,7 @@
 										android:id="@+id/bandwidth_pro_i"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -355,7 +354,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
+										android:textColor="@color/primary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -370,7 +369,7 @@
 										android:id="@+id/storage_pro_ii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -385,7 +384,7 @@
 										android:id="@+id/bandwidth_pro_ii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -482,7 +481,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
+										android:textColor="@color/primary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -497,7 +496,7 @@
 										android:id="@+id/storage_pro_iii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -513,7 +512,7 @@
 										android:id="@+id/bandwidth_pro_iii"
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
-										android:textColor="@color/mail_my_account"
+										android:textColor="@color/secondary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -621,7 +620,7 @@
 										android:layout_width="wrap_content"
 										android:layout_height="wrap_content"
 										android:textStyle="bold"
-										android:textColor="@color/name_my_account"
+										android:textColor="@color/primary_text"
 										android:textSize="15sp" />
 								</RelativeLayout>
 							</TableRow>
@@ -684,7 +683,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/upgrade_comment"
-					android:textColor="@color/mail_my_account"
+					android:textColor="@color/secondary_text"
 					android:gravity="left"
 					android:textSize="12sp"/>
 
@@ -692,7 +691,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/business_account_clarification"
-					android:textColor="@color/mail_my_account"
+					android:textColor="@color/secondary_text"
 					android:gravity="left"
 					android:textSize="12sp"
 					android:layout_marginTop="4dp"/>

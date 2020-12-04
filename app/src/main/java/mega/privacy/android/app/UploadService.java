@@ -45,6 +45,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
@@ -75,6 +76,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_SIZE = "MEGA_SIZE";
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
+
+    private static final int NOT_OVERQUOTA_STATE = 0;
+    private static final int OVERQUOTA_STORAGE_STATE = 1;
+    private static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
@@ -119,10 +124,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private static int uploadCount = 0;
     private static int currentUpload = 0;
 
-	//0 - not overquota, not pre-overquota
-	//1 - overquota
-	//2 - pre-overquota
-    private int isOverquota = 0;
+	//NOT_OVERQUOTA_STATE           = 0 - not overquota, not pre-overquota
+	//OVERQUOTA_STORAGE_STATE       = 1 - overquota
+	//PRE_OVERQUOTA_STORAGE_STATE   = 2 - pre-overquota
+    private int isOverquota = NOT_OVERQUOTA_STATE;
 
     /** the receiver and manager for the broadcast to listen to the pause event */
     private BroadcastReceiver pauseBroadcastReceiver;
@@ -144,7 +149,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		isForeground = false;
 		canceled = false;
-		isOverquota = 0;
+		isOverquota = NOT_OVERQUOTA_STATE;
 
         int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
@@ -227,23 +232,59 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private synchronized void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
 
-		String action = intent.getAction();
-		logDebug("Action is " + action);
-		if(action != null){
-            if (ACTION_OVERQUOTA_STORAGE.equals(action)) {
-                isOverquota = 1;
-            }else if(ACTION_STORAGE_STATE_CHANGED.equals(action)){
-                isOverquota = 0;
+        String action = intent.getAction();
+        logDebug("Action is " + action);
+        if (action != null) {
+            switch (action) {
+                case ACTION_OVERQUOTA_STORAGE:
+                    isOverquota = OVERQUOTA_STORAGE_STATE;
+                    break;
+
+                case ACTION_STORAGE_STATE_CHANGED:
+                    isOverquota = NOT_OVERQUOTA_STATE;
+                    break;
+
+                case ACTION_RESTART_SERVICE:
+                    MegaTransferData transferData = megaApi.getTransferData(null);
+                    if (transferData == null) {
+                        return;
+                    }
+
+                    int uploadsInProgress = transferData.getNumUploads();
+
+                    for (int i = 0; i < uploadsInProgress; i++) {
+                        MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+                        if (transfer == null || isCUOrChatTransfer(transfer)) {
+                            continue;
+                        }
+
+                        MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+
+                        if (transfer.isFolderTransfer()) {
+                            mapProgressFolderTransfers.put(transfer.getTag(), transfer);
+                        } else {
+                            mapProgressFileTransfers.put(transfer.getTag(), transfer);
+                        }
+                    }
+
+                    totalFolderUploads = mapProgressFolderTransfers.size();
+                    totalFileUploads = mapProgressFileTransfers.size();
+                    uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+                    launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+                    break;
             }
+
             if (totalFileUploads > 0) {
                 updateProgressNotification(false);
             }
+
             if (totalFolderUploads > 0) {
                 updateProgressNotification(true);
             }
+
             return;
-        }else {
-            isOverquota = 0;
+        } else {
+            isOverquota = NOT_OVERQUOTA_STATE;
         }
 
         currentUpload ++;
@@ -330,7 +371,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void onQueueComplete() {
 		logDebug("onQueueComplete");
         releaseLocks();
-        if (isOverquota != 0) {
+        if (isOverquota != NOT_OVERQUOTA_STATE) {
             if (totalFileUploads > 0) {
                 showStorageOverQuotaNotification(false);
             }
@@ -426,7 +467,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
      */
     private void showFileUploadCompleteNotification() {
 		logDebug("showFileUploadCompleteNotification");
-        if (isOverquota == 0) {
+        if (isOverquota == NOT_OVERQUOTA_STATE) {
             String notificationTitle, size;
             int quantity = totalFileUploadsCompletedSuccessfully == 0 ? 1 : totalFileUploadsCompletedSuccessfully;
             notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification,quantity,totalFileUploadsCompletedSuccessfully);
@@ -446,7 +487,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
     private void showFolderUploadCompleteNotification() {
 		logDebug("showFolderUploadCompleteNotification");
-        if (isOverquota == 0) {
+        if (isOverquota == NOT_OVERQUOTA_STATE) {
             String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification,totalFolderUploadsCompletedSuccessfully,totalFolderUploadsCompletedSuccessfully);
             String notificationSubTitle;
 
@@ -472,16 +513,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private void notifyProgressNotification(int progressPercent,String message,String info,String actionString,int notificationId,String notificationChannelId,String notificationChannelName){
         Intent intent = new Intent(UploadService.this, ManagerActivityLollipop.class);
         switch (isOverquota) {
-            case 0:
+            case OVERQUOTA_STORAGE_STATE:
+                intent.setAction(ACTION_OVERQUOTA_STORAGE);
+                break;
+
+            case PRE_OVERQUOTA_STORAGE_STATE:
+                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
+                break;
+
+            case NOT_OVERQUOTA_STATE:
             default:
                 intent.setAction(ACTION_SHOW_TRANSFERS);
                 intent.putExtra(TRANSFERS_TAB, PENDING_TAB);
-                break;
-            case 1:
-                intent.setAction(ACTION_OVERQUOTA_STORAGE);
-                break;
-            case 2:
-                intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
                 break;
         }
 
@@ -576,7 +619,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
         String logMessage = isFolderTransfer ? "updateProgressNotificationForFolderUpload: " : "updateProgressNotificationForFileUpload: ";
 		logDebug(logMessage + progressPercent + " " + message);
-        String actionString = isOverquota == 0 ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
+        String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = getProgressSize(UploadService.this,inProgress,total);
 
         if(isFolderTransfer){
@@ -589,7 +632,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private String getMessageForProgressNotification(long inProgress,boolean isFolderUpload) {
         logDebug("inProgress: " + inProgress + ", isFolderUpload:" + isFolderUpload);
         String message;
-        if (isOverquota != 0) {
+        if (isOverquota != NOT_OVERQUOTA_STATE) {
             message = getString(R.string.overquota_alert_title);
         } else if (inProgress == 0) {
             message = getString(R.string.download_preparing_files);
@@ -885,10 +928,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					logError("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
 					if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
-						isOverquota = 1;
+						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}
 					else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-						isOverquota = 2;
+						isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
 					}
 
 					if (!transfer.isFolderTransfer()) {
@@ -995,10 +1038,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				case MegaError.API_EOVERQUOTA:
 				case MegaError.API_EGOINGOVERQUOTA:
 					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
-						isOverquota = 1;
+						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}
 					else if (e.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
-						isOverquota = 2;
+						isOverquota = PRE_OVERQUOTA_STORAGE_STATE;
 					}
 
 					if (e.getValue() != 0) {
@@ -1039,12 +1082,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		if(isOverquota==1){
-			intent.setAction(ACTION_OVERQUOTA_STORAGE);
-		}
-		else{
-			intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-		}
+        if (isOverquota == OVERQUOTA_STORAGE_STATE) {
+            intent.setAction(ACTION_OVERQUOTA_STORAGE);
+        } else {
+            intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
+        }
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -1151,7 +1193,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private boolean isCUOrChatTransfer(MegaTransfer transfer) {
         String appData = transfer.getAppData();
         return !isTextEmpty(appData)
-                && (appData.contains(CU_UPLOAD)
-                || appData.contains(UPLOAD_APP_DATA_CHAT));
+                && (appData.contains(APP_DATA_CU)
+                || appData.contains(APP_DATA_CHAT));
     }
 }

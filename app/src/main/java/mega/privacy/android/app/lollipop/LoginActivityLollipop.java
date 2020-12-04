@@ -46,7 +46,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 
-
 public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 
     float scaleH, scaleW;
@@ -244,7 +243,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     }
                     case CHOOSE_ACCOUNT_FRAGMENT: {
                         if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                            chooseAccountFragment.onFreeClick(null);
+                            chooseAccountFragment.onFreeClick();
                         }
                         break;
                     }
@@ -484,7 +483,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
                 if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                    chooseAccountFragment.onFreeClick(null);
+                    chooseAccountFragment.onFreeClick();
                 }
                 break;
             }

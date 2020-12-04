@@ -19,7 +19,7 @@
         android:fontFamily="roboto"
         android:gravity="center_vertical"
         android:text="@{item.modifiedDate}"
-        android:textColor="@color/name_my_account"
+        android:textColor="@color/primary_text"
         android:textSize="12sp"
         tools:text="July 2020" />
 </layout>

@@ -249,7 +249,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
             reactionText.setTextColor(ContextCompat.getColor(context,
                     isMyOwnReaction(chatId, messageId, reaction)
                             ? R.color.accentColor
-                            : R.color.mail_my_account));
+                            : R.color.secondary_text));
             parent.addView(button);
             return button;
         }
