@@ -744,24 +744,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				files++;
 			}
 		}
-		
-		Resources res = this.getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}
-		actionMode.setTitle(title);
+
+		actionMode.setTitle(getFolderInfo(folders, files));
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {

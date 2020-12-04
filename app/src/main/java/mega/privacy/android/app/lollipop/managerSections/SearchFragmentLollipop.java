@@ -530,8 +530,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
             }
         }
 
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
         if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {

@@ -36,7 +36,6 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -699,9 +698,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             setFolderGridSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
+                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             } else {
-                holder.textViewFileSize.setText(getInfoFolder(node,context));
+                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             }
             holder.imageViewIcon.setVisibility(View.VISIBLE);
             holder.imageViewThumb.setVisibility(View.GONE);
@@ -897,14 +896,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(getInfoFolder(node,context));
+            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
 
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
+                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             } else if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
                 boolean firstLevel;
                 if(type == CONTACT_FILE_ADAPTER){
@@ -1332,7 +1331,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else {
-                subtitle = context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users, sl.size());
+                subtitle = context.getResources()
+                        .getQuantityString(R.plurals.general_num_shared_with, sl.size(), sl.size());
             }
         }
 

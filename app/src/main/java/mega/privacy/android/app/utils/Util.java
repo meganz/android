@@ -288,7 +288,7 @@ public class Util {
 		}
 
 		Context context = MegaApplication.getInstance().getApplicationContext();
-		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
+		String numChilden = context.getResources().getQuantityString(R.plurals.general_num_items, count, count);
 
 		return numChilden;
 	}

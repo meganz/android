@@ -677,36 +677,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		setIntent(intent);
 	}
 
-	public String getDescription(ArrayList<MegaNode> nodes) {
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i = 0; i < nodes.size(); i++) {
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()) {
-				numFolders++;
-			} else {
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			if (numFiles == 0) {
-				info = numFiles + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			} else {
-				info = numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-
-		return info;
-	}
-
 	@Override
 	protected void onDestroy() {
 		logDebug("onDestroy()");

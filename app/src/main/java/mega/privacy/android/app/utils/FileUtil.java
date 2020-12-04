@@ -52,7 +52,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 
 public class FileUtil {
 
@@ -723,6 +723,32 @@ public class FileUtil {
         }
 
         return file;
+    }
+
+    /**
+     * Gets the string to show as content of a folder.
+     *
+     * @param file The folder to get its string content.
+     * @return The string to show as content of the folder.
+     */
+    public static String getFileFolderInfo(File file) {
+        File[] fList = file.listFiles();
+        if (fList == null) {
+            return MegaApplication.getInstance().getString(R.string.file_browser_empty_folder);
+        }
+
+        int numFolders = 0;
+        int numFiles = 0;
+
+        for (File f : fList) {
+            if (f.isDirectory()) {
+                numFolders++;
+            } else {
+                numFiles++;
+            }
+        }
+
+        return getFolderInfo(numFolders, numFiles);
     }
 }
 

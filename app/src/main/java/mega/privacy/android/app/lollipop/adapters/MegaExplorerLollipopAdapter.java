@@ -263,7 +263,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             }
 
             holder.permissionsIcon.setVisibility(View.GONE);
-            holder.textViewFileSize.setText(getInfoFolder(node, context));
+            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if(node.isInShare()){

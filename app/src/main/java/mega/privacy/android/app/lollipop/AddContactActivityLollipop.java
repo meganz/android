@@ -1988,7 +1988,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else if (contactType == CONTACT_TYPE_DEVICE){
                 aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
                 if (addedContactsPhone.size() > 0){
-                    aB.setSubtitle(addedContactsPhone.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsPhone.size()));
+                    aB.setSubtitle(getResources()
+                            .getQuantityString(R.plurals.general_selection_num_contacts,
+                                    addedContactsPhone.size(), addedContactsPhone.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -1997,7 +1999,9 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else {
                 aB.setTitle(getString(R.string.share_with).toUpperCase());
                 if (addedContactsShare.size() > 0){
-                    aB.setSubtitle(addedContactsShare.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsShare.size()));
+                    aB.setSubtitle(getResources()
+                            .getQuantityString(R.plurals.general_selection_num_contacts,
+                                    addedContactsShare.size(), addedContactsShare.size()));
                 }
                 else {
                     aB.setSubtitle(null);

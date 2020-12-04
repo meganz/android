@@ -193,10 +193,8 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		}
 		List<MegaContactRequest> users = adapterList.getSelectedRequest();
 
-		Resources res = getResources();
-		String format = "%d %s";
-
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_request, users.size())));
+		actionMode.setTitle(getResources()
+				.getQuantityString(R.plurals.general_num_request, users.size(), users.size()));
 
 		try {
 			actionMode.invalidate();

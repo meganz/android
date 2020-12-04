@@ -27,7 +27,6 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -179,7 +178,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			holder.imageView.setLayoutParams(params);
 
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
-			holder.textViewFileSize.setText(getInfoFolder(node, context));
+			holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
 
 			if(node.isInShare()){
 				ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -233,7 +232,7 @@ public class MegaProviderLollipopAdapter extends RecyclerView.Adapter<MegaProvid
 			}
 			else{
 				holder.permissionsIcon.setVisibility(View.GONE);
-				holder.textViewFileSize.setText(getInfoFolder(node, context));
+				holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
 
 				if (!multipleSelect) {
 					holder.itemLayout.setBackgroundColor(Color.WHITE);

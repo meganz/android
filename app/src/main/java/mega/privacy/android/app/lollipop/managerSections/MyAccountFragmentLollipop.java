@@ -403,7 +403,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				visibleContacts.add(contacts.get(i));
 			}
 		}
-		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		connections.setText(context.getResources()
+				.getQuantityString(R.plurals.general_selection_num_contacts,
+						visibleContacts.size(), visibleContacts.size()));
 	}
 
 	public void setMkButtonText(){
@@ -782,39 +784,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
     public int onBackPressed(){
 		logDebug("onBackPressed");
 		return 0;
-	}
-
-	public String getDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
-			}
-		}
-
-		return info;
 	}
 
 	public void updateNameView(String fullName){

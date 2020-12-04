@@ -72,7 +72,7 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
-                nodeInfo.setText(getInfoFolder(node, context, megaApi));
+                nodeInfo.setText(getMegaNodeFolderInfo(node));
                 nodeThumb.setImageResource(R.drawable.ic_folder_list);
             } else {
                 long nodeSize = node.getSize();

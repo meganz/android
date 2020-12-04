@@ -173,7 +173,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
-                nodeInfo.setText(getInfoFolder(node, context, megaApi));
+                nodeInfo.setText(getMegaNodeFolderInfo(node));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
@@ -605,7 +605,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                         if (sl != null) {
                             if (sl.size() != 0) {
-                                nodeInfo.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users, sl.size()));
+                                nodeInfo.setText(context.getResources()
+                                        .getQuantityString(R.plurals.general_num_shared_with,
+                                                sl.size(), sl.size()));
                             }
                         }
                     } else {

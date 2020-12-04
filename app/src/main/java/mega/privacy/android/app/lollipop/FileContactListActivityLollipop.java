@@ -640,10 +640,9 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			logDebug("Contacts selected: " + contacts.size());
 		}
 
-		Resources res = getResources();
-		String format = "%d %s";
-	
-		actionMode.setTitle(String.format(format, contacts.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())));
+		actionMode.setTitle(getResources()
+				.getQuantityString(R.plurals.general_selection_num_contacts,
+						contacts.size(), contacts.size()));
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {

@@ -176,8 +176,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
+
         if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -416,12 +415,12 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			if(megaApi.getRubbishNode()!=null){
 				logDebug("Set content of the Rubbish Bin: " + ((ManagerActivityLollipop)context).getParentHandleRubbish());
 				if (((ManagerActivityLollipop)context).getParentHandleRubbish() == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
-					contentText.setText(getInfoFolder(megaApi.getRubbishNode(), context));
+					contentText.setText(getMegaNodeFolderInfo(megaApi.getRubbishNode()));
 
 				}
 				else{
 					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-					contentText.setText(getInfoFolder(infoNode, context));
+					contentText.setText(getMegaNodeFolderInfo(infoNode));
 				}
 			}
 
@@ -537,11 +536,11 @@ public class RubbishBinFragmentLollipop extends Fragment{
 
 			if(megaApi.getRubbishNode()!=null){
 				if (((ManagerActivityLollipop)context).getParentHandleRubbish() == megaApi.getRubbishNode().getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
-					contentText.setText(getInfoFolder(megaApi.getRubbishNode(), context));
+					contentText.setText(getMegaNodeFolderInfo(megaApi.getRubbishNode()));
 				}
 				else{
 					MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-					contentText.setText(getInfoFolder(infoNode, context));
+					contentText.setText(getMegaNodeFolderInfo(infoNode));
 				}
 			}
 
@@ -658,7 +657,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
-				contentText.setText(getInfoFolder(infoNode, context));
+				contentText.setText(getMegaNodeFolderInfo(infoNode));
 
 				adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				nodes = megaApi.getChildren(nodes.get(position), ((ManagerActivityLollipop)context).orderCloud);
@@ -1121,7 +1120,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				}
 
 //			adapter.setParentHandle(parentHandle);
-				contentText.setText(getInfoFolder(parentNode, context));
+				contentText.setText(getMegaNodeFolderInfo(parentNode));
 				return 2;
 			}
 			else{
@@ -1135,13 +1134,13 @@ public class RubbishBinFragmentLollipop extends Fragment{
 		MegaNode rN = megaApi.getRubbishNode();
 		if(rN!=null){
 			if (((ManagerActivityLollipop)context).getParentHandleRubbish() == rN.getHandle()||((ManagerActivityLollipop)context).getParentHandleRubbish()==-1){
-				contentText.setText(getInfoFolder(rN, context));
+				contentText.setText(getMegaNodeFolderInfo(rN));
 
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(((ManagerActivityLollipop)context).getParentHandleRubbish());
 				if (infoNode !=  null){
-					contentText.setText(getInfoFolder(infoNode, context));
+					contentText.setText(getMegaNodeFolderInfo(infoNode));
 				}
 				else{
 					logWarning("INFO NODE null");

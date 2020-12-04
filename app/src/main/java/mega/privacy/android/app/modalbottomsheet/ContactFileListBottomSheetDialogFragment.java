@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,7 +19,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
@@ -115,7 +113,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         if (node.isFolder()) {
             nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
             optionInfoText.setText(R.string.general_folder_info);
-            nodeInfo.setText(getInfoFolder(node, context, megaApi));
+            nodeInfo.setText(getMegaNodeFolderInfo(node));
 
             if (firstLevel || parentHandle == INVALID_HANDLE) {
                 optionLeave.setVisibility(View.VISIBLE);

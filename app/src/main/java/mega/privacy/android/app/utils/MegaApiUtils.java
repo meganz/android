@@ -26,6 +26,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 
 
 public class MegaApiUtils {
@@ -47,133 +48,39 @@ public class MegaApiUtils {
         return size;
     }
 
-    public static String getInfoNodeOnlyFolders(ArrayList<MegaNode> nodes, Context context) {
-        logDebug("getInfoNodeOnlyFolders");
-        int numFolders = nodes.size();
+    /**
+     * Gets the string to show as content of a folder.
+     *
+     * @param n The folder to get its string content.
+     * @return The string to show as content of the folder.
+     */
+    public static String getMegaNodeFolderInfo(MegaNode n) {
+        MegaApplication app = MegaApplication.getInstance();
+        MegaApiJava megaApi = app.getMegaApi();
 
-        String info = "";
-        if (numFolders >= 0) {
-            info = numFolders
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_folders, numFolders);
-
-        }
-        return info;
+        return getFolderInfo(megaApi.getNumChildFolders(n), megaApi.getNumChildFiles(n));
     }
 
-    public static String getInfoNode(ArrayList<MegaNode> nodes, Context context) {
-        logDebug("getInfoNode");
+    /**
+     * Gets the string to show as content of a list of nodes.
+     *
+     * @param nodes The list of nodes to get its string content.
+     * @return The string to show as content of the list of nodes.
+     */
+    public static String getDescription(ArrayList<MegaNode> nodes) {
         int numFolders = 0;
         int numFiles = 0;
 
-        for (int i=0;i<nodes.size();i++){
-            MegaNode n = nodes.get(i);
-            if(n == null) {
-                continue;
-            }
-            if (n.isFolder()){
+        for (int i = 0; i < nodes.size(); i++) {
+            MegaNode c = nodes.get(i);
+            if (c.isFolder()) {
                 numFolders++;
-            }
-            else{
+            } else {
                 numFiles++;
             }
         }
 
-        String info = "";
-        if (numFolders > 0) {
-            info = numFolders
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_folders, numFolders);
-            if (numFiles > 0) {
-                info = info
-                        + ", "
-                        + numFiles
-                        + " "
-                        + context.getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-        } else {
-            info = numFiles
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_files, numFiles);
-        }
-
-        return info;
-    }
-
-    public static String getInfoFolder(MegaNode n, Context context) {
-        logDebug("getInfoFolder");
-        MegaApiAndroid megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        int numFolders = megaApi.getNumChildFolders(n);
-        int numFiles = megaApi.getNumChildFiles(n);
-        logDebug("numFolders, numFiles: " + numFolders + " " + numFiles);
-        String info = "";
-        if (numFolders > 0) {
-            info = numFolders
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_folders, numFolders);
-            if (numFiles > 0) {
-                info = info
-                        + " . "
-                        + numFiles
-                        + " "
-                        + context.getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-        } else {
-            if(numFiles>0) {
-                info = numFiles + " " + context.getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-            else{
-                //Empty folder
-                info = context.getResources().getString(R.string.file_browser_empty_folder);
-            }
-        }
-
-        return info;
-    }
-
-    public static String getInfoFolder(MegaNode n, Context context, MegaApiAndroid megaApi) {
-        logDebug("getInfoFolder with megaApi");
-        if(megaApi==null){
-            return "";
-        }
-
-        int numFolders = megaApi.getNumChildFolders(n);
-        int numFiles = megaApi.getNumChildFiles(n);
-        logDebug("numFolders, numFiles: " + numFolders + " " + numFiles);
-        String info = "";
-        if (numFolders > 0) {
-            info = numFolders
-                    + " "
-                    + context.getResources().getQuantityString(
-                    R.plurals.general_num_folders, numFolders);
-            if (numFiles > 0) {
-                info = info
-                        + ", "
-                        + numFiles
-                        + " "
-                        + context.getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-        } else {
-
-            if(numFiles>0) {
-                info = numFiles + " " + context.getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-            else{
-                //Empty folder
-                info = context.getResources().getString(R.string.file_browser_empty_folder);
-            }
-        }
-
-        return info;
+        return getFolderInfo(numFolders, numFiles);
     }
 
     /*

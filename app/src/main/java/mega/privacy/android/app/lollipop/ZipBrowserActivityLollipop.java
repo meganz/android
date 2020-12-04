@@ -56,6 +56,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.Util.*;
 
 
@@ -820,23 +821,6 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			}
 		}
 
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders
-					+ " "
-					+ this.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info
-						+ ", "
-						+ numFiles
-						+ " "
-						+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			info = numFiles
-					+ " "
-					+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		return info;
+		return getFolderInfo(numFolders, numFiles);
 	}
 }

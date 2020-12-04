@@ -415,7 +415,9 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         logDebug("setTitleAB");
         if (aB != null) {
             if (addedContacts.size() > 0) {
-                aB.setSubtitle(getResources().getQuantityString(R.plurals.num_contacts_selected, addedContacts.size(), addedContacts.size()));
+                aB.setSubtitle(getResources()
+                        .getQuantityString(R.plurals.general_selection_num_contacts,
+                                addedContacts.size(), addedContacts.size()));
             } else {
                 aB.setSubtitle(null);
             }

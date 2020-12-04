@@ -1512,7 +1512,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentTextView.setVisibility(View.VISIBLE);
 			contentTitleTextView.setVisibility(View.VISIBLE);
 
-			contentTextView.setText(getInfoFolder(node, this));
+			contentTextView.setText(getMegaNodeFolderInfo(node));
 
 			long sizeFile=megaApi.getSize(node);
 			sizeTextView.setText(getSizeString(sizeFile));
@@ -1620,7 +1620,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					sharedLayout.setVisibility(View.VISIBLE);
 					dividerSharedLayout.setVisibility(View.VISIBLE);
-					usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+                    usersSharedWithTextButton.setText(getResources()
+                            .getQuantityString(R.plurals.general_selection_num_contacts,
+                                    sl.size(), sl.size()));
 
 				}
 
@@ -1666,7 +1668,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         FrameLayout sharedContactLayout = (FrameLayout)findViewById(R.id.shared_contact_list_container);
         if (isShareContactExpanded) {
             if (sl != null) {
-                usersSharedWithTextButton.setText(sl.size() + " " + getResources().getQuantityString(R.plurals.general_num_users, sl.size()));
+                usersSharedWithTextButton.setText(getResources()
+                        .getQuantityString(R.plurals.general_selection_num_contacts,
+                                sl.size(), sl.size()));
             }
             sharedContactLayout.setVisibility(View.GONE);
         } else {
@@ -2732,7 +2736,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			long sizeFile=megaApi.getSize(node);
 			sizeTextView.setText(getSizeString(sizeFile));
 
-			contentTextView.setText(getInfoFolder(node, this));
+			contentTextView.setText(getMegaNodeFolderInfo(node));
 			setIconResource();
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
@@ -2774,7 +2778,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					sharedLayout.setVisibility(View.VISIBLE);
 					dividerSharedLayout.setVisibility(View.VISIBLE);
-                    usersSharedWithTextButton.setText((sl.size()) + " " + getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+                    usersSharedWithTextButton.setText(getResources()
+                            .getQuantityString(R.plurals.general_selection_num_contacts,
+                                    sl.size(), sl.size()));
 				}
 			}
 		}
@@ -3200,10 +3206,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             logDebug("Contacts selected: " + contacts.size());
         }
         
-        Resources res = getResources();
-        String format = "%d %s";
-        
-        actionMode.setTitle(String.format(format, contacts.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())));
+        actionMode.setTitle(getResources()
+                .getQuantityString(R.plurals.general_selection_num_contacts,
+                        contacts.size(), contacts.size()));
         try {
             actionMode.invalidate();
         } catch (NullPointerException e) {

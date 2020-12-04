@@ -534,34 +534,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			onBindViewHolderGrid(holderGrid, position);
 		}
 	}
-
-	private String getFolderInfo(File file) {
-		int folders = 0;
-		int files = 0;
-
-		File[] fList = file.listFiles();
-		if (fList == null) return " ";
-
-		String info = "";
-		for (File f : fList) {
-			if (f.isDirectory()) {
-				folders++;
-			} else {
-				files++;
-			}
-		}
-
-		if (folders > 0) {
-			info = folders + " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-			if (files > 0) {
-				info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-			}
-		} else {
-			info = files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-		}
-
-		return info;
-	}
 	
 	public void onBindViewHolderGrid (ViewHolderOfflineGrid holder, int position){
 		logDebug("Position: " + position);
@@ -585,7 +557,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		holder.textViewFileName.setText(currentNode.getName());
 
 		if (currentFile.isDirectory()){
-			holder.textViewFileSize.setText(getFolderInfo(currentFile));
+			holder.textViewFileSize.setText(getFileFolderInfo(currentFile));
 		}
 		else{
 			long nodeSize = currentFile.length();
@@ -667,7 +639,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		setImageViewParams(holder.imageView, LARGE_IMAGE_WIDTH, 0);
 
 		if (currentFile.isDirectory()) {
-			holder.textViewFileSize.setText(getFolderInfo(currentFile));
+			holder.textViewFileSize.setText(getFileFolderInfo(currentFile));
 		} else {
 			long nodeSize = currentFile.length();
 			holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(currentFile.lastModified() / 1000)));
