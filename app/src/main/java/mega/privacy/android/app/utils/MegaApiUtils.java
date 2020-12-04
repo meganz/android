@@ -55,8 +55,7 @@ public class MegaApiUtils {
      * @return The string to show as content of the folder.
      */
     public static String getMegaNodeFolderInfo(MegaNode n) {
-        MegaApplication app = MegaApplication.getInstance();
-        MegaApiJava megaApi = app.getMegaApi();
+        MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
 
         return getFolderInfo(megaApi.getNumChildFolders(n), megaApi.getNumChildFiles(n));
     }

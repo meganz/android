@@ -1040,8 +1040,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
 
     <plurals name="general_num_request">
-        <item context="referring to a invitation request in the Contacts section. 1 request" quantity="one">%1$d request</item>
-        <item context="referring to a invitation request in the Contacts section. 5 requests" quantity="other">%1$d requests</item>
+        <item context="referring to a invitation request in the Contacts section. Singular. 1 request" quantity="one">%1$d request</item>
+        <item context="referring to a invitation request in the Contacts section. Plural. 5 requests" quantity="other">%1$d requests</item>
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1066,8 +1066,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. 1 item" quantity="one">%1$d item</item>
-        <item context="Plural of items which contains a folder. 2 items" quantity="other">%1$d items</item>
+        <item context="Singular of items which contains a folder. Singular. 1 item" quantity="one">%1$d item</item>
+        <item context="Plural of items which contains a folder. Plural. 2 items" quantity="other">%1$d items</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
