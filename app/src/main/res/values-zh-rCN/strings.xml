@@ -807,7 +807,7 @@
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">代码错误</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">PIN码错误，请再试一次，您还有1次尝试机会。</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">应用锁密码错误。请再试一次。您还有1此尝试机会</item>
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">应用锁密码错误。请重试。您还剩余%2d次尝试</item>
     </plurals>
     <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">应用锁密码不匹配</string>
@@ -1217,7 +1217,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">聊天记录已删除</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">错误。聊天记录没有被清除</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">发生错误。聊天记录未清除成功。</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">添加与会者</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">删除与会者</string>
@@ -1559,7 +1559,7 @@
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">传输流量不足</string>
     <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">您的IP地址目前没有可用的传输流量。升级您的帐户或等待%s后继续下载。</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">您已超出当前IP地址的可用传输流量。升级您的帐户或等待%s后继续下载。</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">参考我们的方案</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">在未登录账户下继续使用</string>
 
@@ -2050,7 +2050,7 @@
     <string name="login_servers_busy" context="message when a temporary error on logging in is due to servers busy">服务器正忙，请稍等。</string>
     <string name="login_API_lock" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">处理花费的时间比预期的要长。请稍候。</string>
     <string name="login_API_rate" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit">请求太多。请稍候。</string>
-    <string name="login_in_progress" context="Message when previous login is being cancelled">正在取消登录进程。请等待&#8230;&#8230;</string>
+    <string name="login_in_progress" context="Message when previous login is being cancelled">正在取消登录。请稍后&#8230;</string>
 
     <string name="unsupported_file_type" context="when open audio video player, the file that it try to open is not supported">不支持的文件类型</string>
     <string name="corrupt_video_dialog_text" context="when open audio video player, the file that it try to open is damaged or does not exist">出错了。文件损坏或不存在。</string>
@@ -2249,10 +2249,10 @@
 
     <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">该码无效</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">云盘空间几乎已满。升级至PRO帐户并获得高达%1$s的存储空间和%2$s的传输流量。</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">云盘空间几乎已满。升级至Pro会员并获得最高%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">云盘空间几乎已满。立即升级并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">云端空间几乎已满。如果您需要更多存储空间，请联系MEGA技术支持获取定制计划。</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">云盘空间已满。升级至PRO帐户并获得高达%1$s的存储空间和%2$s的传输流量。</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">云盘空间已满。升级至Pro帐户并获得最高%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">云盘空间已满。立即升级并获得高达%1$s的存储空间和%2$s的传输流量。</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">云盘空间已满。如果您需要更多存储空间，请联系MEGA技术支持获取定制计划。</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">参看方案</string>
@@ -2849,7 +2849,7 @@
 
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
-    <string name="failed_label" context="Label describing some action failed">Failed</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Failed</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>

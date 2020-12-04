@@ -2849,7 +2849,7 @@
 
     <string name="storage_root_label" context="Storage root label">Tipo de armazenamento</string>
 
-    <string name="failed_label" context="Label describing some action failed">Cancelado</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Cancelado</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">As suas transferências foram interrompidas. Faça um upgrade ou aguarde %s para continuar.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Cota de transferência excedida</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Cota de armazenamento excedida</string>
