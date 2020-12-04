@@ -1798,8 +1798,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_OPEN_FOLDER);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("locationFileInfo", true);
                 if (adapterType == OFFLINE_ADAPTER){
                     intent.putExtra("offline_adapter", true);
