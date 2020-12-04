@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".FileExplorerListFragment">
+    tools:context=".lollipop.FileExplorerActivityLollipop">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -14,12 +14,11 @@
             android:id="@+id/content_text"
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:textColor="@color/primary_text"
             android:textSize="14sp"
             android:fontFamily="roboto"
-            android:gravity="left|center_vertical"
-            android:text="File"/>
+            android:gravity="start|center_vertical"/>
 
         <RelativeLayout
             android:id="@+id/files_layout"
@@ -46,7 +45,7 @@
                 android:id="@+id/separator_show_more"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
+                android:layout_marginStart="72dp"
                 android:background="@color/tour_bar_grey"/>
 
             <TextView
@@ -57,19 +56,19 @@
                 android:textColor="@color/accentColor"
                 android:fontFamily="roboto"
                 android:text="@string/general_show_more"
-                android:gravity="left|center_vertical"
-                android:layout_marginLeft="16dp"
+                android:gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
                 android:layout_below="@+id/separator_show_more"
                 android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"/>
+                android:layout_alignParentStart="true"/>
 
             <ImageView
                 android:id="@+id/show_more_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
                 android:src="@drawable/ic_collapse_acc"/>
 
         </RelativeLayout>
@@ -85,20 +84,20 @@
             android:id="@+id/choose_destination"
             android:layout_width="match_parent"
             android:layout_height="36dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:textColor="@color/primary_text"
             android:textSize="14sp"
             android:fontFamily="roboto"
             android:layout_below="@+id/separator"
             android:text="@string/choose_destionation"
-            android:gravity="left|center_vertical"
+            android:gravity="start|center_vertical"
             android:layout_marginTop="8dp"/>
 
         <RelativeLayout
             android:id="@+id/cloud_drive_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_below="@+id/choose_destination">
 
             <TextView
@@ -106,28 +105,9 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/accentColor"
                 android:layout_centerVertical="true"
-                android:gravity="left"
+                android:gravity="start"
                 android:textSize="14sp"
                 android:text="@string/section_cloud_drive"
-                android:textAllCaps="true"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/incoming_layout"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginLeft="16dp"
-            android:layout_below="@+id/cloud_drive_layout">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:layout_centerVertical="true"
-                android:gravity="left"
-                android:textSize="14sp"
-                android:text="@string/title_incoming_shares_explorer"
                 android:textAllCaps="true"/>
 
         </RelativeLayout>
@@ -136,15 +116,15 @@
             android:id="@+id/chat_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginLeft="16dp"
-            android:layout_below="@+id/incoming_layout">
+            android:layout_marginStart="16dp"
+            android:layout_below="@+id/cloud_drive_layout">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/accentColor"
                 android:layout_centerVertical="true"
-                android:gravity="left"
+                android:gravity="start"
                 android:textSize="14sp"
                 android:text="@string/section_chat"
                 android:textAllCaps="true"/>
