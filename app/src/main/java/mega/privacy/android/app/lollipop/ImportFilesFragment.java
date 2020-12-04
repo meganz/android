@@ -21,7 +21,6 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
@@ -78,15 +77,13 @@ public class ImportFilesFragment extends BaseFragment {
         new ListenScrollChangesHelper().addViewToListen(binding.scrollContainerImport,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeActionBarElevation());
 
-        binding.fileListView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
         mLayoutManager = new LinearLayoutManager(context);
         binding.fileListView.setLayoutManager(mLayoutManager);
-        binding.cloudDriveLayout.setOnClickListener(v ->
+        binding.cloudDriveButton.setOnClickListener(v ->
                 ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CLOUD_FRAGMENT));
 
-        binding.chatLayout.setOnClickListener(v ->
+        binding.chatButton.setOnClickListener(v ->
                 ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CHAT_FRAGMENT));
-        binding.chatLayout.setVisibility(VISIBLE);
 
         binding.showMoreLayout.setOnClickListener(v -> showMoreClick());
 

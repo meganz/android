@@ -15,52 +15,49 @@
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
-            android:textColor="@color/primary_text"
-            android:textSize="14sp"
-            android:fontFamily="roboto"
-            android:gravity="start|center_vertical"/>
+            android:layout_marginEnd="16dp"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:textColor="@color/secondary_text"
+            android:textSize="14sp" />
 
         <RelativeLayout
             android:id="@+id/files_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/content_text">
+            android:layout_below="@+id/content_text"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/file_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:choiceMode="multipleChoice"/>
+                android:choiceMode="multipleChoice"
+                android:clipToPadding="false" />
 
         </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/show_more_layout"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_below="@id/files_layout">
-
-            <View
-                android:id="@+id/separator_show_more"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="72dp"
-                android:background="@color/tour_bar_grey"/>
+            android:layout_height="36dp"
+            android:layout_below="@id/files_layout"
+            android:layout_marginStart="16dp">
 
             <TextView
                 android:id="@+id/show_more_text"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="14sp"
-                android:textColor="@color/accentColor"
-                android:fontFamily="roboto"
-                android:text="@string/general_show_more"
-                android:gravity="start|center_vertical"
-                android:layout_marginStart="16dp"
-                android:layout_below="@+id/separator_show_more"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"/>
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@id/show_more_image"
+                android:fontFamily="sans-serif"
+                android:gravity="start|center_vertical"
+                android:text="@string/general_show_more"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/show_more_image"
@@ -69,67 +66,44 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_collapse_acc"/>
+                android:src="@drawable/ic_collapse_acc"
+                tools:ignore="ContentDescription" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/black_12_alpha" />
 
         </RelativeLayout>
-
-        <View
-            android:id="@+id/separator"
-            android:background="@color/tour_bar_grey"
-            android:layout_width = "match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@id/show_more_layout"/>
 
         <TextView
             android:id="@+id/choose_destination"
             android:layout_width="match_parent"
             android:layout_height="36dp"
+            android:layout_below="@+id/show_more_layout"
             android:layout_marginStart="16dp"
-            android:textColor="@color/primary_text"
-            android:textSize="14sp"
-            android:fontFamily="roboto"
-            android:layout_below="@+id/separator"
-            android:text="@string/choose_destionation"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="sans-serif"
             android:gravity="start|center_vertical"
-            android:layout_marginTop="8dp"/>
+            android:text="@string/choose_destionation"
+            android:textColor="@color/secondary_text"
+            android:textSize="14sp" />
 
-        <RelativeLayout
-            android:id="@+id/cloud_drive_layout"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_below="@+id/choose_destination">
+        <Button
+            android:id="@+id/cloud_drive_button"
+            style="@style/TransparentBackgroundButtonWithoutBorder"
+            android:layout_below="@+id/choose_destination"
+            android:layout_marginTop="8dp"
+            android:text="@string/section_cloud_drive" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:layout_centerVertical="true"
-                android:gravity="start"
-                android:textSize="14sp"
-                android:text="@string/section_cloud_drive"
-                android:textAllCaps="true"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/chat_layout"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_below="@+id/cloud_drive_layout">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:layout_centerVertical="true"
-                android:gravity="start"
-                android:textSize="14sp"
-                android:text="@string/section_chat"
-                android:textAllCaps="true"/>
-
-        </RelativeLayout>
+        <Button
+            android:id="@+id/chat_button"
+            style="@style/TransparentBackgroundButtonWithoutBorder"
+            android:layout_below="@+id/cloud_drive_button"
+            android:layout_marginTop="12dp"
+            android:text="@string/section_chat" />
 
     </RelativeLayout>
 

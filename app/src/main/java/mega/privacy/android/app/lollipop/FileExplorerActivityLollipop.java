@@ -835,12 +835,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	public void showFabButton(boolean show){
-		if(show){
-			fabButton.setVisibility(View.VISIBLE);
-		}
-		else{
-			fabButton.setVisibility(View.GONE);
-		}
+		fabButton.setVisibility(show ? View.VISIBLE : View.GONE);
 	}
 
 	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
@@ -1022,12 +1017,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			return;
 		}
 
-		if(intent.getAction().equals(ACTION_MULTISELECT_FILE)){
-			createFolderMenuItem.setVisible(false);
-		}
-		else{
-			createFolderMenuItem.setVisible(true);
-		}
+		createFolderMenuItem.setVisible(!intent.getAction().equals(ACTION_MULTISELECT_FILE));
 	}
 
 	@Override
@@ -1188,14 +1178,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	    return super.onPrepareOptionsMenu(menu);
 	}
-	
-	private View getTabIndicator(Context context, String title) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
-
-        TextView tv = (TextView) view.findViewById(R.id.textView);
-        tv.setText(title);
-        return view;
-    }
 
 	private void setRootTitle(){
 		logDebug("setRootTitle");
@@ -1276,14 +1258,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 							}
 							break;
 						}
-						case CHAT_FRAGMENT:{
+						case CHAT_FRAGMENT:
+						case IMPORT_FRAGMENT:
 							setRootTitle();
 							break;
-						}
-						case IMPORT_FRAGMENT:{
-							setRootTitle();
-							break;
-						}
 					}
 				}
 			}
@@ -1434,20 +1412,14 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		bundle.putString(QUERY_AFTER_SEARCH, queryAfterSearch);
 		bundle.putString(CURRENT_ACTION, currentAction);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (getIntent() != null){
-			if (mode == UPLOAD) {
-				if (folderSelected){
-					if (filePreparedInfos == null){
-						OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
-						ownFilePrepareTask.execute(getIntent());
-						createAndShowProgressDialog(false, R.string.upload_prepare);
-					}
-				}
-			}
+		if (getIntent() != null && mode == UPLOAD && folderSelected && filePreparedInfos == null) {
+			OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
+			ownFilePrepareTask.execute(getIntent());
+			createAndShowProgressDialog(false, R.string.upload_prepare);
 		}
 	}
 	

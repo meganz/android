@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -108,6 +110,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
     ViewHolderImportFiles holder;
 
+    @NotNull
     @Override
     public ViewHolderImportFiles onCreateViewHolder(ViewGroup parent, int viewType) {
 
@@ -115,10 +118,11 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
         holder = new ViewHolderImportFiles(v);
 
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_import_layout);
-        holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail_file);
-        holder.name = (TextView) v.findViewById(R.id.text_file);
-        holder.editButton = (RelativeLayout) v.findViewById(R.id.edit_icon_layout);
+        holder.itemLayout = v.findViewById(R.id.item_import_layout);
+        holder.thumbnail = v.findViewById(R.id.thumbnail_file);
+        holder.name = v.findViewById(R.id.text_file);
+        holder.editButton = v.findViewById(R.id.edit_icon_layout);
+        holder.separator = v.findViewById(R.id.separator);
 
         v.setTag(holder);
         return holder;
@@ -148,21 +152,28 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
                         holder.thumbnail.setImageURI(uri);
                     }
                 } else {
-                    new ThumbnailsTask().execute(new Object[]{file, holder});
+                    new ThumbnailsTask().execute(file, holder);
                 }
             }
         }
 
         RelativeLayout.LayoutParams params;
-        if (position >= 4 && !itemsVisibles){
+
+        if (position >= 4 && !itemsVisibles) {
             holder.itemLayout.setVisibility(View.GONE);
             params = new RelativeLayout.LayoutParams(0, 0);
-            holder.itemLayout.setLayoutParams(params);
-        }
-        else {
+        } else {
             holder.itemLayout.setVisibility(View.VISIBLE);
-            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(56, outMetrics));
-            holder.itemLayout.setLayoutParams(params);
+            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(72, outMetrics));
+        }
+
+        holder.itemLayout.setLayoutParams(params);
+
+        if (getItemCount() > 4
+                && ((itemsVisibles && position == getItemCount() -1) || (!itemsVisibles && position == 3))) {
+            holder.separator.setVisibility(View.GONE);
+        } else {
+            holder.separator.setVisibility(View.VISIBLE);
         }
     }
 
@@ -199,6 +210,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         ImageView thumbnail;
         TextView name;
         RelativeLayout editButton;
+        View separator;
         int currentPosition;
 
         public ViewHolderImportFiles(View itemView) {
