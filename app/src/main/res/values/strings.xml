@@ -128,13 +128,8 @@
         <item context="General files label. Plural of file. Files" quantity="other">Files</item>
     </plurals>
 
-    <plurals name="general_num_shared_folders">
-        <item context="Title of the incoming shared folders of a user in singular. 1 shared folder" quantity="one">%1$d shared folder</item>
-        <item context="Title of the incoming shared folders of a user in plural. 5 shared folders" quantity="other">%1$d shared folders</item>
-    </plurals>
-
     <plurals name="general_num_shared_with">
-        <item context="Indicates how many contacts a folder it is shared with. Singular. Shared with 1 contact" quantity="one">Shared with %1$d contact</item>
+        <item context="Indicates how many contacts a folder it is shared with. Singular. Shared with Pepe" quantity="one">Shared with %1$s</item>
         <item context="indicates how many contacts a folder it is shared with. Plural. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
     </plurals>
 
