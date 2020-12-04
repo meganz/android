@@ -51,6 +51,8 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
