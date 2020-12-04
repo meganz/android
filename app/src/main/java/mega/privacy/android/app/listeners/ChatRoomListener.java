@@ -9,11 +9,12 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
-public class ChatRoomGlobalListener implements MegaChatRoomListenerInterface {
+public class ChatRoomListener implements MegaChatRoomListenerInterface {
 
-    public ChatRoomGlobalListener() {
+    public ChatRoomListener() {
     }
 
     @Override
@@ -28,6 +29,7 @@ public class ChatRoomGlobalListener implements MegaChatRoomListenerInterface {
 
     @Override
     public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
+
     }
 
     @Override
@@ -47,9 +49,15 @@ public class ChatRoomGlobalListener implements MegaChatRoomListenerInterface {
 
     @Override
     public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
+
     }
 
     @Override
     public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
+        if(msg != null){
+            Intent intentRetentionTime = new Intent(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT);
+            intentRetentionTime.putExtra(MESSAGE_ID, msg.getMsgId());
+            MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
+        }
     }
 }

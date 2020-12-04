@@ -634,8 +634,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					sharedFilesLayout.setVisibility(View.GONE);
 					dividerSharedFilesLayout.setVisibility(View.GONE);
 				}
-
-
 			}
 
 			if (chat != null) {
@@ -1820,10 +1818,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.recycle();
         }
-
-		if (fromContacts && chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE) {
-			MegaApplication.getInstance().closeChatRoom(chat.getChatId());
-		}
 
 		unregisterReceiver(chatCallUpdateReceiver);
 		unregisterReceiver(chatSessionUpdateReceiver);

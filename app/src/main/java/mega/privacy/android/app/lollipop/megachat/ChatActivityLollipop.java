@@ -564,6 +564,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    private final BroadcastReceiver historyTruncatedByRetentionTimeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                long msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
+                if (msgId != MEGACHAT_INVALID_HANDLE) {
+                    updateHistoryByRetentionTime(msgId);
+                }
+            }
+        }
+    };
+
     private BroadcastReceiver voiceclipDownloadedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -788,7 +800,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -817,6 +828,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         chatActivity = this;
         chatC = new ChatController(chatActivity);
 
+        registerReceiver(historyTruncatedByRetentionTimeReceiver, new IntentFilter(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT));
         registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
 
@@ -5446,6 +5458,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setPreviewersView();
         }
         else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_RETENTION_TIME)) {
+            logDebug("CHANGE_TYPE_RETENTION_TIME for the chat: " + chat.getChatId());
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
@@ -6193,32 +6206,38 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+    /**
+     * Method that controls the update of the chat history depending on the retention time.
+     *
+     * @param msgId Message ID from which the messages are to be deleted.
+     */
+    private void updateHistoryByRetentionTime(long msgId) {
+        for (AndroidMegaChatMessage message : messages) {
+            if (message != null && message.getMessage() != null &&
+                    message.getMessage().getMsgId() == msgId) {
+
+                int position = messages.indexOf(message);
+                if (position < messages.size() - 1) {
+                    List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
+                    messages.clear();
+                    for (int i = position + 1; i < messagesCopy.size(); i++) {
+                        messages.add(messagesCopy.get(i));
+                    }
+                } else {
+                    messages.clear();
+                }
+                updateMessages();
+                break;
+            }
+        }
+    }
+
     @Override
     public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
         if (msg == null || messages == null || messages.isEmpty())
             return;
 
-        for (AndroidMegaChatMessage message : messages) {
-            if (message != null && message.getMessage() != null &&
-                    message.getMessage().getMsgId() == msg.getMsgId()) {
-
-                int position = messages.indexOf(message);
-
-                if (position < messages.size() - 1) {
-                    messages.clear();
-                    List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
-
-                    for (int i = position + 1; i < messagesCopy.size(); i++) {
-                        messages.add(messagesCopy.get(i));
-                    }
-                }else{
-                    messages.clear();
-                }
-
-                updateMessages();
-                break;
-            }
-        }
+        updateHistoryByRetentionTime(msg.getMsgId());
     }
 
     private void disableMultiselection(){
@@ -7828,6 +7847,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             adapter.destroyVoiceElemnts();
         }
 
+        unregisterReceiver(historyTruncatedByRetentionTimeReceiver);
         unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(dialogConnectReceiver);
         unregisterReceiver(voiceclipDownloadedReceiver);
@@ -7880,7 +7900,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         saveInputText();
         shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
-
         megaChatApi.closeChatRoom(idChat, this);
 
         if (chatRoom.isPreview()) {

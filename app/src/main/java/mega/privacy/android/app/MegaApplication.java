@@ -51,7 +51,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.listeners.ChatRoomGlobalListener;
+import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
@@ -196,7 +196,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static MegaApplication singleApplicationInstance;
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
-	private ChatRoomGlobalListener chatRoomGlobalListener = new ChatRoomGlobalListener();
+	private ChatRoomListener chatRoomGlobalListener = new ChatRoomListener();
 
 	@Override
 	public void networkAvailable() {
