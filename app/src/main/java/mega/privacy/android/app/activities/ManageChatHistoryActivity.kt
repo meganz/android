@@ -151,6 +151,10 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
             val seconds = chat!!.retentionTime
             updateRetentionTimeUI(seconds)
+
+            binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
+            binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
+            binding.pickerButton.setOnClickListener(this)
         }
     }
 
@@ -163,13 +167,10 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         logDebug("Show the pickers")
         binding.pickerLayout.visibility = View.VISIBLE
         binding.separator.visibility = View.VISIBLE
-        binding.pickerButton.setOnClickListener(this)
 
         binding.numberPicker.wrapSelectorWheel = true
         binding.textPicker.wrapSelectorWheel = true
-
         binding.numberPicker.minValue = MINIMUM_VALUE_NUMBER_PICKER
-
         binding.textPicker.minValue = MINIMUM_VALUE_TEXT_PICKER
         binding.textPicker.maxValue = MAXIMUM_VALUE_TEXT_PICKER
 
@@ -182,9 +183,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         } else {
             checkPickersValues(seconds)
         }
-
-        binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
-        binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
     }
 
     /**
@@ -213,10 +211,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             ),
             StringResourcesUtils.getString(R.string.year_cc).toLowerCase()
         )
-
-        binding.textPicker.setFormatter { value ->
-            arrayString[value]
-        }
 
         binding.textPicker.displayedValues = arrayString
     }
@@ -300,7 +294,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      * @param newValue the current value of the number picker
      */
     private fun updateTextPicker(oldValue: Int, newValue: Int) {
-        if ((oldValue == 1 && newValue == 1) || (oldValue > 1 && newValue > 1) || binding.textPicker.value == OPTION_YEARS)
+        if ((oldValue == 1 && newValue == 1) || (oldValue > 1 && newValue > 1))
             return
 
         if ((oldValue == 1 && newValue > 1) || (newValue == 1 && oldValue > 1)) {
