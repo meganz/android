@@ -5446,7 +5446,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             setPreviewersView();
         }
         else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_RETENTION_TIME)) {
-            logDebug("CHANGE_TYPE_RETENTION_TIME for the chat: " + chat.getChatId());
             Intent intentRetentionTime = new Intent(ACTION_UPDATE_RETENTION_TIME);
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
@@ -6200,17 +6199,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
 
         for (AndroidMegaChatMessage message : messages) {
-            if (message != null && message.getMessage() != null && message.getMessage().getMsgId() == msg.getMsgId()) {
+            if (message != null && message.getMessage() != null &&
+                    message.getMessage().getMsgId() == msg.getMsgId()) {
+
                 int position = messages.indexOf(message);
+
                 if (position < messages.size() - 1) {
                     messages.clear();
                     List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
+
                     for (int i = position + 1; i < messagesCopy.size(); i++) {
                         messages.add(messagesCopy.get(i));
                     }
                 }else{
                     messages.clear();
                 }
+
                 updateMessages();
                 break;
             }

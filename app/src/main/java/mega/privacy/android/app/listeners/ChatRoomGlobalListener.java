@@ -1,19 +1,19 @@
 package mega.privacy.android.app.listeners;
 
-import android.content.Context;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
+import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 
-public class RetentionTimeListener extends ChatRoomBaseListener {
+public class ChatRoomGlobalListener implements MegaChatRoomListenerInterface {
 
-    public RetentionTimeListener(Context context) {
-        super(context);
+    public ChatRoomGlobalListener() {
     }
 
     @Override
@@ -24,5 +24,32 @@ public class RetentionTimeListener extends ChatRoomBaseListener {
             intentRetentionTime.putExtra(RETENTION_TIME, chat.getRetentionTime());
             MegaApplication.getInstance().sendBroadcast(intentRetentionTime);
         }
+    }
+
+    @Override
+    public void onMessageLoaded(MegaChatApiJava api, MegaChatMessage msg) {
+    }
+
+    @Override
+    public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
+
+    }
+
+    @Override
+    public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
+
+    }
+
+    @Override
+    public void onHistoryReloaded(MegaChatApiJava api, MegaChatRoom chat) {
+
+    }
+
+    @Override
+    public void onReactionUpdate(MegaChatApiJava api, long msgid, String reaction, int count) {
+    }
+
+    @Override
+    public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
     }
 }

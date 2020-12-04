@@ -33,7 +33,7 @@ public class TextUtil {
     }
 
     /**
-     * Add the appropiate format in the  chat management messages.
+     * Add the appropriate format in the  chat management messages.
      *
      * @param textToShow   The message text
      * @param isOwnMessage If it is a sent or received message

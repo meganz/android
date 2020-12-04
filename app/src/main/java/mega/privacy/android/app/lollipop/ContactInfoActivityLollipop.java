@@ -71,7 +71,6 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.listeners.RetentionTimeListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -201,7 +200,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private MarqueeTextView secondLineTextToolbar;
 	private State stateToolbar = State.IDLE;
 
-	private RetentionTimeListener retentionTimeListener;
 	private RelativeLayout manageChatLayout;
 	private TextView retentionTimeText;
 	private View dividerClearChatLayout;
@@ -642,11 +640,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if (chat != null) {
 				if(fromContacts) {
-					retentionTimeListener = new RetentionTimeListener(this);
-					megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
-					if (megaChatApi.openChatRoom(chat.getChatId(), retentionTimeListener)) {
-						logDebug("Successful open chat");
-					}
+					MegaApplication.getInstance().openChatRoom(chat.getChatId());
 				}
 
 				updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chat.getChatId()));
@@ -1827,9 +1821,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             askForDisplayOverDialog.recycle();
         }
 
-		if (fromContacts && chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE
-				&& retentionTimeListener != null) {
-			megaChatApi.closeChatRoom(chat.getChatId(), retentionTimeListener);
+		if (fromContacts && chat != null && chat.getChatId() != MEGACHAT_INVALID_HANDLE) {
+			MegaApplication.getInstance().closeChatRoom(chat.getChatId());
 		}
 
 		unregisterReceiver(chatCallUpdateReceiver);

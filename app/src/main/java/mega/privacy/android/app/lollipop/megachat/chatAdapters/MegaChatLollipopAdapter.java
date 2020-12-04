@@ -6062,7 +6062,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (isMyMessage(message)) {
             logDebug("MY message handle!!: " + message.getMsgId());
 
-            holder.titleOwnMessage.setGravity(Gravity.LEFT);
+            holder.titleOwnMessage.setGravity(Gravity.START);
             holder.titleOwnMessage.setPadding(scaleWidthPx(isScreenInPortrait(context) ?
                     MANAGEMENT_MESSAGE_PORT :
                     MANAGEMENT_MESSAGE_LAND, outMetrics), 0, 0, 0);
@@ -6079,7 +6079,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             RelativeLayout.LayoutParams paramsOwnManagement = (RelativeLayout.LayoutParams) holder.ownManagementMessageText.getLayoutParams();
             paramsOwnManagement.leftMargin = scaleWidthPx(isScreenInPortrait(context) ? MANAGEMENT_MESSAGE_PORT : MANAGEMENT_MESSAGE_LAND, outMetrics);
             holder.ownManagementMessageText.setLayoutParams(paramsOwnManagement);
-
         } else {
             long userHandle = message.getUserHandle();
             logDebug("Contact message!!: " + userHandle);

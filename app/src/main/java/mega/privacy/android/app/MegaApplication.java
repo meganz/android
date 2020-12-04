@@ -51,6 +51,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.listeners.ChatRoomGlobalListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
@@ -195,6 +196,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static MegaApplication singleApplicationInstance;
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
+	private ChatRoomGlobalListener chatRoomGlobalListener = new ChatRoomGlobalListener();
 
 	@Override
 	public void networkAvailable() {
@@ -1866,6 +1868,20 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setCallLayoutStatus(long chatId, boolean callLayoutStatus) {
 		hashMapCallLayout.put(chatId, callLayoutStatus);
+	}
+
+	public boolean openChatRoom(long chatId) {
+		closeChatRoom(chatId);
+		if (megaChatApi.openChatRoom(chatId, chatRoomGlobalListener)) {
+			logDebug("Successful open chat: "+chatId);
+			return true;
+		}
+		return false;
+	}
+
+	public void closeChatRoom(long chatId) {
+		megaChatApi.closeChatRoom(chatId, chatRoomGlobalListener);
+		logDebug("Successful close chat: "+chatId);
 	}
 
 	public int getStorageState() {

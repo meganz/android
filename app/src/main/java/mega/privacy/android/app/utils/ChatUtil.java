@@ -956,9 +956,9 @@ public class ChatUtil {
     }
 
     /**
-    * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
-            *
-            * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
+     * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
+     *
+     * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
      * @return String to show for invalid meta message.
      */
     public static String getInvalidMetaMessage(MegaChatMessage message) {
@@ -989,24 +989,14 @@ public class ChatUtil {
      * @param chat The MegaChatRoom.
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    logDebug("Clear history selected!");
-                    new ChatController(context).clearHistory(chat);
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    dialog.dismiss();
-                    break;
-            }
-        };
-
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        String message = context.getString(chat.isGroup() ? R.string.confirmation_clear_group_chat : R.string.confirmation_clear_chat_history);
-        builder.setTitle(chat.isGroup() ? R.string.title_confirmation_clear_group_chat : R.string.title_confirmation_clear_chat_history);
-        builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+        String message = context.getString(R.string.confirmation_clear_chat_history);
+
+        builder.setTitle(chat.isGroup() ? R.string.title_confirmation_clear_group_chat : R.string.title_confirmation_clear_chat_history)
+                .setMessage(message)
+                .setPositiveButton(R.string.general_clear, (dialog, which) -> new ChatController(context).clearHistory(chat))
+                .setNegativeButton(R.string.general_cancel, null)
+                .show();
     }
 
     /**
@@ -1015,9 +1005,8 @@ public class ChatUtil {
      * @param context    Context of Activity.
      * @param idChat     The chat ID.
      * @param isDisabled True, if the Retention Time is disabled. False, otherwise.
-     * @param option     If there was an option selected.
      */
-    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled, int option) {
+    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled) {
         if (idChat == MEGACHAT_INVALID_HANDLE)
             return;
 
@@ -1043,18 +1032,10 @@ public class ChatUtil {
         ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
         ListView listView = new ListView(context);
         listView.setAdapter(itemsAdapter);
-        int optionSelected;
-
-        if(option == INVALID_VALUE){
-            optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
-        }else{
-            optionSelected = option;
-        }
+        int optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
 
         itemClicked.set(optionSelected);
-        if (context instanceof ManageChatHistoryActivity) {
-            ((ManageChatHistoryActivity) context).setRetentionTimeSelected(optionSelected);
-        }
+
         dialogBuilder.setSingleChoiceItems(itemsAdapter, optionSelected, (dialog, item) -> {
             ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
                     context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
@@ -1062,42 +1043,37 @@ public class ChatUtil {
                             R.string.general_ok));
 
             itemClicked.set(item);
-            if (context instanceof ManageChatHistoryActivity) {
-                ((ManageChatHistoryActivity) context).setRetentionTimeSelected(item);
-            }
 
             updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE),
                     checkIfPositiveButtonShouldBeShown(idChat, item));
         });
 
-        dialogBuilder.setPositiveButton(context.getString(itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+        dialogBuilder.setPositiveButton(context.getString(itemClicked.get() ==
+                        RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
                         R.string.general_next : R.string.general_ok),
                 (dialog, which) -> {
                     if (itemClicked.get() == 4) {
-                        if(context instanceof ManageChatHistoryActivity){
-                            ((ManageChatHistoryActivity)context).showPickers(isDisabled ? DISABLED_RETENTION_TIME : getUpdatedRetentionTimeFromAChat(idChat));
+                        if (context instanceof ManageChatHistoryActivity) {
+                            ((ManageChatHistoryActivity) context).showPickers(isDisabled ?
+                                    DISABLED_RETENTION_TIME :
+                                    getUpdatedRetentionTimeFromAChat(idChat));
                         }
                     } else {
-                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat, getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
+                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat,
+                                getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
                     }
-                    if (context instanceof ManageChatHistoryActivity) {
-                        ((ManageChatHistoryActivity) context).setRTDialogShown(false);
-                    }
-                    dialog.dismiss();
                 });
-        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), (dialog, which) ->{
-            if (context instanceof ManageChatHistoryActivity) {
-                ((ManageChatHistoryActivity) context).setRTDialogShown(false);
-            }
-            dialog.dismiss();
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel),
+                (dialog, which) -> {
+
                 });
+
         historyRetentionDialog = dialogBuilder.create();
         historyRetentionDialog.show();
+
         updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE),
                 checkIfPositiveButtonShouldBeShown(idChat, itemClicked.get()));
-        if(context instanceof ManageChatHistoryActivity){
-            ((ManageChatHistoryActivity) context).setRTDialogShown(true);
-        }
     }
 
     /**
@@ -1108,7 +1084,8 @@ public class ChatUtil {
      * @return              True, if it must be enabled. False, if not.
      */
     private static boolean checkIfPositiveButtonShouldBeShown(long idChat, int itemClicked) {
-        return getOptionSelectedFromRetentionTime(idChat) != RETENTION_TIME_DIALOG_OPTION_DISABLED || itemClicked != RETENTION_TIME_DIALOG_OPTION_DISABLED;
+        return getOptionSelectedFromRetentionTime(idChat) != RETENTION_TIME_DIALOG_OPTION_DISABLED ||
+                itemClicked != RETENTION_TIME_DIALOG_OPTION_DISABLED;
     }
 
     /**
@@ -1119,8 +1096,9 @@ public class ChatUtil {
      */
     public static long getUpdatedRetentionTimeFromAChat(long idChat) {
         MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(idChat);
-        if (chat != null)
+        if (chat != null) {
             return chat.getRetentionTime();
+        }
 
         return DISABLED_RETENTION_TIME;
     }
@@ -1134,35 +1112,40 @@ public class ChatUtil {
     private static int getOptionSelectedFromRetentionTime(long idChat) {
         long seconds = getUpdatedRetentionTimeFromAChat(idChat);
 
-        if (seconds == DISABLED_RETENTION_TIME)
+        if (seconds == DISABLED_RETENTION_TIME) {
             return RETENTION_TIME_DIALOG_OPTION_DISABLED;
+        }
 
         long days = seconds % SECONDS_IN_DAY;
         long weeks = seconds % SECONDS_IN_WEEK;
         long months = seconds % SECONDS_IN_MONTH_31;
         long years = seconds % SECONDS_IN_YEAR;
 
-        if (years == 0)
+        if (years == 0) {
             return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
 
         if (months == 0) {
-            if (seconds / SECONDS_IN_MONTH_31 == 1)
+            if (seconds / SECONDS_IN_MONTH_31 == 1) {
                 return RETENTION_TIME_DIALOG_OPTION_MONTH;
-
-            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            } else {
+                return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            }
         }
 
         if (weeks == 0) {
-            if (seconds / SECONDS_IN_WEEK == 1)
+            if (seconds / SECONDS_IN_WEEK == 1) {
                 return RETENTION_TIME_DIALOG_OPTION_WEEK;
-
-            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            } else {
+                return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            }
         }
 
-        if (days == 0 && seconds / SECONDS_IN_DAY == 1)
+        if (days == 0 && seconds / SECONDS_IN_DAY == 1) {
             return RETENTION_TIME_DIALOG_OPTION_DAY;
-
-        return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        } else {
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
     }
 
     /**

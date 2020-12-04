@@ -507,6 +507,7 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.ManageChatHistoryActivity"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_properties_manage_chat"
             android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">

@@ -14,7 +14,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
-import mega.privacy.android.app.listeners.RetentionTimeListener
 import mega.privacy.android.app.listeners.SetRetentionTimeListener
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ChatUtil
@@ -27,6 +26,7 @@ import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
+import java.util.*
 
 class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
@@ -44,21 +44,12 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         private const val MAXIMUM_VALUE_NUMBER_PICKER_MONTHS = 12
         private const val MINIMUM_VALUE_TEXT_PICKER = 0
         private const val MAXIMUM_VALUE_TEXT_PICKER = 4
-
-        private const val RT_OPTION_SELECTED = "RT_OPTION_SELECTED"
-        private const val RT_DIALOG_SHOWN = "RT_DIALOG_SHOWN"
-
     }
 
-    private var screenOrientation = 0
     private var chat: MegaChatRoom? = null
     private var chatId = MEGACHAT_INVALID_HANDLE
     private var contactHandle = INVALID_HANDLE
     private var isFromContacts = false
-    private var listener: RetentionTimeListener? = null
-    var isRTDialogShown = false
-    var retentionTimeSelected = INVALID_VALUE
-
     private lateinit var binding: ActivityManageChatHistoryBinding
 
     private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -73,6 +64,18 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         }
     }
 
+    private var onValueChangeListenerPickerNumber =
+        OnValueChangeListener { _, oldValue, newValue ->
+            updateTextPicker(oldValue, newValue)
+            updateOptionsAccordingly()
+        }
+
+    private var onValueChangeListenerPickerText =
+        OnValueChangeListener { textPicker, _, _ ->
+            updateNumberPicker(textPicker.value)
+            updateOptionsAccordingly()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -83,14 +86,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
         chatId = intent.extras!!.getLong(CHAT_ID)
         isFromContacts = intent.extras!!.getBoolean(IS_FROM_CONTACTS)
-
-        if (savedInstanceState != null) {
-            savedInstanceState.getBoolean(RT_DIALOG_SHOWN, false).also { isRTDialogShown = it }
-            if (isRTDialogShown) {
-                savedInstanceState.getInt(RT_OPTION_SELECTED, INVALID_VALUE)
-                    .also { retentionTimeSelected = it }
-            }
-        }
 
         if (chatId != MEGACHAT_INVALID_HANDLE) {
             logDebug("Group info")
@@ -134,8 +129,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeButtonEnabled(true)
-        actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase()
-        screenOrientation = resources.configuration.orientation
+        actionBar?.title = getString(R.string.title_properties_manage_chat).toUpperCase(Locale.getDefault())
 
         binding.historyRetentionSwitch.isClickable = false
         binding.historyRetentionSwitch.isChecked = false
@@ -155,20 +149,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.historyRetentionSwitchLayout.setOnClickListener(this)
             binding.clearChatHistoryLayout.setOnClickListener(this)
 
-            if (isFromContacts) {
-                listener = RetentionTimeListener(this)
-                megaChatApi.closeChatRoom(chatId, listener)
-                if (megaChatApi.openChatRoom(chatId, listener)) {
-                    logDebug("Successful open chat")
-                }
-            }
-
             val seconds = chat!!.retentionTime
             updateRetentionTimeUI(seconds)
-
-            if(isRTDialogShown){
-                createHistoryRetentionAlertDialog(this, chatId, false, retentionTimeSelected)
-            }
         }
     }
 
@@ -261,10 +243,12 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     private fun checkPickersValues(seconds: Long) {
         val numberYears = seconds / SECONDS_IN_YEAR
         val years = seconds - numberYears * SECONDS_IN_YEAR
+
         if (years == 0L) {
             updatePickersValues(OPTION_YEARS, MINIMUM_VALUE_NUMBER_PICKER, numberYears.toInt())
             return
         }
+
         val numberMonths = seconds / SECONDS_IN_MONTH_31
         val months = seconds - numberMonths * SECONDS_IN_MONTH_31
 
@@ -276,8 +260,10 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             )
             return
         }
+
         val numberWeeks = seconds / SECONDS_IN_WEEK
         val weeks = seconds - numberWeeks * SECONDS_IN_WEEK
+
         if (weeks == 0L) {
             updatePickersValues(
                 OPTION_WEEKS,
@@ -286,14 +272,18 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             )
             return
         }
+
         val numberDays = seconds / SECONDS_IN_DAY
         val days = seconds - numberDays * SECONDS_IN_DAY
+
         if (days == 0L) {
             updatePickersValues(OPTION_DAYS, MAXIMUM_VALUE_NUMBER_PICKER_DAYS, numberDays.toInt())
             return
         }
+
         val numberHours = seconds / SECONDS_IN_HOUR
         val hours = seconds - numberHours * SECONDS_IN_HOUR
+
         if (hours == 0L) {
             updatePickersValues(
                 OPTION_HOURS,
@@ -320,9 +310,9 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
     /**
      * Method that transforms the chosen option into the most correct form:
-    If the option selected is 24 hours, it becomes 1 day.
-    If the selected option is 31 days, it becomes 1 month.
-    If the selected option is 12 months, it becomes 1 year.
+     * - If the option selected is 24 hours, it becomes 1 day.
+     * - If the selected option is 31 days, it becomes 1 month.
+     * - If the selected option is 12 months, it becomes 1 year.
      */
     private fun updateOptionsAccordingly(){
         if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_HOURS &&
@@ -362,25 +352,26 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      * @param value the value
      */
     private fun getMaximumValueOfNumberPicker(value: Int): Int {
-        var maximumValue = 0
         when (value) {
             OPTION_HOURS -> {
-                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+                return MAXIMUM_VALUE_NUMBER_PICKER_HOURS
             }
             OPTION_DAYS -> {
-                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_DAYS
+                return MAXIMUM_VALUE_NUMBER_PICKER_DAYS
             }
             OPTION_WEEKS -> {
-                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
+                return MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
             }
             OPTION_MONTHS -> {
-                maximumValue = MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
+                return MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
             }
             OPTION_YEARS -> {
-                maximumValue = MINIMUM_VALUE_NUMBER_PICKER
+                return MINIMUM_VALUE_NUMBER_PICKER
+            }
+            else -> {
+                return 0
             }
         }
-        return maximumValue
     }
 
     /**
@@ -395,20 +386,9 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             updateTextPicker(binding.numberPicker.value, MINIMUM_VALUE_NUMBER_PICKER)
             binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
         }
+
         binding.numberPicker.maxValue = maximumValue
     }
-
-    private var onValueChangeListenerPickerNumber =
-        OnValueChangeListener { numberPicker, oldValue, newValue ->
-            updateTextPicker(oldValue, newValue)
-            updateOptionsAccordingly()
-        }
-
-    private var onValueChangeListenerPickerText =
-        OnValueChangeListener { textPicker, i, i1 ->
-            updateNumberPicker(textPicker.value)
-            updateOptionsAccordingly()
-        }
 
     /**
      * Method for updating the UI when the retention time is updated.
@@ -430,6 +410,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.retentionTime.text = timeFormatted
             binding.retentionTime.visibility = View.VISIBLE
         }
+
         binding.pickerLayout.visibility = View.GONE
         binding.separator.visibility = View.GONE
     }
@@ -448,12 +429,12 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                         SetRetentionTimeListener(this)
                     )
                 } else {
-                    createHistoryRetentionAlertDialog(this, chatId, true, INVALID_VALUE)
+                    createHistoryRetentionAlertDialog(this, chatId, true)
                 }
             }
 
             R.id.retention_time_text_layout -> {
-                createHistoryRetentionAlertDialog(this, chatId, false, INVALID_VALUE)
+                createHistoryRetentionAlertDialog(this, chatId, false)
             }
 
             R.id.picker_button -> {
@@ -497,20 +478,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(RT_DIALOG_SHOWN, isRTDialogShown)
-        if (isRTDialogShown) {
-            outState.putInt(RT_OPTION_SELECTED, retentionTimeSelected)
-        }
-    }
-
     override fun onDestroy() {
-        if (isFromContacts && chatId != MEGACHAT_INVALID_HANDLE && listener != null) {
-            logDebug("Successful close chat")
-            megaChatApi.closeChatRoom(chatId, listener)
-        }
-
         unregisterReceiver(retentionTimeReceiver)
         super.onDestroy()
     }

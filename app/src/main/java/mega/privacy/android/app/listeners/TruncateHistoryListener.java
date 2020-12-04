@@ -24,7 +24,6 @@ public class TruncateHistoryListener extends ChatBaseListener {
         if (request.getType() != MegaChatRequest.TYPE_TRUNCATE_HISTORY) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            logDebug("Truncate history request finish.");
             Util.showSnackbar(context, getString(R.string.clear_history_success));
             if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).hideMessageJump();
