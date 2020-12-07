@@ -644,6 +644,21 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <!--  For ListPreference  -->
+    <style name="ThemeOverlay.Mega.MaterialAlertDialog.ListPreference">
+        <item name="colorControlNormal">@color/grey_054_white_054</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.Mega.Title.Text.ListPreference</item>
+    </style>
+
+    <style name="MaterialAlertDialog.Mega.Title.Text.ListPreference">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline6</item>
+    </style>
+
+    <style name="Widget.Mega.CheckedTextView" parent="Widget.MaterialComponents.CheckedTextView">
+        <item name="android:drawableStart">?android:attr/listChoiceIndicatorSingle</item>
+        <item name="drawableTint">@color/ckt_drawable_tint_selector</item>
+    </style>
+
     <!-- Action mode-->
     <style name="Widget.Mega.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="colorControlNormal">?attr/colorSecondary</item>
