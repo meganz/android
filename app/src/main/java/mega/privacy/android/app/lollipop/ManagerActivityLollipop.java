@@ -7537,6 +7537,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
+            killAllSessions.setVisible(false);
+            exportMK.setVisible(false);
         }
     }
 
