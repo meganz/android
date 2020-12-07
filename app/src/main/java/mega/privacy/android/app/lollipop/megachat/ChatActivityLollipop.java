@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -49,7 +50,6 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -137,7 +137,9 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -329,6 +331,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public int showRichLinkWarning = RICH_WARNING_TRUE;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
+    private Drawable upArrow;
 
     ChatController chatC;
     boolean scrollingUp = false;
@@ -354,7 +357,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private MegaChatMessage messageToEdit = null;
 
     private CoordinatorLayout fragmentContainer;
-    private RelativeLayout writingContainerLayout;
+    private LinearLayout writingContainerLayout;
     private RelativeLayout writingLayout;
 
     private RelativeLayout joinChatLinkLayout;
@@ -376,14 +379,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ImageButton gifButton;
 
     private EmojiKeyboard emojiKeyboard;
-    private RelativeLayout rLKeyboardTwemojiButton;
+    private FrameLayout rLKeyboardTwemojiButton;
 
-    private RelativeLayout rLMediaButton;
-    private RelativeLayout rLPickFileStorageButton;
-    private RelativeLayout rLPickAttachButton;
-    private RelativeLayout rlGifButton;
+    private FrameLayout rLMediaButton;
+    private FrameLayout rLPickFileStorageButton;
+    private FrameLayout rLPickAttachButton;
+    private FrameLayout rlGifButton;
 
-    private RelativeLayout returnCallOnHoldButton;
+    private LinearLayout returnCallOnHoldButton;
     private ImageView returnCallOnHoldButtonIcon;
     private TextView returnCallOnHoldButtonText;
 
@@ -423,8 +426,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     DatabaseHandler dbH = null;
 
-    FrameLayout fragmentContainerFileStorage;
-    RelativeLayout fileStorageLayout;
+    FrameLayout fileStorageLayout;
     private ChatFileStorageFragment fileStorageF;
 
     private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
@@ -445,7 +447,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean isLocationDialogShown = false;
     private boolean isJoinCallDialogShown = false;
     private RelativeLayout inputTextLayout;
-    private LinearLayout separatorOptions;
+    private View separatorOptions;
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
@@ -790,7 +792,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
         if (megaApi == null) {
@@ -913,6 +914,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext(),
                 R.color.pro_account, R.color.white_dark_grey, R.color.white_dark_grey);
 
+        upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white)
+                .mutate();
+        upArrow.setColorFilter(getResources().getColor(R.color.grey_087_white_087),
+                PorterDuff.Mode.SRC_IN);
+
         updateNavigationToolbarIcon();
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
@@ -978,8 +984,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         messageJumpLayout.setOnClickListener(this);
 
-        fragmentContainerFileStorage = findViewById(R.id.fragment_container_file_storage);
-        fileStorageLayout = findViewById(R.id.relative_layout_file_storage);
+        fileStorageLayout = findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
         pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
 
@@ -995,12 +1000,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordLayout = findViewById(R.id.layout_button_layout);
         recordButtonLayout = findViewById(R.id.record_button_layout);
         recordButton = findViewById(R.id.record_button);
+        recordButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
+                PorterDuff.Mode.SRC_IN);
         recordButton.setEnabled(true);
         recordButton.setHapticFeedbackEnabled(true);
         recordView = findViewById(R.id.record_view);
         recordView.setVisibility(View.GONE);
         bubbleLayout = findViewById(R.id.bubble_layout);
-        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.voice_clip_bubble));
+        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.black_white));
         myBubble.setCornerRadius(CORNER_RADIUS_BUBBLE);
         myBubble.setPointerAlignment(BubbleDrawable.RIGHT);
         myBubble.setPadding(PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE);
@@ -1454,7 +1461,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordButtonStates(RECORD_BUTTON_DEACTIVATED);
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
             setSizeInputText(true);
@@ -1553,15 +1559,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         String textToShowB = getString(R.string.chat_loading_messages);
 
         try {
-            textToShowB = textToShowB.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShowB = textToShowB.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                    + "\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");
-            textToShowB = textToShowB.replace("[B]", "<font color=\'#000000\'>");
+            textToShowB = textToShowB.replace("[B]", "<font color=\'"
+                    + ColorUtils.getColorHexString(this, R.color.black_white)
+                    + "\'>");
             textToShowB = textToShowB.replace("[/B]", "</font>");
         } catch (Exception e) {
             logWarning("Exception formatting string", e);
         }
 
-        emptyScreen(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
+        emptyScreen(HtmlCompat.fromHtml(textToShowB, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
         if (!isTextEmpty(textSnackbar)) {
             String chatLink = getIntent().getStringExtra(CHAT_LINK_EXTRA);
@@ -1595,11 +1605,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    private void emptyScreen(String text){
+    private void emptyScreen(CharSequence text){
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            emptyImageView.setImageResource(R.drawable.chat_empty_landscape);
+            emptyImageView.setImageResource(R.drawable.empty_chat_message_landscape);
         } else {
-            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+            emptyImageView.setImageResource(R.drawable.empty_chat_message_portrait);
         }
 
         emptyTextView.setText(text);
@@ -2095,29 +2105,33 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("This user is connected");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.online_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_online));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_online_dark_appbar
+                                : R.drawable.ic_online_light));
             }
             else if(state == MegaChatApi.STATUS_AWAY){
                 logDebug("This user is away");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.away_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_away));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_away_dark_appbar
+                                : R.drawable.ic_away_light));
             }
             else if(state == MegaChatApi.STATUS_BUSY){
                 logDebug("This user is busy");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.busy_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_busy));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_busy_dark_appbar
+                                : R.drawable.ic_busy_light));
             }
             else if(state == MegaChatApi.STATUS_OFFLINE){
                 logDebug("This user is offline");
                 individualSubtitleToobar.setText(adjustForLargeFont(getString(R.string.offline_status)));
                 iconStateToolbar.setVisibility(View.VISIBLE);
-                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_offline));
-
+                iconStateToolbar.setImageDrawable(ContextCompat.getDrawable(this,
+                        Util.isDarkMode(this) ? R.drawable.ic_offline_dark_appbar
+                                : R.drawable.ic_offline_light));
             }
             else if(state == MegaChatApi.STATUS_INVALID){
                 logWarning("INVALID status: " + state);
@@ -2645,7 +2659,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         disableButton(rlGifButton, gifButton);
     }
 
-    private void disableButton(final  RelativeLayout layout, final  ImageButton button){
+    private void disableButton(final  FrameLayout layout, final  ImageButton button){
         logDebug("disableButton");
         layout.setOnClickListener(null);
         button.setOnClickListener(null);
@@ -2665,7 +2679,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         enableButton(rlGifButton, gifButton);
     }
 
-    private void enableButton(RelativeLayout layout, ImageButton button){
+    private void enableButton(FrameLayout layout, ImageButton button){
         logDebug("enableButton");
         layout.setOnClickListener(this);
         button.setOnClickListener(this);
@@ -2680,7 +2694,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
 
         sendIcon.setEnabled(true);
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
         textChat.setHint(" ");
         setSizeInputText(false);
         sendIcon.setVisibility(View.VISIBLE);
@@ -2702,15 +2715,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             if(isDeactivated){
                 recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_off));
-                recordButton.setColorFilter(null);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc));
+                recordButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
+                        PorterDuff.Mode.SRC_IN);
                 return;
             }
 
             recordButton.activateOnTouchListener(false);
             recordButton.activateOnClickListener(true);
             recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_send_white));
-            recordButton.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor));
+            recordButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
+                    PorterDuff.Mode.SRC_IN);
         }
     }
 
@@ -2734,8 +2749,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 recordButtonLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.recv_bg_mic));
                 recordButton.activateOnTouchListener(true);
                 recordButton.activateOnClickListener(false);
-                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc_on));
-                recordButton.setColorFilter(null);
+                recordButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_mic_vc));
+                recordButton.setColorFilter(ContextCompat.getColor(this, R.color.white_black),
+                        PorterDuff.Mode.SRC_IN);
             }
 
         }else if(currentRecordButtonState == RECORD_BUTTON_DEACTIVATED){
@@ -8507,7 +8523,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 int numberUnread = megaChatApi.getUnreadChats();
 
                 if(numberUnread==0){
-                    aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                    aB.setHomeAsUpIndicator(upArrow);
                 }
                 else{
 
@@ -8524,11 +8540,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
             else{
-                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                aB.setHomeAsUpIndicator(upArrow);
             }
         }
         else{
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            aB.setHomeAsUpIndicator(upArrow);
         }
     }
 

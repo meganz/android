@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -61,7 +60,6 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -930,19 +928,25 @@ public class ChatUtil {
      * @return The final bitmap.
      */
     public static Bitmap getStatusBitmap(int userStatus) {
+        Resources resources = MegaApplication.getInstance().getBaseContext().getResources();
+        boolean isDarkMode = Util.isDarkMode(MegaApplication.getInstance());
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_online);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_online_dark_standard
+                                : R.drawable.ic_online_light);
             case MegaChatApi.STATUS_AWAY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_away);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_away_dark_standard
+                                : R.drawable.ic_away_light);
             case MegaChatApi.STATUS_BUSY:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_busy);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_busy_dark_standard
+                                : R.drawable.ic_busy_light);
             case MegaChatApi.STATUS_OFFLINE:
-                return BitmapFactory.decodeResource(MegaApplication.getInstance().getBaseContext().getResources(), R.drawable.ic_offline);
-
+                return BitmapFactory.decodeResource(resources,
+                        isDarkMode ? R.drawable.ic_offline_dark_standard
+                                : R.drawable.ic_offline_light);
             case MegaChatApi.STATUS_INVALID:
             default:
                 return null;

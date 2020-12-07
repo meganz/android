@@ -266,9 +266,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.emptyHintImage.setImageResource(R.drawable.offline_empty_landscape)
+            binding.emptyHintImage.setImageResource(R.drawable.empty_offline_landscape)
         } else {
-            binding.emptyHintImage.setImageResource(R.drawable.empty_offline)
+            binding.emptyHintImage.setImageResource(R.drawable.empty_offline_portrait)
         }
 
         var textToShow = getString(R.string.context_empty_offline).toUpperCase()
@@ -280,7 +280,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                         + "\'>"
             ).replace("[/A]", "</font>").replace(
                 "[B]", "<font color=\'"
-                        + getColorHexString(requireContext(), R.color.empty_hint_text_normal)
+                        + getColorHexString(requireContext(), R.color.grey_500_grey_600)
                         + "\'>"
             ).replace("[/B]", "</font>")
         } catch (e: Exception) {

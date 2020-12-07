@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="24dp"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="36dp"
-    android:layout_marginBottom="20dp"
-    android:background="@color/background_chat">
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="36dp"
+    android:layout_marginBottom="20dp">
 
     <RelativeLayout
         android:id="@+id/first_message_chat"
@@ -22,40 +22,24 @@
             android:orientation="horizontal">
 
             <RelativeLayout
-                android:id="@+id/mega_icon_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/mega_icon_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_confidentiality"
-                    android:visibility="invisible"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp">
+                android:layout_marginStart="56dp">
 
                 <TextView
                     android:id="@+id/mega_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mega_info_empty_screen"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <TextView
                     android:id="@+id/mega_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/mega_title"
                     android:text="@string/mega_info_empty_screen"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
-                    android:layout_below="@+id/mega_title"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             </RelativeLayout>
 
@@ -79,31 +63,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/ic_confidentiality"/>
+                    android:src="@drawable/ic_confidentiality"
+                    app:tint="?android:attr/textColorSecondary" />
 
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp">
+                android:layout_marginStart="24dp">
 
                 <TextView
                     android:id="@+id/confidentiality_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mega_confidentiality_empty_screen"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <TextView
                     android:id="@+id/confidentiality_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mega_confidentiality_empty_screen"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
-                    android:layout_below="@+id/confidentiality_title"/>
+                    android:layout_below="@+id/confidentiality_title"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             </RelativeLayout>
 
@@ -126,31 +109,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/ic_authenticity"/>
+                    android:src="@drawable/ic_authenticity"
+                    app:tint="?android:attr/textColorSecondary" />
 
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp">
+                android:layout_marginStart="24dp">
 
                 <TextView
                     android:id="@+id/authenticity_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/title_mega_authenticity_empty_screen"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <TextView
                     android:id="@+id/authenticity_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/mega_authenticity_empty_screen"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp"
-                    android:layout_below="@+id/authenticity_title"/>
+                    android:layout_below="@+id/authenticity_title"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             </RelativeLayout>
 
@@ -162,6 +144,7 @@
         android:id="@+id/loading_messages_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/loading_chat_messages"/>
+        android:src="@drawable/loading_chat_messages"
+        app:tint="@color/grey_005_white_008" />
 
 </RelativeLayout>

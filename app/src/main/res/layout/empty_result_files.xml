@@ -23,7 +23,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_chainStyle="packed"
             app:visibleGone="@{showHint}"
-            android:src="@{context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? @drawable/empty_zero_data_recents_landscape : @drawable/empty_zero_data_recents_portrait}"
+            android:src="@{context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ? @drawable/empty_recents_landscape : @drawable/empty_recents_portrait}"
             tools:src="@drawable/ic_zero_data_recents_portrait" />
 
         <TextView

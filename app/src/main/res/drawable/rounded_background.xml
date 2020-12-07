@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/chat_background" />
+            <solid android:color="@color/grey_012_white_012" />
             <size
                 android:width="40dp"
                 android:height="40dp"/>

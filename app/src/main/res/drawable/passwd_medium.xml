@@ -3,5 +3,5 @@
     android:shape="rectangle">
     <corners android:radius="2dp" />
     <size android:height="4dp" />
-    <solid android:color="@color/password_medium" />
+    <solid android:color="@color/green_500_green_400" />
 </shape>

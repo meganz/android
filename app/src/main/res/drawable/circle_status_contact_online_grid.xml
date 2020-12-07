@@ -7,5 +7,5 @@
         android:color="@color/white"
         />
     <solid
-        android:color="@color/status_connected"/>
+        android:color="@color/lime_green_500_300"/>
 </shape>

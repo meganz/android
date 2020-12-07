@@ -74,7 +74,7 @@
             android:background="@null"
             app:layout_constraintBottom_toBottomOf="@id/avatar_image"
             app:layout_constraintStart_toStartOf="@id/avatar_image"
-            tools:src="@drawable/ic_offline" />
+            tools:src="@drawable/ic_offline_light" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/avatar_container"

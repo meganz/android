@@ -83,6 +83,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -193,7 +194,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	private EmojiTextView firstLineTextToolbar;
 	private int firstLineTextMaxWidthExpanded;
 	private int firstLineTextMaxWidthCollapsed;
-	private int contactStateIcon = R.drawable.ic_offline;
+	private int contactStateIcon = R.drawable.ic_offline_light;
 	private int contactStateIconPaddingLeft;
 
 	private MarqueeTextView secondLineTextToolbar;
@@ -782,23 +783,27 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			int userStatus = megaChatApi.getUserOnlineStatus(user.getHandle());
 			if(userStatus == MegaChatApi.STATUS_ONLINE){
 				logDebug("This user is connected");
-				contactStateIcon = R.drawable.ic_online;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_online_dark_standard
+						: R.drawable.ic_online_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.online_status));
 			}else if(userStatus == MegaChatApi.STATUS_AWAY){
 				logDebug("This user is away");
-				contactStateIcon = R.drawable.ic_away;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_away_dark_standard
+						: R.drawable.ic_away_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.away_status));
 			} else if(userStatus == MegaChatApi.STATUS_BUSY){
 				logDebug("This user is busy");
-				contactStateIcon = R.drawable.ic_busy;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_busy_dark_standard
+						: R.drawable.ic_busy_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.busy_status));
 			}
 			else if(userStatus == MegaChatApi.STATUS_OFFLINE){
 				logDebug("This user is offline");
-				contactStateIcon = R.drawable.ic_offline;
+				contactStateIcon = Util.isDarkMode(this) ? R.drawable.ic_offline_dark_standard
+						: R.drawable.ic_offline_light;
 				secondLineTextToolbar.setVisibility(View.VISIBLE);
 				secondLineTextToolbar.setText(getString(R.string.offline_status));
 			}

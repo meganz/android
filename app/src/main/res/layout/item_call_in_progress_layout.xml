@@ -27,16 +27,14 @@
             android:singleLine="true"
             android:text="@string/call_in_progress_layout"
             android:textAlignment="gravity"
-            android:textColor="?attr/colorOnSecondary"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2" />
 
         <Chronometer
             android:id="@+id/call_in_progress_chrono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:textColor="?attr/colorOnSecondary"
-            android:textSize="13sp"
+            android:layout_marginStart="5dp"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2"
             android:visibility="gone" />
     </LinearLayout>
 </RelativeLayout>

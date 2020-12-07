@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.qualifiers.ActivityContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Consumer
@@ -19,13 +19,15 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.RxUtil.logErr
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.*
 
 class HomePageViewModel @ViewModelInject constructor(
     private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
-    @ApplicationContext private val context: Context
+    // we need check for dark mode, which doesn't work for application context
+    @ActivityContext private val context: Context
 ) : BaseRxViewModel() {
 
     private val _notification = MutableLiveData<Int>()
@@ -123,12 +125,22 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     private fun updateChatStatus(status: Int) {
-        _chatStatus.value = when (status) {
-            STATUS_ONLINE -> R.drawable.ic_online
-            STATUS_AWAY -> R.drawable.ic_away
-            STATUS_BUSY -> R.drawable.ic_busy
-            STATUS_OFFLINE -> R.drawable.ic_offline
-            else -> 0
+        _chatStatus.value = if (Util.isDarkMode(context)) {
+            when (status) {
+                STATUS_ONLINE -> R.drawable.ic_online_dark_drawer
+                STATUS_AWAY -> R.drawable.ic_away_dark_drawer
+                STATUS_BUSY -> R.drawable.ic_busy_dark_drawer
+                STATUS_OFFLINE -> R.drawable.ic_offline_dark_drawer
+                else -> 0
+            }
+        } else {
+            when (status) {
+                STATUS_ONLINE -> R.drawable.ic_online_light
+                STATUS_AWAY -> R.drawable.ic_away_light
+                STATUS_BUSY -> R.drawable.ic_busy_light
+                STATUS_OFFLINE -> R.drawable.ic_offline_light
+                else -> 0
+            }
         }
     }
 

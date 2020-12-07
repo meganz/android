@@ -782,7 +782,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                     + "\'>");
             text = text.replace("[/A]","</font>");
             text = text.replace("[B]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.empty_hint_text_normal)
+                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
                     + "\'>");
             text = text.replace("[/B]","</font>");
         } catch (Exception e) {

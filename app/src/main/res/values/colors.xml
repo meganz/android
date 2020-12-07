@@ -231,25 +231,40 @@
     <color name="white">#FFFFFF</color>
 
     <color name="white_alpha_005">#0DFFFFFF</color>
-    <color name="white_alpha_009">#17FFFFFF</color>
-    <color name="white_alpha_012">#1FFFFFFF</color>
-    <color name="white_alpha_023">#3BFFFFFF</color>
+    <color name="white_alpha_008">#14FFFFFF</color>
+    <color name="white_alpha_009">#16FFFFFF</color>
+    <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
-    <color name="white_alpha_038">#61FFFFFF</color>
-    <color name="white_alpha_054">#8AFFFFFF</color>
+    <color name="white_alpha_038">#60FFFFFF</color>
+    <color name="white_alpha_045">#73FFFFFF</color>
+    <color name="white_alpha_050">#80FFFFFF</color>
+    <color name="white_alpha_054">#89FFFFFF</color>
     <color name="white_alpha_060">#99FFFFFF</color>
-    <color name="white_alpha_087">#DEFFFFFF</color>
+    <color name="white_alpha_087">#DDFFFFFF</color>
 
     <color name="black">#000000</color>
+    <color name="black_87_opacity">#DE000000</color>
     <color name="dark_grey">#121212</color>
-    <color name="grey_alpha_012">#1F000000</color>
+
+    <color name="grey_010">#FAFAFA</color>
+    <color name="grey_300">#9E9E9E</color>
+    <color name="grey_500">#757575</color>
+    <color name="grey_600">#6C6C6C</color>
+    <color name="grey_700">#4F4F4F</color>
+    <color name="grey_800">#2E2E2E</color>
+
+    <color name="grey_alpha_005">#0D000000</color>
+    <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
     <color name="grey_alpha_033">#54000000</color>
-    <color name="grey_alpha_038">#61000000</color>
-    <color name="grey_alpha_054">#8A000000</color>
+    <color name="grey_alpha_038">#60000000</color>
+    <color name="grey_alpha_045">#73000000</color>
+    <color name="grey_alpha_050">#80000000</color>
+    <color name="grey_alpha_054">#89000000</color>
     <color name="grey_alpha_060">#99000000</color>
-    <color name="grey_alpha_087">#DE000000</color>
+    <color name="grey_alpha_087">#DD000000</color>
 
     <color name="teal_200">#6DD2BF</color>
     <color name="teal_300">#00BFA5</color>
@@ -261,8 +276,27 @@
     <color name="red_800">#D50004</color>
     <color name="red_900">#C70000</color>
 
-    <color name="red_600_alpha_038">#61F30C14</color>
-    <color name="red_300_alpha_038">#61F46762</color>
+    <color name="red_600_alpha_038">#60F30C14</color>
+    <color name="red_300_alpha_038">#60F46762</color>
+
+    <color name="yellow_300">#FFEF67</color>
+    <color name="yellow_600">#FFD300</color>
+
+    <color name="orange_300">#FFB640</color>
+    <color name="orange_400">#FFA500</color>
+
+    <color name="green_400">#56C13E</color>
+    <color name="green_500">#31B500</color>
+
+    <color name="salmon_300">#F37476</color>
+    <color name="salmon_700">#E42930</color>
+
+    <color name="lime_green_200">#A9F2A5</color>
+    <color name="lime_green_300">#7FEC7E</color>
+    <color name="lime_green_500">#13E03C</color>
+
+    <color name="dark_blue_200">#85D2ED</color>
+    <color name="dark_blue_500">#2BA6DE</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
@@ -280,6 +314,11 @@
     <!-- Turn on camera uploads button text, action mode bar color -->
     <color name="teal_300_dark_grey">@color/teal_300</color>
 
+    <!-- icon tint for FAB above images or scrim -->
+    <color name="teal_300_black">@color/teal_300</color>
+    <!-- background tint for FAB above images or scrim -->
+    <color name="white_teal_200">@color/white</color>
+
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_600</color>
 
@@ -288,42 +327,73 @@
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">?android:attr/colorBackground</color>
 
+    <!-- chat room message loading image tint  -->
+    <color name="grey_005_white_008">@color/grey_alpha_005</color>
+
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
+    <!-- Record voice clip audio level indicator -->
+    <color name="white_045_grey_045">@color/white_alpha_045</color>
+
+    <!-- Chat observer layout background -->
+    <color name="grey_050_white_050">@color/grey_alpha_050</color>
+
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
+
+    <!-- call in progress text color -->
+    <color name="white_087_grey_087">@color/white_alpha_087</color>
 
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/grey_alpha_054</color>
 
     <color name="grey_054_white_087">@color/grey_alpha_054</color>
 
+    <color name="white_black">@color/white</color>
+
+    <!-- Emoji keyboard background -->
+    <color name="grey_010_grey_800">@color/grey_010</color>
+
+    <!-- Chat message unselected icon tint -->
+    <color name="grey_600_white_087">@color/grey_600</color>
+
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
-    <color name="password_weak">#FFD300</color>
-    <color name="password_medium">#31B500</color>
-    <color name="password_good">#13E03C</color>
-    <color name="password_strong">#2BA6DE</color>
+    <!-- Weak -->
+    <color name="yellow_600_yellow_300">@color/yellow_600</color>
+    <!-- Medium -->
+    <color name="green_500_green_400">@color/green_500</color>
+    <!-- Good -->
+    <color name="lime_green_500_200">@color/lime_green_500</color>
+    <!-- Strong -->
+    <color name="dark_blue_500_200">@color/dark_blue_500</color>
 
     <!-- Colors for empty content hint text. Must be non-alpha colors, for
       <font color=""> doesn't support alpha -->
-    <color name="empty_hint_text_normal">#7A7A7A</color>
+    <color name="grey_500_grey_600">@color/grey_500</color>
 
     <!-- app drawer related related colors -->
-    <color name="drawer_add_phone_number_background">#F9F9F9</color>
-    <color name="drawer_add_phone_number_button_stroke">@color/teal_300</color>
+    <color name="grey_010_white_087">@color/grey_010</color>
+    <color name="teal_300_grey_087">@color/teal_300</color>
 
     <!-- choose & upgrade related colors -->
     <color name="free_account">#2BB200</color>
-    <color name="lite_account">#FFA500</color>
     <color name="pro_account">#F0373A</color>
 
     <color name="homepage_background">#EEF2F1</color>
 
     <color name="new_multiselect_color">#1A0ABFA5</color>
 
+    <color name="lite_account">#FFA500</color>
+
     <!-- chat status color -->
-    <color name="status_offline">#666666</color>
-    <color name="status_busy">#eb4444</color>
+    <!-- Offline -->
+    <color name="grey_700_grey_300">@color/grey_700</color>
+    <!-- Busy -->
+    <color name="salmon_700_salmon_300">@color/salmon_700</color>
+    <!-- Away -->
+    <color name="orange_400_orange_300">@color/orange_400</color>
+    <!-- Online -->
+    <color name="lime_green_500_300">@color/lime_green_500</color>
 </resources>
