@@ -59,14 +59,10 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
 
     public static ImageView imageDrag;
-
-    public static final int OPEN_FROM_ROOT_SINGLE = 1;
-    public static final int OPEN_FROM_ROOT_MULTI = 2;
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -85,8 +81,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     private StickyLayoutManager stickyLayoutManager;
     private RecyclerView listView;
     private FastScroller fastScroller;
-
-    private int openFrom;
 
     private SelectedBucketViewModel selectedBucketModel;
 
@@ -308,30 +302,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     }
 
     public ImageView getImageDrag(long handle) {
-        switch (openFrom) {
-            case OPEN_FROM_ROOT_SINGLE:
-            case OPEN_FROM_ROOT_MULTI:
-                return adapter.getThumbnailView(listView, handle,
-                    openFrom == OPEN_FROM_ROOT_SINGLE);
-            default:
-                return null;
-        }
+        return adapter.getThumbnailView(listView, handle);
     }
 
-    public void updateScrollPosition(long handle) {
-        switch (openFrom) {
-            case OPEN_FROM_ROOT_MULTI:
-                adapter.scrollToSubListNode(listView, handle);
-                break;
-            case OPEN_FROM_ROOT_SINGLE:
-            default:
-                break;
-        }
-    }
-
-    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail, int openFrom) {
+    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail) {
         imageDrag = thumbnail;
-        this.openFrom = openFrom;
 
         int[] screenPosition = null;
         if (thumbnail != null) {

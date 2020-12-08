@@ -1322,8 +1322,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									RecentsFragment.imageDrag = imageDrag;
 									RecentsFragment.imageDrag.setVisibility(View.INVISIBLE);
 								}
-							} else if (actionType == SCROLL_TO_POSITION) {
-								pagerRecentsFragment.updateScrollPosition(handle);
 							}
 						}
 					}
