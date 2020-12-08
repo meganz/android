@@ -254,6 +254,8 @@
     <color name="grey_700">#4F4F4F</color>
     <color name="grey_800">#2E2E2E</color>
 
+    <color name="grey_100_alpha_060">#99E0E0E0</color>
+
     <color name="grey_alpha_005">#0D000000</color>
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
@@ -268,6 +270,12 @@
 
     <color name="teal_200">#6DD2BF</color>
     <color name="teal_300">#00BFA5</color>
+    <color name="teal_400">#00B092</color>
+    <color name="teal_500">#00A07F</color>
+
+    <color name="teal_400_alpha_036">#5C00B092</color>
+    <color name="teal_400_alpha_090">#E600B092</color>
+    <color name="teal_500_alpha_040">#6600B092</color>
 
     <color name="red_300">#F46762</color>
     <color name="red_400">#FD3E38</color>
@@ -396,4 +404,15 @@
     <color name="orange_400_orange_300">@color/orange_400</color>
     <!-- Online -->
     <color name="lime_green_500_300">@color/lime_green_500</color>
+
+    <!-- Chat contact text message text color -->
+    <color name="grey_087_white">@color/grey_alpha_087</color>
+
+    <!-- chat own text message background -->
+    <color name="teal_500_teal_400_090">@color/teal_500</color>
+    <!-- chat own text message background, sending -->
+    <color name="teal_500_040_teal_400_036">@color/teal_500_alpha_040</color>
+
+    <!-- chat contact text message background -->
+    <color name="grey_100_060_white_023">@color/grey_100_alpha_060</color>
 </resources>

@@ -121,17 +121,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:textSize="14sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/dark_rounded_chat_own_message"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:layout_marginLeft="72dp"
-                    android:layout_marginRight="16dp"
-                    android:gravity="left"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="start"
                     app:emojiSize="18sp"/>
 
                 <!--triangle icon own text-->
@@ -140,18 +140,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/content_own_message_text"
+                    android:layout_toStartOf="@+id/content_own_message_text"
                     android:background="@null"
-                    android:src="@drawable/ic_input_warning"/>
+                    android:src="@drawable/ic_input_warning"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <!--Rich links-->
                 <RelativeLayout
                     android:id="@+id/url_own_message_layout"
                     android:layout_width="256dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
                     android:background="@drawable/background_rich_link">
                     <RelativeLayout
                         android:id="@+id/url_own_message_text_rl"
@@ -1390,17 +1390,17 @@
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@color/grey_087_white"
                     android:textSize="14sp"
                     app:emojiSize="18sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:layout_marginLeft="48dp"
-                    android:layout_marginRight="40dp"/>
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:layout_marginStart="48dp"
+                    android:layout_marginEnd="40dp"/>
 
                 <!-- contact's Rich links-->
                 <RelativeLayout

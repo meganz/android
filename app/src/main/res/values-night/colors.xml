@@ -82,4 +82,15 @@
     <color name="salmon_700_salmon_300">@color/salmon_300</color>
     <color name="orange_400_orange_300">@color/orange_300</color>
     <color name="lime_green_500_300">@color/lime_green_300</color>
+
+    <!-- Chat contact text message text color -->
+    <color name="grey_087_white">@color/white</color>
+
+    <!-- chat own text message background -->
+    <color name="teal_500_teal_400_090">@color/teal_400_alpha_090</color>
+    <!-- chat own text message background, sending -->
+    <color name="teal_500_040_teal_400_036">@color/teal_400_alpha_036</color>
+
+    <!-- chat contact text message background -->
+    <color name="grey_100_060_white_023">@color/white_alpha_023</color>
 </resources>
