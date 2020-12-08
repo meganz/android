@@ -11,7 +11,6 @@
         android:id="@+id/file_explorer_grid_folder_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_item_grid_new"
         android:visibility="gone">
 
         <RelativeLayout
@@ -23,7 +22,7 @@
                 android:id="@+id/file_explorer_grid_folder_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
@@ -35,11 +34,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="8dp"
-                android:layout_toRightOf="@+id/file_explorer_grid_folder_icon"
+                android:layout_marginEnd="8dp"
+                android:layout_toEndOf="@+id/file_explorer_grid_folder_icon"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textColor="#DE000000"
                 android:textSize="14sp"/>
         </RelativeLayout>
 
@@ -49,7 +47,6 @@
         android:id="@+id/file_explorer_grid_file_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_item_grid_new"
         android:visibility="gone">
 
         <RelativeLayout
@@ -121,7 +118,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/black_12_alpha"
+            android:background="@color/grey_012_white_012"
             android:layout_below="@+id/file_explorer_grid_file_thumbnail_layout"/>
 
         <RelativeLayout

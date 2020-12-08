@@ -26,8 +26,6 @@ public class PreferencesBaseActivity extends PinActivityLollipop {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
-
         setContentView(R.layout.activity_settings);
 
         fragmentContainer = findViewById(R.id.fragment_container);
@@ -45,8 +43,6 @@ public class PreferencesBaseActivity extends PinActivityLollipop {
             aB.setHomeButtonEnabled(true);
             aB.setDisplayHomeAsUpEnabled(true);
         }
-
-        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
     }
 
     @Override

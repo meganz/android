@@ -1,25 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".FileExplorerListFragment" >
+    android:layout_height="match_parent">
 
 	<RelativeLayout
 		android:id="@+id/content_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
-
-		<TextView
-			android:id="@+id/content_text"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:paddingLeft="8dp"
-			android:paddingTop="3dp"
-			android:paddingBottom="3dp"
-			android:textColor="@color/white"
-			android:background="@color/content_text_folder"
-			android:textSize="14sp"/>
 
 		<RelativeLayout
 			android:layout_width="match_parent"
@@ -57,45 +44,32 @@
 
 		<LinearLayout
 			android:id="@+id/options_explorer_layout"
-			android:layout_width="fill_parent"
-			android:layout_height="48dp"
-			android:background="@color/participants_layout"
-			android:gravity="right|center_vertical"
-			android:layout_alignParentBottom="true"
-			android:orientation="horizontal" >
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp">
 
 			<Button
 				android:id="@+id/cancel_text"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textColor="@color/accentColor"
-				android:stateListAnimator="@null"
-				android:background="@color/participants_layout"
-				android:gravity="center_vertical|center_horizontal"/>
+                android:layout_marginEnd="16dp"
+                style="?attr/borderlessButtonStyle"/>
 
 			<Button
 				android:id="@+id/action_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/accentColor"
-				android:stateListAnimator="@null"
-				android:background="@color/participants_layout"
-				android:layout_marginRight="10dp"
-				android:gravity="center_vertical|center_horizontal"/>
+                style="?attr/materialButtonStyle"
+				android:layout_marginEnd="19dp"/>
 		</LinearLayout>
-
-		<View
-			android:id="@+id/separator"
-			android:background="@color/tour_bar_grey"
-			android:layout_width = "fill_parent"
-			android:layout_height="1dip"
-			android:layout_above="@id/options_explorer_layout"/>
 
 		<RelativeLayout
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_below="@id/content_text"
-			android:layout_above="@id/separator">
+			android:layout_above="@id/options_explorer_layout">
 
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/file_list_view_browser"
