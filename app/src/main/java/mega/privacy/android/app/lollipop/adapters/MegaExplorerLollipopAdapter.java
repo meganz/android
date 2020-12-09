@@ -36,6 +36,7 @@ import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -390,6 +391,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             } else {
                 holder.folderIcon.setAlpha(1.0f);
                 holder.itemView.setOnClickListener(this);
+                holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
             }
         }
         else{
