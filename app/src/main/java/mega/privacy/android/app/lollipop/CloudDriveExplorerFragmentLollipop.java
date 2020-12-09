@@ -90,10 +90,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private LinearLayout emptyTextView;
 	private TextView emptyTextViewFirst;
 
-	private TextView contentText;
 	private Button optionButton;
 	private Button cancelButton;
-	private View separator;
 	private FloatingActionButton fabSelect;
 
 	private ArrayList<Long> nodeHandleMoveCopy;
@@ -280,8 +278,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		contentLayout = v.findViewById(R.id.content_layout);
 		searchProgressBar = v.findViewById(R.id.progressbar);
 
-		separator = v.findViewById(R.id.separator);
-
 		optionsBar = v.findViewById(R.id.options_explorer_layout);
 		optionButton = v.findViewById(R.id.action_text);
 		optionButton.setOnClickListener(this);
@@ -313,9 +309,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				checkScroll();
 			}
 		});
-
-		contentText = v.findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
 
 		emptyImageView = v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = v.findViewById(R.id.file_list_empty_text);
@@ -370,7 +363,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 				break;
 
 			case FileExplorerActivityLollipop.SELECT:
-				separator.setVisibility(View.GONE);
 				optionsBar.setVisibility(View.GONE);
 				activateButton(shouldShowOptionsBar(megaApi.getNodeByHandle(parentHandle)));
 				//No break; needed: the text should be set with SELECT mode
@@ -819,12 +811,10 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			if (selectFile) {
 				fabSelect.setVisibility(visibility);
 			} else {
-				separator.setVisibility(visibility);
 				optionsBar.setVisibility(visibility);
 			}
 		} else {
 			optionButton.setEnabled(show);
-			optionButton.setTextColor(ContextCompat.getColor(context, show ? R.color.accentColor : R.color.invite_button_deactivated));
 		}
 	}
 

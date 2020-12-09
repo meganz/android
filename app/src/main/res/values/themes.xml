@@ -97,9 +97,12 @@
 
         <!-- Alert Dialog -->
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog.ListPreference</item>
 
         <!-- Switch -->
         <item name="switchStyle">@style/Widget.Mega.Switch</item>
+
+        <item name="checkedTextViewStyle">@style/Widget.Mega.CheckedTextView</item>
 
         <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
         <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->

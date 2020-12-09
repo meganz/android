@@ -843,7 +843,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
             paramsMultiselect.setMargins(0,0,0,0);
             holder.imageView.setLayoutParams(paramsMultiselect);
-            holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
             holder.imageView.setImageResource(R.drawable.ic_select_folder);
         }
         else {
@@ -1007,7 +1006,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else {
                 logDebug("Multiselection ON");
                 if (this.isItemChecked(position)) {
-                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                     RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                     paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
                     paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());

@@ -31,6 +31,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -742,7 +745,7 @@ public class ChatUtil {
     public static void createMuteNotificationsChatAlertDialog(Activity context, ArrayList<MegaChatListItem> chats) {
 
         final AlertDialog muteDialog;
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
         if (chats == null) {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
             dialogBuilder.setCustomTitle(view);

@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
@@ -18,7 +19,7 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -100,6 +101,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -153,7 +155,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
 	private AppBarLayout abL;
-	private Toolbar tB;
+	private MaterialToolbar tB;
 	private ActionBar aB;
 	private DisplayMetrics outMetrics;
 	private RelativeLayout fragmentContainer;
@@ -520,8 +522,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		intent = getIntent();
 		if (megaApi.getRootNode() == null){
-			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.transparent_black));
-
 			logDebug("hide action bar");
 			if (!MegaApplication.isLoggingIn()) {
 
@@ -563,8 +563,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			}
 		}
 		else{
-			getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
 			afterLoginAndFetch();
 		}
 
@@ -581,7 +579,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 		aB.show();
 		logDebug("aB.setHomeAsUpIndicator");
-		aB.setHomeAsUpIndicator(mutateIcon(this, R.drawable.ic_arrow_back_white, R.color.black));
+		aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
@@ -868,11 +866,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	private void setGridListAction () {
 		if (isList) {
 			gridListMenuItem.setTitle(R.string.action_grid);
-			gridListMenuItem.setIcon(mutateIcon(this, R.drawable.ic_thumbnail_view, R.color.black));
+			gridListMenuItem.setIcon(R.drawable.ic_thumbnail_view);
 		}
 		else {
 			gridListMenuItem.setTitle(R.string.action_list);
-			gridListMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_list_view));
+			gridListMenuItem.setIcon(R.drawable.ic_list_view);
 		}
 	}
 
@@ -2119,10 +2117,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (error.getErrorCode() == MegaError.API_OK){
-
-				getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+			    DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();
 				MegaUser myUser = megaApi.getMyUser();

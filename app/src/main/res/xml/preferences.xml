@@ -2,8 +2,7 @@
 <androidx.preference.PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:key="general_preference_screen"
-	android:background="@color/white">
+	android:key="general_preference_screen">
 
 	<androidx.preference.PreferenceCategory
 		android:key="settings_features"

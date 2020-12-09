@@ -13,6 +13,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.content.ContextCompat;
@@ -816,10 +818,12 @@ public class BaseActivity extends AppCompatActivity {
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        builder.setMessage(R.string.enable_log_text_dialog).setPositiveButton(R.string.general_enable, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
+        new MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.enable_log_text_dialog)
+                .setPositiveButton(R.string.general_enable, dialogClickListener)
+                .setNegativeButton(R.string.general_cancel, dialogClickListener)
+                .show()
+                .setCanceledOnTouchOutside(false);
     }
 
     /**

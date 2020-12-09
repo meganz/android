@@ -92,8 +92,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private LinearLayout emptyTextView;
 	private TextView emptyTextViewFirst;
 
-	private TextView contentText;
-	private View separator;
 	private Button optionButton;
 	private Button cancelButton;
 	private LinearLayout optionsBar;
@@ -260,8 +258,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		contentLayout = v.findViewById(R.id.content_layout);
 		searchProgressBar = v.findViewById(R.id.progressbar);
 		
-		separator = v.findViewById(R.id.separator);
-		
 		optionsBar = v.findViewById(R.id.options_explorer_layout);
 
 		optionButton = v.findViewById(R.id.action_text);
@@ -295,9 +291,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				checkScroll();
 			}
 		});
-
-		contentText = v.findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
 
 		emptyImageView = v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = v.findViewById(R.id.file_list_empty_text);
@@ -369,7 +362,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 		}
 		else if (modeCloud == FileExplorerActivityLollipop.SELECT) {
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		} else if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			optionButton.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
@@ -390,11 +382,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void setOptionsBarVisibility() {
 		if (modeCloud == FileExplorerActivityLollipop.SELECT ||
 				(!isMultiselect() && (((FileExplorerActivityLollipop) context).getDeepBrowserTree() <= 0 || selectFile))) {
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 		}
 		else{
-			separator.setVisibility(View.VISIBLE);
 			optionsBar.setVisibility(View.VISIBLE);
 		}
 	}
@@ -742,7 +732,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			separator.setVisibility(View.GONE);
 			optionsBar.setVisibility(View.GONE);
 			activateButton(false);
 			((FileExplorerActivityLollipop)context).setDeepBrowserTree(0);

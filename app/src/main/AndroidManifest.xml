@@ -452,49 +452,42 @@
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"
             android:label="@string/settings_advanced_features"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity"
             android:label="@string/section_photo_sync"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity"
             android:label="@string/title_properties_chat_notifications_contact"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity"
             android:label="@string/section_chat"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity"
             android:label="@string/download_location"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity"
             android:label="@string/settings_file_management_category"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity"
             android:label="@string/settings_pin_lock_switch"
-            android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>
 

@@ -1,32 +1,33 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:id="@+id/file_explorer_item_layout"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:descendantFocusability="blocksDescendants"
-    android:id="@+id/file_explorer_item_layout" >
+    android:descendantFocusability="blocksDescendants">
 
     <ImageView
         android:id="@+id/file_explorer_thumbnail"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_centerVertical="true"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter" />
 
     <HorizontalScrollView
         android:id="@+id/scroll_view_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="13dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginEnd="12dp"
+        android:layout_toEndOf="@id/file_explorer_thumbnail"
         android:overScrollMode="never"
-        android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:scrollbars="none">
+
         <TextView
             android:id="@+id/file_explorer_filename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scrollHorizontally="true"
             android:layout_marginTop="16dp"
             android:ellipsize="middle"
+            android:scrollHorizontally="true"
             android:singleLine="true"
             android:textAppearance="?attr/textAppearanceSubtitle1" />
     </HorizontalScrollView>
@@ -35,27 +36,27 @@
         android:id="@+id/file_explorer_filesize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/file_explorer_thumbnail"
         android:layout_below="@+id/scroll_view_filename"
-        android:layout_marginLeft="13dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginEnd="12dp"
+        android:layout_toEndOf="@id/file_explorer_thumbnail"
         android:ellipsize="end"
-        android:singleLine="true"
         android:maxLines="1"
+        android:singleLine="true"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
     <ImageView
         android:id="@+id/file_explorer_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_permissions_full_access"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
         android:alpha="0.35"
         android:background="@null"
-        android:paddingLeft="10dp"
-        android:layout_marginRight="16dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:visibility="gone"/>
+        android:paddingStart="10dp"
+        android:src="@drawable/ic_permissions_full_access"
+        android:visibility="gone" />
 
 </RelativeLayout>
 
