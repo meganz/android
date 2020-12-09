@@ -1485,6 +1485,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (!onHoldFAB.isShown()) onHoldFAB.show();
             updateOnHoldFABStatus();
 
+            if (!videoFAB.isShown()) videoFAB.show();
             updateVideoFABStatus();
 
             if(!hangFAB.isShown()) hangFAB.show();
