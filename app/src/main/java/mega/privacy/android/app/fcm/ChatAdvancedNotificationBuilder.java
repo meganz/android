@@ -195,7 +195,7 @@ public final class ChatAdvancedNotificationBuilder {
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_SUMMARY);
-            intent.putExtra("CHAT_ID", -1);
+            intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
 
             //Order by last interaction
@@ -213,7 +213,7 @@ public final class ChatAdvancedNotificationBuilder {
             Intent intent = new Intent(context, ManagerActivityLollipop.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-            intent.putExtra("CHAT_ID", chats.get(0).getChatId());
+            intent.putExtra(CHAT_ID, chats.get(0).getChatId());
             pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
         } else {
             logError("ERROR:chatSIZE=0:return");
@@ -387,7 +387,7 @@ public final class ChatAdvancedNotificationBuilder {
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-        intent.putExtra("CHAT_ID", chat.getChatId());
+        intent.putExtra(CHAT_ID, chat.getChatId());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) chat.getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
 
         String title;
@@ -644,7 +644,7 @@ public final class ChatAdvancedNotificationBuilder {
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_SUMMARY);
-        intent.putExtra("CHAT_ID", -1);
+        intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1255,7 +1255,7 @@ public final class ChatAdvancedNotificationBuilder {
         Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
-        intent.putExtra("CHAT_ID", chat.getChatId());
+        intent.putExtra(CHAT_ID, chat.getChatId());
         PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
 
         long[] pattern = {0, 1000};

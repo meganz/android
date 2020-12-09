@@ -9,7 +9,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
@@ -572,12 +571,12 @@ public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop imple
         logDebug("hideError");
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
-        firstPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        secondPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
-        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.name_my_account));
+        firstPin.setTextColor(ContextCompat.getColor(this,R.color.primary_text));
+        secondPin.setTextColor(ContextCompat.getColor(this,R.color.primary_text));
+        thirdPin.setTextColor(ContextCompat.getColor(this,R.color.primary_text));
+        fourthPin.setTextColor(ContextCompat.getColor(this,R.color.primary_text));
+        fifthPin.setTextColor(ContextCompat.getColor(this,R.color.primary_text));
+        sixthPin.setTextColor(ContextCompat.getColor(this,R.color.primary_text));
     }
 
     private void showError(String errorMessage) {

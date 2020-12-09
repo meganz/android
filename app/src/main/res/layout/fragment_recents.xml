@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:singleLine="true"
                 android:ellipsize="middle"
                 android:layout_gravity="center_vertical"
@@ -71,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:maxLines="1"
                 android:layout_gravity="center_vertical"/>
 

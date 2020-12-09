@@ -112,7 +112,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.2_340";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.3_343";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -1615,7 +1615,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
                 return;
             }
             logDebug("Creating RTC Audio Manager");
-            rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
+			removeRTCAudioManagerRingIn();
+			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
 			startProximitySensor();
         }
     }

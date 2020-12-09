@@ -66,7 +66,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/attachment_upload_panel_photo"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -97,7 +97,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/upload_to_filesystem"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -134,7 +134,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -164,7 +164,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/menu_take_picture"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -203,7 +203,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/action_create_folder"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>

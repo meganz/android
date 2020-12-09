@@ -26,7 +26,7 @@
     <string name="api_ewrite" context="Label to show that an error related with an write error occurs during a SDK operation.">เขียนผิดพลาด</string>
     <string name="api_eread" context="Label to show that an error related with an read error occurs during a SDK operation.">อ่านผิดพลาด</string>
     <string name="api_eappkey" context="Label to show that an error related with an invalid or missing application key occurs during a SDK operation.">คีย์แอปพลิเคชันไม่ถูกต้อง</string>
-    <string name="api_essl" context="Error shown when SSL check has failed">ยืนยัน SSL ไม่สำเร็จ</string>
+    <string name="api_essl" context="Error shown when SSL check has failed">การตรวจสอบ SSL ล้มเหลว</string>
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">โควต้าไม่เพียงพอ</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">ต้องการการรับรองความถูกต้องด้วยสองปัจจัย</string>
     <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">ปฏิเสธการเข้าถึงสำหรับผู้ใช้ที่ไม่ใช่ผู้ดูแลระบบ</string>

@@ -91,7 +91,7 @@
                 android:layout_toRightOf="@id/internal_extorage_image"
                 android:layout_centerVertical="true"
                 android:textSize="16sp"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:fontFamily="sans-serif-light"
                 android:textStyle="bold"
                 android:text="@string/internal_storage_label"/>
@@ -125,7 +125,7 @@
                 android:layout_toRightOf="@id/external_extorage_image"
                 android:layout_centerVertical="true"
                 android:textSize="16sp"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:fontFamily="sans-serif-light"
                 android:textStyle="bold"
                 android:text="@string/external_storage_label"/>
