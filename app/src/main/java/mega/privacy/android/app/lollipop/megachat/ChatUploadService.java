@@ -266,7 +266,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				if (!isTextEmpty(data) && data.contains(APP_DATA_CHAT)) {
 					mapProgressTransfers.put(transfer.getTag(), transfer);
 
-					if (data.contains(APP_DATA_VOICE_CLIP)) {
+					if (isVoiceClip(data)) {
 						voiceClipsInProgress++;
 					} else {
 						MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
@@ -761,7 +761,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			long inProgress = 0;
 
 			for (MegaTransfer currentTransfer : transfers) {
-				if (!currentTransfer.getAppData().contains(APP_DATA_VOICE_CLIP)) {
+				if (!isVoiceClip(currentTransfer.getAppData())) {
 					if (currentTransfer.getState() == MegaTransfer.STATE_COMPLETED) {
 						total = total + currentTransfer.getTotalBytes();
 						inProgress = inProgress + currentTransfer.getTotalBytes();
@@ -778,7 +778,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		} else {
 			if (totalVideos > 0) {
 				for (MegaTransfer currentTransfer : transfers) {
-					if (!currentTransfer.getAppData().contains(APP_DATA_VOICE_CLIP)) {
+					if (!isVoiceClip(currentTransfer.getAppData())) {
 						long individualInProgress = currentTransfer.getTransferredBytes();
 						long individualTotalBytes = currentTransfer.getTotalBytes();
 						long individualProgressPercent = 0;
@@ -811,7 +811,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				long inProgress = 0;
 
 				for (MegaTransfer currentTransfer : transfers) {
-					if (!currentTransfer.getAppData().contains(APP_DATA_VOICE_CLIP)) {
+					if (!isVoiceClip(currentTransfer.getAppData())) {
 						total = total + currentTransfer.getTotalBytes();
 						inProgress = inProgress + currentTransfer.getTransferredBytes();
 					}
@@ -934,7 +934,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if(appData.contains(APP_DATA_CHAT)){
 				launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 				logDebug("This is a chat upload: " + appData);
-				if(!appData.contains(APP_DATA_VOICE_CLIP)) {
+				if(!isVoiceClip(appData)) {
 					transfersCount++;
 				}
 
@@ -950,7 +950,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				//Update status and tag on db
 				dbH.updatePendingMessageOnTransferStart(id, transfer.getTag());
 				mapProgressTransfers.put(transfer.getTag(), transfer);
-				if (!transfer.isFolderTransfer() && !appData.contains(APP_DATA_VOICE_CLIP)){
+				if (!transfer.isFolderTransfer() && !isVoiceClip(appData)){
 					updateProgressNotification();
 				}
 			}
@@ -994,7 +994,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					}
 					mapProgressTransfers.put(transfer.getTag(), transfer);
 
-					if(!appData.contains(APP_DATA_VOICE_CLIP)) {
+					if(!isVoiceClip(appData)) {
 						updateProgressNotification();
 					}
 
@@ -1023,7 +1023,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
 					}else {
 						logWarning("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
-						if(transfer.getAppData().contains(APP_DATA_VOICE_CLIP)){
+						if (!isVoiceClip(transfer.getAppData())) {
 							showOverquotaNotification();
 							break;
 						}
@@ -1053,7 +1053,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				if(transfer.isStreamingTransfer()){
 					return;
 				}
-				if(!appData.contains(APP_DATA_VOICE_CLIP)) {
+				if(!isVoiceClip(appData)) {
 					transfersCount--;
 					totalUploadsCompleted++;
 				}
@@ -1077,7 +1077,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					ChatUploadService.this.cancel();
 					logDebug("After cancel");
 
-					if(appData.contains(APP_DATA_VOICE_CLIP)) {
+					if(isVoiceClip(appData)) {
 						File localFile = buildVoiceClipFile(this, transfer.getFileName());
 						if (isFileAvailable(localFile) && !localFile.getName().equals(transfer.getFileName())) {
 							localFile.delete();
@@ -1232,7 +1232,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 				if (totalUploadsCompleted == totalUploads && transfersCount == 0 && numberVideosPending <= 0 && requestSent <= 0) {
 					onQueueComplete();
-				} else if (!appData.contains(APP_DATA_VOICE_CLIP)) {
+				} else if (!isVoiceClip(appData)) {
 					updateProgressNotification();
 				}
 			}
@@ -1628,5 +1628,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
 		}
+	}
+
+	private boolean isVoiceClip(String appData) {
+		return !isTextEmpty(appData) && appData.contains(APP_DATA_VOICE_CLIP);
 	}
 }
