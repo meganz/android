@@ -1042,19 +1042,16 @@ public class CallUtil {
     /**
      * Method for removing the incoming call notification.
      *
-     * @param chatIdIncomingCall The chat ID wit the call.
+     * @param callIdIncomingCall The call ID
      */
-    public static void clearIncomingCallNotification(long chatIdIncomingCall) {
-        logDebug("Clear the notification in chat: " + chatIdIncomingCall);
+    public static void clearIncomingCallNotification(long callIdIncomingCall) {
+        logDebug("Clear the notification in chat: " + callIdIncomingCall);
+        if(callIdIncomingCall == MEGACHAT_INVALID_HANDLE)
+            return;
 
         try {
             NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getBaseContext().getSystemService(NOTIFICATION_SERVICE);
-
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdIncomingCall);
-            if (call == null)
-                return;
-
-            notificationManager.cancel(getCallNotificationId(call.getId()));
+            notificationManager.cancel(getCallNotificationId(callIdIncomingCall));
         } catch (Exception e) {
             logError("EXCEPTION", e);
         }

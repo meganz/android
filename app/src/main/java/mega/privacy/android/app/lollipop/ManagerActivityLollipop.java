@@ -878,7 +878,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					//UPGRADE_ACCOUNT_FRAGMENT
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
-						upAFL.setPricing();
+						upAFL.setPricingInfo();
 					}
 
 					//CENTILI_FRAGMENT
@@ -1375,19 +1375,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
-	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
-		if (list == null || list.isEmpty()) {
-			return null;
-		}
-
-		for (SkuDetails details : list) {
-			if (details.getSku().equals(key)) {
-				return details;
-			}
-		}
-		return null;
-	}
-
 	private void getInventory() {
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
@@ -1398,6 +1385,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (skuDetailsList != null && skuDetailsList.size() > 0) {
 					mSkuDetailsList = skuDetailsList;
 					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+
+					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+					if (upAFL != null) {
+						upAFL.setPricingInfo();
+					}
 				}
 			}
 		};
@@ -1512,7 +1504,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
-			upAFL.setPricing();
+			upAFL.setPricingInfo();
 		}
 	}
 
@@ -2564,6 +2556,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this);
 
+		transferData = megaApi.getTransferData(this);
+		if (transferData != null) {
+			for (int i = 0; i < transferData.getNumDownloads(); i++) {
+				int tag = transferData.getDownloadTag(i);
+				transfersInProgress.add(tag);
+				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
+			}
+
+			for (int i = 0; i < transferData.getNumUploads(); i++) {
+				int tag = transferData.getUploadTag(i);
+				transfersInProgress.add(transferData.getUploadTag(i));
+				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
+			}
+		}
+
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
 
@@ -2826,17 +2833,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			megaApi.shouldShowRichLinkWarning(this);
 			megaApi.isRichPreviewsEnabled(this);
 			megaApi.isGeolocationEnabled(this);
-
-			transferData = megaApi.getTransferData(this);
-			int downloadsInProgress = transferData.getNumDownloads();
-			int uploadsInProgress = transferData.getNumUploads();
-
-            for(int i=0;i<downloadsInProgress;i++){
-                transfersInProgress.add(transferData.getDownloadTag(i));
-            }
-            for(int i=0;i<uploadsInProgress;i++){
-                transfersInProgress.add(transferData.getUploadTag(i));
-            }
 
 			if(savedInstanceState==null) {
 				logDebug("Run async task to check offline files");
@@ -3270,6 +3266,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
+							case BUSINESS:{
+								drawerItem = DrawerItem.ACCOUNT;
+								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+								selectDrawerItemPending=false;
+								displayedAccountType = BUSINESS;
+								selectDrawerItemLollipop(drawerItem);
+								return;
+							}
 						}
 					}
 					else{
@@ -3312,6 +3316,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		megaApi.shouldShowPasswordReminderDialog(false, this);
 
 		if (verify2FADialogIsShown){
@@ -14308,20 +14313,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		updateNavigationToolbarIcon();
-	}
-
-	////TRANSFERS/////
-
-	public void changeTransfersStatus(){
-		logDebug("changeTransfersStatus");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			logDebug("Show PLAY button");
-			megaApi.pauseTransfers(false, this);
-		}
-		else{
-			logDebug("Transfers are play -> pause");
-			megaApi.pauseTransfers(true, this);
-		}
 	}
 
 	/**

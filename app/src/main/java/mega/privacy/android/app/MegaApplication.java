@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -32,7 +31,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
@@ -115,7 +113,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.2_340";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.3_343";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -325,10 +323,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
 						megaApi.getMyChatFilesFolder(listener);
 					}
-                    //Ask for MU and CU folder when App in init state
-                    logDebug("Get CU attribute on fetch nodes.");
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
-                }
+					//Ask for MU and CU folder when App in init state
+					logDebug("Get CU attribute on fetch nodes.");
+					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
+
+					//Login transfers resumption
+					TransfersManagement.enableTransfersResumption();
+				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 				if (request.getParamType() == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
@@ -450,6 +451,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 					sendBroadcastUpdateAccountDetails();
 				}
+			} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
+				dbH.setTransferQueueStatus(request.getFlag());
 			}
 		}
 
@@ -568,7 +571,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-						clearIncomingCallNotification(chatId);
+						clearIncomingCallNotification(callId);
 						removeValues(chatId);
 						break;
 					case MegaChatCall.CALL_STATUS_DESTROYED:
@@ -712,6 +715,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+
+		//Logout transfers resumption
+		TransfersManagement.enableTransfersResumption();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1580,7 +1586,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			wakeLock.release();
 		}
 
-		clearIncomingCallNotification(chatId);
+		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 
