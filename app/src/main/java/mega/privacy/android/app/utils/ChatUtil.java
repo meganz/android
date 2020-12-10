@@ -1052,7 +1052,7 @@ public class ChatUtil {
                         RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
                         R.string.general_next : R.string.general_ok),
                 (dialog, which) -> {
-                    if (itemClicked.get() == 4) {
+                    if (itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM) {
                         if (context instanceof ManageChatHistoryActivity) {
                             ((ManageChatHistoryActivity) context).showPickers(isDisabled ?
                                     DISABLED_RETENTION_TIME :
@@ -1064,10 +1064,7 @@ public class ChatUtil {
                     }
                 });
 
-        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel),
-                (dialog, which) -> {
-
-                });
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), null);
 
         historyRetentionDialog = dialogBuilder.create();
         historyRetentionDialog.show();

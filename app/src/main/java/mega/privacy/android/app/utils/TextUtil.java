@@ -1,7 +1,10 @@
 package mega.privacy.android.app.utils;
 
+import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
+
+import androidx.annotation.RequiresApi;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
@@ -39,6 +42,7 @@ public class TextUtil {
      * @param isOwnMessage If it is a sent or received message
      * @return The formatted text
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
         try {
             textToShow = textToShow.replace("[A]", "<font color='#060000'>");
@@ -53,14 +57,7 @@ public class TextUtil {
             logWarning("Error replacing text. ", e);
         }
 
-        Spanned result;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-
-        return result;
+        return Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
     }
 
     public static boolean isEmail(String str) {

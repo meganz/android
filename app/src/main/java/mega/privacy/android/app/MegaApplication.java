@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -118,6 +119,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
 	private static TransfersManagement transfersManagement;
+	private static ChatManagement chatManagement;
 
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
@@ -196,7 +198,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     private static MegaApplication singleApplicationInstance;
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
-	private ChatRoomListener chatRoomGlobalListener = new ChatRoomListener();
 
 	@Override
 	public void networkAvailable() {
@@ -710,6 +711,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        chatManagement = new ChatManagement();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1870,20 +1872,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapCallLayout.put(chatId, callLayoutStatus);
 	}
 
-	public boolean openChatRoom(long chatId) {
-		closeChatRoom(chatId);
-		if (megaChatApi.openChatRoom(chatId, chatRoomGlobalListener)) {
-			logDebug("Successful open chat: "+chatId);
-			return true;
-		}
-		return false;
-	}
-
-	public void closeChatRoom(long chatId) {
-		megaChatApi.closeChatRoom(chatId, chatRoomGlobalListener);
-		logDebug("Successful close chat: "+chatId);
-	}
-
 	public int getStorageState() {
 	    return storageState;
 	}
@@ -1934,6 +1922,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static TransfersManagement getTransfersManagement() {
 		return transfersManagement;
+	}
+
+	public static ChatManagement getChatManagement() {
+		return chatManagement;
 	}
 
 	public static void setVerifyingCredentials(boolean verifyingCredentials) {

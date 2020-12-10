@@ -638,7 +638,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			if (chat != null) {
 				if(fromContacts) {
-					MegaApplication.getInstance().openChatRoom(chat.getChatId());
+					MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
 				}
 
 				updateRetentionTimeLayout(retentionTimeText, getUpdatedRetentionTimeFromAChat(chat.getChatId()));

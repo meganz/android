@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+
+import android.os.Build;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.Spannable;
@@ -1089,6 +1093,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.N)
 	public void setLastMessage(int position, ViewHolderChatList holder){
 		logDebug("position: " + position);
 		if(holder == null){
@@ -1680,13 +1685,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				text = TextUtil.removeFormatPlaceholder(text);
 
-				Spanned result;
-				if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-					result = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
-				} else {
-					result = Html.fromHtml(text);
-				}
-
+				Spanned result = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
 				((ViewHolderNormalChatList) holder).textViewContent.setText(result);
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
