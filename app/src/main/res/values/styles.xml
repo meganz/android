@@ -585,4 +585,11 @@
     <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/rounded_dialog</item>
     </style>
+
+    <style name="TransparentEditText">
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="colorControlActivated">@android:color/transparent</item>
+        <item name="colorControlHighlight">@color/accentColor</item>
+        <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
+    </style>
 </resources>

@@ -32,4 +32,39 @@ public class TextUtil {
     public static boolean isEmail(String str) {
         return !isTextEmpty(str) && EMAIL_ADDRESS.matcher(str).matches();
     }
+
+    /**
+     * Gets the latest position of a file name before the .extension in order to set the cursor
+     * or select the entire file name.
+     *
+     * @param isFile True if is file, false otherwise.
+     * @param text   Current text of the input view.
+     * @return The latest position of a file name before the .extension.
+     */
+    public static int getCursorPositionOfName(boolean isFile, String text) {
+        if (isTextEmpty(text)) {
+            return 0;
+        }
+
+        if (isFile) {
+            String[] s = text.split("\\.");
+            if (s != null) {
+                int numParts = s.length;
+                int lastSelectedPos = 0;
+
+                if (numParts > 1) {
+                    for (int i = 0; i < (numParts - 1); i++) {
+                        lastSelectedPos += s[i].length();
+                        lastSelectedPos++;
+                    }
+
+                    //The last point should not be selected)
+                    lastSelectedPos--;
+                    return lastSelectedPos;
+                }
+            }
+        }
+
+        return text.length();
+    }
 }

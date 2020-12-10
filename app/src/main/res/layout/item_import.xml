@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_import_layout"
     android:layout_width="match_parent"
     android:layout_height="72dp">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/thumbnail_file"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_centerVertical="true"
-        tools:ignore="ContentDescription" />
+        android:scaleType="centerCrop"
+        app:roundWithOverlayColor="@color/white"
+        app:roundedCornerRadius="4dp" />
 
-    <TextView
+    <EditText
         android:id="@+id/text_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,12 +23,15 @@
         android:layout_marginStart="16dp"
         android:layout_toStartOf="@+id/edit_icon_layout"
         android:layout_toEndOf="@+id/thumbnail_file"
-        android:ellipsize="middle"
         android:fontFamily="sans-serif"
         android:gravity="start|center_vertical"
+        android:importantForAutofill="no"
+        android:inputType="text"
         android:singleLine="true"
         android:textColor="@color/primary_text"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:theme="@style/TransparentEditText"
+        tools:ignore="LabelFor" />
 
     <RelativeLayout
         android:id="@+id/edit_icon_layout"

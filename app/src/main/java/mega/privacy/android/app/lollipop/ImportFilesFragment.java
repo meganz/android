@@ -93,7 +93,6 @@ public class ImportFilesFragment extends BaseFragment {
 
             if (adapter == null) {
                 adapter = new ImportFilesAdapter(context, this, filePreparedInfos, nameFiles);
-                adapter.SetOnItemClickListener(this::itemClick);
             }
 
             adapter.setImportNameFiles(nameFiles);
@@ -118,20 +117,6 @@ public class ImportFilesFragment extends BaseFragment {
         } else {
             binding.showMoreText.setText(getString(R.string.general_show_more));
             binding.showMoreImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
-        }
-    }
-
-    public void itemClick(View view, int position) {
-        if (view.getId() == R.id.edit_icon_layout && adapter != null) {
-            ShareInfo info = (ShareInfo) adapter.getItem(position);
-
-            if (info != null) {
-                File file = new File(info.getFileAbsolutePath());
-
-                if (file != null) {
-                    ((FileExplorerActivityLollipop) context).showRenameDialog(file, nameFiles.get(info.getTitle()));
-                }
-            }
         }
     }
 
