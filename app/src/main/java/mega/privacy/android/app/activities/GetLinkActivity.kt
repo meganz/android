@@ -74,7 +74,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
             return
         }
 
-        node = megaApi.getNodeByHandle(handle)
+        setLink(handle)
 
         binding.toolbarGetLink.visibility = GONE
         setSupportActionBar(binding.toolbarGetLink)
@@ -260,16 +260,26 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     }
 
     /**
-     * Updates the node from which the link is getting or managing.
-     * Gets the link without its decryption key and the key separately.
+     * Updates the node from which the link is getting or managing, its link and key separately.
      * Updates the UI of linkFragment.
      */
     fun setLink() {
-        node = megaApi.getNodeByHandle(node.handle)
-        linkWithoutKey = getLinkWithoutKey(node.publicLink)
-        key = getKeyLink(node.publicLink)
-
+        setLink(node.handle)
         linkFragment.updateLink()
+    }
+
+    /**
+     * Updates the node from which the link is getting or managing.
+     * Gets the link without its decryption key and the key separately if the node
+     * it's already exported.
+     */
+    fun setLink(handle: Long) {
+        node = megaApi.getNodeByHandle(handle)
+
+        if (node.isExported) {
+            linkWithoutKey = getLinkWithoutKey(node.publicLink)
+            key = getKeyLink(node.publicLink)
+        }
     }
 
     /**
