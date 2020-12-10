@@ -989,10 +989,10 @@ public class ChatUtil {
      * @param chat The MegaChatRoom.
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.ResumeTransfersWarning);
         String message = context.getString(R.string.confirmation_clear_chat_history);
 
-        builder.setTitle(chat.isGroup() ? R.string.title_confirmation_clear_group_chat : R.string.title_confirmation_clear_chat_history)
+        builder.setTitle(R.string.title_properties_chat_clear)
                 .setMessage(message)
                 .setPositiveButton(R.string.general_clear, (dialog, which) -> new ChatController(context).clearHistory(chat))
                 .setNegativeButton(R.string.general_cancel, null)

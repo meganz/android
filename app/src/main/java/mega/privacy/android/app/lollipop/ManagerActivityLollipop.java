@@ -10352,35 +10352,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationClearChat(final MegaChatListItem c){
-		logDebug("showConfirmationClearChat");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						logDebug("Clear chat!");
-//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
-						logDebug("Clear history selected!");
-						ChatController chatC = new ChatController(managerActivity);
-						chatC.clearHistory(c.getChatId());
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		String message= getResources().getString(R.string.confirmation_clear_group_chat);
-		builder.setTitle(R.string.title_confirmation_clear_group_chat);
-		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void showConfirmationResetPasswordFromMyAccount (){
 		logDebug("showConfirmationResetPasswordFromMyAccount");
 

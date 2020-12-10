@@ -690,16 +690,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void showConfirmationClearChat() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message = getResources().getString(R.string.confirmation_clear_group_chat);
-        builder.setTitle(R.string.title_confirmation_clear_group_chat);
-        builder.setMessage(message)
-                .setPositiveButton(R.string.general_clear, (dialog, which) -> chatC.clearHistory(chat))
-                .setNegativeButton(R.string.general_cancel, null)
-                .show();
-    }
-
     public void showConfirmationLeaveChat() {
         logDebug("Chat ID: " + chat.getChatId());
 

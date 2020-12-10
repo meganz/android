@@ -2464,7 +2464,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(recordView.isRecordingNow()) break;
 
                 logDebug("Clear history selected!");
-                showConfirmationClearChat(chatRoom);
+                stopReproductions();
+                showConfirmationClearChat(this, chatRoom);
                 break;
             }
             case R.id.cab_menu_leave_chat:{
@@ -3575,39 +3576,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void controlCamera(){
         stopReproductions();
         openCameraApp();
-    }
-
-    public void showConfirmationClearChat(final MegaChatRoom c){
-        logDebug("showConfirmationClearChat");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        logDebug("Clear chat!");
-                        stopReproductions();
-                        chatC.clearHistory(c);
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
-        String message= getResources().getString(R.string.confirmation_clear_group_chat);
-        builder.setTitle(R.string.title_confirmation_clear_group_chat);
-        builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showConfirmationLeaveChat (final MegaChatRoom c){
