@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">圖像分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享連接</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">刪除連結</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">取得鏈接</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">分享聯絡人至聊天中</string>
     <string name="context_view_shared_folders" context="open a shared folder">查看共享資料夾</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">分享</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">管理共享</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -566,7 +566,7 @@
     <string name="invalid_decryption_key" context="error message shown on the decryption key dialog if the key typed in was wrong">無效的密鑰</string>
 
     <string name="upload_to_image" context="upload to. Then choose an Image file">圖像</string>
-    <string name="upload_to_audio" context="upload to. Then choose an Audio file">音頻</string>
+    <string name="upload_to_audio" context="upload to. Then choose an Audio file">音樂</string>
     <string name="upload_to_video" context="Title of the button in the contact info screen to start a video call">影片</string>
     <!--
     <string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
@@ -704,10 +704,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">相機上傳完成</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">儲存空間</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">PIN 鎖定</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">密碼鎖</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為設備充電。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">如果啟用，您將上傳關於相片拍攝位置的資訊，所以分享時請格外小心。</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">照片和影片</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">PIN 鎖定</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">密碼鎖</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">更改密碼</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">輸入</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">10次輸入失敗後，您的本機檔案將被刪除且您將被強制登出</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">密碼錯誤</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">錯誤的PIN碼，請重新再試。你還剩1次的嘗試機會</item>
-        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">錯誤的PIN碼，請重新再試。您還剩%2d次的嘗試機會</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">錯誤的密碼，請重新再試。你還剩1次的嘗試機會</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">錯誤的密碼，請重新再試。您還剩%2d次的嘗試機會</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">PIN碼不正確</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">請輸入您的PIN碼</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">請重新輸入您的PIN碼</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">請輸入您的新PIN碼</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">請重新輸入您的新PIN碼</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">密碼不符合</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">請輸入您的密碼</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">請重新輸入您的密碼</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">請輸入您的新密碼</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">請重新輸入您的新密碼</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">您的本機資料將被刪除，且您將在%1d秒後被強制登出</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">關於</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="Title to choose the type of Passcode">PIN碼型態</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4位PIN碼</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6位PIN碼</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">字母或數字之PIN碼</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">密碼類型</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">四位密碼</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">六位密碼</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">字母與數字的密碼</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">日誌已啟用</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">日誌已關閉</string>
@@ -1216,7 +1216,7 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">歷史聊天紀錄已清空</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">聊天紀錄已清空</string>
     <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">發生錯誤。聊天記錄尚未被成功清除。</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">新增成員</string>
@@ -2319,7 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">管理聊天連結</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">啟用加密金鑰輪替</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">加密金鑰輪替啟用</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">金鑰輪替會稍微安全些，但不允許您建立聊天連接，而且新的參與者將無法看到歴史的訊息。</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">與超過100位參與者的對話無法使用金鑰輪替功能。</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">由於超過參與者人數上限，因此無法將此聊天轉換為私人聊天。</string>
@@ -2849,7 +2849,7 @@
 
     <string name="storage_root_label" context="Storage root label">儲存根目錄</string>
 
-    <string name="failed_label" context="Label describing some action failed">失敗</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">失敗</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">您的傳輸已中斷。請升級您的帳戶或等待%s再繼續。</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">超出傳輸配額</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">超出空間配額的儲存</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%%之%2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">啟用聊天訊息的特別資訊</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">停用聊天訊息的特別資訊</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已達到%d個回應的最大限制。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此訊息已達到%d個回應的最大限制。</string>
 </resources>
