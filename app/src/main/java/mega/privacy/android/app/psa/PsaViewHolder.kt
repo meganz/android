@@ -13,7 +13,7 @@ import mega.privacy.android.app.lollipop.WebViewActivityLollipop
  */
 class PsaViewHolder(
     psaLayout: View,
-    private val viewModel: PsaViewModel
+    private val psaManager: PsaManager
 ) {
     private val binding = PsaLayoutBinding.bind(psaLayout)
     private var bound = false
@@ -67,7 +67,7 @@ class PsaViewHolder(
      * @param id the id of the PSA
      */
     private fun dismissPsa(id: Int) {
-        viewModel.dismissPsa(id)
+        psaManager.dismissPsa(id)
         binding.root.visibility = View.GONE
         bound = false
     }

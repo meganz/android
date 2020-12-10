@@ -34,7 +34,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Lifecycle;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -204,8 +204,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
-import mega.privacy.android.app.psa.PsaViewModel;
-import mega.privacy.android.app.psa.PsaViewModelFactory;
+import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -794,7 +793,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
-	private PsaViewModel psaViewModel;
 	private PsaViewHolder psaViewHolder;
 
 
@@ -3346,6 +3344,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             showTransfersTransferOverQuotaWarning();
         }
 
+		PsaManager.INSTANCE.startChecking();
+
 		logDebug("END onCreate");
 	}
 
@@ -4819,26 +4819,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setFirstTime(false);
 		}
         checkBeforeShow();
-
-        psaViewModel.checkPsa();
     }
 
     /**
 	 * Observe LiveData for PSA, and show PSA view when get it.
 	 */
     private void observePsa() {
-        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi))
-                .get(PsaViewModel.class);
-        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), PsaManager.INSTANCE);
 
-        psaViewModel.getPsa().observe(this, this::showPsa);
+		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
     }
 
 	/**
-	 * Show PSA view.
-	 *
-	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
-	 * directly. Otherwise, show the normal PSA view.
+	 * Show PSA view for old PSA type.
 	 *
 	 * @param psa the PSA to show
 	 */
@@ -4847,15 +4840,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             return;
         }
 
-        if (!TextUtils.isEmpty(psa.getUrl())) {
-            Intent intent = new Intent(this, WebViewActivityLollipop.class);
-            intent.setData(Uri.parse(psa.getUrl()));
-            startActivity(intent);
-            psaViewModel.dismissPsa(psa.getId());
-            return;
+        if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+				&& TextUtils.isEmpty(psa.getUrl())) {
+			psaViewHolder.bind(psa);
         }
-
-        psaViewHolder.bind(psa);
     }
 
     public void checkBeforeShow() {
@@ -7716,6 +7704,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
+
+		if (closeDisplayingPsa()) {
+			return;
+		}
 
 		retryConnectionsAndSignalPresence();
 

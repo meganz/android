@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -442,6 +443,8 @@ public class AccountController {
         clearCUBackUp();
 
         new LastShowSMSDialogTimeChecker(context).reset();
+
+        PsaManager.INSTANCE.stopChecking();
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();
