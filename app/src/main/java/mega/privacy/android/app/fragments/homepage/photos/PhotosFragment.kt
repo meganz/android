@@ -15,7 +15,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -312,7 +311,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         })
 
         if (viewModel.searchMode) {
-            listView.switchToLinear()
+            listView.switchToLinearLayout()
             listView.adapter = searchAdapter
         } else {
             configureGridLayoutManager()
@@ -330,7 +329,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         if (viewModel.searchMode) return
 
-        listView.switchToLinear()
+        listView.switchToLinearLayout()
         listView.adapter = searchAdapter
         listView.addItemDecoration(itemDecoration)
 
@@ -342,7 +341,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun exitSearch() {
         if (!viewModel.searchMode) return
 
-        listView.switchBackToGrid()
+        listView.switchBackToGridLayout()
         configureGridLayoutManager()
         listView.adapter = browseAdapter
         listView.removeItemDecoration(itemDecoration)

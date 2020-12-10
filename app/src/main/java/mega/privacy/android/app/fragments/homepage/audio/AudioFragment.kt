@@ -186,14 +186,14 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private fun switchListGridView(isList: Boolean) {
         viewModel.isList = isList
         if (isList) {
-            listView.switchToLinear()
+            listView.switchToLinearLayout()
             listView.adapter = listAdapter
 
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
         } else {
-            listView.switchBackToGrid()
+            listView.switchBackToGridLayout()
             listView.adapter = gridAdapter
             listView.removeItemDecoration(itemDecoration)
 

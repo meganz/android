@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -21,8 +20,7 @@
         <include
             android:id="@+id/empty_hint"
             layout="@layout/empty_result_files"
-            app:showHint="@{viewModel.items.empty}"
-            />
+            app:showHint="@{viewModel.items.empty}" />
 
         <mega.privacy.android.app.components.NewGridRecyclerView
             android:id="@+id/photo_list"
@@ -30,22 +28,22 @@
             android:layout_height="match_parent"
             android:columnWidth="@dimen/photo_item_width"
             android:paddingBottom="@dimen/grid_node_list_padding_bottom"
-            app:visibleGone="@{!viewModel.items.empty}"
             app:items="@{viewModel.items}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleGone="@{!viewModel.items.empty}" />
 
         <mega.privacy.android.app.components.scrollBar.FastScroller
             android:id="@+id/scroller"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

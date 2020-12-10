@@ -103,7 +103,7 @@ public class NewGridRecyclerView extends RecyclerView {
     /**
      * Empower the RecyclerView to change to Linear Layout as needed
      */
-    public void switchToLinear() {
+    public void switchToLinearLayout() {
         mIsLinear = true;
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         setLayoutManager(mLinearLayoutManager);
@@ -112,7 +112,7 @@ public class NewGridRecyclerView extends RecyclerView {
     /**
      * Turn back to use the well-configured CustomizedGridLayoutManager
      */
-    public void switchBackToGrid() {
+    public void switchBackToGridLayout() {
         mIsLinear = false;
         mLinearLayoutManager = null;
         setLayoutManager(manager);

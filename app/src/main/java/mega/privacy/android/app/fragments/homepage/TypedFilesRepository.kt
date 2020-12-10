@@ -20,125 +20,102 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class TypedFilesRepository @Inject constructor(
     private val megaApi: MegaApiAndroid,
     @ApplicationContext private val context: Context
 ) {
+    /** Live Data to notify the query result*/
+    var fileNodeItems: LiveData<List<NodeItem>> = MutableLiveData()
 
-    private var order = ORDER_DEFAULT_ASC
-    private var type = FILE_TYPE_DEFAULT
+    /** Current effective NodeFetcher */
+    lateinit var nodesFetcher: TypedNodesFetcher
 
-    // LinkedHashMap guarantees that the index order of elements is consistent with
-    // the order of putting. Moreover, it has a quick element search[O(1)] (for
-    // the callback of megaApi.getThumbnail())
-    private val fileNodesMap: MutableMap<Any, NodeItem> = LinkedHashMap()
-    private val savedFileNodesMap: MutableMap<Any, NodeItem> = LinkedHashMap()
-
-    private var waitingForRefresh = false
-
-    private val _fileNodeItems = MutableLiveData<List<NodeItem>>()
-    val fileNodeItems: LiveData<List<NodeItem>> = _fileNodeItems
-
-    suspend fun getFiles(type: Int, order: Int) {
-        this.type = type
-        this.order = order
-
-        withContext(Dispatchers.IO) {
-            saveAndClearData()
-            getNodeItems()
-
-            // Update LiveData must in main thread
-            withContext(Dispatchers.Main) {
-                emitFiles()
-            }
-        }
-    }
-
-    fun emitFiles() {
-        synchronized(this) {
-            _fileNodeItems.value = ArrayList(fileNodesMap.values)
-        }
-    }
+    /** The selected nodes in action mode */
+    private val selectedNodesMap: MutableMap<Any, NodeItem> = LinkedHashMap()
 
     /**
-     * Save some field values (e.g. "selected") which do not exist in the raw MegaNode data.
-     * Restore these values in event of querying the raw data again
+     * Data fetcher for fetching typed files
      */
-    private fun saveAndClearData() {
-        synchronized(this) {
-            savedFileNodesMap.clear()
-            fileNodesMap.toMap(savedFileNodesMap)
-            fileNodesMap.clear()
-        }
-    }
+    inner class TypedNodesFetcher(
+        private var type: Int = FILE_TYPE_DEFAULT,
+        private var order: Int = ORDER_DEFAULT_ASC
+    ) {
+        val result = MutableLiveData<List<NodeItem>>()
 
-    private fun getThumbnail(node: MegaNode): File? {
-        val thumbFile = File(
+        /**
+         * LinkedHashMap guarantees that the index order of elements is consistent with
+         * the order of putting. Moreover, it has a quick element search[O(1)] (for
+         * the callback of megaApi.getThumbnail())
+         */
+        private val fileNodesMap: MutableMap<Any, NodeItem> = LinkedHashMap()
+
+        /** Refresh rate limit */
+        private var waitingForRefresh = false
+
+        private val getThumbnailNodes = mutableMapOf<MegaNode, String>()
+
+        /**
+         * Throttle for updating the LiveData
+         */
+        private fun refreshLiveData() {
+            if (waitingForRefresh) return
+            waitingForRefresh = true
+
+            Handler().postDelayed(
+                {
+                    waitingForRefresh = false
+                    result.postValue(ArrayList(fileNodesMap.values))
+                }, UPDATE_DATA_THROTTLE_TIME
+            )
+        }
+
+        private fun getThumbnailFile(node: MegaNode) = File(
             getThumbFolder(context),
             node.base64Handle.plus(FileUtil.JPG_EXTENSION)
         )
 
-        return if (thumbFile.exists()) {
-            thumbFile
-        } else {
-            if (node.hasThumbnail()) {
-                megaApi.getThumbnail(node, thumbFile.absolutePath, object : BaseListener(context) {
-                    override fun onRequestFinish(
-                        api: MegaApiJava,
-                        request: MegaRequest,
-                        e: MegaError
-                    ) {
-                        if (e.errorCode != MegaError.API_OK) return
+        /**
+         * Get the thumbnail of the file.
+         */
+        private fun getThumbnail(node: MegaNode): File? {
+            val thumbFile = getThumbnailFile(node)
 
-                        request.let {
-                            fileNodesMap[it.nodeHandle]?.apply {
-                                thumbnail = thumbFile.absoluteFile
-                                uiDirty = true
-                            }
-                        }
+            return if (thumbFile.exists()) {
+                thumbFile
+            } else {
+                // Note down the nodes and going to get their thumbnails from the server
+                // as soon as the getNodeItems finished. (Don't start the getting operation here
+                // for avoiding potential ConcurrentModification issue)
+                if (node.hasThumbnail()) {
+                    getThumbnailNodes[node] = thumbFile.absolutePath
+                }
 
-                        refreshLiveData()
-                    }
-                })
+                null
             }
-
-            null
         }
-    }
 
-    /**
-     * Throttle for updating the Photos LiveData
-     */
-    private fun refreshLiveData() {
-        if (waitingForRefresh) return
-        waitingForRefresh = true
+        /**
+         * Get all nodes items
+         */
+        fun getNodeItems() {
+            var lastModifyDate: LocalDate? = null
 
-        Handler().postDelayed(
-            {
-                waitingForRefresh = false
-                emitFiles()
-            }, UPDATE_DATA_THROTTLE_TIME
-        )
-    }
+            for (node in getMegaNodes()) {
+                val thumbnail = getThumbnail(node)
+                val modifyDate = Util.fromEpoch(node.modificationTime)
+                val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
 
-    private fun getNodeItems() {
-        var lastModifyDate: LocalDate? = null
-
-        for (node in getMegaNodes()) {
-            val thumbnail = getThumbnail(node)
-            val modifyDate = Util.fromEpoch(node.modificationTime)
-            val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
-
-            // Photo "Month-Year" section headers
-            if (type == FILE_TYPE_PHOTO && (lastModifyDate == null
-                        || YearMonth.from(lastModifyDate) != YearMonth.from(
-                    modifyDate
-                ))
-            ) {
-                lastModifyDate = modifyDate
-                // RandomUUID() can ensure non-repetitive values in practical purpose
-                synchronized(this) {
+                // Photo "Month-Year" section headers
+                if (type == FILE_TYPE_PHOTO && (lastModifyDate == null
+                            || YearMonth.from(lastModifyDate) != YearMonth.from(
+                        modifyDate
+                    ))
+                ) {
+                    lastModifyDate = modifyDate
+                    // RandomUUID() can ensure non-repetitive values in practical purpose
                     fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
                         PhotoNodeItem.TYPE_TITLE,
                         -1,
@@ -149,40 +126,103 @@ class TypedFilesRepository @Inject constructor(
                         false
                     )
                 }
-            }
 
-            val selected = savedFileNodesMap[node.handle]?.selected ?: false
-            var nodeItem: NodeItem?
+                val selected = selectedNodesMap[node.handle]?.selected ?: false
+                var nodeItem: NodeItem?
 
-            if (type == FILE_TYPE_PHOTO) {
-                nodeItem = PhotoNodeItem(
-                    PhotoNodeItem.TYPE_PHOTO,
-                    -1,
-                    node,
-                    -1,
-                    dateString,
-                    thumbnail,
-                    selected
-                )
-            } else {
-                nodeItem = NodeItem(
-                    node,
-                    -1,
-                    type == FILE_TYPE_VIDEO,
-                    dateString,
-                    thumbnail,
-                    selected
-                )
-            }
+                if (type == FILE_TYPE_PHOTO) {
+                    nodeItem = PhotoNodeItem(
+                        PhotoNodeItem.TYPE_PHOTO,
+                        -1,
+                        node,
+                        -1,
+                        dateString,
+                        thumbnail,
+                        selected
+                    )
+                } else {
+                    nodeItem = NodeItem(
+                        node,
+                        -1,
+                        type == FILE_TYPE_VIDEO,
+                        dateString,
+                        thumbnail,
+                        selected
+                    )
+                }
 
-            synchronized(this) {
                 fileNodesMap[node.handle] = nodeItem
             }
+
+            result.postValue(ArrayList(fileNodesMap.values))
+            getThumbnailsFromServer()
+        }
+
+        private fun getThumbnailsFromServer() {
+            for (item in getThumbnailNodes) {
+                megaApi.getThumbnail(
+                    item.key,
+                    item.value,
+                    object : BaseListener(context) {
+                        override fun onRequestFinish(
+                            api: MegaApiJava,
+                            request: MegaRequest,
+                            e: MegaError
+                        ) {
+                            if (e.errorCode != MegaError.API_OK) return
+
+                            request.let {
+                                fileNodesMap[it.nodeHandle]?.apply {
+                                    thumbnail = getThumbnailFile(item.key).absoluteFile
+                                    uiDirty = true
+                                }
+                            }
+
+                            refreshLiveData()
+                        }
+                    })
+            }
+        }
+
+        private fun getMegaNodes(): List<MegaNode> {
+            return megaApi.searchByType(order, type, SEARCH_TARGET_ROOTNODE)
         }
     }
 
-    private fun getMegaNodes(): List<MegaNode> {
-        return megaApi.searchByType(order, type, SEARCH_TARGET_ROOTNODE)
+    suspend fun getFiles(type: Int, order: Int) {
+        preserveSelectedItems()
+
+        // Create a node fetcher for the new request, and link fileNodeItems to its result.
+        // Then the result of any previous NodesFetcher will be ignored
+        nodesFetcher = TypedNodesFetcher(type, order)
+        fileNodeItems = nodesFetcher.result
+
+        withContext(Dispatchers.IO) {
+            nodesFetcher.getNodeItems()
+        }
+    }
+
+    fun emitFiles() {
+        nodesFetcher.result.value?.let {
+            nodesFetcher.result.value = it
+        }
+    }
+
+    /**
+     * Preserve those action mode "selected" nodes.
+     * In order to restore their "selected" status in event of querying the raw data again
+     */
+    private fun preserveSelectedItems() {
+        selectedNodesMap.clear()
+        val listNodeItem = fileNodeItems.value ?: return
+
+        for (item in listNodeItem) {
+            if (item.selected) {
+                item.node?.let {
+                    selectedNodesMap[it.handle] = item
+                }
+            }
+        }
     }
 
     companion object {
