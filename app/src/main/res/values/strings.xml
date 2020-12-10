@@ -2268,6 +2268,7 @@
     <string name="message_button" context="Title of the button in the contact info screen to send a message">Message</string>
     <string name="video_button" context="Title of the button in the contact info screen to start a video call">Video</string>
 
+    <string name="title_file_explorer_send_link" context="Title of file explorer to send a link">Send link to&#8230;</string>
     <string name="title_chat_explorer" context="Title of chat explorer to send a link or file to a chat">Send to&#8230;</string>
     <string name="title_cloud_explorer" context="Title of cloud explorer to upload a link or file">Upload to&#8230;</string>
 

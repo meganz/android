@@ -104,9 +104,11 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
@@ -225,7 +227,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private ArrayList<MegaNode> nodes;
 
-	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
+	private static final String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	private long parentHandleIncoming;
 	private long parentHandleCloud;
@@ -691,8 +693,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				}
 
 				if(isChatFirst){
-					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
-					setView(SHOW_TABS, true, -1);
+					aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
+					setView(SHOW_TABS, true, INCOMING_TAB);
 				}
 				else{
 					aB.setTitle(getString(R.string.title_upload_explorer).toUpperCase());
@@ -731,7 +733,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		viewPagerExplorer.setCurrentItem(position);
 		tabLayoutExplorer.setupWithViewPager(viewPagerExplorer);
 
-		if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2 && !isChatFirst && tabToRemove == CHAT_TAB) {
+		if (mTabsAdapterExplorer != null && mTabsAdapterExplorer.getCount() > 2
+				&& ((!isChatFirst && tabToRemove == CHAT_TAB) || (isChatFirst && tabToRemove == INCOMING_TAB))) {
 			mTabsAdapterExplorer.setTabRemoved(true);
 			tabLayoutExplorer.removeTabAt(2);
 			mTabsAdapterExplorer.notifyDataSetChanged();
@@ -1199,7 +1202,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 		}
 		else if(mode == UPLOAD && !importFileF){
-			aB.setTitle(getString(R.string.title_cloud_explorer).toUpperCase());
+			aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
 		}
 		else if (mode == UPLOAD && importFileF) {
 			if (importFragmentSelected == -1) {
@@ -1232,28 +1235,20 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		cDriveExplorer = getCloudExplorerFragment();
 		iSharesExplorer = getIncomingExplorerFragment();
 
+		aB.setSubtitle(null);
+
 		if(tabShown==NO_TABS){
 			if (importFileF) {
 				if (importFragmentSelected != -1) {
 					switch (importFragmentSelected) {
 						case CLOUD_FRAGMENT: {
 							if(cDriveExplorer!=null){
-								if(cDriveExplorer.getParentHandle()==-1|| cDriveExplorer.getParentHandle()==megaApi.getRootNode().getHandle()){
+								if (cDriveExplorer.getParentHandle() == INVALID_HANDLE
+										|| cDriveExplorer.getParentHandle() == megaApi.getRootNode().getHandle()) {
 									setRootTitle();
-								}
-								else{
-									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
-								}
-							}
-							break;
-						}
-						case INCOMING_FRAGMENT:{
-							if(iSharesExplorer!=null){
-								if(deepBrowserTree==0){
-									setRootTitle();
-								}
-								else{
-									aB.setTitle(megaApi.getNodeByHandle(iSharesExplorer.getParentHandle()).getName());
+									aB.setSubtitle(R.string.general_select_to_download);
+								} else {
+									aB.setTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName().toUpperCase());
 								}
 							}
 							break;
@@ -1289,7 +1284,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						tabShown=CHAT_TAB;
 					}
 
-					aB.setTitle(getString(R.string.title_chat_explorer).toUpperCase());
+					aB.setTitle(getString(R.string.title_file_explorer_send_link).toUpperCase());
 				}
 				else if(f instanceof CloudDriveExplorerFragmentLollipop){
 					if(tabShown!=NO_TABS){
@@ -1328,7 +1323,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						setRootTitle();
 					}
 					else{
-						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName());
+						aB.setTitle(megaApi.getNodeByHandle(((CloudDriveExplorerFragmentLollipop)f).getParentHandle()).getName().toUpperCase());
 					}
 				}
 				showFabButton(false);
@@ -1474,8 +1469,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		else {
 			super.onBackPressed();
 		}
-
-		setToolbarSubtitle(null);
 	}
 
 	private boolean isCloudVisible() {
@@ -1789,7 +1782,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			logDebug("mode UPLOAD");
 
 			if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
-				if ("text/plain".equals(intent.getType())) {
+				if (TYPE_TEXT_PLAIN.equals(intent.getType())) {
 					logDebug("Handle intent of text plain");
 
 					Bundle extras = intent.getExtras();
@@ -1829,7 +1822,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 								parentNode = megaApi.getRootNode();
 							}
 
-							showNewFileDialog(parentNode,body.toString(), isURL);
+							showNewFileDialog(parentNode, body.toString(), isURL, sharedText2);
 							return;
 						}
 					}
@@ -2476,7 +2469,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 						input.requestFocus();
 
 					}else{
-						boolean result=matches(regex, value);
+						boolean result = matches(value);
 						if(result){
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
@@ -2536,7 +2529,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
 				}else{
-					boolean result=matches(regex, value);
+					boolean result = matches(value);
 					if(result){
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
@@ -2707,7 +2700,15 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	private void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL){
+	/**
+	 * Shows a dialog to allow the user type the name of the new file to import.
+	 *
+	 * @param parentNode   Node in which the new file will be saved.
+	 * @param data		   The data which should contain the new file.
+	 * @param hint		   Hint to show in the input text.
+	 * @param isURL		   True if the file will contain an URL, false otherwise.
+	 */
+	private void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL, String hint) {
 		logDebug("showNewFileDialog");
 
 		LinearLayout layout = new LinearLayout(this);
@@ -2741,7 +2742,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
 		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
 		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
 		textError.setLayoutParams(params_text_error);
 
 		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
@@ -2762,7 +2763,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
+				if (error_layout.getVisibility() == View.VISIBLE) {
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
 					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
@@ -2772,109 +2773,79 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		input.setSingleLine();
 		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
+
 		if (isURL) {
-			input.setHint(getString(R.string.context_new_link_name));
-		}
-		else {
+			input.setHint(isTextEmpty(hint) ? getString(R.string.context_new_link_name) : hint);
+		} else {
 			input.setHint(getString(R.string.context_new_file_name_hint));
 		}
+
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					}else{
-						boolean result=matches(regex, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							createFile(value, data, parentNode, isURL);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
+		input.setOnEditorActionListener((v, actionId, event) -> {
+			if (actionId == EditorInfo.IME_ACTION_DONE) {
+				confirmNewFileAction(v, textError, error_layout, parentNode, data, hint, isURL);
+				return true;
 			}
+			return false;
 		});
 
-		input.setImeActionLabel(getString(R.string.general_ok),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
+		input.setImeActionLabel(getString(R.string.general_ok), EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener((v, hasFocus) -> {
+			if (hasFocus) {
+				showKeyboardDelayed(v);
 			}
 		});
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		if (isURL) {
-			builder.setTitle(getString(R.string.dialog_title_new_link));
-		}
-		else {
-			builder.setTitle(getString(R.string.context_new_file_name));
-		}
-		builder.setPositiveButton(getString(R.string.general_ok),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFile(value, data, parentNode, isURL);
-					}
-				});
+		builder.setTitle(isURL ? R.string.dialog_title_new_link : R.string.context_new_file_name)
+				.setPositiveButton(getString(R.string.general_ok), null)
+				.setNegativeButton(getString(android.R.string.cancel), null)
+				.setView(layout);
 
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
-
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener() {
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				}else{
-					boolean result=matches(regex, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					}else{
-						createFile(value, data, parentNode, isURL);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
+		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
+				confirmNewFileAction(input, textError, error_layout, parentNode, data, hint, isURL));
 	}
 
-	private static boolean matches(String regex, CharSequence input) {
+	/**
+	 * Checks the typed text on create new file dialog and warns the user if the text is wrong
+	 * or creates the file otherwise.
+	 *
+	 * @param input		   Input text where the user types the name of the new file.
+	 * @param textError	   Layout where the text error has to be shown.
+	 * @param error_layout Layout where the error has to be shown.
+	 * @param parentNode   Node in which the new file will be saved.
+	 * @param data		   The data which should contain the new file.
+	 * @param hint		   Hint to show in the input text.
+	 * @param isURL		   True if the file will contain an URL, false otherwise.
+	 */
+	private void confirmNewFileAction(TextView input, TextView textError, RelativeLayout error_layout, MegaNode parentNode, String data, String hint, boolean isURL) {
+		String typedText = input.getText().toString().trim();
+
+		if (typedText.isEmpty()) {
+			if (isURL && matches(hint)) {
+				createFile(hint, data, parentNode, isURL);
+				newFolderDialog.dismiss();
+			} else {
+				input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+				textError.setText(getString(isURL ? R.string.invalid_characters : R.string.invalid_string));
+				error_layout.setVisibility(View.VISIBLE);
+				input.requestFocus();
+			}
+		} else if (matches(typedText)) {
+			input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+			textError.setText(getString(R.string.invalid_characters));
+			error_layout.setVisibility(View.VISIBLE);
+			input.requestFocus();
+		} else {
+			createFile(typedText, data, parentNode, isURL);
+			newFolderDialog.dismiss();
+		}
+	}
+
+	private static boolean matches(CharSequence input) {
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		return m.find();

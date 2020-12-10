@@ -642,7 +642,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 
             setParentHandle(parentNode.getHandle());
-            ((FileExplorerActivityLollipop) context).changeTitle();
 
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
 				MegaNode parent = ((FileExplorerActivityLollipop)context).parentMoveCopy();
@@ -678,9 +677,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 					gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0);
 				}
 			}
-			adapter.setParentHandle(parentHandle);
-			((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
-
 
 			return 2;
 		}

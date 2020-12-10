@@ -58,44 +58,32 @@
 		<LinearLayout
 			android:id="@+id/options_explorer_layout"
 			android:layout_width="fill_parent"
-			android:layout_height="48dp"
-			android:background="@color/participants_layout"
-			android:gravity="right|center_vertical"
+			android:layout_height="52dp"
 			android:layout_alignParentBottom="true"
-			android:orientation="horizontal" >
+			android:background="@color/white"
+			android:gravity="end|center_vertical"
+			android:orientation="horizontal">
 
 			<Button
 				android:id="@+id/cancel_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/accentColor"
-				android:stateListAnimator="@null"
-				android:background="@color/participants_layout"
-				android:gravity="center_vertical|center_horizontal"/>
+				style="@style/TransparentBackgroundButtonWithoutBorder"
+				android:layout_gravity="center_vertical"
+				android:layout_marginStart="16dp"
+				android:layout_marginEnd="12dp" />
 
 			<Button
 				android:id="@+id/action_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textColor="@color/accentColor"
-				android:stateListAnimator="@null"
-				android:background="@color/participants_layout"
-				android:layout_marginRight="10dp"
-				android:gravity="center_vertical|center_horizontal"/>
-		</LinearLayout>
+				style="@style/AccentButton"
+				android:layout_gravity="center_vertical"
+				android:layout_marginEnd="16dp" />
 
-		<View
-			android:id="@+id/separator"
-			android:background="@color/tour_bar_grey"
-			android:layout_width = "fill_parent"
-			android:layout_height="1dip"
-			android:layout_above="@id/options_explorer_layout"/>
+		</LinearLayout>
 
 		<RelativeLayout
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
 			android:layout_below="@id/content_text"
-			android:layout_above="@id/separator">
+			android:layout_above="@id/options_explorer_layout">
 
 			<androidx.recyclerview.widget.RecyclerView
 				android:id="@+id/file_list_view_browser"

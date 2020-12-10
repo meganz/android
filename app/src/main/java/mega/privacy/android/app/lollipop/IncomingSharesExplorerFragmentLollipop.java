@@ -390,6 +390,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	}
 
 	private void setOptionsBarVisibility() {
+		if (separator == null || optionsBar == null) {
+			return;
+		}
+
 		if (modeCloud == FileExplorerActivityLollipop.SELECT ||
 				(!isMultiselect() && (((FileExplorerActivityLollipop) context).getDeepBrowserTree() <= 0 || selectFile))) {
 			separator.setVisibility(View.GONE);
