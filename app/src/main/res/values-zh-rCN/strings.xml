@@ -1558,7 +1558,7 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">传输流量不足</string>
-    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">您正在排队的下载由于超出了您当前IP地址可用传输流量而中止。您可以选择升级帐户或等待%s后继续。</string>
     <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">您已超出当前IP地址的可用传输流量。升级您的帐户或等待%s后继续下载。</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">参考我们的方案</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">在未登录账户下继续使用</string>
@@ -2839,24 +2839,24 @@
     <string name="download_location" context="Download location label">下载地址</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">总是保存到此位置？</string>
 
-    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
-    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+    <string name="view_in_folder_label" context="Action to show any file in its location">在文件夹中查看</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">浏览文件</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">添加附件&#8230;&#8230;</string>
 
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">聊天创建于%s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">选择消息</string>
 
-    <string name="storage_root_label" context="Storage root label">Storage root</string>
+    <string name="storage_root_label" context="Storage root label">存储根目录</string>
 
-    <string name="failed_label" context="The label that describes that a transfer failed.">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">传输失败</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">您的传输已中止。升级您的帐户或等待%s后继续。</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
-    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">超出存储空间上限</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">获取更多流量</string>
-    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">文件不存在。</string>
 
-    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">文件在云盘中不存在。</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">空间已满</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">您的数据存在风险！</string>
@@ -2913,12 +2913,12 @@
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
 
-    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">恢复传输？</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">恢复传输</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">取消传输</string>
-    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">取消暂停传输即可继续上传。</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">已下载%1$d%%，共计%2$s</string>
 
     <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>

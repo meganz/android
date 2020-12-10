@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">다음을 사용하여 이미지 공유</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">링크 공유</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">링크 삭제</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">링크 얻기</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">대화에 연락처 공유하기</string>
     <string name="context_view_shared_folders" context="open a shared folder">공유된 폴더 보기</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">공유하기</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">공유 관리</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -598,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">선택한 파일을 열 수 없습니다</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">파일 압축 해제중</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">파일시스템 문제</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">파일 시스템 문제</string>
     <string name="general_error" context="error message while browsing the local filesystem">행동 실행 중 오류가 발생했습니다</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">이미지 뷰어</string>
@@ -704,10 +704,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">카메라 업로드 완료</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">기능</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">PIN 잠금</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">암호 잠금</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">사진과 동영상</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">설정되지 않음</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">PIN 잠금</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">암호 잠금</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">암호 변경</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">입력</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">10번의 실패 이후 모든 로컬 파일이 삭제되고 로그아웃 됩니다</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">잘못된 코드</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">잘못된 PIN, 다시 시도하세요. 1번의 기회가 남았습니다</item>
-        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">잘못된 PIN 코드, 다시 시도하세요. %2d번 남았습니다.</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">암호를 틀렸습니다, 다시 시도하세요. 1번의 기회가 남았습니다</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">암호를 틀렸습니다, 다시 시도하세요. %2d번 남았습니다.</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">PIN 코드가 일치하지 않습니다</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">PIN 코드를 입력하세요</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">PIN 코드를 다시 입력하세요</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">새 PIN 코드를 입력하세요</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">PIN 코드를 다시 입력하세요</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">암호가 일치하지 않습니다</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">암호를 입력하세요</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">암호를 다시 입력하세요</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">새 암호를 입력하세요</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">새 암호를 다시 입력하세요</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="Title to choose the type of Passcode">PIN 코드 유형</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4자리 PIN</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6자리 PIN</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">영숫자 PIN</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">암호 유형</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">네 자리 암호</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">여섯 자리 암호</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">영숫자 암호</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">로그가 활성화 되었습니다.</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">로그가 비활성화 되었습니다.</string>
@@ -1217,7 +1217,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">대화 기록이 삭제되었습니다</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">오류. 대화 기록이 올바르게 삭제되지 않았습니다</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">오류가 발생하였습니다. 대화 기록이 삭제되지 않았습니다.</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">참가자 추가</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">참가자 제거</string>
@@ -2319,7 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">대화 링크 관리</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">암호화 키 순환 활성화</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">암호화된 키 순환 활성화</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">키 순환은 약간 더 안전합니다만, 대화 링크를 생성할 수 없고 새로운 참여자는 과거 메시지를 볼 수 없습니다.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">키 순환은 100명 이상의 참여자가 있는 대화에서는 해제됩니다.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">참여자 수가 제한을 초과하였기 때문이 이 대화를 비밀 대화로 전환할 수 없습니다.</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%2$s의 %1$d%%</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">대화 메시지의 특별 정보 활성화</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">대화 메시지의 특별 정보 해제</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">당신은 최대 반응 한도 %d개에 도달하였습니다.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">이 메시지는 최대 반응 한도 %d개에 도달하였습니다.</string>
 </resources>

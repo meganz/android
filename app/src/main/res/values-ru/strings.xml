@@ -1914,7 +1914,7 @@
     <string name="contacts_mega" context="When it lists contacts of MEGA, the title of list’s header">В MEGA</string>
     <string name="contacts_phone" context="When it lists contacts of phone, the title of list’s header">Телефонные контакты</string>
 
-    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Ваша учетная запись была приостановлена из-за многочисленных нарушений Условий предоставления услуг MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
+    <string name="account_suspended_multiple_breaches_ToS" context="Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service">Ваш аккаунт был заблокирован из-за многочисленных нарушений Условий предоставления услуг MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
     <string name="account_suspended_breache_ToS" context="Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
 
     <string name="file_storage_loading" context="In a chat conversation when you try to send device’s images but images are still loading">Загрузка файлов</string>

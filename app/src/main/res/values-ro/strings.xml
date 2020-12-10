@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Spațiu de stocare</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Blocare prin PIN</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Blocare prin cod de acces</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotografii și videoclipuri</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Nesetat</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Blocare prin PIN</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Blocare prin cod de acces</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Introdu</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Fișierele tale locale vor fi șterse și vei fi deconectat după 10 încercări eșuate</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Cod incorect</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">PIN greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
-        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod PIN greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Cod de acces greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Codurile PIN nu coincid</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu codul PIN</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu codul PIN</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu noul cod PIN</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu noul cod PIN</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Codurile de acces nu coincid</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu codul de acces</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu codul de acces</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Introdu noul cod de acces</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Reintrodu noul cod de acces</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Toate datele tale locale vor fi șterse și vei fi deconectat în %1d secunde</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Despre</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipul codului PIN</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">PIN de 4 cifre</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">PIN de 6 cifre</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">PIN alfanumeric</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Tipul codului de acces</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">Cod de acces din 4 cifre</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">Cod de acces din 6 cifre</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Cod de acces alfanumeric</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Jurnalele sunt acum activate</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Jurnalele sunt acum dezactivate</string>
@@ -1217,7 +1217,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Istoricul chatului a fost golit</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Eroare. Istoricul chatului nu a fost golit cu succes</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">S-a produs o eroare. Istoricul chatului nu a fost golit cu succes.</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Adaugă participanți</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Elimină participantul</string>
