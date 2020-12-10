@@ -213,6 +213,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         )
 
         binding.textPicker.displayedValues = arrayString
+        binding.textPicker.minimumWidth = MAXIMUM_VALUE_TEXT_PICKER
     }
 
     /**

@@ -137,7 +137,7 @@
                         android:id="@+id/text_picker"
                         android:theme="@style/AppTheme.Picker"
                         android:layout_height="match_parent"
-                        android:layout_width="70dp"
+                        android:layout_width="wrap_content"
                         android:layout_toEndOf="@id/number_picker"
                         android:selectionDividerHeight="1dp"
                         android:descendantFocusability="blocksDescendants"
