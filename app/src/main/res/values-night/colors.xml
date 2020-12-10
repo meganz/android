@@ -28,6 +28,9 @@
     <!-- Chat message unselected icon tint -->
     <color name="grey_600_white_087">@color/white_alpha_087</color>
 
+    <!-- Chat message forward icon tint -->
+    <color name="grey_200_grey_500">@color/grey_500</color>
+
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/white_alpha_054</color>
 

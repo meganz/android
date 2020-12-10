@@ -565,6 +565,14 @@
         <item name="colorPrimary">?attr/colorSecondary</item>
     </style>
 
+    <style name="Widget.Mega.Button.TextButton.Red">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton.Red</item>
+    </style>
+
+    <style name="ThemeOverlay.Mega.Button.TextButton.Red" parent="">
+        <item name="colorPrimary">@color/red_600_red_300</item>
+    </style>
+
     <!-- Outlined button -->
     <style name="Widget.Mega.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>

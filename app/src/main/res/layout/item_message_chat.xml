@@ -85,8 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:layout_below="@+id/title_own_message_layout"
-            android:background = "@null">
+            android:layout_below="@+id/title_own_message_layout">
 
             <!--multiseleccion-->
             <RelativeLayout
@@ -94,10 +93,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="16dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="16dp"
                 android:layout_marginBottom="10dp"
-                android:background="@android:color/transparent"
                 android:visibility="gone">
 
                 <ImageView
@@ -120,9 +118,7 @@
                     android:id="@+id/content_own_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
                     android:layout_alignParentEnd="true"
-                    android:textSize="14sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/dark_rounded_chat_own_message"
                     android:paddingTop="10dp"
@@ -131,6 +127,8 @@
                     android:paddingEnd="12dp"
                     android:layout_marginStart="72dp"
                     android:layout_marginEnd="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                    android:textColorLink="@color/white"
                     android:gravity="start"
                     app:emojiSize="18sp"/>
 
@@ -163,15 +161,13 @@
                             android:id="@+id/url_own_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:layout_marginLeft="12dp"
+                            android:gravity="start"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginStart="12dp"
-                            android:layout_marginRight="12dp"
                             android:layout_marginEnd="12dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
+                            android:textColorLink="@color/white"
                             app:emojiSize="14sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>
                     </RelativeLayout>
@@ -180,31 +176,29 @@
                         android:id="@+id/url_own_message_enable_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_own_message_text_rl"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_text_rl">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/url_own_message_image"
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/ic_rich_link"
-                            android:background="@android:color/transparent"
                             android:layout_gravity="center_vertical"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
-                            android:layout_marginLeft="12dp" />
+                            android:layout_marginStart="12dp"
+                            tools:src="@drawable/ic_rich_link" />
 
                         <RelativeLayout
                             android:id="@+id/url_chat_own_message_image"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:layout_centerVertical="true">
 
                             <mega.privacy.android.app.components.RoundedImageView
@@ -212,10 +206,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="fitCenter"
-                                android:layout_centerInParent="true"
-                                app:border_color="@color/white"
-                                app:border_width="2dp"
-                                app:corner_radius="20dp"/>
+                                android:layout_centerInParent="true" />
 
                             <TextView
                                 android:id="@+id/content_url_chat_own_message_contact_initial_letter"
@@ -230,41 +221,34 @@
                             android:id="@+id/url_own_message_enable_layout_inside"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:layout_marginEnd="12dp"
-                            android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginStart="12dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@android:color/transparent">
+                            android:layout_gravity="center_vertical">
 
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_own_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="16sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
                                 app:emojiSize="16sp"
-                                android:background="@android:color/transparent"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginTop="12dp"/>
+                                android:layout_marginTop="12dp" />
 
                             <TextView
                                 android:id="@+id/url_own_message_description"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:maxLines="2"
                                 android:ellipsize="end"
-                                android:background="@android:color/transparent"
                                 android:layout_below="@+id/url_own_message_title"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="14sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle2"
                                 android:layout_marginBottom="12dp"
-                                android:layout_gravity="left"/>
+                                android:layout_gravity="start" />
 
                         </RelativeLayout>
 
@@ -274,31 +258,27 @@
                         android:id="@+id/url_own_message_icon_link_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_own_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_enable_layout">
 
                         <ImageView
                             android:id="@+id/url_own_message_icon"
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_marginEnd="5dp"
                             android:layout_gravity="center_vertical|center_horizontal"
-                            android:background="@null"/>
+                            android:background="@null" />
 
                         <TextView
                             android:id="@+id/url_own_message_link"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="14sp"/>
+                            android:gravity="start"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
                     </LinearLayout>
 
@@ -306,57 +286,44 @@
                         android:id="@+id/url_own_message_buttons_warning_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:orientation="vertical"
-                        android:layout_below="@id/url_own_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_enable_layout">
 
                         <Button
                             android:id="@+id/url_always_allow_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/accentColor"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="8dp"
                             android:layout_marginBottom="8dp"
                             android:text="@string/button_always_rich_links"
-                            android:minWidth="0dp"
-                            android:background="@android:color/transparent"
-                            android:elevation="0dp"/>
-
+                            android:minWidth="0dp" />
 
                         <Button
                             android:id="@+id/url_not_now_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
                             android:minWidth="0dp"
-                            android:text="@string/button_not_now_rich_links"
-                            android:elevation="0dp"
-                            android:background="@android:color/transparent"
-                            android:textColor="@color/accentColor"/>
+                            android:text="@string/button_not_now_rich_links" />
 
                         <Button
                             android:id="@+id/url_never_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textColor="@color/tour_bar_red"
+                            style="@style/Widget.Mega.Button.TextButton.Red"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
                             android:minWidth="0dp"
-                            android:text="@string/button_never_rich_links"
-                            android:background="@android:color/transparent"
-                            android:elevation="0dp"/>
+                            android:text="@string/button_never_rich_links" />
 
                     </LinearLayout>
 
@@ -364,42 +331,33 @@
                         android:id="@+id/url_own_message_buttons_disable_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="right"
+                        android:gravity="end"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_own_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_own_message_enable_layout">
 
                         <Button
                             android:id="@+id/url_no_disable_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/accentColor"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
-                            android:text="@string/general_no"
-                            android:background="@android:color/transparent"
-                            android:elevation="0dp"/>
+                            android:text="@string/general_no" />
 
 
                         <Button
                             android:id="@+id/url_yes_disable_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
+                            style="?attr/borderlessButtonStyle"
                             android:layout_centerVertical="true"
-                            android:layout_marginLeft="24dp"
+                            android:layout_marginStart="24dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="8dp"
-                            android:text="@string/general_yes"
-                            android:elevation="0dp"
-                            android:background="@android:color/transparent"
-                            android:textColor="@color/accentColor"/>
+                            android:text="@string/general_yes" />
 
                     </LinearLayout>
 
@@ -411,16 +369,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:paddingRight="4dp"
-                    android:layout_toLeftOf="@+id/url_own_message_layout"
-                    android:background="@android:color/transparent">
+                    android:paddingEnd="4dp"
+                    android:layout_toStartOf="@+id/url_own_message_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_gravity="center"
                         android:background="@null"
-                        android:src="@drawable/ic_input_warning"/>
+                        android:src="@drawable/ic_input_warning"
+                        app:tint="?android:attr/textColorSecondary" />
                 </RelativeLayout>
 
                 <!--forward rich links-->
@@ -430,8 +388,8 @@
                     android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@+id/url_own_message_layout">
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/url_own_message_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -441,7 +399,8 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
+                        android:src="@drawable/ic_w_forward"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!--End Rich links-->
 
@@ -471,7 +430,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
+                                android:layout_marginStart="16dp"
                                 android:src="@drawable/ic_play_grey"
                                 android:background="@null"
                                 android:visibility="gone"/>
@@ -481,7 +440,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
+                                android:layout_marginStart="16dp"
                                 android:src="@drawable/ic_clear_white"
                                 android:tint="@color/grey_achievements_invite_friends"
                                 android:background="@null"
@@ -493,7 +452,7 @@
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
-                                android:layout_marginLeft="16dp"
+                                android:layout_marginStart="16dp"
                                 android:visibility="gone"
                                 android:background="@android:color/transparent">
                                 <ProgressBar
@@ -539,14 +498,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toLeftOf="@id/content_own_message_voice_clip_layout"
+                        android:layout_toStartOf="@id/content_own_message_voice_clip_layout"
                         android:gravity="right"
                         android:paddingRight="4dp"
                         android:background="@android:color/transparent">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
                             android:src="@drawable/ic_input_warning"/>
@@ -577,7 +536,7 @@
                             android:layout_width="256dp"
                             android:layout_height="140dp"
                             android:layout_marginTop="1dp"
-                            android:layout_marginLeft="1dp"
+                            android:layout_marginStart="1dp"
                             android:layout_marginRight="1dp"
                             android:scaleType="centerCrop"
                             android:layout_gravity="center_horizontal|center_vertical"
@@ -588,7 +547,7 @@
                             android:layout_width="256dp"
                             android:layout_height="12dp"
                             android:layout_marginTop="-12dp"
-                            android:layout_marginLeft="1dp"
+                            android:layout_marginStart="1dp"
                             android:layout_marginRight="1dp"
                             android:background="@color/white"
                             android:layout_below="@id/own_rounded_imageview_location"/>
@@ -601,7 +560,7 @@
                             android:layout_below="@id/own_rounded_imageview_location"
                             android:layout_marginTop="-12dp"
                             android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
+                            android:layout_marginStart="12dp"
                             android:layout_marginBottom="1dp">
 
                             <RelativeLayout
@@ -635,7 +594,7 @@
                             android:layout_width="256dp"
                             android:layout_height="128dp"
                             android:layout_marginTop="1dp"
-                            android:layout_marginLeft="1dp"
+                            android:layout_marginStart="1dp"
                             android:layout_marginRight="1dp"
                             android:background="@drawable/shape_location_chat_transparent">
 
@@ -666,12 +625,12 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:paddingRight="4dp"
-                        android:layout_toLeftOf="@+id/own_main_item_location_rl"
+                        android:layout_toStartOf="@+id/own_main_item_location_rl"
                         android:background="@android:color/transparent">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
                             android:src="@drawable/ic_input_warning"/>
@@ -684,8 +643,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toLeftOf="@+id/own_main_item_location_rl">
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@+id/own_main_item_location_rl">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -695,7 +654,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
                 </RelativeLayout>
@@ -755,7 +715,7 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_alignLeft="@+id/content_own_message_thumb_portrait"/>
                         <TextView
@@ -779,7 +739,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                         <!--Transparent coat-->
                         <RelativeLayout
@@ -823,12 +783,12 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:paddingRight="4dp"
-                        android:layout_toLeftOf="@+id/preview_frame_portrait_rl"
+                        android:layout_toStartOf="@+id/preview_frame_portrait_rl"
                         android:background="@android:color/transparent">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
                             android:src="@drawable/ic_input_warning"/>
@@ -841,8 +801,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toLeftOf="@+id/preview_frame_portrait_rl">
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@+id/preview_frame_portrait_rl">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -852,7 +812,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
                 </RelativeLayout>
 
@@ -911,7 +872,7 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:layout_alignLeft="@+id/content_own_message_thumb_landscape"/>
                         <TextView
@@ -936,7 +897,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                         <!--Transparent coat-->
                         <RelativeLayout
@@ -979,12 +940,12 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:paddingRight="4dp"
-                        android:layout_toLeftOf="@+id/preview_frame_landscape_rl"
+                        android:layout_toStartOf="@+id/preview_frame_landscape_rl"
                         android:background="@android:color/transparent">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_gravity="center"
                             android:background="@null"
                             android:src="@drawable/ic_input_warning"/>
@@ -997,8 +958,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginRight="8dp"
-                        android:layout_toLeftOf="@+id/preview_frame_landscape_rl">
+                        android:layout_marginEnd="8dp"
+                        android:layout_toStartOf="@+id/preview_frame_landscape_rl">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1008,7 +969,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
                 </RelativeLayout>
@@ -1028,7 +990,7 @@
                         android:id="@+id/content_own_message_file_thumb"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="4dp"
                         android:layout_marginRight="7dp"
@@ -1037,7 +999,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/content_own_message_file_thumb">
+                        android:layout_toEndOf="@+id/content_own_message_file_thumb">
                         <TextView
                             android:id="@+id/content_own_message_file_name"
                             android:layout_width="wrap_content"
@@ -1072,7 +1034,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_gravity="center"
                         android:background="@null"
                         android:src="@drawable/ic_input_warning"/>
@@ -1085,8 +1047,8 @@
                     android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@+id/content_own_message_file_layout">
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/content_own_message_file_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1096,7 +1058,8 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
+                        android:src="@drawable/ic_w_forward"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
 
                 <!--End RelativeLayout file-->
@@ -1118,7 +1081,7 @@
                         android:id="@+id/content_own_message_contact_layout_avatar"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginRight="12dp"
@@ -1137,7 +1100,7 @@
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/content_own_message_contact_layout_avatar"
+                        android:layout_toEndOf="@+id/content_own_message_contact_layout_avatar"
                         android:layout_centerVertical="true"
                         android:layout_centerInParent="true">
 
@@ -1175,14 +1138,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@+id/content_own_message_contact_layout"
+                    android:layout_toStartOf="@+id/content_own_message_contact_layout"
                     android:gravity="right"
                     android:paddingRight="4dp"
                     android:background="@android:color/transparent">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_gravity="center"
                         android:background="@null"
                         android:src="@drawable/ic_input_warning"/>
@@ -1195,8 +1158,8 @@
                     android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@+id/content_own_message_contact_layout">
+                    android:layout_marginEnd="8dp"
+                    android:layout_toStartOf="@+id/content_own_message_contact_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1206,7 +1169,8 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
+                        android:src="@drawable/ic_w_forward"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -1348,19 +1312,16 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentBottom="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="@android:color/transparent">
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="10dp">
 
                     <mega.privacy.android.app.components.RoundedImageView
                         android:id="@+id/contact_thumbnail"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerInParent="true"
-                        android:background="@android:color/transparent"
                         android:scaleType="fitCenter"
-                        app:border_color="@color/border_file_properties"
                         app:border_width="0dp"
                         app:corner_radius="40dp" />
                 </RelativeLayout>
@@ -1371,10 +1332,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
                     android:layout_marginBottom="10dp"
-                    android:background="@android:color/transparent"
                     android:visibility="gone">
 
                     <ImageView
@@ -1390,8 +1350,8 @@
                     android:id="@+id/content_contact_message_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/grey_087_white"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
+                    android:textColorLink="@color/grey_087_white"
                     app:emojiSize="18sp"
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
@@ -1400,14 +1360,14 @@
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:layout_marginStart="48dp"
-                    android:layout_marginEnd="40dp"/>
+                    android:layout_marginEnd="40dp" />
 
                 <!-- contact's Rich links-->
                 <RelativeLayout
                     android:id="@+id/url_contact_message_layout"
                     android:layout_width="256dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:background="@drawable/contact_background_rich_link">
 
                     <RelativeLayout
@@ -1420,16 +1380,13 @@
                             android:id="@+id/url_contact_message_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:background="@android:color/transparent"
-                            android:layout_marginLeft="12dp"
+                            android:gravity="start"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginStart="12dp"
-                            android:layout_marginRight="12dp"
                             android:layout_marginEnd="12dp"
-                            android:textColor="@color/black"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant4"
+                            android:textColorLink="@color/grey_087_white"
                             app:emojiSize="18sp"
                             android:layout_gravity="center_horizontal|center_vertical"/>/>
 
@@ -1449,21 +1406,20 @@
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:scaleType="fitXY"
-                            android:src="@drawable/ic_install_mega"
-                            android:background="@android:color/transparent"
                             android:layout_marginBottom="12dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginTop="12dp"
-                            android:layout_marginLeft="12dp" />
+                            android:layout_marginStart="12dp"
+                            tools:src="@drawable/ic_install_mega" />
 
                         <RelativeLayout
                             android:id="@+id/url_chat_contact_message_image"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginBottom="12dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:layout_centerVertical="true">
 
                             <mega.privacy.android.app.components.RoundedImageView
@@ -1471,10 +1427,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:scaleType="fitCenter"
-                                android:layout_centerInParent="true"
-                                app:border_color="@color/white"
-                                app:border_width="2dp"
-                                app:corner_radius="20dp"/>
+                                android:layout_centerInParent="true" />
 
                             <TextView
                                 android:id="@+id/content_url_chat_contact_message_contact_initial_letter"
@@ -1493,38 +1446,33 @@
                             android:layout_marginEnd="12dp"
                             android:layout_marginStart="12dp"
                             android:orientation="vertical"
-                            android:layout_gravity="center_vertical"
-                            android:background="@android:color/transparent">
+                            android:layout_gravity="center_vertical">
 
                             <mega.privacy.android.app.components.twemoji.EmojiTextView
                                 android:id="@+id/url_contact_message_title"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:text="@string/title_enable_rich_links"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="16sp"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
                                 app:emojiSize="16sp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:background="@android:color/transparent"
                                 android:layout_marginTop="12dp"
-                                android:layout_gravity="center_vertical"/>
+                                android:layout_gravity="center_vertical" />
 
                             <TextView
                                 android:id="@+id/url_contact_message_description"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:gravity="left"
+                                android:gravity="start"
                                 android:maxLines="2"
                                 android:ellipsize="end"
                                 android:layout_below="@+id/url_contact_message_title"
-                                android:background="@android:color/transparent"
-                                android:textColor="?android:attr/textColorSecondary"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle2"
                                 android:text="@string/text_enable_rich_links"
-                                android:textSize="14sp"
                                 android:layout_marginBottom="12dp"
-                                android:layout_gravity="left"/>
+                                android:layout_gravity="start" />
 
                         </RelativeLayout>
 
@@ -1534,21 +1482,18 @@
                         android:id="@+id/url_contact_message_icon_link_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginRight="12dp"
-                        android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginBottom="12dp"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_contact_message_enable_layout"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_contact_message_enable_layout">
 
                         <ImageView
                             android:id="@+id/url_contact_message_icon"
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:layout_marginRight="5dp"
+                            android:layout_marginEnd="5dp"
                             android:layout_gravity="center_vertical|center_horizontal"
                             android:background="@null"/>
 
@@ -1556,9 +1501,8 @@
                             android:id="@+id/url_contact_message_link"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="14sp"/>
+                            android:gravity="start"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
                     </LinearLayout>
 
                 </RelativeLayout>
@@ -1570,8 +1514,8 @@
                     android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
-                    android:layout_toRightOf="@+id/url_contact_message_layout">
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/url_contact_message_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1581,7 +1525,8 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
+                        android:src="@drawable/ic_w_forward"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!--end contact's rich links-->
 
@@ -1592,7 +1537,7 @@
                     android:layout_height="56dp"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
                     android:gravity="left"
-                    android:layout_alignParentLeft="true">
+                    android:layout_alignParentStart="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1605,7 +1550,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:background="@null"
                             android:visibility="gone"/>
 
@@ -1615,7 +1560,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:src="@drawable/ic_clear_white"
                             android:tint="@color/grey_achievements_invite_friends"
                             android:background="@null"
@@ -1627,7 +1572,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:visibility="gone"
                             android:background="@android:color/transparent">
                             <ProgressBar
@@ -1676,7 +1621,7 @@
                         android:id="@+id/contact_main_item_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:background="@drawable/contact_background_location_message">
 
                         <!--Preview of location-->
@@ -1686,7 +1631,7 @@
                             android:layout_height="140dp"
                             android:adjustViewBounds="true"
                             android:layout_marginTop="1dp"
-                            android:layout_marginLeft="1dp"
+                            android:layout_marginStart="1dp"
                             android:layout_marginRight="1dp"
                             android:scaleType="centerCrop"
                             android:layout_gravity="center_horizontal|center_vertical"
@@ -1697,7 +1642,7 @@
                             android:layout_width="256dp"
                             android:layout_height="12dp"
                             android:layout_marginTop="-12dp"
-                            android:layout_marginLeft="1dp"
+                            android:layout_marginStart="1dp"
                             android:layout_marginRight="1dp"
                             android:background="@color/white"
                             android:layout_below="@id/contact_rounded_imageview_location"/>
@@ -1710,7 +1655,7 @@
                             android:layout_below="@id/contact_rounded_imageview_location"
                             android:layout_marginTop="-12dp"
                             android:layout_marginRight="12dp"
-                            android:layout_marginLeft="12dp"
+                            android:layout_marginStart="12dp"
                             android:layout_marginBottom="1dp">
 
                             <RelativeLayout
@@ -1746,8 +1691,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@id/contact_main_item_location">
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@id/contact_main_item_location">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1757,7 +1702,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
                 </RelativeLayout>
                 <!-- End location-->
@@ -1767,7 +1713,7 @@
                     android:id="@+id/content_contact_message_attach_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:gravity="left"
                     android:background="@android:color/transparent">
 
@@ -1816,7 +1762,7 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                             android:layout_alignLeft="@+id/content_contact_message_thumb_portrait"/>
                         <TextView
@@ -1840,7 +1786,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                     </RelativeLayout>
                     <!--forward preview portrait-->
@@ -1850,9 +1796,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@+id/content_contact_message_portrait">
-                        <!--android:background="@drawable/forward_circle"-->
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/content_contact_message_portrait">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -1863,7 +1808,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
                     <!--End contact elements portrait-->
@@ -1913,7 +1859,7 @@
                             android:src="@drawable/ic_play_arrow_white_24dp"
                             android:background="@null"
                             android:layout_marginBottom="5dp"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                             android:layout_alignLeft="@+id/content_contact_message_thumb_landscape"/>
                         <TextView
@@ -1938,7 +1884,7 @@
                             android:background="@null"
                             android:layout_marginBottom="6dp"
                             android:layout_alignParentBottom="true"
-                            android:layout_alignParentLeft="true"/>
+                            android:layout_alignParentStart="true"/>
 
                     </RelativeLayout>
 
@@ -1949,8 +1895,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@+id/content_contact_message_landscape">
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/content_contact_message_landscape">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -1960,7 +1906,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
                     <!--End contact elements landscape-->
@@ -1971,7 +1918,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_text_view_chat_contact_message"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:paddingRight="12dp"
                         android:paddingLeft="7dp"
                         android:gravity="left">
@@ -1980,7 +1927,7 @@
                             android:id="@+id/content_contact_message_file_thumb"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="4dp"
                             android:layout_marginRight="7dp"
@@ -1990,7 +1937,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:layout_toRightOf="@+id/content_contact_message_file_thumb">
+                            android:layout_toEndOf="@+id/content_contact_message_file_thumb">
 
                             <TextView
                                 android:id="@+id/content_contact_message_file_name"
@@ -2026,8 +1973,8 @@
                         android:layout_height="32dp"
                         android:background="@drawable/forward_circle"
                         android:layout_centerVertical="true"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@+id/content_contact_message_file">
+                        android:layout_marginStart="8dp"
+                        android:layout_toEndOf="@+id/content_contact_message_file">
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -2037,7 +1984,8 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"/>
+                            android:src="@drawable/ic_w_forward"
+                            app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
                 </RelativeLayout>
                 <!--End RelativeLayout file-->
@@ -2050,7 +1998,7 @@
                     android:minHeight="56dp"
                     android:background="@drawable/rounded_text_view_chat_contact_message"
                     android:gravity="left"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:paddingRight="12dp"
                     android:paddingLeft="12dp">
 
@@ -2058,7 +2006,7 @@
                         android:id="@+id/content_contact_message_contact_layout_avatar"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginRight="12dp"
@@ -2086,7 +2034,7 @@
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/content_contact_message_contact_layout_avatar"
+                        android:layout_toEndOf="@+id/content_contact_message_contact_layout_avatar"
                         android:layout_centerVertical="true"
                         android:layout_centerInParent="true">
 
@@ -2123,8 +2071,8 @@
                     android:layout_height="32dp"
                     android:background="@drawable/forward_circle"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="8dp"
-                    android:layout_toRightOf="@+id/content_contact_message_contact_layout">
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/content_contact_message_contact_layout">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -2134,7 +2082,8 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"/>
+                        android:src="@drawable/ic_w_forward"
+                        app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!--End RelativeLayout contact-->
 

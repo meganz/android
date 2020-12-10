@@ -248,6 +248,7 @@
     <color name="dark_grey">#121212</color>
 
     <color name="grey_010">#FAFAFA</color>
+    <color name="grey_200">#BDBDBD</color>
     <color name="grey_300">#9E9E9E</color>
     <color name="grey_500">#757575</color>
     <color name="grey_600">#6C6C6C</color>
@@ -365,6 +366,9 @@
 
     <!-- Chat message unselected icon tint -->
     <color name="grey_600_white_087">@color/grey_600</color>
+
+    <!-- Chat message forward icon tint -->
+    <color name="grey_200_grey_500">@color/grey_200</color>
 
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->

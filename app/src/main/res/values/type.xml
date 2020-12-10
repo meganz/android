@@ -141,6 +141,16 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <!-- Chat own message text -->
+    <style name="TextAppearance.Mega.Body2.Variant3">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Chat contact message text -->
+    <style name="TextAppearance.Mega.Body2.Variant4">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
