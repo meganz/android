@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
@@ -100,7 +101,7 @@ class TypedFilesRepository @Inject constructor(
         /**
          * Get all nodes items
          */
-        fun getNodeItems() {
+        suspend fun getNodeItems() {
             var lastModifyDate: LocalDate? = null
 
             for (node in getMegaNodes()) {
@@ -155,6 +156,10 @@ class TypedFilesRepository @Inject constructor(
             }
 
             result.postValue(ArrayList(fileNodesMap.values))
+
+            // Delay before getting thumbnails to make the UI thread rendering the
+            // list view at first. (Callback of getThumbnail will also be running on UI thread)
+            delay(UPDATE_DATA_THROTTLE_TIME)
             getThumbnailsFromServer()
         }
 
