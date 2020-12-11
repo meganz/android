@@ -448,6 +448,11 @@ public class Constants {
                     ")+"
     );
 
+    /**
+     * A node name must not contain these characters.
+     */
+    public static final String NODE_NAME_REGEX = "[*|\\?:\"<>\\\\\\\\/]";
+
     public static final int FROM_INCOMING_SHARES = 140;
     public static final int FROM_INBOX = 150;
     public static final int FROM_OTHERS = 0;

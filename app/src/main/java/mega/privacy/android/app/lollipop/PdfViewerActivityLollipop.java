@@ -218,7 +218,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     int typeExport = -1;
     private Handler handler;
     private AlertDialog renameDialog;
-    String regex = "[*|\\?:\"<>\\\\\\\\/]";
     boolean moveToRubbish = false;
     ProgressDialog moveToTrashStatusDialog;
     private boolean fromShared = false;
@@ -1960,7 +1959,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         input.requestFocus();
 
                     } else {
-                        boolean result = matches(regex, value);
+                        boolean result = matches(NODE_NAME_REGEX, value);
                         if (result) {
                             input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
@@ -2013,7 +2012,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     input.requestFocus();
                 }
                 else{
-                    boolean result=matches(regex, value);
+                    boolean result=matches(NODE_NAME_REGEX, value);
                     if(result){
                         input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));

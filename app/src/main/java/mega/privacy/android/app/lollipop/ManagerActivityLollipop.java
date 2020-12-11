@@ -335,8 +335,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public long transferCallback = 0;
 
-	String regex = "[*|\\?:\"<>\\\\\\\\/]";
-
 	//GET PRO ACCOUNT PANEL
 	LinearLayout getProLayout=null;
 	TextView getProText;
@@ -8359,7 +8357,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						input.requestFocus();
 
 					}else{
-						boolean result=matches(regex, value);
+						boolean result=matches(NODE_NAME_REGEX, value);
 						if(result){
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
@@ -8409,7 +8407,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					input.requestFocus();
 				}
 				else{
-					boolean result=matches(regex, value);
+					boolean result=matches(NODE_NAME_REGEX, value);
 					if(result){
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
@@ -9700,7 +9698,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						input.requestFocus();
 
 					} else {
-						boolean result = matches(regex, value);
+						boolean result = matches(NODE_NAME_REGEX, value);
 						if (result) {
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
@@ -9753,7 +9751,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					input.requestFocus();
 
 				} else {
-					boolean result = matches(regex, value);
+					boolean result = matches(NODE_NAME_REGEX, value);
 					if (result) {
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));

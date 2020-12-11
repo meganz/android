@@ -227,8 +227,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	private ArrayList<MegaNode> nodes;
 
-	private static final String regex = "[*|\\?:\"<>\\\\\\\\/]";
-
 	private long parentHandleIncoming;
 	private long parentHandleCloud;
 	private int deepBrowserTree;
@@ -2842,7 +2840,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	}
 
 	private static boolean matches(CharSequence input) {
-		Pattern p = Pattern.compile(regex);
+		Pattern p = Pattern.compile(NODE_NAME_REGEX);
 		Matcher m = p.matcher(input);
 		return m.find();
 	}

@@ -293,7 +293,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private boolean fromShared = false;
     private int typeExport = -1;
     private AlertDialog renameDialog;
-    private String regex = "[*|\\?:\"<>\\\\\\\\/]";
     boolean moveToRubbish = false;
     private ProgressDialog moveToTrashStatusDialog;
     private boolean loop = false;
@@ -2885,7 +2884,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         input.requestFocus();
 
                     } else {
-                        boolean result = matches(regex, value);
+                        boolean result = matches(NODE_NAME_REGEX, value);
                         if (result) {
                             input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
@@ -2938,7 +2937,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     input.requestFocus();
                 }
                 else{
-                    boolean result=matches(regex, value);
+                    boolean result=matches(NODE_NAME_REGEX, value);
                     if(result){
                         input.getBackground().mutate().setColorFilter(ContextCompat.getColor(audioVideoPlayerLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));

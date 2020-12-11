@@ -190,8 +190,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
 
-	private String regex = "[*|\\?:\"<>\\\\\\\\/]";
-
 	private Handler handler;
 
 	private boolean pickingFromSDCard;
@@ -1120,7 +1118,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						input.requestFocus();
 
 					}else{
-						boolean result=matches(regex, value);
+						boolean result=matches(NODE_NAME_REGEX, value);
 						if(result){
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
@@ -1180,7 +1178,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					input.requestFocus();
 
 				}else{
-					boolean result=matches(regex, value);
+					boolean result=matches(NODE_NAME_REGEX, value);
 					if(result){
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));

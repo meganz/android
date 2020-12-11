@@ -153,7 +153,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	String url;
 
 	int positionToRemove = -1;
-	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	NodeController nC;
 	boolean isFileLink;
@@ -1741,7 +1740,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						input.requestFocus();
 
 					}else{
-						boolean result=matches(regex, value);
+						boolean result=matches(NODE_NAME_REGEX, value);
 						if(result){
 							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 							textError.setText(getString(R.string.invalid_characters));
@@ -1795,7 +1794,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					input.requestFocus();
 				}
 				else{
-					boolean result=matches(regex, value);
+					boolean result=matches(NODE_NAME_REGEX, value);
 					if(result){
 						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(fullScreenImageViewer, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
 						textError.setText(getString(R.string.invalid_characters));
