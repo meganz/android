@@ -842,7 +842,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
-                    offlineSwitch.setOnClickListener(this);
+                    offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
                     availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                 }else{
                     offlineSwitch.setEnabled(false);
