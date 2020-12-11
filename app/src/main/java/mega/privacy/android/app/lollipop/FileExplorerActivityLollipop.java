@@ -2190,17 +2190,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	
 	@Override
 	public void onDestroy(){
-		if(megaApi != null)
-		{	
+		if (megaApi != null) {
 			megaApi.removeGlobalListener(this);
 		}
 
 		File childThumbDir = new File(getThumbFolder(this), ImportFilesFragment.THUMB_FOLDER);
-		if (childThumbDir != null){
-			if (childThumbDir.exists()){
-				try {
-					deleteFile(childThumbDir);
-				} catch (IOException e) {}
+		if (isFileAvailable(childThumbDir)){
+			try {
+				deleteFile(childThumbDir);
+			} catch (IOException e) {
+				logWarning("IOException deleting childThumbDir.", e);
 			}
 		}
 		
@@ -2297,6 +2296,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		logDebug("Request code: " + requestCode + ", Result code: " + resultCode);
 
 		if (requestCode == REQUEST_CREATE_CHAT && resultCode == RESULT_OK) {
@@ -2309,20 +2309,19 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
-			if (contactsData != null){
-				if(contactsData.size()==1){
+			if (contactsData != null) {
+				if (contactsData.size() == 1) {
 					MegaUser user = megaApi.getContact(contactsData.get(0));
-					if(user!=null){
+					if (user != null) {
 						logDebug("Chat with contact: " + contactsData.size());
 						startOneToOneChat(user);
 					}
-				}
-				else{
+				} else {
 					logDebug("Create GROUP chat");
 					MegaChatPeerList peers = MegaChatPeerList.createInstance();
-					for (int i=0; i<contactsData.size(); i++){
+					for (int i = 0; i < contactsData.size(); i++) {
 						MegaUser user = megaApi.getContact(contactsData.get(i));
-						if(user!=null){
+						if (user != null) {
 							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
 						}
 					}
@@ -2332,20 +2331,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					final boolean isEKR = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_EKR, false);
 					if (isEKR) {
 						megaChatApi.createChat(true, peers, chatTitle, this);
-					}
-					else {
+					} else {
 						final boolean chatLink = intent.getBooleanExtra(AddContactActivityLollipop.EXTRA_CHAT_LINK, false);
 
-						if(chatLink){
-							if(chatTitle!=null && !chatTitle.isEmpty()){
+						if (chatLink) {
+							if (chatTitle != null && !chatTitle.isEmpty()) {
 								CreateGroupChatWithPublicLink listener = new CreateGroupChatWithPublicLink(this, chatTitle);
 								megaChatApi.createPublicChat(peers, chatTitle, listener);
-							}
-							else{
+							} else {
 								showAlert(this, getString(R.string.message_error_set_title_get_link), null);
 							}
-						}
-						else{
+						} else {
 							megaChatApi.createPublicChat(peers, chatTitle, this);
 						}
 					}
@@ -2914,24 +2910,16 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		return null;
 	}
 
-	private IncomingSharesExplorerFragmentLollipop getIncomingExplorerFragment () {
-		IncomingSharesExplorerFragmentLollipop iS;
-
-		if (importFileF) {
-			return (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag("iSharesExplorer");
-		}
-
+	private IncomingSharesExplorerFragmentLollipop getIncomingExplorerFragment() {
 		if (mTabsAdapterExplorer == null) return null;
 
-		if (isChatFirst) {
-			iS =  (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 2);
-		}
-		else {
-			iS = (IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
-		}
+		if (!isChatFirst) {
+			IncomingSharesExplorerFragmentLollipop iS =
+					(IncomingSharesExplorerFragmentLollipop) mTabsAdapterExplorer.instantiateItem(viewPagerExplorer, 1);
 
-		if (iS.isAdded()) {
-			return iS;
+			if (iS.isAdded()) {
+				return iS;
+			}
 		}
 
 		return null;

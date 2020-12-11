@@ -2,12 +2,17 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -109,6 +114,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private SearchNodesTask searchNodesTask;
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
+
+	private Spanned emptyRootText;
+	private Spanned emptyGeneralText;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -402,6 +410,37 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		return v;
 	}
 
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		String emptyRoot = context.getString(R.string.context_empty_cloud_drive);
+		String emptyGeneral = context.getString(R.string.file_browser_empty_folder_new);
+
+		try {
+			emptyRoot = emptyRoot.replace("[A]", "<font color='#000000'>");
+			emptyRoot = emptyRoot.replace("[/A]", "</font>");
+			emptyRoot = emptyRoot.replace("[B]", "<font color='#7a7a7a'>");
+			emptyRoot = emptyRoot.replace("[/B]", "</font>");
+			emptyGeneral = emptyGeneral.replace("[A]", "<font color='#000000'>");
+			emptyGeneral = emptyGeneral.replace("[/A]", "</font>");
+			emptyGeneral = emptyGeneral.replace("[B]", "<font color='#7a7a7a'>");
+			emptyGeneral = emptyGeneral.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting string", e);
+		}
+
+		emptyRootText = HtmlCompat.fromHtml(emptyRoot, HtmlCompat.FROM_HTML_MODE_LEGACY);
+		emptyGeneralText = HtmlCompat.fromHtml(emptyGeneral, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		updateEmptyScreen();
+	}
+
 	private void getNodes() {
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 
@@ -422,52 +461,30 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		if (adapter == null) {
 			return;
 		}
+
 		if (adapter.getItemCount() == 0) {
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-
-			String textToShow;
-
-			if (megaApi.getRootNode().getHandle() == parentHandle) {
-				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-				} else {
-					emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
-				}
-
-				textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
-			} else {
-				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-				}
-
-				textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-			}
-
-			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			} catch (Exception e) {
-				logWarning("Exception formatting string", e);
-			}
-
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-
-			emptyTextViewFirst.setText(result);
+			emptyTextViewFirst.setText(updateEmptyScreen());
 		} else {
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
+		}
+	}
+
+	private Spanned updateEmptyScreen() {
+		if (megaApi.getRootNode().getHandle() == parentHandle) {
+			emptyImageView.setImageResource(isScreenInPortrait(context)
+					? R.drawable.ic_empty_cloud_drive : R.drawable.cloud_empty_landscape);
+
+			return emptyRootText;
+		} else {
+			emptyImageView.setImageResource(isScreenInPortrait(context)
+					? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
+
+			return emptyGeneralText;
 		}
 	}
 

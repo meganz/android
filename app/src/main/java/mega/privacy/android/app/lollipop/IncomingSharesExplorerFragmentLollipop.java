@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,9 +25,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,6 +68,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
@@ -113,6 +118,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
 	private boolean hasWritePermissions = true;
+
+	private Spanned emptyRootText;
+	private Spanned emptyGeneralText;
 
 	@Override
 	protected RotatableAdapter getAdapter() {
@@ -389,6 +397,37 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		return v;
 	}
 
+	@Override
+	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+		String emptyRoot = context.getString(R.string.context_empty_incoming);
+		String emptyGeneral = context.getString(R.string.file_browser_empty_folder_new);
+
+		try {
+			emptyRoot = emptyRoot.replace("[A]", "<font color='#000000'>");
+			emptyRoot = emptyRoot.replace("[/A]", "</font>");
+			emptyRoot = emptyRoot.replace("[B]", "<font color='#7a7a7a'>");
+			emptyRoot = emptyRoot.replace("[/B]", "</font>");
+			emptyGeneral = emptyGeneral.replace("[A]", "<font color='#000000'>");
+			emptyGeneral = emptyGeneral.replace("[/A]", "</font>");
+			emptyGeneral = emptyGeneral.replace("[B]", "<font color='#7a7a7a'>");
+			emptyGeneral = emptyGeneral.replace("[/B]", "</font>");
+		} catch (Exception e) {
+			logWarning("Exception formatting string", e);
+		}
+
+		emptyRootText = HtmlCompat.fromHtml(emptyRoot, HtmlCompat.FROM_HTML_MODE_LEGACY);
+		emptyGeneralText = HtmlCompat.fromHtml(emptyGeneral, HtmlCompat.FROM_HTML_MODE_LEGACY);
+
+		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onConfigurationChanged(@NonNull Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		updateEmptyScreen();
+	}
+
 	private void setOptionsBarVisibility() {
 		if (separator == null || optionsBar == null) {
 			return;
@@ -428,45 +467,21 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			recyclerView.setVisibility(View.GONE);
+			emptyTextViewFirst.setText(updateEmptyScreen());
+		}
+	}
 
-			String textToShow;
+	private Spanned updateEmptyScreen() {
+		if (parentHandle == INVALID_HANDLE) {
+			emptyImageView.setImageResource(isScreenInPortrait(context)
+					? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
 
-			if (parentHandle == -1) {
-				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.incoming_shares_empty);
-				} else {
-					emptyImageView.setImageResource(R.drawable.incoming_empty_landscape);
-				}
+			return emptyRootText;
+		} else {
+			emptyImageView.setImageResource(isScreenInPortrait(context)
+					? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
 
-				textToShow = String.format(context.getString(R.string.context_empty_incoming));
-			} else {
-				if (isScreenInPortrait(context)) {
-					emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
-				} else {
-					emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
-				}
-
-				textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
-			}
-
-			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
-			} catch (Exception e) {
-				logWarning("Error formatting string", e);
-			}
-
-			Spanned result = null;
-			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-				result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-			} else {
-				result = Html.fromHtml(textToShow);
-			}
-
-			emptyTextViewFirst.setText(result);
-			emptyTextViewFirst.setVisibility(View.VISIBLE);
+			return emptyGeneralText;
 		}
 	}
 
