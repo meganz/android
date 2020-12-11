@@ -7705,6 +7705,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onBackPressed() {
 		logDebug("onBackPressed");
 
+		// If there is a displaying PSA, we should only close it, and not navigate back anymore,
+		// e.g. when we are at chat tab, and there is a displaying PSA, when we press back, if we
+		// keep executing the remaining logic, we would go back to cloud drive tab after close
+		// the PSA browser.
 		if (closeDisplayingPsa()) {
 			return;
 		}

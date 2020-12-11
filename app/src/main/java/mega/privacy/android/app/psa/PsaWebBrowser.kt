@@ -53,13 +53,16 @@ class PsaWebBrowser : Fragment() {
                 view: WebView,
                 request: WebResourceRequest
             ): Boolean {
-                view.loadUrl(request.url.toString())
-                return true
+                return false
             }
         }
 
         binding.webView.addJavascriptInterface(this, JS_INTERFACE)
 
+        // This is the same way SDK getting device id:
+        // https://github.com/meganz/sdk/blob/develop/src/posix/fs.cpp#L1575
+        // and we find out the in param of `PosixFileSystemAccess::statsid` is an empty string
+        // through debugging.
         val androidId = Settings.Secure.getString(requireContext().contentResolver, "android_id")
         val finalUrl = "$url/$myUserHandle?$androidId"
         binding.webView.loadUrl(finalUrl)
