@@ -69,9 +69,8 @@ class PsaWebBrowser : Fragment() {
     }
 
     override fun onDestroy() {
-        val currentActivity = activity
-        if (currentActivity is BaseActivity) {
-            currentActivity.onPsaWebViewDestroyed(binding.webView.visibility == View.VISIBLE)
+        if (activity is BaseActivity) {
+            (activity as BaseActivity).onPsaWebViewDestroyed(binding.webView.visibility == View.VISIBLE)
         }
         super.onDestroy()
     }

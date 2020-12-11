@@ -1,7 +1,6 @@
 package mega.privacy.android.app.psa
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.MegaApplication
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit
 /**
  * The ViewModel for PSA logic.
  */
-object PsaManager {
+object PsaManager : LifecycleObserver {
 
     /**
      * The minimum interval in milliseconds that we should keep between two calls to
@@ -27,6 +26,8 @@ object PsaManager {
     private val megaApi = application.megaApi
 
     private var getPsaDisposable: Disposable? = null
+    private var processLifecycleObserved = false
+    private var startCheckingOnForeground = false
 
     /**
      * LiveData for PSA, mutable, used to emit value.
@@ -42,6 +43,24 @@ object PsaManager {
      * Start checking PSA periodically.
      */
     fun startChecking() {
+        doStartChecking()
+        startCheckingOnForeground = true
+
+        if (!processLifecycleObserved) {
+            processLifecycleObserved = true
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        }
+    }
+
+    /**
+     * Stop checking PSA periodically.
+     */
+    fun stopChecking() {
+        startCheckingOnForeground = false
+        doStopChecking()
+    }
+
+    private fun doStartChecking() {
         if (getPsaDisposable != null) {
             return
         }
@@ -67,10 +86,7 @@ object PsaManager {
             }, RxUtil.logErr("PsaManager getPSA"))
     }
 
-    /**
-     * Stop checking PSA periodically.
-     */
-    fun stopChecking() {
+    private fun doStopChecking() {
         getPsaDisposable?.dispose()
         getPsaDisposable = null
     }
@@ -101,5 +117,17 @@ object PsaManager {
     fun dismissPsa(id: Int) {
         megaApi.setPSA(id)
         _psa.value = null
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onMoveToForeground() {
+        if (startCheckingOnForeground) {
+            doStartChecking()
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onMoveToBackground() {
+        doStopChecking()
     }
 }

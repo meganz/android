@@ -110,6 +110,7 @@ dependencies {
     implementation 'com.android.billingclient:billing:3.0.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.2.0'
     implementation 'com.facebook.fresco:fresco:2.3.0'
     implementation 'com.facebook.fresco:animated-gif:2.3.0'
     implementation 'com.facebook.fresco:animated-webp:2.3.0'
