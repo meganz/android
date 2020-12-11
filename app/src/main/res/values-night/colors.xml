@@ -17,6 +17,9 @@
     <!-- Chat observer layout background -->
     <color name="grey_050_white_050">@color/white_alpha_050</color>
 
+    <!-- Chat sending location overlay -->
+    <color name="white_050_grey_050">@color/grey_alpha_050</color>
+
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/white_alpha_087</color>
 

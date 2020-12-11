@@ -149,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="16dp"
-                    android:background="@drawable/background_rich_link">
+                    android:background="@drawable/background_own_message_stroke">
                     <RelativeLayout
                         android:id="@+id/url_own_message_text_rl"
                         android:layout_width="match_parent"
@@ -512,8 +512,7 @@
                 <RelativeLayout
                     android:id="@+id/own_main_item_location"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:id="@+id/own_main_item_location_rl"
@@ -521,7 +520,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
-                        android:background="@drawable/own_background_location_message">
+                        android:background="@drawable/background_own_message_stroke">
 
                         <!--Preview of location-->
                         <mega.privacy.android.app.components.RoundedImageView
@@ -532,8 +531,7 @@
                             android:layout_marginStart="1dp"
                             android:layout_marginEnd="1dp"
                             android:scaleType="centerCrop"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            android:layout_gravity="center_horizontal|center_vertical" />
 
                         <RelativeLayout
                             android:id="@+id/own_separator_imageview_location"
@@ -542,14 +540,13 @@
                             android:layout_marginTop="-12dp"
                             android:layout_marginStart="1dp"
                             android:layout_marginEnd="1dp"
-                            android:background="@color/white"
+                            android:background="?attr/colorSurface"
                             android:layout_below="@id/own_rounded_imageview_location"/>
 
                         <RelativeLayout
                             android:id="@+id/own_pinned_location_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="72dp"
-                            android:background="@android:color/transparent"
                             android:layout_below="@id/own_rounded_imageview_location"
                             android:layout_marginTop="-12dp"
                             android:layout_marginEnd="12dp"
@@ -565,17 +562,15 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/title_geolocation_message"
-                                    android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
-                                    android:textColor="?android:attr/textColorPrimary"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                                 <TextView
                                     android:id="@+id/own_info_pinned_location"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/own_title_pinned_location"
-                                    android:textSize="14dp"
-                                    android:textColor="?android:attr/textColorPrimary"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
 
                             </RelativeLayout>
 
@@ -597,8 +592,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentBottom="true"
-                                android:layout_alignParentEnd="true"
-                                android:background="@android:color/transparent">
+                                android:layout_alignParentEnd="true">
 
                                 <ProgressBar
                                     android:id="@+id/uploadingProgressBarLocation_im"
@@ -1357,7 +1351,7 @@
                     android:layout_width="256dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:background="@drawable/contact_background_rich_link">
+                    android:background="@drawable/background_contact_message_stroke">
 
                     <RelativeLayout
                         android:id="@+id/url_contact_message_text_rl"
@@ -1599,15 +1593,14 @@
                 <RelativeLayout
                     android:id="@+id/contact_main_item_location_rl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:id="@+id/contact_main_item_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:background="@drawable/contact_background_location_message">
+                        android:background="@drawable/background_contact_message_stroke">
 
                         <!--Preview of location-->
                         <mega.privacy.android.app.components.RoundedImageView
@@ -1619,8 +1612,7 @@
                             android:layout_marginStart="1dp"
                             android:layout_marginEnd="1dp"
                             android:scaleType="centerCrop"
-                            android:layout_gravity="center_horizontal|center_vertical"
-                            android:background="@android:color/transparent" />
+                            android:layout_gravity="center_horizontal|center_vertical" />
 
                         <RelativeLayout
                             android:id="@+id/contact_separator_imageview_location"
@@ -1629,14 +1621,13 @@
                             android:layout_marginTop="-12dp"
                             android:layout_marginStart="1dp"
                             android:layout_marginEnd="1dp"
-                            android:background="@color/white"
+                            android:background="?attr/colorSurface"
                             android:layout_below="@id/contact_rounded_imageview_location"/>
 
                         <RelativeLayout
                             android:id="@+id/contact_pinned_location_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="72dp"
-                            android:background="@android:color/transparent"
                             android:layout_below="@id/contact_rounded_imageview_location"
                             android:layout_marginTop="-12dp"
                             android:layout_marginEnd="12dp"
@@ -1652,17 +1643,15 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Pinned Location"
-                                    android:textSize="16dp"
                                     android:layout_marginBottom="8dp"
-                                    android:textColor="?android:attr/textColorPrimary"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                                 <TextView
                                     android:id="@+id/contact_info_pinned_location"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@id/contact_title_pinned_location"
-                                    android:textSize="14dp"
-                                    android:textColor="?android:attr/textColorPrimary"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
 
                             </RelativeLayout>
 

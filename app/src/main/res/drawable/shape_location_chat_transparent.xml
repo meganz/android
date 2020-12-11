@@ -1,14 +1,6 @@
-<shape
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid
-        android:color="@color/less_transparent_white">
-    </solid>
-    <stroke
-        android:width="0dp">
-    </stroke>
-
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/white_050_grey_050" />
     <corners
         android:topLeftRadius="12dp"
-        android:topRightRadius="12dp">
-    </corners>
+        android:topRightRadius="12dp" />
 </shape>
