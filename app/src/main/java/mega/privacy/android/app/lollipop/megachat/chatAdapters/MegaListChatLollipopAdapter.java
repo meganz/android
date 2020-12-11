@@ -7,12 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
-import android.os.Build;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.Spannable;
@@ -43,7 +42,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.SimpleSpanBuilder;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.components.textFormatter.TextFormatterViewCompat;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -1093,7 +1091,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		((ViewHolderNormalChatList) holder).iconMyVideoOn.setVisibility(View.GONE);
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.N)
 	public void setLastMessage(int position, ViewHolderChatList holder){
 		logDebug("position: " + position);
 		if(holder == null){
@@ -1685,7 +1682,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				text = TextUtil.removeFormatPlaceholder(text);
 
-				Spanned result = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY);
+				Spanned result = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
 				((ViewHolderNormalChatList) holder).textViewContent.setText(result);
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 			}
