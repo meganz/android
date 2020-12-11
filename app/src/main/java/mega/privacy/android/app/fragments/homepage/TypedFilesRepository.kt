@@ -157,13 +157,10 @@ class TypedFilesRepository @Inject constructor(
 
             result.postValue(ArrayList(fileNodesMap.values))
 
-            // Delay before getting thumbnails to make the UI thread rendering the
-            // list view at first. (Callback of getThumbnail will also be running on UI thread)
-            delay(UPDATE_DATA_THROTTLE_TIME)
             getThumbnailsFromServer()
         }
 
-        private fun getThumbnailsFromServer() {
+        private suspend fun getThumbnailsFromServer() {
             for (item in getThumbnailNodes) {
                 megaApi.getThumbnail(
                     item.key,
@@ -186,6 +183,9 @@ class TypedFilesRepository @Inject constructor(
                             refreshLiveData()
                         }
                     })
+
+                // Throttle the getThumbnail call, or the UI would be non-responsive
+                delay(GET_THUMBNAIL_THROTTLE)
             }
         }
 
@@ -233,5 +233,6 @@ class TypedFilesRepository @Inject constructor(
     companion object {
         private const val UPDATE_DATA_THROTTLE_TIME =
             500L   // 500ms, user can see the update of photos instantly
+        private const val GET_THUMBNAIL_THROTTLE = 10L // 10ms
     }
 }
