@@ -652,24 +652,24 @@
                 <RelativeLayout
                     android:id="@+id/preview_frame_portrait"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
-                        android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_portrait_rl">
 
                         <!--Image with preview or Giphy-->
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_thumb_portrait_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            app:roundWithOverlayColor="@color/white"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:roundWithOverlayColor="?attr/colorSurface"
                             app:roundedCornerRadius="10dp"
-                            app:roundingBorderColor="@color/mail_my_account"
-                            app:roundingBorderWidth="1px" />
+                            app:roundingBorderColor="@color/teal_500_teal_400_090"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_portrait"
@@ -682,7 +682,8 @@
                         <ProgressBar
                             android:id="@+id/content_own_message_thumb_portrait_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -708,13 +709,12 @@
                             android:id="@+id/video_time_own_message_thumb_portrait"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_own_message_thumb_portrait"
                             android:layout_marginBottom="5dp"
                             android:layout_marginEnd="10dp"
-                            android:text="00:00"/>
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -747,8 +747,7 @@
                             android:layout_alignLeft="@+id/content_own_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_own_message_thumb_portrait"
                             android:layout_alignTop="@+id/content_own_message_thumb_portrait"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait"
-                            android:background="@android:color/transparent">
+                            android:layout_alignBottom="@+id/content_own_message_thumb_portrait">
                             <ProgressBar
                                 android:id="@+id/uploadingProgressBarPort_im"
                                 android:indeterminate="true"
@@ -807,25 +806,23 @@
                 <RelativeLayout
                     android:id="@+id/preview_frame_landscape"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
+                    android:layout_height="wrap_content">
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="16dp"
-                        android:background="@android:color/transparent"
                         android:id="@+id/preview_frame_landscape_rl">
 
                         <!--Image with preview or Giphy-->
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_own_message_thumb_landscape_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            app:roundWithOverlayColor="@color/white"
+                            app:roundWithOverlayColor="?attr/colorSurface"
                             app:roundedCornerRadius="10dp"
-                            app:roundingBorderColor="@color/mail_my_account"
-                            app:roundingBorderWidth="1px" />
+                            app:roundingBorderColor="@color/teal_500_teal_400_090"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_own_message_thumb_landscape"
@@ -838,7 +835,8 @@
                         <ProgressBar
                             android:id="@+id/content_own_message_thumb_landscape_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -864,13 +862,12 @@
                             android:id="@+id/video_time_own_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
                             android:layout_alignRight="@+id/content_own_message_thumb_landscape"
                             android:layout_marginBottom="5dp"
                             android:layout_marginEnd="10dp"
-                            android:text="00:00"/>
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
 
@@ -903,8 +900,7 @@
                             android:layout_alignLeft="@+id/content_own_message_thumb_landscape"
                             android:layout_alignRight="@+id/content_own_message_thumb_landscape"
                             android:layout_alignTop="@+id/content_own_message_thumb_landscape"
-                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape"
-                            android:background="@android:color/transparent">
+                            android:layout_alignBottom="@+id/content_own_message_thumb_landscape">
 
                             <ProgressBar
                                 android:id="@+id/uploadingProgressBarLand_im"
@@ -1285,7 +1281,6 @@
                 android:id="@+id/content_contact_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:layout_marginBottom="6dp"
                 android:layout_below="@+id/title_contact_message_layout">
 
@@ -1381,8 +1376,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:orientation="horizontal"
-                        android:layout_below="@id/url_contact_message_text_rl"
-                        android:background="@android:color/transparent">
+                        android:layout_below="@id/url_contact_message_text_rl">
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/url_contact_message_image"
@@ -1688,8 +1682,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:gravity="start"
-                    android:background="@android:color/transparent">
+                    android:gravity="start">
 
                     <!-- contacts elements portrait -->
                     <RelativeLayout
@@ -1701,10 +1694,10 @@
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_thumb_portrait_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            app:roundWithOverlayColor="@color/white"
+                            app:roundWithOverlayColor="?attr/colorSurface"
                             app:roundedCornerRadius="10dp"
-                            app:roundingBorderColor="@color/mail_my_account"
-                            app:roundingBorderWidth="1px" />
+                            app:roundingBorderColor="@color/grey_100_060_white_023"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_portrait"
@@ -1717,7 +1710,8 @@
                         <ProgressBar
                             android:id="@+id/content_contact_message_thumb_portrait_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/grey_087_white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1743,13 +1737,12 @@
                             android:id="@+id/video_time_contact_message_thumb_portrait"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_portrait"
                             android:layout_alignRight="@+id/content_contact_message_thumb_portrait"
                             android:layout_marginBottom="5dp"
                             android:layout_marginEnd="10dp"
-                            android:text="00:00"/>
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView
@@ -1798,10 +1791,10 @@
                         <com.facebook.drawee.view.SimpleDraweeView
                             android:id="@+id/content_contact_message_thumb_landscape_gif_view"
                             style="@style/SimpleDraweeViewMessages"
-                            app:roundWithOverlayColor="@color/white"
+                            app:roundWithOverlayColor="?attr/colorSurface"
                             app:roundedCornerRadius="10dp"
-                            app:roundingBorderColor="@color/mail_my_account"
-                            app:roundingBorderWidth="1px" />
+                            app:roundingBorderColor="@color/grey_100_060_white_023"
+                            app:roundingBorderWidth="1dp" />
 
                         <mega.privacy.android.app.components.RoundedImageView
                             android:id="@+id/content_contact_message_thumb_landscape"
@@ -1814,7 +1807,8 @@
                         <ProgressBar
                             android:id="@+id/content_contact_message_thumb_landscape_gif_progressbar"
                             style="@style/ProgressBarGifMessage"
-                            android:theme="?android:attr/progressBarStyleLargeInverse" />
+                            android:theme="?android:attr/progressBarStyleLargeInverse"
+                            android:indeterminateTint="@color/grey_087_white" />
 
                         <!-- Video elements -->
                         <RelativeLayout
@@ -1840,14 +1834,12 @@
                             android:id="@+id/video_time_contact_message_thumb_landscape"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant3"
                             android:layout_alignBottom="@+id/content_contact_message_thumb_landscape"
                             android:layout_alignRight="@+id/content_contact_message_thumb_landscape"
                             android:layout_marginBottom="5dp"
                             android:layout_marginEnd="10dp"
-                            android:text="00:00"/>
-
+                            tools:text="00:00"/>
 
                         <!--Icon to PDF with preview-->
                         <ImageView

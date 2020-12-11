@@ -31,6 +31,9 @@
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_800</color>
 
+    <!-- Giphy loading placeholder -->
+    <color name="grey_050_grey_800">@color/grey_800</color>
+
     <!-- Chat message unselected icon tint -->
     <color name="grey_600_white_087">@color/white_alpha_087</color>
 
