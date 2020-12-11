@@ -5,6 +5,9 @@
     <!-- chat room message loading image tint  -->
     <color name="grey_005_white_008">@color/white_alpha_008</color>
 
+    <!-- chat room voice clip SeekBar progressBackgroundTint -->
+    <color name="white_018_white_038">@color/white_alpha_038</color>
+
     <!-- Drawer item disabled text color  -->
     <color name="grey_038_white_038">@color/white_alpha_038</color>
 

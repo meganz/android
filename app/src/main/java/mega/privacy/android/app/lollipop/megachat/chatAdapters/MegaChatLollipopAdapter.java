@@ -1497,8 +1497,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if(isVoiceClip(path) && (type==TYPE_VOICE_CLIP) || path.contains(voiceClipDir.getAbsolutePath())){
                     logDebug("TYPE_VOICE_CLIP - message.getPendingMessage().getState() " + message.getPendingMessage().getState());
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
-                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
-                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipLayout.setBackgroundResource(R.drawable.light_rounded_chat_own_message);
+                    ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_voice_clip);
 
                     ((ViewHolderMessageChat) holder).uploadingOwnProgressbarVoiceclip.setVisibility(View.VISIBLE);
                     ((ViewHolderMessageChat) holder).contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
@@ -5269,7 +5269,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
                 holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
 
-                holder.contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
+                holder.contentOwnMessageVoiceClipLayout.setBackgroundResource(R.drawable.light_rounded_chat_own_message);
                 holder.errorUploadingVoiceClip.setVisibility(View.VISIBLE);
                 holder.retryAlert.setVisibility(View.VISIBLE);
 
@@ -5284,7 +5284,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.GONE);
 
-                holder.contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.light_rounded_chat_own_message));
+                holder.contentOwnMessageVoiceClipLayout.setBackgroundResource(R.drawable.light_rounded_chat_own_message);
                 holder.errorUploadingVoiceClip.setVisibility(View.GONE);
                 holder.retryAlert.setVisibility(View.GONE);
 
@@ -5332,9 +5332,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         holder.notAvailableOwnVoiceclip.setVisibility(View.GONE);
                         holder.uploadingOwnProgressbarVoiceclip.setVisibility(View.GONE);
                         if(currentMessagePlaying.getMediaPlayer().isPlaying()){
-                            holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                            holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_voice_clip);
                         }else{
-                            holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                            holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_voice_clip);
                         }
 
                         if(currentMessagePlaying.getProgress() == 0){
@@ -5377,7 +5377,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipDuration.setVisibility(View.VISIBLE);
                 holder.contentOwnMessageVoiceClipSeekBar.setVisibility(View.VISIBLE);
 
-                holder.contentOwnMessageVoiceClipLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
+                holder.contentOwnMessageVoiceClipLayout.setBackgroundResource(R.drawable.dark_rounded_chat_own_message);
                 holder.errorUploadingVoiceClip.setVisibility(View.GONE);
                 holder.retryAlert.setVisibility(View.GONE);
             }
@@ -5389,7 +5389,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageVoiceClipSeekBar.setOnSeekBarChangeListener(null);
                 holder.contentOwnMessageVoiceClipSeekBar.setEnabled(false);
                 if(currentMessagePlaying.getMediaPlayer().isPlaying()){
-                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_voice_clip);
                     currentMessagePlaying.getMediaPlayer().pause();
                     currentMessagePlaying.setProgress(currentMessagePlaying.getMediaPlayer().getCurrentPosition());
                     currentMessagePlaying.setPaused(true);
@@ -5505,9 +5505,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.uploadingContactProgressbarVoiceclip.setVisibility(View.GONE);
 
                     if(currentMessagePlaying.getMediaPlayer().isPlaying()){
-                        holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                        holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_voice_clip);
                     }else{
-                        holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                        holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_voice_clip);
                     }
 
                     if(currentMessagePlaying.getProgress() == 0){
@@ -5557,7 +5557,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentContactMessageVoiceClipSeekBar.setEnabled(false);
 
                 if(currentMessagePlaying.getMediaPlayer().isPlaying()){
-                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_grey);
+                    holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_play_voice_clip);
                     currentMessagePlaying.getMediaPlayer().pause();
                     currentMessagePlaying.setProgress(currentMessagePlaying.getMediaPlayer().getCurrentPosition());
                     currentMessagePlaying.setPaused(true);
@@ -7799,12 +7799,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if(holder!=null){
                             if(m.getUserHandle() == megaChatApi.getMyUserHandle()){
                                 holder.contentOwnMessageVoiceClipPlay.setVisibility(View.VISIBLE);
-                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                holder.contentOwnMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_voice_clip);
                                 holder.contentOwnMessageVoiceClipSeekBar.setProgress(m.getProgress());
                                 holder.contentOwnMessageVoiceClipDuration.setText(milliSecondsToTimer(m.getProgress()));
                             }else{
                                 holder.contentContactMessageVoiceClipPlay.setVisibility(View.VISIBLE);
-                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_grey);
+                                holder.contentContactMessageVoiceClipPlay.setImageResource(R.drawable.ic_pause_voice_clip);
                                 holder.contentContactMessageVoiceClipSeekBar.setProgress(m.getProgress());
                                 holder.contentContactMessageVoiceClipDuration.setText(milliSecondsToTimer(m.getProgress()));
                             }

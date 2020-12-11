@@ -679,6 +679,22 @@
         <item name="android:minHeight">0dp</item>
     </style>
 
+    <!--- SeekBar white, chat room own voice clip -->
+    <style name="Widget.Mega.SeekBar.White" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">@color/white_alpha_038</item>
+        <item name="android:progressTint">@color/white</item>
+        <item name="android:thumbTint">@color/white</item>
+        <item name="android:colorControlActivated">@color/white</item>
+    </style>
+
+    <!--- SeekBar teal, chat room contact voice clip -->
+    <style name="Widget.Mega.SeekBar.Secondary" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">?attr/colorSecondary</item>
+        <item name="android:progressTint">@color/teal_300</item>
+        <item name="android:thumbTint">@color/teal_300</item>
+        <item name="android:colorControlActivated">@color/teal_300</item>
+    </style>
+
     <!-- For the CollapsingToolbarLayout -->
     <style name="ThemeOverlay.Mega.DefaultToolBar" parent="">
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar</item>
