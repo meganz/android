@@ -103,6 +103,7 @@ import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7651,7 +7652,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			EventNotifierKt.notifyNodesChange(false);
+			LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -11149,7 +11150,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-						EventNotifierKt.notifyNodesChange(false);
+						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -14307,7 +14308,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		EventNotifierKt.notifyNodesChange(true);
+		LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
 		// Invalidate the menu will collapse/expand the search view and set the query text to ""
 		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -14508,7 +14509,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				EventNotifierKt.notifyNodesChange(false);
+				LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
 				if (isTransfersInProgressAdded()){
 					tFLol.transferFinish(transfer.getTag());

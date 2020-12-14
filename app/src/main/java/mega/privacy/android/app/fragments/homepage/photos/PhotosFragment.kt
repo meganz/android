@@ -15,7 +15,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.facebook.drawee.view.SimpleDraweeView
@@ -66,7 +65,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
             viewModel = this@PhotosFragment.viewModel
         }
@@ -200,7 +199,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         })
 
     private fun observeSelectedItems() =
-        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.selectedNodes.observe(viewLifecycleOwner, {
             if (it.isEmpty()) {
                 actionMode?.apply {
                     finish()
@@ -224,7 +223,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun observeAnimatedItems() {
         var animatorSet: AnimatorSet? = null
 
-        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, Observer {
+        actionModeViewModel.animNodeIndices.observe(viewLifecycleOwner, {
             animatorSet?.run {
                 // End the started animation if any, or the view may show messy as its property
                 // would be wrongly changed by multiple animations running at the same time

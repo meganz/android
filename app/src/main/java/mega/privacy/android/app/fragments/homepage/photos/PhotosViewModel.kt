@@ -2,9 +2,11 @@ package mega.privacy.android.app.fragments.homepage.photos
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
 import mega.privacy.android.app.fragments.homepage.nodesChange
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.*
@@ -20,7 +22,6 @@ class PhotosViewModel @ViewModelInject constructor(
     var skipNextAutoScroll = false
 
     private var forceUpdate = false
-    private var ignoredFirstNodesChange = false
 
     // Whether a photo loading is in progress
     private var loadInProgress = false
@@ -69,11 +70,6 @@ class PhotosViewModel @ViewModelInject constructor(
     }
 
     private val nodesChangeObserver = Observer<Boolean> {
-        if (!ignoredFirstNodesChange) {
-            ignoredFirstNodesChange = true
-            return@Observer
-        }
-
         if (it) {
             loadPhotos(true)
         } else {
@@ -91,7 +87,11 @@ class PhotosViewModel @ViewModelInject constructor(
 
     init {
         items.observeForever(loadFinishedObserver)
-        nodesChange.observeForever(nodesChangeObserver)
+        // Calling ObserveForever() here instead of calling observe()
+        // in the PhotosFragment, for fear that an nodes update event would be missed if
+        // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
+        LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
+            .observeForever(nodesChangeObserver)
         loadPhotos(true)
     }
 
@@ -145,7 +145,8 @@ class PhotosViewModel @ViewModelInject constructor(
     }
 
     override fun onCleared() {
-        nodesChange.removeObserver(nodesChangeObserver)
+        LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
+            .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }
 }

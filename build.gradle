@@ -69,4 +69,5 @@ ext {
     ankoVersion = '0.10.8'
     frescoVersion = '2.3.0'
     bannerViewPagerVersion = '3.2.0'
+    liveEventBus = '1.7.3'
 }
