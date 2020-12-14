@@ -330,6 +330,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
     }
 
     public void checkPasswordStrenght(String s) {
+        userPasswordLayout.setErrorEnabled(false);
 
         if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
             firstShape.setBackground(ContextCompat.getDrawable(context, R.drawable.passwd_very_weak));
@@ -419,6 +420,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 
         userPasswordError.setVisibility(View.GONE);
         userPasswordLayout.setError(" ");
+        userPasswordLayout.setErrorEnabled(true);
     }
 
     @Override
