@@ -423,6 +423,9 @@
     <!-- Chat contact text message text color -->
     <color name="grey_087_white">@color/grey_alpha_087</color>
 
+    <!-- Chat contact file info color -->
+    <color name="grey_054_white">@color/grey_alpha_054</color>
+
     <!-- chat own text message background -->
     <color name="teal_500_teal_400_090">@color/teal_500</color>
     <!-- chat own text message background, sending -->

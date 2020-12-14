@@ -795,7 +795,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         RoundedImageView contentContactMessageContactThumb;
         private EmojiTextView contentContactMessageContactName;
         public EmojiTextView contentContactMessageContactEmail;
-        private EmojiTextView contentContactMessageContactInitialLetter;
 
         RelativeLayout contentContactMessageVoiceClipLayout;
         ImageView contentContactMessageVoiceClipPlay;
@@ -834,7 +833,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         public void setContactImageView(Bitmap bitmap) {
             contentContactMessageContactThumb.setImageBitmap(bitmap);
-            contentContactMessageContactInitialLetter.setVisibility(View.GONE);
         }
     }
 
@@ -1262,7 +1260,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentContactMessageContactName = v.findViewById(R.id.content_contact_message_contact_name);
             holder.contentContactMessageContactName.setNeccessaryShortCode(false);
             holder.contentContactMessageContactEmail = v.findViewById(R.id.content_contact_message_contact_email);
-            holder.contentContactMessageContactInitialLetter = v.findViewById(R.id.content_contact_message_contact_initial_letter);
 
             holder.iconContactTypeDocLandPreview = v.findViewById(R.id.contact_attachment_type_icon_lands);
             holder.iconContactTypeDocPortraitPreview = v.findViewById(R.id.contact_attachment_type_icon_portrait);
@@ -6453,7 +6450,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     if (myUserHandle == message.getUserHandle()) {
                         holder.contentOwnMessageContactThumb.setImageBitmap(bitmap);
                     } else {
-                        holder.contentContactMessageContactInitialLetter.setVisibility(View.GONE);
                         holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
                     }
                 }

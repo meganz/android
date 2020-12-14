@@ -92,8 +92,19 @@
 
     <!-- In material design, for the CheckedTextView -->
     <!-- Regular, 16sp, 0.15px, textColorPrimary-->
-<!--    <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">-->
-<!--    </style>-->
+    <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
+    </style>
+
+    <!-- Chat own send contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant3">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Chat contact send contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant4">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
 
     <!-- ================== Body2 ====================== -->
 
@@ -184,6 +195,16 @@
     <!-- Regular, 12sp, 0px -->
     <style name="TextAppearance.Mega.Caption.OnSecondary">
         <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, chat own file info -->
+    <style name="TextAppearance.Mega.Caption.Variant">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, chat contact file info -->
+    <style name="TextAppearance.Mega.Caption.Variant2">
+        <item name="android:textColor">@color/grey_054_white</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->
