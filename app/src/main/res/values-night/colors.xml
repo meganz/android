@@ -5,6 +5,21 @@
     <!-- chat room message loading image tint  -->
     <color name="grey_005_white_008">@color/white_alpha_008</color>
 
+    <!-- chat reaction add/own emoji background fill -->
+    <color name="grey_003_white_018">@color/white_alpha_018</color>
+
+    <!-- chat reaction add/own emoji background border -->
+    <color name="grey_012_white_015">@color/white_alpha_015</color>
+
+    <!-- chat reaction contact emoji background fill -->
+    <color name="teal_300_006_teal_400_050">@color/teal_400_alpha_050</color>
+
+    <!-- chat reaction contact emoji background border -->
+    <color name="teal_300_teal_600">@color/teal_600</color>
+
+    <!-- chat unread message background -->
+    <color name="grey_020_grey_700">@color/grey_700</color>
+
     <!-- chat room voice clip SeekBar progressBackgroundTint -->
     <color name="white_018_white_038">@color/white_alpha_038</color>
 
@@ -100,6 +115,9 @@
 
     <!-- Chat contact file info color -->
     <color name="grey_054_white">@color/white</color>
+
+    <!-- Chat contact reaction emoji count text color -->
+    <color name="teal_300_white">@color/white</color>
 
     <!-- chat own text message background -->
     <color name="teal_500_teal_400_090">@color/teal_400_alpha_090</color>

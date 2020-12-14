@@ -1157,7 +1157,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/own_message"
-                android:textColor="@color/text_login"
+                android:textColor="@color/black_white"
                 android:layout_alignParentEnd="true"
                 android:text="@string/manual_retry_alert"
                 android:textSize="11sp"
@@ -1179,7 +1179,6 @@
             android:layout_marginTop="-4dp"
             android:layout_alignEnd="@id/content_own_message_layout"
             android:gravity="end"
-            android:background="@null"
             android:visibility="gone">
 
             <mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView
@@ -2084,8 +2083,7 @@
             android:layout_height="match_parent"
             android:textAllCaps="true"
             android:gravity="center"
-            android:textSize="14sp"
-            android:textColor="@color/color_text_new_messages"/>
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant5" />
 
     </LinearLayout>
 

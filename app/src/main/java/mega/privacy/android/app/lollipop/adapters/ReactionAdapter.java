@@ -153,7 +153,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             holder.itemNumUsersReaction.setLayoutParams(params);
             holder.itemNumUsersReaction.setGravity(Gravity.CENTER_VERTICAL);
             boolean ownReaction = isMyOwnReaction(chatId, messageId, reaction);
-            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.grey_054_white_054));
+            holder.itemNumUsersReaction.setTextAppearance(context,
+                    ownReaction ? R.style.TextAppearance_Mega_Body2_Variant6
+                            : R.style.TextAppearance_Mega_Body2_Variant7);
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
         }else{
             holder.moreReactionsLayout.setVisibility(View.GONE);

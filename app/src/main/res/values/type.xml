@@ -162,6 +162,21 @@
         <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
+    <!-- Chat new message -->
+    <style name="TextAppearance.Mega.Body2.Variant5">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <!-- Chat own reaction emoji count -->
+    <style name="TextAppearance.Mega.Body2.Variant6">
+        <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
+    <!-- Chat contact reaction emoji count -->
+    <style name="TextAppearance.Mega.Body2.Variant7">
+        <item name="android:textColor">@color/teal_300_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>

@@ -234,6 +234,7 @@
     <color name="white_alpha_008">#14FFFFFF</color>
     <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_015">#26FFFFFF</color>
     <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
@@ -249,6 +250,7 @@
     <color name="dark_grey">#121212</color>
 
     <color name="grey_010">#FAFAFA</color>
+    <color name="grey_020">#F5F5F5</color>
     <color name="grey_050">#EEEEEE</color>
     <color name="grey_200">#BDBDBD</color>
     <color name="grey_300">#9E9E9E</color>
@@ -259,7 +261,9 @@
 
     <color name="grey_100_alpha_060">#99E0E0E0</color>
 
+    <color name="grey_alpha_003">#08000000</color>
     <color name="grey_alpha_005">#0D000000</color>
+    <color name="grey_alpha_006">#0F000000</color>
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
@@ -275,8 +279,11 @@
     <color name="teal_300">#00BFA5</color>
     <color name="teal_400">#00B092</color>
     <color name="teal_500">#00A07F</color>
+    <color name="teal_600">#009372</color>
 
+    <color name="teal_300_alpha_006">#0F00B092</color>
     <color name="teal_400_alpha_036">#5C00B092</color>
+    <color name="teal_400_alpha_050">#8000B092</color>
     <color name="teal_400_alpha_090">#E600B092</color>
     <color name="teal_500_alpha_040">#6600B092</color>
 
@@ -340,6 +347,21 @@
 
     <!-- chat room message loading image tint  -->
     <color name="grey_005_white_008">@color/grey_alpha_005</color>
+
+    <!-- chat reaction add/own emoji background fill -->
+    <color name="grey_003_white_018">@color/grey_alpha_003</color>
+
+    <!-- chat reaction add/own emoji background border -->
+    <color name="grey_012_white_015">@color/grey_alpha_012</color>
+
+    <!-- chat reaction contact emoji background fill -->
+    <color name="teal_300_006_teal_400_050">@color/teal_300_alpha_006</color>
+
+    <!-- chat reaction contact emoji background border -->
+    <color name="teal_300_teal_600">@color/teal_300</color>
+
+    <!-- chat unread message background -->
+    <color name="grey_020_grey_700">@color/grey_020</color>
 
     <!-- chat room voice clip SeekBar progressBackgroundTint -->
     <color name="white_018_white_038">@color/white_alpha_018</color>
@@ -425,6 +447,9 @@
 
     <!-- Chat contact file info color -->
     <color name="grey_054_white">@color/grey_alpha_054</color>
+
+    <!-- Chat contact reaction emoji count text color -->
+    <color name="teal_300_white">@color/teal_300</color>
 
     <!-- chat own text message background -->
     <color name="teal_500_teal_400_090">@color/teal_500</color>
