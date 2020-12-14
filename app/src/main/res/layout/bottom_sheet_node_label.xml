@@ -25,8 +25,8 @@
             android:id="@+id/radio_group_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:divider="@drawable/radio_group_divider"
+            android:showDividers="middle">
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_red"

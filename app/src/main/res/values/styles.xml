@@ -587,6 +587,7 @@
     </style>
 
     <style name="Widget.Mega.RadioButton.Label" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:layout_marginStart">16dp</item>
         <item name="android:paddingStart">32dp</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:button">@drawable/selector_label</item>
