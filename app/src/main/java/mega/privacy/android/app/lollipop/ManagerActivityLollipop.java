@@ -5048,7 +5048,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						titleId = R.string.upload_to_audio;
 						break;
                     case VIDEO:
-                        titleId = R.string.upload_to_video;
+                        titleId = R.string.sortby_type_video_first;
                         break;
 				}
 
