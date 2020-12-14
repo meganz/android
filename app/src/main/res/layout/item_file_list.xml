@@ -88,28 +88,28 @@
             tools:text="Test title" />
 
         <ImageView
-            android:id="@+id/img_favourite"
+            android:id="@+id/img_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
             android:layout_gravity="center"
             android:layout_margin="4dp"
             android:layout_toEndOf="@+id/file_list_filename"
-            android:layout_alignBottom="@id/file_list_filename"
-            android:layout_alignTop="@id/file_list_filename"
-            android:src="@drawable/ic_favorite"
+            android:src="@drawable/ic_circle_label"
             android:visibility="gone"
             tools:visibility="visible" />
 
         <ImageView
-            android:id="@+id/img_label"
+            android:id="@+id/img_favourite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
             android:layout_gravity="center"
             android:layout_margin="4dp"
-            android:layout_toEndOf="@+id/img_favourite"
-            android:layout_alignBottom="@id/file_list_filename"
-            android:layout_alignTop="@id/file_list_filename"
-            android:src="@drawable/ic_circle_label"
+            android:layout_toEndOf="@+id/img_label"
+            android:src="@drawable/ic_favorite"
             android:visibility="gone"
             tools:visibility="visible" />
 
@@ -117,11 +117,11 @@
             android:id="@+id/file_list_public_link"
             android:layout_width="16dp"
             android:layout_height="16dp"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
             android:layout_centerVertical="true"
             android:layout_marginStart="3dp"
-            android:layout_toEndOf="@+id/img_label"
-            android:layout_alignBottom="@id/file_list_filename"
-            android:layout_alignTop="@id/file_list_filename"
+            android:layout_toEndOf="@+id/img_favourite"
             android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
