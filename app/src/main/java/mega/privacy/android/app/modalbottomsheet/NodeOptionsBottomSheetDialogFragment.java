@@ -804,6 +804,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                             }
 
+                            optionLabel.setVisibility(View.VISIBLE);
+                            optionFavourite.setVisibility(View.VISIBLE);
+
                             break;
 
                         case MegaShare.ACCESS_READ:
@@ -872,6 +875,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionLink.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
                     optionOpenFolder.setVisibility(View.VISIBLE);
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
 
                     //Hide
                     counterModify--;
