@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,7 +15,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
-public class WebViewActivityLollipop extends Activity {
+public class WebViewActivity extends Activity {
 
     private ProgressDialog progressDialog;
 
@@ -55,6 +55,8 @@ public class WebViewActivityLollipop extends Activity {
             progressDialog = ProgressDialog.show(this, this.getString(R.string.embed_web_browser_loading_title), this.getString(R.string.embed_web_browser_loading_message), true);
             progressDialog.setCancelable(false);
         }
+
+        WebView.setWebContentsDebuggingEnabled(true);
     }
 
     @Override

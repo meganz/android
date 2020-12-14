@@ -15,7 +15,7 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -422,7 +422,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	}
 
 	public void openWebLink(String url) {
-		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
+		Intent openIntent = new Intent(this, WebViewActivity.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);
 		finish();

@@ -27,7 +27,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -201,7 +201,7 @@ public class MegaNodeUtil {
 
             disputeButton.setOnClickListener(button -> {
                 listener.onDisputeClicked();
-                Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                 openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 openTermsIntent.setData(Uri.parse(DISPUTE_URL));
                 context.startActivity(openTermsIntent);
