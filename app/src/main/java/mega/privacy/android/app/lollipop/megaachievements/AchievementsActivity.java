@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -51,16 +52,16 @@ public class AchievementsActivity extends PinActivityLollipop {
 
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
+        if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
 
-        if(megaApi==null||megaApi.getRootNode()==null){
+        if (megaApi == null || megaApi.getRootNode() == null) {
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -111,6 +112,10 @@ public class AchievementsActivity extends PinActivityLollipop {
             });
             sFetcher.fetch();
         }
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
     }
 
     @Override

@@ -1,10 +1,15 @@
 package mega.privacy.android.app.fragments.homepage.banner
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.zhpan.bannerview.BaseViewHolder
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import nz.mega.sdk.MegaBanner
@@ -22,11 +27,19 @@ class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
         image.setImageURI(data?.imageLocation.plus(data?.image))
         title.text = data?.title
         description.text = data?.description
+//        val link = data?.url
 
         (findView(R.id.imageView_dismiss) as ImageView  ).setOnClickListener {
             data?.run {
                 viewModel.dismissBanner(data)
             }
+        }
+
+        itemView.setOnClickListener {
+            val url = "https://mega.nz/achievements"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            Log.i("Alex", "startActivity")
+            itemView.context.startActivity(intent)
         }
     }
 

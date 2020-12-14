@@ -91,6 +91,18 @@
             android:name="mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Megaactionbar.Secondary">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="mega.nz"
+                    android:path="/achievements" />
+            </intent-filter>
         </activity>
 
         <activity android:name="OpenLinkActivity" android:launchMode="singleTask" android:screenOrientation="portrait" >
