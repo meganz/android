@@ -4819,7 +4819,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
-                            aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                            aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
                             firstNavigationLevel = true;
                         }
                         else {
