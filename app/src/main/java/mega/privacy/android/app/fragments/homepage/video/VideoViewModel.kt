@@ -139,6 +139,7 @@ class VideoViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         nodesChange.removeObserver(nodesChangeObserver)
+        items.removeObserver(loadFinishedObserver)
     }
 }
 
