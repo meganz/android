@@ -1,222 +1,122 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.core.text.HtmlCompat;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.listeners.SessionTransferURLListener;
-import nz.mega.sdk.MegaApiAndroid;
-import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaPricing;
+import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
 
 import static mega.privacy.android.app.constants.IntentConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class ChooseAccountFragmentLollipop extends Fragment implements View.OnClickListener {
+public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipop implements View.OnClickListener {
 
-    Context context;
-    static int HEIGHT_ACCOUNT_LAYOUT=109;
-
-    float scaleH, scaleW;
-    float density;
-    DisplayMetrics outMetrics;
-    Display display;
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
-    ActionBar aB;
-    Toolbar tB;
+    private Toolbar tB;
 
     public ArrayList<Product> accounts;
 
-    private LinearLayout mainLinearLayout;
-    private ScrollView scrollView;
-
-    //free elements:
-    private RelativeLayout freeLayout;
-    private TextView titleFree;
     private TextView storageSectionFree;
     private TextView bandwidthSectionFree;
     private TextView achievementsSectionFree;
 
-    //pro lite elements:
-    private RelativeLayout proLiteLayout;
-    private TextView titleProLite;
-    private TextView monthSectionProLite;
-    private TextView storageSectionProLite;
-    private TextView bandwidthSectionProLite;
-
-    //pro i elements:
-    private RelativeLayout pro1Layout;
-    private TextView titlePro1;
-    private TextView monthSectionPro1;
-    private TextView storageSectionPro1;
-    private TextView bandwidthSectionPro1;
-
-    //pro ii elements:
-    private RelativeLayout pro2Layout;
-    private TextView titlePro2;
-    private TextView monthSectionPro2;
-    private TextView storageSectionPro2;
-    private TextView bandwidthSectionPro2;
-
-    //pro iii elements:
-    private RelativeLayout pro3Layout;
-    private TextView titlePro3;
-    private TextView monthSectionPro3;
-    private TextView storageSectionPro3;
-    private TextView bandwidthSectionPro3;
-
-    //business elements:
-    private RelativeLayout businessLayout;
-    private TextView monthSectionBusiness;
-    private TextView storageSectionBusiness;
-    private TextView bandwidhtSectionBusiness;
-
     @Override
-    public void onCreate (Bundle savedInstanceState){
-        logDebug("onCreate");
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        if(context==null){
-            logWarning("Context is null");
-            return;
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        logDebug("onCreateView");
+        myAccountInfo = app.getMyAccountInfo();
 
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-        float density = getResources().getDisplayMetrics().density;
 
-        float scaleW = getScaleW(outMetrics, density);
-        float scaleH = getScaleH(outMetrics, density);
-
-        if(megaApi==null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-
-        if(megaChatApi==null){
-            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-        }
-
-        DatabaseHandler dbH = DatabaseHandler.getDbHandler(((Activity)context).getApplicationContext());
+        DatabaseHandler dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         if (dbH.getCredentials() == null){
-//            megaApi.localLogout();
-//            AccountController aC = new AccountController(context);
-//            aC.logout(context, megaApi, megaChatApi, false);
             //Show Login Fragment
             ((LoginActivityLollipop)context).showFragment(LOGIN_FRAGMENT);
         }
 
-        accounts = new ArrayList<Product>();
+        accounts = new ArrayList<>();
 
         View v = inflater.inflate(R.layout.fragment_choose_account, container, false);
 
-        tB = (Toolbar) v.findViewById(R.id.toolbar_choose_account);
+        tB =  v.findViewById(R.id.toolbar_choose_account);
         ((LoginActivityLollipop) context).showAB(tB);
 
-        scrollView = (ScrollView) v.findViewById(R.id.scroll_view_choose_account);
-        new ListenScrollChangesHelper().addViewToListen(scrollView, new ListenScrollChangesHelper.OnScrollChangeListenerCompat() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollView.canScrollVertically(-1)){
-                    tB.setElevation(px2dp(4, outMetrics));
-                }
-                else {
-                    tB.setElevation(0);
-                }
+        scrollView = v.findViewById(R.id.scroll_view_choose_account);
+        new ListenScrollChangesHelper().addViewToListen(scrollView, (v1, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if (scrollView.canScrollVertically(-1)) {
+                tB.setElevation(px2dp(4, outMetrics));
+            } else {
+                tB.setElevation(0);
             }
         });
 
-        mainLinearLayout = (LinearLayout) v.findViewById(R.id.choose_account_main_linear_layout);
-
-//        //Replace elevation
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//            scrollView.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-//            mainLinearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grid_item_separator));
-//        }
-
         //FREE ACCOUNT
-        freeLayout = (RelativeLayout) v.findViewById(R.id.choose_account_free_layout);
+        RelativeLayout freeLayout = v.findViewById(R.id.choose_account_free_layout);
         freeLayout.setOnClickListener(this);
-        titleFree = (TextView) v.findViewById(R.id.choose_account_free_title_text);
-        titleFree.setText(getString(R.string.free_account));
-        storageSectionFree = (TextView) v.findViewById(R.id.storage_free);
-        bandwidthSectionFree = (TextView) v.findViewById(R.id.bandwidth_free);
-        achievementsSectionFree = (TextView) v.findViewById(R.id.achievements_free);
+        TextView titleFree = v.findViewById(R.id.choose_account_free_title_text);
+        titleFree.setText(getString(R.string.free_account).toUpperCase());
+        storageSectionFree = v.findViewById(R.id.storage_free);
+        bandwidthSectionFree = v.findViewById(R.id.bandwidth_free);
+        achievementsSectionFree = v.findViewById(R.id.achievements_free);
         //END -- PRO LITE ACCOUNT
 
         //PRO LITE ACCOUNT
-        proLiteLayout = (RelativeLayout) v.findViewById(R.id.choose_account_prolite_layout);
+        proLiteLayout = v.findViewById(R.id.choose_account_prolite_layout);
         proLiteLayout.setOnClickListener(this);
-        titleProLite = (TextView) v.findViewById(R.id.choose_account_prolite_title_text);
-        titleProLite.setText(getString(R.string.lite_account));
-        monthSectionProLite = (TextView) v.findViewById(R.id.month_lite);
-        storageSectionProLite = (TextView) v.findViewById(R.id.storage_lite);
-        bandwidthSectionProLite = (TextView) v.findViewById(R.id.bandwidth_lite);
+        TextView titleProLite = v.findViewById(R.id.choose_account_prolite_title_text);
+        titleProLite.setText(getString(R.string.prolite_account));
+        monthSectionLite = v.findViewById(R.id.month_lite);
+        storageSectionLite = v.findViewById(R.id.storage_lite);
+        bandwidthSectionLite = v.findViewById(R.id.bandwidth_lite);
         //END -- PRO LITE ACCOUNT
 
         //PRO I ACCOUNT
-        pro1Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_i_layout);
+        pro1Layout = v.findViewById(R.id.choose_account_pro_i_layout);
         pro1Layout.setOnClickListener(this);
-        titlePro1 = (TextView) v.findViewById(R.id.choose_account_pro_i_title_text);
+        TextView titlePro1 = v.findViewById(R.id.choose_account_pro_i_title_text);
         titlePro1.setText(getString(R.string.pro1_account));
-        monthSectionPro1 = (TextView) v.findViewById(R.id.month_pro_i);
-        storageSectionPro1 = (TextView) v.findViewById(R.id.storage_pro_i);
-        bandwidthSectionPro1 = (TextView) v.findViewById(R.id.bandwidth_pro_i);
-
+        monthSectionPro1 = v.findViewById(R.id.month_pro_i);
+        storageSectionPro1 = v.findViewById(R.id.storage_pro_i);
+        bandwidthSectionPro1 = v.findViewById(R.id.bandwidth_pro_i);
         //END -- PRO I ACCOUNT
 
         //PRO II ACCOUNT
-        pro2Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_ii_layout);
+        pro2Layout = v.findViewById(R.id.choose_account_pro_ii_layout);
         pro2Layout.setOnClickListener(this);
-        titlePro2 = (TextView) v.findViewById(R.id.choose_account_pro_ii_title_text);
+        TextView titlePro2 = v.findViewById(R.id.choose_account_pro_ii_title_text);
         titlePro2.setText(getString(R.string.pro2_account));
-        monthSectionPro2 = (TextView) v.findViewById(R.id.month_pro_ii);
-        storageSectionPro2 = (TextView) v.findViewById(R.id.storage_pro_ii);
-        bandwidthSectionPro2 = (TextView) v.findViewById(R.id.bandwidth_pro_ii);
+        monthSectionPro2 = v.findViewById(R.id.month_pro_ii);
+        storageSectionPro2 = v.findViewById(R.id.storage_pro_ii);
+        bandwidthSectionPro2 = v.findViewById(R.id.bandwidth_pro_ii);
         //END -- PRO II ACCOUNT
 
         //PRO III ACCOUNT
-        pro3Layout = (RelativeLayout) v.findViewById(R.id.choose_account_pro_iii_layout);
+        pro3Layout = v.findViewById(R.id.choose_account_pro_iii_layout);
         pro3Layout.setOnClickListener(this);
-        titlePro3 = (TextView) v.findViewById(R.id.choose_account_pro_iii_title_text);
+        TextView titlePro3 = v.findViewById(R.id.choose_account_pro_iii_title_text);
         titlePro3.setText(getString(R.string.pro3_account));
-        monthSectionPro3 = (TextView) v.findViewById(R.id.month_pro_iii);
-        storageSectionPro3 = (TextView) v.findViewById(R.id.storage_pro_iii);
-        bandwidthSectionPro3 = (TextView) v.findViewById(R.id.bandwidth_pro_iii);
-
+        monthSectionPro3 = v.findViewById(R.id.month_pro_iii);
+        storageSectionPro3 = v.findViewById(R.id.storage_pro_iii);
+        bandwidthSectionPro3 = v.findViewById(R.id.bandwidth_pro_iii);
         //END -- PRO III ACCOUNT
 
         //BUSINESS
@@ -224,7 +124,7 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
         businessLayout.setOnClickListener(this);
         monthSectionBusiness = v.findViewById(R.id.month_business);
         storageSectionBusiness = v.findViewById(R.id.storage_business);
-        bandwidhtSectionBusiness = v.findViewById(R.id.bandwidth_business);
+        bandwidthSectionBusiness = v.findViewById(R.id.bandwidth_business);
         //END -- BUSINESS
 
         setPricingInfo();
@@ -233,493 +133,76 @@ public class ChooseAccountFragmentLollipop extends Fragment implements View.OnCl
 
     @Override
     public void onClick(View v) {
+
+        Intent intent = new Intent(context,ManagerActivityLollipop.class);
+        intent.putExtra(EXTRA_FIRST_LOGIN, true);
+        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
+        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
+
         switch (v.getId()){
-            case R.id.choose_account_free_layout:{
-                onFreeClick(v);
+            case R.id.choose_account_free_layout:
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, false);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, FREE);
                 break;
-            }
-            case R.id.choose_account_prolite_layout:{
-                onUpgradeLiteClick(v);
+            case R.id.choose_account_prolite_layout:
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_LITE);
                 break;
-            }
-            case R.id.choose_account_pro_i_layout:{
-                onUpgrade1Click(v);
+            case R.id.choose_account_pro_i_layout:
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_I);
                 break;
-            }
-            case R.id.choose_account_pro_ii_layout:{
-                onUpgrade2Click(v);
+            case R.id.choose_account_pro_ii_layout:
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_II);
                 break;
-            }
-            case R.id.choose_account_pro_iii_layout:{
-                onUpgrade3Click(v);
+            case R.id.choose_account_pro_iii_layout:
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_III);
                 break;
-            }
             case R.id.choose_account_business_layout:
-                megaApi.getSessionTransferURL(REGISTER_BUSINESS_ACCOUNT, new SessionTransferURLListener(context));
+                intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
+                intent.putExtra(EXTRA_ACCOUNT_TYPE, BUSINESS);
                 break;
         }
+
+        startActivity(intent);
+        ((LoginActivityLollipop)context).finish();
     }
 
-
-    public void onFreeClick (View view){
-        logDebug("onFreeClick");
-
-        Intent intent = null;
-        intent = new Intent(context,ManagerActivityLollipop.class);
+    void onFreeClick() {
+        Intent intent = new Intent(context, ManagerActivityLollipop.class);
         intent.putExtra(EXTRA_FIRST_LOGIN, true);
         intent.putExtra(EXTRA_UPGRADE_ACCOUNT, false);
+        intent.putExtra(EXTRA_ACCOUNT_TYPE, FREE);
         intent.putExtra(EXTRA_NEW_ACCOUNT, true);
         intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
         startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
+        ((LoginActivityLollipop) context).finish();
     }
 
-    public void onUpgrade1Click(View view) {
-//		((ManagerActivity)context).showpF(1, accounts);
-        logDebug("onUpgrade1Click");
-
-        Intent intent = null;
-        intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
-        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_I);
-        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    public void onUpgrade2Click(View view) {
-//		((ManagerActivity)context).showpF(2, accounts);
-        logDebug("onUpgrade2Click");
-
-        Intent intent = null;
-        intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
-        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_II);
-        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    public void onUpgrade3Click(View view) {
-//		((ManagerActivity)context).showpF(3, accounts);
-        logDebug("onUpgrade3Click");
-
-        Intent intent = null;
-        intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
-        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_III);
-        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    public void onUpgradeLiteClick(View view){
-//		((ManagerActivity)context).showpF(4, accounts);
-        logDebug("onUpgradeLiteClick");
-
-        Intent intent = null;
-        intent = new Intent(context,ManagerActivityLollipop.class);
-        intent.putExtra(EXTRA_UPGRADE_ACCOUNT, true);
-        intent.putExtra(EXTRA_ACCOUNT_TYPE, PRO_LITE);
-        intent.putExtra(EXTRA_NEW_ACCOUNT, true);
-        intent.putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true);
-        startActivity(intent);
-        ((LoginActivityLollipop)context).finish();
-    }
-
-    public String sizeTranslation(long size, int type) {
-        switch(type){
-            case 0:{
-                //From GB to TB
-                if(size!=1024){
-                    size=size/1024;
-                }
-
-                String value = new DecimalFormat("#").format(size);
-                return value;
-            }
-        }
-        return null;
-    }
-
-    public void setPricingInfo(){
-        logDebug("setPricingInfo");
-
-        DecimalFormat df = new DecimalFormat("0.00");
-        MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity)context).getApplication()).getMyAccountInfo();
-
-        if(myAccountInfo==null)
-            return;
-
-        MegaPricing p = myAccountInfo.getPricing();
-        if(p==null){
-            logWarning("Return - getPricing NULL");
-            return;
-        }
-
+    @Override
+    public void setPricingInfo() {
         //Currently the API side doesn't return this value, so we have to hardcode.
-        String textToShowFreeStorage = "[A] 50 GB [/A]"+getString(R.string.label_storage_upgrade_account)+" ";
-        try{
-            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'#000000\'>");
+        String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
+        try {
+            textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color='#000000'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
+        } catch (Exception e) {
+            logWarning("Exception formatting string", e);
         }
-        catch (Exception e){}
+        storageSectionFree.setText(HtmlCompat.fromHtml(textToShowFreeStorage + "<sup><small><font color='#ff333a'>1</font></small></sup>", HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        Spanned resultFreeStorage = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultFreeStorage = Html.fromHtml(textToShowFreeStorage+"<sup><small><font color=\'#ff333a\'>1</font></small></sup>",Html.FROM_HTML_MODE_LEGACY);
-
-        }else {
-            resultFreeStorage = Html.fromHtml(textToShowFreeStorage+"<sup><small><font color=\'#ff333a\'>1</font></small></sup>");
-        }
-        storageSectionFree.setText(resultFreeStorage);
-
-        String textToShowFreeBandwidth = "[A] "+getString(R.string.limited_bandwith)+"[/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-        try{
-            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'#000000\'>");
+        String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith) + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
+        try {
+            textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color='#000000'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
-        }catch (Exception e){}
-        Spanned resultFreeBandwidth = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultFreeBandwidth = Html.fromHtml(textToShowFreeBandwidth, Html.FROM_HTML_MODE_LEGACY);
-        }else {
-            resultFreeBandwidth = Html.fromHtml(textToShowFreeBandwidth);
+        } catch (Exception e) {
+            logWarning("Exception formatting string", e);
         }
-        bandwidthSectionFree.setText(resultFreeBandwidth);
+        bandwidthSectionFree.setText(HtmlCompat.fromHtml(textToShowFreeBandwidth, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        achievementsSectionFree.setText(HtmlCompat.fromHtml("<sup><small><font color='#ff333a'>1</font></small></sup> " + getString(R.string.footnote_achievements), HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        String textToShowFreeAchievements = " "+getString(R.string.footnote_achievements);
-        Spanned resultFreeAchievements = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultFreeAchievements = Html.fromHtml("<sup><small><font color=\'#ff333a\'>1</font></small></sup>"+textToShowFreeAchievements, Html.FROM_HTML_MODE_LEGACY);
-        }else {
-            resultFreeAchievements = Html.fromHtml("<sup><small><font color=\'#ff333a\'>1</font></small></sup>"+textToShowFreeAchievements);
-        }
-        achievementsSectionFree.setText(resultFreeAchievements);
-
-        //Pro
-        for (int i=0;i<p.getNumProducts();i++){
-            logDebug("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
-
-            Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i), p.isBusinessType(i));
-
-            if(account.getLevel()==1&&account.getMonths()==1){
-                logDebug("PRO1: " + account.getStorage());
-                double price = account.getAmount() / 100.00;
-                String priceString = df.format(price);
-                String[] s = priceString.split("\\.");
-
-                String textMonth = "";
-                if (s.length == 1) {
-                    String[] s1 = priceString.split(",");
-                    if (s1.length == 1) {
-                        textMonth = s1[0];
-                    } else if (s1.length == 2) {
-                        textMonth = s1[0]+","+s1[1]+" €";
-                    }
-                }else if (s.length == 2) {
-                    textMonth = s[0]+","+s[1]+" €";
-                }
-
-                String textToShowPro1Month = getString(R.string.type_month, textMonth);
-                try{
-                    textToShowPro1Month = textToShowPro1Month.replace("[A]", "<font color=\'#ff333a\'>");
-                    textToShowPro1Month = textToShowPro1Month.replace("[/A]", "</font>");
-                 }catch (Exception e){}
-                Spanned resultPro1Month = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro1Month = Html.fromHtml(textToShowPro1Month,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro1Month = Html.fromHtml(textToShowPro1Month);
-                }
-                monthSectionPro1.setText(resultPro1Month);
-
-                String textToShowPro1Storage = "[A] "+ getSizeStringGBBased(account.getStorage()) +" [/A] "+getString(R.string.label_storage_upgrade_account);
-                try{
-                    textToShowPro1Storage = textToShowPro1Storage.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowPro1Storage = textToShowPro1Storage.replace("[/A]", "</font>");
-                }
-                catch (Exception e){}
-                Spanned resultPro1Storage = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro1Storage = Html.fromHtml(textToShowPro1Storage,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro1Storage = Html.fromHtml(textToShowPro1Storage);
-                }
-                storageSectionPro1.setText(resultPro1Storage);
-
-
-                String textToShowPro1Bandwidth = "[A] "+ getSizeStringGBBased(account.getTransfer()) +" [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-                try{
-                    textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowPro1Bandwidth = textToShowPro1Bandwidth.replace("[/A]", "</font>");
-                }catch (Exception e){}
-                Spanned resultPro1Bandwidth = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro1Bandwidth = Html.fromHtml(textToShowPro1Bandwidth,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro1Bandwidth = Html.fromHtml(textToShowPro1Bandwidth);
-                }
-                bandwidthSectionPro1.setText(resultPro1Bandwidth);
-
-            }
-            else if(account.getLevel()==2&&account.getMonths()==1){
-                logDebug("PRO2: " + account.getStorage());
-
-                double price = account.getAmount() / 100.00;
-                String priceString = df.format(price);
-                String[] s = priceString.split("\\.");
-
-                String textMonth = "";
-                if (s.length == 1) {
-                    String[] s1 = priceString.split(",");
-                    if (s1.length == 1) {
-                        textMonth = s1[0];
-                    } else if (s1.length == 2) {
-                        textMonth = s1[0]+","+s1[1]+" €";
-                    }
-                }else if (s.length == 2) {
-                    textMonth = s[0]+","+s[1]+" €";
-                }
-
-                String textToShowPro2Month = getString(R.string.type_month, textMonth);
-                try{
-                    textToShowPro2Month = textToShowPro2Month.replace("[A]", "<font color=\'#ff333a\'>");
-                    textToShowPro2Month = textToShowPro2Month.replace("[/A]", "</font>");
-                    textToShowPro2Month = textToShowPro2Month.replace("[B]", "<font color=\'#ff333a\'>");
-                    textToShowPro2Month = textToShowPro2Month.replace("[/B]", "</font>");
-                }catch (Exception e){}
-                Spanned resultPro2Month = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro2Month = Html.fromHtml(textToShowPro2Month,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro2Month = Html.fromHtml(textToShowPro2Month);
-                }
-                monthSectionPro2.setText(resultPro2Month);
-
-                String textToShowPro2Storage = "[A] " + getSizeStringGBBased(account.getStorage()) +" [/A] " + getString(R.string.label_storage_upgrade_account);
-                try{
-                    textToShowPro2Storage = textToShowPro2Storage.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowPro2Storage = textToShowPro2Storage.replace("[/A]", "</font>");
-                }
-                catch (Exception e){}
-                Spanned resultPro2Storage = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro2Storage = Html.fromHtml(textToShowPro2Storage,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro2Storage = Html.fromHtml(textToShowPro2Storage);
-                }
-                storageSectionPro2.setText(resultPro2Storage);
-
-
-                String textToShowPro2Bandwidth = "[A] "+ getSizeStringGBBased(account.getTransfer()) + " [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-                try{
-                    textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowPro2Bandwidth = textToShowPro2Bandwidth.replace("[/A]", "</font>");
-                }catch (Exception e){}
-                Spanned resultPro2Bandwidth  = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro2Bandwidth  = Html.fromHtml(textToShowPro2Bandwidth,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro2Bandwidth  = Html.fromHtml(textToShowPro2Bandwidth);
-                }
-                bandwidthSectionPro2.setText(resultPro2Bandwidth );
-            }
-            else if(account.getLevel()==3&&account.getMonths()==1){
-                logDebug("PRO3: " + account.getStorage());
-
-                double price = account.getAmount() / 100.00;
-                String priceString = df.format(price);
-                String[] s = priceString.split("\\.");
-
-                String textMonth = "";
-                if (s.length == 1) {
-                    String[] s1 = priceString.split(",");
-                    if (s1.length == 1) {
-                        textMonth = s1[0];
-                    } else if (s1.length == 2) {
-                        textMonth = s1[0]+","+s1[1]+" €";
-                    }
-                }else if (s.length == 2) {
-                    textMonth = s[0]+","+s[1]+" €";
-                }
-
-                String textToShowPro3Month = getString(R.string.type_month, textMonth);
-                try{
-                    textToShowPro3Month = textToShowPro3Month.replace("[A]", "<font color=\'#ff333a\'>");
-                    textToShowPro3Month = textToShowPro3Month.replace("[/A]", "</font>");
-                    textToShowPro3Month = textToShowPro3Month.replace("[B]", "<font color=\'#ff333a\'>");
-                    textToShowPro3Month = textToShowPro3Month.replace("[/B]", "</font>");
-                }catch (Exception e){}
-                Spanned resultPro3Month = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro3Month = Html.fromHtml(textToShowPro3Month,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro3Month = Html.fromHtml(textToShowPro3Month);
-                }
-                monthSectionPro3.setText(resultPro3Month);
-
-                String textToShowPro3Storage = "[A] " + getSizeStringGBBased(account.getStorage()) + " [/A] "+getString(R.string.label_storage_upgrade_account);
-                try{
-                    textToShowPro3Storage = textToShowPro3Storage.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowPro3Storage = textToShowPro3Storage.replace("[/A]", "</font>");
-                }
-                catch (Exception e){}
-                Spanned resultPro3Storage = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro3Storage = Html.fromHtml(textToShowPro3Storage,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro3Storage = Html.fromHtml(textToShowPro3Storage);
-                }
-                storageSectionPro3.setText(resultPro3Storage);
-
-
-                String textToShowPro3Bandwidth = "[A] " + getSizeStringGBBased(account.getTransfer()) + " [/A] "+getString(R.string.label_transfer_quota_upgrade_account);
-                try{
-                    textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowPro3Bandwidth = textToShowPro3Bandwidth.replace("[/A]", "</font>");
-                }catch (Exception e){}
-                Spanned resultPro3Bandwidth = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultPro3Bandwidth = Html.fromHtml(textToShowPro3Bandwidth,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultPro3Bandwidth = Html.fromHtml(textToShowPro3Bandwidth);
-                }
-                bandwidthSectionPro3.setText(resultPro3Bandwidth);
-            }
-            else if (account.getLevel()==4&&account.getMonths()==1){
-                logDebug("Lite: " + account.getStorage());
-
-                double price = account.getAmount() / 100.00;
-                String priceString = df.format(price);
-                String[] s = priceString.split("\\.");
-                String textMonth = "";
-                if (s.length == 1) {
-                    String[] s1 = priceString.split(",");
-                    if (s1.length == 1) {
-                        textMonth = s1[0];
-                    } else if (s1.length == 2) {
-                        textMonth = s1[0]+","+s1[1]+" €";
-                    }
-                }else if (s.length == 2) {
-                    textMonth = s[0]+","+s[1]+" €";
-                }
-
-                String textToShowLiteMonth = getString(R.string.type_month, textMonth);
-                try{
-                    textToShowLiteMonth = textToShowLiteMonth.replace("[A]", "<font color=\'#ffa500\'>");
-                    textToShowLiteMonth = textToShowLiteMonth.replace("[/A]", "</font>");
-                    textToShowLiteMonth = textToShowLiteMonth.replace("[B]", "<font color=\'#ff333a\'>");
-                    textToShowLiteMonth = textToShowLiteMonth.replace("[/B]", "</font>");
-                }catch (Exception e){}
-                Spanned resultLiteMonth = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultLiteMonth = Html.fromHtml(textToShowLiteMonth,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultLiteMonth = Html.fromHtml(textToShowLiteMonth);
-                }
-                monthSectionProLite.setText(resultLiteMonth);
-
-                String textToShowLiteStorage = "[A] " + getSizeStringGBBased(account.getStorage()) + " [/A] " + getString(R.string.label_storage_upgrade_account);
-                try{
-                    textToShowLiteStorage = textToShowLiteStorage.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowLiteStorage = textToShowLiteStorage.replace("[/A]", "</font>");
-                }
-                catch (Exception e){}
-                Spanned resultLiteStorage = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultLiteStorage = Html.fromHtml(textToShowLiteStorage,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultLiteStorage = Html.fromHtml(textToShowLiteStorage);
-                }
-                storageSectionProLite.setText(resultLiteStorage);
-
-
-                String textToShowLiteBandwidth = "[A] " + getSizeStringGBBased(account.getTransfer()) + " [/A] " + getString(R.string.label_transfer_quota_upgrade_account);
-                try{
-                    textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[A]", "<font color=\'#000000\'>");
-                    textToShowLiteBandwidth = textToShowLiteBandwidth.replace("[/A]", "</font>");
-                }catch (Exception e){}
-                Spanned resultLiteBandwidth = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    resultLiteBandwidth = Html.fromHtml(textToShowLiteBandwidth,Html.FROM_HTML_MODE_LEGACY);
-                }else {
-                    resultLiteBandwidth = Html.fromHtml(textToShowLiteBandwidth);
-                }
-                bandwidthSectionProLite.setText(resultLiteBandwidth);
-
-            } else if (account.getLevel() == BUSINESS && account.getMonths() == 1) {
-                double price = account.getAmount() / 100.00;
-                String priceString = df.format(price);
-                String[] s = priceString.split("\\.");
-                String textMonth = "";
-                if (s.length == 1) {
-                    String[] s1 = priceString.split(",");
-                    if (s1.length == 1) {
-                        textMonth = s1[0];
-                    } else if (s1.length == 2) {
-                        textMonth = s1[0]+","+s1[1]+" €";
-                    }
-                }else if (s.length == 2) {
-                    textMonth = s[0]+","+s[1]+" €";
-                }
-
-                String textToShowBusinessMonth = getString(R.string.type_month, textMonth);
-                // The initial amount of storage space for business account is 15TB
-                String businessStorageSpace = getString(R.string.storage_space_amount, getSizeStringGBBased(BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT));
-                String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
-
-                try{
-                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[A]", "<font color=\'#2ba6de\'>");
-                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[/A]", "</font>");
-                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[B]", "<font color=\'#2ba6de\'>");
-                    textToShowBusinessMonth = textToShowBusinessMonth.replace("[/B]", "</font>");
-                    businessStorageSpace = businessStorageSpace.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
-                    businessTransferQuota = businessTransferQuota.replace("[A]", "<font color=\'#7a7a7a\'>");
-                    businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
-                }catch (Exception e){
-                    logError("NullPointerException happens when getting the storage string", e);
-                }
-
-                monthSectionBusiness.setText(HtmlCompat.fromHtml(textToShowBusinessMonth, HtmlCompat.FROM_HTML_MODE_LEGACY));
-                storageSectionBusiness.setText(HtmlCompat.fromHtml(businessStorageSpace, HtmlCompat.FROM_HTML_MODE_LEGACY));
-                bandwidhtSectionBusiness.setText(HtmlCompat.fromHtml(businessTransferQuota, HtmlCompat.FROM_HTML_MODE_LEGACY));
-            }
-            accounts.add(account);
-        }
-        //			/*RESULTS
-//            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
-//    		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
-//    		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
-//    		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
-//    		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
-//    		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-    }
-
-
-
-    @Override
-    public void onAttach(Context context) {
-        logDebug("onAttach");
-        super.onAttach(context);
-        this.context = context;
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
-    }
-
-    @Override
-    public void onAttach(Activity context) {
-        logDebug("onAttach Activity");
-        super.onAttach(context);
-        this.context = context;
-
-        if (megaApi == null){
-            megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-        }
+        super.setPricingInfo();
     }
 }

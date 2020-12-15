@@ -80,9 +80,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 android:text="@string/business_label"
-                android:textAllCaps="true"
                 android:textColor="@color/business_color"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 

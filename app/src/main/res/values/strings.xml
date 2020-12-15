@@ -2849,7 +2849,7 @@
 
     <string name="storage_root_label" context="Storage root label">Storage root</string>
 
-    <string name="failed_label" context="Label describing some action failed">Failed</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Failed</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>

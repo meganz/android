@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Gửi hình ảnh này bằng</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Chia sẻ đường dẫn liên kết</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">Xóa liên kết</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Lấy Liên Kết</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">Chia sẻ tên liên lạc vào cuộc chát</string>
     <string name="context_view_shared_folders" context="open a shared folder">Xem các thư mục được chia sẻ</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Chia sẻ</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">Quản lý chia sẻ</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -704,10 +704,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads đã đăng tải xong</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">Chức năng</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Lưu trữ</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Khóa bằng PIN</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Khóa bằng Mã Số</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Việc nén kích thước video tiêu dùng rất nhiều điện; MEGA sẽ cần điện thoại phải được cắm sạc nếu video muốn nén có kích thước lớn hơn %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Nếu được bật, tất cả các ảnh tải lên sẽ có kèm theo thông tin vị trí địa lý nơi mà ảnh đã được chụp, nên tự cân nhắc khi chia sẻ.</string>
 
@@ -750,11 +750,11 @@
 	<string name="verify_account_successfully" context="verify phone number successfully">Số điện thoại đã được xác thực thành công</string>
 
     <string-array name="settings_storage_download_location_array">
-        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong</item>
+        <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong máy</item>
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, external storage option">Bộ nhớ ngoài</item>
     </string-array>
 
-    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong</string>
+    <string name="internal_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, internal storage option">Bộ nhớ trong máy</string>
     <string name="external_storage_label" context="If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option">Bộ nhớ ngoài</string>
 
     <string-array name="add_contact_array">
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Hình ảnh và video</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Chưa chỉnh</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Khóa bằng PIN</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Khóa bằng Mã Số</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Nhập</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Tất cả các dữ liệu có liên quan đến ứng dụng MEGA trong điện thoại sẽ bị xóa sau 10 lần nhập sai mã</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Mã chưa đúng</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Mã PIN sai, xin thử lại. Chỉ còn lại 1 lần thử</item>
-        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Mã PIN sai, xin thử lại. Chỉ còn lại %2d lần thử</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Mã Số nhập sai, xin thử lại. Chỉ còn lại 1 lần thử</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Mã Số nhập sai, xin thử lại. Chỉ còn lại %2d lần thử</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Mã PIN không trùng khớp</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập Mã PIN</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập Mã PIN lần nữa</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập mã PIN mới muốn đặt</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại mã PIN mới lần nữa</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Mã Số không trùng khớp</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập Mã Số</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại Mã Số một lần nữa</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Nhập vào Mã Số muốn sử dụng</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Nhập lại Mã Số mới một lần nữa</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Tất cả dữ liệu tải về từ MEGA lưu vào trong máy sẽ bị xóa, và tài khoản sẽ đăng xuất trong %1d giây</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Thông Tin</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="Title to choose the type of Passcode">Dạng Mã PIN</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">Mã PIN 4 chữ số</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">Mã PIN 6 chữ số</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Mã PIN chứa chữ và số</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Dạng Mã Số</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">Mã 4 số</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">Mã 6 số</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Mã Số có chữ cái</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Bản ghi chép đã được bật</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Bản ghi chép đã được tắt</string>
@@ -1216,8 +1216,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Lịch sử nội dung chat đã được dọn sạch</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Lỗi. Lịch sử cuộc chat chưa được xoá sạch</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Lịch sử tin nhắn chát đã được dọn sạch</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Lỗi phát sinh. Lịch sử cuộc chát chưa được xoá sạch.</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Thêm thành viên</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Mời ra khỏi cuộc chát</string>
@@ -1291,7 +1291,7 @@
     <string name="message_participant_left_group_chat" context="chat message when a participant left a group chat">[A]%1$s[/A][B] đã rời khỏi nhóm chát[/B]</string>
 
     <string name="manual_retry_alert" context="chat message alert when the message have to been manually">Tin nhắn không gửi được. Chạm để hiện lựa chọn</string>
-    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Truyền tải bị tạm ngừng. Chạm để tiếp tục.</string>
+    <string name="manual_resume_alert" context="Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused.">Truyền tải bị tạm dừng. Chạm để tiếp tục.</string>
     <!--
     <string name="settings_chat_summary_online" context="summary of the status online in settings">You can chat, share files and make calls with your contacts.</string>
     -->
@@ -1327,7 +1327,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]Đăng xuất[/A] và sử dụng MEGA với tài khoản khác</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">Bạn co chắc muốn đăng xuất khỏi tài khoản hiện tại?</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">Tin nhắn này đã bị xóa bởi %1$s</string>
-    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Chat history has been cleared</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Lịch sử chát được được dọn sạch</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">Lịch sử nội dung chat đã bị xóa bởi %1$s</string>
 
     <!--
@@ -1454,7 +1454,7 @@
 
 	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Tiến trình đang được hoàn tất&#8230;</string>
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Xem</string>
-    <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Ngừng tất cả các truyền tải</string>
+    <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Tạm dừng tất cả các truyền tải</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Tiếp tục tất cả các truyền tải</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Dọn danh sách truyền tải</string>
     <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Thử lại tất cả các truyền tải</string>
@@ -2757,9 +2757,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Lỗi phát sinh xảy ra khi tải lên tin nhắn thoại.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Cuộc gọi đến</string>
-    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
-    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
-    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Cuộc gọi nhóm đang gọi đến</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Cuộc gọi video đang gọi đến</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Cuộc gọi thoại đang gọi đến</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Đang tải</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Vui lòng chờ&#8230;</string>
@@ -2847,9 +2847,9 @@
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Chát tạo vào ngày %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Chọn tin nhắn</string>
 
-    <string name="storage_root_label" context="Storage root label">Storage root</string>
+    <string name="storage_root_label" context="Storage root label">Dung lượng gốc</string>
 
-    <string name="failed_label" context="Label describing some action failed">Thất bại</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Thất bại</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
@@ -2914,7 +2914,7 @@
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]Hết[/A] kết quả</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Tiếp tục các truyền tải?</string>
-    <string name="option_resume_transfers" context="Option to  resume all transfers">Khôi phục phiên truyền tải</string>
+    <string name="option_resume_transfers" context="Option to  resume all transfers">Tiếp tục phiên truyền tải</string>
     <string name="option_cancel_transfer" context="Option to  cancel a transfer">Hủy truyền tải</string>
     <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Các truyền tải bị ngừng sẽ được tiếp tục tải lên.</string>
 

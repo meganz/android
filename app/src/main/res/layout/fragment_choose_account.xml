@@ -18,7 +18,7 @@
 		app:theme="@style/Theme.Megaactionbar"
 		tools:context=".lollipop.LoginActivityLollipop" />
 
-	<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	<ScrollView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/white"
@@ -69,7 +69,7 @@
 								android:id="@+id/choose_account_free_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/green_free_account"
+								android:textColor="@color/free_account"
 								android:layout_below="@+id/image_free"
 								android:textSize="18sp"/>
 						</RelativeLayout>
@@ -188,8 +188,8 @@
 								android:id="@+id/choose_account_prolite_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
-								android:textColor="@color/upgrade_orange"
-								android:text="@string/lite_account"
+								android:textColor="@color/lite_account"
+								android:text="@string/prolite_account"
 								android:layout_below="@+id/image_lite"
 								android:textSize="18sp"/>
 						</RelativeLayout>
