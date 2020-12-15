@@ -704,6 +704,8 @@ public class Constants {
     public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
     public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
 
+    public static final long GET_THUMBNAIL_THROTTLE_MS = 50;
+
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 

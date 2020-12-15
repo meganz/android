@@ -4,15 +4,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Pair;
+
 import androidx.collection.LongSparseArray;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjava3.subjects.PublishSubject;
-import io.reactivex.rxjava3.subjects.Subject;
+
 import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -20,12 +16,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import io.reactivex.rxjava3.subjects.PublishSubject;
+import io.reactivex.rxjava3.subjects.Subject;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
 import mega.privacy.android.app.listeners.BaseListener;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -60,16 +66,14 @@ class CuViewModel extends BaseRxViewModel {
     private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
 
     private final MegaRequestListenerInterface mCreateThumbnailRequest;
-
-    private boolean mSelecting;
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
-
+    private boolean mSelecting;
     private long[] mSearchDate;
     private int mRealNodeCount;
 
     @Inject
     public CuViewModel(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
-            Context context, int type) {
+                       Context context, int type) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
@@ -154,13 +158,13 @@ class CuViewModel extends BaseRxViewModel {
 
     /**
      * Handle node click & long click event.
-     *
+     * <p>
      * In selection mode, we need need animate the selection icon, so we don't
      * trigger nodes update through {@code cuNodes.setValue(nodes); }, we only
      * update node's selected property here, for consistency.
      *
      * @param position clicked node position in RV
-     * @param node clicked node
+     * @param node     clicked node
      */
     public void onNodeClicked(int position, CuNode node) {
         if (mSelecting) {
@@ -383,11 +387,15 @@ class CuViewModel extends BaseRxViewModel {
         }
         mRealNodeCount = realNodes.size();
 
-        for (MegaNode node : nodesWithoutThumbnail) {
-            File thumbnail =
-                    new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
-            mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
-        }
+        add(Observable.fromIterable(nodesWithoutThumbnail)
+                .zipWith(Observable.interval(Constants.GET_THUMBNAIL_THROTTLE_MS, TimeUnit.MILLISECONDS),
+                        (node, interval) -> node)
+                .observeOn(Schedulers.computation())
+                .subscribe(node -> {
+                    File thumbnail =
+                            new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
+                    mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
+                }, logErr("CuViewModel getThumbnail")));
 
         return nodes;
     }
