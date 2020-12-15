@@ -167,6 +167,18 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+		if (!app.isActivityVisible()) {
+            try {
+                startForeground(notificationIdForFileUpload,
+                        createInitialServiceNotification(notificationChannelIdForFileUpload,
+                                notificationChannelNameForFileUpload, mNotificationManager, mBuilderCompat, mBuilder));
+                isForeground = true;
+            } catch (Exception e) {
+                logWarning("Error starting foreground.", e);
+                isForeground = false;
+            }
+        }
+
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = new BroadcastReceiver() {
             @Override

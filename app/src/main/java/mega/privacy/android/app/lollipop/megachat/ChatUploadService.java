@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
@@ -182,6 +183,17 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		mBuilderCompat = new NotificationCompat.Builder(ChatUploadService.this);
 
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		if (!app.isActivityVisible()) {
+			try {
+				startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
+						notificationChannelName, mNotificationManager, mBuilderCompat, mBuilder));
+				isForeground = true;
+			} catch (Exception e) {
+				logWarning("Error starting foreground.", e);
+				isForeground = false;
+			}
+		}
 
 		// delay 1 second to refresh the pause notification to prevent update is missed
 		pauseBroadcastReceiver = new BroadcastReceiver() {

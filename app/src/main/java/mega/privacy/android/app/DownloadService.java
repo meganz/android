@@ -196,6 +196,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		if (!app.isActivityVisible()) {
+			try {
+				startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
+						notificationChannelName, mNotificationManager, mBuilderCompat, mBuilder));
+				isForeground = true;
+			} catch (Exception e) {
+				logWarning("Error starting foreground.", e);
+				isForeground = false;
+			}
+		}
+
 		rootNode = megaApi.getRootNode();
 
 		// delay 1 second to refresh the pause notification to prevent update is missed
