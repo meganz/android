@@ -1218,8 +1218,6 @@
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Call ringtone</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Notification sound</string>
 
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">After cleared, neither %s nor you will be able to see messages of this chat.</string>
-
     <string name="general_clear" context="Button to clear the chat history">Clear</string>
     <!--
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
