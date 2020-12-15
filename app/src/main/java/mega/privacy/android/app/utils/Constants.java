@@ -176,11 +176,11 @@ public class Constants {
     public static final int BUSINESS = 100;
 
     public static final long DISABLED_RETENTION_TIME = 0;
-    public static final int SECONDS_IN_YEAR = 31556900;
-    public static final int SECONDS_IN_MONTH_31 = 2678400;
-    public static final int SECONDS_IN_WEEK = 604800;
-    public static final int SECONDS_IN_DAY = 86400;
     public static final int SECONDS_IN_HOUR = 3600;
+    public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+    public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
+    public static final int SECONDS_IN_MONTH_31 = SECONDS_IN_DAY * 31;
+    public static final int SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;

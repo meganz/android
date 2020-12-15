@@ -209,7 +209,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 R.plurals.retention_time_picker_months,
                 value
             ),
-            StringResourcesUtils.getString(R.string.year_cc).toLowerCase()
+            StringResourcesUtils.getString(R.string.year_cc).toLowerCase(Locale.getDefault())
         )
 
         binding.textPicker.displayedValues = arrayString

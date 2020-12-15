@@ -6047,6 +6047,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
     }
 
+    /**
+     * Draws a Retention Time message.
+     *
+     * @param holder         ViewHolderMessageChat where the message is going to be drawn.
+     * @param androidMessage AndroidMegaChatMessage to draw.
+     * @param position       Position in adapter.
+     */
     public void bindRetentionTimeMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         holder.layoutAvatarMessages.setVisibility(View.VISIBLE);
         MegaChatMessage message = androidMessage.getMessage();
