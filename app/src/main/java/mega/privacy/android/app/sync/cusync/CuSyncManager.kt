@@ -416,10 +416,9 @@ object CuSyncManager {
             TYPE_BACKUP_INVALID,
             targetNode,
             localFolder,
-            null,
             state,
-            INVALID_VALUE,
-            null,
+            MegaError.API_OK,
+            INVALID_NON_NULL_VALUE,
             SyncListener(UpdateBackupCallback(), megaApplication)
         )
     }
