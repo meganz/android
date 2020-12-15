@@ -105,30 +105,6 @@
             </LinearLayout>
 
         </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/media_bucket_layout"
-            android:layout_width="match_parent"
-            android:layout_height="88dp"
-            android:orientation="horizontal"
-            android:layout_below="@+id/bucket_layout">
-
-            <mega.privacy.android.app.components.NestedScrollableHost
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/media_recyler"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:choiceMode="multipleChoice"
-                    android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:paddingStart="70dp" />
-            </mega.privacy.android.app.components.NestedScrollableHost>
-
-        </LinearLayout>
         
     </RelativeLayout>
     

@@ -1323,8 +1323,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									RecentsFragment.imageDrag = imageDrag;
 									RecentsFragment.imageDrag.setVisibility(View.INVISIBLE);
 								}
-							} else if (actionType == SCROLL_TO_POSITION) {
-								pagerRecentsFragment.updateScrollPosition(handle);
 							}
 						}
 					}
@@ -5051,7 +5049,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						titleId = R.string.upload_to_audio;
 						break;
                     case VIDEO:
-                        titleId = R.string.upload_to_video;
+                        titleId = R.string.sortby_type_video_first;
                         break;
 				}
 
@@ -7536,6 +7534,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
+            killAllSessions.setVisible(false);
+            exportMK.setVisible(false);
         }
     }
 

@@ -2920,10 +2920,10 @@
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there's no photo to show">No photos to show</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there's no document to show">No documents to show</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there's no audio to show">No audio to show</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there's no video to show">No video to show</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there's no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there's no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there's no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there's no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
