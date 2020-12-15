@@ -112,10 +112,6 @@ public class AchievementsActivity extends PinActivityLollipop {
             });
             sFetcher.fetch();
         }
-        // ATTENTION: This was auto-generated to handle app links.
-        Intent appLinkIntent = getIntent();
-        String appLinkAction = appLinkIntent.getAction();
-        Uri appLinkData = appLinkIntent.getData();
     }
 
     @Override

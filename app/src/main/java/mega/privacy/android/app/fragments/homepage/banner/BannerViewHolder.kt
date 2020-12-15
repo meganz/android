@@ -12,6 +12,7 @@ import com.zhpan.bannerview.BaseViewHolder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
+import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import nz.mega.sdk.MegaBanner
 
 class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
@@ -36,14 +37,24 @@ class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
         }
 
         itemView.setOnClickListener {
-            val url = "https://mega.nz/achievements"
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            Log.i("Alex", "startActivity")
-            itemView.context.startActivity(intent)
+            actOnActionLink(itemView.context, ACHIEVEMENT)
         }
     }
 
     fun setViewModel(viewModel: HomePageViewModel) {
         this.viewModel = viewModel
+    }
+
+    private fun actOnActionLink(context: Context, link: String) {
+        when (link) {
+            ACHIEVEMENT -> {
+                val intent = Intent(context, AchievementsActivity::class.java)
+                context.startActivity(intent)
+            }
+        }
+    }
+
+    companion object {
+        private const val ACHIEVEMENT = "https://mega.nz/achievements"
     }
 }
