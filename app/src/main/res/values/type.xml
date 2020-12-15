@@ -96,12 +96,12 @@
     </style>
 
     <!-- Chat own send contact info -->
-    <style name="TextAppearance.Mega.Body1.Variant3">
+    <style name="TextAppearance.Mega.Body1.Variant">
         <item name="android:textColor">@color/white</item>
     </style>
 
     <!-- Chat contact send contact info -->
-    <style name="TextAppearance.Mega.Body1.Variant4">
+    <style name="TextAppearance.Mega.Body1.Variant2">
         <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
