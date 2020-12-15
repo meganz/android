@@ -7,9 +7,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
+import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import nz.mega.sdk.MegaApiJava.*
 
 class SortByHeaderViewModel @ViewModelInject constructor(
@@ -41,8 +44,13 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     }
 
     init {
-        orderChange.observeForever(orderChangeObserver)
-        listGridChange.observeForever(listGridChangeObserver)
+        // Use "sticky" to observe the value set in ManagerActivity onCreate()
+        LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java)
+            .observeStickyForever(orderChangeObserver)
+        LiveEventBus.get(
+            EVENT_LIST_GRID_CHANGE,
+            Boolean::class.java
+        ).observeStickyForever(listGridChangeObserver)
     }
 
     fun showSortByDialog() {
@@ -56,8 +64,12 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     }
 
     override fun onCleared() {
-        orderChange.removeObserver(orderChangeObserver)
-        listGridChange.removeObserver(listGridChangeObserver)
+        LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java)
+            .removeObserver(orderChangeObserver)
+        LiveEventBus.get(
+            EVENT_LIST_GRID_CHANGE,
+            Boolean::class.java
+        ).removeObserver(listGridChangeObserver)
     }
 
     companion object {

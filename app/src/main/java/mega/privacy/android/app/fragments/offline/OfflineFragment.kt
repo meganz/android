@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -714,7 +715,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             callManager {
                 it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
-            notifyScrolling(Pair(this, rv.canScrollVertically(-1)))
+            LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
+                .post(Pair(this, rv.canScrollVertically(-1)))
         }
     }
 

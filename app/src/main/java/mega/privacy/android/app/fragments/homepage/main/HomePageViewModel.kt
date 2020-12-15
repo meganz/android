@@ -3,10 +3,13 @@ package mega.privacy.android.app.fragments.homepage.main
 import android.graphics.Bitmap
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.*
 
 class HomePageViewModel @ViewModelInject constructor(
@@ -43,10 +46,11 @@ class HomePageViewModel @ViewModelInject constructor(
     }
 
     init {
-        avatarChange.observeForever(avatarChangeObserver)
-        scrolling.observeForever(scrollingObserver)
-        notificationCountChange.observeForever(notificationCountObserver)
-        chatOnlineStatusChange.observeForever(chatOnlineStatusObserver)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java).observeForever(avatarChangeObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_SCROLLING_CHANGE).observeForever(scrollingObserver as Observer<Any>)
+        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).observeForever(notificationCountObserver)
+        LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).observeForever(chatOnlineStatusObserver)
 
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
@@ -56,10 +60,11 @@ class HomePageViewModel @ViewModelInject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        avatarChange.removeObserver(avatarChangeObserver)
-        scrolling.removeObserver(scrollingObserver)
-        notificationCountChange.removeObserver(notificationCountObserver)
-        chatOnlineStatusChange.removeObserver(chatOnlineStatusObserver)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java).removeObserver(avatarChangeObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_SCROLLING_CHANGE).removeObserver(scrollingObserver as Observer<Any>)
+        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).removeObserver(notificationCountObserver)
+        LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).removeObserver(chatOnlineStatusObserver)
     }
 
     private fun showDefaultAvatar() = viewModelScope.launch {

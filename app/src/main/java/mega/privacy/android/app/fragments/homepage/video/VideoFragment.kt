@@ -69,7 +69,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentVideoBinding.inflate(inflater, container, false).apply {
             viewModel = this@VideoFragment.viewModel
             sortByHeaderViewModel = this@VideoFragment.sortByHeaderViewModel

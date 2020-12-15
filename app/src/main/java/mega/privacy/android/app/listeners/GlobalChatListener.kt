@@ -1,9 +1,10 @@
 package mega.privacy.android.app.listeners
 
 import android.content.Intent
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.fragments.homepage.notifyChatOnlineStatusChange
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatListItem
@@ -25,7 +26,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
         inProgress: Boolean
     ) {
         if (userhandle == api?.myUserHandle) {
-            notifyChatOnlineStatusChange(status)
+            LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).post(status)
         }
     }
 

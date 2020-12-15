@@ -3,9 +3,10 @@ package mega.privacy.android.app.fragments.recent
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.fragments.homepage.nodesChange
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -92,11 +93,13 @@ class RecentsBucketViewModel @ViewModelInject constructor(
     }
 
     init {
-        nodesChange.observeForever(nodesChangeObserver)
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
+            .observeForever(nodesChangeObserver)
     }
 
     override fun onCleared() {
-        nodesChange.removeObserver(nodesChangeObserver)
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
+            .removeObserver(nodesChangeObserver)
     }
 }
 

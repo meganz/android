@@ -46,7 +46,6 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.displayMetrics
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -382,12 +381,12 @@ class HomepageFragment : Fragment() {
         viewModel.bannerList.observe(viewLifecycleOwner) {
             if (it == null || it.isEmpty()) {
                 Log.i("Alex", "null bannerlist")
-                bannerViewPager.visibility = View.GONE
+//                bannerViewPager.visibility = View.GONE
                 bottomSheetBehavior.peekHeight =
                     rootView.height - category.bottom
             } else {
                 Log.i("Alex", "banners.size:${it.size}")
-                bannerViewPager.visibility = View.VISIBLE
+//                bannerViewPager.visibility = View.VISIBLE
                 bannerViewPager.refreshData(it)
                 bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
 //                    Log.i("Alex", "dismiss banner id: ${banners[0].id}")
@@ -444,7 +443,10 @@ class HomepageFragment : Fragment() {
         rootView.viewTreeObserver?.addOnPreDrawListener (object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-                rootView.viewTreeObserver?.removeOnPreDrawListener(this)
+                if (bottomSheetBehavior.peekHeight > 0) {
+                    rootView.viewTreeObserver?.removeOnPreDrawListener(this)
+                }
+
                 return true
             }
         })

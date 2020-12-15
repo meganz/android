@@ -2,11 +2,12 @@ package mega.privacy.android.app.fragments.homepage.video
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
-import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.*
 
@@ -25,7 +26,6 @@ class VideoViewModel @ViewModelInject constructor(
     var searchQuery = ""
 
     private var forceUpdate = false
-    private var ignoredFirstNodesChange = false
 
     // Whether a video loading is in progress
     private var loadInProgress = false
@@ -67,11 +67,6 @@ class VideoViewModel @ViewModelInject constructor(
     }
 
     private val nodesChangeObserver = Observer<Boolean> {
-        if (!ignoredFirstNodesChange) {
-            ignoredFirstNodesChange = true
-            return@Observer
-        }
-
         if (it) {
             loadVideo(true)
         } else {
@@ -89,7 +84,8 @@ class VideoViewModel @ViewModelInject constructor(
 
     init {
         items.observeForever(loadFinishedObserver)
-        nodesChange.observeForever(nodesChangeObserver)
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
+            .observeForever(nodesChangeObserver)
     }
 
     /**
@@ -138,7 +134,9 @@ class VideoViewModel @ViewModelInject constructor(
     fun getRealNodeCount() = items.value?.size?.minus(if (searchMode) 0 else 1) ?: 0
 
     override fun onCleared() {
-        nodesChange.removeObserver(nodesChangeObserver)
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
+            .removeObserver(nodesChangeObserver)
+        items.removeObserver(loadFinishedObserver)
     }
 }
 

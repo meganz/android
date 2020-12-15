@@ -152,7 +152,6 @@ import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
@@ -247,7 +246,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -2203,7 +2201,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		logDebug("Preferred View List: " + isList);
 
-		EventNotifierKt.notifyListGridChange(isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -2244,7 +2242,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		handler = new Handler();
 
@@ -7567,7 +7565,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setPreferredViewList(isList);
         }
 
-        EventNotifierKt.notifyListGridChange(this.isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
@@ -10761,7 +10759,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("New order: " + newOrderCloud);
 		this.setOrderCloud(newOrderCloud);
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
@@ -13134,7 +13132,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if(maFLol!=null){
 						maFLol.updateAvatar(false);
 					}
-					EventNotifierKt.notifyAvatarChange(true);
+
+					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
 				}
 				else{
 					if(request.getFile()!=null) {
@@ -13227,7 +13226,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						maFLol.updateAvatar(false);
 					}
 				}
-				EventNotifierKt.notifyAvatarChange(false);
+				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){

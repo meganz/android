@@ -5,8 +5,8 @@ import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
-import mega.privacy.android.app.fragments.homepage.nodesChange
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.*
@@ -90,7 +90,7 @@ class PhotosViewModel @ViewModelInject constructor(
         // Calling ObserveForever() here instead of calling observe()
         // in the PhotosFragment, for fear that an nodes update event would be missed if
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
-        LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
         loadPhotos(true)
     }
@@ -145,7 +145,7 @@ class PhotosViewModel @ViewModelInject constructor(
     }
 
     override fun onCleared() {
-        LiveEventBus.get(Constants.EVENT_NODES_CHANGE, Boolean::class.java)
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .removeObserver(nodesChangeObserver)
         items.removeObserver(loadFinishedObserver)
     }

@@ -70,7 +70,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentDocumentsBinding.inflate(inflater, container, false).apply {
             viewModel = this@DocumentsFragment.viewModel
             sortByHeaderViewModel = this@DocumentsFragment.sortByHeaderViewModel
