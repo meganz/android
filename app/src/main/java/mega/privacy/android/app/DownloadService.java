@@ -232,6 +232,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 	}
 
+	private void stopForeground() {
+		isForeground = false;
+		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
+		stopSelf();
+	}
+
 	@Override
 	public void onDestroy(){
 		logDebug("onDestroy");
@@ -298,6 +305,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
 			MegaTransferData transferData = megaApi.getTransferData(null);
 			if (transferData == null) {
+				stopForeground();
 				return;
 			}
 
@@ -317,6 +325,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if (transfersCount > 0) {
 				updateProgressNotification();
+			} else {
+				stopForeground();
 			}
 
 			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
@@ -547,10 +557,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try{ wl.release(); } catch(Exception ex) {}
 
         showCompleteNotification(handle);
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
-		stopSelf();
+		stopForeground();
 		rootNode = null;
 		int total = megaApi.getNumPendingDownloads();
 		logDebug("onQueueComplete: total of files before reset " + total);
@@ -1427,10 +1434,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void cancel() {
 		logDebug("cancel");
 		canceled = true;
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
-		stopSelf();
+		stopForeground();
 		rootNode = null;
 	}
 

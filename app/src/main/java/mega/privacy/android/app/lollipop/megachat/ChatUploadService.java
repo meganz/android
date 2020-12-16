@@ -215,6 +215,13 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 	}
 
+	private void stopForeground() {
+		isForeground = false;
+		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
+		stopSelf();
+	}
+
 	@Override
 	public void onDestroy(){
 		logDebug("onDestroy");
@@ -270,6 +277,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
 			MegaTransferData transferData = megaApi.getTransferData(null);
 			if (transferData == null) {
+				stopForeground();
 				return;
 			}
 
@@ -298,6 +306,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 			if (totalUploads > 0) {
 				updateProgressNotification();
+			} else {
+				stopForeground();
 			}
 
 			launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
@@ -560,10 +570,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private void cancel() {
 		logDebug("cancel");
 		canceled = true;
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
-		stopSelf();
+		stopForeground();
 	}
 
 	@Override
@@ -606,11 +613,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		logDebug("Stopping service!!");
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
 		MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(false);
-		stopSelf();
+		stopForeground();
 		logDebug("After stopSelf");
 
 		try{
