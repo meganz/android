@@ -3,16 +3,18 @@ package mega.privacy.android.app.fragments.homepage.banner
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import com.facebook.drawee.view.SimpleDraweeView
 import com.zhpan.bannerview.BaseViewHolder
-import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
+import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaBanner
 
 class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
@@ -37,7 +39,7 @@ class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
         }
 
         itemView.setOnClickListener {
-            actOnActionLink(itemView.context, ACHIEVEMENT)
+            actOnActionLink(itemView.context, REFERRAL)
         }
     }
 
@@ -51,10 +53,17 @@ class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
                 val intent = Intent(context, AchievementsActivity::class.java)
                 context.startActivity(intent)
             }
+            REFERRAL -> {
+                val openLinkIntent = Intent(context, OpenLinkActivity::class.java).apply {
+                    data = Uri.parse(link)
+                }
+                context.startActivity(openLinkIntent)
+            }
         }
     }
 
     companion object {
         private const val ACHIEVEMENT = "https://mega.nz/achievements"
+        private const val REFERRAL = "https://mega.nz/fm/refer"
     }
 }
