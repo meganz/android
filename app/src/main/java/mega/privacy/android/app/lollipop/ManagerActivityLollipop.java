@@ -2537,8 +2537,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
 					tFLol.setGetMoreQuotaViewVisibility();
-				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
-					completedTFLol.setGetMoreQuotaViewVisibility();
+				} else if (position == COMPLETED_TAB) {
+					if (isTransfersCompletedAdded()) {
+						completedTFLol.setGetMoreQuotaViewVisibility();
+					}
+
+					if (isTransfersInProgressAdded()) {
+						tFLol.checkSelectModeAfterChangeTab();
+					}
 				}
 			}
 

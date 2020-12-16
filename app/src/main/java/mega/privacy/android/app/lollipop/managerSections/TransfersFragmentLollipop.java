@@ -489,4 +489,10 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			adapter.setTransfers(tL);
 		}
 	}
+
+	public void checkSelectModeAfterChangeTab() {
+		if (adapter != null && adapter.isMultipleSelect()) {
+			destroyActionMode();
+		}
+	}
 }
