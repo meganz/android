@@ -48,15 +48,15 @@ import static nz.mega.sdk.MegaTransfer.*;
 
 public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTransfersLollipopAdapter.ViewHolderTransfer> implements OnClickListener, RotatableAdapter {
 
-    private Context context;
+    private final Context context;
     private MegaApiAndroid megaApi;
 
-    private DisplayMetrics outMetrics;
+    private final DisplayMetrics outMetrics;
 
     private ArrayList<MegaTransfer> tL;
-    private RecyclerView listFragment;
+    private final RecyclerView listFragment;
 
-    private SelectModeInterface selectModeInterface;
+    private final SelectModeInterface selectModeInterface;
     private boolean multipleSelect;
     private SparseBooleanArray selectedItems;
 
@@ -412,6 +412,12 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
         notifyItemMoved(oldPosition, newPosition);
     }
 
+    /**
+     * Updates the progress of a transfer.
+     *
+     * @param position Position of the transfer in the adapter.
+     * @param transfer Transfer to which the progress has to be updated.
+     */
     public void updateProgress(int position, MegaTransfer transfer) {
         ViewHolderTransfer holder = (ViewHolderTransfer) listFragment.findViewHolderForAdapterPosition(position);
         if (holder == null) {

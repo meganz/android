@@ -11,7 +11,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_MOVE_TRANSFER
 
 class MoveTransferListener(
-    private val context: Context,
+    context: Context,
     private val moveTransferInterface: MoveTransferInterface
 ) : BaseListener(context) {
 

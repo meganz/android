@@ -11,7 +11,7 @@ class TransfersActionBarCallBack(private val transfersActionInterface: Transfers
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         mode.menuInflater.inflate(R.menu.transfers_action, menu)
         transfersActionInterface.onCreateActionMode()
-        return true;
+        return true
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
@@ -64,7 +64,7 @@ class TransfersActionBarCallBack(private val transfersActionInterface: Transfers
         fun cancelTransfers()
         fun selectAll()
         fun clearSelections()
-        fun getSelectedTransfers() : Int
-        fun areAllTransfersSelected() : Boolean
+        fun getSelectedTransfers(): Int
+        fun areAllTransfersSelected(): Boolean
     }
 }

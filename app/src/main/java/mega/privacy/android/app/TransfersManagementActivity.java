@@ -23,7 +23,7 @@ public class TransfersManagementActivity extends PinActivityLollipop {
     protected TransferWidget transfersWidget;
 
     /**
-     * Broadcast to pdate the transfers widget when a change in network connection is detected.
+     * Broadcast to update the transfers widget when a change in network connection is detected.
      */
     protected BroadcastReceiver networkUpdateReceiver = new BroadcastReceiver() {
         @Override
