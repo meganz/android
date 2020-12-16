@@ -14335,7 +14335,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	public void showConfirmationClearCompletedTransfers() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
-		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers))
+		builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
 				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
 					dbH.emptyCompletedTransfers();
 
@@ -14344,7 +14344,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					supportInvalidateOptionsMenu();
 				})
-				.setNegativeButton(R.string.general_cancel, null);
+				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
 		setConfirmationTransfersDialogNotCancellableAndShow();

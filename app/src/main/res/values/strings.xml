@@ -1476,7 +1476,7 @@
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Resume transfer?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Resume</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Clear completed transfers?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Clear all transfers?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">In progress</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Completed</string>
