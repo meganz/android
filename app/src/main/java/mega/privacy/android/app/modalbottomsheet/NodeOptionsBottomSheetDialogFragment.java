@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -24,6 +27,7 @@ import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -91,6 +95,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
         TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
+//      optionFavourite
+        LinearLayout optionFavourite = contentView.findViewById(R.id.option_favourite_layout);
+        ImageView imageFavourite = contentView.findViewById(R.id.option_favourite_image);
+        TextView textFavourite = contentView.findViewById(R.id.option_favourite_text);
+//      optionLabel
+        LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
+        TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
 //      counterSave
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
@@ -117,6 +128,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionRubbishBin = contentView.findViewById(R.id.option_rubbish_bin_layout);
         LinearLayout optionRemove = contentView.findViewById(R.id.option_remove_layout);
 
+        optionLabel.setOnClickListener(this);
+        optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -337,6 +350,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionMove.setVisibility(View.VISIBLE);
                 optionCopy.setVisibility(View.VISIBLE);
 
+                optionLabel.setVisibility(View.VISIBLE);
+                optionFavourite.setVisibility(View.VISIBLE);
+
                 //Hide
                 counterRemove--;
                 optionRemove.setVisibility(View.GONE);
@@ -535,6 +551,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                             }
 
+                            optionLabel.setVisibility(View.VISIBLE);
+                            optionFavourite.setVisibility(View.VISIBLE);
+
                             break;
 
                         case MegaShare.ACCESS_READ:
@@ -621,6 +640,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionCopy.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
 
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
+
                     //Hide
                     counterRemove--;
                     optionRemove.setVisibility(View.GONE);
@@ -676,6 +698,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionRename.setVisibility(View.VISIBLE);
                     optionMove.setVisibility(View.VISIBLE);
                     optionCopy.setVisibility(View.VISIBLE);
+
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
 
                     //Hide
                     counterRemove--;
@@ -779,6 +804,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                             }
 
+                            optionLabel.setVisibility(View.VISIBLE);
+                            optionFavourite.setVisibility(View.VISIBLE);
+
                             break;
 
                         case MegaShare.ACCESS_READ:
@@ -847,6 +875,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionLink.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
                     optionOpenFolder.setVisibility(View.VISIBLE);
+                    optionLabel.setVisibility(View.VISIBLE);
+                    optionFavourite.setVisibility(View.VISIBLE);
 
                     //Hide
                     counterModify--;
@@ -869,6 +899,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         separatorOpen.setVisibility(counterOpen <= 0 || counterRemove <= 0 ? View.GONE : View.VISIBLE);
 
         offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+
+        textFavourite.setText(node.isFavourite() ? R.string.file_properties_unfavourite : R.string.file_properties_favourite);
+        imageFavourite.setImageResource(node.isFavourite() ? R.drawable.ic_remove_favourite : R.drawable.ic_add_favourite);
+
+        if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+            int color = ResourcesCompat.getColor(getResources(), getNodeLabelColor(node.getLabel()), null);
+            Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), getResources());
+            optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
+            optionLabelCurrent.setText(MegaNodeUtil.getNodeLabelText(node.getLabel()));
+            optionLabelCurrent.setTextColor(color);
+            optionLabelCurrent.setVisibility(View.VISIBLE);
+        } else {
+            optionLabelCurrent.setVisibility(View.GONE);
+        }
 
         dialog.setContentView(contentView);
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true);
@@ -904,6 +948,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         switch (v.getId()) {
             case R.id.option_download_layout:
                 nC.prepareForDownload(handleList, false);
+                break;
+
+            case R.id.option_favourite_layout:
+                megaApi.setNodeFavourite(node, !node.isFavourite());
+                break;
+
+            case R.id.option_label_layout:
+                ((ManagerActivityLollipop) context).showNodeLabelsPanel(node);
                 break;
 
             case R.id.file_properties_switch:

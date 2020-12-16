@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPRO LITEサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPRO Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPRO II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPRO IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -> MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -> 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -> MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -> MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -> MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -> 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -> MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -> MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGAは、強力な常時プライバシーを備えたクラウドストレージです。</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF ビューア</string>
@@ -115,7 +115,7 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">選択をクリアする</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">サムネールで見る</string>
     <string name="action_list" context="Menu item to change from grid view to list view">リスト一覧</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">回復キーをバックアップ</string>
+    <string name="action_export_master_key" context="Title of the preference Recovery key on Settings section">回復キーをバックアップ</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">定期契約キャンセル</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">定期契約はキャンセルされました。</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">あなたのサブスクリプションをキャンセルできませんでした。サポートについてはsupport&#64;mega.nzにお問い合わせください</string>
@@ -378,6 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">イメージ共有方法</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">共有リンク</string>
+    <string name="context_delete_link" context="Delete a link label">リンクを削除</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">リンクを取得</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -444,6 +445,7 @@
     <string name="context_send_contact" context="menu item">連絡先をチャットと共有</string>
     <string name="context_view_shared_folders" context="open a shared folder">共有フォルダを見る</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">共有する</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">共有を管理</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -596,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">選択したファイルを開くことができません</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">ファイル解凍中</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">ファイルシステムの問題です。</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">ファイルシステムの問題</string>
     <string name="general_error" context="error message while browsing the local filesystem">その操作の実行中にエラーが発生しました</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">画像ビューア</string>
@@ -702,9 +704,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">カメラアップロードが完了しました</string>
+    <string name="settings_features" context="settings of the Features section">各種機能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">ストレージ</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">PIN ロック</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">パスコードロック</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">動画圧縮は多くの電力を消費します。 MEGAはあなたに、圧縮する動画が%sより大きい場合、あなたの端末を積極的に充電することを求めます。</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">有効にすると、あなたの写真が撮影された場所に関する情報をアップロードするため、それらを共有する際にご注意ください。</string>
 
@@ -714,6 +717,7 @@
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">ダウンロード時にファイルを開く</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">アカウントをキャンセルする</string>
+    <string name="settings_delete_account" context="Settings preference title for delete account">アカウントを削除</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">利用している領域 %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">計算中</string>
@@ -795,32 +799,23 @@
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">動画のみ</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">フォトと動画</string>
 
-    <!--
-    <string name="settings_pin_lock_on" context="settings of the pin lock">Enable PIN Lock</string>
-    -->
-    <!--
-    <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
-    -->
-    <!--
-    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
-    -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未設定</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">PINを変更</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">PIN ロック</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">パスコードロック</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">パスコードの変更</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">入力</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">試行が10回失敗後、あなたのローカルファイルが削除され、あなたはログアウトされます。</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">コードの間違い</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">入力</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">試行が10回失敗後、あなたのローカルファイルが削除され、あなたはログアウトされます。</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">コードの間違い</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">PINコードが間違っています。もう一度お試しください。残りの試行回数は1回です</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">PINコードが間違っています。もう一度お試しください。残りの試行回数は%2d回です</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">パスコードが間違っています。もう一度お試しください。残りの試行回数は1回です</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">パスコードが間違っています。もう一度お試しください。残りの試行回数は%2d回です</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">PINコードは一致しない</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">PINコードを入力してください</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">もう一度PINコードを入力してください</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">新しいPINコードを入力してください</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">PINコードを再入力してください</string>
-    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">ローカルデータがすべて削除され、あなたは%1d秒後にログアウトされます</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">パスコードが一致しません</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">パスコードを入力してください</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">パスコードを再入力してください</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">新しいパスコードを入力してください</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">新しいパスコードを再入力してください</string>
+    <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">ローカルデータがすべて削除され、あなたは%1d秒後にログアウトされます</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">概要</string>
     <string name="settings_about_privacy_policy" context="App means “Application”">プライバシーポリシー</string>
@@ -919,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">PINコード・タイプ</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">4桁のPIN</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">6桁のPIN</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">英数PINコード</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">パスコードタイプ</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4桁のパスコード</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6桁のパスコード</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">英数字のパスコード</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">ロギングが有効にしました。</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">ロギングが無効にしました。</string>
@@ -938,7 +933,7 @@
     <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO IIアカウント</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO IIIアカウント</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">プロライト・アカウント</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Pro Liteアカウント</string>
 
     <string name="backup_title" context="">あなたの回復キーをバックアップ</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">あなたのパスワードはあなたの回復キーのロックを解除します</string>
@@ -1034,7 +1029,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">もうすぐスペースがいっぱいになります。</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">PROにアップグレードして、あなたのMEGAアカウントを最大限にご活用ください。</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Proにアップグレードして、あなたのMEGAアカウントを最大限にご活用ください。</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">アバターを編集</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">写真を撮る</string>
@@ -1188,7 +1183,7 @@
     <string name="general_mute" context="button">ミュート</string>
     <string name="general_unmute" context="button">ミュートを解除</string>
     <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">邪魔しないでください</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">以下用のすべてのチャット通知をミュート：</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">以下用のチャット通知をミュート：</string>
 
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">通知をミュート</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">オン</string>
@@ -1221,8 +1216,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">チャットの履歴がクリアされました</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">エラー。チャットの履歴が正しくクリアされていません</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">チャット履歴がクリアされました</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">エラーが発生しました。チャット履歴が正常にクリアされていません。</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">参加者を追加</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">参加者を削除</string>
@@ -1563,8 +1558,8 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">転送容量が不十分です</string>
-    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">あなたのIPアドレスに使用できる転送容量が不足しています。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">あなたのキューに入れられたダウンロードは、あなたのIPアドレスで利用可能な現在の転送容量を超えているため、中断されています。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">このIPアドレスの転送容量を超えました。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">プランを見る</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">アカウントを作成せず続ける</string>
 
@@ -2047,8 +2042,8 @@
 
     <string name="context_loop_video" context="menu option to loop video or audio file">ループ</string>
 
-    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">セキュリティオプション</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">リカバリーキー</string>
+    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">セキュリティ</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">回復キーをバックアップ</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">回復キーをエクスポートして安全な場所に保管すると、データを失うことなく新しいパスワードを設定できます。</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">MEGAに到達できません。接続を確認するか、後でもう一度お試しください。</string>
@@ -2254,10 +2249,10 @@
 
     <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">コードが無効です</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">クラウドドライブがほぼいっぱいです。PROにアップグレードし、最大%1$sのストレージと%2$sの転送容量をご取得ください。</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">クラウドドライブがほぼいっぱいです。Proにアップグレードし、最大%1$sのストレージと%2$sの転送容量をご取得ください。</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">クラウドドライブがほぼいっぱいです。今すぐアップグレードし、最大%1$sのストレージと%2$sの転送容量をご取得ください。</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">クラウドドライブがほぼいっぱいです。もっとストレージがご必要な場合は、MEGAサポートにお問い合わせし、カスタムプランを入手してください。</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">クラウドドライブがいっぱいです。PROにアップグレードし、最大%1$sのストレージと%2$sの転送容量をご取得ください。</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">クラウドドライブがいっぱいです。Proにアップグレードし、最大%1$sのストレージと%2$sの転送容量をご取得ください。</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">クラウドドライブがいっぱいです。今すぐアップグレードし、最大%1$sのストレージと%2$sの転送容量をご取得ください。</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">クラウドドライブがいっぱいです。もっとストレージがご必要な場合は、MEGAサポートにお問い合わせし、カスタムプランを入手してください。</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">計画を参照</string>
@@ -2324,6 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">チャットリンクの管理</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">暗号化キーローテーションを有効にする</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">暗号化キーローテーションが有効になっています</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">キーローテーションでは安全性が少し高まりますが、チャットリンクを作成できず、新規参加者は過去のメッセージを見れません。</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">キーローテーションは、100人を超える参加者との会話では無効になっています。</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">参加者の制限を超えたため、このチャットを非公開に変えられません。</string>
@@ -2490,7 +2486,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d人の参加者</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">あと%1$s%2$d</string>
+    <string name="custom_subtitle_of_group_chat" context="">あと%1$s%2$d</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">このチャット用のリンクを作成する前に、説明を設定する必要があります。</string>
 
@@ -2556,7 +2552,7 @@
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">最大参加者数に達したため、この通話に参加できません。</string>
     <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">グループがチャットの最大参加者数に達しているため、この通話に参加できません。</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">この通話はビデオを使用している最大参加者数に達したため、ビデオを有効にできません。</string>
-    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">通話を保留にすることはできません。</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">エラー。ファイルが開けません。</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">着信&#8230;</string>
@@ -2658,7 +2654,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">継続中の通話</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%sさんがグループ通話を開始しました。参加するにはタップします。</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">通話に戻るにはタップします</string>
-    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
+    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">現在通話中です</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B]さんがグループチャットに参加しました。[/B]</string>
 
@@ -2677,18 +2673,18 @@
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">無視する</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%sさんはこの通話をミュートしました</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">ミュート済み</string>
-    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Call on hold</string>
-    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
-    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold &amp; Answer</string>
-    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold &amp; Join</string>
-    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End &amp; Answer</string>
-    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End &amp; Join</string>
+    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">通話保留中</string>
+    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%sさんは保留中です</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">保留して応答</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">保留して参加</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">終了して応答</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">終了して参加</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">ファイルはすでにダウンロードされています。選択されたパスにコピー済みです。</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">通話に参加</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">この通話に参加するには、現在の通話を終了する必要があります。</string>
-    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
+    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">この通話に参加するには、現在の通話を終了または保留する必要があります。</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">チャットリンクを入力</string>
 
@@ -2761,9 +2757,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">ボイスメッセージをアップロードしようとしたときにエラーが発生しました。</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">着信</string>
-    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
-    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
-    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">着信グループ通話</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">着信ビデオ通話</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">着信音声通話</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">ローディング</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">しばらくお待ちください&#8230;</string>
@@ -2791,7 +2787,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">ちょと、うまく行かなかったようです。</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">あなたのビジネスアカウント管理者に連絡して問題を解決し、あなたのアカウントを有効にしてください。</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**本物のビジネス目的用に、追加料金なしで、自動的に増加します。</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]ストレージ[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">無制限[A]転送容量[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">ログアウトすると、あなたのオフラインセクションのファイルはお使いの端末から削除されます。</string>
@@ -2828,7 +2824,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">再接続中</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">戻りました。</string>
-    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Poor internet connection</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">インターネット接続が悪いです</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">録音中&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">新規ファイルを作成</string>
@@ -2843,24 +2839,24 @@
     <string name="download_location" context="Download location label">ダウンロード先</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">常にこの場所に保存しますか？</string>
 
-    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
-    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+    <string name="view_in_folder_label" context="Action to show any file in its location">フォルダで表示</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">ファイルを閲覧</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">以下から添付&#8230;</string>
 
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">%sに作成されたチャット</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">メッセージを選択</string>
 
-    <string name="storage_root_label" context="Storage root label">Storage root</string>
+    <string name="storage_root_label" context="Storage root label">ストレージルート</string>
 
-    <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
-    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
-    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
-    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">失敗しました</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">あなたの転送が中断されました。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
+    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">容量を超えた転送</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">容量を超えたストレージ</string>
+    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">転送容量を増やす</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">フォルダが存在しません。</string>
 
-    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">ファイルがクラウドドライブに存在しません。</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">ストレージがいっぱい</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">あなたのデータは危険にさらされています！</string>
@@ -2913,17 +2909,19 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%sさんの資格情報</string>
 
-    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
-    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
-    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+    <string name="search_giphy_title" context="Title of the screen to attach GIFs">GIPHYを検索</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">[A]GIF[/A]が見つかりません</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]結果[/A]の終わり</string>
 
-    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
-    <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
-    <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
-    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">転送を再開しますか？</string>
+    <string name="option_resume_transfers" context="Option to  resume all transfers">転送続行</string>
+    <string name="option_cancel_transfer" context="Option to  cancel a transfer">転送をキャンセル</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">転送の一時停止を解除して、アップロードを続行します。</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% / %2$s</string>
 
-    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
-    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">チャットメッセージの特別情報を有効にしました</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">チャットメッセージの特別情報を無効にしました</string>
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">反応の上限(%d)に達しました。</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">このメッセージは、反応の上限（%d）に達しました。</string>
 </resources>

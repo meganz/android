@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement PRO LÉGER : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement PRO I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement PRO II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement PRO III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement Pro Léger : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement Pro I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement Pro II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement Pro III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Visualiseur de PDF MEGA</string>
@@ -115,7 +115,7 @@
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Annuler la sélection</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vue en imagettes</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Vue en liste</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Sauvegarder la clé de récupération</string>
+    <string name="action_export_master_key" context="Title of the preference Recovery key on Settings section">Sauvegarder la clé de récupération</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Annuler l\'abonnement</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">L\'abonnement a été annulé</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled successfully">Il nous a été impossible d\'annuler votre abonnement. Veuillez contacter support&#64;mega.nz pour obtenir de l\'assistance</string>
@@ -378,6 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
+    <string name="context_delete_link" context="Delete a link label">Supprimer le lien</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Obtenir le lien</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -444,6 +445,7 @@
     <string name="context_send_contact" context="menu item">Envoyer un contact vers la conversation</string>
     <string name="context_view_shared_folders" context="open a shared folder">Visualiser les dossiers partagés</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Partage</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">Gérer le partage</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -702,9 +704,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Les téléversements de l\'appareil photo sont terminés</string>
+    <string name="settings_features" context="settings of the Features section">Fonctions</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Espace de stockage</string>
-    <string name="settings_pin_lock" context="settings of the pin lock">NIP de verrouillage</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Code d\'accès</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">La compression vidéo demande beaucoup d\'énergie. MEGA exigera que vous rechargiez activement votre appareil si les vidéos à compresser dépassent %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Si cette option est activée, vous téléverserez des renseignements sur le lieu où vos photos ont été prises. Veuillez donc faire preuve de prudence en les partageant.</string>
 
@@ -714,6 +717,7 @@
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Ouvrir le fichier une fois téléchargé</string>
     <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Annuler votre compte</string>
+    <string name="settings_delete_account" context="Settings preference title for delete account">Supprimer le compte</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">%s utilisés actuellement</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calcul</string>
@@ -786,7 +790,7 @@
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Conserver les noms de fichier comme sur l\'appareil</string>
 
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Dossier local de l\'appareil photo</string>
-    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA pour Téléversements de l\'appareil photo</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Dossier MEGA des Téléversements de l\'appareil photo</string>
 
     <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Dossier local secondaire</string>
     <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Dossier MEGA secondaire</string>
@@ -795,32 +799,23 @@
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Vidéos seulement</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos et vidéos</string>
 
-    <!--
-    <string name="settings_pin_lock_on" context="settings of the pin lock">Enable PIN Lock</string>
-    -->
-    <!--
-    <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
-    -->
-    <!--
-    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string>
-    -->
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">N\'a pas été défini</string>
-    <string name="settings_reset_lock_code" context="Settings option to change PIN. Keep PIN uppercase">Réinitialiser le NIP</string>
-    <string name="settings_pin_lock_switch" context="settings of the pin lock">NIP de verrouillage</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Code d\'accès</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Changer le code d\'accès</string>
 
-    <string name="pin_lock_enter" context="Button after the pin code input field">Valider</string>
-    <string name="pin_lock_alert" context="error message when not typing the pin code correctly">Vos fichiers locaux seront supprimés et vous serez déconnecté après dix tentatives infructueuses.</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Le NIP est erroné</string>
+    <string name="pin_lock_enter" context="Button after the Passcode code input field">Valider</string>
+    <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Vos fichiers locaux seront supprimés et vous serez déconnecté après dix tentatives infructueuses.</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Le NIP est erroné</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the pin code correctly and only have 1 attempt left." quantity="one">Le NIP est erroné, veuillez réessayer. Il vous reste un essai</item>
-        <item context="Error message when not typing the pin code correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Le NIP est erroné, veuillez réessayer. Il vous reste %2d tentatives</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Le code d\'accès est erroné, veuillez réessayer. Il vous reste un essai</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Le code d\'accès est erroné, veuillez réessayer. Il vous reste %2d tentatives</item>
     </plurals>
-    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Les NIP ne correspondent pas</string>
-    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Saisissez votre NIP</string>
-    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Saisissez votre NIP de nouveau</string>
-    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Saisissez votre nouveau NIP</string>
-    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Saisissez votre nouveau NIP de nouveau</string>
-    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN" formatted="false">Toutes vos données locales seront supprimées et vous serez déconnecté dans %1d secondes</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Les codes d\'accès ne correspondent pas</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Saisissez votre code d\'accès</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Saisissez votre code d\'accès de nouveau</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Saisissez votre nouveau code d\'accès</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Saisissez votre nouveau code d\'accès de nouveau</string>
+    <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">Toutes vos données locales seront supprimées et vous serez déconnecté dans %1d secondes</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">À propos</string>
     <string name="settings_about_privacy_policy" context="App means “Application”">Politique de confidentialité</string>
@@ -919,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="title to choose the type of PIN code">Type de NIP</string>
-    <string name="four_pin_lock" context="PIN with 4 digits">NIP à 4 chiffres</string>
-    <string name="six_pin_lock" context="PIN with 6 digits">NIP à 6 chiffres</string>
-    <string name="AN_pin_lock" context="PIN alphanumeric">NIP alphanumérique</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Type de code d\'accès</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">Code d\'accès à quatre chiffres</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">Code d\'accès à six chiffres</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Code d\'accès alphanumérique</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">La journalisation est maintenant activée</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Les journaux sont maintenant désactivés</string>
@@ -933,12 +928,12 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Ce processus prend plus de temps que prévu. Veuillez patienter.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Compte Gratuit</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Pro Léger</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Compte Pro léger</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Compte Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Compte Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Compte Pro III</string>
 
-    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte PRO Léger</string>
+    <string name="my_account_prolite_feedback_email" context="Type of account info added to the feedback email sent to support">Compte Pro léger</string>
 
     <string name="backup_title" context="">Sauvegarder votre clé de récupération</string>
     <string name="backup_subtitle" context="Subtitle of the screen to backup the master key">Votre mot de passe déverrouille votre clé de récupération</string>
@@ -1034,7 +1029,7 @@
     -->
 
     <string name="title_new_warning_out_space" context="Iitle of the warning when the user is running out of space">Vous êtes presque à court d\'espace !</string>
-    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Profitez pleinement de votre compte MEGA en passant à un compte PRO.</string>
+    <string name="new_warning_out_space" context="Text of the warning when the user is running out of space">Profitez pleinement de votre compte MEGA en passant à un compte Pro.</string>
 
     <string name="title_options_avatar_panel" context="Iitle of sliding panel to choose the option to edit the profile picture">Changer la photo de profil</string>
     <string name="take_photo_avatar_panel" context="Option of the sliding panel to change the avatar by taking a new picture">Prendre une photo</string>
@@ -1188,7 +1183,7 @@
     <string name="general_mute" context="button">Sourdine</string>
     <string name="general_unmute" context="button">Désactiver la sourdine</string>
     <string name="title_dialog_mute_chat_notifications" context="Title of the dialogue to mute the general chat notifications.">Ne pas déranger</string>
-    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mettre en sourdine toutes les notifications des conversations pendant</string>
+    <string name="subtitle_dialog_mute_chat_notifications" context="Subtitle of the dialogue to mute the general chat notifications.">Mettre les notifications en sourdine pendant</string>
 
     <string name="title_dialog_mute_chatroom_notifications" context="Title of the dialogue to mute the notifications of a specific chat.">Mettre les notifications en sourdine</string>
     <string name="mute_chat_notification_option_on" context="Label for the setting option that indicates the general notifications are enabled.">Activé</string>
@@ -1222,7 +1217,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">L\'historique de la conversation a été effacé</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Erreur. L\'historique de la conversation n\'a pas été effacé correctement</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Une erreur est survenue. L\'historique de la conversation n\'a pas été effacé avec succès</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Ajouter des participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Supprimer le participant</string>
@@ -1563,8 +1558,8 @@
     </plurals>
 
     <string name="title_depleted_transfer_overquota" context="Title of the alert when the transfer quota is exceeded.">Le quota de transfert est insuffisant</string>
-    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Your queued download exceeds the current transfer quota available for your IP address and has therefore been interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Il manque de quota de transfert pour votre adresse IP. Surclassez votre compte ou attendez %s afin de poursuivre votre téléchargement.</string>
+    <string name="current_text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Votre téléchargement en attente dépasse votre quota actuel de transfert pour votre adresse IP et a donc été interrompu. Surclassez votre compte ou attendez %s afin de poursuivre.</string>
+    <string name="text_depleted_transfer_overquota" context="Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s">Le quota de transfert pour votre adresse IP a été dépassé. Surclassez votre compte ou attendez %s afin de poursuivre votre téléchargement.</string>
     <string name="plans_depleted_transfer_overquota" context="Button to show plans in the alert when the transfer quota is depleted">Voir nos abonnements</string>
     <string name="continue_without_account_transfer_overquota" context="Button option of the alert when the transfer quota is depleted">Poursuivre sans compte</string>
 
@@ -2047,8 +2042,8 @@
 
     <string name="context_loop_video" context="menu option to loop video or audio file">Lecture en boucle</string>
 
-    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Options de sécurité</string>
-    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Clé de récupération</string>
+    <string name="settings_security_options_title" context="Title of the category Security options on Settings section">Sécurité</string>
+    <string name="settings_recovery_key_title" context="Title of the preference Recovery key on Settings section">Sauvegarder la clé de récupération</string>
     <string name="settings_recovery_key_summary" context="Summary of the preference Recovery key on Settings section">En exportant et en conservant la clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
 
     <string name="login_connectivity_issues" context="message when a temporary error on logging in is due to connectivity issues">Impossible d\'atteindre MEGA. Veuillez vérifier votre connectivité ou réessayer ultérieurement.</string>
@@ -2254,10 +2249,10 @@
 
     <string name="invalid_code" context="Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code">Le code est invalide</string>
 
-    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Votre disque nuagique est presque plein. Passez à un compte PRO et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_almost_full_warning" context="Text of the dialog shown when the storage of a FREE account is almost full">Votre disque nuagique est presque plein. Passez à un compte Pro et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
     <string name="text_almost_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is almost full">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
     <string name="text_almost_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is almost full">Votre disque nuagique est presque plein. Si vous avez besoin de plus d\'espace de stockage, veuillez contacter l\'assistance de MEGA pour obtenir un abonnement personnalisé.</string>
-    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Votre disque nuagique est plein. Passez à un compte PRO et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
+    <string name="text_storage_full_warning" context="Text of the dialog shown when the storage of a FREE account is full">Votre disque nuagique est plein. Passez à un compte Pro et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
     <string name="text_storage_full_warning_pro_account" context="Text of the dialog shown when the storage of a PRO I or II account is full">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu\'à %1$s To d\'espace de stockage et %2$s To de quota de transfert.</string>
     <string name="text_storage_full_warning_pro3_account" context="Text of the dialog shown when the storage of a PRO III account is full">Votre disque nuagique est plein. Si vous avez besoin de plus d\'espace de stockage, veuillez contacter l\'assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <string name="button_plans_almost_full_warning" context="Button of the dialog shown when the storage is almost full to see the available PRO plans">Voir les abonnements</string>
@@ -2324,6 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gérer le lien de conversation</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Activer la rotation de la clé chiffrée</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">La rotation de la clé chiffrée est activée</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotation de clé est désactivée pour les conversations de plus de 100 participants.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Il est impossible de rendre cette conversation privée, car la limite de participants a été dépassée.</string>
@@ -2490,7 +2486,7 @@
         <item context="Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants" quantity="other">%d participants</item>
     </plurals>
 
-    <string name="custom_subtitle_of_group_chat" context="Subtitle chat screen for groups with permissions, not archived and custom titles, When there are more than 4 participants in the chat. Example: user1, user2, user3 and 7 more">%1$s et %2$d de plus</string>
+    <string name="custom_subtitle_of_group_chat" context="">%1$s et %2$d de plus</string>
 
     <string name="message_error_set_title_get_link" context="Error when the user tries to get a public chat link for a chat with the default title">Avant de pouvoir générer un lien pour cette conversation, vous devez définir une description :</string>
 
@@ -2545,7 +2541,7 @@
 
     <string name="label_today" context="label today">Aujourd\'hui</string>
     <string name="label_yesterday" context="label yesterday">Hier</string>
-    <string name="label_tomorrow" context="label tomorrow">Demain</string>
+    <string name="label_tomorrow" context="label tomorrow">demain</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Il n\'y a aucun [/B][A]fichier partagé[/A][B].[/B]</string>
 
@@ -2556,7 +2552,7 @@
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">Vous n\'êtes pas autorisé à vous joindre à cet appel, car le nombre maximal de participants a été atteint.</string>
     <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">Vous n\'êtes pas autorisé à vous joindre à cet appel, car le groupe a atteint le nombre maximal de participants de la conversation.</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">Vous n\'êtes pas autorisé à activer la vidéo pour cet appel, car le nombre maximal de participants qui utilisent la vidéo a été atteint.</string>
-    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">Vous n\'êtes pas autorisé à mettre l\'appel en attente.</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">Erreur. Le fichier ne peut pas être ouvert.</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">Appel entrant&#8230;</string>
@@ -2658,7 +2654,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">Appel en cours</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s a commencé un appel de groupe. Touchez pour vous y joindre.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">Touchez pour reprendre l\'appel</string>
-    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
+    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">Vous êtes actuellement en appel</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B] s\'est joint à la conversation de groupe.[/B]</string>
 
@@ -2677,18 +2673,18 @@
     <string name="ignore_call_incoming" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorer</string>
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s a mis l\'appel en sourdine</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">En sourdine</string>
-    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Call on hold</string>
-    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
-    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold &amp; Answer</string>
-    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold &amp; Join</string>
-    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End &amp; Answer</string>
-    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End &amp; Join</string>
+    <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">Appel en attente</string>
+    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s est en attente</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Mettre en attente et répondre</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Mettre en attente et me joindre</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">Mettre fin à l\'appel et répondre</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">Mettre fin à l\'appel et me joindre</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">Le fichier est déjà téléchargé. Il a été copié dans le chemin sélectionné.</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">Vous joindre à l\'appel</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">Pour vous joindre à l\'appel, vous devez mettre fin à votre appel actuel.</string>
-    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
+    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">Pour vous joindre à cet appel, vous devez mettre fin à l\'appel en cours ou le mettre en attente.</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">Saisissez le lien de conversation</string>
 
@@ -2737,7 +2733,7 @@
 		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d fichiers en attente.</item>
 	</plurals>
 
-    <string name="login_to_mega" context="Title of the login screen">Connexion à MEGA</string>
+    <string name="login_to_mega" context="Title of the login screen">Se connecter à MEGA</string>
     <string name="create_account_title" context="Title of the create account screen">Créer votre compte MEGA</string>
 
     <string name="recents_label" context="Label to reference a recents section">Récents</string>
@@ -2761,9 +2757,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">Une erreur est survenue lors de la tentative de téléversement du message vocal.</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">Appel entrant</string>
-    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
-    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
-    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Appel de groupe entrant</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Appel vidéo entrant</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Appel vocal entrant</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">Chargement</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">Veuillez patienter&#8230;</string>
@@ -2791,7 +2787,7 @@
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Un problème est survenu</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactez l\'administrateur de votre compte d\'entreprise pour résoudre la situation et activer votre compte.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Augmentera automatiquement, sans frais supplémentaires, pour une utilisation professionnelle justifiée.</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]d\'espace de stockage[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">[A]Quota de transfert[/A] ILLIMITÉ</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">Quand vous vous déconnectez, les fichiers de votre section Hors ligne sont supprimés de votre appareil.</string>
@@ -2828,7 +2824,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Reconnexion</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Vous êtes de retour.</string>
-    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Poor internet connection</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">La connexion à Internet est mauvaise</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Enregistrement&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Créer un nouveau fichier</string>
@@ -2843,24 +2839,24 @@
     <string name="download_location" context="Download location label">Emplacement de téléchargement</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Toujours enregistrer dans cet emplacement ?</string>
 
-    <string name="view_in_folder_label" context="Action to show any file in its location">View in folder</string>
-    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+    <string name="view_in_folder_label" context="Action to show any file in its location">Afficher dans le dossier</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">Parcourir les fichiers</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Joindre à partir de&#8230;</string>
 
     <string name="inactive_chat_title" context="Title of an inactive chat. Placeholder is to show the creation date and time">Conversation crée le %s</string>
     <string name="select_message_title" context="Title of the chat when multi-selection is activated">Sélection des messages</string>
 
-    <string name="storage_root_label" context="Storage root label">Storage root</string>
+    <string name="storage_root_label" context="Storage root label">Racine de la mémoire</string>
 
-    <string name="failed_label" context="Label describing some action failed">Failed</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Your transfers are interrupted. Upgrade your account or wait %s to continue.</string>
-    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
-    <string name="label_storage_over_quota" context="Label indicating storage over quota">Storage over quota</string>
-    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Get more transfer quota</string>
-    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">The folder does not exist.</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Échec</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Vos transferts ont été interrompus. Surclassez votre compte ou attendez %s afin de poursuivre</string>
+    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Le quota de transfert est dépassé</string>
+    <string name="label_storage_over_quota" context="Label indicating storage over quota">Le quota de stockage a été dépassé</string>
+    <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Obtenir plus de quota de transfert</string>
+    <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">Le dossier n\'existe pas.</string>
 
-    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">The file does not exist in the Cloud.</string>
+    <string name="warning_node_not_exists_in_cloud" context="Warning show to the user when a node does not exist in cloud">Le fichier n\'existe pas dans le disque nuagique.</string>
 
     <string name="over_disk_quota_paywall_header" context="Header text of the Over Disk Quota Paywall warning">L\'espace de stockage est plein</string>
     <string name="over_disk_quota_paywall_title" context="Title of the Over Disk Quota Paywall warning">Vos données courent un danger !</string>
@@ -2913,17 +2909,19 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Numéro d\'identification de %s</string>
 
-    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
-    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
-    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+    <string name="search_giphy_title" context="Title of the screen to attach GIFs">Chercher dans GIPHY</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Aucun [A]GIF[/A] n\'a été trouvé</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]Fin[/A] des résultats</string>
 
-    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
-    <string name="option_resume_transfers" context="Option to  resume all transfers">Resume transfers</string>
-    <string name="option_cancel_transfer" context="Option to  cancel a transfer">Cancel transfer</string>
-    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Unpause transfers to proceed with your upload.</string>
+    <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Reprendre les transferts ?</string>
+    <string name="option_resume_transfers" context="Option to  resume all transfers">Reprendre les transferts</string>
+    <string name="option_cancel_transfer" context="Option to  cancel a transfer">Annuler le transfert</string>
+    <string name="warning_message_resume_transfers" context="Message of a dialog to confirm the action of resume all transfers">Reprendre les transferts pour poursuivre votre téléversement ?</string>
 
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% sur %2$s</string>
 
-    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
-    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Les renseignements spéciaux sont activés pour les messages du dialogue en ligne</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Les renseignements spéciaux sont désactivés pour les messages du dialogue en ligne</string>
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Vous avez atteint la limite maximale de %d réactions.</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
 </resources>
