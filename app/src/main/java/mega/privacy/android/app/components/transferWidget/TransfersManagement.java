@@ -280,17 +280,15 @@ public class TransfersManagement {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
-                    .setOngoing(true)
                     .setContentTitle(getString(R.string.download_preparing_files))
-                    .setOnlyAlertOnce(true);
+                    .setAutoCancel(true);
 
             return mBuilderCompat.build();
         } else {
             mBuilder.setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
-                    .setOngoing(true)
                     .setContentTitle(getString(R.string.download_preparing_files))
-                    .setOnlyAlertOnce(true);
+                    .setAutoCancel(true);
 
             return mBuilder.build();
         }

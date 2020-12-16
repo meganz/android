@@ -184,16 +184,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		if (!app.isActivityVisible()) {
-			try {
-				startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
-						notificationChannelName, mNotificationManager, mBuilderCompat, mBuilder));
-				isForeground = true;
-			} catch (Exception e) {
-				logWarning("Error starting foreground.", e);
-				isForeground = false;
-			}
-		}
+		startForeground();
 
 		// delay 1 second to refresh the pause notification to prevent update is missed
 		pauseBroadcastReceiver = new BroadcastReceiver() {
@@ -205,6 +196,23 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 		};
 		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
+	}
+
+	private void startForeground() {
+		if (megaApi.getNumPendingUploads() <= 0) {
+			return;
+		}
+
+		try {
+			startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
+					notificationChannelName, mNotificationManager,
+					new NotificationCompat.Builder(ChatUploadService.this, notificationChannelId),
+					mBuilder));
+			isForeground = true;
+		} catch (Exception e) {
+			logWarning("Error starting foreground.", e);
+			isForeground = false;
+		}
 	}
 
 	@Override

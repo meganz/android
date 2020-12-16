@@ -197,16 +197,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		if (!app.isActivityVisible()) {
-			try {
-				startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
-						notificationChannelName, mNotificationManager, mBuilderCompat, mBuilder));
-				isForeground = true;
-			} catch (Exception e) {
-				logWarning("Error starting foreground.", e);
-				isForeground = false;
-			}
-		}
+		startForeground();
 
 		rootNode = megaApi.getRootNode();
 
@@ -222,6 +213,23 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
+	}
+
+	private void startForeground() {
+		if (megaApi.getNumPendingDownloads() <= 0) {
+			return;
+		}
+
+		try {
+			startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
+					notificationChannelName, mNotificationManager,
+					new NotificationCompat.Builder(DownloadService.this, notificationChannelId),
+					mBuilder));
+			isForeground = true;
+		} catch (Exception e) {
+			logWarning("Error starting foreground.", e);
+			isForeground = false;
+		}
 	}
 
 	@Override
