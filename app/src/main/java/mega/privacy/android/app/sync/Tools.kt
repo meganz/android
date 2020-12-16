@@ -5,7 +5,7 @@ import mega.privacy.android.app.MegaApplication
 import java.lang.Boolean
 
 /**
- * @return Name of the node with the hanlde. null if the node doesn't exist.
+ * @return Name of the node with the handle. null if the node doesn't exist.
  */
 fun Long.name(): String? = MegaApplication.getInstance().megaApi.getNodeByHandle(this)?.name
 

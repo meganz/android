@@ -89,7 +89,7 @@ public class SetAttrUserListener extends BaseListener {
                     long primaryHandle = request.getNodeHandle();
                     long secondaryHandle = request.getParentHandle();
 
-                    logDebug("Set CU folders successfully primary: " + primaryHandle + "(" + MegaNodeUtil.getNodeName(primaryHandle) + ") secondary: " + secondaryHandle + "(" + MegaNodeUtil.getNodeName(secondaryHandle) + ")");
+                    logDebug("Set CU folders successfully primary: " + primaryHandle + ", secondary: " + secondaryHandle);
                     if(primaryHandle != INVALID_HANDLE){
                         resetPrimaryTimeline();
                         dBH.setCamSyncHandle(primaryHandle);

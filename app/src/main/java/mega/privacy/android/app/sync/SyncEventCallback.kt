@@ -40,6 +40,6 @@ interface SyncEventCallback {
     /**
      * @return DatabaseHandler object.
      */
-    fun getDatabase(): DatabaseHandler = DatabaseHandler.getDbHandler(MegaApplication.getInstance())
+    fun getDatabase(): DatabaseHandler = MegaApplication.getInstance().dbH
 }
 

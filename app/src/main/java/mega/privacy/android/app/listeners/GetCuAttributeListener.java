@@ -33,17 +33,20 @@ public class GetCuAttributeListener extends BaseListener {
         if (request.getType() != TYPE_GET_ATTR_USER || request.getParamType() != USER_ATTR_CAMERA_UPLOADS_FOLDER) {
             return;
         }
+
         if (e.getErrorCode() == MegaError.API_OK) {
             long[] handles = getCUHandles(request);
-            logDebug("Get CU folders successfully primary: " + handles[0] + "(" + MegaNodeUtil.getNodeName(handles[0]) + ") secondary: " + handles[1] + "(" + MegaNodeUtil.getNodeName(handles[1]) + ")");
+            logDebug("Get CU folders successfully primary: " + handles[0] +", secondary: " + handles[1]);
+
             synchronized (this) {
-                handle(api, handles[0], false, e);
-                handle(api, handles[1], true, e);
+                handle(handles[0], false, e);
+                handle(handles[1], true, e);
             }
         } else if (e.getErrorCode() == MegaError.API_ENOENT) {
             // only when both CU and MU are not set, will return API_ENOENT
             logDebug("First time set CU attribute.");
             initCUFolderFromScratch(context, false);
+
             if (context instanceof CameraUploadsService) {
                 // The unique process run within shoudRun method in CameraUploadsService
                 ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e.getErrorCode(), true);
@@ -63,11 +66,13 @@ public class GetCuAttributeListener extends BaseListener {
     private long[] getCUHandles(MegaRequest request) {
         long primaryHandle = INVALID_HANDLE, secondaryHandle = INVALID_HANDLE;
         MegaStringMap map = request.getMegaStringMap();
+
         if (map != null) {
             String h = map.get("h");
             if (h != null) {
                 primaryHandle = MegaApiJava.base64ToHandle(h);
             }
+
             String sh = map.get("sh");
             if (sh != null) {
                 secondaryHandle = MegaApiJava.base64ToHandle(sh);
@@ -75,6 +80,7 @@ public class GetCuAttributeListener extends BaseListener {
         } else {
             logError("MegaStringMap is null.");
         }
+
         return new long[]{primaryHandle, secondaryHandle};
     }
 
@@ -85,8 +91,9 @@ public class GetCuAttributeListener extends BaseListener {
      * @param isSecondary Is the handle CU handle or MU handle.
      * @param e MegaError object.
      */
-    private void handle(MegaApiJava api, long handle, boolean isSecondary, MegaError e) {
+    private void handle(long handle, boolean isSecondary, MegaError e) {
         boolean shouldCUStop = false;
+
         if (isNodeInRubbishOrDeleted(handle)) {
             logDebug("Folder in rubbish bin, is secondary: " + isSecondary);
             initCUFolderFromScratch(context, isSecondary);
@@ -99,8 +106,8 @@ public class GetCuAttributeListener extends BaseListener {
 
             forceUpdateCameraUploadFolderIcon(isSecondary, handle);
         }
+
         if (!shouldCUStop && context instanceof CameraUploadsService) {
-            // The unique process run within shoudRun method in CameraUploadsService
             if (isSecondary) {
                 ((CameraUploadsService) context).onGetSecondaryFolderAttribute(handle, e.getErrorCode());
             } else {

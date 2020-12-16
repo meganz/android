@@ -47,8 +47,7 @@ import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_UPLOAD;
+import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -57,7 +56,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
@@ -1210,11 +1209,11 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
     public void reEnableCameraUploadsPreference(int which) {
         switch (which) {
-            case CuSyncManager.TYPE_BACKUP_PRIMARY:
+            case BACKUP_TYPE_CAMERA_UPLOADS:
                 if (cameraUploadOnOff != null) {
                     cameraUploadOnOff.setEnabled(true);
                 }
-            case CuSyncManager.TYPE_BACKUP_SECONDARY:
+            case BACKUP_TYPE_MEDIA_UPLOADS:
                 if (secondaryMediaFolderOn != null) {
                     secondaryMediaFolderOn.setEnabled(true);
                 }

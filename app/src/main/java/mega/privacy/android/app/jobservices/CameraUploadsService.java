@@ -127,9 +127,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     public static boolean running, ignoreAttr;
     private Handler handler;
-    
+
     private ExecutorService threadPool = Executors.newFixedThreadPool(8);
-    
+
     private WifiManager.WifiLock lock;
     private PowerManager.WakeLock wl;
 
@@ -265,7 +265,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         createFolderListener = null;
 
         // CU process is running, but interrupted.
-        if(CuSyncManager.INSTANCE.isActive()) {
+        if (CuSyncManager.INSTANCE.isActive()) {
             //Update backups' state.
             CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED);
             CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_TEMPORARY_DISABLED);
@@ -848,7 +848,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (media == null) continue;
 
             if (dbH.localPathExists(media.filePath, isSecondary, SyncRecord.TYPE_ANY)) {
-                logDebug("Skip media with timestamp: "  + media.timestamp);
+                logDebug("Skip media with timestamp: " + media.timestamp);
                 continue;
             }
 
@@ -977,26 +977,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             mNotificationManager.cancel(LOCAL_FOLDER_REMINDER_PRIMARY);
         }
 
-        // To see if secondary sync is enabled.
-        if (prefs.getSecondaryMediaFolderEnabled() == null) {
-            logDebug("Secondary upload setting not defined, so not enabled");
-            dbH.setSecondaryUploadEnabled(false);
-            secondaryEnabled = false;
-        } else if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
-            secondaryEnabled = true;
-            if (dbH.getMediaFolderExternalSdCard()) {
-                Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
-                localPathSecondary = getFullPathFromTreeUri(uri,this);
-            } else {
-                localPathSecondary = prefs.getLocalPathSecondaryFolder();
-            }    if (!localPathSecondary.endsWith(SEPARATOR)) {
-                localPathSecondary += SEPARATOR;
-            }
-        } else {
-            logDebug("Not enabled Secondary");
-            secondaryEnabled = false;
-        }
-
         if (!checkSecondaryLocalFolder()) {
             localFolderUnavailableNotification(R.string.camera_notif_secondary_local_unavailable, LOCAL_FOLDER_REMINDER_SECONDARY);
             // disable media upload only
@@ -1098,9 +1078,15 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      */
     private boolean checkSecondaryLocalFolder() {
         // check secondary local folder if media upload is enabled
-        if (Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())) {
+        secondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+        if (secondaryEnabled) {
             if (dbH.getMediaFolderExternalSdCard()) {
                 Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                localPathSecondary = getFullPathFromTreeUri(uri, this);
+                if (!localPathSecondary.endsWith(SEPARATOR)) {
+                    localPathSecondary += SEPARATOR;
+                }
+
                 DocumentFile file = DocumentFile.fromTreeUri(this, uri);
                 if (file == null) {
                     logError("Local media folder on sd card is unavailable.");
@@ -1109,13 +1095,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
                 return file.exists();
             } else {
-                if(localPathSecondary != null) {
-                    return new File(localPathSecondary).exists();
+                localPathSecondary = prefs.getLocalPathSecondaryFolder();
+
+                if (localPathSecondary == null) return false;
+
+                if (!localPathSecondary.endsWith(SEPARATOR)) {
+                    localPathSecondary += SEPARATOR;
                 }
+
+                return new File(localPathSecondary).exists();
             }
+        } else {
+            logDebug("Not enabled Secondary");
+            dbH.setSecondaryUploadEnabled(false);
+            // if not enable secondary
+            return true;
         }
-        // if not enable secondary
-        return true;
     }
 
     /**
@@ -1427,7 +1422,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
      * Callback when getting CU folder handle from CU attributes completes.
      *
      * @param handle      CU folder hanlde stored in CU atrributes.
-     * @param errorCode           Used to get error code to see if the request is successful.
+     * @param errorCode   Used to get error code to see if the request is successful.
      * @param shouldStart If should start CU process.
      */
     public void onGetPrimaryFolderAttribute(long handle, int errorCode, boolean shouldStart) {
@@ -1447,8 +1442,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     /**
      * Callback when getting MU folder handle from CU attributes completes.
      *
-     * @param handle MU folder hanlde stored in CU atrributes.
-     * @param errorCode      Used to get error code to see if the request is successful.
+     * @param handle    MU folder hanlde stored in CU atrributes.
+     * @param errorCode Used to get error code to see if the request is successful.
      */
     public void onGetSecondaryFolderAttribute(long handle, int errorCode) {
         if (errorCode == MegaError.API_OK || errorCode == MegaError.API_ENOENT) {
@@ -1490,7 +1485,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     @Override
-    public void onTransferUpdate(MegaApiJava api,MegaTransfer transfer) {
+    public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
         transferUpdated(transfer);
     }
 

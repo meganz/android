@@ -13576,17 +13576,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					playTransfersMenuIcon.setVisible(paused);
 				}
 
-			    // Update CU backup state.
-                boolean uploadPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD);
-			    if(uploadPaused) {
-                    CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP);
-                    CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP);
-                } else {
-			        // Reset as active, so that can continue to send heartbeat.
-                    CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_ACTIVE);
-                    CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_ACTIVE);
-                }
-			}
+                // Update CU backup state.
+                int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        ? CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP
+                        : CuSyncManager.State.CU_SYNC_STATE_ACTIVE;
+
+                CuSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
+                CuSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+            }
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");

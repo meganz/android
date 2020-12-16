@@ -6,6 +6,8 @@ import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
+import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.jobservices.SyncRecord
 import mega.privacy.android.app.listeners.BaseListener
@@ -21,7 +23,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.*
 import java.io.File
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -32,12 +34,6 @@ import java.util.concurrent.TimeUnit.SECONDS
  */
 object CuSyncManager {
 
-    /**
-     * @see MegaApi.BACKUP_TYPE_INVALID
-     */
-    private const val TYPE_BACKUP_INVALID = -1
-    const val TYPE_BACKUP_PRIMARY = MegaApiJava.BACKUP_TYPE_CAMERA_UPLOAD
-    const val TYPE_BACKUP_SECONDARY = MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS
     private const val PROGRESS_FINISHED = 100
 
     /**
@@ -92,11 +88,11 @@ object CuSyncManager {
      */
     const val INACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30 * 60
 
-    private val megaApplication: MegaApplication = MegaApplication.getInstance()
+    private val megaApplication = MegaApplication.getInstance()
 
-    private val megaApi: MegaApiAndroid = megaApplication.megaApi
+    private val megaApi = megaApplication.megaApi
 
-    private val databaseHandler: DatabaseHandler = DatabaseHandler.getDbHandler(megaApplication)
+    private val databaseHandler: DatabaseHandler = megaApplication.dbH
 
     /**
      * Periodically execute task, used to send active sync heartbeat.
@@ -119,7 +115,7 @@ object CuSyncManager {
     private var cuLastActionTimestampSeconds = 0L
 
     /**
-     * Hanlde of last uploaded file as CU backup.
+     * Handle of last uploaded file as CU backup.
      */
     private var cuLastUploadedHandle = INVALID_HANDLE
 
@@ -139,7 +135,7 @@ object CuSyncManager {
     private var muLastActionTimestampSeconds = 0L
 
     /**
-     * Hanlde of last uploaded file as MU backup.
+     * Handle of last uploaded file as MU backup.
      */
     private var muLastUploadedHandle = INVALID_HANDLE
 
@@ -148,7 +144,7 @@ object CuSyncManager {
      */
     fun setPrimaryBackup() =
         setBackup(
-            TYPE_BACKUP_PRIMARY,
+            BACKUP_TYPE_CAMERA_UPLOADS,
             databaseHandler.preferences?.camSyncHandle?.toLong(),
             databaseHandler.preferences?.camSyncLocalPath
         )
@@ -158,7 +154,7 @@ object CuSyncManager {
      */
     fun setSecondaryBackup() =
         setBackup(
-            TYPE_BACKUP_SECONDARY,
+            BACKUP_TYPE_MEDIA_UPLOADS,
             databaseHandler.preferences?.megaHandleSecondaryFolder?.toLong(),
             databaseHandler.preferences?.localPathSecondaryFolder
         )
@@ -196,7 +192,7 @@ object CuSyncManager {
         }
 
         // Same as localized CU/MU folder name.
-        val backupName = if (backupType == TYPE_BACKUP_PRIMARY)
+        val backupName = if (backupType == BACKUP_TYPE_CAMERA_UPLOADS)
             StringResourcesUtils.getString(R.string.section_photo_sync)
         else
             StringResourcesUtils.getString(R.string.section_secondary_media_uploads)
@@ -413,7 +409,7 @@ object CuSyncManager {
 
         megaApi.updateBackup(
             backupId,
-            TYPE_BACKUP_INVALID,
+            BACKUP_TYPE_INVALID,
             targetNode,
             localFolder,
             state,
@@ -449,7 +445,7 @@ object CuSyncManager {
     }
 
     /**
-     * Check if a string is value, incuding null check and value check(whether a non-null invalid value).
+     * Check if a string is invalid value, including null check and value check(whether a non-null invalid value).
      *
      * @param value String value to be checked.
      * @return true, if the string is null, empty or invalid value. false, otherwise.
@@ -623,7 +619,7 @@ object CuSyncManager {
     }
 
     /**
-     * Stop send active heartbeat and reset when CameraUploadsService destorys.
+     * Stop send active heartbeat and reset when CameraUploadsService destroys.
      */
     fun stopActiveHeartbeat() {
         activeHeartbeatTask?.dispose()
@@ -699,7 +695,7 @@ object CuSyncManager {
      */
     fun reEnableCameraUploadsPreference(which: Int) = MegaApplication.getInstance()
         .sendBroadcast(
-            Intent(ACTION_REENABLE_CAMERA_UPLOADS_PREFERENCE).putExtra(
+            Intent(BROADCAST_ACTION_REENABLE_CU_PREFERENCE).putExtra(
                 KEY_REENABLE_WHICH_PREFERENCE,
                 which
             )

@@ -18,6 +18,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE = "INTENT_RICH_LINK_SETTING_UPDATE";
     public static final String BROADCAST_ACTION_RESUME_TRANSFERS = "INTENT_RESUME_TRANSFERS";
     public static final String BROADCAST_ACTION_TRANSFER_FINISH = "INTENT_TRANSFER_FINISH";
+    public static final String BROADCAST_ACTION_REENABLE_CU_PREFERENCE = "BROADCAST_ACTION_REENABLE_CU_PREFERENCE";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -86,5 +87,6 @@ public class BroadcastConstants {
     public static final String PRIMARY_HANDLE = "PRIMARY_HANDLE";
     public static final String ACTION_TYPE = "actionType";
     public static final String DAYS_COUNT = "DAYS_COUNT";
+    public static final String KEY_REENABLE_WHICH_PREFERENCE = "REENABLE_WHICH_PREFERENCE";
 
 }

@@ -31,13 +31,11 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_PRIMARY;
-import static mega.privacy.android.app.sync.cusync.CuSyncManager.TYPE_BACKUP_SECONDARY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -4378,11 +4376,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public Backup getCuBackup() {
-        return getBackupByType(TYPE_BACKUP_PRIMARY);
+        return getBackupByType(BACKUP_TYPE_CAMERA_UPLOADS);
     }
 
     public Backup getMuBackup() {
-        return getBackupByType(TYPE_BACKUP_SECONDARY);
+        return getBackupByType(BACKUP_TYPE_MEDIA_UPLOADS);
     }
 
     private Backup getBackupByType(int type) {
@@ -4390,7 +4388,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "' ORDER BY " + KEY_ID + " DESC";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
-            Backup backup = fromCursor(cursor);
+            Backup backup = getBackupFromCursor(cursor);
             cursor.close();
             return backup;
         } else {
@@ -4410,7 +4408,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_ID + " = '" + encrypt(Long.toString(id)) + "'";
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor != null && cursor.moveToFirst()) {
-            Backup pair = fromCursor(cursor);
+            Backup pair = getBackupFromCursor(cursor);
             cursor.close();
             return pair;
         } else {
@@ -4424,14 +4422,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         List<Backup> list = new ArrayList<>();
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                list.add(fromCursor(cursor));
+                list.add(getBackupFromCursor(cursor));
             }
             cursor.close();
         }
         return list;
     }
 
-    private Backup fromCursor(Cursor cursor) {
+    private Backup getBackupFromCursor(Cursor cursor) {
         return new Backup(
                 Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_ID)))),
                 cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_TYPE)),
