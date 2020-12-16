@@ -2849,7 +2849,7 @@
 
     <string name="storage_root_label" context="Storage root label">รากของที่จัดเก็บ</string>
 
-    <string name="failed_label" context="Label describing some action failed">ล้มเหลว</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">ล้มเหลว</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">การถ่ายโอนของคุณถูกขัดจังหวะ อัปเกรดบัญชีของคุณหรือรอ %s เพื่อดำเนินการต่อ</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">เกินโควต้าการถ่ายโอนแล้ว</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">เกินโควต้าพื้นที่เก็บข้อมูล</string>
