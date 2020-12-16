@@ -412,7 +412,9 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
     @Override
     public void onDestroy() {
         removeSurfaceView();
-        this.avatarImage.setImageBitmap(null);
+        if (avatarImage != null) {
+            avatarImage.setImageBitmap(null);
+        }
         super.onDestroy();
     }
 }

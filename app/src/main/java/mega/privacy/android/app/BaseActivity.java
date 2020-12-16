@@ -169,7 +169,13 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
 
-        ColorUtils.setStatusBarTextColor(this);
+        if (shouldSetStatusBarTextColor()) {
+            ColorUtils.setStatusBarTextColor(this);
+        }
+    }
+
+    protected boolean shouldSetStatusBarTextColor() {
+        return true;
     }
 
     @Override
