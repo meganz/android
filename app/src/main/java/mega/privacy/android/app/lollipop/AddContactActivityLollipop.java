@@ -22,6 +22,7 @@ import android.provider.ContactsContract;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
@@ -85,6 +86,7 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1097,18 +1099,17 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             if (adapterMEGA.getItemCount() == 0) {
                 String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.black_white)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
                 }
-                Spanned result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
+                Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
                 emptyTextView.setText(result);
                 showHeader(false);
                 recyclerViewList.setVisibility(View.GONE);
@@ -1570,8 +1571,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
@@ -1742,9 +1741,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         emptyImageView = (ImageView) findViewById(R.id.add_contact_list_empty_image);
         emptyTextView = (TextView) findViewById(R.id.add_contact_list_empty_text);
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-        }
-        else {
+            emptyImageView.setImageResource(R.drawable.empty_contacts_portrait);
+        } else {
             // auto scroll to the bottom to show the invite button
             final ScrollView scrollView = findViewById(R.id.scroller);
             new Handler().postDelayed(new Runnable() {
@@ -1753,7 +1751,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     scrollView.fullScroll(View.FOCUS_DOWN);
                 }
             }, 100);
-            emptyImageView.setImageResource(R.drawable.contacts_empty_landscape);
+            emptyImageView.setImageResource(R.drawable.empty_contacts_landscape);
         }
         emptyTextView.setText(R.string.contacts_list_empty_text_loading_share);
         emptySubTextView = (TextView) findViewById(R.id.add_contact_list_empty_subtext);

@@ -53,6 +53,12 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.AccentColor.Variant1">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
@@ -77,6 +83,10 @@
     <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="android:letterSpacing">0</item>
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
@@ -175,6 +185,16 @@
     <!-- Chat contact reaction emoji count -->
     <style name="TextAppearance.Mega.Body2.Variant7">
         <item name="android:textColor">@color/teal_300_white</item>
+    </style>
+
+    <!-- Add contact email input -->
+    <style name="TextAppearance.Mega.Body2.Variant8">
+        <item name="android:textColor">@color/black_white</item>
+    </style>
+
+    <!-- Add contact empty hint -->
+    <style name="TextAppearance.Mega.Body2.Variant9">
+        <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
     <style name="TextAppearance.Mega.Body2.PrimaryColor">

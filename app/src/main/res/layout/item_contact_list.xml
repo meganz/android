@@ -1,5 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_list_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="72dp"
@@ -18,8 +20,6 @@
             android:layout_height="fill_parent"
             android:scaleType="fitCenter"
             android:layout_centerInParent="true"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
 
     </RelativeLayout>
@@ -43,10 +43,11 @@
             android:id="@+id/contact_list_three_dots"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_dots_vertical_grey"
             android:background="@null"
             android:layout_marginRight="10dp"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_dots_vertical_grey"
+            app:tint="?android:attr/textColorSecondary" />
 
     </RelativeLayout>
 
@@ -63,8 +64,8 @@
             android:src="@drawable/ic_decline"
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
-            android:alpha="0.5"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            app:tint="?attr/colorControlNormal" />
 
     </RelativeLayout>
 
@@ -79,9 +80,8 @@
             android:id="@+id/contact_list_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/file_list_first_row"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
             android:maxLines="1"
-            android:textSize="16sp"
             rounded:emojiSize="14sp"/>
 
         <ImageView
@@ -100,10 +100,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/contact_list_name"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
             android:ellipsize="none"
-            android:singleLine="true"
-            android:textColor="@color/file_list_second_row" />
+            android:singleLine="true" />
 
     </RelativeLayout>
 

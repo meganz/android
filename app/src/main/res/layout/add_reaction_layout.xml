@@ -140,7 +140,7 @@
                 android:layout_centerInParent="true"
                 android:background="@null"
                 android:src="@drawable/ic_emoji_add"
-                app:tint="@color/grey_038_white_038" />
+                app:tint="?attr/textColorHint" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>
