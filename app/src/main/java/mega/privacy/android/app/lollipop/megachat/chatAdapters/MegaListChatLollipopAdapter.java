@@ -234,9 +234,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					display.getMetrics(outMetrics);
 				}
 
-				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxWidth(scaleWidthPx(6,outMetrics));
-				((ViewHolderNormalChatList)holder).contactStateIcon.setMaxHeight(scaleHeightPx(6,outMetrics));
-
 				setStatus(position, holder);
 			}
 			else{

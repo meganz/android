@@ -70,11 +70,11 @@
 
             <ImageView
                 android:id="@+id/recent_chat_list_contact_state"
-                android:layout_width="6dp"
-                android:layout_height="6dp"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="6dp"
-                android:src="@drawable/circle_status_contact_offline" />
+                tools:src="@drawable/ic_offline_light" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

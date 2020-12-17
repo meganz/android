@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="72dp"
     android:descendantFocusability="blocksDescendants"
@@ -70,15 +71,15 @@
 
         <ImageView
             android:id="@+id/shared_folder_state_icon"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
             android:layout_toRightOf="@+id/shared_folder_contact_name"
             android:layout_centerVertical="true"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="4dp"
             android:background="@null"
-            android:src="@drawable/circle_status_contact_offline"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            tools:src="@drawable/ic_offline_light" />
 
     </RelativeLayout>
 

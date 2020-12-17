@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/contact_grid_item_layout"
 	android:background="@drawable/background_item_grid_new"
 	android:layout_margin="2dp"
@@ -86,13 +87,12 @@
 
 			<ImageView
 				android:id="@+id/contact_grid_drawable_state"
-				android:layout_width="6dp"
-				android:layout_height="6dp"
-				android:layout_marginTop="1dp"
+				android:layout_width="12dp"
+				android:layout_height="12dp"
 				android:layout_marginLeft="4dp"
 				android:layout_gravity="center_vertical"
 				android:background="@null"
-				android:src="@drawable/circle_status_contact_offline" />
+				tools:src="@drawable/ic_offline_light" />
 
 		</LinearLayout>
 

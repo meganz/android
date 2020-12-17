@@ -76,14 +76,13 @@
 
                     <ImageView
                         android:id="@+id/file_properties_owner_state_icon"
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="6dp"
-                        android:layout_marginTop="1dp"
                         android:background="@null"
-                        android:src="@drawable/circle_status_contact_offline"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        tools:src="@drawable/ic_offline_light" />
 
                 </LinearLayout>
 

@@ -497,23 +497,24 @@ public class ChatUtil {
             return;
         }
 
+        Context context = contactStateIcon.getContext();
         contactStateIcon.setVisibility(View.VISIBLE);
 
         switch (userStatus) {
             case MegaChatApi.STATUS_ONLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_online));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_online_dark_standard : R.drawable.ic_online_light);
                 break;
 
             case MegaChatApi.STATUS_AWAY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_away));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_away_dark_standard : R.drawable.ic_away_light);
                 break;
 
             case MegaChatApi.STATUS_BUSY:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_busy));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_busy_dark_standard : R.drawable.ic_busy_light);
                 break;
 
             case MegaChatApi.STATUS_OFFLINE:
-                contactStateIcon.setImageDrawable(ContextCompat.getDrawable(MegaApplication.getInstance(), R.drawable.circle_status_contact_offline));
+                contactStateIcon.setImageResource(Util.isDarkMode(context) ? R.drawable.ic_offline_dark_standard : R.drawable.ic_offline_light);
                 break;
 
             case MegaChatApi.STATUS_INVALID:
