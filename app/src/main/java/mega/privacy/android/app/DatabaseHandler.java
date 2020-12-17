@@ -403,7 +403,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //18
 				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //19
 				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//20
-				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN"																					//21
+				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"											//21 - True if the queue is paused, false otherwise
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -904,19 +904,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 58) {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN;");
-
-			boolean transferQueueStatus = false;
-			MegaApplication app = MegaApplication.getInstance();
-
-			if (app != null) {
-				MegaApiJava megaApi = app.getMegaApi();
-				if (megaApi != null) {
-					transferQueueStatus = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
-							|| megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
-				}
-			}
-
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_TRANSFER_QUEUE_STATUS + " = '" + encrypt(transferQueueStatus + "") + "';");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_TRANSFER_QUEUE_STATUS + " = '" + encrypt("false") + "';");
 
 			db.execSQL(CREATE_SD_TRANSFERS_TABLE);
 		}

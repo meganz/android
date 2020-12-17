@@ -3,8 +3,14 @@ package mega.privacy.android.app.utils;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -746,14 +752,67 @@ public class MegaNodeUtil {
     }
 
     /**
-     * Get a node's name by its handle.
+     * Gets the tinted circle Drawable for the provided {@link MegaNode} Label
      *
-     * @param handle Hanlde of node.
-     * @return The node's name, if exists otherwise null.
+     * @param nodeLabel     {@link MegaNode} Label
+     * @param resources     Android resources
+     * @return              Drawable
      */
-    public static String getNodeName(long handle) {
-        MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        MegaNode node = megaApi.getNodeByHandle(handle);
-        return node != null ? node.getName() : null;
+    public static Drawable getNodeLabelDrawable(int nodeLabel, Resources resources) {
+        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null);
+        drawable.setTint(ResourcesCompat.getColor(resources, getNodeLabelColor(nodeLabel), null));
+        return drawable;
+    }
+
+    /**
+     * Gets the String resource reference for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @return              String resource reference
+     */
+    @StringRes
+    public static int getNodeLabelText(int nodeLabel) {
+        switch (nodeLabel) {
+            case MegaNode.NODE_LBL_RED:
+                return R.string.label_red;
+            case MegaNode.NODE_LBL_ORANGE:
+                return R.string.label_orange;
+            case MegaNode.NODE_LBL_YELLOW:
+                return R.string.label_yellow;
+            case MegaNode.NODE_LBL_GREEN:
+                return R.string.label_green;
+            case MegaNode.NODE_LBL_BLUE:
+                return R.string.label_blue;
+            case MegaNode.NODE_LBL_PURPLE:
+                return R.string.label_purple;
+            default:
+                return R.string.label_grey;
+        }
+    }
+
+    /**
+     * Gets the Color resource reference for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @return              Color resource reference
+     */
+    @ColorRes
+    public static int getNodeLabelColor(int nodeLabel) {
+        switch (nodeLabel) {
+            case MegaNode.NODE_LBL_RED:
+                return R.color.label_red;
+            case MegaNode.NODE_LBL_ORANGE:
+                return R.color.label_orange;
+            case MegaNode.NODE_LBL_YELLOW:
+                return R.color.label_yellow;
+            case MegaNode.NODE_LBL_GREEN:
+                return R.color.label_green;
+            case MegaNode.NODE_LBL_BLUE:
+                return R.color.label_blue;
+            case MegaNode.NODE_LBL_PURPLE:
+                return R.color.label_purple;
+            default:
+                return R.color.label_grey;
+        }
     }
 }

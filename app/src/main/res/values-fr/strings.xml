@@ -2541,7 +2541,7 @@
 
     <string name="label_today" context="label today">Aujourd\'hui</string>
     <string name="label_yesterday" context="label yesterday">Hier</string>
-    <string name="label_tomorrow" context="label tomorrow">Demain</string>
+    <string name="label_tomorrow" context="label tomorrow">demain</string>
 
     <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]Il n\'y a aucun [/B][A]fichier partagé[/A][B].[/B]</string>
 
@@ -2849,7 +2849,7 @@
 
     <string name="storage_root_label" context="Storage root label">Racine de la mémoire</string>
 
-    <string name="failed_label" context="Label describing some action failed">Échec</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Échec</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Vos transferts ont été interrompus. Surclassez votre compte ou attendez %s afin de poursuivre</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Le quota de transfert est dépassé</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Le quota de stockage a été dépassé</string>

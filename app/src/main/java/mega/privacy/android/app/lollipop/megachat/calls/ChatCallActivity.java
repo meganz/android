@@ -997,9 +997,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method to hide the FAB buttons.
      */
     private void hideFABs() {
-        videoFAB.hide();
         linearArrowVideo.setVisibility(View.GONE);
-        relativeVideo.setVisibility(View.GONE);
+
+        videoFAB.hide();
         microFAB.hide();
         speakerFAB.hide();
         onHoldFAB.hide();
@@ -1485,6 +1485,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (!onHoldFAB.isShown()) onHoldFAB.show();
             updateOnHoldFABStatus();
 
+            if (!videoFAB.isShown()) videoFAB.show();
             updateVideoFABStatus();
 
             if(!hangFAB.isShown()) hangFAB.show();
