@@ -214,6 +214,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
@@ -10532,7 +10533,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
-	public void showNodeOptionsPanel(MegaNode node, int mode){
+	public void showNodeOptionsPanel(MegaNode node, int mode) {
 		logDebug("showNodeOptionsPanel");
 
 		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
@@ -10541,6 +10542,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment(mode);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
+
+	public void showNodeLabelsPanel(@NonNull MegaNode node) {
+        logDebug("showNodeLabelsPanel");
+
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            bottomSheetDialogFragment.dismiss();
+        }
+
+        selectedNode = node;
+        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.getHandle());
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
 
 	public void showOptionsPanel(MegaOffline sNode){
 		logDebug("showNodeOptionsPanel-Offline");
