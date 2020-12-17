@@ -316,6 +316,8 @@
     <color name="dark_blue_200">#85D2ED</color>
     <color name="dark_blue_500">#2BA6DE</color>
 
+    <color name="ambar_700">#FFA003</color>
+
     <!-- ======================== Color pair: light_dark ================== -->
 
     <color name="black_white">@color/black</color>

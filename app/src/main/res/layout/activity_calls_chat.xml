@@ -4,7 +4,6 @@
     android:id="@+id/file_info_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     android:fitsSystemWindows="true"
     android:keepScreenOn="true"
     tools:context=".lollipop.megachat.calls.ChatCallActivity">
@@ -17,14 +16,14 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@color/black">
 
             <!-- Layout for group call -->
             <RelativeLayout
                 android:id="@+id/big_elements_group_call"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/black">
+                android:layout_height="match_parent">
 
                 <!--Layout Cameras in Group call (1 - 6)-->
                 <RelativeLayout
@@ -32,7 +31,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:background="@color/black"
                     android:orientation="vertical">
 
                     <mega.privacy.android.app.components.CustomizedGridCallRecyclerView
@@ -43,7 +41,6 @@
                         android:layout_centerHorizontal="true"
                         android:layout_centerVertical="true"
                         android:layout_gravity="center_vertical|center|center_horizontal"
-                        android:background="@android:color/transparent"
                         android:horizontalSpacing="0dp"
                         android:nestedScrollingEnabled="false"
                         android:numColumns="auto_fit"
@@ -60,14 +57,12 @@
                     android:layout_height="424dp"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:background="@android:color/transparent"
                     android:visibility="gone">
 
                     <FrameLayout
                         android:id="@+id/fragment_peer_selected"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
                 </RelativeLayout>
                 <RelativeLayout
@@ -75,7 +70,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:background="@android:color/transparent"
                     android:visibility="gone">
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -92,8 +86,7 @@
             <RelativeLayout
                 android:id="@+id/big_elements_individual_call"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/black">
+                android:layout_height="match_parent">
 
                 <RelativeLayout
                     android:id="@+id/full_screen_parent"
@@ -101,14 +94,12 @@
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:background="@android:color/transparent">
+                    android:layout_alignParentRight="true">
 
                     <FrameLayout
                         android:id="@+id/full_screen_fragment"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent" />
+                        android:layout_height="match_parent" />
                 </RelativeLayout>
             </RelativeLayout>
 
@@ -196,7 +187,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_below="@id/call_toolbar"
-                android:background="@color/reconnecting_bar"
+                android:background="@color/ambar_700"
                 android:visibility="gone">
                 <TextView
                     android:id="@+id/reconnecting_text"
@@ -220,7 +211,7 @@
                 android:minHeight="36dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:background="@color/accentColor"
+                android:background="@color/teal_300"
                 android:visibility="gone">
                 <RelativeLayout
                     android:id="@+id/another_call_layout_layer"
@@ -385,7 +376,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_below="@id/call_toolbar"
-                android:background="@color/accentColor"
+                android:background="@color/teal_300"
                 android:gravity="center"
                 android:textAlignment="center"
                 android:textColor="@color/white"
@@ -407,8 +398,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginTop="60dp"
                     android:layout_marginRight="5dp"
-                    android:layout_marginBottom="110dp"
-                    android:background="@android:color/transparent">
+                    android:layout_marginBottom="110dp">
 
                     <FrameLayout
                         android:id="@+id/small_camera_fragment"
@@ -418,7 +408,6 @@
                         android:layout_alignParentBottom="true"
                         android:layout_marginRight="20dp"
                         android:layout_marginBottom="10dp"
-                        android:background="@android:color/transparent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
                 </RelativeLayout>
             </RelativeLayout>
@@ -445,7 +434,7 @@
                     android:scaleType="center"
                     android:src="@drawable/ic_w_end_call"
                     android:visibility="gone"
-                    app:backgroundTint="@color/red_600_red_300"
+                    app:backgroundTint="@color/red_600"
                     app:borderWidth="0dp"
                     app:elevation="0dp"
                     app:fabSize="normal"
@@ -480,7 +469,7 @@
                         android:src="@drawable/ic_call_hold_fab"
                         android:alpha="1"
                         android:visibility="gone"
-                        app:backgroundTint="@color/accentColor"
+                        app:backgroundTint="@color/teal_300"
                         app:borderWidth="0dp"
                         app:elevation="0dp"
                         app:fabSize="normal"
@@ -504,7 +493,7 @@
                         android:src="@drawable/ic_speaker_on"
                         android:alpha="1"
                         android:visibility="gone"
-                        app:backgroundTint="@color/accentColor"
+                        app:backgroundTint="@color/teal_300"
                         app:borderWidth="0dp"
                         app:elevation="0dp"
                         app:fabSize="normal"
@@ -515,7 +504,6 @@
                         android:id="@+id/relative_answer_call_fab"
                         android:layout_width="54dp"
                         android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
                         android:gravity="bottom|center_horizontal">
 
                         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -528,7 +516,7 @@
                             android:scaleType="center"
                             android:alpha="1"
                             android:src="@drawable/ic_phone_white"
-                            app:backgroundTint="@color/accentColor"
+                            app:backgroundTint="@color/teal_300"
                             app:borderWidth="0dp"
                             app:elevation="0dp"
                             app:fabSize="normal"
@@ -539,7 +527,6 @@
                             android:layout_width="54dp"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:background="@android:color/transparent"
                             android:gravity="bottom|center_horizontal"
                             android:orientation="vertical"
                             android:visibility="gone">
@@ -603,7 +590,7 @@
                         android:scaleType="center"
                         android:alpha="1"
                         android:src="@drawable/ic_videocam_white"
-                        app:backgroundTint="@color/accentColor"
+                        app:backgroundTint="@color/teal_300"
                         app:borderWidth="0dp"
                         app:elevation="0dp"
                         app:fabSize="normal"
@@ -673,7 +660,7 @@
                         android:background="@null"
                         android:scaleType="center"
                         android:src="@drawable/ic_record_audio_w"
-                        app:backgroundTint="@color/accentColor"
+                        app:backgroundTint="@color/teal_300"
                         app:borderWidth="0dp"
                         android:alpha="1"
                         app:elevation="0dp"
@@ -689,7 +676,7 @@
                         android:background="@null"
                         android:scaleType="center"
                         android:src="@drawable/ic_w_end_call"
-                        app:backgroundTint="@color/red_600_red_300"
+                        app:backgroundTint="@color/red_600"
                         app:borderWidth="0dp"
                         android:alpha="1"
                         app:elevation="0dp"
