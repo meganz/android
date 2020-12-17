@@ -1,12 +1,13 @@
 package mega.privacy.android.app.activities
 
+import android.Manifest.permission.*
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,35 +19,41 @@ import android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.FileProvider
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityWebViewBinding
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
-import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.io.File
 import java.io.IOException
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WebViewActivity : Activity() {
+class WebViewActivity : BaseActivity() {
 
     companion object {
         private const val FILE_CHOOSER_RESULT_CODE = 1000
         private const val IMAGE_CONTENT_TYPE = 0
         private const val VIDEO_CONTENT_TYPE = 1
         private const val FILE = "file:"
+        private const val REQUEST_ALL = 7
+        private const val REQUEST_WRITE_AND_RECORD_AUDIO = 8
+        private const val REQUEST_CAMERA_AND_RECORD_AUDIO = 9
     }
 
     private lateinit var binding: ActivityWebViewBinding
 
     private var mFilePathCallback: ValueCallback<Array<Uri>>? = null
+    private var mFileChooserParams: WebChromeClient.FileChooserParams? = null
     private var pickedImage: String? = null
     private var pickedVideo: String? = null
 
@@ -94,29 +101,9 @@ class WebViewActivity : Activity() {
                     fileChooserParams: FileChooserParams
                 ): Boolean {
                     mFilePathCallback = filePathCallback
-                    val takePictureIntent: Intent? = getContentIntent(IMAGE_CONTENT_TYPE)
-                    val takeVideoIntent: Intent? = getContentIntent(VIDEO_CONTENT_TYPE)
-                    val takeAudioIntent = Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION)
+                    mFileChooserParams = fileChooserParams
 
-                    val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
-                    contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
-                    contentSelectionIntent.type = FileUtil.ANY_TYPE_FILE
-
-                    val chooserIntent = Intent(Intent.ACTION_CHOOSER)
-                    chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
-                    chooserIntent.putExtra(
-                        Intent.EXTRA_INITIAL_INTENTS,
-                        arrayOf(takePictureIntent, takeVideoIntent, takeAudioIntent)
-                    )
-
-                    try {
-                        startActivityForResult(chooserIntent, FILE_CHOOSER_RESULT_CODE)
-                    } catch (e: ActivityNotFoundException) {
-                        logError("Error opening file chooser.", e)
-                        return false
-                    }
-
-                    return true
+                    return if (hasAllPermissions()) launchChooserIntent() else false
                 }
             }
 
@@ -155,6 +142,80 @@ class WebViewActivity : Activity() {
 
         pickedImage = null
         pickedVideo = null
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+            showSnackbar(
+                binding.root,
+                StringResourcesUtils.getString(R.string.files_required_permissions_warning)
+            )
+        }
+    }
+
+    private fun hasAllPermissions(): Boolean {
+        val writePermission = hasPermissions(this, WRITE_EXTERNAL_STORAGE)
+        val cameraPermission = hasPermissions(this, CAMERA)
+        val recordAudioPermission = hasPermissions(this, RECORD_AUDIO)
+
+        if (writePermission && cameraPermission && recordAudioPermission) {
+            return true
+        }
+
+        if (!writePermission && !cameraPermission && !recordAudioPermission) {
+            requestPermission(this, REQUEST_ALL, WRITE_EXTERNAL_STORAGE, CAMERA, RECORD_AUDIO)
+        } else if (!writePermission && !recordAudioPermission) {
+            requestPermission(
+                this,
+                REQUEST_WRITE_AND_RECORD_AUDIO,
+                WRITE_EXTERNAL_STORAGE,
+                RECORD_AUDIO
+            )
+        } else if (!writePermission) {
+            requestPermission(this, REQUEST_WRITE_STORAGE, WRITE_EXTERNAL_STORAGE)
+        } else if (!cameraPermission && !recordAudioPermission) {
+            requestPermission(this, REQUEST_CAMERA_AND_RECORD_AUDIO, CAMERA, RECORD_AUDIO)
+        } else if (!cameraPermission) {
+            requestPermission(this, REQUEST_CAMERA, CAMERA)
+        } else {
+            requestPermission(this, REQUEST_RECORD_AUDIO, RECORD_AUDIO)
+        }
+
+        return false
+    }
+
+    private fun launchChooserIntent(): Boolean {
+        val takePictureIntent: Intent? = getContentIntent(IMAGE_CONTENT_TYPE)
+        val takeVideoIntent: Intent? = getContentIntent(VIDEO_CONTENT_TYPE)
+        val takeAudioIntent = Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION)
+
+        val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
+        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
+        contentSelectionIntent.type = FileUtil.ANY_TYPE_FILE
+
+        val chooserIntent = Intent(Intent.ACTION_CHOOSER)
+        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
+        chooserIntent.putExtra(
+            Intent.EXTRA_INITIAL_INTENTS,
+            arrayOf(takePictureIntent, takeVideoIntent, takeAudioIntent)
+        )
+
+        try {
+            startActivityForResult(chooserIntent, FILE_CHOOSER_RESULT_CODE)
+        } catch (e: ActivityNotFoundException) {
+            logError("Error opening file chooser.", e)
+            return false
+        }
+
+        return true
     }
 
     private fun manageResult(data: Intent?) {

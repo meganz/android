@@ -142,7 +142,7 @@ public class Constants {
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;
-    public static final int RECORD_AUDIO = 4;
+    public static final int REQUEST_RECORD_AUDIO = 4;
     public static final int REQUEST_UPLOAD_CONTACT = 5;
     public static final int REQUEST_READ_STORAGE = 6;
 

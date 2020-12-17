@@ -1719,7 +1719,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 
-			case RECORD_AUDIO:
+			case REQUEST_RECORD_AUDIO:
 				if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();

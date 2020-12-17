@@ -2933,7 +2933,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean checkPermissionsCall() {
         logDebug("checkPermissionsCall");
         return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
-                && checkPermissions(Manifest.permission.RECORD_AUDIO, RECORD_AUDIO);
+                && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO);
     }
 
     private boolean checkPermissionsTakePicture() {
@@ -2985,7 +2985,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case REQUEST_CAMERA:
-            case RECORD_AUDIO:{
+            case REQUEST_RECORD_AUDIO:{
                 logDebug("REQUEST_CAMERA || RECORD_AUDIO");
                 if (checkPermissionsCall()) {
                     startCall();
