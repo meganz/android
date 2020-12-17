@@ -442,7 +442,7 @@ class HomepageFragment : Fragment() {
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener (object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
-                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
                 if (bottomSheetBehavior.peekHeight > 0) {
                     rootView.viewTreeObserver?.removeOnPreDrawListener(this)
                 }
