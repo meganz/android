@@ -317,17 +317,13 @@
 			<RelativeLayout
 				android:id="@+id/new_group_contacts_adds_container"
 				android:layout_width="match_parent"
-				android:layout_height="90dp"
-				android:background="@color/white"
-				android:layout_below="@id/add_contact_toolbar">
+				android:layout_height="90dp">
 
 				<com.google.android.material.floatingactionbutton.FloatingActionButton
 					android:id="@+id/image_group_floating_button"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:elevation="@dimen/elevation_low"
-					android:layout_marginLeft="16sp"
-					android:layout_marginRight="16dp"
+					android:layout_marginHorizontal="16sp"
 					android:layout_centerVertical="true"
 					android:src="@drawable/ic_w_take_photo"/>
 
@@ -336,27 +332,22 @@
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:maxLines="1"
-					android:background="@android:color/transparent"
 					android:layout_centerVertical="true"
-					android:layout_toRightOf="@+id/image_group_floating_button"
-					android:layout_marginRight="16dp"
+					android:layout_toEndOf="@+id/image_group_floating_button"
+					android:layout_marginEnd="16dp"
 					android:hint="@string/hint_type_group"
-					android:textSize="16sp"
 					app:emojiSize="16sp"
-					android:textColorHint="?android:attr/textColorSecondary"
-					android:textColor="?android:attr/textColorPrimary"
-					android:fontFamily="roboto"/>
+					android:textAppearance="?attr/textAppearanceSubtitle1" />
 
 			</RelativeLayout>
 
 			<View
 				android:id="@+id/separator_name_group"
-				android:layout_below="@+id/contacts_adds_container"
 				android:layout_width="match_parent"
 				android:layout_height="1dp"
 				android:layout_marginLeft="16dp"
 				android:layout_marginRight="16dp"
-				android:background="@color/black_12_alpha"/>
+				android:background="@color/grey_012_white_012" />
 
 			<LinearLayout
 				android:id="@+id/ekr_layout"
@@ -368,22 +359,18 @@
 					android:id="@+id/ekr_switch"
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:textSize="16sp"
-					android:textColor="?android:attr/textColorPrimary"
-					android:fontFamily="roboto"
+					android:textAppearance="?attr/textAppearanceSubtitle1"
 					android:checked="false"
 					android:text="@string/ekr_label"
 					android:layout_marginTop="14dp"
-					android:layout_marginLeft="16dp"
-					android:layout_marginRight="6dp"/>
+					android:layout_marginStart="16dp"
+					android:layout_marginEnd="6dp" />
 
 				<TextView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
 					android:layout_marginTop="13dp"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorSecondary"
-					android:fontFamily="roboto"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
 					android:text="@string/ekr_explanation"
 					android:layout_marginBottom="7dp"
 					android:layout_marginLeft="16dp"
@@ -392,8 +379,7 @@
 				<RelativeLayout
 					android:id="@+id/get_chat_link_layout"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_below="@+id/contacts_adds_container">
+					android:layout_height="wrap_content">
 
 					<View
 						android:id="@+id/separator_ekr"
@@ -401,7 +387,7 @@
 						android:layout_height="1dp"
 						android:layout_marginLeft="16dp"
 						android:layout_marginRight="16dp"
-						android:background="@color/black_12_alpha"/>
+						android:background="@color/grey_012_white_012"/>
 
 					<RelativeLayout
 						android:layout_width="match_parent"
@@ -416,19 +402,16 @@
 							android:layout_width="wrap_content"
 							android:layout_height="wrap_content"
 							android:layout_centerVertical="true"
-							android:textSize="16sp"
-							android:textColor="?android:attr/textColorPrimary"
-							android:fontFamily="roboto"
+							android:textAppearance="?attr/textAppearanceSubtitle1"
 							android:text="@string/get_chat_link_option"/>
 
 						<CheckBox
 							android:id="@+id/get_chat_link_checkbox"
 							android:layout_centerVertical="true"
-							android:layout_alignParentRight="true"
-							android:layout_marginRight="-6dp"
+							android:layout_alignParentEnd="true"
+							android:layout_marginEnd="-20dp"
 							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:theme="@style/ColorControlStyle"/>
+							android:layout_height="wrap_content" />
 
 					</RelativeLayout>
 
@@ -438,7 +421,7 @@
 						android:layout_height="1dp"
 						android:layout_marginLeft="16dp"
 						android:layout_marginRight="16dp"
-						android:background="@color/black_12_alpha"
+						android:background="@color/grey_012_white_012"
 						android:layout_alignParentBottom="true"/>
 
 				</RelativeLayout>
@@ -448,9 +431,7 @@
 			<RelativeLayout
 				android:id="@+id/new_group_add_contact_list_layout"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:layout_below="@id/container_linear_layout"
-				android:background="@color/white">
+				android:layout_height="match_parent">
 
 				<RelativeLayout
 					android:id="@+id/new_group_container_list_contacts"
@@ -467,11 +448,8 @@
 							android:layout_width="match_parent"
 							android:layout_height="wrap_content"
 							android:layout_centerVertical="true"
-							android:textColor="?android:attr/textColorPrimary"
-							android:textSize="14sp"
-							android:fontFamily="sans-serif-light"
-							android:textStyle="bold"
-							android:layout_marginLeft="16dp"/>
+							android:textAppearance="?attr/textAppearanceSubtitle2"
+							android:layout_marginStart="16dp"/>
 
 					</RelativeLayout>
 
@@ -504,9 +482,7 @@
 		android:elevation="@dimen/elevation_low"
 		android:layout_margin="16dp"
 		android:src="@drawable/ic_send_white"
-		android:stateListAnimator="@anim/button_elevation"
-		android:tint="@android:color/white"
 		android:layout_alignParentBottom="true"
-		android:layout_alignParentRight="true"/>
+		android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

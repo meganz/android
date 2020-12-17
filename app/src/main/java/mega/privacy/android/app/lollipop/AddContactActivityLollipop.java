@@ -1203,15 +1203,11 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_add_contact, menu);
 
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
         searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-        searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
         searchAutoComplete.setHint(getString(R.string.hint_action_search));
         View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
         v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -1228,9 +1224,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 return false;
             }
         });
-
-        ImageView closeIcon = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
-        closeIcon.setImageDrawable(mutateIcon(this, R.drawable.ic_close_white, R.color.black));
 
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
@@ -1281,7 +1274,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         });
 
         scanQrMenuItem = menu.findItem(R.id.action_scan_qr);
-        scanQrMenuItem.setIcon(mutateIcon(this, R.drawable.ic_action_scan_qr, R.color.black));
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && contactType != CONTACT_TYPE_MEGA) {
             scanQrMenuItem.setVisible(true);
@@ -1291,7 +1283,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         inviteContactMenuItem = menu.findItem(R.id.action_invite_contact);
-        inviteContactMenuItem.setIcon(mutateIcon(this, R.drawable.ic_add_contact, R.color.black));
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
                 && contactType == CONTACT_TYPE_MEGA && !createNewGroup && !comesFromChat && !onNewGroup) {
             inviteContactMenuItem.setVisible(true);
@@ -1301,7 +1292,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
 
         sendInvitationMenuItem = menu.findItem(R.id.action_send_invitation);
-        sendInvitationMenuItem.setIcon(mutateIcon(this, R.drawable.ic_send_white, R.color.accentColor));
         setSendInvitationVisibility();
 
         if (searchExpand && searchMenuItem != null) {

@@ -19,11 +19,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
@@ -6460,7 +6455,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_manager, menu);
 
-		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchView = (SearchView) searchMenuItem.getActionView();
 
