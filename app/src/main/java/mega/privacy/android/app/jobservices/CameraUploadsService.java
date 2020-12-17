@@ -37,6 +37,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -617,12 +618,22 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
         List<SyncRecord> finalList = dbH.findAllPendingSyncRecords();
 
+        // Reset backup state as active.
+        CuSyncManager.INSTANCE.updatePrimaryBackupState(CuSyncManager.State.CU_SYNC_STATE_ACTIVE);
+        CuSyncManager.INSTANCE.updateSecondaryBackupState(CuSyncManager.State.CU_SYNC_STATE_ACTIVE);
+
         if (finalList.size() == 0) {
             if (isCompressedVideoPending()) {
                 logDebug("Pending upload list is empty, now check view compression status.");
                 startVideoCompression();
             } else {
                 logDebug("Nothing to upload.");
+
+                // Make sure to send inactive heartbeat.
+                CuSyncManager.INSTANCE.doInactiveHeartbeat(() -> {
+                    logDebug("Nothing to upload, send inactive heartbeat.");
+                    return Unit.INSTANCE;
+                });
                 finish();
                 purgeDirectory(new File(tempRoot));
             }
@@ -827,7 +838,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         totalToUpload = 0;
 
         CuSyncManager.INSTANCE.reportUploadFinish();
-
+        CuSyncManager.INSTANCE.stopActiveHeartbeat();
         finish();
     }
 
@@ -1743,7 +1754,6 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
             showNotification(title, message, pendingIntent, true);
         }
-
     }
 
     private boolean shouldStartVideoCompression(long queueSize) {

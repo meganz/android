@@ -349,9 +349,7 @@ object CuSyncManager {
         }
 
         val cuSync = databaseHandler.cuBackup
-        if (cuSync == null) {
-            setSecondaryBackup()
-        } else {
+        if (cuSync != null && newState != cuSync.state) {
             updateBackup(
                 cuSync.backupId,
                 INVALID_HANDLE,
@@ -373,9 +371,7 @@ object CuSyncManager {
         }
 
         val muSync = databaseHandler.muBackup
-        if (muSync == null) {
-            setSecondaryBackup()
-        } else {
+        if (muSync != null && newState != muSync.state) {
             updateBackup(
                 muSync.backupId,
                 INVALID_HANDLE,
