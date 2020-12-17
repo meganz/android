@@ -118,7 +118,7 @@ public class JobUtil {
         logDebug("isOverQuota:" + isOverQuota +
                 ", hasStoragePermission:" + hasReadPermission +
                 ", isCameraUploadEnabled:" + isEnabled +
-                ", isRunning:" + CameraUploadsService.isServiceRunning);
+                ", isRunning:" + CameraUploadsService.isServiceRunning + ", should ignore attr: " + shouldIgnoreAttr);
         if (!CameraUploadsService.isServiceRunning && !isOverQuota && hasReadPermission && isEnabled && !hasStartedCU) {
             hasStartedCU = true;
             Intent newIntent = new Intent(context, CameraUploadsService.class);

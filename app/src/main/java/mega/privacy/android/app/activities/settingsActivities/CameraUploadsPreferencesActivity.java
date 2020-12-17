@@ -113,10 +113,8 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && BROADCAST_ACTION_REENABLE_CU_PREFERENCE.equals(intent.getAction())) {
-                if (sttCameraUploads != null) {
-                    sttCameraUploads.reEnableCameraUploadsPreference(intent.getIntExtra(KEY_REENABLE_WHICH_PREFERENCE, 0));
-                }
+            if (intent != null && BROADCAST_ACTION_REENABLE_CU_PREFERENCE.equals(intent.getAction()) && sttCameraUploads != null) {
+                sttCameraUploads.reEnableCameraUploadsPreference(intent.getIntExtra(KEY_REENABLE_WHICH_PREFERENCE, 0));
             }
         }
     };

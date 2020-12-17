@@ -10,7 +10,7 @@ import nz.mega.sdk.MegaRequest
 /**
  * Update backup event callback.
  */
-class UpdateBackupCallback: SyncEventCallback {
+class UpdateBackupCallback : SyncEventCallback {
 
     override fun requestType(): Int = MegaRequest.TYPE_BACKUP_PUT
 
@@ -25,9 +25,9 @@ class UpdateBackupCallback: SyncEventCallback {
 
             if (backup != null && !backup.outdated) {
                 backup.apply {
-                    if(nodeHandle != MegaApiJava.INVALID_HANDLE) targetNode = nodeHandle
-                    if(file != null) localFolder = file
-                    if(access != Constants.INVALID_VALUE) state = access
+                    if (nodeHandle != MegaApiJava.INVALID_HANDLE) targetNode = nodeHandle
+                    if (file != null) localFolder = file
+                    if (access != Constants.INVALID_VALUE) state = access
                 }
                 getDatabase().updateBackup(backup)
                 logDebug("Successful callback: update $backup.")

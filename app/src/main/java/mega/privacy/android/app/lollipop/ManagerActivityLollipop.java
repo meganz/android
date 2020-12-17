@@ -12153,7 +12153,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 				}
 				storageState = newStorageState;
-                logDebug("Try to start CU, false.");
                 startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 

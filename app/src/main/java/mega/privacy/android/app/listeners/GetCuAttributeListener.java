@@ -36,7 +36,7 @@ public class GetCuAttributeListener extends BaseListener {
 
         if (e.getErrorCode() == MegaError.API_OK) {
             long[] handles = getCUHandles(request);
-            logDebug("Get CU folders successfully primary: " + handles[0] +", secondary: " + handles[1]);
+            logDebug("Get CU folders successfully primary: " + handles[0] + ", secondary: " + handles[1]);
 
             synchronized (this) {
                 handle(handles[0], false, e);
@@ -48,7 +48,6 @@ public class GetCuAttributeListener extends BaseListener {
             initCUFolderFromScratch(context, false);
 
             if (context instanceof CameraUploadsService) {
-                // The unique process run within shoudRun method in CameraUploadsService
                 ((CameraUploadsService) context).onGetPrimaryFolderAttribute(INVALID_HANDLE, e.getErrorCode(), true);
             }
         } else {
@@ -87,9 +86,9 @@ public class GetCuAttributeListener extends BaseListener {
     /**
      * Process CU or MU folder handle after get them from CU attributes.
      *
-     * @param handle Folder handle.
+     * @param handle      Folder handle.
      * @param isSecondary Is the handle CU handle or MU handle.
-     * @param e MegaError object.
+     * @param e           MegaError object.
      */
     private void handle(long handle, boolean isSecondary, MegaError e) {
         boolean shouldCUStop = false;

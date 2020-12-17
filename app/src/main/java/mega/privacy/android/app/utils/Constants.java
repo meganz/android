@@ -676,6 +676,6 @@ public class Constants {
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
 
-    /** In database, invalid value is dedfined as '-1' */
+    /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
 }
