@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" 
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -41,14 +42,46 @@
                 android:orientation="vertical"
                 android:paddingTop="15dp">
 
-                <TextView
-                    android:id="@+id/first_line_text"
+                <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@color/primary_text"
-                    android:singleLine="true"
-                    android:ellipsize="middle"/>
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/first_line_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/primary_text"
+                        android:singleLine="true"
+                        android:ellipsize="middle" />
+
+                    <ImageView
+                        android:id="@+id/img_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@id/first_line_text"
+                        android:layout_alignBottom="@id/first_line_text"
+                        android:layout_gravity="center"
+                        android:layout_margin="4dp"
+                        android:layout_toEndOf="@+id/first_line_text"
+                        android:src="@drawable/ic_circle_label"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <ImageView
+                        android:id="@+id/img_favourite"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignTop="@id/first_line_text"
+                        android:layout_alignBottom="@id/first_line_text"
+                        android:layout_gravity="center"
+                        android:layout_margin="4dp"
+                        android:layout_toEndOf="@+id/img_label"
+                        android:src="@drawable/ic_favorite"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+                </RelativeLayout>
+
 
                 <TextView
                     android:id="@+id/second_line_text"
@@ -57,7 +90,7 @@
                     android:textSize="14sp"
                     android:textColor="@color/primary_text"
                     android:singleLine="true"
-                    android:ellipsize="middle"/>
+                    android:ellipsize="middle"/>imageFavourite
 
                 <LinearLayout
                     android:layout_width="wrap_content"

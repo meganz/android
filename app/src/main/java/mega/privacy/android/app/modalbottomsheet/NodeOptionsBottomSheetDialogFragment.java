@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -918,7 +919,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     case MegaShare.ACCESS_FULL:
                     case MegaShare.ACCESS_OWNER:
+                        optionLabel.setVisibility(View.VISIBLE);
+                        optionFavourite.setVisibility(View.VISIBLE);
                         optionLink.setVisibility(View.VISIBLE);
+
                         if (node.isExported()) {
                             nodeIconLayout.setVisibility(View.VISIBLE);
                             nodeIcon.setImageResource(R.drawable.link_ic);
