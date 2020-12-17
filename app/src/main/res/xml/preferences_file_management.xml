@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
+<PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_file_management_offline"
         android:title="@string/settings_advanced_features_offline"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_advanced_features_cache"
         android:title="@string/settings_advanced_features_cache"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_file_management_rubbish"
         android:title="@string/context_clear_rubbish"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_rb_scheduler_switch"
         android:title="@string/settings_rb_scheduler_enable_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_days_rb_scheduler"
         android:title="@string/settings_rb_scheduler_select_days_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_file_versioning_switch"
         android:title="@string/settings_enable_file_versioning_title"
         android:summary="@string/settings_enable_file_versioning_subtitle"
@@ -47,14 +47,14 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_file_management_file_version"
         android:title="@string/settings_file_management_file_versions_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_file_management_clear_version"
         android:layout="@layout/delete_versions_preferences"
         android:title="@string/settings_file_management_delete_versions"
@@ -62,11 +62,11 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="auto_play_switch"
         android:title="@string/settings_auto_play_label"
         android:defaultValue="false"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>

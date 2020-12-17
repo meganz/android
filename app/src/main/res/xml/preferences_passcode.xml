@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
+<PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_pin_lock_enable"
         android:title="@string/settings_pin_lock_switch"
         android:defaultValue="false"
@@ -11,10 +11,10 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_pin_lock_code"
         android:title="@string/settings_change_passcode"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>

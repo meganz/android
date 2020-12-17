@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
+<PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_camera_upload_on_off"
         android:title="@string/section_photo_sync"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="settings_camera_upload_how_to_upload"
         android:title="@string/settings_camera_upload_how_to_upload"
         android:entries="@array/settings_camera_upload_how_to_entries"
@@ -20,7 +20,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="settings_camera_upload_what_to_upload"
         android:title="@string/settings_camera_upload_what_to_upload"
         android:entries="@array/settings_camera_upload_file_upload_entries"
@@ -29,7 +29,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_camera_upload_include_gps"
         android:title="@string/settings_camera_upload_include_gps"
         android:defaultValue="false"
@@ -37,7 +37,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="settings_video_upload_quality"
         android:title="@string/settings_video_upload_quality"
         android:entries="@array/settings_chat_upload_quality_entries"
@@ -46,7 +46,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_camera_upload_charging"
         android:title="@string/settings_camera_upload_require_plug_in"
         android:defaultValue="true"
@@ -54,7 +54,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="video_compression_queue_size"
         android:title="@string/settings_video_compression_queue_size_title"
         app:allowDividerAbove="true"
@@ -68,38 +68,38 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_local_camera_upload_folder"
         android:title="@string/settings_local_camera_upload_folder"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_mega_camera_folder"
         android:title="@string/settings_mega_camera_upload_folder"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_secondary_media_folder_on"
         android:title="@string/settings_secondary_upload_on"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_local_secondary_media_folder"
         android:title="@string/settings_local_secondary_folder"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_mega_secondary_media_folder"
         android:title="@string/settings_mega_secondary_folder"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>

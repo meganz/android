@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
+<PreferenceScreen
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:key="general_preference_screen"
 	android:background="@color/white">
 
-	<androidx.preference.PreferenceCategory
+	<PreferenceCategory
 		android:key="settings_features"
 		android:title="@string/settings_features"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_features_camera_upload"
 			android:title="@string/section_photo_sync"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_features_chat"
 			android:title="@string/section_chat"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-	</androidx.preference.PreferenceCategory>
+	</PreferenceCategory>
 
-	<androidx.preference.PreferenceCategory
+	<PreferenceCategory
 		android:key="settings_storage"
 		android:title="@string/settings_storage"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_nested_download_location"
 			android:title="@string/download_location"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_storage_file_management"
 			android:title="@string/settings_file_management_category"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-	</androidx.preference.PreferenceCategory>
+	</PreferenceCategory>
 
-	<androidx.preference.PreferenceCategory
+	<PreferenceCategory
 		android:key="settings_security"
 		android:title="@string/settings_security_options_title"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_recovery_key"
 			android:title="@string/settings_recovery_key_title"
 			android:summary="@string/settings_recovery_key_summary"
@@ -60,7 +60,7 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_pin_lock"
 			android:title="@string/settings_pin_lock_switch"
 			android:defaultValue="false"
@@ -68,14 +68,14 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_change_password"
 			android:title="@string/my_account_change_password"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.SwitchPreferenceCompat
+		<SwitchPreferenceCompat
 			android:key="settings_2fa_activated"
 			android:title="@string/settings_2fa"
 			android:summary="@string/setting_subtitle_2fa"
@@ -83,7 +83,7 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.SwitchPreferenceCompat
+		<SwitchPreferenceCompat
 			android:key="settings_qrcode_autoaccept"
 			android:title="@string/section_qr_code"
 			android:summary="@string/setting_subtitle_qrcode_autoccept"
@@ -91,35 +91,35 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_security_advanced"
 			android:title="@string/settings_advanced_features"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-	</androidx.preference.PreferenceCategory>
+	</PreferenceCategory>
 
-	<androidx.preference.PreferenceCategory
+	<PreferenceCategory
 		android:key="settings_help"
 		android:title="@string/settings_help"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_help_send_feedback"
 			android:title="@string/settings_help_preference"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-	</androidx.preference.PreferenceCategory>
+	</PreferenceCategory>
 
-	<androidx.preference.PreferenceCategory
+	<PreferenceCategory
 		android:key="settings_about"
 		android:title="@string/settings_about"
 		app:allowDividerAbove="false"
 		app:allowDividerBelow="false">
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_privacy_policy"
 			android:title="@string/settings_about_privacy_policy"
 			android:summary=""
@@ -127,7 +127,7 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_terms_of_service"
 			android:title="@string/settings_about_terms_of_service"
 			android:summary=""
@@ -135,7 +135,7 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_gdpr"
 			android:title="@string/settings_about_gdpr"
 			android:summary=""
@@ -143,14 +143,14 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_code_link"
 			android:title="@string/settings_about_code_link_title"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_sdk_version"
 			android:title="@string/settings_about_sdk_version"
 			android:summary="@string/sdk_version"
@@ -158,7 +158,7 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_karere_version"
 			android:title="@string/settings_about_karere_version"
 			android:summary="@string/karere_version"
@@ -166,7 +166,7 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_app_version"
 			android:title="@string/settings_about_app_version"
 			android:summary="@string/app_version"
@@ -174,12 +174,12 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 
-		<androidx.preference.Preference
+		<Preference
 			android:key="settings_about_cancel_account"
 			android:layout="@layout/cancel_account_preferences"
 			android:title="@string/settings_delete_account"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
-	</androidx.preference.PreferenceCategory>
-</androidx.preference.PreferenceScreen>
+	</PreferenceCategory>
+</PreferenceScreen>

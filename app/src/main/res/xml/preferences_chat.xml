@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
     <!--  Chat notification  -->
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_chat_notification_chat"
         android:title="@string/title_properties_contact_notifications_for_chat"
         app:allowDividerAbove="true"
@@ -12,7 +12,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Set status  -->
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="settings_chat_list_status"
         android:title="@string/set_status_option_label"
         android:entries="@array/settings_status_entries"
@@ -22,14 +22,14 @@
         app:iconSpaceReserved="false" />
 
     <!--  Auto-away  -->
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_chat_autoaway_switch"
         android:title="@string/settings_autoaway_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_chat_autoaway_preference"
         android:title="@string/settings_autoaway_subtitle"
         app:allowDividerAbove="true"
@@ -46,7 +46,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Show Last seen ...   -->
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_chat_last_green"
         android:title="@string/option_enable_last_green_chat"
         android:summary="@string/subtitle_option_enable_last_green_chat"
@@ -56,7 +56,7 @@
         app:iconSpaceReserved="false" />
 
     <!--  Chat video quality   -->
-    <androidx.preference.ListPreference
+    <ListPreference
         android:key="settings_chat_send_originals"
         android:title="@string/settings_chat_upload_quality"
         android:entries="@array/settings_chat_upload_quality_entries"
@@ -66,11 +66,11 @@
         app:iconSpaceReserved="false" />
 
     <!--  Rich URL Previews   -->
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:key="settings_chat_rich_links_enable"
         android:title="@string/option_enable_chat_rich_preview"
         android:defaultValue="false"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>

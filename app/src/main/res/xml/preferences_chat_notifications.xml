@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="settings_chat_notifications"
         android:title="@string/title_properties_contact_notifications_for_chat"
@@ -11,14 +11,14 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.Preference
+    <Preference
         android:key="settings_chat_sound"
         android:title="@string/title_properties_chat_contact_message_sound"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="settings_chat_vibrate"
         android:title="@string/settings_chat_vibration"
@@ -26,7 +26,7 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-    <androidx.preference.SwitchPreferenceCompat
+    <SwitchPreferenceCompat
         android:defaultValue="true"
         android:key="settings_chat_dnd"
         android:title="@string/title_dialog_mute_chat_notifications"
@@ -34,4 +34,4 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>
