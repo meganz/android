@@ -5,9 +5,11 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.view.View.*
 import android.webkit.ValueCallback
@@ -15,15 +17,21 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.content.FileProvider
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.databinding.ActivityWebViewBinding
+import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.Util
 import java.io.File
 import java.io.IOException
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -135,7 +143,7 @@ class WebViewActivity : Activity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (data == null || requestCode != FILE_CHOOSER_RESULT_CODE) {
+        if (requestCode != FILE_CHOOSER_RESULT_CODE) {
             return
         }
 
@@ -149,23 +157,33 @@ class WebViewActivity : Activity() {
         pickedVideo = null
     }
 
-    private fun manageResult(data: Intent) {
-        var clipData: ClipData?
-        var stringData: String?
+    private fun manageResult(data: Intent?) {
+        val clipData: ClipData?
+        val stringData: String?
 
-        try {
-            clipData = data.clipData
-            stringData = data.dataString
-        } catch (e: Exception) {
-            logWarning("Error getting intent data.", e)
+        if (data == null) {
             clipData = null
             stringData = null
+        } else {
+            clipData = data.clipData
+            stringData = data.dataString
         }
 
         val results: Array<Uri?>
 
         if (clipData == null && stringData == null && (pickedImage != null || pickedVideo != null)) {
-            results = arrayOf(Uri.parse(pickedImage ?: pickedVideo))
+            val image = File(pickedImage?.removePrefix(FILE))
+            val video = File(pickedVideo?.removePrefix(FILE))
+
+            val picked = if (isFileAvailable(image)) {
+                results = arrayOf(Uri.parse(pickedImage))
+                image
+            } else {
+                results = arrayOf(Uri.parse(pickedVideo))
+                video
+            }
+
+            copyFileToDCIM(picked)
         } else if (null != clipData) {
             results = arrayOfNulls(clipData.itemCount)
 
@@ -183,23 +201,34 @@ class WebViewActivity : Activity() {
     private fun getContentIntent(contentType: Int): Intent? {
         var contentIntent: Intent? = createContentIntent(contentType)
 
-        if (contentIntent?.resolveActivity(this@WebViewActivity.packageManager) != null) {
+        if (contentIntent?.resolveActivity(packageManager) != null) {
             var file: File? = null
             try {
                 @SuppressLint("SimpleDateFormat")
                 val fileName = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
-                file = File.createTempFile(
-                    fileName, getContentExtension(contentType),
-                    getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                )
+                file = buildTempFile(this, fileName + getContentExtension(contentType))
             } catch (e: IOException) {
                 logError("Error creating temp file.", e)
             }
 
             if (file != null) {
                 initPickedContent(file, contentType)
-                contentIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file))
+
+                contentIntent.apply {
+                    putExtra(
+                        MediaStore.EXTRA_OUTPUT,
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            FileProvider.getUriForFile(
+                                this@WebViewActivity,
+                                AUTHORITY_STRING_FILE_PROVIDER,
+                                file
+                            )
+                        } else Uri.fromFile(file)
+                    )
+
+                    flags = FLAG_GRANT_WRITE_URI_PERMISSION and FLAG_GRANT_READ_URI_PERMISSION
+                }
             } else {
                 contentIntent = null
             }
