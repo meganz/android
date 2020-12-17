@@ -308,7 +308,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), holder.contactStateIcon);
 		
 		if (multipleSelect && this.isItemChecked(position)) {
-				holder.itemLayout.setBackgroundResource(R.drawable.background_contact_grid_selected);
+				holder.itemLayout.setBackgroundResource(R.drawable.background_item_grid_selected);
 				holder.contactSelectedIcon.setImageResource(R.drawable.ic_select_folder);
 				holder.contactSelectedIcon.setVisibility(View.VISIBLE);
 		} else {

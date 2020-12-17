@@ -3,11 +3,8 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -18,11 +15,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -45,7 +40,6 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 
 public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContactsHeaderAdapter.ViewHolderShareContactsLollipop> implements View.OnClickListener, SectionTitleProvider {
 
-    DatabaseHandler dbH = null;
     private Context mContext;
     OnItemClickListener mItemClickListener;
     private List<ShareContactInfo> shareContacts;
@@ -219,11 +213,8 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle()), holder.contactStateIcon);
 
                 if (contact.getMegaContactAdapter().isSelected()) {
-                    holder.itemLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.new_multiselect_color));
                     holder.avatar.setImageResource(R.drawable.ic_select_avatar);
                 } else {
-                    holder.itemLayout.setBackgroundColor(Color.WHITE);
-
                     Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaContactAdapter().getMegaUser().getHandle()), contact.getMegaContactAdapter().getMegaUser().getEmail());
                     if (bitmap != null) {
                         holder.avatar.setImageBitmap(bitmap);

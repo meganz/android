@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -1008,9 +1007,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 showHeader(false);
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.black_white)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
@@ -1142,9 +1145,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         if (adapterShareHeader.getItemCount() == 0){
             String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
             try{
-                textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.black_white)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             }
             catch (Exception e){}
@@ -1560,6 +1567,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 }
             }
         }
+
+        contactType = CONTACT_TYPE_BOTH;
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
@@ -2060,9 +2069,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.black_white)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
@@ -2110,9 +2123,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.black_white)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
@@ -2171,9 +2188,13 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
                 String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.black_white)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
