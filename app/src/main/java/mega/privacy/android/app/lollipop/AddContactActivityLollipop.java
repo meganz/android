@@ -1568,8 +1568,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             }
         }
 
-        contactType = CONTACT_TYPE_BOTH;
-
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);

@@ -197,8 +197,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             dbH = MegaApplication.getInstance().getDbH();
             setContentView(R.layout.activity_group_chat_properties);
 
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
             containerLayout = findViewById(R.id.fragment_container_group_chat);
 
             toolbar = findViewById(R.id.toolbar_group_chat_properties);

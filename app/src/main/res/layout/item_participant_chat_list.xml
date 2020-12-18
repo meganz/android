@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/participant_list_item_layout"
     android:layout_width="fill_parent"
@@ -10,7 +10,7 @@
         android:id="@+id/participant_list_relative_layout_avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginLeft="18dp"
+        android:layout_marginStart="18dp"
         android:layout_centerVertical="true">
 
         <mega.privacy.android.app.components.RoundedImageView
@@ -19,9 +19,7 @@
             android:layout_height="fill_parent"
             android:scaleType="fitCenter"
             android:layout_centerInParent="true"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
-            rounded:corner_radius="20dp" />
+            app:corner_radius="20dp" />
     </RelativeLayout>
 
     <ImageView
@@ -37,16 +35,17 @@
         android:id="@+id/participant_list_three_dots_layout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentEnd="true">
 
         <ImageView
             android:id="@+id/participant_list_three_dots"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_dots_vertical_grey"
             android:background="@null"
-            android:layout_marginRight="10dp"
-            android:layout_centerVertical="true" />
+            android:layout_marginEnd="10dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_dots_vertical_grey"
+            tools:tint="?android:attr/textColorSecondary" />
 
     </RelativeLayout>
 
@@ -58,35 +57,34 @@
         android:background="@null"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
-        android:alpha="0.54"
-        android:layout_toLeftOf="@id/participant_list_three_dots_layout"
-        android:layout_centerVertical="true"/>
+        android:layout_toStartOf="@id/participant_list_three_dots_layout"
+        android:layout_centerVertical="true"
+        app:tint="?attr/textColorHint" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="13dp"
+        android:layout_marginStart="13dp"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/participant_list_relative_layout_avatar">
+        android:layout_toEndOf="@id/participant_list_relative_layout_avatar">
 
         <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/participant_list_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/file_list_first_row"
-            android:textSize="16sp"
-            rounded:emojiSize="14sp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            app:emojiSize="14sp"
             android:maxLines="1"
-            android:singleLine="true"/>
+            android:singleLine="true" />
 
         <ImageView
             android:id="@+id/group_participants_state_circle"
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_alignTop="@id/participant_list_name"
-            android:layout_toRightOf="@id/participant_list_name"
+            android:layout_toEndOf="@id/participant_list_name"
             android:layout_marginTop="3dp"
-            android:layout_marginLeft="6dp"
+            android:layout_marginStart="6dp"
             android:background="@null"
             tools:src="@drawable/ic_offline_light" />
 
@@ -95,10 +93,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/participant_list_name"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
             android:ellipsize="none"
-            android:singleLine="true"
-            android:textColor="@color/file_list_second_row" />
+            android:singleLine="true" />
     </RelativeLayout>
 
 </RelativeLayout>

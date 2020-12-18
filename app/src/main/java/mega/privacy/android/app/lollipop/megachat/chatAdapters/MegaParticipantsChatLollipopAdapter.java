@@ -30,6 +30,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.MegaChatParticipant;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -308,10 +309,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
-                    holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_unarchive));
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_b_unarchive);
                 } else {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_archive));
-                    holderHeader.archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(groupChatInfoActivity, R.drawable.ic_b_archive));
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_b_archive);
                 }
 
                 long participantsCount = getChat().getPeerCount();
@@ -345,21 +346,19 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                         if (!getChat().isPublic()) {
                             holderHeader.privateTitle.setText(R.string.private_chat);
                             holderHeader.privateTitle.setAllCaps(false);
-                            holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
-                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.primary_text));
+                            holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_087_white_087));
                             holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                             holderHeader.privateLayout.setOnClickListener(null);
                         } else {
                             holderHeader.privateTitle.setText(R.string.make_chat_private_option);
                             holderHeader.privateTitle.setAllCaps(true);
-                            holderHeader.privateTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
 
                             if (participantsCount <= MAX_PARTICIPANTS_CHANGE_TO_PRIVATE) {
-                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.accentColor));
+                                holderHeader.privateTitle.setTextColor(ColorUtils.getThemeColor(groupChatInfoActivity, R.attr.colorSecondary));
                                 holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                                 holderHeader.privateLayout.setOnClickListener(this);
                             } else {
-                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.emoji_icons));
+                                holderHeader.privateTitle.setTextColor(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                                 holderHeader.privateText.setText(R.string.make_chat_private_not_available_text);
                                 holderHeader.privateLayout.setOnClickListener(null);
                             }
@@ -443,14 +442,15 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
                 holderParticipantsList.textViewContactName.setText(holderParticipantsList.fullName);
-                holderParticipantsList.threeDotsLayout.setOnClickListener(this);
-                holderParticipantsList.itemLayout.setOnClickListener(this);
-                holderParticipantsList.imageButtonThreeDots.setColorFilter(null);
 
                 if (isPreview && megaChatApi.getInitState() == INIT_ANONYMOUS) {
-                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                     holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                     holderParticipantsList.itemLayout.setOnClickListener(null);
+                } else {
+                    holderParticipantsList.threeDotsLayout.setOnClickListener(this);
+                    holderParticipantsList.itemLayout.setOnClickListener(this);
+                    holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
                 }
 
                 int permission = participant.getPrivilege();
@@ -724,12 +724,13 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
             String nameFileEmail = holderParticipantsList.contactMail;
 
             if (isTextEmpty(nameFileEmail)) {
-                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.chat_sliding_panel_separator));
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_038_white_038));
                 holderParticipantsList.threeDotsLayout.setOnClickListener(null);
                 holderParticipantsList.itemLayout.setOnClickListener(null);
                 avatarBitmap = getAvatarBitmap(nameFileHandle);
             } else {
                 avatarBitmap = getUserAvatar(nameFileHandle, nameFileEmail);
+                holderParticipantsList.imageButtonThreeDots.setColorFilter(ContextCompat.getColor(groupChatInfoActivity, R.color.grey_054_white_054));
             }
         }
 

@@ -9,30 +9,29 @@
         android:id="@+id/add_participant_list_relative_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="24dp"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:layout_marginStart="24dp">
 
         <ImageView
             android:id="@+id/add_participant_list_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal|center_vertical"
             android:src="@drawable/ic_g_add_contact"
-            android:gravity="center_horizontal|center_vertical"/>
+            app:tint="?attr/colorSecondary" />
     </RelativeLayout>
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/add_participant_list_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/add_participant_list_relative_layout"
-        android:layout_marginLeft="24dp"
         android:layout_centerVertical="true"
-        android:textAllCaps="true"
+        android:layout_marginStart="24dp"
+        android:layout_toEndOf="@id/add_participant_list_relative_layout"
+        android:maxLines="1"
         android:text="@string/add_participants_menu_item"
-        android:textColor="@color/accentColor"
-        android:fontFamily="sans-serif-medium"
-        android:textSize="14sp"
-        app:emojiSize="12sp"
-        android:maxLines="1"/>
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+        app:emojiSize="12sp" />
 
 </RelativeLayout>
