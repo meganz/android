@@ -2,6 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -67,6 +69,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         private ImageView thumbnailList;
         private TextView nameText;
         private TextView infoText;
+        private ImageView imgLabel;
+        private ImageView imgFavourite;
         private ImageView threeDots;
 
         public ViewHolderMultipleBucket(View itemView) {
@@ -121,6 +125,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.thumbnailList = v.findViewById(R.id.thumbnail_list);
         holder.nameText = v.findViewById(R.id.name_text);
         holder.infoText = v.findViewById(R.id.info_text);
+        holder.imgLabel = v.findViewById(R.id.img_label);
+        holder.imgFavourite = v.findViewById(R.id.img_favourite);
         holder.threeDots = v.findViewById(R.id.three_dots);
         holder.threeDots.setTag(holder);
         holder.threeDots.setOnClickListener(this);
@@ -157,6 +163,9 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
             holder.listView.setVisibility(View.GONE);
+            holder.imgLabel.setVisibility(View.GONE);
+            holder.imgFavourite.setVisibility(View.GONE);
+
             if (isAudioOrVideo(node)) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setText(getVideoDuration(node.getDuration()));
@@ -185,6 +194,16 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.listView.setVisibility(View.VISIBLE);
             holder.nameText.setText(node.getName());
             holder.infoText.setText(getSizeString(node.getSize()) + " · " + formatTime(node.getCreationTime()));
+
+            if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+                Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+                holder.imgLabel.setImageDrawable(drawable);
+                holder.imgLabel.setVisibility(View.VISIBLE);
+            } else {
+                holder.imgLabel.setVisibility(View.GONE);
+            }
+
+            holder.imgFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
 
             if (thumbnail != null) {
                 holder.setImageThumbnail(thumbnail);

@@ -203,6 +203,16 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.threeDots.setVisibility(View.VISIBLE);
                 holder.threeDots.setOnClickListener(this);
                 holder.title.setText(node.getName());
+
+                if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+                    Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+                    holder.imageLabel.setImageDrawable(drawable);
+                    holder.imageLabel.setVisibility(View.VISIBLE);
+                } else {
+                    holder.imageLabel.setVisibility(View.GONE);
+                }
+
+                holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
             } else {
                 holder.threeDots.setVisibility(View.INVISIBLE);
                 holder.threeDots.setOnClickListener(null);
@@ -220,16 +230,6 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             } else {
                 holder.actionIcon.setImageResource(R.drawable.ic_recents_up);
             }
-
-            if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
-                Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
-                holder.imageLabel.setImageDrawable(drawable);
-                holder.imageLabel.setVisibility(View.VISIBLE);
-            } else {
-                holder.imageLabel.setVisibility(View.GONE);
-            }
-
-            holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
         }
     }
 

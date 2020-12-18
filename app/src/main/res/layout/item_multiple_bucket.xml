@@ -29,7 +29,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/thumbnail_list"
@@ -53,10 +53,35 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="@color/secondary_text"
+                android:layout_below="@id/name_text"
                 android:singleLine="true"
                 android:ellipsize="middle"/>
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/img_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/name_text"
+                android:layout_alignBottom="@id/name_text"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                android:layout_toEndOf="@+id/name_text"
+                android:src="@drawable/ic_circle_label"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/img_favourite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/name_text"
+                android:layout_alignBottom="@id/name_text"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                android:layout_toEndOf="@+id/img_label"
+                android:src="@drawable/ic_favorite"
+                android:visibility="gone" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
