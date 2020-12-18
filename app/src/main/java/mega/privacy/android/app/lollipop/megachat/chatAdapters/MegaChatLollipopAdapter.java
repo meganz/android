@@ -2185,11 +2185,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[C]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/C]", "</font>");
                 } catch (Exception e) {
                 }
@@ -2199,20 +2205,30 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     logDebug("I left the chat");
                     textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(megaChatApi.getMyFullname()));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                + "\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
                 } else {
                     textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(megaChatApi.getMyFullname()), toCDATA(fullNameAction));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                + "\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
-                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/C]", "</font>");
                     } catch (Exception e) {
                     }
@@ -2284,11 +2300,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
 
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'#"
+                                + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                + "\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
-                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/C]", "</font>");
                     } catch (Exception e) {
                     }
@@ -2305,11 +2327,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     }
 
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                + "\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
-                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/C]", "</font>");
                     } catch (Exception e) {
                     }
@@ -2321,11 +2349,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (message.getUserHandle() == myUserHandle) {
                     textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(holder.fullNameTitle), toCDATA(megaChatApi.getMyFullname()));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                + "\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
-                        textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[C]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/C]", "</font>");
                     } catch (Exception e) {
                     }
@@ -2336,9 +2370,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         textToShow = String.format(context.getString(R.string.message_participant_left_group_chat), toCDATA(holder.fullNameTitle));
                         try {
-                            textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                            textToShow = textToShow.replace("[A]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                    + "\'>");
                             textToShow = textToShow.replace("[/A]", "</font>");
-                            textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                    + "\'>");
                             textToShow = textToShow.replace("[/B]", "</font>");
                         } catch (Exception e) {
                         }
@@ -2349,11 +2387,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                         textToShow = String.format(context.getString(R.string.message_remove_participant), toCDATA(holder.fullNameTitle), toCDATA(fullNameAction));
                         try {
-                            textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                            textToShow = textToShow.replace("[A]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                    + "\'>");
                             textToShow = textToShow.replace("[/A]", "</font>");
-                            textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                            textToShow = textToShow.replace("[B]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                                    + "\'>");
                             textToShow = textToShow.replace("[/B]", "</font>");
-                            textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                            textToShow = textToShow.replace("[C]", "<font color=\'"
+                                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                    + "\'>");
                             textToShow = textToShow.replace("[/C]", "</font>");
                         } catch (Exception e) {
                         }
@@ -2419,15 +2463,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("I changed my Own permission");
                 textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[C]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[D]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[E]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/E]", "</font>");
                 } catch (Exception e) {
                 }
@@ -2437,15 +2491,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(megaChatApi.getMyFullname()), toCDATA(privilegeString), toCDATA(fullNameAction));
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[C]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[D]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[E]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/E]", "</font>");
                 } catch (Exception e) {
                 }
@@ -2521,15 +2585,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 logDebug("The privilege was change by me");
                 textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(megaChatApi.getMyFullname()));
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[C]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[D]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[E]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/E]", "</font>");
                 } catch (Exception e) {
                 }
@@ -2540,15 +2614,25 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 textToShow = String.format(context.getString(R.string.message_permissions_changed), toCDATA(holder.fullNameTitle), toCDATA(privilegeString), toCDATA(fullNameAction));
                 try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[C]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/C]", "</font>");
-                    textToShow = textToShow.replace("[D]", "<font color=\'#868686\'>");
+                    textToShow = textToShow.replace("[D]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                            + "\'>");
                     textToShow = textToShow.replace("[/D]", "</font>");
-                    textToShow = textToShow.replace("[E]", "<font color=\'#060000\'>");
+                    textToShow = textToShow.replace("[E]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                            + "\'>");
                     textToShow = textToShow.replace("[/E]", "</font>");
                 } catch (Exception e) {
                 }
@@ -3962,9 +4046,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (chatRoom != null && chatRoom.isGroup()) {
                     String textToShow = String.format(context.getString(R.string.text_deleted_message_by), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
                     try {
-                        textToShow = textToShow.replace("[A]", "<font color=\'#00BFA5\'>");
+                        textToShow = textToShow.replace("[A]", "<font color=\'"
+                                + ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary)
+                                + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
-                        textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+                        textToShow = textToShow.replace("[B]", "<font color=\'"
+                                + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                                + "\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
                     } catch (Exception e) {
                     }
@@ -5825,11 +5913,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = String.format(context.getString(R.string.change_title_messages), toCDATA( megaChatApi.getMyFullname()), toCDATA(messageContent));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
-                textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[C]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/C]", "</font>");
             } catch (Exception e) {
             }
@@ -5894,11 +5988,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = String.format(context.getString(R.string.change_title_messages), toCDATA(holder.fullNameTitle), toCDATA(messageContent));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
-                textToShow = textToShow.replace("[C]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[C]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/C]", "</font>");
             } catch (Exception e) {
             }
@@ -5956,9 +6056,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_CREATE){
             textToShow = String.format(context.getString(R.string.message_created_chat_link), toCDATA(holder.fullNameTitle));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -5968,9 +6072,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         else if(messageType == MegaChatMessage.TYPE_PUBLIC_HANDLE_DELETE){
             textToShow = String.format(context.getString(R.string.message_deleted_chat_link), toCDATA(holder.fullNameTitle));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -5980,9 +6088,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         else{
             textToShow = String.format(context.getString(R.string.message_set_chat_private), toCDATA(holder.fullNameTitle));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#060000\'><b>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'><b>");
                 textToShow = textToShow.replace("[/B]", "</b></font><br/><br/>");
                 textToShow += context.getString(R.string.subtitle_chat_message_enabled_ERK);
             } catch (Exception e) {
@@ -6030,9 +6142,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#868686\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }
@@ -6091,9 +6207,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(holder.fullNameTitle));
             try {
-                textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+                textToShow = textToShow.replace("[A]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                        + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
-                textToShow = textToShow.replace("[B]", "<font color=\'#00BFA5\'>");
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary)
+                        + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             } catch (Exception e) {
             }

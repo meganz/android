@@ -55,6 +55,12 @@
     <!-- Chat message forward icon tint -->
     <color name="grey_200_grey_500">@color/grey_500</color>
 
+    <!-- Chat management message name, e.g. Tom created a chat link, "Tom" is the name -->
+    <color name="grey_900_grey_100">@color/grey_100</color>
+
+    <!-- Chat management message text, e.g. Tom created a chat link, "created a chat link" is the text -->
+    <color name="grey_500_grey_400">@color/grey_400</color>
+
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/white_alpha_054</color>
 

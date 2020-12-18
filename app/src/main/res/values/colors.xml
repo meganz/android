@@ -255,12 +255,15 @@
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
     <color name="grey_050">#EEEEEE</color>
+    <color name="grey_100">#E0E0E0</color>
     <color name="grey_200">#BDBDBD</color>
     <color name="grey_300">#9E9E9E</color>
+    <color name="grey_400">#929292</color>
     <color name="grey_500">#757575</color>
     <color name="grey_600">#6C6C6C</color>
     <color name="grey_700">#4F4F4F</color>
     <color name="grey_800">#2E2E2E</color>
+    <color name="grey_900">#212121</color>
 
     <color name="grey_100_alpha_060">#99E0E0E0</color>
 
@@ -407,6 +410,12 @@
 
     <!-- Chat message forward icon tint -->
     <color name="grey_200_grey_500">@color/grey_200</color>
+
+    <!-- Chat management message name, e.g. Tom created a chat link, "Tom" is the name -->
+    <color name="grey_900_grey_100">@color/grey_900</color>
+
+    <!-- Chat management message text, e.g. Tom created a chat link, "created a chat link" is the text -->
+    <color name="grey_500_grey_400">@color/grey_500</color>
 
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
