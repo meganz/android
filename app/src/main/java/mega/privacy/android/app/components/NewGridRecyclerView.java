@@ -86,11 +86,15 @@ public class NewGridRecyclerView extends RecyclerView {
     }
     
     public int findFirstCompletelyVisibleItemPosition() {
-        return ((LinearLayoutManager)getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        LinearLayoutManager layoutManager = (LinearLayoutManager)getLayoutManager();
+        if (layoutManager == null) return RecyclerView.NO_POSITION;
+        return layoutManager.findFirstCompletelyVisibleItemPosition();
     }
     
     public int findFirstVisibleItemPosition() {
-        return ((LinearLayoutManager)getLayoutManager()).findFirstVisibleItemPosition();
+        LinearLayoutManager layoutManager = (LinearLayoutManager)getLayoutManager();
+        if (layoutManager == null) return RecyclerView.NO_POSITION;
+        return layoutManager.findFirstVisibleItemPosition();
     }
 
     /**
