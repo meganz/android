@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -54,6 +53,8 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
@@ -263,12 +264,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         } else {
             listDivider = PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
             binding.offlineBrowserList.addItemDecoration(listDivider!!)
-        }
-
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.emptyHintImage.setImageResource(R.drawable.empty_offline_landscape)
-        } else {
-            binding.emptyHintImage.setImageResource(R.drawable.empty_offline_portrait)
         }
 
         var textToShow = getString(R.string.context_empty_offline).toUpperCase()

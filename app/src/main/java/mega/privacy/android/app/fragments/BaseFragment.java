@@ -2,6 +2,8 @@ package mega.privacy.android.app.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -38,7 +40,7 @@ public class BaseFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         this.context = context;

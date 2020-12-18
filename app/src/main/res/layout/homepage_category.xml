@@ -56,7 +56,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_audio"
             app:layout_constraintTop_toTopOf="parent"
-            app:name="@string/upload_to_video"
+            app:name="@string/sortby_type_video_first"
             app:icon="@drawable/ic_videos"
             tools:layout_editor_absoluteY="16dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>

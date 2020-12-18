@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="business_account">#2BA6DE</color>
+
     <color name="pressed_mega">#CCcc0000</color>
     <color name="text_tab_alpha">#99ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
@@ -56,9 +58,10 @@
     <color name="ic_mic_read_message">#9e9e9e</color>
     <color name="ic_mic_unread_message">#00bfa5</color>
 
-    <color name="name_my_account">#de000000</color>
-    <color name="mail_my_account">#8a000000</color>
+    <color name="primary_text">#de000000</color>
+    <color name="secondary_text">#8a000000</color>
     <color name="forgot_pass_text">#91000000</color>
+    <color name="mail_my_account">#8a000000</color>
 
     <color name="tab_pressed">#ee0008</color>
 

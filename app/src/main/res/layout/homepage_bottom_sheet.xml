@@ -18,6 +18,7 @@
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
+            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

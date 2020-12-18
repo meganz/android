@@ -17,4 +17,12 @@ class OfflineSortedByViewHolder(
             this.sortByHeaderViewModel = sortByViewModel
         }
     }
+
+    override fun handleNodeClicked(position: Int) {
+        // don't handle click
+    }
+
+    override fun handleNodeLongClicked(position: Int) {
+        // don't handle long click
+    }
 }

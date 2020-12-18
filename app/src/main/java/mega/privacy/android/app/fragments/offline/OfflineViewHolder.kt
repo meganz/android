@@ -11,18 +11,24 @@ abstract class OfflineViewHolder(
 
     init {
         itemView.setOnClickListener {
-            val position = adapterPosition
-            listener.onNodeClicked(position, itemGetter(position))
+            handleNodeClicked(adapterPosition)
         }
 
         itemView.setOnLongClickListener {
-            val position = adapterPosition
-            listener.onNodeLongClicked(position, itemGetter(position))
+            handleNodeLongClicked(adapterPosition)
             true
         }
     }
 
     open fun bind(position: Int, node: OfflineNode) {
         node.uiDirty = false
+    }
+
+    open fun handleNodeClicked(position: Int) {
+        listener.onNodeClicked(position, itemGetter(position))
+    }
+
+    open fun handleNodeLongClicked(position: Int) {
+        listener.onNodeLongClicked(position, itemGetter(position))
     }
 }
