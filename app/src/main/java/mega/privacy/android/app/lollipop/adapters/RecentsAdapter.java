@@ -227,7 +227,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     private Spanned formatUserAction(String userAction) {
         try {
             userAction = userAction.replace("[A]", "<font color=\'" +
-                    ColorUtils.getColorHexString(context, R.color.grey_500_grey_600) + "\'>");
+                    ColorUtils.getColorHexString(context, R.color.grey_300_grey_600) + "\'>");
             userAction = userAction.replace("[/A]", "</font>");
         } catch (Exception e) {
             logError("Exception formatting string", e);

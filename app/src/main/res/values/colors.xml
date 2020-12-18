@@ -421,7 +421,7 @@
 
     <!-- Colors for empty content hint text. Must be non-alpha colors, for
       <font color=""> doesn't support alpha -->
-    <color name="grey_500_grey_600">@color/grey_500</color>
+    <color name="grey_300_grey_600">@color/grey_300</color>
 
     <!-- app drawer related related colors -->
     <color name="grey_010_white_087">@color/grey_010</color>

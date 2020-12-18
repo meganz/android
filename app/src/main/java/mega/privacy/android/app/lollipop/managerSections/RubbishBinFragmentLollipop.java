@@ -421,7 +421,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
@@ -446,7 +446,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
@@ -526,7 +526,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
@@ -551,7 +551,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
@@ -643,7 +643,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 									+ "\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
 							textToShow = textToShow.replace("[B]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+									+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 									+ "\'>");
 							textToShow = textToShow.replace("[/B]", "</font>");
 						}
@@ -669,7 +669,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 									+ "\'>");
 							textToShow = textToShow.replace("[/A]", "</font>");
 							textToShow = textToShow.replace("[B]", "<font color=\'"
-									+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+									+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 									+ "\'>");
 							textToShow = textToShow.replace("[/B]", "</font>");
 						}
@@ -1118,7 +1118,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}
@@ -1143,7 +1143,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]", "</font>");
 						textToShow = textToShow.replace("[B]", "<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]", "</font>");
 					}

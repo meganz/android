@@ -598,7 +598,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         String textToShow = originalMessage;
         try {
             textToShow = textToShow.replace("[A]", "<font color=" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_500_grey_600)
+                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
                     + ">");
             textToShow = textToShow.replace("[/A]", "</font>");
             textToShow = textToShow.replace("[B]", "<font color=" +

@@ -1086,7 +1086,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+							+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
@@ -1107,7 +1107,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							+ "\'>");
                     textToShow = textToShow.replace("[/A]","</font>");
                     textToShow = textToShow.replace("[B]","<font color=\'"
-							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+							+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 							+ "\'>");
                     textToShow = textToShow.replace("[/B]","</font>");
                 } catch (Exception e) {
@@ -1380,7 +1380,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {
@@ -1406,7 +1406,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 								+ "\'>");
 						textToShow = textToShow.replace("[/A]","</font>");
 						textToShow = textToShow.replace("[B]","<font color=\'"
-								+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_600)
+								+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
 								+ "\'>");
 						textToShow = textToShow.replace("[/B]","</font>");
 					} catch (Exception e) {

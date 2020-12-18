@@ -55,7 +55,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -1566,7 +1565,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         try {
             textToShowB = textToShowB.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                    + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                     + "\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");
             textToShowB = textToShowB.replace("[B]", "<font color=\'"

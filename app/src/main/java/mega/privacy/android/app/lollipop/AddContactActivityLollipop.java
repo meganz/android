@@ -1012,7 +1012,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
                     textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                             + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
@@ -1107,7 +1107,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
                     textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                             + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 } catch (Exception e) {
@@ -1150,7 +1150,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                         + "\'>");
                 textToShow = textToShow.replace("[/A]", "</font>");
                 textToShow = textToShow.replace("[B]", "<font color=\'"
-                        + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                        + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                         + "\'>");
                 textToShow = textToShow.replace("[/B]", "</font>");
             }
@@ -2074,7 +2074,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
                     textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                             + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
@@ -2128,7 +2128,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
                     textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                             + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
@@ -2193,7 +2193,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                             + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
                     textToShow = textToShow.replace("[B]", "<font color=\'"
-                            + ColorUtils.getColorHexString(this, R.color.grey_500_grey_600)
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
                             + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }

@@ -275,7 +275,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                         + "\'>"
             ).replace("[/A]", "</font>").replace(
                 "[B]", "<font color=\'"
-                        + getColorHexString(requireContext(), R.color.grey_500_grey_600)
+                        + getColorHexString(requireContext(), R.color.grey_300_grey_600)
                         + "\'>"
             ).replace("[/B]", "</font>")
         } catch (e: Exception) {
