@@ -5043,7 +5043,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						titleId = R.string.sortby_type_photo_first;
 						break;
 					case DOCUMENTS:
-						titleId = R.string.category_documents;
+						titleId = R.string.section_documents;
 						break;
 					case AUDIO:
 						titleId = R.string.upload_to_audio;

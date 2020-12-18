@@ -2916,7 +2916,8 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
 
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
 
