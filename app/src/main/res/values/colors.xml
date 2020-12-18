@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="free_account">#2BB200</color>
+    <color name="lite_account">#FFA500</color>
+    <color name="pro_account">#F0373A</color>
+    <color name="business_account">#2BA6DE</color>
+
 	<color name="pressed_mega">#CCcc0000</color>
     <color name="text_tab_alpha">#99ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
@@ -56,7 +61,6 @@
     <color name="black">#000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
-    <color name="upgrade_orange">#ffa500</color>
     <color name="upgrade_grey">#8d8d8d</color>
     <color name="filter_icon">#8d8d94</color>
     <color name="upgrade_white">#b9ffffff</color>
@@ -183,8 +187,6 @@
     <color name="yellow_notif_shares">#FFFFA500</color>
     <color name="green_notif_contacts">#FF00897B</color>
 
-    <color name="free_account">#2bb200</color>
-
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
@@ -225,4 +227,14 @@
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
     <color name="black_bottom_sheets_icon_tint">#8F000000</color>
+
+    <!-- NODE LABELS -->
+    <color name="label_red">#FF625D</color>
+    <color name="label_orange">#F9A646</color>
+    <color name="label_yellow">#F4CE4A</color>
+    <color name="label_green">#6DCB50</color>
+    <color name="label_blue">#4BB8F3</color>
+    <color name="label_purple">#D088E1</color>
+    <color name="label_grey">#A4A4A7</color>
+
 </resources>

@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -702,7 +704,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public void onAttach(Context context) {
+	public void onAttach(@NonNull Context context) {
 		logDebug("onAttach");
 		super.onAttach(context);
 		this.context = context;

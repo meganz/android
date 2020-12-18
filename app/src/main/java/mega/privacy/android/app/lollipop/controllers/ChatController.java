@@ -11,6 +11,7 @@ import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+
 import android.text.Html;
 import android.text.Spanned;
 
@@ -1535,7 +1536,7 @@ public class ChatController {
 
                         if (isVoiceClip(nodeList.get(0).getName())) {
                             service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                            service.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
+                            service.putExtra(EXTRA_TRANSFER_TYPE, APP_DATA_VOICE_CLIP);
                         } else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer) {
                             service.putExtra("fromMV", true);
                         }

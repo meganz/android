@@ -2,7 +2,6 @@ package mega.privacy.android.app;
 
 import android.app.Activity;
 import android.app.Application;
-import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -32,7 +31,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.emoji.bundled.BundledEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.provider.FontRequest;
 import android.text.Html;
 import android.text.Spanned;
@@ -114,7 +112,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.2_340";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.4_347";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
     DatabaseHandler dbH;
@@ -327,6 +325,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 					//Ask for MU and CU folder when App in init state
                     megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+
+					//Login transfers resumption
+					TransfersManagement.enableTransfersResumption();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -449,6 +450,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 					sendBroadcastUpdateAccountDetails();
 				}
+			} else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS) {
+				dbH.setTransferQueueStatus(request.getFlag());
 			}
 		}
 
@@ -567,7 +570,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-						clearIncomingCallNotification(chatId);
+						clearIncomingCallNotification(callId);
 						removeValues(chatId);
 						break;
 					case MegaChatCall.CALL_STATUS_DESTROYED:
@@ -712,6 +715,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
         chatManagement = new ChatManagement();
+
+		//Logout transfers resumption
+		TransfersManagement.enableTransfersResumption();
 
 		boolean staging = false;
 		if (dbH != null) {
@@ -1565,7 +1571,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			wakeLock.release();
 		}
 
-		clearIncomingCallNotification(chatId);
+		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 

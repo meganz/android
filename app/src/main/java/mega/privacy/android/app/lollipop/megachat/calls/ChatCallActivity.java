@@ -272,7 +272,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             return;
         }
 
-        clearIncomingCallNotification(chatId);
+        clearIncomingCallNotification(callChat.getId());
 
         titleToolbar.setText(getTitleChat(chat));
         updateSubTitle();
@@ -489,16 +489,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 return;
 
             long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+            long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
+
             if (chatIdReceived != getCurrentChatid()) {
                 logWarning("Call in different chat");
-                long callIdReceived = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
                 if (callChat != null && callIdReceived != callChat.getId() && (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE) || intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD))) {
                     checkAnotherCallOnHold();
                 }
                 return;
             }
 
-            long callIdReceived  = intent.getLongExtra(UPDATE_CALL_ID, MEGACHAT_INVALID_HANDLE);
             if (callIdReceived == MEGACHAT_INVALID_HANDLE) {
                 logWarning("Call recovered is incorrect");
                 return;
@@ -513,18 +513,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         case MegaChatCall.CALL_STATUS_HAS_LOCAL_STREAM:
                             updateLocalAV();
                             break;
+
                         case MegaChatCall.CALL_STATUS_IN_PROGRESS:
                             checkInProgressCall();
                             break;
-                        case MegaChatCall.CALL_STATUS_JOINING:
-                            break;
+
                         case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
                         case MegaChatCall.CALL_STATUS_DESTROYED:
                             checkTerminatingCall();
                             break;
+
                         case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
                             checkUserNoPresentInCall();
                             break;
+
                         case MegaChatCall.CALL_STATUS_RECONNECTING:
                             checkReconnectingCall();
                             break;
@@ -575,6 +577,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             }
 
             updateCall(callId);
+
             if(!intent.getAction().equals(ACTION_UPDATE_CALL)){
 
                 long peerId = intent.getLongExtra(UPDATE_PEER_ID, MEGACHAT_INVALID_HANDLE);
@@ -994,9 +997,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method to hide the FAB buttons.
      */
     private void hideFABs() {
-        videoFAB.hide();
         linearArrowVideo.setVisibility(View.GONE);
-        relativeVideo.setVisibility(View.GONE);
+
+        videoFAB.hide();
         microFAB.hide();
         speakerFAB.hide();
         onHoldFAB.hide();
@@ -1471,6 +1474,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         } else if (callChat.getStatus() == MegaChatCall.CALL_STATUS_REQUEST_SENT || callChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS || callChat.getStatus() == MegaChatCall.CALL_STATUS_JOINING || callChat.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
 
+            rejectFAB.hide();
+
             if (!microFAB.isShown()) microFAB.show();
             updateMicroFABStatus();
 
@@ -1484,8 +1489,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             updateVideoFABStatus();
 
             if(!hangFAB.isShown()) hangFAB.show();
-
-            rejectFAB.hide();
             answerCallFAB.hide();
 
             relativeVideo.setVisibility(View.VISIBLE);
@@ -1531,6 +1534,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         translateAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                rejectFAB.setEnabled(false);
             }
 
             @Override
@@ -1670,10 +1674,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Update video FAB status depending on the state of the local video.
      */
     private void updateVideoFABStatus() {
-        if (!videoFAB.isShown())
-            return;
-
-        if (callChat.hasLocalVideo()) {
+        if (callChat.hasLocalVideo() || callChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
             //Enable video FAB
             videoFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.accentColor)));
             videoFAB.setImageDrawable(getResources().getDrawable(R.drawable.ic_videocam_white));
