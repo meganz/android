@@ -2,6 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/participant_item_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -73,14 +74,14 @@
 
                 <ImageView
                     android:id="@+id/group_participants_state_circle"
-                    android:layout_width="6dp"
-                    android:layout_height="6dp"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
                     android:layout_alignTop="@id/group_participants_chat_name_text"
                     android:layout_toRightOf="@id/group_participants_chat_name_text"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="3dp"
                     android:layout_marginStart="6dp"
                     android:background="@null"
-                    android:src="@drawable/circle_status_contact_offline" />
+                    tools:src="@drawable/ic_offline_light" />
 
                 <TextView
                     android:id="@+id/group_participants_chat_mail_text"

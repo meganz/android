@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,8 +18,6 @@
             android:layout_height="40dp"
             android:scaleType="fitCenter"
             android:layout_marginLeft="18dp"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
             rounded:corner_radius="20dp"
             android:layout_centerVertical="true"/>
 
@@ -38,22 +37,21 @@
             android:layout_toRightOf="@id/contact_avatar"
             android:layout_marginTop="16dp"
             android:layout_marginLeft="13dp"
-            android:textColor="@color/file_list_first_row"
             android:maxLines="1"
             android:singleLine="true"
-            android:textSize="16sp"
-            rounded:emojiSize="14sp"/>
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            rounded:emojiSize="14sp" />
 
         <ImageView
             android:id="@+id/contact_state"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
             android:layout_alignTop="@id/contact_name"
             android:layout_toRightOf="@id/contact_name"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="6dp"
             android:background="@null"
-            android:src="@drawable/circle_status_contact_offline" />
+            tools:src="@drawable/ic_offline_light" />
 
         <TextView
             android:id="@+id/contact_mail"
@@ -62,31 +60,25 @@
             android:layout_below="@id/contact_name"
             android:layout_toRightOf="@id/contact_avatar"
             android:layout_marginLeft="13dp"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
             android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/file_list_second_row" />
+            android:maxLines="1" />
 
     </RelativeLayout>
 
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:background="@color/white">
+        android:layout_height="36dp">
 
         <TextView
             android:id="@+id/text_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="14sp"
-            android:fontFamily="sans-serif-light"
+            android:textAppearance="?attr/textAppearanceSubtitle2"
             android:layout_marginTop="8dp"
-            android:textStyle="bold"
-            android:layout_marginLeft="16dp"/>
+            android:layout_marginStart="16dp" />
 
     </RelativeLayout>
 

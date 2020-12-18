@@ -509,14 +509,12 @@
         <item name="android:layout_width">45dp</item>
         <item name="android:layout_height">45dp</item>
         <item name="android:layout_centerInParent">true</item>
-        <item name="android:indeterminateTint">@color/white</item>
     </style>
 
     <style name="SimpleDraweeViewMessages">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerInParent">true</item>
-        <item name="android:scaleType">centerInside</item>
         <item name="android:maxHeight">212dp</item>
         <item name="android:maxWidth">212dp</item>
     </style>
@@ -529,7 +527,6 @@
         <item name="android:maxHeight">212dp</item>
         <item name="android:maxWidth">212dp</item>
         <item name="android:layout_gravity">center_horizontal|center_vertical</item>
-        <item name="android:background">@android:color/transparent</item>
     </style>
 
     <style name="AppBottomSheetDialogThemeReactions" parent="Theme.Design.Light.BottomSheetDialog">
@@ -563,6 +560,14 @@
 
     <style name="ThemeOverlay.Mega.Button.TextButton" parent="">
         <item name="colorPrimary">?attr/colorSecondary</item>
+    </style>
+
+    <style name="Widget.Mega.Button.TextButton.Red">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton.Red</item>
+    </style>
+
+    <style name="ThemeOverlay.Mega.Button.TextButton.Red" parent="">
+        <item name="colorPrimary">@color/red_600_red_300</item>
     </style>
 
     <!-- Outlined button -->
@@ -669,6 +674,22 @@
         <item name="useMaterialThemeColors">false</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:minHeight">0dp</item>
+    </style>
+
+    <!--- SeekBar white, chat room own voice clip -->
+    <style name="Widget.Mega.SeekBar.White" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">@color/white_alpha_038</item>
+        <item name="android:progressTint">@color/white</item>
+        <item name="android:thumbTint">@color/white</item>
+        <item name="android:colorControlActivated">@color/white</item>
+    </style>
+
+    <!--- SeekBar teal, chat room contact voice clip -->
+    <style name="Widget.Mega.SeekBar.Secondary" parent="Widget.AppCompat.SeekBar">
+        <item name="android:progressBackgroundTint">?attr/colorSecondary</item>
+        <item name="android:progressTint">@color/teal_300</item>
+        <item name="android:thumbTint">@color/teal_300</item>
+        <item name="android:colorControlActivated">@color/teal_300</item>
     </style>
 
     <!-- For the CollapsingToolbarLayout -->

@@ -97,6 +97,8 @@
 
         <!-- Alert Dialog -->
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
+
+        <!-- Theme for ListPreference in settings, colorControlNormal controls radio button's tint color -->
         <item name="alertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog.ListPreference</item>
 
         <!-- Switch -->

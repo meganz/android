@@ -30,7 +30,7 @@
             android:layout_marginRight="-3dp"
             android:layout_marginBottom="-3dp"
             android:contentDescription="@null"
-            android:src="@drawable/ic_b_remove_avatar" />
+            android:src="@drawable/ic_cancel_avatar" />
     </RelativeLayout>
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -38,14 +38,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:textSize="12sp"
         app:emojiSize="10sp"
         android:singleLine="true"
         android:maxLines="1"
         android:maxWidth="60dp"
         android:gravity="center"
-        android:textColor="?android:attr/textColorSecondary"
-        android:fontFamily="roboto"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary"
         android:layout_below="@+id/chip_layout"/>
 
 </RelativeLayout>

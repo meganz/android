@@ -308,12 +308,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaUser().getHandle()), holder.contactStateIcon);
 		
 		if (multipleSelect && this.isItemChecked(position)) {
-				holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_contact_grid_selected));
+				holder.itemLayout.setBackgroundResource(R.drawable.background_item_grid_selected);
 				holder.contactSelectedIcon.setImageResource(R.drawable.ic_select_folder);
-		}
-		else{
-			holder.itemLayout.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.background_item_grid_new));
-			holder.contactSelectedIcon.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
+				holder.contactSelectedIcon.setVisibility(View.VISIBLE);
+		} else {
+			holder.itemLayout.setBackground(null);
+			holder.contactSelectedIcon.setVisibility(View.INVISIBLE);
 		}
 
 		holder.textViewContactName.setText(contact.getFullName());
@@ -370,10 +370,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.textViewContactName.setText(contact.getFullName());
 
 		if (contact.isSelected()) {
-			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 			holder.imageView.setImageResource(R.drawable.ic_select_avatar);
 		} else {
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
 
 			Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaUser().getHandle()), contact.getMegaUser().getEmail());
 			if (bitmap != null) {
@@ -454,8 +452,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.textViewContactName.setText(contact.getFullName());
 
 		if (!multipleSelect) {
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 			createDefaultAvatar(holder, contact);
 
 			UserAvatarListener listener = new UserAvatarListener(context, holder);
@@ -488,11 +484,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 			if(this.isItemChecked(position)){
 				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
-				holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.new_multiselect_color));
 			}
 			else{
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-
 				createDefaultAvatar(holder, contact);
 
 				UserAvatarListener listener = new UserAvatarListener(context, holder);

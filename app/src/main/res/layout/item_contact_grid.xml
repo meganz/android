@@ -1,9 +1,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/contact_grid_item_layout"
-	android:background="@drawable/background_item_grid_new"
+	android:background="@drawable/background_item_grid"
 	android:layout_margin="2dp"
 	android:padding="1dp"
 	android:descendantFocusability="blocksDescendants">
@@ -46,7 +47,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
 		android:layout_below="@id/contact_grid_relative_layout_avatar"
-		android:background="@color/new_background_fragment"/>
+		android:background="@color/grey_012_white_012"/>
 
 	<RelativeLayout
 		android:layout_width="match_parent"
@@ -57,11 +58,12 @@
 			android:id="@+id/contact_grid_three_dots"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:src="@drawable/ic_dots_vertical_grey"
 			android:background="@null"
 			android:padding="3dp"
 			android:layout_alignParentRight="true"
-			android:layout_centerVertical="true"/>
+			android:layout_centerVertical="true"
+			android:src="@drawable/ic_dots_vertical_grey"
+			app:tint="?android:attr/textColorSecondary" />
 
 		<LinearLayout
 			android:id="@+id/contact_grid_name_layout"
@@ -78,21 +80,19 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="6dp"
-				android:textColor="?android:attr/textColorPrimary"
-				android:textSize="15sp"
+				android:textAppearance="?attr/textAppearanceSubtitle1"
 				app:emojiSize="13sp"
 				android:maxLines="1"
 				android:singleLine="true"/>
 
 			<ImageView
 				android:id="@+id/contact_grid_drawable_state"
-				android:layout_width="6dp"
-				android:layout_height="6dp"
-				android:layout_marginTop="1dp"
+				android:layout_width="12dp"
+				android:layout_height="12dp"
 				android:layout_marginLeft="4dp"
 				android:layout_gravity="center_vertical"
 				android:background="@null"
-				android:src="@drawable/circle_status_contact_offline" />
+				tools:src="@drawable/ic_offline_light" />
 
 		</LinearLayout>
 

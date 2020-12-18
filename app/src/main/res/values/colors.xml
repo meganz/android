@@ -237,6 +237,8 @@
     <color name="white_alpha_008">#14FFFFFF</color>
     <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
+    <color name="white_alpha_015">#26FFFFFF</color>
+    <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
@@ -251,13 +253,20 @@
     <color name="dark_grey">#121212</color>
 
     <color name="grey_010">#FAFAFA</color>
+    <color name="grey_020">#F5F5F5</color>
+    <color name="grey_050">#EEEEEE</color>
+    <color name="grey_200">#BDBDBD</color>
     <color name="grey_300">#9E9E9E</color>
     <color name="grey_500">#757575</color>
     <color name="grey_600">#6C6C6C</color>
     <color name="grey_700">#4F4F4F</color>
     <color name="grey_800">#2E2E2E</color>
 
+    <color name="grey_100_alpha_060">#99E0E0E0</color>
+
+    <color name="grey_alpha_003">#08000000</color>
     <color name="grey_alpha_005">#0D000000</color>
+    <color name="grey_alpha_006">#0F000000</color>
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
     <color name="grey_alpha_026">#42000000</color>
@@ -271,6 +280,15 @@
 
     <color name="teal_200">#6DD2BF</color>
     <color name="teal_300">#00BFA5</color>
+    <color name="teal_400">#00B092</color>
+    <color name="teal_500">#00A07F</color>
+    <color name="teal_600">#009372</color>
+
+    <color name="teal_300_alpha_006">#0F00B092</color>
+    <color name="teal_400_alpha_036">#5C00B092</color>
+    <color name="teal_400_alpha_050">#8000B092</color>
+    <color name="teal_400_alpha_090">#E600B092</color>
+    <color name="teal_500_alpha_040">#6600B092</color>
 
     <color name="red_300">#F46762</color>
     <color name="red_400">#FD3E38</color>
@@ -300,6 +318,8 @@
 
     <color name="dark_blue_200">#85D2ED</color>
     <color name="dark_blue_500">#2BA6DE</color>
+
+    <color name="ambar_700">#FFA003</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
@@ -333,6 +353,24 @@
     <!-- chat room message loading image tint  -->
     <color name="grey_005_white_008">@color/grey_alpha_005</color>
 
+    <!-- chat reaction add/own emoji background fill -->
+    <color name="grey_003_white_018">@color/grey_alpha_003</color>
+
+    <!-- chat reaction add/own emoji background border -->
+    <color name="grey_012_white_015">@color/grey_alpha_012</color>
+
+    <!-- chat reaction contact emoji background fill -->
+    <color name="teal_300_006_teal_400_050">@color/teal_300_alpha_006</color>
+
+    <!-- chat reaction contact emoji background border -->
+    <color name="teal_300_teal_600">@color/teal_300</color>
+
+    <!-- chat unread message background -->
+    <color name="grey_020_grey_700">@color/grey_020</color>
+
+    <!-- chat room voice clip SeekBar progressBackgroundTint -->
+    <color name="white_018_white_038">@color/white_alpha_018</color>
+
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
@@ -341,6 +379,9 @@
 
     <!-- Chat observer layout background -->
     <color name="grey_050_white_050">@color/grey_alpha_050</color>
+
+    <!-- Chat sending location overlay -->
+    <color name="white_050_grey_050">@color/white_alpha_050</color>
 
     <!-- Same to textColorPrimary -->
     <color name="grey_087_white_087">@color/grey_alpha_087</color>
@@ -358,8 +399,14 @@
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
 
+    <!-- Giphy loading placeholder -->
+    <color name="grey_050_grey_800">@color/grey_050</color>
+
     <!-- Chat message unselected icon tint -->
     <color name="grey_600_white_087">@color/grey_600</color>
+
+    <!-- Chat message forward icon tint -->
+    <color name="grey_200_grey_500">@color/grey_200</color>
 
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
@@ -399,4 +446,21 @@
     <color name="orange_400_orange_300">@color/orange_400</color>
     <!-- Online -->
     <color name="lime_green_500_300">@color/lime_green_500</color>
+
+    <!-- Chat contact text message text color -->
+    <color name="grey_087_white">@color/grey_alpha_087</color>
+
+    <!-- Chat contact file info color -->
+    <color name="grey_054_white">@color/grey_alpha_054</color>
+
+    <!-- Chat contact reaction emoji count text color -->
+    <color name="teal_300_white">@color/teal_300</color>
+
+    <!-- chat own text message background -->
+    <color name="teal_500_teal_400_090">@color/teal_500</color>
+    <!-- chat own text message background, sending -->
+    <color name="teal_500_040_teal_400_036">@color/teal_500_alpha_040</color>
+
+    <!-- chat contact text message background -->
+    <color name="grey_100_060_white_023">@color/grey_100_alpha_060</color>
 </resources>

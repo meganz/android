@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/participant_list_item_layout"
     android:layout_width="fill_parent"
     android:layout_height="72dp"
@@ -80,14 +81,14 @@
 
         <ImageView
             android:id="@+id/group_participants_state_circle"
-            android:layout_width="6dp"
-            android:layout_height="6dp"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
             android:layout_alignTop="@id/participant_list_name"
             android:layout_toRightOf="@id/participant_list_name"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="3dp"
             android:layout_marginLeft="6dp"
             android:background="@null"
-            android:src="@drawable/circle_status_contact_offline" />
+            tools:src="@drawable/ic_offline_light" />
 
         <mega.privacy.android.app.components.MarqueeTextView
             android:id="@+id/participant_list_content"

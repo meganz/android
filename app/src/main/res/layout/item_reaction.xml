@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/general_rl"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -12,8 +13,8 @@
         android:paddingStart="10dp"
         android:layout_centerVertical="true"
         android:gravity="center_vertical"
-        android:background="@drawable/contact_reaction_added"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:background="@drawable/contact_reaction_added">
 
         <mega.privacy.android.app.components.twemoji.reaction.ReactionImageView
             android:id="@+id/item_emoji_reaction"
@@ -47,8 +48,7 @@
             android:lines="1"
             android:layout_toEndOf="@id/item_emoji_reaction"
             android:layout_marginEnd="8dp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="14sp"/>
+            tools:textAppearance="@style/TextAppearance.Mega.Body2.Variant6" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -56,7 +56,7 @@
         android:layout_width="40dp"
         android:layout_height="28dp"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/rounded_add_reaction"
+        android:background="@drawable/own_reaction_added"
         android:visibility="visible">
 
         <ImageView
@@ -65,6 +65,7 @@
             android:layout_centerInParent="true"
             android:adjustViewBounds="true"
             android:background="@null"
-            android:src="@drawable/ic_emoji_add" />
+            android:src="@drawable/ic_emoji_add"
+            app:tint="?attr/textColorHint" />
     </RelativeLayout>
 </RelativeLayout>

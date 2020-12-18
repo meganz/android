@@ -97,7 +97,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_search"
+                    android:src="@drawable/ic_menu_search"
                     android:visibility="visible" />
 
                 <TextView

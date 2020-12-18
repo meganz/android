@@ -161,7 +161,7 @@
                     android:id="@+id/empty_image_view_recent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/empty_text_chat_recent_invite"
+                    android:layout_above="@id/empty_text_chat_recent_invite"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true" />
 
@@ -169,12 +169,11 @@
                     android:id="@+id/empty_text_chat_recent_invite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/empty_text_chat_recent"
+                    android:layout_above="@id/empty_text_chat_recent"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:maxWidth="300dp"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
                 <TextView
                     android:id="@+id/empty_text_chat_recent"
@@ -182,13 +181,12 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center"
-                    android:textColor="@color/adapters_background"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/empty_data_font_size" />
 
                 <Button
                     android:id="@+id/invite_button"
                     style="?attr/borderlessButtonStyle"
-                    android:layout_below="@+id/empty_text_chat_recent"
+                    android:layout_below="@id/empty_text_chat_recent"
                     android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal" />
             </RelativeLayout>

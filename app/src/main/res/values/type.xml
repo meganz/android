@@ -53,6 +53,12 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.AccentColor.Variant1">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
@@ -79,6 +85,10 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
@@ -92,8 +102,19 @@
 
     <!-- In material design, for the CheckedTextView -->
     <!-- Regular, 16sp, 0.15px, textColorPrimary-->
-<!--    <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">-->
-<!--    </style>-->
+    <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
+    </style>
+
+    <!-- Chat own send contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Chat contact send contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant2">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
 
     <!-- ================== Body2 ====================== -->
 
@@ -141,6 +162,41 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <!-- Chat own message text -->
+    <style name="TextAppearance.Mega.Body2.Variant3">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Chat contact message text -->
+    <style name="TextAppearance.Mega.Body2.Variant4">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
+    <!-- Chat new message -->
+    <style name="TextAppearance.Mega.Body2.Variant5">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <!-- Chat own reaction emoji count -->
+    <style name="TextAppearance.Mega.Body2.Variant6">
+        <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
+    <!-- Chat contact reaction emoji count -->
+    <style name="TextAppearance.Mega.Body2.Variant7">
+        <item name="android:textColor">@color/teal_300_white</item>
+    </style>
+
+    <!-- Add contact email input -->
+    <style name="TextAppearance.Mega.Body2.Variant8">
+        <item name="android:textColor">@color/black_white</item>
+    </style>
+
+    <!-- Add contact empty hint -->
+    <style name="TextAppearance.Mega.Body2.Variant9">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
@@ -174,6 +230,16 @@
     <!-- Regular, 12sp, 0px -->
     <style name="TextAppearance.Mega.Caption.OnSecondary">
         <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, chat own file info -->
+    <style name="TextAppearance.Mega.Caption.Variant">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Regular, 12sp, 0px, chat contact file info -->
+    <style name="TextAppearance.Mega.Caption.Variant2">
+        <item name="android:textColor">@color/grey_054_white</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->
