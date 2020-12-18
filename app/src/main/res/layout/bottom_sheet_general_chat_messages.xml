@@ -357,7 +357,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:src="@drawable/ic_add_contact_chat_item"
+                        android:src="@drawable/ic_g_add_contact"
                         android:visibility="visible"
                         app:tint="?android:attr/textColorSecondary" />
 

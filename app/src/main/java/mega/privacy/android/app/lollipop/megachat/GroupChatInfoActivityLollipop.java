@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,7 +11,7 @@ import androidx.annotation.NonNull;
 
 import android.graphics.Bitmap;
 
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +59,7 @@ import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -399,7 +400,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             megaChatApi.signalPresenceActivity();
         }
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(groupChatInfoActivity, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(groupChatInfoActivity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String name = chatC.getParticipantFullName(handle);
         builder.setMessage(getResources().getString(R.string.confirmation_remove_chat_contact, name))
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeParticipant())
@@ -431,12 +432,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams administratorMLP = (ViewGroup.MarginLayoutParams) administratorCheck.getLayoutParams();
         administratorMLP.setMargins(scaleWidthPx(17, getOutMetrics()), 0, 0, 0);
 
-        final TextView administratorTitle = dialoglayout.findViewById(R.id.administrator_title);
-        administratorTitle.setText(getString(R.string.administrator_permission_label_participants_panel));
-        administratorTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
-        final TextView administratorSubtitle = dialoglayout.findViewById(R.id.administrator_subtitle);
-        administratorSubtitle.setText(getString(R.string.file_properties_shared_folder_full_access));
-        administratorSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout administratorTextLayout = dialoglayout.findViewById(R.id.administrator_text_layout);
         ViewGroup.MarginLayoutParams administratorSubtitleMLP = (ViewGroup.MarginLayoutParams) administratorTextLayout.getLayoutParams();
         administratorSubtitleMLP.setMargins(scaleHeightPx(10, getOutMetrics()), scaleHeightPx(15, getOutMetrics()), 0, scaleHeightPx(15, getOutMetrics()));
@@ -447,12 +442,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams memberMLP = (ViewGroup.MarginLayoutParams) memberCheck.getLayoutParams();
         memberMLP.setMargins(scaleWidthPx(17, getOutMetrics()), 0, 0, 0);
 
-        final TextView memberTitle = dialoglayout.findViewById(R.id.member_title);
-        memberTitle.setText(getString(R.string.standard_permission_label_participants_panel));
-        memberTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
-        final TextView memberSubtitle = dialoglayout.findViewById(R.id.member_subtitle);
-        memberSubtitle.setText(getString(R.string.file_properties_shared_folder_read_write));
-        memberSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout memberTextLayout = dialoglayout.findViewById(R.id.member_text_layout);
         ViewGroup.MarginLayoutParams memberSubtitleMLP = (ViewGroup.MarginLayoutParams) memberTextLayout.getLayoutParams();
         memberSubtitleMLP.setMargins(scaleHeightPx(10, getOutMetrics()), scaleHeightPx(15, getOutMetrics()), 0, scaleHeightPx(15, getOutMetrics()));
@@ -463,17 +452,11 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         ViewGroup.MarginLayoutParams observerMLP = (ViewGroup.MarginLayoutParams) observerCheck.getLayoutParams();
         observerMLP.setMargins(scaleWidthPx(17, getOutMetrics()), 0, 0, 0);
 
-        final TextView observerTitle = dialoglayout.findViewById(R.id.observer_title);
-        observerTitle.setText(getString(R.string.observer_permission_label_participants_panel));
-        observerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16));
-        final TextView observerSubtitle = dialoglayout.findViewById(R.id.observer_subtitle);
-        observerSubtitle.setText(getString(R.string.subtitle_read_only_permissions));
-        observerSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14));
         final LinearLayout observerTextLayout = dialoglayout.findViewById(R.id.observer_text_layout);
         ViewGroup.MarginLayoutParams observerSubtitleMLP = (ViewGroup.MarginLayoutParams) observerTextLayout.getLayoutParams();
         observerSubtitleMLP.setMargins(scaleHeightPx(10, getOutMetrics()), scaleHeightPx(15, getOutMetrics()), 0, scaleHeightPx(15, getOutMetrics()));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialoglayout);
 
         builder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
@@ -623,7 +606,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setOnLongClickListener(v -> false);
         input.setSingleLine();
         input.setSelectAllOnFocus(true);
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         input.setEmojiSize(dp2px(EMOJI_SIZE, getOutMetrics()));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -633,7 +616,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxAllowed)});
         input.setText(getTitleChat(chat));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         input.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 changeTitle(input);
@@ -673,7 +656,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     }
 
     public void showConfirmationClearChat() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = getResources().getString(R.string.confirmation_clear_group_chat);
         builder.setTitle(R.string.title_confirmation_clear_group_chat);
         builder.setMessage(message)
@@ -685,7 +668,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void showConfirmationLeaveChat() {
         logDebug("Chat ID: " + chat.getChatId());
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message = getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message)
@@ -1043,7 +1026,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
     public void showConfirmationPrivateChatDialog() {
         logDebug("showConfirmationPrivateChatDialog");
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_chat_link_options, null);
@@ -1078,7 +1061,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void showConfirmationCreateChatLinkDialog() {
         logDebug("showConfirmationCreateChatLinkDialog");
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_chat_link_options, null);

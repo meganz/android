@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_attachment_bottom_sheet"
     android:layout_width="match_parent"
@@ -29,9 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter"
-                rounded:border_color="@color/border_file_properties"
-                rounded:border_width="0dp"
-                rounded:corner_radius="20dp" />
+                app:corner_radius="20dp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -61,7 +59,7 @@
                 android:singleLine="true"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp"
-                rounded:emojiSize="14sp" />
+                app:emojiSize="14sp" />
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/contact_attachment_chat_mail_text"
@@ -73,7 +71,7 @@
                 android:singleLine="true"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp"
-                rounded:emojiSize="12sp" />
+                app:emojiSize="12sp" />
 
         </RelativeLayout>
 
@@ -214,9 +212,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_add_contact_chat_item"
-                    android:tint="?android:attr/textColorSecondary"
-                    android:visibility="visible" />
+                    android:src="@drawable/ic_g_add_contact"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_invite_text"

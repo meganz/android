@@ -99,10 +99,10 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         optionLeaveChat.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
         optionStartCall.setVisibility(View.GONE);
-        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
-        LinearLayout separatorChat = contentView.findViewById(R.id.separator_chat);
-        LinearLayout separatorOptions = contentView.findViewById(R.id.separator_options);
-        LinearLayout separatorLeave = contentView.findViewById(R.id.separator_leave);
+        View separatorInfo = contentView.findViewById(R.id.separator_info);
+        View separatorChat = contentView.findViewById(R.id.separator_chat);
+        View separatorOptions = contentView.findViewById(R.id.separator_options);
+        View separatorLeave = contentView.findViewById(R.id.separator_leave);
 
         if (isScreenInPortrait(context)) {
             titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));

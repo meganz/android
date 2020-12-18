@@ -34,17 +34,15 @@
 					android:id="@+id/administrator_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="?android:attr/textColorPrimary"
-					android:fontFamily="roboto"
-					android:gravity="left"/>
+					android:text="@string/administrator_permission_label_participants_panel"
+					android:textAppearance="?attr/textAppearanceSubtitle1" />
 
 				<TextView
 					android:id="@+id/administrator_subtitle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="?android:attr/textColorSecondary"
-					android:fontFamily="roboto"
-					android:gravity="left"/>
+					android:text="@string/file_properties_shared_folder_full_access"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
 			</LinearLayout>
 
@@ -76,17 +74,15 @@
 					android:id="@+id/member_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="?android:attr/textColorPrimary"
-					android:fontFamily="roboto"
-					android:gravity="left"/>
+					android:text="@string/standard_permission_label_participants_panel"
+					android:textAppearance="?attr/textAppearanceSubtitle1" />
 
 				<TextView
 					android:id="@+id/member_subtitle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="?android:attr/textColorSecondary"
-					android:fontFamily="roboto"
-					android:gravity="left"/>
+					android:text="@string/file_properties_shared_folder_read_write"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
 			</LinearLayout>
 
@@ -118,17 +114,15 @@
 					android:id="@+id/observer_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="?android:attr/textColorPrimary"
-					android:fontFamily="roboto"
-					android:gravity="left"/>
+					android:text="@string/observer_permission_label_participants_panel"
+					android:textAppearance="?attr/textAppearanceSubtitle1" />
 
 				<TextView
 					android:id="@+id/observer_subtitle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="?android:attr/textColorSecondary"
-					android:fontFamily="roboto"
-					android:gravity="left"/>
+					android:text="@string/subtitle_read_only_permissions"
+					android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
 			</LinearLayout>
 
