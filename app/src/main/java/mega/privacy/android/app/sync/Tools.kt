@@ -2,7 +2,6 @@ package mega.privacy.android.app.sync
 
 import mega.privacy.android.app.DatabaseHandler.*
 import mega.privacy.android.app.MegaApplication
-import java.lang.Boolean
 
 /**
  * @return Name of the node with the handle. null if the node doesn't exist.
@@ -19,14 +18,14 @@ fun updateSQL(backup: Backup) =
             "$KEY_BACKUP_LOCAL_FOLDER = '${encrypt(backup.localFolder)}', " +
             "$KEY_BACKUP_TARGET_NODE_PATH = '${encrypt(backup.targetFolderPath)}', " +
             "$KEY_BACKUP_TARGET_NODE = '${encrypt(backup.targetNode.toString())}', " +
-            "$KEY_BACKUP_EX = '${encrypt(Boolean.toString(backup.isExcludeSubFolders))}', " +
-            "$KEY_BACKUP_DEL = '${encrypt(Boolean.toString(backup.isDeleteEmptySubFolders))}', " +
+            "$KEY_BACKUP_EX = '${encrypt(backup.isExcludeSubFolders.toString())}', " +
+            "$KEY_BACKUP_DEL = '${encrypt(backup.isDeleteEmptySubFolders.toString())}', " +
             "$KEY_BACKUP_START_TIME = '${encrypt(backup.startTimestamp.toString())}', " +
             "$KEY_BACKUP_LAST_TIME = '${encrypt(backup.lastFinishTimestamp.toString())}', " +
             "$KEY_BACKUP_STATE = ${backup.state}, " +
             "$KEY_BACKUP_SUB_STATE = ${backup.subState}, " +
             "$KEY_BACKUP_EXTRA_DATA = '${encrypt(backup.extraData)}', " +
-            "$KEY_BACKUP_OUTDATED = '${encrypt(Boolean.toString(backup.outdated))}'" +
+            "$KEY_BACKUP_OUTDATED = '${encrypt(backup.outdated.toString())}'" +
             "WHERE $KEY_BACKUP_ID = '${encrypt(backup.backupId.toString())}'"
 
 /**
