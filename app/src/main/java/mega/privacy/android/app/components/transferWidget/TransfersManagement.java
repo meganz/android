@@ -1,13 +1,21 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import nz.mega.sdk.MegaApiAndroid;
@@ -18,6 +26,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.SDCardUtils.checkSDCardCompletedTransfers;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
@@ -246,6 +255,43 @@ public class TransfersManagement {
                 logWarning("Exception checking pending transfers", e);
             }
         }, WAIT_TIME_TO_RESTART_SERVICES);
+    }
+
+    /**
+     * Creates the initial notification when a service starts.
+     *
+     * @param notificationChannelId   Identifier of the notification channel.
+     * @param notificationChannelName Name of the notification channel.
+     * @param mNotificationManager    NotificationManager to create the notification.
+     * @param mBuilder                Builder to create the notification.
+     * @return The initial notification created.
+     */
+    public static Notification createInitialServiceNotification(String notificationChannelId,
+                                                                String notificationChannelName,
+                                                                NotificationManager mNotificationManager,
+                                                                NotificationCompat.Builder mBuilderCompat,
+                                                                Notification.Builder mBuilder) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setContentTitle(getString(R.string.download_preparing_files))
+                    .setAutoCancel(true);
+
+            return mBuilderCompat.build();
+        } else {
+            mBuilder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setContentTitle(getString(R.string.download_preparing_files))
+                    .setAutoCancel(true);
+
+            return mBuilder.build();
+        }
     }
 
     /**
