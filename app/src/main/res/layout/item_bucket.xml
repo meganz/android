@@ -42,15 +42,17 @@
                 android:orientation="vertical"
                 android:paddingTop="15dp">
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/first_line_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
+                        android:layout_weight="1"
                         android:textColor="@color/primary_text"
                         android:singleLine="true"
                         android:ellipsize="middle" />
@@ -59,11 +61,8 @@
                         android:id="@+id/img_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/first_line_text"
-                        android:layout_alignBottom="@id/first_line_text"
                         android:layout_gravity="center"
                         android:layout_margin="4dp"
-                        android:layout_toEndOf="@+id/first_line_text"
                         android:src="@drawable/ic_circle_label"
                         android:visibility="gone"
                         tools:visibility="visible" />
@@ -72,15 +71,12 @@
                         android:id="@+id/img_favourite"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/first_line_text"
-                        android:layout_alignBottom="@id/first_line_text"
                         android:layout_gravity="center"
                         android:layout_margin="4dp"
-                        android:layout_toEndOf="@+id/img_label"
                         android:src="@drawable/ic_favorite"
                         android:visibility="gone"
                         tools:visibility="visible" />
-                </RelativeLayout>
+                </LinearLayout>
 
 
                 <TextView
