@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -151,13 +152,27 @@ class WebViewActivity : BaseActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.isEmpty()) {
+            return
+        }
 
-        } else {
-            showSnackbar(
-                binding.root,
-                StringResourcesUtils.getString(R.string.files_required_permissions_warning)
-            )
+
+        for (result in grantResults.indices) {
+            if (grantResults[result] == PackageManager.PERMISSION_DENIED) {
+                val warningText =
+                    StringResourcesUtils.getString(R.string.files_required_permissions_warning)
+
+                if (!PermissionUtils.shouldShowRequestPermissionRationale(
+                        this,
+                        getRequestedPermission(requestCode)
+                    )
+                ) {
+                    showSnackbar(PERMISSIONS_TYPE, binding.root, warningText)
+                } else {
+                    showSnackbar(binding.root, warningText)
+                }
+                break
+            }
         }
     }
 
@@ -190,6 +205,43 @@ class WebViewActivity : BaseActivity() {
         }
 
         return false
+    }
+
+    private fun getRequestedPermission(requestCode: Int): String {
+        return when (requestCode) {
+            REQUEST_ALL -> {
+                if (!hasPermissions(this, WRITE_EXTERNAL_STORAGE)) {
+                    WRITE_EXTERNAL_STORAGE
+                } else if (hasPermissions(this, CAMERA)) {
+                    CAMERA
+                } else {
+                    RECORD_AUDIO
+                }
+            }
+            REQUEST_WRITE_AND_RECORD_AUDIO -> {
+                if (!hasPermissions(this, WRITE_EXTERNAL_STORAGE)) {
+                    WRITE_EXTERNAL_STORAGE
+                } else {
+                    RECORD_AUDIO
+                }
+            }
+            REQUEST_WRITE_STORAGE -> {
+                WRITE_EXTERNAL_STORAGE
+            }
+            REQUEST_CAMERA_AND_RECORD_AUDIO -> {
+                if (hasPermissions(this, CAMERA)) {
+                    CAMERA
+                } else {
+                    RECORD_AUDIO
+                }
+            }
+            REQUEST_CAMERA -> {
+                CAMERA
+            }
+            else -> {
+                RECORD_AUDIO
+            }
+        }
     }
 
     private fun launchChooserIntent(): Boolean {
