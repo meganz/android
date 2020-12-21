@@ -2,8 +2,7 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/export_MK_fragment_container"
@@ -12,7 +11,6 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="17dp"
         android:layout_marginEnd="24dp"
-        android:background="@color/white"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -25,9 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/backup_title"
-                android:textAllCaps="true"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps"
                 android:textStyle="bold" />
 
             <TextView
@@ -37,8 +33,7 @@
                 android:layout_below="@id/title_export_MK_layout"
                 android:layout_marginTop="33dp"
                 android:text="@string/backup_subtitle"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
             <TextView
                 android:id="@+id/first_par_export_MK_layout"
@@ -47,8 +42,7 @@
                 android:layout_below="@id/subtitle_export_MK_layout"
                 android:layout_marginTop="20dp"
                 android:text="@string/backup_first_paragraph"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
             <TextView
                 android:id="@+id/second_par_export_MK_layout"
@@ -57,8 +51,7 @@
                 android:layout_below="@id/first_par_export_MK_layout"
                 android:layout_marginTop="16dp"
                 android:text="@string/backup_second_paragraph"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
             <TextView
                 android:id="@+id/third_par_export_MK_layout"
@@ -67,8 +60,7 @@
                 android:layout_below="@id/second_par_export_MK_layout"
                 android:layout_marginTop="24dp"
                 android:text="@string/backup_third_paragraph"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView
                 android:id="@+id/action_export_MK_layout"
@@ -77,8 +69,7 @@
                 android:layout_below="@id/third_par_export_MK_layout"
                 android:layout_marginTop="20dp"
                 android:text="@string/backup_action"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             <LinearLayout
                 android:id="@+id/MK_buttons_layout"
@@ -87,13 +78,12 @@
                 android:layout_below="@id/action_export_MK_layout"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:background="@color/white"
                 android:gravity="start"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/print_MK_button"
-                    style="@style/AccentBorderBackgroundBorderlessButton"
+                    style="@style/Widget.Mega.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/context_option_print"
@@ -101,7 +91,7 @@
 
                 <Button
                     android:id="@+id/copy_MK_button"
-                    style="@style/AccentBorderBackgroundBorderlessButton"
+                    style="@style/Widget.Mega.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -110,7 +100,7 @@
 
                 <Button
                     android:id="@+id/save_MK_button"
-                    style="@style/AccentBorderBackgroundBorderlessButton"
+                    style="@style/Widget.Mega.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
