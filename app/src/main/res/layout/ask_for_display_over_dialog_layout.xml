@@ -33,14 +33,14 @@
             android:src="@drawable/il_call_interface"/>
 
         <TextView
-            style="@style/GetFreeXxGbWhen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/ask_for_display_over_msg"
             android:gravity="start"
             android:lineSpacingMultiplier="1.27"
-            android:textAlignment="textStart"/>
+            android:textAlignment="textStart"
+            android:textAppearance="?attr/textAppearanceSubtitle1" />
 
     </LinearLayout>
 

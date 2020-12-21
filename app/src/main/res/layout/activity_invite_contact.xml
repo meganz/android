@@ -3,22 +3,15 @@
     android:id="@+id/relative_container_invite_contact"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:fitsSystemWindows="true"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/invite_contact_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/Theme.Megaactionbar"
-        app:subtitleTextAppearance="@style/ToolbarSubtitle"
-        app:subtitleTextColor="?android:attr/textColorSecondary"
-        app:theme="@style/Theme.Megaactionbar"
-        app:titleTextAppearance="@style/ToolbarTitle"
-        app:titleTextColor="?android:attr/textColorPrimary" />
+        android:minHeight="?attr/actionBarSize" />
 
     <LinearLayout
         android:id="@+id/invite_contacts_container"
@@ -31,21 +24,18 @@
             android:id="@+id/container_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/layout_type_mail"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@color/white">
+                android:layout_height="50dp">
 
-                <HorizontalScrollView xmlns:tools="http://schemas.android.com/tools"
+                <HorizontalScrollView
                     android:id="@+id/scroller"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fillViewport="true"
-                    tools:context=".MainActivity">
+                    android:fillViewport="true">
 
                     <RelativeLayout
                         android:id="@+id/text_container"
@@ -70,16 +60,13 @@
                             android:layout_marginRight="18dp"
                             android:paddingLeft="6dp"
                             android:layout_toRightOf="@+id/label_container"
-                            android:backgroundTint="@color/white"
                             android:hint="@string/type_mail"
                             android:inputType="textEmailAddress"
                             android:maxLines="1"
                             android:minWidth="100dp"
                             android:singleLine="true"
-                            android:textColor="#FF4A4A4A"
-                            android:textColorHint="@color/emoji_icons"
-                            android:textCursorDrawable="@drawable/cursor_color"
-                            android:textSize="13sp" />
+                            android:backgroundTint="?attr/colorSurface"
+                            android:textAppearance="@style/TextAppearance.Mega.Body2.Variant8" />
 
                     </RelativeLayout>
                 </HorizontalScrollView>
@@ -89,41 +76,35 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/layout_scan_qr"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:background="@color/white">
+                android:layout_height="56dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="sans-serif-light"
                     android:paddingLeft="16dp"
                     android:text="@string/menu_item_scan_code"
-                    android:textAllCaps="true"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1" />
 
                 <View
                     android:id="@+id/separator_scan_qr"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignParentBottom="true"
-                    android:background="@color/black_12_alpha" />
+                    android:background="@color/grey_012_white_012" />
             </RelativeLayout>
         </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/invite_contact_list_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white">
+            android:layout_height="match_parent">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -144,8 +125,7 @@
                         android:paddingTop="5dp"
                         android:paddingBottom="5dp"
                         android:text="@string/contacts_phone"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
+                        android:textAppearance="?attr/textAppearanceSubtitle2"
                         android:visibility="gone" />
 
                     <ImageView
@@ -153,7 +133,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/ic_empty_contacts"
+                        android:src="@drawable/empty_contacts_portrait"
                         android:visibility="gone" />
 
                     <TextView
@@ -162,8 +142,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:gravity="center"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="18sp" />
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
 
                     <TextView
                         android:id="@+id/invite_contact_list_empty_subtext"
@@ -175,8 +154,7 @@
                         android:gravity="center"
                         android:lineSpacingMultiplier="1.29"
                         android:text="@string/invite_contacts_to_start_chat"
-                        android:textColor="@color/grey_achievements_invite_friends_sub"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Variant9" />
 
                     <ProgressBar
                         android:id="@+id/invite_contact_progress_bar"
@@ -218,9 +196,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:elevation="@dimen/elevation_low"
-        android:src="@drawable/ic_send_white"
-        android:stateListAnimator="@anim/button_elevation"
-        android:tint="@android:color/white" />
+        android:src="@drawable/ic_send_white" />
 
 </RelativeLayout>

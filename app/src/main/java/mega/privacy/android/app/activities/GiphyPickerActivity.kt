@@ -77,12 +77,9 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         binding = ActivityGiphyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.dark_primary_color)
-
         setSupportActionBar(binding.giphyToolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_grey)
         binding.giphyToolbar.title = getString(R.string.search_giphy_title)
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
@@ -370,7 +367,6 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
 
         val searchAutoComplete =
             searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
-        searchAutoComplete.setTextColor(ContextCompat.getColor(applicationContext, R.color.giphy_search_text))
         searchAutoComplete.hint = getString(R.string.search_giphy_title)
 
         searchMenuItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {

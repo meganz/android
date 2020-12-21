@@ -135,7 +135,7 @@
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Mega.Swipe">
         </activity>
 
         <activity
@@ -143,7 +143,7 @@
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Mega.Swipe">
         </activity>
 
         <activity
@@ -331,7 +331,6 @@
 	    <activity
 		    android:name="mega.privacy.android.app.lollipop.InviteContactActivity"
 		    android:label="@string/app_name"
-		    android:theme="@style/Theme.Megaactionbar"
 		    android:windowSoftInputMode="adjustNothing">
 	    </activity>
 
@@ -349,8 +348,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
 
         <activity
@@ -508,14 +506,12 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/search_giphy_title"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Giphy"
             android:windowSoftInputMode="adjustNothing">
 
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.GiphyViewerActivity"
-            android:theme="@style/Theme.Giphy"
             android:launchMode="singleTop">
         </activity>
 

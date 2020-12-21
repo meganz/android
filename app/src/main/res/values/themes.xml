@@ -2,6 +2,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.Mega" parent="Base.Theme.Mega" />
+
+    <style name="Theme.Mega.Swipe">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Base.Theme.Mega" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!--Material color attributes (light theme) -->
