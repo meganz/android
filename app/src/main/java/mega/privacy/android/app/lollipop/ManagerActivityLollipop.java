@@ -6088,13 +6088,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	mNavController.navigate(
     			HomepageFragmentDirections.Companion.actionHomepageToFullscreenOffline(path, false),
 				new NavOptions.Builder().setLaunchSingleTop(true).build());
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-				&& !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			ActivityCompat.requestPermissions(this,
-					new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-					REQUEST_WRITE_STORAGE);
-		}
 	}
 
 	public void fullscreenOfflineFragmentOpened(OfflineFragment fragment) {
