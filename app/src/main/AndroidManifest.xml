@@ -135,7 +135,7 @@
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Mega.Swipe">
         </activity>
 
         <activity
@@ -143,7 +143,7 @@
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Swipe.BackFullScreen">
+            android:theme="@style/Theme.Mega.Swipe">
         </activity>
 
         <activity

@@ -29,6 +29,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CheckBox;
@@ -290,11 +291,24 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		return super.onOptionsItemSelected(item);
 	}
 
-
+	@Override
+	protected boolean shouldSetStatusBarTextColor() {
+		return false;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
+
+		Window window = getWindow();
+		window.setNavigationBarColor(ContextCompat.getColor(this, R.color.black));
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.setStatusBarColor(ContextCompat.getColor(this, R.color.black));
+		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+		window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		super.onCreate(savedInstanceState);
 
 		handler = new Handler();
@@ -620,7 +634,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		final CheckBox dontShowAgain =new CheckBox(this);
 		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
 
 		confirmationLayout.addView(dontShowAgain, params);
 
@@ -1001,7 +1015,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 							}
 						}).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
-				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				aB.hide();
 			}
@@ -1013,7 +1026,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			if(tB != null) {
 				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
-				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			}
 
 		}
@@ -1059,7 +1071,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		draggableView.setDraggableListener(this);
 		ivShadow = new ImageView(this);
-		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.black_p50));
+		ivShadow.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_alpha_050));
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 		container.addView(ivShadow, params);
 		container.addView(draggableView);
