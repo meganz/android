@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/multiple_bucket_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -29,59 +30,62 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"/>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/thumbnail_list"
-            android:layout_toLeftOf="@+id/three_dots"
+            android:layout_toEndOf="@+id/thumbnail_list"
+            android:layout_toStartOf="@+id/three_dots"
             android:orientation="vertical"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
-            <TextView
-                android:id="@+id/name_text"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/primary_text"
-                android:singleLine="true"
-                android:ellipsize="middle"/>
+                android:orientation="horizontal"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/name_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/img_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="4dp"
+                    android:src="@drawable/ic_circle_label"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/img_favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="4dp"
+                    android:src="@drawable/ic_favorite"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="@color/secondary_text"
-                android:layout_below="@id/name_text"
+                android:ellipsize="middle"
                 android:singleLine="true"
-                android:ellipsize="middle"/>
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp"/>
 
-            <ImageView
-                android:id="@+id/img_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/name_text"
-                android:layout_alignBottom="@id/name_text"
-                android:layout_gravity="center"
-                android:layout_margin="4dp"
-                android:layout_toEndOf="@+id/name_text"
-                android:src="@drawable/ic_circle_label"
-                android:visibility="gone" />
-
-            <ImageView
-                android:id="@+id/img_favourite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/name_text"
-                android:layout_alignBottom="@id/name_text"
-                android:layout_gravity="center"
-                android:layout_margin="4dp"
-                android:layout_toEndOf="@+id/img_label"
-                android:src="@drawable/ic_favorite"
-                android:visibility="gone" />
-
-        </RelativeLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 

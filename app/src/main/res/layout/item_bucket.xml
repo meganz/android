@@ -37,8 +37,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/thumbnail_view"
-                android:layout_toLeftOf="@+id/three_dots"
+                android:layout_toEndOf="@+id/thumbnail_view"
+                android:layout_toStartOf="@+id/three_dots"
                 android:orientation="vertical"
                 android:paddingTop="15dp">
 
@@ -49,7 +49,7 @@
 
                     <TextView
                         android:id="@+id/first_line_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="16sp"
                         android:layout_weight="1"
@@ -77,7 +77,6 @@
                         android:visibility="gone"
                         tools:visibility="visible" />
                 </LinearLayout>
-
 
                 <TextView
                     android:id="@+id/second_line_text"
