@@ -5,64 +5,53 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:layout_centerHorizontal="true"
-    android:elevation="8dp"
-    android:background="@color/white"
     android:layout_gravity="center|fill_horizontal"
-    android:orientation="vertical" >
-    
-   <View
-        android:id="@+id/separator"
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="@color/delimiterColor" />
+    android:elevation="8dp"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/get_pro_account_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:gravity="left"
         android:text="@string/get_pro_account"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="16sp"/>
-       
+        android:textSize="16sp" />
+
     <LinearLayout
         android:id="@+id/get_pro_account_buttons_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:gravity="right"
-        android:background="@color/white"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnLeft_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:stateListAnimator="@null"
+            android:layout_centerVertical="true"
             android:elevation="0dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textSize="14sp"
-            android:textColor="@color/accentColor"
+            android:stateListAnimator="@null"
             android:text="@string/general_cancel"
-            android:background="@color/white"/>
+            android:textColor="@color/accentColor"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/btnRight_upgrade"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:stateListAnimator="@null"
+            android:layout_centerVertical="true"
             android:elevation="0dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:textSize="14sp"
-            android:textColor="@color/accentColor"
+            android:stateListAnimator="@null"
             android:text="@string/my_account_upgrade_pro_panel"
-            android:background="@color/white"/>
+            android:textColor="@color/accentColor"
+            android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

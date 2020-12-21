@@ -709,4 +709,23 @@
     <!--======= Legacy styles(may not be best practice, keep for quick development) ========= -->
 
     <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
+
+    <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
+    </style>
+
+    <!-- My Account "CHANGE PASSWORD" Button, solid white in Light, outlined in Dark -->
+    <style name="Widget.Mega.Button.Variant2">
+        <item name="strokeColor">@color/white</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <!-- My Account "LOGOUT" Button, grey outlined in Light, outlined in Dark -->
+    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="strokeColor">@color/grey_alpha_026</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
 </resources>

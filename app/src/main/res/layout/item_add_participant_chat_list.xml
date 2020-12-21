@@ -31,7 +31,7 @@
         android:maxLines="1"
         android:text="@string/add_participants_menu_item"
         android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
         app:emojiSize="12sp" />
 
 </RelativeLayout>

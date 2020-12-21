@@ -435,7 +435,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/file_properties_info_menu_location"
                     android:layout_marginRight="20dp"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
                     tools:text="CLOUD DRIVE" />
             </LinearLayout>
 

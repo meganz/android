@@ -28,6 +28,11 @@
     <style name="TextAppearance.Mega.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
     </style>
 
+    <!-- 0px -->
+    <style name="TextAppearance.Mega.Subtitle1.Variant">
+        <item name="android:letterSpacing">0</item>
+    </style>
+
     <!-- Mainly for login/create account screen titles -->
     <style name="TextAppearance.Mega.Subtitle1.AllCaps">
         <item name="android:textAllCaps">true</item>
@@ -73,9 +78,15 @@
         <item name="android:letterSpacing">-0.00875</item>
     </style>
 
+    <!-- Medium, normal, 16sp, 0.15px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant">
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
@@ -149,11 +160,20 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <!-- Medium, Accent -->
-    <style name="TextAppearance.Mega.Body2.Accent">
-        <item name="android:textColor">?attr/colorSecondary</item>
+    <!-- Medium -->
+    <style name="TextAppearance.Mega.Body2.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Accent -->
+    <style name="TextAppearance.Mega.Body2.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
+    <!-- Medium, Accent -->
+    <style name="TextAppearance.Mega.Body2.Medium.Accent">
+        <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
     <style name="TextAppearance.Mega.Body2.Variant2">

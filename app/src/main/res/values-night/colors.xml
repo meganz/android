@@ -132,4 +132,7 @@
 
     <!-- chat contact text message background -->
     <color name="grey_100_060_white_023">@color/white_alpha_023</color>
+
+    <!-- Business account management container-->
+    <color name="grey_020_white_012">@color/white_alpha_012</color>
 </resources>

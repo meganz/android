@@ -15,6 +15,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -271,13 +273,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         }
 
 		mkButton = v.findViewById(R.id.MK_button);
-		mkButton.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
 		mkButton.setOnClickListener(this);
 
 		setMkButtonText();
 
 		changePassButton = v.findViewById(R.id.change_pass_button);
-		changePassButton.setBackground(ContextCompat.getDrawable(context, R.drawable.white_rounded_corners_button));
 		changePassButton.setOnClickListener(this);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -502,7 +502,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				switch (status) {
 					case BUSINESS_STATUS_EXPIRED:
 						status = R.string.payment_overdue_label;
-						businessAccountStatusText.setTextColor(getResources().getColor(R.color.expired_red));
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.red_800));
 						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grey_054_white_054));
 						break;
 					case BUSINESS_STATUS_ACTIVE:
@@ -512,8 +512,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						break;
 					case BUSINESS_STATUS_GRACE_PERIOD:
 						status = R.string.payment_required_label;
-						businessAccountStatusText.setTextColor(getResources().getColor(R.color.grace_yellow));
-						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.grace_yellow));
+						businessAccountStatusText.setTextColor(getResources().getColor(R.color.orange_400_orange_300));
+						businessAccountRenewsDateText.setTextColor(getResources().getColor(R.color.orange_400_orange_300));
 						break;
 				}
 				businessAccountStatusText.setText(status);

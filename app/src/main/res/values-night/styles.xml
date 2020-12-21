@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Widget.Mega.Button.Variant1">
+        <item name="strokeColor">@color/white</item>
+        <item name="android:textColor">@color/grey_alpha_087</item>
+        <item name="backgroundTint">@color/white</item>
+    </style>
+
+    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton">
+    </style>
+
+    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
+    </style>
+</resources>
