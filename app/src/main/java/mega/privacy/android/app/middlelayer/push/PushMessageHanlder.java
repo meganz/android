@@ -115,13 +115,13 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
                     //If true - wait until connection finish
                     //If false, no need to change it
                     logDebug("Flag showMessageNotificationAfterPush: " + showMessageNotificationAfterPush);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         PowerManager pm = (PowerManager) app.getSystemService(Context.POWER_SERVICE);
                         boolean isIdle = pm.isDeviceIdleMode();
                         if ((!app.isActivityVisible() && megaApi.getRootNode() == null) || isIdle) {
                             logDebug("Launch foreground service!");
                             awakeCpu(false);
-                            app.startService(new Intent(app, IncomingCallService.class));
+                            app.startForegroundService(new Intent(app, IncomingCallService.class));
                             return;
                         }
                     }
