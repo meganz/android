@@ -195,8 +195,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     private void bindHeader(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact) {
         holder.headerTextView.setText(contact.getName());
-        holder.headerTextView.setTextColor(context.getResources().getColor(R.color.black));
-        holder.headerTextView.setBackgroundColor(Color.WHITE);
     }
 
     private void bindContact(ViewHolderPhoneContactsLollipop holder, InvitationContactInfo contact, boolean isMegaContact) {
@@ -205,7 +203,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         holder.contactId = contact.getId();
         holder.contactNameTextView.setText(holder.contactName);
         holder.displayLabelTextView.setText(holder.displayLabel);
-        holder.contactLayout.setBackgroundColor(Color.WHITE);
 
         if (contact.isHighlighted()) {
             setItemHighlighted(holder.contactLayout);
@@ -246,7 +243,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     private void setItemHighlighted(View view) {
         logDebug("setItemHighlighted");
-        view.setBackgroundColor(context.getResources().getColor(R.color.contactSelected));
         ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
         Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_select_avatar);
         if (image != null) {
@@ -256,7 +252,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
 
     private void setItemNormal(View view, Bitmap bitmap) {
         logDebug("setItemNormal");
-        view.setBackgroundColor(context.getResources().getColor(R.color.white));
         if (bitmap != null) {
             ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
             imageView.setImageBitmap(bitmap);

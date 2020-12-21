@@ -331,7 +331,6 @@
 	    <activity
 		    android:name="mega.privacy.android.app.lollipop.InviteContactActivity"
 		    android:label="@string/app_name"
-		    android:theme="@style/Theme.Megaactionbar"
 		    android:windowSoftInputMode="adjustNothing">
 	    </activity>
 
@@ -349,8 +348,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
 
         <activity

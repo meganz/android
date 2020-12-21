@@ -197,6 +197,11 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
+    <!-- empty hint text non-highlight color -->
+    <style name="TextAppearance.Mega.Body2.Variant10">
+        <item name="android:textColor">@color/grey_300_grey_600</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.PrimaryColor">
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>

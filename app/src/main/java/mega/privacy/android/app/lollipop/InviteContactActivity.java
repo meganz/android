@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -156,7 +155,6 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dbH = DatabaseHandler.getDbHandler(this);
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -1191,8 +1189,6 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
 
     private void enableFabButton(Boolean enableFabButton) {
         logDebug("enableFabButton: " + enableFabButton);
-        int lintColor = enableFabButton ? R.color.accentColor : R.color.disable_fab_invite_contact;
-        fabButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(lintColor)));
         fabButton.setEnabled(enableFabButton);
     }
 

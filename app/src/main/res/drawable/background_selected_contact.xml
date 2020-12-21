@@ -1,12 +1,7 @@
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-	<item>
-		<shape android:shape="rectangle">
-			<stroke android:width="1dp" android:color="#4D000000" />
-			<corners
-				android:bottomLeftRadius="16dp"
-				android:bottomRightRadius="16dp"
-				android:topLeftRadius="16dp"
-				android:topRightRadius="16dp"/>
-		</shape>
-	</item>
-</layer-list>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <stroke
+        android:width="1dp"
+        android:color="@color/grey_038_white_038" />
+    <corners android:radius="16sp" />
+</shape>

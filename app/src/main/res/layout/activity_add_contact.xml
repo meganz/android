@@ -215,7 +215,7 @@
 						android:layout_height="wrap_content"
 						android:gravity="center"
 						android:layout_gravity="center_horizontal"
-						android:textSize="18sp"/>
+						android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
 
 					<TextView
 						android:id="@+id/add_contact_list_empty_subtext"
@@ -479,7 +479,6 @@
 		android:id="@+id/fab_button_next"
 		android:layout_width="@dimen/fab_button_diameter"
 		android:layout_height="@dimen/fab_button_diameter"
-		android:elevation="@dimen/elevation_low"
 		android:layout_margin="16dp"
 		android:src="@drawable/ic_send_white"
 		android:layout_alignParentBottom="true"
