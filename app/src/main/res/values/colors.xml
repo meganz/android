@@ -227,4 +227,14 @@
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
     <color name="black_bottom_sheets_icon_tint">#8F000000</color>
+
+    <!-- NODE LABELS -->
+    <color name="label_red">#FF625D</color>
+    <color name="label_orange">#F9A646</color>
+    <color name="label_yellow">#F4CE4A</color>
+    <color name="label_green">#6DCB50</color>
+    <color name="label_blue">#4BB8F3</color>
+    <color name="label_purple">#D088E1</color>
+    <color name="label_grey">#A4A4A7</color>
+
 </resources>

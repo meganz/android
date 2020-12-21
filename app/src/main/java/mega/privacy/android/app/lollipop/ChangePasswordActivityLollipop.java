@@ -169,7 +169,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						String temp = s.toString();
 						containerPasswdElements.setVisibility(View.VISIBLE);
 
-						checkPasswordStrenght(temp.trim());
+						checkPasswordStrength(temp.trim());
 					}
 					else{
 						passwdValid = false;
@@ -861,7 +861,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		}
 	}
 
-	public void checkPasswordStrenght(String s) {
+	public void checkPasswordStrength(String s) {
+		newPassword1Layout.setErrorEnabled(false);
 
 		if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
 			firstShape.setBackground(ContextCompat.getDrawable(this, R.drawable.passwd_very_weak));
@@ -951,6 +952,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		newPassword1Error.setVisibility(View.GONE);
 		newPassword1Layout.setError(" ");
+		newPassword1Layout.setErrorEnabled(true);
 	}
 
 	public void onResetPasswordClick(boolean hasMk){
