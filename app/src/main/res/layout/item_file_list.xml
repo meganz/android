@@ -31,7 +31,8 @@
             android:layout_height="48dp"
             android:layout_centerVertical="true"
             android:scaleType="fitCenter"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:src="@android:drawable/ic_menu_report_image" />
 
     </RelativeLayout>
 
@@ -83,17 +84,44 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:textColor="@color/file_list_first_row"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:text="Test title" />
+
+        <ImageView
+            android:id="@+id/img_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:layout_toEndOf="@+id/file_list_filename"
+            android:src="@drawable/ic_circle_label"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/img_favourite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:layout_toEndOf="@+id/img_label"
+            android:src="@drawable/ic_favorite"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/file_list_public_link"
             android:layout_width="16dp"
             android:layout_height="16dp"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
             android:layout_centerVertical="true"
             android:layout_marginStart="3dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="6dp"
-            android:layout_toEndOf="@+id/file_list_filename"
+            android:layout_toEndOf="@+id/img_favourite"
             android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
@@ -102,12 +130,17 @@
         <ImageView
             android:id="@+id/file_list_taken_down"
             style="@style/taken_down_icon"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="6dp"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignTop="@id/file_list_filename"
+            android:layout_alignBottom="@id/file_list_filename"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="3dp"
             android:layout_marginEnd="6dp"
-            android:layout_toEndOf="@+id/file_list_filename"
+            android:layout_toEndOf="@+id/file_list_public_link"
             android:src="@drawable/ic_input_warning"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:visibility="visible" />
 
     </RelativeLayout>
 
@@ -139,7 +172,8 @@
             android:maxLines="1"
             android:textSize="14sp"
             rounded:emojiSize="14sp"
-            android:layout_toRightOf="@id/file_list_versions_icon"/>
+            android:layout_toEndOf="@id/file_list_versions_icon"
+            tools:text="4.6 MB" />
     </RelativeLayout>
 
 </RelativeLayout>
