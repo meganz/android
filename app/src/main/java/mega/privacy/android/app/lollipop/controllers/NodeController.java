@@ -891,19 +891,19 @@ public class NodeController {
     }
 
     public void renameNode(MegaNode document, String newName){
-        logDebug("renameNode");
-        if (newName.compareTo(document.getName()) == 0) {
+        if (isOffline(context)) {
             return;
         }
 
-        if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            return;
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
+        } else if (context instanceof AudioVideoPlayerLollipop) {
+            megaApi.renameNode(document, newName, ((AudioVideoPlayerLollipop) context));
+        } else if (context instanceof FullScreenImageViewerLollipop) {
+            megaApi.renameNode(document, newName, ((FullScreenImageViewerLollipop) context));
+        } else if (context instanceof PdfViewerActivityLollipop) {
+            megaApi.renameNode(document, newName, ((PdfViewerActivityLollipop) context));
         }
-
-        logDebug("Renaming " + document.getName() + " to " + newName);
-
-        megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
     }
 
     public int importLink(String url) {

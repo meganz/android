@@ -1040,7 +1040,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.option_rename_layout:
-                ((ManagerActivityLollipop) context).showRenameDialog(node, node.getName());
+                ((ManagerActivityLollipop) context).showRenameDialog(node);
 
                 break;
 

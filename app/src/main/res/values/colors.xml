@@ -228,8 +228,6 @@
 
     <color name="black_bottom_sheets_icon_tint">#8F000000</color>
 
-    <color name="new_dialog_error_color">#C70000</color>
-
     <!-- NODE LABELS -->
     <color name="label_red">#FF625D</color>
     <color name="label_orange">#F9A646</color>

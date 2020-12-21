@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="24dp">
+    android:padding="24dp">
 
     <EditText
         android:id="@+id/type_text"
@@ -25,9 +25,9 @@
         android:layout_marginStart="4dp"
         android:layout_marginEnd="2dp"
         android:textSize="12sp"
-        android:textColor="@color/new_dialog_error_color"
+        android:textColor="@color/dark_primary_color"
         app:drawableEndCompat="@drawable/ic_input_warning"
-        app:drawableTint="@color/new_dialog_error_color"
+        app:drawableTint="@color/dark_primary_color"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/type_text" />
 

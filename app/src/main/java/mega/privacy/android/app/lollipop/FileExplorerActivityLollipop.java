@@ -1,17 +1,16 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -19,39 +18,27 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -61,7 +48,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
@@ -103,8 +89,10 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFileDialog;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewURLFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1820,7 +1808,9 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 								parentNode = megaApi.getRootNode();
 							}
 
-							showNewFileDialog(parentNode, body.toString(), isURL, sharedText2);
+							newFolderDialog = isURL
+									? showNewURLFileDialog(this, parentNode, body.toString(), sharedText2)
+									: showNewFileDialog(this, parentNode, body.toString());
 							return;
 						}
 					}
@@ -1919,7 +1909,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		showSnackbar(fragmentContainer, s);
     }
 
-    private void createFile(String name, String data, MegaNode parentNode, boolean isURL){
+    public void createFile(String name, String data, MegaNode parentNode, boolean isURL){
 		if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
 			showOverDiskQuotaPaywallWarning();
 			return;
@@ -1949,7 +1939,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	private void createFolder(String title) {
+	public void createFolder(String title) {
 
 		logDebug("createFolder");
 		if (!isOnline(this)){
@@ -2253,7 +2243,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case R.id.cab_menu_create_folder:{
-	        	showNewFolderDialog(); 
+	        	newFolderDialog = showNewFolderDialog(this);
         		break;
 			}
 			case R.id.cab_menu_new_chat:{
@@ -2380,162 +2370,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			logDebug("There is already a chat, open it!");
 			showSnackbar(getString(R.string.chat_already_exists));
 		}
-	}
-
-	private void showNewFolderDialog(){
-		logDebug("showNewFolderDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(FileExplorerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						boolean result = matches(value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				}else{
-					boolean result = matches(value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-					}else{
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
 	}
 
 	private void getChatAdded (ArrayList<ChatExplorerListItem> listItems) {
@@ -2692,157 +2526,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				onIntentChatProcessed(filePreparedInfos);
 			}
 		}
-	}
-
-	/**
-	 * Shows a dialog to allow the user type the name of the new file to import.
-	 *
-	 * @param parentNode   Node in which the new file will be saved.
-	 * @param data		   The data which should contain the new file.
-	 * @param hint		   Hint to show in the input text.
-	 * @param isURL		   True if the file will contain an URL, false otherwise.
-	 */
-	private void showNewFileDialog(final MegaNode parentNode, final String data, final boolean isURL, String hint) {
-		logDebug("showNewFileDialog");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(FileExplorerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(FileExplorerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(FileExplorerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.login_warning));
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if (error_layout.getVisibility() == View.VISIBLE) {
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
-
-		if (isURL) {
-			input.setHint(isTextEmpty(hint) ? getString(R.string.context_new_link_name) : hint);
-		} else {
-			input.setHint(getString(R.string.context_new_file_name_hint));
-		}
-
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-		input.setOnEditorActionListener((v, actionId, event) -> {
-			if (actionId == EditorInfo.IME_ACTION_DONE) {
-				confirmNewFileAction(v, textError, error_layout, parentNode, data, hint, isURL);
-				return true;
-			}
-			return false;
-		});
-
-		input.setImeActionLabel(getString(R.string.general_ok), EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener((v, hasFocus) -> {
-			if (hasFocus) {
-				showKeyboardDelayed(v);
-			}
-		});
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		builder.setTitle(isURL ? R.string.dialog_title_new_link : R.string.context_new_file_name)
-				.setPositiveButton(getString(R.string.general_ok), null)
-				.setNegativeButton(getString(android.R.string.cancel), null)
-				.setView(layout);
-
-		newFolderDialog = builder.create();
-		newFolderDialog.show();
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
-				confirmNewFileAction(input, textError, error_layout, parentNode, data, hint, isURL));
-	}
-
-	/**
-	 * Checks the typed text on create new file dialog and warns the user if the text is wrong
-	 * or creates the file otherwise.
-	 *
-	 * @param input		   Input text where the user types the name of the new file.
-	 * @param textError	   Layout where the text error has to be shown.
-	 * @param error_layout Layout where the error has to be shown.
-	 * @param parentNode   Node in which the new file will be saved.
-	 * @param data		   The data which should contain the new file.
-	 * @param hint		   Hint to show in the input text.
-	 * @param isURL		   True if the file will contain an URL, false otherwise.
-	 */
-	private void confirmNewFileAction(TextView input, TextView textError, RelativeLayout error_layout, MegaNode parentNode, String data, String hint, boolean isURL) {
-		String typedText = input.getText().toString().trim();
-
-		if (typedText.isEmpty()) {
-			if (isURL && matches(hint)) {
-				createFile(hint, data, parentNode, isURL);
-				newFolderDialog.dismiss();
-			} else {
-				input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-				textError.setText(getString(isURL ? R.string.invalid_characters : R.string.invalid_string));
-				error_layout.setVisibility(View.VISIBLE);
-				input.requestFocus();
-			}
-		} else if (matches(typedText)) {
-			input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-			textError.setText(getString(R.string.invalid_characters));
-			error_layout.setVisibility(View.VISIBLE);
-			input.requestFocus();
-		} else {
-			createFile(typedText, data, parentNode, isURL);
-			newFolderDialog.dismiss();
-		}
-	}
-
-	private static boolean matches(CharSequence input) {
-		Pattern p = Pattern.compile(NODE_NAME_REGEX);
-		Matcher m = p.matcher(input);
-		return m.find();
 	}
 
 	@Override

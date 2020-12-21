@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.text.Editable
@@ -11,48 +12,149 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaNode
 import java.util.regex.Pattern
 
 class MegaNodeDialogUtil {
 
     companion object {
+        private const val TYPE_RENAME = 0
+        private const val TYPE_NEW_FOLDER = 1
+        private const val TYPE_NEW_FILE = 2
+        private const val TYPE_NEW_URL_FILE = 3
+
         @JvmStatic
         fun showRenameNodeDialog(activity: Activity, node: MegaNode): AlertDialog {
             val renameDialogBuilder =
                 AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
-            val view = activity.layoutInflater.inflate(R.layout.dialog_create_rename_node, null)
 
             renameDialogBuilder
                 .setTitle(getString(R.string.rename_dialog_title, node.name))
-                .setView(view)
                 .setPositiveButton(R.string.context_rename, null)
                 .setNegativeButton(R.string.general_cancel, null)
 
-            val renameDialog = renameDialogBuilder.create()
+            return setFinalValuesAndShowDialog(
+                activity,
+                node,
+                null,
+                null,
+                renameDialogBuilder,
+                TYPE_RENAME
+            )
+        }
+
+        @JvmStatic
+        fun showNewFolderDialog(activity: Activity): AlertDialog {
+            val newFolderDialogBuilder =
+                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+
+            newFolderDialogBuilder
+                .setTitle(R.string.menu_new_folder)
+                .setPositiveButton(R.string.general_create, null)
+                .setNegativeButton(R.string.general_cancel, null)
+
+            return setFinalValuesAndShowDialog(
+                activity,
+                null,
+                null,
+                null,
+                newFolderDialogBuilder,
+                TYPE_NEW_FOLDER
+            )
+        }
+
+        @JvmStatic
+        fun showNewFileDialog(activity: Activity, parent: MegaNode, data: String): AlertDialog {
+            val newFileDialogBuilder =
+                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+
+            newFileDialogBuilder
+                .setTitle(R.string.context_new_file_name)
+                .setPositiveButton(R.string.general_ok, null)
+                .setNegativeButton(R.string.general_cancel, null)
+
+            return setFinalValuesAndShowDialog(
+                activity,
+                parent,
+                data,
+                null,
+                newFileDialogBuilder,
+                TYPE_NEW_FILE
+            )
+        }
+
+        @JvmStatic
+        fun showNewURLFileDialog(
+            activity: Activity,
+            parent: MegaNode,
+            data: String,
+            defaultURLName: String?
+        ): AlertDialog {
+            val newURLFileDialogBuilder =
+                AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
+
+            newURLFileDialogBuilder
+                .setTitle(R.string.dialog_title_new_link)
+                .setPositiveButton(R.string.general_ok, null)
+                .setNegativeButton(R.string.general_cancel, null)
+
+            return setFinalValuesAndShowDialog(
+                activity,
+                parent,
+                data,
+                defaultURLName,
+                newURLFileDialogBuilder,
+                TYPE_NEW_URL_FILE
+            )
+        }
+
+        private fun setFinalValuesAndShowDialog(
+            activity: Activity,
+            node: MegaNode?,
+            data: String?,
+            defaultURLName: String?,
+            builder: AlertDialog.Builder,
+            dialogType: Int
+        ): AlertDialog {
+            val view = activity.layoutInflater.inflate(R.layout.dialog_create_rename_node, null)
+            builder.setView(view)
+
+            val dialog = builder.create()
             val typeText = view.findViewById<EditText>(R.id.type_text)
             val errorText = view.findViewById<TextView>(R.id.error_text)
 
-            renameDialog.getButton(BUTTON_POSITIVE)
-                .setOnClickListener {
-                    checkRenameNodeDialogValue(
-                        activity,
-                        node,
-                        typeText,
-                        errorText,
-                        renameDialog
-                    )
-                }
-
             typeText?.apply {
-                setText(node.name)
-                setSelection(0, getCursorPositionOfName(node.isFile, node.name))
+                when (dialogType) {
+                    TYPE_RENAME -> {
+                        if (node != null) {
+                            setText(node.name)
+                            setSelection(0, getCursorPositionOfName(node.isFile, node.name))
+                        }
+                    }
+                    TYPE_NEW_FOLDER -> {
+                        setHint(R.string.context_new_folder_name)
+                    }
+                    TYPE_NEW_FILE -> {
+                        setHint(R.string.context_new_file_name_hint)
+                    }
+                    TYPE_NEW_URL_FILE -> {
+                        if (isTextEmpty(defaultURLName)) setHint(R.string.context_new_link_name)
+                        else {
+                            setText(defaultURLName)
+                            setSelection(0, getCursorPositionOfName(false, defaultURLName))
+                        }
+                    }
+                }
 
                 addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(
@@ -72,76 +174,144 @@ class MegaNodeDialogUtil {
                     }
 
                     override fun afterTextChanged(s: Editable?) {
-                        quitDialogError(typeText, errorText)
+                        quitDialogError(activity, typeText, errorText)
                     }
                 })
 
                 setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        checkRenameNodeDialogValue(
+                        checkActionDialogValue(
                             activity,
                             node,
                             typeText,
+                            data,
                             errorText,
-                            renameDialog
+                            dialog,
+                            dialogType
                         )
-                        true
                     }
 
                     false
                 }
             }
 
-            quitDialogError(typeText, errorText)
+            quitDialogError(activity, typeText, errorText)
 
-            renameDialog.show()
-            return renameDialog
+            dialog.show()
+
+            dialog.getButton(BUTTON_POSITIVE)
+                .setOnClickListener {
+                    checkActionDialogValue(
+                        activity,
+                        node,
+                        typeText,
+                        data,
+                        errorText,
+                        dialog,
+                        dialogType
+                    )
+                }
+
+            showKeyboardDelayed(typeText)
+
+            return dialog
         }
 
-        private fun checkRenameNodeDialogValue(
+        private fun checkActionDialogValue(
             activity: Activity,
-            node: MegaNode,
+            node: MegaNode?,
             typeText: EditText?,
+            data: String?,
             errorText: TextView?,
-            dialog: AlertDialog
+            dialog: AlertDialog,
+            dialogType: Int
         ) {
             val typedString = typeText?.text.toString().trim()
 
             when {
                 typedString.isEmpty() -> {
-                    showDialogError(typeText, errorText, getString(R.string.invalid_string))
+                    showDialogError(
+                        activity,
+                        typeText,
+                        errorText,
+                        getString(R.string.invalid_string)
+                    )
                 }
                 Pattern.compile(NODE_NAME_REGEX).matcher(typedString).find() -> {
-                    showDialogError(typeText, errorText, getString(R.string.invalid_characters))
+                    showDialogError(
+                        activity,
+                        typeText,
+                        errorText,
+                        getString(R.string.invalid_characters)
+                    )
                 }
                 else -> {
-                    NodeController(activity).renameNode(node, typedString)
+                    when (dialogType) {
+                        TYPE_RENAME -> {
+                            if (node != null && typedString != node.name) {
+                                NodeController(activity).renameNode(node, typedString)
+                            }
+                        }
+                        TYPE_NEW_FOLDER -> {
+                            when (activity) {
+                                is FileExplorerActivityLollipop -> {
+                                    activity.createFolder(typedString)
+                                }
+                                is ManagerActivityLollipop -> {
+                                    activity.createFolder(typedString)
+                                }
+                                is FileStorageActivityLollipop -> {
+                                    activity.createFolder(typedString)
+                                }
+                            }
+                        }
+                        TYPE_NEW_FILE -> {
+                            if (activity is FileExplorerActivityLollipop) {
+                                activity.createFile(typedString, data, node, false)
+                            }
+                        }
+                        TYPE_NEW_URL_FILE -> {
+                            if (activity is FileExplorerActivityLollipop) {
+                                activity.createFile(typedString, data, node, true)
+                            }
+                        }
+                    }
+
                     dialog.dismiss()
                 }
             }
         }
 
-        private fun showDialogError(typeText: EditText?, errorText: TextView?, text: String) {
-            typeText?.setBackgroundColor(
-                ContextCompat.getColor(
-                    MegaApplication.getInstance(),
-                    R.color.new_dialog_error_color
-                )
-            )
-            typeText?.requestFocus()
+        @SuppressLint("UseCompatLoadingForColorStateLists")
+        private fun showDialogError(
+            activity: Activity,
+            typeText: EditText?,
+            errorText: TextView?,
+            text: String
+        ) {
+            typeText?.apply {
+                backgroundTintList =
+                    activity.resources.getColorStateList(R.color.background_error_input_text)
+                setTextColor(ContextCompat.getColor(activity, R.color.dark_primary_color))
+                requestFocus()
+            }
 
-            errorText?.visibility = VISIBLE
-            errorText?.text = text
+            errorText?.apply {
+                visibility = VISIBLE
+                this.text = text
+            }
         }
 
-        private fun quitDialogError(typeText: EditText?, errorText: TextView?) {
-            typeText?.setBackgroundColor(
-                ContextCompat.getColor(
-                    MegaApplication.getInstance(),
-                    R.color.accentColor
-                )
-            )
-            typeText?.requestFocus()
+        @SuppressLint("UseCompatLoadingForColorStateLists")
+        private fun quitDialogError(
+            activity: Activity, typeText: EditText?, errorText: TextView?
+        ) {
+            typeText?.apply {
+                backgroundTintList =
+                    activity.resources.getColorStateList(R.color.background_right_input_text)
+                setTextColor(ContextCompat.getColor(activity, R.color.text_secondary))
+                requestFocus()
+            }
 
             errorText?.visibility = GONE
         }

@@ -111,8 +111,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BucketSaved;
@@ -135,7 +133,6 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.CustomViewPager;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
@@ -208,6 +205,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
 import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.billing.BillingManager;
@@ -246,6 +244,7 @@ import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
 
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -8249,185 +8248,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	public void showRenameDialog(final MegaNode document, String text){
-		logDebug("showRenameDialog");
-		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-//	    layout.setLayoutParams(params);
-
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-//		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-
-		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
-		input.setText(text);
-		input.requestFocus();
-
-		if (document.isFolder()) {
-			input.setSelection(0, input.getText().length());
-		} else {
-			String[] s = document.getName().split("\\.");
-			if (s != null) {
-
-				int numParts = s.length;
-				int lastSelectedPos = 0;
-				if (numParts == 1) {
-					input.setSelection(0, input.getText().length());
-				} else if (numParts > 1) {
-					for (int i = 0; i < (numParts - 1); i++) {
-						lastSelectedPos += s[i].length();
-						lastSelectedPos++;
-					}
-					lastSelectedPos--; //The last point should not be selected)
-					input.setSelection(0, lastSelectedPos);
-				}
-			}
-		}
-
-	    layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(ManagerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout.getVisibility() == View.VISIBLE){
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-										  KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						boolean result=matches(NODE_NAME_REGEX, value);
-						if(result){
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						}else{
-							nC.renameNode(document, value);
-							renameDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		renameDialog = builder.create();
-		renameDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		renameDialog.show();
-		renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				String value = input.getText().toString().trim();
-
-				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				}
-				else{
-					boolean result=matches(NODE_NAME_REGEX, value);
-					if(result){
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					}else{
-						nC.renameNode(document, value);
-						renameDialog.dismiss();
-					}
-				}
-			}
-		});
-	}
-
-	public static boolean matches(String regex, CharSequence input) {
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(input);
-		return m.find();
+	public void showRenameDialog(final MegaNode document){
+		renameDialog = showRenameNodeDialog(this, document);
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -9619,153 +9441,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	@Override
 	public void showNewFolderDialog() {
-		logDebug("showNewFolderDialogKitLollipop");
-
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout, params1);
-
-		final ImageView error_icon = new ImageView(ManagerActivityLollipop.this);
-		error_icon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout.addView(error_icon);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon.setLayoutParams(params_icon);
-
-		error_icon.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError = new TextView(ManagerActivityLollipop.this);
-		error_layout.addView(textError);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0, 0, 0);
-		textError.setLayoutParams(params_text_error);
-
-		textError.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout.setVisibility(View.GONE);
-
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if (error_layout.getVisibility() == View.VISIBLE) {
-					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-
-		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-		input.setHint(getString(R.string.context_new_folder_name));
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_string));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					} else {
-						boolean result = matches(NODE_NAME_REGEX, value);
-						if (result) {
-							input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-							textError.setText(getString(R.string.invalid_characters));
-							error_layout.setVisibility(View.VISIBLE);
-							input.requestFocus();
-
-						} else {
-							createFolder(value);
-							newFolderDialog.dismiss();
-						}
-					}
-					return true;
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
-		input.requestFocus();
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.menu_new_folder));
-		builder.setPositiveButton(getString(R.string.general_create),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						createFolder(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		newFolderDialog = builder.create();
-		newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		newFolderDialog.show();
-		newFolderDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String value = input.getText().toString().trim();
-				 if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError.setText(getString(R.string.invalid_string));
-					error_layout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-
-				} else {
-					boolean result = matches(NODE_NAME_REGEX, value);
-					if (result) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError.setText(getString(R.string.invalid_characters));
-						error_layout.setVisibility(View.VISIBLE);
-						input.requestFocus();
-
-					} else {
-						createFolder(value);
-						newFolderDialog.dismiss();
-					}
-				}
-			}
-		});
+		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this);
 	}
 
 	public long getParentHandleBrowser() {
@@ -9852,7 +9528,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return parentNode;
 	}
 
-	private void createFolder(String title) {
+	public void createFolder(String title) {
 		logDebug("createFolder");
 		if (!isOnline(this)){
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -9941,153 +9617,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		Intent in = new Intent(this, InviteContactActivity.class);
 		in.putExtra("contactType", CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
-	}
-
-	public void showNewContactDialog(){
-		logDebug("showNewContactDialog");
-
-		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
-		if (cFLol != null){
-			if (drawerItem == DrawerItem.CONTACTS){
-				cFLol.setPositionClicked(-1);
-				cFLol.notifyDataSetChanged();
-			}
-		}
-
-		LinearLayout layout = new LinearLayout(this);
-	    layout.setOrientation(LinearLayout.VERTICAL);
-	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-		LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout_email, params1);
-
-		final ImageView error_icon_email = new ImageView(ManagerActivityLollipop.this);
-		error_icon_email.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout_email.addView(error_icon_email);
-		RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon_email.getLayoutParams();
-
-
-		params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon_email.setLayoutParams(params_icon);
-
-		error_icon_email.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		final TextView textError_email = new TextView(ManagerActivityLollipop.this);
-		error_layout_email.addView(textError_email);
-		RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError_email.getLayoutParams();
-		params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error.addRule(RelativeLayout.LEFT_OF, error_icon_email.getId());
-		params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError_email.setLayoutParams(params_text_error);
-
-		textError_email.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.login_warning));
-
-		error_layout_email.setVisibility(View.GONE);
-
-//		input.setId(EDIT_TEXT_ID);
-		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-		input.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {
-				if(error_layout_email.getVisibility() == View.VISIBLE){
-					error_layout_email.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-				}
-			}
-		});
-		input.setSingleLine();
-		input.setHint(getString(R.string.context_new_contact_name));
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = input.getText().toString().trim();
-					String emailError = getEmailError(value, managerActivity);
-					if (emailError != null) {
-//                        input.setError(emailError);
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-						textError_email.setText(emailError);
-						error_layout_email.setVisibility(View.VISIBLE);
-					} else {
-						cC.inviteContact(value);
-						addContactDialog.dismiss();
-					}
-				}
-				else{
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
-		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					showKeyboardDelayed(v);
-				}
-			}
-		});
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(getString(R.string.menu_add_contact));
-		builder.setPositiveButton(getString(R.string.general_add),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				input.getBackground().clearColorFilter();
-			}
-		});
-		builder.setView(layout);
-		addContactDialog = builder.create();
-		addContactDialog.show();
-		addContactDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				String value = input.getText().toString().trim();
-				String emailError = getEmailError(value, managerActivity);
-				if (emailError != null) {
-//					input.setError(emailError);
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
-					textError_email.setText(emailError);
-					error_layout_email.setVisibility(View.VISIBLE);
-				} else {
-					cC.inviteContact(value);
-					addContactDialog.dismiss();
-				}
-			}
-		});
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){

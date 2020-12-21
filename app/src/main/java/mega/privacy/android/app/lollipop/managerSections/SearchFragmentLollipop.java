@@ -207,7 +207,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_rename:{
 					if (documents.size()==1){
-						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
+						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0));
 					}
 
 					closeSelectMode();

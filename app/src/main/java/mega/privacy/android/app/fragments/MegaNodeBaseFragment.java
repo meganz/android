@@ -155,7 +155,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                         logWarning("The selected node is NULL");
                         break;
                     }
-                    managerActivity.showRenameDialog(selected.get(0), selected.get(0).getName());
+                    managerActivity.showRenameDialog(selected.get(0));
                     hideActionMode();
                     break;
 

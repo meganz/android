@@ -1795,7 +1795,7 @@
     <string name="label_set_day" context="title of a Search by date tag">Set day</string>
     <string name="snackbar_search_by_date" context="the user can’t choose this date">Date required is not valid</string>
 
-    <string name="invalid_characters" context="Error when the user writes a character not allowed">Characters not allowed</string>
+    <string name="invalid_characters" context="Error when the user writes a character not allowed">The following characters are not allowed: \" * / : &lt; > \? \\ |</string>
 
     <string name="audio_play" context="Label shown when audio file is playing">Audio File</string>
 
