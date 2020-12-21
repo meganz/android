@@ -15,6 +15,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -122,7 +123,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
                             logDebug("Launch foreground service!");
                             awakeCpu(false);
 
-                            if (BuildConfig.FLAVOR.equals("gms")) {
+                            if (BuildFlavorHelper.INSTANCE.isGMS()) {
                                 app.startService(new Intent(app, IncomingCallService.class));
                                 return;
                             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
