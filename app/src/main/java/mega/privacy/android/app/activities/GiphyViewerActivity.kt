@@ -3,8 +3,6 @@ package mega.privacy.android.app.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContextCompat
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
 import mega.privacy.android.app.lollipop.PinActivityLollipop
@@ -26,8 +24,6 @@ class GiphyViewerActivity : PinActivityLollipop() {
         super.onCreate(savedInstanceState)
         binding = ActivityGiphyViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.black)
 
         if (intent.action.equals(ACTION_PREVIEW_GIPHY)) {
             picking = false

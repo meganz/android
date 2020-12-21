@@ -506,14 +506,12 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/search_giphy_title"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Giphy"
             android:windowSoftInputMode="adjustNothing">
 
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.activities.GiphyViewerActivity"
-            android:theme="@style/Theme.Giphy"
             android:launchMode="singleTop">
         </activity>
 

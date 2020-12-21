@@ -9,16 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:scaleType="centerInside"
-        android:background="@color/giphy_loading_background"/>
+        android:background="@color/grey_050_grey_800"
+        android:scaleType="centerInside" />
 
     <ProgressBar
         android:id="@+id/gif_progress_bar"
         style="?android:attr/progressBarStyleLargeInverse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:indeterminateTint="@color/white" />
+        android:layout_centerInParent="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/send_fab"
@@ -28,9 +27,6 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:elevation="@dimen/elevation_low"
-        android:src="@drawable/ic_send_white"
-        android:stateListAnimator="@anim/button_elevation"
-        android:tint="@android:color/white" />
+        android:src="@drawable/ic_send_white" />
 
 </RelativeLayout>
