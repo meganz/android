@@ -176,6 +176,11 @@ class WebViewActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Checks if the app has all the required permissions to capture and share files.
+     *
+     * @return True if the app has all the required permissions, false otherwise.
+     */
     private fun hasAllPermissions(): Boolean {
         val writePermission = hasPermissions(this, WRITE_EXTERNAL_STORAGE)
         val cameraPermission = hasPermissions(this, CAMERA)
@@ -207,6 +212,12 @@ class WebViewActivity : BaseActivity() {
         return false
     }
 
+    /**
+     * Gets the denied permission depending on the requestCode requested.
+     *
+     * @param requestCode The code that identifies the requested permissions.
+     * @return The denied permission.
+     */
     private fun getRequestedPermission(requestCode: Int): String {
         return when (requestCode) {
             REQUEST_ALL -> {
@@ -244,10 +255,25 @@ class WebViewActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Gets the available intents to capture and/or share content and launches the chooser intent.
+     *
+     * @return True if the chooser was launched successfully, false otherwise.
+     */
     private fun launchChooserIntent(): Boolean {
         val takePictureIntent: Intent? = getContentIntent(IMAGE_CONTENT_TYPE)
         val takeVideoIntent: Intent? = getContentIntent(VIDEO_CONTENT_TYPE)
         val takeAudioIntent = Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION)
+
+        val chooserArray = if (takePictureIntent != null && takeVideoIntent != null) {
+            arrayOf(takePictureIntent, takeVideoIntent, takeAudioIntent)
+        } else if (takePictureIntent != null) {
+            arrayOf(takePictureIntent, takeAudioIntent)
+        } else if (takeVideoIntent != null) {
+            arrayOf(takeVideoIntent, takeAudioIntent)
+        } else {
+            arrayOf(takeAudioIntent)
+        }
 
         val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT)
         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -255,10 +281,7 @@ class WebViewActivity : BaseActivity() {
 
         val chooserIntent = Intent(Intent.ACTION_CHOOSER)
         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
-        chooserIntent.putExtra(
-            Intent.EXTRA_INITIAL_INTENTS,
-            arrayOf(takePictureIntent, takeVideoIntent, takeAudioIntent)
-        )
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, chooserArray)
 
         try {
             startActivityForResult(chooserIntent, FILE_CHOOSER_RESULT_CODE)
@@ -270,6 +293,11 @@ class WebViewActivity : BaseActivity() {
         return true
     }
 
+    /**
+     * Manages the result after capture or pick a file.
+     *
+     * @param data Intent containing the result of the action.
+     */
     private fun manageResult(data: Intent?) {
         val clipData: ClipData?
         val stringData: String?
@@ -311,6 +339,13 @@ class WebViewActivity : BaseActivity() {
         mFilePathCallback = null
     }
 
+    /**
+     * Gets a capture image or video Intent to add to the chooser Intent.
+     *
+     * @param contentType IMAGE_CONTENT_TYPE if requires a capture image Intent.
+     *                    VIDEO_CONTENT_TYPE if requires a capture video Intent.
+     * @return The Intent if the device has camera available or null otherwise.
+     */
     private fun getContentIntent(contentType: Int): Intent? {
         var contentIntent: Intent? = createContentIntent(contentType)
 
@@ -350,6 +385,14 @@ class WebViewActivity : BaseActivity() {
         return contentIntent
     }
 
+    /**
+     * Creates the initial capture image or video Intent without data and extras
+     * to add to the chooser Intent.
+     *
+     * @param contentType IMAGE_CONTENT_TYPE if requires a capture image Intent.
+     *                    VIDEO_CONTENT_TYPE if requires a capture video Intent.
+     * @return The initial capture image or video Intent.
+     */
     private fun createContentIntent(contentType: Int): Intent? {
         return when (contentType) {
             IMAGE_CONTENT_TYPE -> {
@@ -364,6 +407,13 @@ class WebViewActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Gets the extension of the file to capture.
+     *
+     * @param contentType IMAGE_CONTENT_TYPE if requires an image extension.
+     *                    VIDEO_CONTENT_TYPE if requires a video extension.
+     * @return The extension of the file to capture.
+     */
     private fun getContentExtension(contentType: Int): String? {
         return when (contentType) {
             IMAGE_CONTENT_TYPE -> {
@@ -378,6 +428,13 @@ class WebViewActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Initializes the variable pickedImage or pickedVideo with the path of file to captured.
+     *
+     * @param file        The file to store the captured image or video.
+     * @param contentType IMAGE_CONTENT_TYPE if referred to an image file.
+     *                    VIDEO_CONTENT_TYPE if referred to a video file.
+     */
     private fun initPickedContent(file: File, contentType: Int) {
         if (contentType == IMAGE_CONTENT_TYPE) {
             pickedImage = FILE + file.absolutePath
