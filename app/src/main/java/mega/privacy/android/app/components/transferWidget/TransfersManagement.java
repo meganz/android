@@ -1,22 +1,39 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
+import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
+import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.SDCardUtils.checkSDCardCompletedTransfers;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
 public class TransfersManagement {
     private static final long INVALID_VALUE = -1;
     private static final int WAIT_TIME_TO_SHOW_WARNING = 60000;
+    private static final int WAIT_TIME_TO_RESTART_SERVICES = 5000;
 
     private long transferOverQuotaTimestamp;
     private boolean hasNotToBeShowDueToTransferOverQuota;
@@ -28,7 +45,6 @@ public class TransfersManagement {
     private boolean resumeTransfersWarningHasAlreadyBeenShown;
 
     private ArrayList<String> pausedTransfers = new ArrayList<>();
-    private Map<String, String> targetPaths = new HashMap<>();
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -61,7 +77,37 @@ public class TransfersManagement {
      * @param transferTag   tag of the paused transfer
      */
     public void addPausedTransfers(int transferTag) {
+        String tag = Integer.toString(transferTag);
+        if (pausedTransfers.contains(tag)) {
+            return;
+        }
+
         pausedTransfers.add(Integer.toString(transferTag));
+    }
+
+    /**
+     * Checks if a transfer is paused.
+     * If so, adds it to the paused transfers list.
+     * If not, do nothing.
+     *
+     * @param transferTag Identifier of the MegaTransfer to check.
+     */
+    public void checkIfTransferIsPaused(int transferTag) {
+        MegaTransfer transfer = MegaApplication.getInstance().getMegaApi().getTransferByTag(transferTag);
+        checkIfTransferIsPaused(transfer);
+    }
+
+    /**
+     * Checks if a transfer is paused.
+     * If so, adds it to the paused transfers list.
+     * If not, do nothing.
+     *
+     * @param transfer MegaTransfer to check.
+     */
+    public void checkIfTransferIsPaused(MegaTransfer transfer) {
+        if (transfer != null && transfer.getState() == MegaTransfer.STATE_PAUSED) {
+            addPausedTransfers(transfer.getTag());
+        }
     }
 
     /**
@@ -155,6 +201,100 @@ public class TransfersManagement {
     }
 
     /**
+     * Enables transfers resumption.
+     * Before start to check if there are pending transfers, it has to wait a time
+     * WAIT_TIME_TO_RESTART_SERVICES. This time is for the transfer resumption to be enabled
+     * since there is no possibility to listen any response of the request to know when it finishes.
+     *
+     */
+    public static void enableTransfersResumption() {
+        MegaApplication app = MegaApplication.getInstance();
+        MegaApiJava megaApi = app.getMegaApi();
+
+        if (megaApi.getRootNode() != null) {
+            checkSDCardCompletedTransfers();
+        }
+
+        megaApi.enableTransferResumption();
+
+        if (app.getDbH().getTransferQueueStatus()) {
+            //Queue of transfers should be paused.
+            megaApi.pauseTransfers(true);
+        }
+
+        new Handler().postDelayed(() -> {
+            try {
+                if (megaApi.getNumPendingDownloads() > 0) {
+                    Intent downloadServiceIntent = new Intent(app, DownloadService.class)
+                            .setAction(ACTION_RESTART_SERVICE);
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                            && !app.isActivityVisible()) {
+                        app.startForegroundService(downloadServiceIntent);
+                    } else {
+                        app.startService(downloadServiceIntent);
+                    }
+                }
+
+                if (megaApi.getNumPendingUploads() > 0) {
+                    Intent uploadServiceIntent = new Intent(app, UploadService.class)
+                            .setAction(ACTION_RESTART_SERVICE);
+                    Intent chatUploadServiceIntent = new Intent(app, ChatUploadService.class)
+                            .setAction(ACTION_RESTART_SERVICE);
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                            && !app.isActivityVisible()) {
+                        app.startForegroundService(uploadServiceIntent);
+                        app.startForegroundService(chatUploadServiceIntent);
+                    } else {
+                        app.startService(uploadServiceIntent);
+                        app.startService(chatUploadServiceIntent);
+                    }
+                }
+            } catch (Exception e) {
+                logWarning("Exception checking pending transfers", e);
+            }
+        }, WAIT_TIME_TO_RESTART_SERVICES);
+    }
+
+    /**
+     * Creates the initial notification when a service starts.
+     *
+     * @param notificationChannelId   Identifier of the notification channel.
+     * @param notificationChannelName Name of the notification channel.
+     * @param mNotificationManager    NotificationManager to create the notification.
+     * @param mBuilder                Builder to create the notification.
+     * @return The initial notification created.
+     */
+    public static Notification createInitialServiceNotification(String notificationChannelId,
+                                                                String notificationChannelName,
+                                                                NotificationManager mNotificationManager,
+                                                                NotificationCompat.Builder mBuilderCompat,
+                                                                Notification.Builder mBuilder) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setContentTitle(getString(R.string.download_preparing_files))
+                    .setAutoCancel(true);
+
+            return mBuilderCompat.build();
+        } else {
+            mBuilder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setContentTitle(getString(R.string.download_preparing_files))
+                    .setAutoCancel(true);
+
+            return mBuilder.build();
+        }
+    }
+
+    /**
      * Checks if the transfer over quota has occurred at this moment
      * or it occurred in other past moment.
      *
@@ -198,14 +338,6 @@ public class TransfersManagement {
 
     public boolean isTransferOverQuotaBannerShown() {
         return isTransferOverQuotaBannerShown;
-    }
-
-    public void setTargetPaths(Map<String, String> targetPaths) {
-        this.targetPaths = targetPaths;
-    }
-
-    public Map<String, String> getTargetPaths() {
-        return targetPaths;
     }
 
     public void setResumeTransfersWarningHasAlreadyBeenShown(boolean resumeTransfersWarningHasAlreadyBeenShown) {

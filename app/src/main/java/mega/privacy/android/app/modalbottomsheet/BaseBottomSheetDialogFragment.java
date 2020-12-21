@@ -27,6 +27,10 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
+    private static final int DEFAULT_VIEW_TYPE = 0;
+    private static final int RADIO_GROUP_VIEW_TYPE = 1;
+
+    private static final int HEIGHT_RADIO_GROUP_VIEW = 56;
     private static final int HEIGHT_CHILD = 50;
     protected static final int HEIGHT_HEADER_LARGE = 81;
     protected static final int HEIGHT_HEADER_LOW = 48;
@@ -42,6 +46,7 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private int heightHeader;
     protected BottomSheetBehavior mBehavior;
 
+    private int viewType = DEFAULT_VIEW_TYPE;
     protected View contentView;
     protected LinearLayout mainLinearLayout;
     protected LinearLayout items_layout;
@@ -97,6 +102,15 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     /**
+     * Sets the initial state of a BottomSheet composed by a RadioGroup and its state.
+     *
+     */
+    protected void setRadioGroupViewBottomSheetBehaviour() {
+        viewType = RADIO_GROUP_VIEW_TYPE;
+        setBottomSheetBehavior(HEIGHT_RADIO_GROUP_VIEW, false);
+    }
+
+    /**
      * Hides the BottomSheet.
      */
     protected void setStateBottomSheetBehaviorHidden() {
@@ -147,17 +161,17 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
      */
     private int getPeekHeight() {
         int numOptions = items_layout.getChildCount();
-        int numOptionsVisibles = 0;
-        int heightChild = px2dp(HEIGHT_CHILD, outMetrics);
+        int numVisibleOptions = 0;
+        int heightChild = px2dp(viewType == DEFAULT_VIEW_TYPE ? HEIGHT_CHILD : HEIGHT_RADIO_GROUP_VIEW, outMetrics);
         int peekHeight = px2dp(heightHeader, outMetrics);
 
         for (int i = 0; i < numOptions; i++) {
             if (getItemsLayoutChildAt(i).getVisibility() == VISIBLE) {
-                numOptionsVisibles++;
+                numVisibleOptions++;
             }
         }
 
-        if ((numOptionsVisibles <= 3 && heightHeader == HEIGHT_HEADER_LARGE) || (numOptionsVisibles <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
+        if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE) || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
             return peekHeight + (heightChild * numOptions);
         } else {
             for (int i = 0; i < numOptions; i++) {
