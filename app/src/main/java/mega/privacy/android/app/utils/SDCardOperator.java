@@ -104,7 +104,7 @@ public class SDCardOperator {
         return sdCardRoot;
     }
 
-    private boolean isNewSDCardPath(String path) {
+    public boolean isNewSDCardPath(String path) {
         return !path.startsWith(sdCardRoot);
     }
 

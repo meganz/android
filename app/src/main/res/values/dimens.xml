@@ -37,6 +37,46 @@
     <dimen name="emoji_grid_view_column_width">35dp</dimen>
     <dimen name="emoji_grid_view_spacing">6dp</dimen>
 
+    <!-- Floating Search View -->
+    <dimen name="search_bar_left_icon_left_margin">4dp</dimen>
+    <dimen name="search_bar_search_input_left_margin">20dp</dimen>
+    <dimen name="search_view_corner_radius">3dp</dimen>
+    <dimen name="search_bar_text_size">16sp</dimen>
+    <dimen name="square_button_icon_size">24dp</dimen>
+    <dimen name="square_button_size">48dp</dimen>
+    <dimen name="square_button_padding">12dp</dimen>
+
+    <!-- Homepage Categories -->
+    <dimen name="text_photo_span">8dp</dimen>
+    <dimen name="category_padding">16dp</dimen>
+
+    <!-- Homepage Fab -->
+    <dimen name="fab_size_normal">56dp</dimen>
+    <dimen name="fab_size_small">48dp</dimen>
+    <dimen name="label_padding">6dp</dimen>
+    <dimen name="label_margin_end">16dp</dimen>
+    <dimen name="fab_margin_span">16dp</dimen>
+    <dimen name="fab_margin_vertical">24dp</dimen>
+
+    <dimen name="icon_selected_size">23dp</dimen>
+    <dimen name="icon_selected_margin">7dp</dimen>
+
+    <dimen name="grid_node_item_width">172dp</dimen>
+    <dimen name="grid_node_list_padding_bottom">65dp</dimen>
+    <dimen name="grid_node_default_thumbnail_size">88dp</dimen>
+
+    <dimen name="photo_item_width">86dp</dimen>
+    <dimen name="photo_grid_margin">1dp</dimen>
+    <dimen name="photo_selected_icon_width">16dp</dimen>
+    <dimen name="photo_selected_icon_margin">4dp</dimen>
+    <dimen name="photo_selected_icon_round_corner_radius">2dp</dimen>
+    <dimen name="photo_item_padding">2dp</dimen>
+    <dimen name="photo_selected_border_width">0.5dp</dimen>
+
+    <dimen name="homepage_node_grid_round_corner_radius">5dp</dimen>
+
+    <dimen name="empty_data_font_size">18sp</dimen>
+
     <dimen name="cu_fragment_ic_selected_size_large">23dp</dimen>
     <dimen name="cu_fragment_ic_selected_margin_large">8dp</dimen>
     <dimen name="cu_fragment_ic_selected_size_small">16dp</dimen>

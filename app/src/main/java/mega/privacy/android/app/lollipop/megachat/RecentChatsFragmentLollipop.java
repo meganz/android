@@ -306,7 +306,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         bannerDivider.setVisibility(View.GONE);
-                        appBarLayout.setElevation(px2dp(4, outMetrics));
+                        appBarLayout.setElevation(dp2px(4, outMetrics));
                     } else {
                         bannerDivider.setVisibility(View.VISIBLE);
                         appBarLayout.setElevation(0);
