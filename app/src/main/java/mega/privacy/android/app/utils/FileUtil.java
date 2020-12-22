@@ -41,6 +41,7 @@ import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -53,6 +54,8 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
+import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FileUtil {
 
@@ -102,12 +105,25 @@ public class FileUtil {
         return localPath != null && (isOnMegaDownloads(node) || (fingerprintNode != null && fingerprintNode.equals(megaApi.getFingerprint(localPath))));
     }
 
-    public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent, String localPath, boolean isText) {
+    public static boolean setLocalIntentParams(Context context, MegaOffline offline, Intent intent,
+            String localPath, boolean isText) {
+        return setLocalIntentParams(context, getOfflineFile(context, offline).getName(), intent,
+                localPath, isText);
+    }
+
+    public static boolean setLocalIntentParams(Context context, MegaNode node, Intent intent,
+            String localPath, boolean isText) {
+        return setLocalIntentParams(context, node.getName(), intent, localPath, isText);
+    }
+
+    public static boolean setLocalIntentParams(Context context, String nodeName, Intent intent,
+            String localPath, boolean isText) {
         File mediaFile = new File(localPath);
 
         Uri mediaFileUri;
         try {
-            mediaFileUri = FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
+            mediaFileUri = FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER,
+                    mediaFile);
         } catch (IllegalArgumentException e) {
             mediaFileUri = Uri.fromFile(mediaFile);
         }
@@ -116,13 +132,14 @@ public class FileUtil {
             if (isText) {
                 intent.setDataAndType(mediaFileUri, TYPE_TEXT_PLAIN);
             } else {
-                intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(node.getName()).getType());
+                intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(nodeName).getType());
             }
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             return true;
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE,
+                context.getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
         return false;
     }
 
@@ -749,6 +766,34 @@ public class FileUtil {
         }
 
         return getFolderInfo(numFolders, numFiles);
+    }
+
+    /**
+     * Gets the total size of a File.
+     *
+     * @param file The File to get its total size.
+     * @return The total size.
+     */
+    public static long getTotalSize(File file) {
+        if (file.isFile()) {
+            return file.length();
+        }
+
+        File[] files = file.listFiles();
+        if (files == null) {
+            return 0;
+        }
+
+        long totalSize = 0;
+        for (File child : files) {
+            if (child.isFile()) {
+                totalSize += child.length();
+            } else {
+                totalSize += getTotalSize(child);
+            }
+        }
+
+        return totalSize;
     }
 }
 

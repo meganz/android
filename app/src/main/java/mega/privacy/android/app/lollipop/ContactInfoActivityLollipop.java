@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -17,14 +16,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.palette.graphics.Palette;
@@ -106,7 +102,6 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -128,7 +123,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -466,20 +460,20 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			int width;
 			if(isScreenInPortrait(this)){
-				width = px2dp(MAX_WIDTH_APPBAR_PORT, outMetrics);
+				width = dp2px(MAX_WIDTH_APPBAR_PORT, outMetrics);
 				secondLineTextToolbar.setPadding(0,0,0,11);
 			}else{
-				width = px2dp(MAX_WIDTH_APPBAR_LAND, outMetrics);
+				width = dp2px(MAX_WIDTH_APPBAR_LAND, outMetrics);
 				secondLineTextToolbar.setPadding(0,0,0,5);
 			}
 			nameText.setMaxWidthEmojis(width);
 			secondLineTextToolbar.setMaxWidth(width);
 
 			// left margin 72dp + right margin 36dp
-			firstLineTextMaxWidthExpanded = outMetrics.widthPixels - px2dp(108, outMetrics);
+			firstLineTextMaxWidthExpanded = outMetrics.widthPixels - dp2px(108, outMetrics);
 			firstLineTextMaxWidthCollapsed = width;
 			firstLineTextToolbar.setMaxWidthEmojis(firstLineTextMaxWidthExpanded);
-			contactStateIconPaddingLeft = px2dp(8, outMetrics);
+			contactStateIconPaddingLeft = dp2px(8, outMetrics);
 
 			imageGradient = findViewById(R.id.gradient_view);
 
@@ -1320,7 +1314,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		input.requestFocus();
 		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
 		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-		input.setEmojiSize(px2dp(EMOJI_SIZE, outMetrics));
+		input.setEmojiSize(dp2px(EMOJI_SIZE, outMetrics));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_CLASS_TEXT);
 		showKeyboardDelayed(input);
@@ -2478,7 +2472,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	 */
 	public void changeToolbarLayoutElevation() {
 		appBarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
-				px2dp(16, outMetrics) : 0);
+				dp2px(16, outMetrics) : 0);
 
 		if (callInProgressLayout.getVisibility() == View.VISIBLE) {
 			appBarLayout.setExpanded(false);

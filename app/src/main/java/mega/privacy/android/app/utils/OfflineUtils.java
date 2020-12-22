@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.StatFs;
 
+import android.util.Base64;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -91,20 +92,24 @@ public class OfflineUtils {
     /*
      * Get list of all child files
      */
-    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder, MegaApiAndroid megaApi) {
-
-        if (megaApi.getRootNode() == null)
+    public static void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder,
+            MegaApiAndroid megaApi) {
+        if (megaApi.getRootNode() == null) {
             return;
+        }
 
-        folder.mkdir();
         ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
-        for(int i=0; i<nodeList.size(); i++){
+        if (nodeList.size() == 0) {
+            // if this is an empty folder, do nothing
+            return;
+        }
+        folder.mkdir();
+        for (int i = 0; i < nodeList.size(); i++) {
             MegaNode document = nodeList.get(i);
             if (document.getType() == MegaNode.TYPE_FOLDER) {
-                File subfolder = new File(folder, new String(document.getName()));
-                getDlList(dlFiles, document, subfolder, megaApi);
-            }
-            else {
+                File subFolder = new File(folder, document.getName());
+                getDlList(dlFiles, document, subFolder, megaApi);
+            } else {
                 dlFiles.put(document, folder.getAbsolutePath());
             }
         }
@@ -247,6 +252,12 @@ public class OfflineUtils {
         }
 
         return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
+    }
+
+    public static File getThumbnailFile(Context context, MegaOffline node) {
+        File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
+        String thumbName = Base64.encodeToString(node.getHandle().getBytes(), Base64.DEFAULT);
+        return new File(thumbDir, thumbName + ".jpg");
     }
 
     private static String getOfflinePath(String path, MegaOffline offlineNode) {

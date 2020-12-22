@@ -377,7 +377,7 @@ public class ChatUtil {
             return 0;
         }
 
-        int initSize = px2dp(MIN_WIDTH, outMetrics);
+        int initSize = dp2px(MIN_WIDTH, outMetrics);
         for (String reaction : listReactions) {
             int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
             if (numUsers > 0) {
@@ -387,7 +387,7 @@ public class ChatUtil {
                 paint.setTextSize(TEXT_SIZE);
                 int newWidth = (int) paint.measureText(text);
                 int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
-                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2dp(sizeText, outMetrics);
+                int possibleNewSize = dp2px(MIN_WIDTH, outMetrics) + dp2px(sizeText, outMetrics);
                 if (possibleNewSize > initSize) {
                     initSize = possibleNewSize;
                 }

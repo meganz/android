@@ -33,13 +33,8 @@ public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragme
 
         LinearLayout createFolderSeparator = contentView.findViewById(R.id.create_folder_separator);
         if (context instanceof ManagerActivityLollipop) {
-            if (((ManagerActivityLollipop) context).isOnRecents()) {
-                optionCreateFolder.setVisibility(View.GONE);
-                createFolderSeparator.setVisibility(View.GONE);
-            } else {
-                optionCreateFolder.setVisibility(View.VISIBLE);
-                createFolderSeparator.setVisibility(View.VISIBLE);
-            }
+            optionCreateFolder.setVisibility(View.VISIBLE);
+            createFolderSeparator.setVisibility(View.VISIBLE);
         }
 
         optionFromDevice.setOnClickListener(this);

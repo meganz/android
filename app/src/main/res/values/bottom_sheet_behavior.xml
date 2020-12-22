@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="homepage_bottom_sheet_behavior" translatable="false">mega.privacy.android.app.fragments.homepage.main.HomepageBottomSheetBehavior</string>
+</resources>
