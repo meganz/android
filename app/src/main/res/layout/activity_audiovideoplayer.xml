@@ -38,9 +38,9 @@
 				android:id="@+id/call_toolbar"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:background="@color/transparent_black"
+				android:background="@color/grey_alpha_050"
 				android:minHeight="?attr/actionBarSize"
-				app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+				app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
 				app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
 				app:titleTextAppearance="@style/ToolbarTitle.Secondary"
 				android:fitsSystemWindows="true"/>
