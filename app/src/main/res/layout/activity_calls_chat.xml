@@ -110,7 +110,7 @@
                 android:layout_height="56dp"
                 android:background="@drawable/gradient_shape_callschat"
                 android:fitsSystemWindows="true"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 <LinearLayout

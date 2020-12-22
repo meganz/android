@@ -415,8 +415,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		logDebug("aB.setHomeAsUpIndicator");
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(" ");
