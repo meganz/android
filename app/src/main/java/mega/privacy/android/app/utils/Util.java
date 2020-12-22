@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,7 +35,11 @@ import android.provider.MediaStore;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
@@ -168,7 +171,7 @@ public class Util {
 		}
 
 		try{
-			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+			MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
 			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
 				dialog.dismiss();
 				if (finish) {
@@ -377,8 +380,8 @@ public class Util {
 	 * @param message To display, could be null
 	 * @param view Custom view to display in the dialog
 	 */
-	public static AlertDialog.Builder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+	public static MaterialAlertDialogBuilder getCustomAlertBuilder(Activity activity, String title, String message, View view) {
+		MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(activity);
 		ViewGroup customView = getCustomAlertView(activity, title, message);
 		if (view != null) {
 			customView.addView(view);

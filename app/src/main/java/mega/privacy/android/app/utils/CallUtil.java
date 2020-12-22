@@ -18,8 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
@@ -500,7 +503,7 @@ public class CallUtil {
         }
 
         try {
-            android.app.AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
+            MaterialAlertDialogBuilder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
             dialogBuilder.setPositiveButton(
                     activity.getString(android.R.string.ok),
                     (dialog, which) -> {
@@ -515,7 +518,7 @@ public class CallUtil {
                 }
             });
 
-            android.app.AlertDialog dialog = dialogBuilder.create();
+            AlertDialog dialog = dialogBuilder.create();
             dialog.show();
             brandAlertDialog(dialog);
         } catch (Exception ex) {
