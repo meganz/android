@@ -33,6 +33,14 @@ class MegaNodeDialogUtil {
         private const val TYPE_NEW_FILE = 2
         private const val TYPE_NEW_URL_FILE = 3
 
+        /**
+         * Creates and shows a TYPE_RENAME dialog to rename a node.
+         *
+         * @param activity Current activity.
+         * @param node     A valid node.
+         *
+         * @return The rename dialog.
+         */
         @JvmStatic
         fun showRenameNodeDialog(activity: Activity, node: MegaNode): AlertDialog {
             val renameDialogBuilder =
@@ -53,6 +61,13 @@ class MegaNodeDialogUtil {
             )
         }
 
+        /**
+         * Creates and shows a TYPE_NEW_FOLDER dialog to create a new folder.
+         *
+         * @param activity Current activity.
+         *
+         * @return The create new folder dialog.
+         */
         @JvmStatic
         fun showNewFolderDialog(activity: Activity): AlertDialog {
             val newFolderDialogBuilder =
@@ -73,6 +88,15 @@ class MegaNodeDialogUtil {
             )
         }
 
+        /**
+         * Creates and shows a TYPE_NEW_FILE dialog to create a new file.
+         *
+         * @param activity Current activity.
+         * @param parent   A valid node. Specifically the parent in which the folder will be created.
+         * @param data     Valid data. Specifically the content of the new file.
+         *
+         * @return The create new file dialog.
+         */
         @JvmStatic
         fun showNewFileDialog(activity: Activity, parent: MegaNode, data: String): AlertDialog {
             val newFileDialogBuilder =
@@ -93,6 +117,16 @@ class MegaNodeDialogUtil {
             )
         }
 
+        /**
+         * Creates and shows a TYPE_NEW_URL_FILE dialog to create a new URL file.
+         *
+         * @param activity       Current activity.
+         * @param parent         A valid node. Specifically the parent in which the folder will be created.
+         * @param data           Valid data. Specifically the content of the new URL file.
+         * @param defaultURLName Default name of the URL if has, null otherwise.
+         *
+         * @return The create new URL file dialog.
+         */
         @JvmStatic
         fun showNewURLFileDialog(
             activity: Activity,
@@ -118,6 +152,22 @@ class MegaNodeDialogUtil {
             )
         }
 
+        /**
+         * Finish the initialization of the dialog and shows it.
+         *
+         * @param activity       Current activity.
+         * @param node           A valid node if needed to confirm the action, null otherwise.
+         * @param data           Valid data if needed to confirm the action, null otherwise.
+         * @param defaultURLName The default URL name if the dialog is TYPE_NEW_URL_FILE.
+         * @param builder        The AlertDialog.Builder to create and show the final dialog.
+         * @param dialogType     Indicates the type of dialog. It can be:
+         *                        - TYPE_RENAME:       Rename action.
+         *                        - TYPE_NEW_FOLDER:   Create new folder action.
+         *                        - TYPE_NEW_FILE:     Create new file action.
+         *                        - TYPE_NEW_URL_FILE: Create new URL file action.
+         *
+         * @return The created dialog.
+         */
         private fun setFinalValuesAndShowDialog(
             activity: Activity,
             node: MegaNode?,
@@ -217,6 +267,23 @@ class MegaNodeDialogUtil {
             return dialog
         }
 
+        /**
+         * Checks, after user's confirmation, if the typed value is valid.
+         * - If so, confirms the action.
+         * - If not, shows the error in question.
+         *
+         * @param activity   Current activity.
+         * @param node       A valid node if needed to confirm the action, null otherwise.
+         * @param typeText   The input text field.
+         * @param data       Valid data if needed to confirm the action, null otherwise.
+         * @param errorText  The text field to show the error.
+         * @param dialog     The AlertDialog to check.
+         * @param dialogType Indicates the type of dialog. It can be:
+         *                   - TYPE_RENAME:       Rename action.
+         *                   - TYPE_NEW_FOLDER:   Create new folder action.
+         *                   - TYPE_NEW_FILE:     Create new file action.
+         *                   - TYPE_NEW_URL_FILE: Create new URL file action.
+         */
         private fun checkActionDialogValue(
             activity: Activity,
             node: MegaNode?,
@@ -282,12 +349,20 @@ class MegaNodeDialogUtil {
             }
         }
 
+        /**
+         * Shows an error in a dialog and updates the input text field UI in consequence.
+         *
+         * @param activity  Current activity.
+         * @param typeText  The input text field.
+         * @param errorText The text field to show the error.
+         * @param error     Text to show as error.
+         */
         @SuppressLint("UseCompatLoadingForColorStateLists")
         private fun showDialogError(
             activity: Activity,
             typeText: EditText?,
             errorText: TextView?,
-            text: String
+            error: String
         ) {
             typeText?.apply {
                 backgroundTintList =
@@ -298,10 +373,17 @@ class MegaNodeDialogUtil {
 
             errorText?.apply {
                 visibility = VISIBLE
-                this.text = text
+                text = error
             }
         }
 
+        /**
+         * Hides an error from a dialog and updates the input text field UI in consequence.
+         *
+         * @param activity  Current activity.
+         * @param typeText  The input text field.
+         * @param errorText The text field to hide the error.
+         */
         @SuppressLint("UseCompatLoadingForColorStateLists")
         private fun quitDialogError(
             activity: Activity, typeText: EditText?, errorText: TextView?
