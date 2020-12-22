@@ -1,10 +1,8 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="vertical"
@@ -14,18 +12,13 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout_chat_explorer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar_chat_explorer"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/Theme.Megaactionbar"
-                app:titleTextAppearance="@style/ToolbarTitle"
-                app:theme="@style/Theme.Megaactionbar"
-                tools:context=".ManagerActivityLollipop" />
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,7 +26,6 @@
             android:id="@+id/fragment_container_chat_explorer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/app_bar_layout_chat_explorer"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     </LinearLayout>
@@ -45,10 +37,6 @@
         android:elevation="@dimen/elevation_low"
         android:layout_margin="16dp"
         android:src="@drawable/ic_send_white"
-        android:stateListAnimator="@anim/button_elevation"
-        android:tint="@android:color/white"
-        android:layout_gravity="bottom|right|end"/>
+        android:layout_gravity="bottom|end"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-

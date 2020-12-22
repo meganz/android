@@ -171,7 +171,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:paddingBottom="1dp"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant2" />
             </RelativeLayout>
 
         </RelativeLayout>

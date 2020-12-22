@@ -1708,8 +1708,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 ((ManagerActivityLollipop) context).hideFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
                 checkScroll();
-            } else if (context instanceof ArchivedChatsActivity) {
-                ((ArchivedChatsActivity) context).changeStatusBarColor(1);
             }
             return true;
         }
@@ -1722,8 +1720,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 ((ManagerActivityLollipop) context).showFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
                 checkScroll();
-            } else if (context instanceof ArchivedChatsActivity) {
-                ((ArchivedChatsActivity) context).changeStatusBarColor(0);
             }
         }
 
