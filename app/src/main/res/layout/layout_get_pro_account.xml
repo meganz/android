@@ -23,7 +23,7 @@
         android:background="@color/white"
         android:gravity="left"
         android:text="@string/get_pro_account"
-        android:textColor="@color/name_my_account"
+        android:textColor="@color/primary_text"
         android:textSize="16sp"/>
        
     <LinearLayout

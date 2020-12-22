@@ -59,14 +59,10 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
 
     public static ImageView imageDrag;
-
-    public static final int OPEN_FROM_ROOT_SINGLE = 1;
-    public static final int OPEN_FROM_ROOT_MULTI = 2;
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -85,8 +81,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     private StickyLayoutManager stickyLayoutManager;
     private RecyclerView listView;
     private FastScroller fastScroller;
-
-    private int openFrom;
 
     private SelectedBucketViewModel selectedBucketModel;
 
@@ -131,17 +125,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         emptyImage = v.findViewById(R.id.empty_image_recents);
 
-        RelativeLayout.LayoutParams params;
-        int size;
-        if (isScreenInPortrait(context)) {
-            size = dp2px(200, outMetrics);
-        } else {
-            size = dp2px(100, outMetrics);
-        }
-        params = new RelativeLayout.LayoutParams(size, size);
-        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        emptyImage.setLayoutParams(params);
-
         emptyText = v.findViewById(R.id.empty_text_recents);
 
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
@@ -185,8 +168,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         EventNotifierKt.getNodesChange().observeForever(o -> {
             if (o) {
                 ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
-                fillRecentItems(buckets);
+                reloadItems(buckets);
                 refreshRecentsActions();
+                setVisibleContacts();
             }
         });
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
@@ -197,8 +181,17 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     }
 
     public void fillRecentItems(ArrayList<MegaRecentActionBucket> buckets) {
-        recentsItems.clear();
         this.buckets = buckets;
+        reloadItems(buckets);
+
+        adapter = new RecentsAdapter(context, this, recentsItems);
+        listView.setAdapter(adapter);
+        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
+        setVisibleContacts();
+    }
+
+    private void reloadItems(ArrayList<MegaRecentActionBucket> buckets) {
+        recentsItems.clear();
         String previousDate = "";
         String currentDate;
 
@@ -216,11 +209,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
             recentsItems.add(item);
         }
-
-        adapter = new RecentsAdapter(context, this, recentsItems);
-        listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
-        setVisibleContacts();
     }
 
     public void refreshRecentsActions() {
@@ -319,30 +307,11 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     }
 
     public ImageView getImageDrag(long handle) {
-        switch (openFrom) {
-            case OPEN_FROM_ROOT_SINGLE:
-            case OPEN_FROM_ROOT_MULTI:
-                return adapter.getThumbnailView(listView, handle,
-                    openFrom == OPEN_FROM_ROOT_SINGLE);
-            default:
-                return null;
-        }
+        return adapter.getThumbnailView(listView, handle);
     }
 
-    public void updateScrollPosition(long handle) {
-        switch (openFrom) {
-            case OPEN_FROM_ROOT_MULTI:
-                adapter.scrollToSubListNode(listView, handle);
-                break;
-            case OPEN_FROM_ROOT_SINGLE:
-            default:
-                break;
-        }
-    }
-
-    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail, int openFrom) {
+    public void openFile(MegaNode node, boolean isMedia, ImageView thumbnail) {
         imageDrag = thumbnail;
-        this.openFrom = openFrom;
 
         int[] screenPosition = null;
         if (thumbnail != null) {

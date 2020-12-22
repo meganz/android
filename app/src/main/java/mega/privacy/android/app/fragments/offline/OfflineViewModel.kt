@@ -10,7 +10,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import mega.privacy.android.app.MegaOffline
@@ -100,7 +99,7 @@ class OfflineViewModel @ViewModelInject constructor(
             openNodeAction.throttleFirst(1, SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    Consumer { _nodeToOpen.value = Event(it) },
+                    { _nodeToOpen.value = Event(it) },
                     logErr("OfflineViewModel openNodeAction")
                 )
         )
@@ -108,7 +107,7 @@ class OfflineViewModel @ViewModelInject constructor(
             openFolderFullscreenAction.throttleFirst(1, SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    Consumer { _openFolderFullscreen.value = Event(it) },
+                    { _openFolderFullscreen.value = Event(it) },
                     logErr("OfflineViewModel openFolderFullscreenAction")
                 )
         )
@@ -116,7 +115,7 @@ class OfflineViewModel @ViewModelInject constructor(
             showOptionsPanelAction.throttleFirst(1, SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    Consumer { _showOptionsPanel.value = Event(it) },
+                    { _showOptionsPanel.value = Event(it) },
                     logErr("OfflineViewModel showOptionsPanelAction")
                 )
         )
@@ -196,10 +195,11 @@ class OfflineViewModel @ViewModelInject constructor(
         } else {
             val nodeFile = getOfflineFile(context, node.node)
 
-            if (isFileAvailable(nodeFile) && nodeFile.isDirectory) {
-                navigateIn(node.node, firstVisiblePosition)
-            } else if (isFileAvailable(nodeFile) && nodeFile.isFile) {
-                openNodeAction.onNext(Pair(position, node))
+            if (isFileAvailable(nodeFile)) {
+                when {
+                    nodeFile.isDirectory -> navigateIn(node.node, firstVisiblePosition)
+                    nodeFile.isFile -> openNodeAction.onNext(Pair(position, node))
+                }
             }
         }
     }
@@ -433,7 +433,7 @@ class OfflineViewModel @ViewModelInject constructor(
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer {
+            .subscribe({
                 if (it != null) {
                     _urlFileOpenAsUrl.value = Event(it)
                 } else {
@@ -502,7 +502,7 @@ class OfflineViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                Consumer { _nodes.value = Pair(it, autoScrollPos) },
+                { _nodes.value = Pair(it, autoScrollPos) },
                 logErr("loadOfflineNodes")
             )
         )
@@ -529,7 +529,7 @@ class OfflineViewModel @ViewModelInject constructor(
             .filter { it.first.exists() }
             .map { createThumbnail(it.first, it.second) }
             .throttleLatest(1, SECONDS, true)
-            .subscribe(Consumer { loadOfflineNodes() }, logErr("createThumbnail"))
+            .subscribe({ loadOfflineNodes() }, logErr("createThumbnail"))
         )
     }
 }

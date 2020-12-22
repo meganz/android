@@ -58,7 +58,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -71,6 +71,7 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -948,5 +949,33 @@ public class ChatUtil {
             default:
                 return null;
         }
+    }
+
+    /**
+     * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
+     *
+     * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
+     * @return String to show for invalid meta message.
+     */
+    public static String getInvalidMetaMessage(MegaChatMessage message) {
+        String invalidMetaMessage = getString(R.string.error_meta_message_invalid);
+
+        if (message == null) {
+            return invalidMetaMessage;
+        }
+
+        String contentMessage = message.getContent();
+        if (!isTextEmpty(contentMessage)) {
+            return contentMessage;
+        }
+
+        MegaChatContainsMeta meta = message.getContainsMeta();
+
+        String metaTextMessage = meta != null ? meta.getTextMessage() : null;
+        if (!isTextEmpty(metaTextMessage)) {
+            return metaTextMessage;
+        }
+
+        return invalidMetaMessage;
     }
 }

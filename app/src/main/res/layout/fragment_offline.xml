@@ -1,5 +1,4 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,8 +8,7 @@
         android:id="@+id/empty_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/recycler_view_separator"
+        android:layout_gravity="center"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:visibility="gone"
@@ -18,17 +16,18 @@
 
         <ImageView
             android:id="@+id/empty_hint_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:src="@drawable/ic_empty_offline" />
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            android:src="@drawable/ic_empty_offline" />
 
         <TextView
             android:id="@+id/empty_hint_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:fontFamily="sans-serif"
             android:textColor="@color/text_secondary"
-            android:textSize="18sp"
+            android:textSize="14sp"
             tools:text="@string/context_empty_offline" />
     </LinearLayout>
 

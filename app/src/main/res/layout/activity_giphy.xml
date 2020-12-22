@@ -39,7 +39,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="16dp"
                 android:textAllCaps="true"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="14sp" />
 
             <androidx.recyclerview.widget.RecyclerView

@@ -833,7 +833,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			final ArrayList<MegaChatMessage> messagesSelected = adapter.getSelectedMessages();
 
 			if (app.getStorageState() == STORAGE_STATE_PAYWALL &&
-					item.getItemId() != R.id.cab_menu_select_all || item.getItemId() != R.id.cab_menu_unselect_all) {
+					item.getItemId() != R.id.cab_menu_select_all && item.getItemId() != R.id.cab_menu_unselect_all) {
 				showOverDiskQuotaPaywallWarning();
 				return false;
 			}

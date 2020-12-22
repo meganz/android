@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -53,6 +52,8 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
@@ -72,16 +73,15 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 return
             }
 
-            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0)
-                == Constants.OFFLINE_ADAPTER
+            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0) == OFFLINE_ADAPTER
             ) {
                 val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
 
                 when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
-                    Constants.SCROLL_TO_POSITION -> {
+                    SCROLL_TO_POSITION -> {
                         scrollToNode(handle)
                     }
-                    Constants.UPDATE_IMAGE_DRAG -> {
+                    UPDATE_IMAGE_DRAG -> {
                         hideDraggingThumbnail(handle)
                     }
                 }
@@ -152,7 +152,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     ): View? {
         requireContext().registerReceiver(
             receiverUpdatePosition,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
+            IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
         )
 
         binding = FragmentOfflineBinding.inflate(inflater, container, false)
@@ -264,13 +264,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.offlineBrowserList.addItemDecoration(listDivider!!)
         }
 
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.emptyHintImage.setImageResource(R.drawable.offline_empty_landscape)
-        } else {
-            binding.emptyHintImage.setImageResource(R.drawable.ic_empty_offline)
-        }
-
-        var textToShow = getString(R.string.context_empty_offline)
+        var textToShow = getString(R.string.context_empty_offline).toUpperCase(Locale.ROOT)
 
         try {
             textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>")
@@ -626,7 +620,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 } else {
                     callManager {
                         it.showSnackbar(
-                            Constants.SNACKBAR_TYPE,
+                            SNACKBAR_TYPE,
                             getString(R.string.intent_not_available),
                             MEGACHAT_INVALID_HANDLE
                         )
@@ -653,7 +647,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
-                pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
+                pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
 
@@ -890,7 +884,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         val inflater = mode!!.menuInflater
 
         inflater.inflate(R.menu.offline_browser_action, menu)
-        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT) }
+        callManager { it.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT) }
         checkScroll()
 
         return true
@@ -910,7 +904,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
-        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY) }
+        callManager { it.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
     }
 

@@ -842,8 +842,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
-                    offlineSwitch.setOnClickListener(this);
-                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                 }else{
                     offlineSwitch.setEnabled(false);
                     availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
@@ -1161,7 +1161,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         }
                     });
 
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.primary_text));
                     collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
                     collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
                 }
@@ -1798,8 +1798,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_OPEN_FOLDER);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("locationFileInfo", true);
                 if (adapterType == OFFLINE_ADAPTER){
                     intent.putExtra("offline_adapter", true);

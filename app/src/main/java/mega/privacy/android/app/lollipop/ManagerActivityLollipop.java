@@ -216,6 +216,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
@@ -248,6 +249,7 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -894,7 +896,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					//UPGRADE_ACCOUNT_FRAGMENT
 					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 					if(upAFL!=null){
-						upAFL.setPricing();
+						upAFL.setPricingInfo();
 					}
 
 					//CENTILI_FRAGMENT
@@ -1325,8 +1327,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									RecentsFragment.imageDrag = imageDrag;
 									RecentsFragment.imageDrag.setVisibility(View.INVISIBLE);
 								}
-							} else if (actionType == SCROLL_TO_POSITION) {
-								pagerRecentsFragment.updateScrollPosition(handle);
 							}
 						}
 					}
@@ -1435,19 +1435,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
-	private SkuDetails getSkuDetails(List<SkuDetails> list, String key) {
-		if (list == null || list.isEmpty()) {
-			return null;
-		}
-
-		for (SkuDetails details : list) {
-			if (details.getSku().equals(key)) {
-				return details;
-			}
-		}
-		return null;
-	}
-
 	private void getInventory() {
 		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
 			@Override
@@ -1458,6 +1445,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (skuDetailsList != null && skuDetailsList.size() > 0) {
 					mSkuDetailsList = skuDetailsList;
 					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+
+					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+					if (upAFL != null) {
+						upAFL.setPricingInfo();
+					}
 				}
 			}
 		};
@@ -1572,7 +1564,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
 		if (upAFL != null) {
-			upAFL.setPricing();
+			upAFL.setPricingInfo();
 		}
 	}
 
@@ -2572,6 +2564,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this);
 
+		transferData = megaApi.getTransferData(this);
+		if (transferData != null) {
+			for (int i = 0; i < transferData.getNumDownloads(); i++) {
+				int tag = transferData.getDownloadTag(i);
+				transfersInProgress.add(tag);
+				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
+			}
+
+			for (int i = 0; i < transferData.getNumUploads(); i++) {
+				int tag = transferData.getUploadTag(i);
+				transfersInProgress.add(transferData.getUploadTag(i));
+				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
+			}
+		}
+
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
 
@@ -2833,17 +2840,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			megaApi.shouldShowRichLinkWarning(this);
 			megaApi.isRichPreviewsEnabled(this);
 			megaApi.isGeolocationEnabled(this);
-
-			transferData = megaApi.getTransferData(this);
-			int downloadsInProgress = transferData.getNumDownloads();
-			int uploadsInProgress = transferData.getNumUploads();
-
-            for(int i=0;i<downloadsInProgress;i++){
-                transfersInProgress.add(transferData.getDownloadTag(i));
-            }
-            for(int i=0;i<uploadsInProgress;i++){
-                transfersInProgress.add(transferData.getUploadTag(i));
-            }
 
 			if(savedInstanceState==null) {
 				logDebug("Run async task to check offline files");
@@ -3276,6 +3272,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								selectDrawerItemLollipop(drawerItem);
 								return;
 							}
+							case BUSINESS:{
+								drawerItem = DrawerItem.ACCOUNT;
+								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
+								selectDrawerItemPending=false;
+								displayedAccountType = BUSINESS;
+								selectDrawerItemLollipop(drawerItem);
+								return;
+							}
 						}
 					}
 					else{
@@ -3318,6 +3322,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				selectDrawerItemLollipop(drawerItem);
 			}
 		}
+
 		megaApi.shouldShowPasswordReminderDialog(false, this);
 
 		if (verify2FADialogIsShown){
@@ -4837,7 +4842,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
-                            aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                            aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
                             firstNavigationLevel = true;
                         }
                         else {
@@ -5060,13 +5065,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						titleId = R.string.sortby_type_photo_first;
 						break;
 					case DOCUMENTS:
-						titleId = R.string.category_documents;
+						titleId = R.string.section_documents;
 						break;
 					case AUDIO:
 						titleId = R.string.upload_to_audio;
 						break;
                     case VIDEO:
-                        titleId = R.string.upload_to_video;
+                        titleId = R.string.sortby_type_video_first;
                         break;
 				}
 
@@ -5387,19 +5392,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		switch (tabSelected) {
 			case OUTGOING_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
 				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
 				break;
 			case LINKS_TAB:
-				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.secondary_text));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
 				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.link_ic, R.color.dark_primary_color));
 				break;
 			default:
 				tabLayoutShares.getTabAt(INCOMING_TAB).setIcon(mutateIconSecondary(getApplicationContext(), R.drawable.ic_incoming_shares, R.color.dark_primary_color));
-				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.mail_my_account));
-				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.mail_my_account));
+				tabLayoutShares.getTabAt(OUTGOING_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.ic_outgoing_shares, R.color.secondary_text));
+				tabLayoutShares.getTabAt(LINKS_TAB).setIcon(mutateIcon(getApplicationContext(), R.drawable.link_ic, R.color.secondary_text));
 
 		}
 	}
@@ -6105,13 +6110,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	mNavController.navigate(
     			HomepageFragmentDirections.Companion.actionHomepageToFullscreenOffline(path, false),
 				new NavOptions.Builder().setLaunchSingleTop(true).build());
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-				&& !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			ActivityCompat.requestPermissions(this,
-					new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-					REQUEST_WRITE_STORAGE);
-		}
 	}
 
 	public void fullscreenOfflineFragmentOpened(OfflineFragment fragment) {
@@ -7576,6 +7574,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
+            killAllSessions.setVisible(false);
+            exportMK.setVisible(false);
         }
     }
 
@@ -9260,12 +9260,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 	}
 
 	void verifyShowError(){
@@ -9317,13 +9317,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
                     switch (error) {
                         case CHAT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                             openLinkErrorText.setText(R.string.valid_chat_link);
                             openLinkOpenButton.setText(R.string.action_open_chat_link);
                             break;
                         }
                         case CONTACT_LINK: {
-							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+							openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                             openLinkErrorText.setText(R.string.valid_contact_link);
                             openLinkOpenButton.setText(R.string.action_open_contact_link);
                             break;
@@ -9345,7 +9345,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					openLinkText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 					openLinkText.getBackground().mutate().clearColorFilter();
 					openLinkText.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
 					openLinkError.setVisibility(View.GONE);
@@ -10571,7 +10571,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
-	public void showNodeOptionsPanel(MegaNode node, int mode){
+	public void showNodeOptionsPanel(MegaNode node, int mode) {
 		logDebug("showNodeOptionsPanel");
 
 		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
@@ -10580,6 +10580,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment(mode);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
+
+	public void showNodeLabelsPanel(@NonNull MegaNode node) {
+        logDebug("showNodeLabelsPanel");
+
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            bottomSheetDialogFragment.dismiss();
+        }
+
+        selectedNode = node;
+        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.getHandle());
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
 
 	public void showOptionsPanel(MegaOffline sNode){
 		logDebug("showNodeOptionsPanel-Offline");
@@ -12113,7 +12125,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void resetNavigationViewLayout() {
 		if (myAccountSection != null) {
 			myAccountSection.setEnabled(true);
-			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			((TextView) myAccountSection.findViewById(R.id.my_account_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 		}
 
 		if (inboxSection != null){
@@ -12126,7 +12138,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(hasChildren){
 					inboxSection.setEnabled(true);
 					inboxSection.setVisibility(View.VISIBLE);
-					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+					((TextView) inboxSection.findViewById(R.id.inbox_section_text)).setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 				}
 				else{
 					logDebug("Inbox Node NO children");
@@ -12140,7 +12152,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (contactsSectionText == null) {
 				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 			setContactTitleSection();
 		}
 
@@ -12149,7 +12161,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (notificationsSectionText == null) {
 				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 			setNotificationsTitleSection();
 		}
 
@@ -14397,20 +14409,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		updateNavigationToolbarIcon();
-	}
-
-	////TRANSFERS/////
-
-	public void changeTransfersStatus(){
-		logDebug("changeTransfersStatus");
-		if(megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)||megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)){
-			logDebug("Show PLAY button");
-			megaApi.pauseTransfers(false, this);
-		}
-		else{
-			logDebug("Transfers are play -> pause");
-			megaApi.pauseTransfers(true, this);
-		}
 	}
 
 	/**

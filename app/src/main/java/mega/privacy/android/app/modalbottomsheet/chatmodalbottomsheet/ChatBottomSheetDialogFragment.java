@@ -170,15 +170,16 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 }
 
                 if (contact != null) {
-                    titleMailContactChatPanel.setText(contact.getEmail());
                     addAvatarChatPanel(contact.getEmail(), chat);
 
                     if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                         optionInfoChat.setVisibility(View.VISIBLE);
                         infoChatText.setText(getString(R.string.contact_properties_activity));
+                        titleMailContactChatPanel.setText(contact.getEmail());
                     } else {
                         optionInfoChat.setVisibility(View.GONE);
                         optionClearHistory.setVisibility(View.GONE);
+                        titleMailContactChatPanel.setVisibility(View.GONE);
                     }
                 } else {
                     optionInfoChat.setVisibility(View.GONE);

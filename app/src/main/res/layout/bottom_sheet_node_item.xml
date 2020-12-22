@@ -51,7 +51,7 @@
                     android:singleLine="true"
                     android:maxLines="1"
                     android:ellipsize="middle"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
 
                 <RelativeLayout
@@ -94,7 +94,7 @@
                     android:id="@+id/node_info_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/mail_my_account"
+                    android:textColor="@color/secondary_text"
                     android:textSize="14sp"
                     android:singleLine="true"
                     android:layout_toRightOf="@id/node_info_versions_icon"
@@ -135,46 +135,151 @@
 
             <!-- Options -->
             <LinearLayout
+                android:id="@+id/option_properties_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-                <LinearLayout
-                    android:id="@+id/option_properties_layout"
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/option_properties_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
+                    android:alpha="0.54"
+                    android:layout_marginStart="5dp"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic"
+                    android:visibility="visible" />
 
-                    <ImageView
-                        android:id="@+id/option_properties_image"
-                        style="@style/dialogActionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.54"
-                        android:layout_marginLeft="5dp"
-                        android:paddingBottom="2dp"
-                        android:paddingTop="2dp"
-                        android:src="@drawable/info_ic"
-                        android:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/option_properties_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="2dp"
-                        android:paddingTop="2dp"
-                        android:layout_marginLeft="18dp"
-                        android:textColor="@color/name_my_account"
-                        android:textSize="16sp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
-                    android:background="@color/black_12_alpha"/>
+                <TextView
+                    android:id="@+id/option_properties_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp"/>
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/view_in_folder_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible"
+                >
+
+                <ImageView
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_view_in_folder"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/view_in_folder_label"
+                    android:layout_marginStart="18dp"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/option_favourite_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/option_favourite_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:alpha="0.54"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_add_favourite" />
+
+                <TextView
+                    android:id="@+id/option_favourite_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_favourite"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/option_label_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/option_label_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:alpha="0.54"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_label" />
+
+                <TextView
+                    android:id="@+id/option_label_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="5"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_label"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/option_label_current"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:drawablePadding="8dp"
+                    android:gravity="end|center_vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="16sp"
+                    tools:drawableRight="@drawable/ic_circle_label"
+                    tools:text="@string/label_red"
+                    tools:textColor="@color/label_red" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/black_12_alpha"/>
 
             <LinearLayout
                 android:id="@+id/option_download_layout"
@@ -203,7 +308,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -235,7 +340,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"
                     />
 
@@ -246,37 +351,6 @@
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
                     />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/view_in_folder_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                tools:visibility="visible"
-                >
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_view_in_folder"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/view_in_folder_label"
-                    android:layout_marginStart="18dp"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -314,7 +388,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_get_link_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -345,7 +419,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_remove_link_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -377,7 +451,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_share"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -404,12 +478,12 @@
                     android:id="@+id/option_share_folder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_share_folder"
-                    android:textColor="@color/name_my_account"
-                    android:textSize="16sp"/>
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -439,7 +513,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_send_file_to_chat"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -470,7 +544,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_clean_shares_menu"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -509,7 +583,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_rename"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -540,7 +614,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_move_to"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -571,7 +645,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_copy"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -601,7 +675,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_restore"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -640,7 +714,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/external_play"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -671,7 +745,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/search_open_location"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 

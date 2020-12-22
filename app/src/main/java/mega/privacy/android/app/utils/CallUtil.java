@@ -2,16 +2,14 @@ package mega.privacy.android.app.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.SystemClock;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +17,10 @@ import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
@@ -30,7 +32,6 @@ import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -43,13 +44,13 @@ import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallUtil {
@@ -65,8 +66,9 @@ public class CallUtil {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+        MegaHandleList listCallsTerminating = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION);
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
         MegaHandleList listCalls = megaChatApi.getChatCalls();
 
@@ -76,7 +78,7 @@ public class CallUtil {
         }
 
         logDebug("There is some call in progress");
-        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
+        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsTerminating.size() + listCallsRingIn.size())) {
             logDebug("I'm not participating in any of the calls there");
             return false;
         }
@@ -955,6 +957,9 @@ public class CallUtil {
     public static boolean checkPermissionsCall(Activity activity, int typePermission) {
         boolean hasCameraPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
         if (!hasCameraPermission) {
+            if(activity == null)
+                return false;
+
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
@@ -964,6 +969,9 @@ public class CallUtil {
 
         boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(MegaApplication.getInstance().getBaseContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
         if (!hasRecordAudioPermission) {
+            if(activity == null)
+                return false;
+
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
@@ -1030,5 +1038,34 @@ public class CallUtil {
     public static void addChecksForACall(long chatId, boolean speakerStatus){
         MegaApplication.setCallLayoutStatus(chatId, false);
         MegaApplication.setSpeakerStatus(chatId, speakerStatus);
+    }
+
+    /**
+     * Method for removing the incoming call notification.
+     *
+     * @param callIdIncomingCall The call ID
+     */
+    public static void clearIncomingCallNotification(long callIdIncomingCall) {
+        logDebug("Clear the notification in chat: " + callIdIncomingCall);
+        if(callIdIncomingCall == MEGACHAT_INVALID_HANDLE)
+            return;
+
+        try {
+            NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getBaseContext().getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.cancel(getCallNotificationId(callIdIncomingCall));
+        } catch (Exception e) {
+            logError("EXCEPTION", e);
+        }
+    }
+
+    /**
+     * Method for getting the call notification ID.
+     *
+     * @param callId The call ID.
+     * @return The notification ID.
+     */
+    public static int getCallNotificationId(long callId) {
+        String notificationCallId = MegaApiAndroid.userHandleToBase64(callId);
+        return notificationCallId.hashCode() + NOTIFICATION_CALL_IN_PROGRESS;
     }
 }
