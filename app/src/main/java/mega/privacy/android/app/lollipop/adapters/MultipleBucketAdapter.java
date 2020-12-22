@@ -231,7 +231,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         return nodes.size();
     }
 
-    private void setNodes(List<MegaNode> nodes) {
+    public void setNodes(List<MegaNode> nodes) {
         this.nodes = nodes;
         notifyDataSetChanged();
     }

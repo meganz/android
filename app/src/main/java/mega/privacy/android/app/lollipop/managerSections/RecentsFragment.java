@@ -168,8 +168,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         EventNotifierKt.getNodesChange().observeForever(o -> {
             if (o) {
                 ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
-                fillRecentItems(buckets);
+                reloadItems(buckets);
                 refreshRecentsActions();
+                setVisibleContacts();
             }
         });
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
@@ -180,8 +181,17 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     }
 
     public void fillRecentItems(ArrayList<MegaRecentActionBucket> buckets) {
-        recentsItems.clear();
         this.buckets = buckets;
+        reloadItems(buckets);
+
+        adapter = new RecentsAdapter(context, this, recentsItems);
+        listView.setAdapter(adapter);
+        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
+        setVisibleContacts();
+    }
+
+    private void reloadItems(ArrayList<MegaRecentActionBucket> buckets) {
+        recentsItems.clear();
         String previousDate = "";
         String currentDate;
 
@@ -199,11 +209,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
             recentsItems.add(item);
         }
-
-        adapter = new RecentsAdapter(context, this, recentsItems);
-        listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
-        setVisibleContacts();
     }
 
     public void refreshRecentsActions() {
