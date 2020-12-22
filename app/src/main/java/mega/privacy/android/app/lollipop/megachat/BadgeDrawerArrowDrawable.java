@@ -6,13 +6,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import androidx.core.content.ContextCompat;
+
+import androidx.annotation.ColorRes;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
-
+import androidx.core.content.ContextCompat;
 import java.util.Objects;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.TextUtil;
 
 public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
 
@@ -24,36 +25,32 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     private Paint bigBackgroundPaint;
     private Paint textPaint;
     private String text;
-    private boolean enabled = true;
+    private boolean badgeEnabled = true;
 
-    public BadgeDrawerArrowDrawable(Context context) {
+    public BadgeDrawerArrowDrawable(Context context, @ColorRes int textColor) {
         super(context);
 
         backgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
+        if (context instanceof ManagerActivityLollipop
+            || context instanceof ArchivedChatsActivity) {
             backgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
-        }
-        else {
+        } else {
             backgroundPaint.setColor(Color.WHITE);
         }
         backgroundPaint.setAntiAlias(true);
 
         bigBackgroundPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
+        if (context instanceof ManagerActivityLollipop
+            || context instanceof ArchivedChatsActivity) {
             bigBackgroundPaint.setColor(Color.WHITE);
-        }
-        else {
-            bigBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
+        } else {
+            bigBackgroundPaint.setColor(
+                ContextCompat.getColor(context, R.color.dark_primary_color));
         }
         bigBackgroundPaint.setAntiAlias(true);
 
         textPaint = new Paint();
-        if (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity) {
-            textPaint.setColor(Color.WHITE);
-        }
-        else {
-            textPaint.setColor(ContextCompat.getColor(context, R.color.dark_primary_color));
-        }
+        textPaint.setColor(ContextCompat.getColor(context, textColor));
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);
@@ -64,38 +61,34 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        if (!enabled) {
+        if (!badgeEnabled) {
             return;
         }
 
         final Rect bounds = getBounds();
 
+        if (TextUtil.isTextEmpty(text)) {
+            return;
+        }
+
         final float x = (1 - HALF_SIZE_FACTOR) * bounds.width();
         final float y = HALF_SIZE_FACTOR * bounds.height();
         canvas.drawCircle(x, y, (SIZE_FACTOR / 1.4f) * bounds.width(), bigBackgroundPaint);
 
-        final float x1 = (1 - HALF_SIZE_FACTOR) * bounds.width()+2;
-        final float y1 = HALF_SIZE_FACTOR * bounds.height()-2;
-        canvas.drawCircle(x1, y1, (SIZE_FACTOR / 1.3f) * bounds.width()-2, backgroundPaint);
-
-        if (text == null || text.length() == 0) {
-            return;
-        }
+        final float x1 = (1 - HALF_SIZE_FACTOR) * bounds.width() + 2;
+        final float y1 = HALF_SIZE_FACTOR * bounds.height() - 2;
+        canvas.drawCircle(x1, y1, (SIZE_FACTOR / 1.3f) * bounds.width() - 2, backgroundPaint);
 
         final Rect textBounds = new Rect();
         textPaint.getTextBounds(text, 0, text.length(), textBounds);
-        canvas.drawText(text, x1, y1 + (float)(textBounds.height() / 2.5), textPaint);
+        canvas.drawText(text, x1, y1 + (float) (textBounds.height() / 2.5), textPaint);
     }
 
-    public void setEnabled(boolean enabled) {
-        if (this.enabled != enabled) {
-            this.enabled = enabled;
+    public void setBadgeEnabled(boolean badgeEnabled) {
+        if (this.badgeEnabled != badgeEnabled) {
+            this.badgeEnabled = badgeEnabled;
             invalidateSelf();
         }
-    }
-
-    public boolean isEnabled() {
-        return enabled;
     }
 
     public void setText(String text) {
@@ -112,6 +105,13 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     public void setBackgroundColor(int color) {
         if (backgroundPaint.getColor() != color) {
             backgroundPaint.setColor(color);
+            invalidateSelf();
+        }
+    }
+
+    public void setBigBackgroundColor(int color) {
+        if (bigBackgroundPaint.getColor() != color) {
+            bigBackgroundPaint.setColor(color);
             invalidateSelf();
         }
     }

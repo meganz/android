@@ -846,7 +846,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
 		if (!isCurrentFragment(fragmentIndex)) return;
 
-		abL.setElevation(elevate ? px2dp(4, outMetrics) : 0);
+		abL.setElevation(elevate ? dp2px(4, outMetrics) : 0);
 	}
 
 	private boolean isCurrentFragment(int index) {
