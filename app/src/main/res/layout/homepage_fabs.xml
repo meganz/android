@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:elevation="@dimen/elevation_low"
+    tools:viewBindingIgnore="true">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabCustomSize="@dimen/fab_size_small"
+        android:src="@drawable/ic_chat"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/fab_upload"
+        app:layout_constraintEnd_toEndOf="@+id/fab_upload"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/fab_upload"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_upload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabCustomSize="@dimen/fab_size_small"
+        android:backgroundTint="@color/copyright_text"
+        android:layout_marginTop="@dimen/fab_margin_vertical"
+        android:layout_marginBottom="@dimen/fab_margin_vertical"
+        android:src="@drawable/ic_upload"
+        android:tint="@color/white"
+        android:visibility="gone"
+        app:borderWidth="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/fab_main"
+        app:layout_constraintEnd_toEndOf="@+id/fab_main"
+        app:layout_constraintStart_toStartOf="@+id/fab_main"
+        app:layout_constraintTop_toBottomOf="@+id/fab_chat" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabCustomSize="@dimen/fab_size_normal"
+        android:src="@drawable/ic_add_white"
+        android:tint="@android:color/white"
+        android:layout_marginBottom="@dimen/fab_margin_span"
+        android:layout_marginEnd="@dimen/fab_margin_span"
+        app:borderWidth="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fab_upload" />
+
+    <TextView
+        style="@style/homepage_fab_label"
+        android:id="@+id/text_chat"
+        android:text="@string/fab_label_new_chat"
+        app:layout_constraintBottom_toBottomOf="@id/fab_chat"
+        app:layout_constraintEnd_toStartOf="@id/fab_chat"
+        app:layout_constraintTop_toTopOf="@id/fab_chat" />
+
+    <TextView
+        style="@style/homepage_fab_label"
+        android:id="@+id/text_upload"
+        android:text="@string/context_upload"
+        app:layout_constraintBottom_toBottomOf="@id/fab_upload"
+        app:layout_constraintEnd_toStartOf="@id/fab_upload"
+        app:layout_constraintTop_toTopOf="@id/fab_upload" />
+</androidx.constraintlayout.widget.ConstraintLayout>

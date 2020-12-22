@@ -42,9 +42,9 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
         LinearLayout.LayoutParams expiredLayoutParams = (LinearLayout.LayoutParams) expiredImageLayout.getLayoutParams();
 
         if (isScreenInPortrait(this)) {
-            expiredLayoutParams.height = px2dp(IMAGE_HEIGHT_PORTRAIT, getOutMetrics());
+            expiredLayoutParams.height = dp2px(IMAGE_HEIGHT_PORTRAIT, getOutMetrics());
         } else {
-            expiredLayoutParams.height = px2dp(IMAGE_HEIGHT_LANDSCAPE, getOutMetrics());
+            expiredLayoutParams.height = dp2px(IMAGE_HEIGHT_LANDSCAPE, getOutMetrics());
         }
 
         expiredImageLayout.setLayoutParams(expiredLayoutParams);
