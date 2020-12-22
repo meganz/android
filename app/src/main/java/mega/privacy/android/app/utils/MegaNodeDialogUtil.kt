@@ -38,7 +38,6 @@ class MegaNodeDialogUtil {
          *
          * @param activity Current activity.
          * @param node     A valid node.
-         *
          * @return The rename dialog.
          */
         @JvmStatic
@@ -65,7 +64,6 @@ class MegaNodeDialogUtil {
          * Creates and shows a TYPE_NEW_FOLDER dialog to create a new folder.
          *
          * @param activity Current activity.
-         *
          * @return The create new folder dialog.
          */
         @JvmStatic
@@ -94,7 +92,6 @@ class MegaNodeDialogUtil {
          * @param activity Current activity.
          * @param parent   A valid node. Specifically the parent in which the folder will be created.
          * @param data     Valid data. Specifically the content of the new file.
-         *
          * @return The create new file dialog.
          */
         @JvmStatic
@@ -124,7 +121,6 @@ class MegaNodeDialogUtil {
          * @param parent         A valid node. Specifically the parent in which the folder will be created.
          * @param data           Valid data. Specifically the content of the new URL file.
          * @param defaultURLName Default name of the URL if has, null otherwise.
-         *
          * @return The create new URL file dialog.
          */
         @JvmStatic
@@ -165,7 +161,6 @@ class MegaNodeDialogUtil {
          *                        - TYPE_NEW_FOLDER:   Create new folder action.
          *                        - TYPE_NEW_FILE:     Create new file action.
          *                        - TYPE_NEW_URL_FILE: Create new URL file action.
-         *
          * @return The created dialog.
          */
         private fun setFinalValuesAndShowDialog(

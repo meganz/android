@@ -3,7 +3,9 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -36,6 +38,9 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.ViewHolderImportFiles> implements View.OnClickListener {
+    private static final int MAX_VISIBLE_ITEMS_AT_BEGINNING = 4;
+    private static final int LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING = 3;
+    private static final int ITEM_HEIGHT = 72;
 
     Context context;
     Object fragment;
@@ -60,25 +65,18 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
             holder = (ViewHolderImportFiles) objects[1];
 
             if (file != null) {
-                File childThumbDir = new File(getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
+                File thumb = getThumbnail(file);
 
-                if (childThumbDir != null) {
-                    if (!childThumbDir.exists()) {
-                        childThumbDir.mkdirs();
-                    }
-
-                    File thumb = new File(childThumbDir, file.getTitle() + JPG_EXTENSION);
-
-                    if (thumb != null && thumb.exists()) {
+                if (thumb.exists()) {
+                    uri = Uri.parse(thumb.getAbsolutePath());
+                } else {
+                    boolean thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
+                    if (thumbnailCreated) {
                         uri = Uri.parse(thumb.getAbsolutePath());
-                    } else {
-                        boolean thumbnailCreated = megaApi.createThumbnail(file.getFileAbsolutePath(), thumb.getAbsolutePath());
-                        if (thumbnailCreated) {
-                            uri = Uri.parse(thumb.getAbsolutePath());
-                        }
                     }
                 }
             }
+
             return null;
         }
 
@@ -91,6 +89,22 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
                 }
             }
         }
+    }
+
+    /**
+     * Gets the thumbnail if exists from the ShareInfo received.
+     *
+     * @param file ShareInfo to get its thumbnail.
+     * @return The thumbnail if exist.
+     */
+    private File getThumbnail(ShareInfo file) {
+        File childThumbDir = new File(getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
+
+        if (!childThumbDir.exists()) {
+            childThumbDir.mkdirs();
+        }
+
+        return new File(childThumbDir, file.getTitle() + JPG_EXTENSION);
     }
 
     public ImportFilesAdapter(Context context, Object fragment, List<ShareInfo> files, HashMap<String, String> names) {
@@ -150,25 +164,17 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
         if (typeForName(file.getTitle()).isImage()
                 || typeForName(file.getTitle()).isVideo()
                 || typeForName(file.getTitle()).isVideoReproducible()) {
+            File thumb = getThumbnail(file);
             Uri uri = null;
-            File childThumbDir = new File(getThumbFolder(context), ImportFilesFragment.THUMB_FOLDER);
 
-            if (childThumbDir != null) {
-                if (!childThumbDir.exists()) {
-                    childThumbDir.mkdirs();
+            if (thumb.exists()) {
+                uri = Uri.parse(thumb.getAbsolutePath());
+
+                if (uri != null) {
+                    holder.thumbnail.setImageURI(Uri.fromFile(thumb));
                 }
-
-                File thumb = new File(childThumbDir, file.getTitle() + JPG_EXTENSION);
-
-                if (thumb != null && thumb.exists()) {
-                    uri = Uri.parse(thumb.getAbsolutePath());
-
-                    if (uri != null) {
-                        holder.thumbnail.setImageURI(Uri.fromFile(thumb));
-                    }
-                } else {
-                    new ThumbnailsTask().execute(file, holder);
-                }
+            } else {
+                new ThumbnailsTask().execute(file, holder);
             }
 
             if (uri == null) {
@@ -178,18 +184,20 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
 
         RelativeLayout.LayoutParams params;
 
-        if (position >= 4 && !itemsVisible) {
+        if (position >= MAX_VISIBLE_ITEMS_AT_BEGINNING && !itemsVisible) {
             holder.itemLayout.setVisibility(GONE);
             params = new RelativeLayout.LayoutParams(0, 0);
         } else {
             holder.itemLayout.setVisibility(VISIBLE);
-            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp2px(72, outMetrics));
+            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    dp2px(ITEM_HEIGHT, outMetrics));
         }
 
         holder.itemLayout.setLayoutParams(params);
 
-        if (getItemCount() > 4
-                && ((itemsVisible && position == getItemCount() - 1) || (!itemsVisible && position == 3))) {
+        if (getItemCount() > MAX_VISIBLE_ITEMS_AT_BEGINNING
+                && ((itemsVisible && position == getItemCount() - 1)
+                || (!itemsVisible && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING))) {
             holder.separator.setVisibility(GONE);
         } else {
             holder.separator.setVisibility(VISIBLE);
