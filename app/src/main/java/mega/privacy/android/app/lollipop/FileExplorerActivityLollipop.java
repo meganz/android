@@ -34,6 +34,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
@@ -99,7 +102,10 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
+public class FileExplorerActivityLollipop extends SorterContentActivity
+		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
+		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
+		ActionNodeCallback {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -1939,18 +1945,29 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	public void createFolder(String title) {
+	@Override
+	public void finishRenameActionWithSuccess() {
+		//No action needed
+	}
+
+	@Override
+	public void actionConfirmed() {
+		//No update needed
+	}
+
+	@Override
+	public void createFolder(@NotNull String title) {
 
 		logDebug("createFolder");
 		if (!isOnline(this)){
             showSnackbar(getString(R.string.error_server_connection_problem));
 			return;
 		}
-		
+
 		if(isFinishing()){
-			return;	
+			return;
 		}
-		
+
 		long parentHandle = -1;
 
 		cDriveExplorer = getCloudExplorerFragment();
@@ -1964,7 +1981,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-		
+
 		if (parentNode != null){
 			logDebug("parentNode != null: " + parentNode.getName());
 			boolean exists = false;
@@ -1974,7 +1991,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					exists = true;
 				}
 			}
-			
+
 			if (!exists){
 				statusDialog = null;
 				try {
@@ -1985,7 +2002,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				catch(Exception e){
 					return;
 				}
-				
+
 				megaApi.createFolder(title, parentNode, new CreateFolderListener(this));
 			}
 			else{
@@ -2026,7 +2043,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				return;
 			}
 		}
-		
+
 	}
 
 	/*
@@ -2243,7 +2260,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				break;
 			}
 			case R.id.cab_menu_create_folder:{
-	        	newFolderDialog = showNewFolderDialog(this);
+	        	newFolderDialog = showNewFolderDialog(this, this);
         		break;
 			}
 			case R.id.cab_menu_new_chat:{

@@ -2,7 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.app.R
-import mega.privacy.android.app.interfaces.UpdateNodeCallback
+import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.showSnackbar
@@ -15,14 +15,14 @@ import nz.mega.sdk.MegaRequest.TYPE_RENAME
 class RenameListener(context: Context) : BaseListener(context) {
 
     private var isMyChatFilesFolder: Boolean = false
-    private var updateNodeCallback: UpdateNodeCallback? = null
+    private var actionNodeCallback: ActionNodeCallback? = null
 
     constructor (context: Context, isMyChatFilesFolder: Boolean) : this(context) {
         this.isMyChatFilesFolder = isMyChatFilesFolder
     }
 
-    constructor (context: Context, updateNodeCallback: UpdateNodeCallback?) : this(context) {
-        this.updateNodeCallback = updateNodeCallback
+    constructor (context: Context, actionNodeCallback: ActionNodeCallback?) : this(context) {
+        this.actionNodeCallback = actionNodeCallback
     }
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
@@ -33,7 +33,7 @@ class RenameListener(context: Context) : BaseListener(context) {
         when {
             e.errorCode == API_OK -> {
                 showSnackbar(context, getString(R.string.context_correctly_renamed))
-                updateNodeCallback?.finishRenameActionWithSuccess()
+                actionNodeCallback?.finishRenameActionWithSuccess()
             }
             isMyChatFilesFolder -> {
                 logWarning("Error renaming \"My chat files\" folder")

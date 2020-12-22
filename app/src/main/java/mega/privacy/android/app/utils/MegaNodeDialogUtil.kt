@@ -13,11 +13,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.interfaces.UpdateNodeCallback
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop
+import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -40,14 +37,14 @@ class MegaNodeDialogUtil {
          *
          * @param activity           Current activity.
          * @param node               A valid node.
-         * @param updateNodeCallback Callback to finish the rename action if needed, null otherwise.
+         * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
          * @return The rename dialog.
          */
         @JvmStatic
         fun showRenameNodeDialog(
             activity: Activity,
             node: MegaNode,
-            updateNodeCallback: UpdateNodeCallback?
+            actionNodeCallback: ActionNodeCallback?
         ): AlertDialog {
             val renameDialogBuilder =
                 AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
@@ -60,7 +57,7 @@ class MegaNodeDialogUtil {
             return setFinalValuesAndShowDialog(
                 activity,
                 node,
-                updateNodeCallback,
+                actionNodeCallback,
                 null,
                 null,
                 renameDialogBuilder,
@@ -71,11 +68,15 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_NEW_FOLDER dialog to create a new folder.
          *
-         * @param activity Current activity.
+         * @param activity           Current activity.
+         * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
          * @return The create new folder dialog.
          */
         @JvmStatic
-        fun showNewFolderDialog(activity: Activity): AlertDialog {
+        fun showNewFolderDialog(
+            activity: Activity,
+            actionNodeCallback: ActionNodeCallback?
+        ): AlertDialog {
             val newFolderDialogBuilder =
                 AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
 
@@ -87,7 +88,7 @@ class MegaNodeDialogUtil {
             return setFinalValuesAndShowDialog(
                 activity,
                 null,
-                null,
+                actionNodeCallback,
                 null,
                 null,
                 newFolderDialogBuilder,
@@ -164,7 +165,7 @@ class MegaNodeDialogUtil {
          *
          * @param activity           Current activity.
          * @param node               A valid node if needed to confirm the action, null otherwise.
-         * @param updateNodeCallback Callback to finish the node action if needed, null otherwise.
+         * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
          * @param builder            The AlertDialog.Builder to create and show the final dialog.
@@ -178,7 +179,7 @@ class MegaNodeDialogUtil {
         private fun setFinalValuesAndShowDialog(
             activity: Activity,
             node: MegaNode?,
-            updateNodeCallback: UpdateNodeCallback?,
+            actionNodeCallback: ActionNodeCallback?,
             data: String?,
             defaultURLName: String?,
             builder: AlertDialog.Builder,
@@ -241,7 +242,7 @@ class MegaNodeDialogUtil {
                         checkActionDialogValue(
                             activity,
                             node,
-                            updateNodeCallback,
+                            actionNodeCallback,
                             typeText,
                             data,
                             errorText,
@@ -263,7 +264,7 @@ class MegaNodeDialogUtil {
                     checkActionDialogValue(
                         activity,
                         node,
-                        updateNodeCallback,
+                        actionNodeCallback,
                         typeText,
                         data,
                         errorText,
@@ -284,7 +285,7 @@ class MegaNodeDialogUtil {
          *
          * @param activity           Current activity.
          * @param node               A valid node if needed to confirm the action, null otherwise.
-         * @param updateNodeCallback Callback to finish the node action if needed, null otherwise.
+         * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
          * @param typeText           The input text field.
          * @param data               Valid data if needed to confirm the action, null otherwise.
          * @param errorText          The text field to show the error.
@@ -298,7 +299,7 @@ class MegaNodeDialogUtil {
         private fun checkActionDialogValue(
             activity: Activity,
             node: MegaNode?,
-            updateNodeCallback: UpdateNodeCallback?,
+            actionNodeCallback: ActionNodeCallback?,
             typeText: EditText?,
             data: String?,
             errorText: TextView?,
@@ -331,24 +332,14 @@ class MegaNodeDialogUtil {
                                 NodeController(activity).renameNode(
                                     node,
                                     typedString,
-                                    updateNodeCallback
+                                    actionNodeCallback
                                 )
 
-                                updateNodeCallback?.actionConfirmed()
+                                actionNodeCallback?.actionConfirmed()
                             }
                         }
                         TYPE_NEW_FOLDER -> {
-                            when (activity) {
-                                is FileExplorerActivityLollipop -> {
-                                    activity.createFolder(typedString)
-                                }
-                                is ManagerActivityLollipop -> {
-                                    activity.createFolder(typedString)
-                                }
-                                is FileStorageActivityLollipop -> {
-                                    activity.createFolder(typedString)
-                                }
-                            }
+                            actionNodeCallback?.createFolder(typedString)
                         }
                         TYPE_NEW_FILE -> {
                             if (activity is FileExplorerActivityLollipop) {

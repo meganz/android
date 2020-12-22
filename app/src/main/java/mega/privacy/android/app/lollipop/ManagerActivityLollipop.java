@@ -104,6 +104,8 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -113,8 +115,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.AndroidCompletedTransfer;
@@ -136,8 +136,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.components.CustomViewPager;
-import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
@@ -155,7 +153,7 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
-import mega.privacy.android.app.interfaces.UpdateNodeCallback;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -298,7 +296,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		View.OnFocusChangeListener, View.OnLongClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		BillingManager.BillingUpdatesListener, UpdateNodeCallback {
+		BillingManager.BillingUpdatesListener, ActionNodeCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -9479,7 +9477,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	@Override
 	public void showNewFolderDialog() {
-		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this);
+		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
 	}
 
 	public long getParentHandleBrowser() {
@@ -9570,7 +9568,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		return parentNode;
 	}
 
-	public void createFolder(String title) {
+	@Override
+	public void createFolder(@NotNull String title) {
 		logDebug("createFolder");
 		if (!isOnline(this)){
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);

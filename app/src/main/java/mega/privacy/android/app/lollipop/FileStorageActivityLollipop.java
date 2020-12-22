@@ -47,6 +47,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +64,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.utils.SDCardOperator;
 
@@ -74,7 +77,8 @@ import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener {
+public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener,
+		ActionNodeCallback {
 
 	private static final String IS_SET_DOWNLOAD_LOCATION_SHOWN = "IS_SET_DOWNLOAD_LOCATION_SHOWN";
 	private static final String IS_CONFIRMATION_CHECKED = "IS_CONFIRMATION_CHECKED";
@@ -199,7 +203,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 return true;
 
             case R.id.cab_menu_create_folder:
-				newFolderDialog = showNewFolderDialog(this);
+				newFolderDialog = showNewFolderDialog(this, this);
                 return true;
 
             case R.id.cab_menu_select_all:
@@ -1043,11 +1047,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		}, 50);
 	}
-	
-	/*
-	 * Create new folder and reload file list
-	 */
-	public void createFolder(String value) {
+
+	@Override
+	public void finishRenameActionWithSuccess() {
+		//No action needed
+	}
+
+	@Override
+	public void actionConfirmed() {
+		//No update needed
+	}
+
+	@Override
+	public void createFolder(@NotNull String value) {
 		logDebug(value + " Of value");
         SDCardOperator sdCardOperator = null;
         try {

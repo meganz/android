@@ -51,6 +51,8 @@ import android.widget.TextView;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +69,7 @@ import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.interfaces.UpdateNodeCallback;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -130,7 +132,7 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivityLollipop extends PinActivityLollipop
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
-		MegaGlobalListenerInterface, UpdateNodeCallback {
+		MegaGlobalListenerInterface, ActionNodeCallback {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 	private ChatController chatC;
@@ -2328,5 +2330,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 			sharedFoldersFragment.clearSelections();
 			sharedFoldersFragment.hideMultipleSelect();
 		}
+	}
+
+	@Override
+	public void createFolder(@NotNull String folderName) {
+		//No action needed
 	}
 }

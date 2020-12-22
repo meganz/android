@@ -27,7 +27,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.UpdateNodeCallback;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
@@ -892,12 +892,12 @@ public class NodeController {
         }
     }
 
-    public void renameNode(MegaNode document, String newName, UpdateNodeCallback updateNodeCallback){
+    public void renameNode(MegaNode document, String newName, ActionNodeCallback actionNodeCallback){
         if (isOffline(context)) {
             return;
         }
 
-        megaApi.renameNode(document, newName, new RenameListener(context, updateNodeCallback));
+        megaApi.renameNode(document, newName, new RenameListener(context, actionNodeCallback));
     }
 
     public int importLink(String url) {

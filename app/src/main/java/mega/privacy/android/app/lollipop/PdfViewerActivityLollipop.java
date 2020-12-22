@@ -53,6 +53,8 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +79,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.interfaces.UpdateNodeCallback;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -129,7 +131,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 public class PdfViewerActivityLollipop extends PinActivityLollipop
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface,
-        MegaTransferListenerInterface, UpdateNodeCallback {
+        MegaTransferListenerInterface, ActionNodeCallback {
 
     private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
             = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -946,6 +948,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
     @Override
     public void actionConfirmed() {
         //No update needed
+    }
+
+    @Override
+    public void createFolder(@NotNull String folderName) {
+        //No action needed
     }
 
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {

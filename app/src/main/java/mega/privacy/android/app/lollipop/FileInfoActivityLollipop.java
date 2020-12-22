@@ -56,6 +56,8 @@ import android.widget.Toast;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -72,7 +74,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.interfaces.UpdateNodeCallback;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.adapters.MegaFileInfoSharedContactLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -127,7 +129,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener,
         MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface,
-        UpdateNodeCallback {
+        ActionNodeCallback {
 
 	public static int MAX_WIDTH_FILENAME_LAND=400;
 	public static int MAX_WIDTH_FILENAME_LAND_2=400;
@@ -427,6 +429,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     @Override
     public void actionConfirmed() {
         //No update needed
+    }
+
+    @Override
+    public void createFolder(@NotNull String folderName) {
+        //No action needed
     }
 
     private class ActionBarCallBack implements ActionMode.Callback {

@@ -83,6 +83,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,7 +107,7 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
-import mega.privacy.android.app.interfaces.UpdateNodeCallback;
+import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -165,7 +167,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener,
         View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener,
         MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface,
-        DraggableView.DraggableListener, UpdateNodeCallback {
+        DraggableView.DraggableListener, ActionNodeCallback {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
@@ -863,6 +865,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     @Override
     public void actionConfirmed() {
         //No update needed
+    }
+
+    @Override
+    public void createFolder(@NotNull String folderName) {
+        //No action needed
     }
 
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
