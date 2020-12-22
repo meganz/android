@@ -27,10 +27,12 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.UpdateNodeCallback;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
+import mega.privacy.android.app.listeners.RenameListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -890,20 +892,12 @@ public class NodeController {
         }
     }
 
-    public void renameNode(MegaNode document, String newName){
+    public void renameNode(MegaNode document, String newName, UpdateNodeCallback updateNodeCallback){
         if (isOffline(context)) {
             return;
         }
 
-        if (context instanceof ManagerActivityLollipop) {
-            megaApi.renameNode(document, newName, ((ManagerActivityLollipop) context));
-        } else if (context instanceof AudioVideoPlayerLollipop) {
-            megaApi.renameNode(document, newName, ((AudioVideoPlayerLollipop) context));
-        } else if (context instanceof FullScreenImageViewerLollipop) {
-            megaApi.renameNode(document, newName, ((FullScreenImageViewerLollipop) context));
-        } else if (context instanceof PdfViewerActivityLollipop) {
-            megaApi.renameNode(document, newName, ((PdfViewerActivityLollipop) context));
-        }
+        megaApi.renameNode(document, newName, new RenameListener(context, updateNodeCallback));
     }
 
     public int importLink(String url) {

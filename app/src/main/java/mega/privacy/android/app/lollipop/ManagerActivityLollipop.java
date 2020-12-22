@@ -155,6 +155,7 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.interfaces.UpdateNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -249,7 +250,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -292,7 +292,13 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
+public class ManagerActivityLollipop extends SorterContentActivity
+		implements MegaRequestListenerInterface, MegaChatListenerInterface,
+		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
+		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+		View.OnFocusChangeListener, View.OnLongClickListener,
+		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
+		BillingManager.BillingUpdatesListener, UpdateNodeCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -457,7 +463,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private BillingManager mBillingManager;
 	private List<SkuDetails> mSkuDetailsList;
 
-    public enum FragmentTag {
+	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
@@ -8281,7 +8287,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	public void showRenameDialog(final MegaNode document){
-		renameDialog = showRenameNodeDialog(this, document);
+		renameDialog = showRenameNodeDialog(this, document, this);
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -13267,36 +13273,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			    showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_removed), -1);
 			}
 			logDebug("Remove request finished");
-		}
-		else if (request.getType() == MegaRequest.TYPE_RENAME){
-
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					refreshCloudDrive();
-				}
-				else if (drawerItem == DrawerItem.RUBBISH_BIN){
-					refreshRubbishBin();
-				}
-				else if (drawerItem == DrawerItem.INBOX){
-					refreshInboxList();
-				}
-				else if (drawerItem == DrawerItem.SHARED_ITEMS){
-    				onNodesSharedUpdate();
-				} else {
-					refreshOfflineNodes();
-				}
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_COPY){
+		} else if (request.getType() == MegaRequest.TYPE_COPY){
 			logDebug("TYPE_COPY");
 
 			try {
@@ -15589,5 +15566,25 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private RecentChatsFragmentLollipop getChatsFragment() {
 		return rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+	}
+
+	@Override
+	public void finishRenameActionWithSuccess() {
+		switch (drawerItem) {
+			case CLOUD_DRIVE:
+				refreshCloudDrive();
+				break;
+			case RUBBISH_BIN:
+				refreshRubbishBin();
+				break;
+			case INBOX:
+				refreshInboxList();
+				break;
+			case SHARED_ITEMS:
+				onNodesSharedUpdate();
+				break;
+			case HOMEPAGE:
+				refreshOfflineNodes();
+		}
 	}
 }

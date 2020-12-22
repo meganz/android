@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
+import mega.privacy.android.app.interfaces.UpdateNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -36,12 +37,17 @@ class MegaNodeDialogUtil {
         /**
          * Creates and shows a TYPE_RENAME dialog to rename a node.
          *
-         * @param activity Current activity.
-         * @param node     A valid node.
+         * @param activity           Current activity.
+         * @param node               A valid node.
+         * @param updateNodeCallback Callback to finish the rename action.
          * @return The rename dialog.
          */
         @JvmStatic
-        fun showRenameNodeDialog(activity: Activity, node: MegaNode): AlertDialog {
+        fun showRenameNodeDialog(
+            activity: Activity,
+            node: MegaNode,
+            updateNodeCallback: UpdateNodeCallback
+        ): AlertDialog {
             val renameDialogBuilder =
                 AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
 
@@ -53,6 +59,7 @@ class MegaNodeDialogUtil {
             return setFinalValuesAndShowDialog(
                 activity,
                 node,
+                updateNodeCallback,
                 null,
                 null,
                 renameDialogBuilder,
@@ -78,6 +85,7 @@ class MegaNodeDialogUtil {
 
             return setFinalValuesAndShowDialog(
                 activity,
+                null,
                 null,
                 null,
                 null,
@@ -107,6 +115,7 @@ class MegaNodeDialogUtil {
             return setFinalValuesAndShowDialog(
                 activity,
                 parent,
+                null,
                 data,
                 null,
                 newFileDialogBuilder,
@@ -141,6 +150,7 @@ class MegaNodeDialogUtil {
             return setFinalValuesAndShowDialog(
                 activity,
                 parent,
+                null,
                 data,
                 defaultURLName,
                 newURLFileDialogBuilder,
@@ -151,21 +161,23 @@ class MegaNodeDialogUtil {
         /**
          * Finish the initialization of the dialog and shows it.
          *
-         * @param activity       Current activity.
-         * @param node           A valid node if needed to confirm the action, null otherwise.
-         * @param data           Valid data if needed to confirm the action, null otherwise.
-         * @param defaultURLName The default URL name if the dialog is TYPE_NEW_URL_FILE.
-         * @param builder        The AlertDialog.Builder to create and show the final dialog.
-         * @param dialogType     Indicates the type of dialog. It can be:
-         *                        - TYPE_RENAME:       Rename action.
-         *                        - TYPE_NEW_FOLDER:   Create new folder action.
-         *                        - TYPE_NEW_FILE:     Create new file action.
-         *                        - TYPE_NEW_URL_FILE: Create new URL file action.
+         * @param activity           Current activity.
+         * @param node               A valid node if needed to confirm the action, null otherwise.
+         * @param updateNodeCallback Callback to finish the node action if needed, null otherwise.
+         * @param data               Valid data if needed to confirm the action, null otherwise.
+         * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
+         * @param builder            The AlertDialog.Builder to create and show the final dialog.
+         * @param dialogType         Indicates the type of dialog. It can be:
+         *                            - TYPE_RENAME:       Rename action.
+         *                            - TYPE_NEW_FOLDER:   Create new folder action.
+         *                            - TYPE_NEW_FILE:     Create new file action.
+         *                            - TYPE_NEW_URL_FILE: Create new URL file action.
          * @return The created dialog.
          */
         private fun setFinalValuesAndShowDialog(
             activity: Activity,
             node: MegaNode?,
+            updateNodeCallback: UpdateNodeCallback?,
             data: String?,
             defaultURLName: String?,
             builder: AlertDialog.Builder,
@@ -228,6 +240,7 @@ class MegaNodeDialogUtil {
                         checkActionDialogValue(
                             activity,
                             node,
+                            updateNodeCallback,
                             typeText,
                             data,
                             errorText,
@@ -249,6 +262,7 @@ class MegaNodeDialogUtil {
                     checkActionDialogValue(
                         activity,
                         node,
+                        updateNodeCallback,
                         typeText,
                         data,
                         errorText,
@@ -267,21 +281,23 @@ class MegaNodeDialogUtil {
          * - If so, confirms the action.
          * - If not, shows the error in question.
          *
-         * @param activity   Current activity.
-         * @param node       A valid node if needed to confirm the action, null otherwise.
-         * @param typeText   The input text field.
-         * @param data       Valid data if needed to confirm the action, null otherwise.
-         * @param errorText  The text field to show the error.
-         * @param dialog     The AlertDialog to check.
-         * @param dialogType Indicates the type of dialog. It can be:
-         *                   - TYPE_RENAME:       Rename action.
-         *                   - TYPE_NEW_FOLDER:   Create new folder action.
-         *                   - TYPE_NEW_FILE:     Create new file action.
-         *                   - TYPE_NEW_URL_FILE: Create new URL file action.
+         * @param activity           Current activity.
+         * @param node               A valid node if needed to confirm the action, null otherwise.
+         * @param updateNodeCallback Callback to finish the node action if needed, null otherwise.
+         * @param typeText           The input text field.
+         * @param data               Valid data if needed to confirm the action, null otherwise.
+         * @param errorText          The text field to show the error.
+         * @param dialog             The AlertDialog to check.
+         * @param dialogType         Indicates the type of dialog. It can be:
+         *                           - TYPE_RENAME:       Rename action.
+         *                            - TYPE_NEW_FOLDER:   Create new folder action.
+         *                           - TYPE_NEW_FILE:     Create new file action.
+         *                           - TYPE_NEW_URL_FILE: Create new URL file action.
          */
         private fun checkActionDialogValue(
             activity: Activity,
             node: MegaNode?,
+            updateNodeCallback: UpdateNodeCallback?,
             typeText: EditText?,
             data: String?,
             errorText: TextView?,
@@ -311,7 +327,11 @@ class MegaNodeDialogUtil {
                     when (dialogType) {
                         TYPE_RENAME -> {
                             if (node != null && typedString != node.name) {
-                                NodeController(activity).renameNode(node, typedString)
+                                NodeController(activity).renameNode(
+                                    node,
+                                    typedString,
+                                    updateNodeCallback
+                                )
                             }
                         }
                         TYPE_NEW_FOLDER -> {

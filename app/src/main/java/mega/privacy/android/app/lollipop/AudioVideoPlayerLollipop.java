@@ -105,6 +105,7 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.interfaces.UpdateNodeCallback;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -161,8 +162,10 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
-        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
+public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener,
+        View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener,
+        MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface,
+        DraggableView.DraggableListener, UpdateNodeCallback {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
     public static final String IS_PLAYLIST = "IS_PLAYLIST";
@@ -850,6 +853,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         exoPlayerName.setLayoutParams(paramsName);
         controlsButtonsLayout.setLayoutParams(paramsControlButtons);
         audioContainer.setLayoutParams(paramsAudioContainer);
+    }
+
+    @Override
+    public void finishRenameActionWithSuccess() {
+        updateFile();
     }
 
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
@@ -2450,7 +2458,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 break;
             }
             case R.id.full_video_viewer_rename: {
-                renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(handle));
+                renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this);
                 break;
             }
             case R.id.full_video_viewer_move: {
@@ -3716,22 +3724,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish");
 
-        if (request.getType() == MegaRequest.TYPE_RENAME){
-
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-                updateFile();
-            }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_MOVE){
+        if (request.getType() == MegaRequest.TYPE_MOVE){
             try {
                 statusDialog.dismiss();
             }

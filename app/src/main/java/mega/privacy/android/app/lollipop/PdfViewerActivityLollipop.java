@@ -77,6 +77,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
+import mega.privacy.android.app.interfaces.UpdateNodeCallback;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -125,7 +126,10 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+public class PdfViewerActivityLollipop extends PinActivityLollipop
+        implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
+        OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface,
+        MegaTransferListenerInterface, UpdateNodeCallback {
 
     private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
             = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -934,6 +938,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     }
 
+    @Override
+    public void finishRenameActionWithSuccess() {
+        updateFile();
+    }
+
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
 
         @Override
@@ -1634,7 +1643,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 break;
             }
             case R.id.pdf_viewer_rename: {
-                renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(handle));
+                renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this);
                 break;
             }
             case R.id.pdf_viewer_move: {
@@ -2338,23 +2347,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 MegaApplication.setLoggingIn(false);
                 download();
             }
-        }
-        else if (request.getType() == MegaRequest.TYPE_RENAME){
-
-            try {
-                statusDialog.dismiss();
-            }
-            catch (Exception ex) {}
-
-            if (e.getErrorCode() == MegaError.API_OK){
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-                updateFile();
-            }
-            else{
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-            }
-        }
-        else if (request.getType() == MegaRequest.TYPE_MOVE){
+        } else if (request.getType() == MegaRequest.TYPE_MOVE){
             try {
                 statusDialog.dismiss();
             }

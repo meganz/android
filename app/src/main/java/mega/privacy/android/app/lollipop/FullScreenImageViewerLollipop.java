@@ -115,7 +115,9 @@ import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop
+		implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
+		MegaChatRequestListenerInterface, DraggableView.DraggableListener {
 
 	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
 			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -797,7 +799,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 			case R.id.full_image_viewer_rename: {
-				renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(imageHandles.get(positionG)));
+				renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(imageHandles.get(positionG)), null);
 				break;
 			}
 			case R.id.full_image_viewer_move: {
@@ -1789,21 +1791,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
 
 		logDebug("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_RENAME){
-
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_renamed), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_renamed), -1);
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_MOVE){
+		if (request.getType() == MegaRequest.TYPE_MOVE){
 			try {
 				statusDialog.dismiss();
 			}
