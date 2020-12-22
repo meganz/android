@@ -89,6 +89,7 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -126,6 +127,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -207,8 +209,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DatabaseHandler dbH = null;
     private MegaPreferences prefs = null;
 
-    private AlertDialog alertDialogTransferOverquota;
-
     private Handler handler;
     private Runnable runnableActionStatusBar = new Runnable() {
         @Override
@@ -289,7 +289,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DraggableView draggableView;
     private ImageView ivShadow;
     private NodeController nC;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private boolean fromShared = false;
@@ -1403,7 +1403,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     void showErrorDialog() {
         logWarning("Error open video file");
-        new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
+        new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
             .setCancelable(false)
             .setMessage(isOnline(this) ? R.string.unsupported_file_type
                 : R.string.error_fail_to_open_file_no_network)
@@ -2556,14 +2556,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
              }
          };
 
-         androidx.appcompat.app.AlertDialog.Builder builder;
-         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-             builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-         }
-         else{
-             builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-         }
-
+         MaterialAlertDialogBuilder builder =
+                 new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
          builder.setMessage(R.string.confirmation_delete_one_attachment);
 
          builder.setPositiveButton(R.string.context_remove, dialogClickListener)
@@ -2587,8 +2581,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
          final long sizeC = size;
          final ChatController chatC = new ChatController(this);
 
-         Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
-         AlertDialog.Builder builder = pair.first;
+         Pair<MaterialAlertDialogBuilder, CheckBox> pair = confirmationDialog();
+         MaterialAlertDialogBuilder builder = pair.first;
          CheckBox dontShowAgain = pair.second;
 
          builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
@@ -2618,8 +2612,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
      *
      * @return the first is AlertDialog.Builder, the second is CheckBox
      */
-    private Pair<AlertDialog.Builder, CheckBox> confirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+    private Pair<MaterialAlertDialogBuilder, CheckBox> confirmationDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -2632,7 +2626,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
+        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 
         confirmationLayout.addView(dontShowAgain, params);
 
@@ -2743,13 +2737,13 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         };
 
         if (moveToRubbish){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_move_to_rubbish);
             builder.setMessage(message).setPositiveButton(R.string.general_move, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
         }
         else{
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
             String message= getResources().getString(R.string.confirmation_delete_from_mega);
             builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
@@ -2814,7 +2808,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, node.isFolder());
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.white_alpha_054));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE);
@@ -2939,8 +2933,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 return false;
             }
         });
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.context_rename) + " "	+ node.getName());
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -2960,7 +2954,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         builder.setView(layout);
         renameDialog = builder.create();
         renameDialog.show();
-        renameDialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
+        renameDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new   View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -3027,8 +3021,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void showRemoveLink(){
-        androidx.appcompat.app.AlertDialog removeLinkDialog;
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        AlertDialog removeLinkDialog;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         LayoutInflater inflater = getLayoutInflater();
         View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
@@ -3859,8 +3853,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         final long sizeC=size;
 
 
-        Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
-        AlertDialog.Builder builder = pair.first;
+        Pair<MaterialAlertDialogBuilder, CheckBox> pair = confirmationDialog();
+        MaterialAlertDialogBuilder builder = pair.first;
         CheckBox dontShowAgain = pair.second;
 
         builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
@@ -3911,8 +3905,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
-        AlertDialog.Builder builder = pair.first;
+        Pair<MaterialAlertDialogBuilder, CheckBox> pair = confirmationDialog();
+        MaterialAlertDialogBuilder builder = pair.first;
         CheckBox dontShowAgain = pair.second;
 
         builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
