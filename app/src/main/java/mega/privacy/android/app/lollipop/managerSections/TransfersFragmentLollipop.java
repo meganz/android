@@ -114,7 +114,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 				// Add elevation when the item is picked
 				if (addElevation) {
 					ViewPropertyAnimator animator = viewHolder.itemView.animate();
-					viewHolder.itemView.setTranslationZ(px2dp(2, outMetrics));
+					viewHolder.itemView.setTranslationZ(dp2px(2, outMetrics));
 					animator.start();
 
 					addElevation = false;

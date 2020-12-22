@@ -261,6 +261,32 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/offline_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="sans-serif-light"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/section_saved_for_offline_new"
+                    android:textColor="@color/primary_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/black_12_alpha" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:id="@+id/settings_section"
                 android:layout_width="match_parent"
                 android:layout_height="56dp">

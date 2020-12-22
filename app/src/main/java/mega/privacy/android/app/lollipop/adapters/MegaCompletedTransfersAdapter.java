@@ -144,7 +144,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 		holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
         RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
-        params1.rightMargin = px2dp(5, context.getResources().getDisplayMetrics());
+        params1.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 
 		switch (transfer.getState()) {
 			case STATE_COMPLETED:

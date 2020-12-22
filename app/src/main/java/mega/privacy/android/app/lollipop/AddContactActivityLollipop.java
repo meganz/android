@@ -1637,7 +1637,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         typeContactLayout.setVisibility(View.GONE);
         typeContactEditText = (EditText) findViewById(R.id.type_mail_edit_text);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(40, outMetrics));
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp2px(40, outMetrics));
             typeContactLayout.setLayoutParams(params1);
         }
         editTextBackground = typeContactEditText.getBackground().mutate().getConstantState().newDrawable();
@@ -1762,10 +1762,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) emptySubTextView.getLayoutParams();
-            params1.setMargins(px2dp(34, outMetrics), 0, px2dp(34, outMetrics), 0);
+            params1.setMargins(dp2px(34, outMetrics), 0, dp2px(34, outMetrics), 0);
             emptyTextView.setLayoutParams(params1);
             LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) emptyInviteButton.getLayoutParams();
-            params2.setMargins(0, px2dp(5, outMetrics), 0, px2dp(32, outMetrics));
+            params2.setMargins(0, dp2px(5, outMetrics), 0, dp2px(32, outMetrics));
             emptyInviteButton.setLayoutParams(params2);
         }
 
@@ -2010,7 +2010,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         logDebug("setError");
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(px2dp(18, outMetrics), px2dp(-10, outMetrics), px2dp(18, outMetrics), 0);
+            params.setMargins(dp2px(18, outMetrics), dp2px(-10, outMetrics), dp2px(18, outMetrics), 0);
             typeContactEditText.setLayoutParams(params);
         }
         mailError.setVisibility(View.VISIBLE);
@@ -2027,7 +2027,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(px2dp(18, outMetrics), px2dp(0, outMetrics), px2dp(18, outMetrics), 0);
+            params.setMargins(dp2px(18, outMetrics), dp2px(0, outMetrics), dp2px(18, outMetrics), 0);
             typeContactEditText.setLayoutParams(params);
         }
         typeContactEditText.setBackground(editTextBackground);

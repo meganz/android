@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/multiple_bucket_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -32,29 +33,71 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/thumbnail_list"
-            android:layout_toLeftOf="@+id/three_dots"
+            android:layout_toEndOf="@+id/thumbnail_list"
+            android:layout_toStartOf="@+id/three_dots"
             android:orientation="vertical"
             android:paddingTop="15dp"
             android:paddingBottom="15dp">
 
-            <TextView
-                android:id="@+id/name_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@color/primary_text"
-                android:singleLine="true"
-                android:ellipsize="middle"/>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:singleLine="true"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/guideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constrainedWidth="true" />
+
+                <ImageView
+                    android:id="@+id/img_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_circle_label"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@id/name_text"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/img_favourite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:src="@drawable/ic_favorite"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toEndOf="@id/img_label"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_end="60dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textColor="@color/secondary_text"
+                android:ellipsize="middle"
                 android:singleLine="true"
-                android:ellipsize="middle"/>
+                android:textColor="@color/secondary_text"
+                android:textSize="14sp"/>
 
         </LinearLayout>
 
@@ -77,7 +120,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true">
 
-            <RelativeLayout
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="35dp"
                 android:background="@drawable/gradient_cam_uploads"

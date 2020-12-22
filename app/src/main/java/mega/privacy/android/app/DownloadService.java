@@ -44,12 +44,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
@@ -1934,7 +1934,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void refreshOfflineFragment(){
-		sendBroadcast(new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST));
+		sendBroadcast(new Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST));
 	}
 
 	private void refreshSettingsFragment() {

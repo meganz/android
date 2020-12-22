@@ -167,6 +167,12 @@
         <item name="tabPaddingStart">12dp</item>
         <item name="tabPaddingEnd">12dp</item>
         <item name="tabTextAppearance">@style/MyCustomTabTextAppearance</item>
+        <item name="tabMaxWidth">0dp</item>
+        <item name="tabGravity">fill</item>
+    </style>
+
+    <style name="HomepageBottomTabLayout" parent="MyCustomTabLayout">
+        <item name="tabBackground">@android:color/transparent</item>
     </style>
 
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
@@ -524,6 +530,20 @@
 
     <style name="MyCredentialsText" parent="CredentialsText">
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="homepage_fab_label">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">@dimen/label_margin_end</item>
+        <item name="android:background">@drawable/rounded_text_view_chat_keyboard</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:paddingStart">11dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:textColor">@color/homepage_fab_label_text_color</item>
+        <item name="android:visibility">gone</item>
+        <item name="borderWidth">0dp</item>
     </style>
 
     <style name="CheckBoxStyleStyle" parent="Theme.Megaactionbar">

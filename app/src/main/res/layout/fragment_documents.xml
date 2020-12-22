@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="mega.privacy.android.app.utils.Constants" />
+
+        <variable
+            name="viewModel"
+            type="mega.privacy.android.app.fragments.homepage.documents.DocumentsViewModel" />
+        <variable
+            name="sortByHeaderViewModel"
+            type="mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/empty_hint"
+            layout="@layout/empty_result_files"
+            app:showHint="@{viewModel.items.empty}"
+            />
+
+        <mega.privacy.android.app.components.NewGridRecyclerView
+            android:id="@+id/document_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="@dimen/grid_node_item_width"
+            android:paddingBottom="@dimen/grid_node_list_padding_bottom"
+            app:visibleGone="@{!viewModel.items.empty}"
+            app:items="@{viewModel.items}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <mega.privacy.android.app.components.scrollBar.FastScroller
+            android:id="@+id/scroller"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

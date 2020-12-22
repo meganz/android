@@ -77,7 +77,7 @@ public class MegaAddContactsLollipopAdapter extends RecyclerView.Adapter<MegaAdd
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
+        holder.textViewName.setMaxWidthEmojis(dp2px(MAX_WIDTH_ADD_CONTACTS, outMetrics));
 
         holder.avatar = v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = v.findViewById(R.id.delete_icon_chip);

@@ -165,6 +165,37 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/view_in_folder_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible"
+                >
+
+                <ImageView
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_view_in_folder"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/view_in_folder_label"
+                    android:layout_marginStart="18dp"
+                    android:textColor="@color/primary_text"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/option_favourite_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -447,12 +478,12 @@
                     android:id="@+id/option_share_folder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_share_folder"
                     android:textColor="@color/primary_text"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
