@@ -79,7 +79,7 @@
                                 android:layout_marginLeft="2dp"
                                 android:layout_toRightOf="@+id/my_account_name"
                                 android:src="@drawable/ic_rename_title"
-                                rounded:tint="@color/grey_054_white_087" />
+                                rounded:tint="?android:attr/textColorSecondary" />
 
                         </RelativeLayout>
 

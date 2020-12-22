@@ -586,7 +586,7 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
-        snackbarLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_snackbar));
+        snackbarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
 
         if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
             final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();

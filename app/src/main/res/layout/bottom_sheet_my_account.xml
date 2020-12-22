@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/my_account_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <androidx.core.widget.NestedScrollView
@@ -31,11 +31,11 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_qr"
+                    app:tint="?android:attr/textColorSecondary"
                     android:visibility="visible" />
 
                 <TextView
@@ -46,15 +46,14 @@
                     android:paddingTop="2dp"
                     android:text="@string/choose_qr_option_panel"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/black_12_alpha"/>
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/my_account_choose_photo_layout"
@@ -68,9 +67,9 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
+                    app:tint="?android:attr/textColorSecondary"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_choose_photo"
                     android:visibility="visible" />
@@ -83,8 +82,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/choose_photo_avatar_panel"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -102,6 +100,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
+                    app:tint="?android:attr/textColorSecondary"
                     android:src="@drawable/ic_take_photo"
                     android:visibility="visible" />
 
@@ -113,8 +112,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/take_photo_avatar_panel"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -132,7 +130,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
@@ -144,8 +142,8 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/delete_avatar_panel"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textColor="@color/red_600_red_300"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
         </LinearLayout>

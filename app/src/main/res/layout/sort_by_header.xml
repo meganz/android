@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:src="@drawable/ic_down"
-                app:tint="@color/grey_054_white_087"
+                app:tint="?android:attr/textColorSecondary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/sorted_by"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -59,7 +59,7 @@
             android:layout_marginEnd="12dp"
             android:onClick="@{() -> sortByHeaderViewModel.switchListGrid()}"
             android:src="@{sortByHeaderViewModel.isList ? @drawable/ic_grid_view_new : @drawable/ic_list_view_new}"
-            app:tint="@color/grey_054_white_087"
+            app:tint="?android:attr/textColorSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
