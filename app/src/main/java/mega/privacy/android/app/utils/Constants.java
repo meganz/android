@@ -276,6 +276,12 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
     public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
+    public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
+    public static final String INTENT_EXTRA_KEY_ACTION_TYPE = "actionType";
+    public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
+    public static final String INTENT_EXTRA_KEY_PATH = "path";
+    public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
+    public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -302,6 +308,16 @@ public class Constants {
     public static final int GENERAL_OTHERS_ADAPTER = 2023;
     public static final int RECENTS_ADAPTER = 2024;
     public static final int LINKS_ADAPTER = 2025;
+    public static final int PHOTOS_BROWSE_ADAPTER = 2026;
+    public static final int PHOTOS_SEARCH_ADAPTER = 2027;
+    public static final int AUDIO_BROWSE_ADAPTER = 2028;
+    public static final int AUDIO_SEARCH_ADAPTER = 2029;
+    public static final int DOCUMENTS_BROWSE_ADAPTER = 2030;
+    public static final int DOCUMENTS_SEARCH_ADAPTER = 2031;
+    public static final int VIDEO_BROWSE_ADAPTER = 2032;
+    public static final int VIDEO_SEARCH_ADAPTER = 2033;
+    public static final int RECENTS_BUCKET_ADAPTER = 2034;
+
 
     public static final String NOTIFICATIONS_ENABLED = "NOTIFICATIONS_ENABLED";
     public static final String NOTIFICATIONS_30_MINUTES = "NOTIFICATIONS_30_MINUTES";
@@ -477,6 +493,9 @@ public class Constants {
     public static final int INVALID_CALL_STATUS = -1;
     public static final int MAX_PARTICIPANTS_GRID = 6;
     public static final int INVALID_CALL = -1;
+
+    public static final int BACK_PRESS_NOT_HANDLED = 0;
+    public static final int BACK_PRESS_HANDLED = 1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
@@ -676,6 +695,19 @@ public class Constants {
     public static final int LOCATION_INDEX_TOP = 1;
 
     public static final String OFFLINE_ROOT = "/";
+
+    public static final int SEARCH_BY_DATE_FILTER_POS_TYPE = 0;
+    public static final int SEARCH_BY_DATE_FILTER_POS_THE_DAY = 1;
+    public static final int SEARCH_BY_DATE_FILTER_POS_MONTH_OR_YEAR = 2;
+    public static final int SEARCH_BY_DATE_FILTER_POS_START_DAY = 3;
+    public static final int SEARCH_BY_DATE_FILTER_POS_END_DAY = 4;
+
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_ONE_DAY = 1;
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_LAST_MONTH_OR_YEAR = 2;
+    public static final long SEARCH_BY_DATE_FILTER_TYPE_BETWEEN_TWO_DAYS = 3;
+
+    public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
+    public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
 
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;

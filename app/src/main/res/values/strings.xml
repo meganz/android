@@ -726,14 +726,14 @@
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Default download location</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask for download location</string>
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
-	<string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Add phone number</string>
-	<string name="verify_account_title" context="enter verification code page title">Verify your account</string>
-	<string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
+    <string name="add_phone_number_label" context="Label of button on account page that ask user to add their phone number">Add phone number</string>
+    <string name="verify_account_title" context="enter verification code page title">Verify your account</string>
+    <string name="verify_account_helper_locked" context="Text to explain to user why to verify phone number (account suspended use case)">Your account has been locked temporarily due to potential abuse. Please verify your phone number to unlock your account.</string>
     <string name="general_country_label" context="Hint text of the country edittext for billing purposes">Country</string>
     <string name="sms_region_label" context="Hint text of the region edittext for choosing dial code.">Region</string>
 	<string name="verify_account_phone_number_placeholder" context="place holder for enter mobile number field">Your phone number</string>
     <string name="general_back_button" context="Button label - go to previous page">Back</string>
-	<string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
+    <string name="verify_account_not_now_button" context="button label - quite sms verification use case">Not now</string>
     <string name="general_confirm_button" context="Button label - confirm some action">Confirm</string>
 	<string name="verify_account_invalid_country_code" context="On “add phone number” page, an error message will be shown if user click next button without select country code.">Please select a region code</string>
     <string name="verify_account_not_loading_country_code" context="On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end.">Region codes could not be fetched.</string>
@@ -743,12 +743,12 @@
 	<string name="verify_account_incorrect_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
 	<string name="verify_account_resend_label" context="text message to remind user to resend verification code">You didn’t receive a code?</string>
     <string name="general_resend_button" context="Button to resend the create account email to a new email address in case the previous email address was misspelled">Resend</string>
-	<string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a MEGA account.</string>
-	<string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
-	<string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
-	<string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
-	<string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
-	<string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
+    <string name="verify_account_error_phone_number_register" context="error message that will show to user when host detected that the mobile number has been registered already">This number is already associated with a MEGA account.</string>
+    <string name="verify_account_error_reach_limit" context="error message that will show to user when user reached the sms verification daily limit">You have reached the daily limit</string>
+    <string name="verify_account_error_wrong_code" context="error message that will show to user when user reached the sms verification daily limit">The verification code doesn’t match.</string>
+    <string name="verify_account_error_code_verified" context="error message that will show to user when code has been verified">The code has been verified</string>
+    <string name="verify_account_error_invalid_code" context="error message that will show to user when user entered invalid verification code">Wrong code. Please try again or resend.</string>
+    <string name="verify_account_successfully" context="verify phone number successfully">Your phone number has been verified successfully</string>
 
     <string-array name="settings_storage_download_location_array">
         <item context="if the user has an internal and an external SD card, it has to be set on the settings screen, internal storage option">Internal storage</item>
@@ -886,6 +886,11 @@
     <string name="sortby_type" context="Title of sort by media type options">Media type</string>
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Photos</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Videos</string>
+
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
@@ -1170,8 +1175,8 @@
     <string name="number_correctly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts removed successfully from the shared folder</string>
     <string name="number_incorrectly_removed_from_shared" context="success message when removing a contact from a shared folder">%d contacts were not successfully removed</string>
 
-	<string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Successfully updated permissions for %d contacts</string>
-	<string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Failed to update permissions for %d contacts</string>
+    <string name="number_permission_correctly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Successfully updated permissions for %d contacts</string>
+    <string name="number_permission_incorrectly_changed_from_shared" context="success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected">Failed to update permissions for %d contacts</string>
 
     <string name="contacts_list_empty_text_loading" context="Message shown while the contact list from the device is being read and then shown to the user">Loading contacts from the phone&#8230;</string>
 
@@ -1284,7 +1289,7 @@
     <string name="number_no_add_participant_request" context="error message when inviting multiple contacts to a group chat">%1$d participants were successfully invited but %2$d participants were not invited.</string>
 
     <string name="message_permissions_changed" context="chat message when the permissions for a user has been changed">[A]%1$s[/A][B] was changed to [/B][C]%2$s[/C][D] by [/D][E]%3$s[/E]</string>
-    <string name="message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
+    <string name="message_add_participant" context="chat message when a participant was added to a group chat" formatted="false">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
     <string name="message_remove_participant" context="chat message when a participant was removed from a group chat">[A]%1$s[/A][B] was removed from group chat by [/B][C]%2$s[/C]</string>
 
     <string name="change_title_messages" context="Message shown when a participant change the title of a group chat.">[A]%1$s[/A][B] changed the group chat name to [/B][C]“%2$s”[/C]</string>
@@ -1335,7 +1340,7 @@
     <string name="non_format_text_cleared_history" context="Text shown when a user cleared the history of a chat">%1$s cleared the chat history</string>
     -->
     <string name="non_format_message_permissions_changed" context="chat message when the permissions for a user has been changed">%1$s was changed to %2$s by %3$s</string>
-    <string name="non_format_message_add_participant" formatted="false" context="chat message when a participant was added to a group chat">%1$s was added to this group chat by invitation from %2$s</string>
+    <string name="non_format_message_add_participant" context="chat message when a participant was added to a group chat" formatted="false">%1$s was added to this group chat by invitation from %2$s</string>
     <string name="non_format_message_remove_participant" context="chat message when a participant was removed from a group chat">%1$s was removed from group chat by %2$s</string>
 
     <string name="non_format_change_title_messages" context="Message shown when a participant change the title of a group chat.">%1$s changed the group chat name to “%2$s”</string>
@@ -1453,7 +1458,7 @@
         <item context="Label to show the number of transfers in progress, Plural" quantity="other">%1$d of %2$d files</item>
     </plurals>
 
-	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
+    <string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Process is finishing&#8230;</string>
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">View</string>
     <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pause all transfers</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Resume all transfers</string>
@@ -1496,10 +1501,10 @@
         <item context="Text of the notification shown when the upload service is running, Plural" quantity="other">Uploading %1$d of %2$d files (paused)</item>
     </plurals>
 
-	<plurals name="folder_upload_service_notification">
-		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
-		<item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
-	</plurals>
+    <plurals name="folder_upload_service_notification">
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder</item>
+        <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders" quantity="other">Uploading %1$d of %2$d folders</item>
+    </plurals>
 
     <plurals name="folder_upload_service_paused_notification">
         <item context="Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - singular e.g. Uploading 1 of 1 folder" quantity="one">Uploading %1$d of %2$d folder (paused)</item>
@@ -1511,10 +1516,10 @@
         <item context="Text of the notification shown when the upload service has finished, Plural" quantity="other">Uploaded %1$d files</item>
     </plurals>
 
-	<plurals name="folder_upload_service_final_notification">
-		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
-		<item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
-	</plurals>
+    <plurals name="folder_upload_service_final_notification">
+        <item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - singular e.g. Uploaded 1 folder" quantity="one">Uploaded %1$d folder</item>
+        <item context="Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders" quantity="other">Uploaded %1$d folders</item>
+    </plurals>
 
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)" formatted="false">Total size: %1$s</string>
 
@@ -1664,7 +1669,7 @@
 
     <string name="confirmation_delete_one_attachment" context="Confirmation before deleting one attachment">Remove attachment?</string>
 
-    <string name="general_view_with_revoke" formatted="false" context="Menu option">View files (%1$d deleted)</string>
+    <string name="general_view_with_revoke" context="Menu option" formatted="false">View files (%1$d deleted)</string>
 
     <string name="success_attaching_node_from_cloud" context="Success message when the attachment has been sent to a chat">File sent to %1$s</string>
     <string name="success_attaching_node_from_cloud_chats" context="Success message when the attachment has been sent to a many chats">File sent to %1$d chats</string>
@@ -1687,7 +1692,7 @@
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
     <string name="history_cleared_by" context="Text shown when the chat history was cleared by someone">[A]%1$s[/A][B] cleared the chat history[/B]</string>
 
-    <string name="number_messages_chat_notification" formatted="false" context="Notification title to show the number of unread chats, unread messages">%1$d unread chats</string>
+    <string name="number_messages_chat_notification" context="Notification title to show the number of unread chats, unread messages" formatted="false">%1$d unread chats</string>
 
     <string name="context_permissions_changing_folder" context="Item menu option upon clicking on one or multiple files.">Changing permissions</string>
     <string name="context_removing_contact_folder" context="Item menu option upon clicking on one or multiple files.">Removing contact from shared folder</string>
@@ -1877,7 +1882,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No files in your [/B][A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No files in your [/B][A]Cloud Drive[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No files [/B][A]Offline[/A][B][/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]No [/B][A]Contacts[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No[/A] [B]Conversations[/B]</string>
@@ -1958,7 +1963,7 @@
     <string name="chat_upload_title_notification" context="Title of the notification shown when a file is uploading to a chat">Chat uploading</string>
 
     <string name="settings_chat_upload_quality" context="Label for the option on setting to set up the quality of multimedia files uploaded to the chat">Chat video quality</string>
-	<string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Video Quality</string>
+    <string name="settings_video_upload_quality" context="Label for the option on setting to set up the quality of video files to be uploaded">Video Quality</string>
     <string name="on_refuse_storage_permission" context="Text shown when the user refuses to permit the storage permission when enable camera upload">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <string-array name="settings_chat_upload_quality_entries">
         <item context="the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of origin quality multimedia file to upload.">Original quality</item>
@@ -2306,13 +2311,13 @@
 
     <string name="settings_rb_scheduler_enable_period_PRO" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days.</string>
     <string name="settings_rb_scheduler_enable_period_FREE" context="Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts">The minimum period is 7 days and your maximum period is 30 days.</string>
-	<string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
+    <string name="settings_compression_queue_subtitle" context="Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB.">The minimum size is %1$s and the maximum size is %2$s.</string>
 
     <string name="settings_rb_scheduler_select_days_title" context="Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler">Remove files older than</string>
     <string name="settings_rb_scheduler_select_days_subtitle" context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics">%d days</string>
 	<string name="settings_video_compression_queue_size_popup_title" context="Title of popup that userd to set compression queue size (in MB) in settings">Notify me when size is larger than</string>
 
-	<string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
+    <string name="settings_video_compression_queue_size_title" context="Title of compression queue size option in settings">If videos to compress are larger than</string>
 
     <string name="settings_rb_scheduler_alert_disabling" context="Text of the alert when a FREE user tries to disable the RB scheduler">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a PRO plan.</string>
 
@@ -2447,14 +2452,14 @@
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Show Last seen&#8230;</string>
     <string name="subtitle_option_enable_last_green_chat" context="Subtitle of the option in Settings section to enable the last active connection in chat">Allow your contacts to see the last time you were active on MEGA.</string>
 
-	<string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
-	<string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
-	<string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
-	<string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
-	<string name="message_keep_device_name" context="Message displayed when the user changes the ‘Keep file names as in the device’ setting">This setting will take effect the next time Camera Uploads runs</string>
-	<string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
-	<string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
-	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
+    <string name="title_out_of_space" context="title of notification when device is out of storage during camera upload">Not enough storage space</string>
+    <string name="message_out_of_space" context="message will be shown when there is not enough space to perform camera upload.">Not enough storage space to perform video compression.</string>
+    <string name="title_compression_size_over_limit" context="the title of the notification that displays when compression larger than setting">Video compression size is too large</string>
+    <string name="message_compression_size_over_limit" context="the content message of the notification that displays when compression larger than setting, placeholder: size in MB">The total size of the videos to compress exceeds %s, please put your device on charge to continue.</string>
+    <string name="message_keep_device_name" context="Message displayed when the user changes the ‘Keep file names as in the device’ setting">This setting will take effect the next time Camera Uploads runs</string>
+    <string name="message_compress_video" context="Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime.">%s has been compressed</string>
+    <string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
+    <string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d file</item>
@@ -2658,7 +2663,7 @@
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
     <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
 
-    <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B] joined the group chat.[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime." formatted="false">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
     <string name="context_remove_chat_link_warning_text" context="Warning that appears prior to remove a chat link on the group info screen.">This conversation will no longer be accessible through the chat link once it has been removed.</string>
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">Encrypted Key Rotation does not allow you to get a chat link without creating a new group chat.</string>
@@ -2725,15 +2730,15 @@
 
     <string name="invite_contact_chooser_title" context="Title of popup when user click ‘Share’ button on invite contact page">Invite a friend via</string>
     <string name="invite_contact_action_button" context="Action button label">Invite a friend via&#8230;</string>
-	<plurals name="file_already_downloaded">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
-	</plurals>
+    <plurals name="file_already_downloaded">
+        <item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in singular. placeholder: number of files" quantity="one">%d file already downloaded.&#160;</item>
+        <item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files" quantity="other">%d files already downloaded.&#160;</item>
+    </plurals>
 
-	<plurals name="file_pending_download">
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
-		<item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
-	</plurals>
+    <plurals name="file_pending_download">
+        <item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in singular. placeholder: number of files" quantity="one">%d file pending.</item>
+        <item context="When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files" quantity="other">%d files pending.</item>
+    </plurals>
 
     <string name="login_to_mega" context="Title of the login screen">Log in to MEGA</string>
     <string name="create_account_title" context="Title of the create account screen">Create your MEGA account</string>
@@ -2741,7 +2746,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recents</string>
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No file activity to show in [/B][A]Recents[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No files on your [/B][A]Recents[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
@@ -2896,6 +2901,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Your phone number has been removed successfully.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Your phone number removal failed.</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">The account you’re trying to reset is blocked.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Your account has been blocked. Please contact support&#64;mega.nz</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Your account has been disabled by your administrator. Please contact your business account administrator for further details.</string>
@@ -2910,6 +2917,16 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">See</string>
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s’s credentials</string>
+
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there's no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there's no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there's no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there's no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>

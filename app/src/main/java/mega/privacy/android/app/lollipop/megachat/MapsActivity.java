@@ -217,11 +217,11 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 sendCurrentLocationLayout.setVisibility(View.GONE);
                 sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
-                params.bottomMargin = px2dp(45, outMetrics);
+                params.bottomMargin = dp2px(45, outMetrics);
             } else {
                 sendCurrentLocationLayout.setVisibility(View.VISIBLE);
                 sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
-                params.bottomMargin = px2dp(72, outMetrics);
+                params.bottomMargin = dp2px(72, outMetrics);
             }
             mapLayout.setLayoutParams(params);
             return;
@@ -725,7 +725,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
             fullScreenMarker.setVisible(false);
             fullscreenMarkerIcon.setVisibility(View.VISIBLE);
             fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
-            fullscreenMarkerIcon.animate().translationY(-px2dp(12, outMetrics)).setDuration(duration).start();
+            fullscreenMarkerIcon.animate().translationY(-dp2px(12, outMetrics)).setDuration(duration).start();
         }
     }
 

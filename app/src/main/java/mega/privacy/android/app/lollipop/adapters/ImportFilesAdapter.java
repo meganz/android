@@ -183,7 +183,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
             params = new RelativeLayout.LayoutParams(0, 0);
         } else {
             holder.itemLayout.setVisibility(VISIBLE);
-            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(72, outMetrics));
+            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp2px(72, outMetrics));
         }
 
         holder.itemLayout.setLayoutParams(params);

@@ -54,8 +54,6 @@
     
     <color name="green_free_account">#31B404</color>
 
-    <color name="black_12_alpha">#1F000000</color>
-
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -105,6 +103,8 @@
     <color name="status_invisible_layout">#bfbfbf</color>
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
+
+    <color name="fab_mask">#D96B6B6B</color>
 
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
@@ -207,6 +207,7 @@
     <color name="expired_business_user">#44BCE6</color>
     <color name="business_color">#2BA6DE</color>
 
+    <color name="black_12_alpha">#1F000000</color>
     <color name="black_40_alpha">#66000000</color>
     <color name="black_54_alpha">#89000000</color>
 
@@ -226,6 +227,14 @@
     <color name="over_quota_yellow">#FFFFB42B</color>
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
+    <color name="pressed_color">#E7E7E7</color>
+
+    <color name="homepage_background">#EEF2F1</color>
+
+    <color name="homepage_title">#dd000000</color>
+    <color name="homepage_content">#89000000</color>
+    <color name="homepage_fab_label_text_color">#ff373737</color>
+
     <color name="black_bottom_sheets_icon_tint">#8F000000</color>
 
     <!-- NODE LABELS -->
@@ -236,4 +245,5 @@
     <color name="label_blue">#4BB8F3</color>
     <color name="label_purple">#D088E1</color>
     <color name="label_grey">#A4A4A7</color>
+
 </resources>

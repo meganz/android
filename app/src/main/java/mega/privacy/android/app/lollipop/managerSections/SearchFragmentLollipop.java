@@ -38,6 +38,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -736,7 +743,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			logDebug("nodes.size(): "+nodes.size());
 			((ManagerActivityLollipop) context).setTextSubmitted();
 
-			// If nothing is input, then click a folder in search view, redirect to CD.
+			// If search text is empty and try to open a folder in search fragment.
 			if (!((ManagerActivityLollipop) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
 				((ManagerActivityLollipop) context).closeSearchView();
 				((ManagerActivityLollipop) context).openSearchFolder(nodes.get(position));

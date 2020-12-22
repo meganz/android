@@ -61,7 +61,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -71,19 +73,22 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+
+import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -121,6 +126,9 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+
+    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+            = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
 
     int[] screenPosition;
     int mLeftDelta;
@@ -237,6 +245,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
     };
+
+    public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+        DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+    }
+
+    public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+        DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
+    }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -630,8 +646,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (type == FILE_BROWSER_ADAPTER){
             FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
         }
-        else if (type == OFFLINE_ADAPTER){
-            OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        else if (type == OFFLINE_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
+        } else if (type == DOCUMENTS_BROWSE_ADAPTER || type == DOCUMENTS_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(DocumentsFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
         else if (type == ZIP_ADAPTER) {
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);

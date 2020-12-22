@@ -659,7 +659,7 @@ public class CallUtil {
      */
     public static Bitmap getDefaultAvatarCall(Context context, MegaChatRoom chat, long peerId) {
         return AvatarUtil.getDefaultAvatar(getColorAvatar(peerId), getUserNameCall(context, peerId),
-                px2dp(AVATAR_SIZE_CALLS, ((ChatCallActivity) context).getOutMetrics()), true);
+                dp2px(AVATAR_SIZE_CALLS, ((ChatCallActivity) context).getOutMetrics()), true);
     }
 
     /**

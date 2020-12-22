@@ -94,7 +94,7 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 		holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
 		holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
 		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = px2dp((225 * scaleW), outMetrics);
+		holder.textViewFileName.getLayoutParams().width = dp2px((225 * scaleW), outMetrics);
 		holder.textViewFileSize = convertView.findViewById(R.id.file_list_filesize);
 		holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 		holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
