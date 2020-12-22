@@ -21,7 +21,7 @@ class RenameListener(context: Context) : BaseListener(context) {
         this.isMyChatFilesFolder = isMyChatFilesFolder
     }
 
-    constructor (context: Context, updateNodeCallback: UpdateNodeCallback) : this(context) {
+    constructor (context: Context, updateNodeCallback: UpdateNodeCallback?) : this(context) {
         this.updateNodeCallback = updateNodeCallback
     }
 

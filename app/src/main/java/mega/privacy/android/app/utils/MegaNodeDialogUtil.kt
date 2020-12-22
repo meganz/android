@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.UpdateNodeCallback
+import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -39,14 +40,14 @@ class MegaNodeDialogUtil {
          *
          * @param activity           Current activity.
          * @param node               A valid node.
-         * @param updateNodeCallback Callback to finish the rename action.
+         * @param updateNodeCallback Callback to finish the rename action if needed, null otherwise.
          * @return The rename dialog.
          */
         @JvmStatic
         fun showRenameNodeDialog(
             activity: Activity,
             node: MegaNode,
-            updateNodeCallback: UpdateNodeCallback
+            updateNodeCallback: UpdateNodeCallback?
         ): AlertDialog {
             val renameDialogBuilder =
                 AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle)
@@ -332,6 +333,8 @@ class MegaNodeDialogUtil {
                                     typedString,
                                     updateNodeCallback
                                 )
+
+                                updateNodeCallback?.actionConfirmed()
                             }
                         }
                         TYPE_NEW_FOLDER -> {

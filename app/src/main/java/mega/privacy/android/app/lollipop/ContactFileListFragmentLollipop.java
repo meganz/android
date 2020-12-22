@@ -57,6 +57,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -161,7 +162,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
                 }
 				case R.id.cab_menu_rename: {
 					MegaNode aux = documents.get(0);
-					((ContactFileListActivityLollipop) context).showRenameDialog(aux, aux.getName());
+					showRenameNodeDialog((ContactFileListActivityLollipop) context, aux, (ContactFileListActivityLollipop) context);
 					break;
 				}
 			}

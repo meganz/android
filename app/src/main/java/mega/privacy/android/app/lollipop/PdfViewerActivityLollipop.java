@@ -943,6 +943,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
         updateFile();
     }
 
+    @Override
+    public void actionConfirmed() {
+        //No update needed
+    }
+
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
 
         @Override

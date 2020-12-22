@@ -860,6 +860,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         updateFile();
     }
 
+    @Override
+    public void actionConfirmed() {
+        //No update needed
+    }
+
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
 
         @Override

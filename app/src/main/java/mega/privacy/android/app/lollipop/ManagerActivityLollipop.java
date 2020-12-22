@@ -15587,4 +15587,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				refreshOfflineNodes();
 		}
 	}
+
+	@Override
+	public void actionConfirmed() {
+		//No update needed
+	}
 }

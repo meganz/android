@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -257,9 +258,9 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
             case R.id.option_rename_layout:
                 if (context instanceof ContactFileListActivityLollipop) {
-                    contactFileListActivity.showRenameDialog(node, node.getName());
+                    showRenameNodeDialog((ContactFileListActivityLollipop) context, node, (ContactFileListActivityLollipop) context);
                 } else if (context instanceof ContactInfoActivityLollipop) {
-                    contactInfoActivity.showRenameDialog(node, node.getName());
+                    showRenameNodeDialog((ContactInfoActivityLollipop) context, node, (ContactInfoActivityLollipop) context);
                 }
                 break;
 
