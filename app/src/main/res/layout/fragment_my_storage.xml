@@ -1,271 +1,268 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/my_storage_complete_relative_layout"
-	android:layout_width="match_parent"
-	android:background="@color/white"
-	android:layout_height="match_parent">
+    android:id="@+id/my_storage_complete_relative_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-	<LinearLayout
-		android:id="@+id/my_storage_parent_linear_layout"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/white"
-		android:layout_marginLeft="16dp"
-		android:layout_marginRight="16dp"
-		android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/my_storage_parent_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="vertical">
 
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/overall_usage_label"
-			android:textColor="?android:attr/textColorPrimary"
-			android:layout_marginTop="9dp"
-			android:textSize="14sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:text="@string/overall_usage_label"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp" />
 
-		<LinearLayout
-			android:id="@+id/storage_container"
-			android:layout_width="match_parent"
-			android:layout_height="72dp"
-			android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/storage_container"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="vertical">
 
-			<TextView
-				android:id="@+id/storage_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="14sp"
-				android:textColor="?android:attr/textColorSecondary"
-				android:text="@string/general_storage"
-				android:layout_marginTop="14dp"/>
+            <TextView
+                android:id="@+id/storage_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/general_storage"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="14sp" />
 
-			<TextView
-				android:id="@+id/used_storage_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="16sp"
-				android:layout_marginTop="8dp"/>
+            <TextView
+                android:id="@+id/used_storage_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp" />
 
-		</LinearLayout>
+        </LinearLayout>
 
-		<LinearLayout
-			android:id="@+id/storage_separator"
-			android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:background="@color/black_12_alpha"
-			android:orientation="horizontal" />
+        <LinearLayout
+            android:id="@+id/storage_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey_012_white_012"
+            android:orientation="horizontal" />
 
-		<LinearLayout
-			android:id="@+id/transfer_container"
-			android:layout_width="match_parent"
-			android:layout_height="72dp"
-			android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/transfer_container"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="vertical">
 
-			<TextView
-				android:id="@+id/transfer_label"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="14sp"
-				android:text="@string/transfer_label"
-				android:layout_marginTop="14dp"/>
+            <TextView
+                android:id="@+id/transfer_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="@string/transfer_label"
+                android:textSize="14sp" />
 
-			<TextView
-				android:id="@+id/used_transfer_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textSize="16sp"
-				android:textColor="@color/accentColor"
-				android:layout_marginTop="8dp"/>
+            <TextView
+                android:id="@+id/used_transfer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/accentColor"
+                android:textSize="16sp" />
 
-		</LinearLayout>
+        </LinearLayout>
 
-		<LinearLayout
-			android:id="@+id/transfer_separator"
-			android:layout_width="match_parent"
-			android:layout_height="1dp"
-			android:background="@color/black_12_alpha"
-			android:orientation="horizontal" />
+        <LinearLayout
+            android:id="@+id/transfer_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grey_012_white_012"
+            android:orientation="horizontal" />
 
 
+        <!--Usage Storage-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:orientation="vertical">
 
-		<!--Usage Storage-->
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="vertical"
-			android:layout_marginTop="24dp"
-			android:layout_marginBottom="24dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/usage_storage_details_label"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp" />
 
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/usage_storage_details_label"
-				android:textColor="?android:attr/textColorPrimary"
-				android:textSize="14sp"/>
+            <!--cloud drive-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:paddingTop="16dp">
 
-			<!--cloud drive-->
-			<RelativeLayout
-				android:layout_width="match_parent"
-				android:layout_height="40dp"
-				android:layout_centerVertical="true"
-				android:paddingTop="16dp">
+                <TextView
+                    android:id="@+id/my_storage_account_cloud_storage_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/section_cloud_drive"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_cloud_storage_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/section_cloud_drive"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorSecondary"/>
+                <TextView
+                    android:id="@+id/my_storage_account_cloud_storage_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_cloud_storage_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorPrimary"/>
+                <LinearLayout
+                    android:id="@+id/cloud_drive_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
 
-				<LinearLayout
-					android:id="@+id/cloud_drive_separator"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:background="@color/black_12_alpha"
-					android:orientation="horizontal"
-					android:layout_alignParentBottom="true"/>
+            </RelativeLayout>
 
-			</RelativeLayout>
+            <!--inbox-->
+            <RelativeLayout
+                android:id="@+id/inbox_storage_container"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:paddingTop="16dp">
 
-			<!--inbox-->
-			<RelativeLayout
-				android:id="@+id/inbox_storage_container"
-				android:layout_width="match_parent"
-				android:layout_height="40dp"
-				android:layout_centerVertical="true"
-				android:paddingTop="16dp">
+                <TextView
+                    android:id="@+id/my_storage_account_inbox_storage_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/section_inbox"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_inbox_storage_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/section_inbox"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorSecondary"/>
+                <TextView
+                    android:id="@+id/my_storage_account_inbox_storage_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_inbox_storage_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorPrimary"/>
+                <LinearLayout
+                    android:id="@+id/inbox_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
 
-				<LinearLayout
-					android:id="@+id/inbox_separator"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:background="@color/black_12_alpha"
-					android:orientation="horizontal"
-					android:layout_alignParentBottom="true"/>
+            </RelativeLayout>
 
-			</RelativeLayout>
+            <!--incoming shares-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:paddingTop="16dp">
 
-			<!--incoming shares-->
-			<RelativeLayout
-				android:layout_width="match_parent"
-				android:layout_height="40dp"
-				android:layout_centerVertical="true"
-				android:paddingTop="16dp">
+                <TextView
+                    android:id="@+id/my_storage_account_incoming_storage_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/title_incoming_shares_explorer"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_incoming_storage_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/title_incoming_shares_explorer"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorSecondary"/>
+                <TextView
+                    android:id="@+id/my_storage_account_incoming_storage_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_incoming_storage_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorPrimary"/>
+                <LinearLayout
+                    android:id="@+id/incoming_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
 
-				<LinearLayout
-					android:id="@+id/incoming_separator"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:background="@color/black_12_alpha"
-					android:orientation="horizontal"
-					android:layout_alignParentBottom="true"/>
+            </RelativeLayout>
 
-			</RelativeLayout>
+            <!--rubbish bin-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:paddingTop="16dp">
 
-			<!--rubbish bin-->
-			<RelativeLayout
-				android:layout_width="match_parent"
-				android:layout_height="40dp"
-				android:layout_centerVertical="true"
-				android:paddingTop="16dp">
+                <TextView
+                    android:id="@+id/my_storage_account_rubbish_storage_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/section_rubbish_bin"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_rubbish_storage_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/section_rubbish_bin"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorSecondary"/>
+                <TextView
+                    android:id="@+id/my_storage_account_rubbish_storage_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_rubbish_storage_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorPrimary"/>
+                <LinearLayout
+                    android:id="@+id/rubbish_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
 
-				<LinearLayout
-					android:id="@+id/rubbish_separator"
-					android:layout_width="match_parent"
-					android:layout_height="1dp"
-					android:background="@color/black_12_alpha"
-					android:orientation="horizontal"
-					android:layout_alignParentBottom="true"/>
+            </RelativeLayout>
 
-			</RelativeLayout>
+            <!--Previous versions-->
+            <RelativeLayout
+                android:id="@+id/previous_versions_storage_container"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:paddingTop="16dp">
 
-			<!--Previous versions-->
-			<RelativeLayout
-				android:id="@+id/previous_versions_storage_container"
-				android:layout_width="match_parent"
-				android:layout_height="40dp"
-				android:layout_centerVertical="true"
-				android:paddingTop="16dp">
+                <TextView
+                    android:id="@+id/my_storage_account_previous_versions_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/file_properties_folder_previous_versions"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_previous_versions_title"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:text="@string/file_properties_folder_previous_versions"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorSecondary"/>
+                <TextView
+                    android:id="@+id/my_storage_account_previous_versions_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="14sp" />
 
-				<TextView
-					android:id="@+id/my_storage_account_previous_versions_text"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentRight="true"
-					android:textSize="14sp"
-					android:textColor="?android:attr/textColorPrimary"/>
+            </RelativeLayout>
 
-			</RelativeLayout>
+        </LinearLayout>
 
-		</LinearLayout>
-
-	</LinearLayout>
+    </LinearLayout>
 
 </ScrollView>

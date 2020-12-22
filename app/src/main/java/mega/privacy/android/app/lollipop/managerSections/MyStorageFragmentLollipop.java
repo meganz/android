@@ -23,6 +23,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -165,7 +166,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 			totalUsedSpace.setTypeface(normalTypeface);
 		}
 		else{
-			totalUsedSpace.setTextColor(getResources().getColor(R.color.accentColor));
+			totalUsedSpace.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 
 			if (megaApi.isBusinessAccount()) {
 				totalUsedSpace.setText(myAccountInfo.getUsedFormatted());
@@ -175,7 +176,9 @@ public class MyStorageFragmentLollipop extends Fragment {
 				try {
 					usedSpaceString = usedSpaceString.replace("[A]", "<b><font face=\"sans-serif-light\">");
 					usedSpaceString = usedSpaceString.replace("[/A]", "</font></b>");
-					usedSpaceString = usedSpaceString.replace("[B]", "<font color=\'#000000\'>");
+					usedSpaceString = usedSpaceString.replace("[B]", "<font color=" +
+							ColorUtils.getColorHexString(requireActivity(), R.color.black_white)
+							+ ">");
 					usedSpaceString = usedSpaceString.replace("[/B]", "</font>");
 				} catch (Exception e) {
 					logWarning("Exception formatting string", e);
