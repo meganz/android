@@ -4296,39 +4296,39 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final EmojiEditText inputFirstName = new EmojiEditText(this);
 		inputFirstName.getBackground().mutate().clearColorFilter();
-		inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		inputFirstName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputFirstName, params);
 
-		final RelativeLayout error_layout_firtName = new RelativeLayout(ManagerActivityLollipop.this);
-		layout.addView(error_layout_firtName, params1);
+		final RelativeLayout error_layout_firstName = new RelativeLayout(ManagerActivityLollipop.this);
+		layout.addView(error_layout_firstName, params1);
 
-		final ImageView error_icon_firtName = new ImageView(ManagerActivityLollipop.this);
-		error_icon_firtName.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
-		error_layout_firtName.addView(error_icon_firtName);
-		RelativeLayout.LayoutParams params_icon_firtName = (RelativeLayout.LayoutParams) error_icon_firtName.getLayoutParams();
+		final ImageView error_icon_firstName = new ImageView(ManagerActivityLollipop.this);
+		error_icon_firstName.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_input_warning));
+		error_layout_firstName.addView(error_icon_firstName);
+		RelativeLayout.LayoutParams params_icon_firstName = (RelativeLayout.LayoutParams) error_icon_firstName.getLayoutParams();
 
-		params_icon_firtName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		error_icon_firtName.setLayoutParams(params_icon_firtName);
+		params_icon_firstName.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		error_icon_firstName.setLayoutParams(params_icon_firstName);
 
-		error_icon_firtName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
+		error_icon_firstName.setColorFilter(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
-		final TextView textError_firtName = new TextView(ManagerActivityLollipop.this);
-		error_layout_firtName.addView(textError_firtName);
-		RelativeLayout.LayoutParams params_text_error_firtName = (RelativeLayout.LayoutParams) textError_firtName.getLayoutParams();
-		params_text_error_firtName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-		params_text_error_firtName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error_firtName.addRule(RelativeLayout.CENTER_VERTICAL);
-		params_text_error_firtName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		params_text_error_firtName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-		textError_firtName.setLayoutParams(params_text_error_firtName);
+		final TextView textError_firstName = new TextView(ManagerActivityLollipop.this);
+		error_layout_firstName.addView(textError_firstName);
+		RelativeLayout.LayoutParams params_text_error_firstName = (RelativeLayout.LayoutParams) textError_firstName.getLayoutParams();
+		params_text_error_firstName.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+		params_text_error_firstName.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params_text_error_firstName.addRule(RelativeLayout.CENTER_VERTICAL);
+		params_text_error_firstName.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		params_text_error_firstName.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
+		textError_firstName.setLayoutParams(params_text_error_firstName);
 
-		textError_firtName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
+		textError_firstName.setTextColor(ContextCompat.getColor(ManagerActivityLollipop.this, R.color.red_600_red_300));
 
-		error_layout_firtName.setVisibility(View.GONE);
+		error_layout_firstName.setVisibility(View.GONE);
 
 		final EmojiEditText inputLastName = new EmojiEditText(this);
 		inputLastName.getBackground().mutate().clearColorFilter();
-		inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		inputLastName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputLastName, params);
 
 		final RelativeLayout error_layout_lastName = new RelativeLayout(ManagerActivityLollipop.this);
@@ -4361,7 +4361,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		final EditText inputMail = new EditText(this);
 		inputMail.getBackground().mutate().clearColorFilter();
-		inputMail.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		inputMail.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		layout.addView(inputMail, params);
 
 		final RelativeLayout error_layout_email = new RelativeLayout(ManagerActivityLollipop.this);
@@ -4411,8 +4411,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					} else if (valueFirstName.equals("") || valueFirstName.isEmpty()) {
 						logWarning("First name input is empty");
 						inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-						textError_firtName.setText(R.string.error_enter_username);
-						error_layout_firtName.setVisibility(View.VISIBLE);
+						textError_firstName.setText(R.string.error_enter_username);
+						error_layout_firstName.setVisibility(View.VISIBLE);
 						inputFirstName.requestFocus();
 					} else if (valueLastName.equals("") || valueLastName.isEmpty()) {
 						logWarning("Last name input is empty");
@@ -4435,7 +4435,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		inputFirstName.setSingleLine();
 		inputFirstName.setHint(R.string.first_name_text);
 		inputFirstName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getFirstNameText());
-		inputFirstName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputFirstName.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputFirstName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputFirstName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputFirstName.addTextChangedListener(new TextWatcher() {
@@ -4452,10 +4452,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			@Override
 			public void afterTextChanged(Editable editable) {
 				userNameChanged = true;
-				if(error_layout_firtName.getVisibility() == View.VISIBLE){
-					error_layout_firtName.setVisibility(View.GONE);
+				if(error_layout_firstName.getVisibility() == View.VISIBLE){
+					error_layout_firstName.setVisibility(View.GONE);
 					inputFirstName.getBackground().mutate().clearColorFilter();
-					inputFirstName.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					inputFirstName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(
+							ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -4466,7 +4467,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		inputLastName.setSingleLine();
 		inputLastName.setHint(R.string.lastname_text);
 		inputLastName.setText(((MegaApplication) getApplication()).getMyAccountInfo().getLastNameText());
-		inputLastName.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputLastName.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputLastName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputLastName.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputLastName.addTextChangedListener(new TextWatcher() {
@@ -4486,7 +4487,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(error_layout_lastName.getVisibility() == View.VISIBLE){
 					error_layout_lastName.setVisibility(View.GONE);
 					inputLastName.getBackground().mutate().clearColorFilter();
-					inputLastName.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					inputLastName.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(
+							ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -4497,7 +4499,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		inputMail.setSingleLine();
 		inputMail.setHint(R.string.email_text);
 		inputMail.setText(megaApi.getMyUser().getEmail());
-		inputMail.setTextColor(getResources().getColor(R.color.text_secondary));
+		inputMail.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		inputMail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
 		inputMail.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		inputMail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -4518,7 +4520,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
 					inputMail.getBackground().mutate().clearColorFilter();
-					inputMail.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					inputMail.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(
+							ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 
 				}
 			}
@@ -4567,8 +4570,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				else if(valueFirstName.equals("")||valueFirstName.isEmpty()){
 					logWarning("Input is empty");
 					inputFirstName.getBackground().setColorFilter(ContextCompat.getColor(managerActivity, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                    textError_firtName.setText(R.string.error_enter_username);
-					error_layout_firtName.setVisibility(View.VISIBLE);
+                    textError_firstName.setText(R.string.error_enter_username);
+					error_layout_firstName.setVisibility(View.VISIBLE);
 					inputFirstName.requestFocus();
 				}
 				else if(valueLastName.equals("")||valueLastName.isEmpty()){
