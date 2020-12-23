@@ -225,6 +225,14 @@ public class SDCardOperator {
     }
 
     private List<String> getSubFolders(String root, String parent) {
+        if (parent == null) {
+            throw new IllegalArgumentException("parent is null");
+        }
+
+        if (root == null) {
+            throw new IllegalArgumentException("root is null");
+        }
+
         if (parent.length() < root.length()) {
             throw new IllegalArgumentException("no subfolders!");
         }
