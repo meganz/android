@@ -288,6 +288,12 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Secondary.Medium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.035833333</item>
+    </style>
+
     <!-- ======== Password strength hint text ============ -->
     <style name="TextAppearance.InputHint" parent="TextAppearance.Design.Error">
         <item name="android:textSize">12sp</item>
@@ -324,5 +330,12 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="textAllCaps">false</item>
         <item name="android:letterSpacing">0.017857143</item>
+    </style>
+
+    <!-- Achievements small caption -->
+    <style name="TextAppearance.Mega.SmallSubtitle" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 </resources>

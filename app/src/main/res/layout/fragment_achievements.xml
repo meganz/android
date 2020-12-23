@@ -69,7 +69,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:textColor="@color/blue_unlocked_rewards"
+                                    android:textColor="@color/dark_blue_500_200"
                                     android:textSize="28sp" />
 
                                 <TextView
@@ -79,9 +79,8 @@
                                     android:layout_alignBaseline="@+id/unlocked_storage_text"
                                     android:layout_marginLeft="2dp"
                                     android:layout_toRightOf="@+id/unlocked_storage_text"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:textColor="@color/blue_unlocked_rewards"
-                                    android:textSize="14sp" />
+                                    android:textColor="@color/dark_blue_500_200"
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps"/>
                             </RelativeLayout>
 
                             <TextView
@@ -89,10 +88,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_column="0"
-                                android:fontFamily="sans-serif-medium"
                                 android:text="@string/unlocked_storage_title"
-                                android:textColor="@color/grey_achievements_title"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Medium"/>
                         </LinearLayout>
 
                     </RelativeLayout>
@@ -117,7 +114,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:textColor="@color/green_unlocked_rewards"
+                                    android:textColor="@color/green_500_green_400"
                                     android:textSize="28sp" />
 
                                 <TextView
@@ -127,9 +124,8 @@
                                     android:layout_alignBaseline="@+id/unlocked_transfer_text"
                                     android:layout_marginLeft="2dp"
                                     android:layout_toRightOf="@+id/unlocked_transfer_text"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:textColor="@color/green_unlocked_rewards"
-                                    android:textSize="14sp" />
+                                    android:textColor="@color/green_500_green_400"
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps" /> />
                             </RelativeLayout>
 
                             <TextView
@@ -137,10 +133,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_column="0"
-                                android:fontFamily="sans-serif-medium"
                                 android:text="@string/label_transfer_quota_achievements"
-                                android:textColor="@color/grey_achievements_title"
-                                android:textSize="12sp" />
+                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Medium"/>
                         </LinearLayout>
 
                     </RelativeLayout>
@@ -219,7 +213,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="1 GB"
-                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textColor="@color/dark_blue_500_200"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -229,9 +223,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_referral"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAllCaps="false"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
 
@@ -246,7 +238,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="0 GB"
-                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textColor="@color/green_500_green_400"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -256,8 +248,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_referral"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
                             </LinearLayout>
@@ -270,17 +261,10 @@
 
                             <Button
                                 android:id="@+id/invite_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                style="?attr/borderlessButtonStyle"
                                 android:layout_alignParentRight="true"
                                 android:layout_centerVertical="true"
-                                android:background="@android:color/transparent"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:padding="12dp"
-                                android:stateListAnimator="@null"
-                                android:text="@string/contact_invite"
-                                android:textColor="@color/accentColor" />
+                                android:text="@string/contact_invite" />
                         </RelativeLayout>
                     </LinearLayout>
                 </RelativeLayout>
@@ -290,7 +274,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@+id/referral_bonuses_layout"
-                    android:background="@color/separator_grey"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
 
                 <RelativeLayout
@@ -347,7 +331,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="1 GB"
-                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textColor="@color/dark_blue_500_200"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -374,7 +358,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="0 GB"
-                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textColor="@color/green_500_green_400"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -417,7 +401,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@+id/base_quota_layout"
-                    android:background="@color/separator_grey"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal"
                     android:visibility="gone" />
 
@@ -477,7 +461,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="1 GB"
-                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textColor="@color/dark_blue_500_200"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -487,9 +471,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_install_app"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAllCaps="false"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
 
@@ -504,7 +486,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="0 GB"
-                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textColor="@color/green_500_green_400"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -514,8 +496,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_install_app"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
                             </LinearLayout>
@@ -552,7 +533,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@+id/install_app_layout"
-                    android:background="@color/separator_grey"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
 
                 <RelativeLayout
@@ -611,7 +592,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="1 GB"
-                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textColor="@color/dark_blue_500_200"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -637,7 +618,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="0 GB"
-                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textColor="@color/green_500_green_400"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -676,7 +657,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@+id/add_phone_layout"
-                    android:background="@color/separator_grey"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
 
                 <RelativeLayout
@@ -730,7 +711,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="1 GB"
-                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textColor="@color/dark_blue_500_200"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -740,9 +721,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_registration"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAllCaps="false"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
 
@@ -757,7 +736,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="0 GB"
-                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textColor="@color/green_500_green_400"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -767,8 +746,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_registration"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
 
@@ -789,7 +767,7 @@
                                     android:ellipsize="end"
                                     android:gravity="right"
                                     android:singleLine="true"
-                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textColor="@color/grey_alpha_054"
                                     android:textSize="14dp" />
                             </RelativeLayout>
 
@@ -806,7 +784,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_below="@+id/registration_layout"
-                    android:background="@color/separator_grey"
+                    android:background="@color/grey_012_white_012"
                     android:orientation="horizontal" />
 
                 <RelativeLayout
@@ -865,7 +843,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="1 GB"
-                                        android:textColor="@color/blue_unlocked_rewards"
+                                        android:textColor="@color/dark_blue_500_200"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -875,9 +853,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_install_desktop"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAllCaps="false"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
 
@@ -892,7 +868,7 @@
                                         android:layout_column="0"
                                         android:layout_gravity="left"
                                         android:text="0 GB"
-                                        android:textColor="@color/green_unlocked_rewards"
+                                        android:textColor="@color/green_500_green_400"
                                         android:textSize="14dp" />
 
                                     <TextView
@@ -902,8 +878,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_install_desktop"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textColor="@color/grey_achievements_title"
-                                        android:textSize="11dp" />
+                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
 
                                 </RelativeLayout>
 

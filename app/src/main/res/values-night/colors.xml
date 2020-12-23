@@ -95,6 +95,8 @@
     <!-- Primary red -->
     <color name="red_600_red_300">@color/red_300</color>
 
+    <color name="red_600_red_400">@color/red_400</color>
+
     <color name="red_500_red_300">@color/red_300</color>
 
     <!-- Solid color. e.g. Grid item background -->

@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -494,7 +493,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
 				if(diffDays<=15){
-					daysLeftInstallAppText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					daysLeftInstallAppText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
 				}
 
 				if(diffDays>0){
@@ -553,7 +552,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
                 if(diffDays<=15){
-                    daysLeftAddPhoneText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+                    daysLeftAddPhoneText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
                 }
 
                 if(diffDays>0){
@@ -612,7 +611,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
 				if(diffDays<=15){
-					daysLeftInstallDesktopText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					daysLeftInstallDesktopText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
 				}
 
 				if(diffDays>0){
@@ -667,7 +666,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				long diffDays = diffTime / (1000 * 60 * 60 * 24);
 
 				if(diffDays<=15){
-					daysLeftRegistrationText.setTextColor(ContextCompat.getColor(context,R.color.login_title));
+					daysLeftRegistrationText.setTextColor(ContextCompat.getColor(context,R.color.red_600_red_400));
 				}
 
 				if(diffDays>0){

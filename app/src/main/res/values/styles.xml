@@ -345,19 +345,6 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
-    <style name="achievements_subtitle">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignParentTop">true</item>
-        <item name="android:layout_marginRight">24dp</item>
-        <item name="android:layout_marginBottom">4dp</item>
-        <item name="android:singleLine">false</item>
-        <item name="android:ellipsize">end</item>
-    </style>
-
     <style name="figures_text_style">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
@@ -706,10 +693,6 @@
         <item name="colorOnSecondary">@color/teal_300_black</item>
     </style>
 
-    <!--======= Legacy styles(may not be best practice, keep for quick development) ========= -->
-
-    <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
-
     <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
     <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
     </style>
@@ -727,5 +710,22 @@
         <item name="strokeColor">@color/grey_alpha_026</item>
         <item name="backgroundTint">@color/white</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <!--======= Legacy styles(may not be best practice, keep them just for quick development) ========= -->
+
+    <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
+
+    <style name="achievements_subtitle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:layout_marginRight">24dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:ellipsize">end</item>
     </style>
 </resources>
