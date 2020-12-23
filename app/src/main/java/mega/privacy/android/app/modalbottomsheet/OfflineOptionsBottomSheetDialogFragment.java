@@ -67,7 +67,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         LinearLayout optionShare = contentView.findViewById(R.id.option_share_layout);
 
         contentView.findViewById(R.id.option_delete_offline_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.available_offline_switch).setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
         optionShare.setOnClickListener(this);
 
@@ -156,9 +155,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
-            case R.id.available_offline_switch:
-                ((SwitchMaterial) contentView.findViewById(R.id.available_offline_switch))
-                        .setChecked(true);
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context)
                             .showConfirmationRemoveFromOffline(nodeOffline,
