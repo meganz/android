@@ -1598,13 +1598,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-							mediaIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						else{
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							mediaIntent.setDataAndType(
+									FileProvider.getUriForFile(FolderLinkActivityLollipop.this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile),
+									MimeTypeList.typeForName(file.getName()).getType());
+						} else {
 							mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
+
 						mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
@@ -1687,12 +1688,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					String localPath = getLocalFile(this, file.getName(), file.getSize());
 					if (localPath != null){
 						File mediaFile = new File(localPath);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-							pdfIntent.setDataAndType(FileProvider.getUriForFile(FolderLinkActivityLollipop.this, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
-						}
-						else{
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+							pdfIntent.setDataAndType(
+									FileProvider.getUriForFile(FolderLinkActivityLollipop.this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile),
+									MimeTypeList.typeForName(file.getName()).getType());
+						} else {
 							pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
 						}
+
 						pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 					}
 					else {
