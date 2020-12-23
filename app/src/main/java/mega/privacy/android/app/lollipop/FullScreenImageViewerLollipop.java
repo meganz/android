@@ -482,6 +482,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			if (node == null) {
+				getlinkIcon.setVisible(false);
+				removelinkIcon.setVisible(false);
+				shareIcon.setVisible(false);
+				propertiesIcon.setVisible(false);
+				downloadIcon.setVisible(false);
+				renameIcon.setVisible(false);
+				moveIcon.setVisible(false);
+				copyIcon.setVisible(false);
+				moveToTrashIcon.setVisible(false);
+				removeIcon.setVisible(false);
+				chatIcon.setVisible(false);
+
+				return super.onCreateOptionsMenu(menu);
+			}
 
 			downloadIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
