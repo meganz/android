@@ -4,32 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:fitsSystemWindows="true"
     >
   <com.google.android.material.appbar.AppBarLayout
       android:id="@+id/app_bar"
       android:layout_width="match_parent"
       android:layout_height="168dp"
-      android:background="@color/content_text_background"
       android:fitsSystemWindows="true"
       >
     <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
         android:id="@+id/collapse_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
         android:fitsSystemWindows="true"
-        android:theme="@style/Theme.Megaactionbar.InfoScreens"
+        android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
         app:layout_scrollFlags="scroll|exitUntilCollapsed"
-        app:collapsedTitleTextAppearance="@style/ToolbarTitle"
+        app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium"
         app:contentScrim="?attr/colorPrimary"
         app:expandedTitleGravity="center_vertical"
         app:expandedTitleMarginStart="72dp"
-        app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
+        app:expandedTitleTextAppearance="?attr/textAppearanceSubtitle1"
         app:lineSpacingMultiplier="1.2"
-        app:maxLines="3"
-        >
+        app:maxLines="3">
 
       <ImageView
           android:id="@+id/toolbar_node_icon"
@@ -72,14 +68,12 @@
             />
       </FrameLayout>
 
-      <androidx.appcompat.widget.Toolbar
-          android:id="@+id/toolbar"
-          android:layout_width="match_parent"
-          android:layout_height="?attr/actionBarSize"
-          app:titleTextAppearance="@style/ToolbarTitle"
-          app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-          app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-          app:layout_collapseMode="pin"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_collapseMode="pin"
+            app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium" />
     </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
   </com.google.android.material.appbar.AppBarLayout>
 
@@ -106,8 +100,7 @@
           android:layout_height="48dp"
           android:gravity="center_vertical"
           android:text="@string/file_properties_available_offline"
-          android:textColor="@color/homepage_title"
-          android:textSize="16sp"
+          android:textAppearance="?attr/textAppearanceSubtitle1"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toTopOf="parent"
           />
@@ -126,7 +119,7 @@
           android:id="@+id/divider"
           android:layout_width="0dp"
           android:layout_height="1dp"
-          android:background="@color/black_12_alpha"
+          android:background="@color/grey_012_white_012"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toBottomOf="@id/available_offline_text"
@@ -139,8 +132,7 @@
           android:layout_marginTop="9dp"
           android:text="@string/file_properties_info_size"
           android:textAllCaps="true"
-          android:textColor="@color/homepage_title"
-          android:textSize="14sp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
           android:textStyle="bold"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toBottomOf="@id/divider"
@@ -149,8 +141,7 @@
           android:id="@+id/total_size_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:textColor="@color/homepage_content"
-          android:textSize="14sp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toBottomOf="@id/total_size_title"
           tools:text="4.3 MB"
@@ -163,8 +154,7 @@
           android:layout_marginTop="14dp"
           android:text="@string/file_properties_info_content"
           android:textAllCaps="true"
-          android:textColor="@color/homepage_title"
-          android:textSize="14sp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
           android:textStyle="bold"
           android:visibility="gone"
           app:layout_constraintStart_toStartOf="@id/guideline"
@@ -175,8 +165,7 @@
           android:id="@+id/contains_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:textColor="@color/homepage_content"
-          android:textSize="14sp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
           android:visibility="gone"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toBottomOf="@id/contains_title"
@@ -191,8 +180,7 @@
           android:layout_marginTop="14dp"
           android:text="@string/file_properties_info_added"
           android:textAllCaps="true"
-          android:textColor="@color/homepage_title"
-          android:textSize="14sp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
           android:textStyle="bold"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toBottomOf="@id/contains_value"
@@ -201,8 +189,7 @@
           android:id="@+id/added_value"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:textColor="@color/homepage_content"
-          android:textSize="14sp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
           app:layout_constraintStart_toStartOf="@id/guideline"
           app:layout_constraintTop_toBottomOf="@id/added_title"
           tools:text="1 hour ago"

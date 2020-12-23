@@ -38,8 +38,6 @@
                     android:layout_height="fill_parent"
                     android:layout_centerInParent="true"
                     android:scaleType="fitCenter"
-                    rounded:border_color="?attr/colorPrimary"
-                    rounded:border_width="0dp"
                     rounded:corner_radius="20dp" />
             </RelativeLayout>
 
@@ -71,8 +69,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:textAppearance="?attr/textAppearanceSubtitle1"
-                        android:textColor="@color/grey_038_white_038" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant2" />
 
                     <ImageView
                         android:id="@+id/file_properties_owner_state_icon"
@@ -175,7 +172,7 @@
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/separator_grey" />
+            android:background="@color/grey_012_white_012" />
 
         <!-- SHARED LAYOUT -->
 
@@ -210,7 +207,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone">
 
-            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <RelativeLayout
                 android:id="@+id/file_info_contact_list_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -230,7 +227,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
-                    android:text="4 More" />
+                    tools:text="4 More" />
 
             </RelativeLayout>
 
@@ -398,8 +395,7 @@
                     android:id="@+id/file_properties_info_data_folder_previous_versions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorSecondary"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
             </LinearLayout>
 
         </RelativeLayout>
@@ -515,7 +511,7 @@
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
             android:layout_marginTop="8dp"
-            android:background="@color/separator_grey" />
+            android:background="@color/grey_012_white_012" />
 
         <RelativeLayout
             android:id="@+id/file_properties_link_layout"

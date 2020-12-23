@@ -33,6 +33,10 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant2">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+    </style>
+
     <!-- Mainly for login/create account screen titles -->
     <style name="TextAppearance.Mega.Subtitle1.AllCaps">
         <item name="android:textAllCaps">true</item>

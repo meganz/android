@@ -266,6 +266,8 @@
     <color name="grey_900">#212121</color>
 
     <color name="grey_100_alpha_060">#99E0E0E0</color>
+    <color name="grey_300_alpha_026">#429E9E9E</color>
+    <color name="grey_700_alpha_026">#424F4F4F</color>
 
     <color name="grey_alpha_003">#08000000</color>
     <color name="grey_alpha_005">#0D000000</color>
@@ -457,6 +459,10 @@
     <!-- chat status color -->
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>
+
+    <!-- Available offline disabled text color -->
+    <color name="grey_700_026_grey_300_026">@color/grey_700_alpha_026</color>
+
     <!-- Busy -->
     <color name="salmon_700_salmon_300">@color/salmon_700</color>
     <!-- Away -->

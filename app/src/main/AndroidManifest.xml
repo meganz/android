@@ -357,7 +357,6 @@
         <activity
             android:name=".activities.OfflineFileInfoActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens"
             android:configChanges="orientation|screenSize" />
 
         <activity
