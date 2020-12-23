@@ -43,6 +43,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
@@ -229,7 +230,25 @@ class HomepageFragment : Fragment() {
             searchInputView.setAvatar(it)
         }
         viewModel.chatStatus.observe(viewLifecycleOwner) {
-            searchInputView.setChatStatus(it != 0, it)
+            val iconRes = if (Util.isDarkMode(requireContext())) {
+                when (it) {
+                    MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online_dark_drawer
+                    MegaChatApi.STATUS_AWAY -> R.drawable.ic_away_dark_drawer
+                    MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy_dark_drawer
+                    MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline_dark_drawer
+                    else -> 0
+                }
+            } else {
+                when (it) {
+                    MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online_light
+                    MegaChatApi.STATUS_AWAY -> R.drawable.ic_away_light
+                    MegaChatApi.STATUS_BUSY -> R.drawable.ic_busy_light
+                    MegaChatApi.STATUS_OFFLINE -> R.drawable.ic_offline_light
+                    else -> 0
+                }
+            }
+
+            searchInputView.setChatStatus(iconRes != 0, iconRes)
         }
 
         searchInputView.setAvatarClickListener {
