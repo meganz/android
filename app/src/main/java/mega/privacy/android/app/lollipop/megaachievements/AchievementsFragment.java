@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.megaachievements;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,6 +26,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
@@ -308,6 +310,12 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		figureUnlockedRewardStorage.setText("...");
 
 		figureUnlockedRewardTransfer.setText("...");
+
+		if (Util.isDarkMode(context)) {
+			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
+			v.findViewById(R.id.unlocked_rewards_layout).setBackgroundColor(backgroundColor);
+			v.findViewById(R.id.card_view_2).setBackgroundColor(backgroundColor);
+		}
 
 		return v;
 	}

@@ -3360,7 +3360,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	/**
 	 * Get a String value from the database.
-	 *
+	 *setSDsetSD
 	 * @param tableName    Name of the database's table.
 	 * @param columnName   Name of the table's column.
 	 * @param defaultValue Default value to return if no result found.

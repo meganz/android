@@ -420,6 +420,9 @@
     <!-- Business account management container-->
     <color name="grey_020_white_012">@color/grey_020</color>
 
+    <!-- Background color of Achievements screen -->
+    <color name="grey_020_dark_grey">@color/grey_020</color>
+
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->
     <!-- Weak -->

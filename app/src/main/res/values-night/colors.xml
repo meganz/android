@@ -135,4 +135,8 @@
 
     <!-- Business account management container-->
     <color name="grey_020_white_012">@color/white_alpha_012</color>
+
+    <!-- Background color of Achievements screen -->
+    <color name="grey_020_dark_grey">@color/dark_grey</color>
+
 </resources>

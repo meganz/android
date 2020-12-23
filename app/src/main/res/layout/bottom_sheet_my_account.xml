@@ -101,7 +101,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     app:tint="?android:attr/textColorSecondary"
-                    android:src="@drawable/ic_take_photo"
+                    android:src="@drawable/ic_media"
                     android:visibility="visible" />
 
                 <TextView

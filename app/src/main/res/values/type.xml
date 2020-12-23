@@ -109,6 +109,16 @@
         <item name="android:letterSpacing">0.035714286</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Variant.Medium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!--- 0.5px, Medium, AllCap -->
+    <style name="TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
     <!-- ================== Body1 ====================== -->
 
     <!-- In material design, for the CheckedTextView -->
@@ -125,7 +135,6 @@
     <style name="TextAppearance.Mega.Body1.Variant2">
         <item name="android:textColor">@color/grey_087_white</item>
     </style>
-
 
     <!-- ================== Body2 ====================== -->
 
