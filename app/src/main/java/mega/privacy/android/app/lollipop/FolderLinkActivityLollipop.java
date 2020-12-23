@@ -98,6 +98,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FolderLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener {
@@ -1545,12 +1546,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
-					}
+
+					MegaNode parent = megaApiFolder.getParentNode(nodes.get(position));
+					intent.putExtra("parentNodeHandle",
+							parent == null || parent.getType() == MegaNode.TYPE_ROOT
+									? INVALID_HANDLE
+									: parent.getHandle());
+
 					intent.putExtra("orderGetChildren", orderGetChildren);
 					intent.putExtra("isFolderLink", true);
 					intent.putExtra("screenPosition", screenPosition);
