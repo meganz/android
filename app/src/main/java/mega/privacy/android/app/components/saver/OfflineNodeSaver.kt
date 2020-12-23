@@ -23,13 +23,17 @@ class OfflineNodeSaver @Inject constructor(
     /**
      * Save an offline node into device.
      *
-     * @param node the offline node to save
+     * @param nodes the offline nodes to save
      * @param highPriority whether this download is high priority or not
      * @param activityStarter a high-order function to launch activity when needed
      */
-    fun save(node: MegaOffline, highPriority: Boolean, activityStarter: (Intent, Int) -> Unit) {
+    fun save(nodes: List<MegaOffline>, highPriority: Boolean, activityStarter: (Intent, Int) -> Unit) {
         save(activityStarter) {
-            OfflineSaving(getTotalSize(getOfflineFile(context, node)), highPriority, node)
+            var totalSize = 0L
+            for (node in nodes) {
+                totalSize += getTotalSize(getOfflineFile(context, node))
+            }
+            OfflineSaving(totalSize, highPriority, nodes)
         }
     }
 
@@ -38,10 +42,12 @@ class OfflineNodeSaver @Inject constructor(
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?
     ) {
-        doDownload(
-            getOfflineFile(context, (saving as OfflineSaving).node),
-            parentPath, externalSDCard, sdCardOperator
-        )
+        for (node in (saving as OfflineSaving).nodes) {
+            doDownload(
+                getOfflineFile(context, node),
+                parentPath, externalSDCard, sdCardOperator
+            )
+        }
 
         runOnUiThread {
             showSnackbar(
