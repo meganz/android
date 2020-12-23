@@ -81,6 +81,7 @@ import java.util.List;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.*;
 
 /**
@@ -713,11 +714,16 @@ public class PDFView extends RelativeLayout {
     }
 
     void showErrorDialog(final Throwable t) {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(getContext());
+        if (pdfViewer == null || t == null) {
+            logError("Cannot show error dialog, pdfViewer or t is null");
+            return;
+        }
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setCancelable(false);
-        if (t.getLocalizedMessage().equals("Password required or incorrect password.") || t.getMessage().equals("Password required or incorrect password.")) {
+
+        if ((t.getLocalizedMessage() != null && t.getLocalizedMessage().equals("Password required or incorrect password."))
+                || (t.getMessage() != null && t.getMessage().equals("Password required or incorrect password."))) {
             if (pdfViewer.getMaxIntents() > 0) {
                 View layout = pdfViewer.getLayoutInflater().inflate(R.layout.dialog_pdf_password, null);
                 final TextInputLayout passwordLayout = layout.findViewById(R.id.password_layout);
