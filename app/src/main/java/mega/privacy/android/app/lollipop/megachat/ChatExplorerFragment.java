@@ -6,13 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -43,6 +44,7 @@ import mega.privacy.android.app.lollipop.CheckScrollInterface;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -91,9 +93,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     //Empty screen
     private TextView emptyTextView;
     private LinearLayout emptyLayout;
-    private TextView emptyTextViewInvite;
     private ImageView emptyImageView;
-    private Button inviteButton;
     private RelativeLayout contentLayout;
     private ProgressBar progressBar;
 
@@ -196,40 +196,31 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         });
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
-        emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
 
-        String textToShow = String.format(context.getString(R.string.recent_chat_empty));
+        String textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
         try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#7a7a7a\'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'" +
+                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_300_grey_600)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#000000\'>");
+            textToShow = textToShow.replace("[B]", "<font color=\'" +
+                    ColorUtils.getColorHexString(requireActivity(), R.color.black_white)
+                    + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
         }
         catch (Exception e){}
-        Spanned resultB = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            resultB = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            resultB = Html.fromHtml(textToShow);
-        }
+        Spanned resultB = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
         emptyTextView.setText(resultB);
-
-        LinearLayout.LayoutParams emptyTextViewParams1 = (LinearLayout.LayoutParams)emptyTextViewInvite.getLayoutParams();
-        emptyTextViewParams1.setMargins(0, scaleHeightPx(50, outMetrics), 0, scaleHeightPx(24, outMetrics));
-        emptyTextViewInvite.setLayoutParams(emptyTextViewParams1);
 
         LinearLayout.LayoutParams emptyTextViewParams2 = (LinearLayout.LayoutParams)emptyTextView.getLayoutParams();
         emptyTextViewParams2.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics));
         emptyTextView.setLayoutParams(emptyTextViewParams2);
 
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
-        emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+        emptyImageView.setImageResource(R.drawable.empty_chat_message_portrait);
 
         mainRelativeLayout = v.findViewById(R.id.main_relative_layout);
-        inviteButton = v.findViewById(R.id.invite_button);
-        inviteButton.setVisibility(View.GONE);
 
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
@@ -300,7 +291,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     }
 
     private void showConnecting() {
-        String textToShow = String.format(context.getString(R.string.chat_connecting));
+        String textToShow = context.getString(R.string.chat_connecting);
         emptyTextView.setText(textToShow);
     }
 

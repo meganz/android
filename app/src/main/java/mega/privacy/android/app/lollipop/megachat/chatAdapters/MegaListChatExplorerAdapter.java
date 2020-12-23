@@ -155,8 +155,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         ChatExplorerListItem item = getItem(position);
         MegaChatListItem chat = item.getChat();
 
-        holder.itemLayout.setBackgroundColor(Color.WHITE);
-
         if (item.isHeader()) {
             holder.itemContainer.setVisibility(View.GONE);
             holder.headerLayout.setVisibility(View.VISIBLE);
@@ -176,7 +174,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         if (chat != null && chat.isGroup()) {
 
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
-                holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
                 holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
             }
             else{
@@ -211,7 +208,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
             String userHandleEncoded = MegaApiAndroid.userHandleToBase64(handle);
 
             if((isItemChecked(position) && !isSearchEnabled()) || (isSearchEnabled() && isSearchItemChecked(position))){
-                holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
                 holder.avatarImage.setImageResource(R.drawable.ic_select_avatar);
             }
             else{
@@ -226,10 +222,6 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
 
         holder.itemLayout.setOnClickListener(this);
         holder.itemLayout.setOnLongClickListener(this);
-
-        holder.titleText.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
-        holder.lastSeenStateText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-        holder.participantsText.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
     }
 
     public void createGroupChatAvatar(ViewHolderChatExplorerList holder){

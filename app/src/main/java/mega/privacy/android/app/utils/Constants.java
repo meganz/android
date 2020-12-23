@@ -706,4 +706,6 @@ public class Constants {
 
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
+
+    public static final int MAX_BADGE_NUM = 9;
 }

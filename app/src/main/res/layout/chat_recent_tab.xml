@@ -59,12 +59,8 @@
                         android:layout_marginStart="32dp"
                         android:layout_marginEnd="52dp"
                         android:layout_toEndOf="@+id/collapse_btn"
-                        android:fontFamily="Roboto"
-                        android:lineSpacingExtra="0.3dp"
                         android:text="@string/see_local_contacts_on_mega"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                     <TextView
                         android:id="@+id/more_contacts_title"
@@ -74,11 +70,9 @@
                         android:layout_centerVertical="true"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="20dp"
-                        android:fontFamily="sans-serif-medium"
                         android:text="@string/contact_invite"
                         android:textAllCaps="true"
-                        android:textColor="?attr/colorSecondary"
-                        android:visibility="gone" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
                 </RelativeLayout>
 
                 <FrameLayout
@@ -100,10 +94,8 @@
                             android:layout_marginStart="72dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="16dp"
-                            android:fontFamily="Roboto"
                             android:text="@string/grant_mega_access_contacts"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="14sp" />
+                            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
                         <Button
                             android:id="@+id/dismiss_button"
@@ -181,7 +173,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center"
-                    android:textSize="@dimen/empty_data_font_size" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
 
                 <Button
                     android:id="@+id/invite_button"
