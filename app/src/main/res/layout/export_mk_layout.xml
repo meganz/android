@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/backup_title"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps"
                 android:textStyle="bold" />
 
             <TextView

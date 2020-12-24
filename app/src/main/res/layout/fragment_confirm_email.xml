@@ -18,7 +18,7 @@
             android:layout_marginTop="17dp"
             android:layout_marginEnd="24dp"
             android:text="@string/confirm_email_text"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
 
         <ImageView
             android:id="@+id/confirm_email_icon"

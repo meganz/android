@@ -20,7 +20,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
-            app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium"
+            app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="start|top"
             app:expandedTitleMarginBottom="14dp"
@@ -90,7 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium" />
+                app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
 
             <!--android:background="@drawable/gradient_shape"-->
 

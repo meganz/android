@@ -32,7 +32,7 @@
                     android:layout_gravity="start"
                     android:layout_marginTop="17dp"
                     android:text="@string/login_to_mega"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"

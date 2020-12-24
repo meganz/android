@@ -550,7 +550,7 @@
 
     <!-- Action bar title -->
     <style name="Widget.Mega.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
-        <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps</item>
         <item name="android:elevation">0dp</item>
     </style>
 

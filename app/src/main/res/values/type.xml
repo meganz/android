@@ -38,15 +38,8 @@
     </style>
 
     <!-- Mainly for login/create account screen titles -->
-    <style name="TextAppearance.Mega.Subtitle1.AllCaps">
+    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps">
         <item name="android:textAllCaps">true</item>
-    </style>
-
-    <!-- Mainly for Toolbar title -->
-    <!-- Medium, 16sp, 0.15px, textColorPrimary, AllCaps=true -->
-    <style name="TextAppearance.Mega.Subtitle1.AllCaps.Medium">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Red">

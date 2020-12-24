@@ -19,7 +19,7 @@
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
         app:layout_scrollFlags="scroll|exitUntilCollapsed"
-        app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium"
+        app:collapsedTitleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps"
         app:contentScrim="?attr/colorPrimary"
         app:expandedTitleGravity="center_vertical"
         app:expandedTitleMarginStart="72dp"
@@ -73,7 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_collapseMode="pin"
-            app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps.Medium" />
+            app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
     </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
   </com.google.android.material.appbar.AppBarLayout>
 

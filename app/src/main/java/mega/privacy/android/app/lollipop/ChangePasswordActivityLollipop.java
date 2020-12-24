@@ -1274,8 +1274,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		if (aB != null){
 			aB.hide();
 		}
-
-		changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
 	}
 
 	@Override

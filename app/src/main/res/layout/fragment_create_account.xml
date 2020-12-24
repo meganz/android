@@ -36,7 +36,7 @@
                         android:layout_gravity="start"
                         android:layout_marginTop="17dp"
                         android:text="@string/create_account_title"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AllCaps" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
