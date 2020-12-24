@@ -50,6 +50,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.text.HtmlCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -76,6 +77,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -124,7 +126,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	MegaNode selectedNode;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	TextView contentText;
     RelativeLayout fragmentContainer;
 	RelativeLayout fileLinkFragmentContainer;
 	Button downloadButton;
@@ -469,13 +470,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		
 		folderLinkActivity = this;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
-
 		prefs = dbH.getPreferences();
 		downloadLocationDefaultPath = getDownloadLocation();
 
@@ -487,7 +481,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		tB = (Toolbar) findViewById(R.id.toolbar_folder_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-//		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 
@@ -501,25 +494,24 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		emptyTextView = (TextView) findViewById(R.id.folder_link_list_empty_text);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-			emptyImageView.setImageResource(R.drawable.ic_zero_landscape_empty_folder);
+			emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
 		}else{
-			emptyImageView.setImageResource(R.drawable.ic_zero_portrait_empty_folder);
+			emptyImageView.setImageResource(R.drawable.empty_folder_portrait);
 		}
 
-		String textToShow = String.format(getString(R.string.file_browser_empty_folder_new));
+		String textToShow = getString(R.string.file_browser_empty_folder_new);
 		try{
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.black_white)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'"
+					+ ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		}
 		catch (Exception e){}
-		Spanned result = null;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-		} else {
-			result = Html.fromHtml(textToShow);
-		}
+		Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
 		emptyTextView.setText(result);
 		emptyImageView.setVisibility(View.GONE);
 		emptyTextView.setVisibility(View.GONE);
@@ -550,9 +542,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				importButton.setVisibility(View.GONE);
 			}
 		}
-
-		contentText = (TextView) findViewById(R.id.content_text);
-		contentText.setVisibility(View.GONE);
 
 		fileLinkIconView = (ImageView) findViewById(R.id.folder_link_file_link_icon);
 		fileLinkIconView.getLayoutParams().width = scaleWidthPx(200, outMetrics);
@@ -589,14 +578,12 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
 		fileLinkDownloadButton.setOnClickListener(this);
-		fileLinkDownloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
 		//Left and Right margin
 		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
 		downloadTextParams.setMargins(scaleWidthPx(6, outMetrics), 0, scaleWidthPx(8, outMetrics), 0);
 		fileLinkDownloadButton.setLayoutParams(downloadTextParams);
 
 		fileLinkImportButton = (TextView) findViewById(R.id.folder_link_file_link_button_import);
-		fileLinkImportButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
 		fileLinkImportButton.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams importTextParams = (LinearLayout.LayoutParams)fileLinkImportButton.getLayoutParams();

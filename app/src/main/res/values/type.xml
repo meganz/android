@@ -46,6 +46,10 @@
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Error">
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
@@ -95,6 +99,10 @@
 
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle2.PrimaryColor">

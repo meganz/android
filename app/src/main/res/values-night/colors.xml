@@ -147,4 +147,7 @@
 
     <!--Info Achievements title background -->
     <color name="white_transparent">@android:color/transparent</color>
+
+    <!-- SMSVerificationActivity background and status bar -->
+    <color name="blue_400_blue_200">@color/dark_blue_200</color>
 </resources>

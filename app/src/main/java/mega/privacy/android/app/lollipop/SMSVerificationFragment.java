@@ -65,7 +65,6 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
         }
-        ((ManagerActivityLollipop) context).changeStatusBarColor(Constants.COLOR_STATUS_BAR_SMS_VERIFICATION);
         return v;
     }
 

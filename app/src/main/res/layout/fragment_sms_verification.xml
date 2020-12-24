@@ -5,8 +5,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
@@ -25,7 +24,7 @@
                     android:layout_height="190dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:layout_marginTop="90dp"
                     android:src="@drawable/il_verify_phone_circle" />
 
@@ -45,8 +44,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:text="@string/add_phone_number_label"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="22sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Headline5" />
 
                 <TextView
                     android:id="@+id/sv_dialog_msg"
@@ -79,33 +77,26 @@
 
             <Button
                 android:id="@+id/not_now_button_2"
-                style="?android:attr/borderlessButtonStyle"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/background_button_white"
-                android:elevation="0dp"
                 android:paddingLeft="16.5dp"
                 android:paddingTop="10dp"
                 android:paddingRight="16.5dp"
                 android:paddingBottom="10dp"
-                android:text="@string/button_not_now_rich_links"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp" />
+                android:text="@string/button_not_now_rich_links" />
 
             <Button
                 android:id="@+id/enable_button"
-                style="@style/ButtonStyle"
+                style="?attr/materialButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:background="@drawable/background_accent_button"
                 android:paddingLeft="16.5dp"
                 android:paddingTop="10dp"
                 android:paddingRight="16.5dp"
                 android:paddingBottom="10dp"
-                android:text="@string/add_phone_number_label"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:text="@string/add_phone_number_label" />
 
         </LinearLayout>
 

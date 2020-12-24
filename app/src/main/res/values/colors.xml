@@ -167,7 +167,6 @@
     <color name="dark_primary_color">#FFF30C14</color>
     <color name="dark_primary_color_secondary">#FFD50004</color>
     <color name="status_bar_search">#FFCCCCCC</color>
-    <color name="status_bar_sms_verification">#40B0D7</color>
     <color name="status_bar_navigation_view">#FF33CCB7</color>
     <color name="white_50_opacity">#80FFFFFF</color>
     <color name="white_15_opacity">#26FFFFFF</color>
@@ -322,6 +321,7 @@
     <color name="lime_green_500">#13E03C</color>
 
     <color name="dark_blue_200">#85D2ED</color>
+    <color name="dark_blue_400">#3FB2E2</color>
     <color name="dark_blue_500">#2BA6DE</color>
 
     <color name="ambar_700">#FFA003</color>
@@ -426,6 +426,9 @@
 
     <!-- Background color of Achievements screen -->
     <color name="grey_020_dark_grey">@color/grey_020</color>
+
+    <!-- SMSVerificationActivity background and status bar -->
+    <color name="blue_400_blue_200">@color/dark_blue_400</color>
 
     <!-- ============ Color pair by its main origin (Not the standard colors in Mega palette) ============== -->
     <!-- password strength -->

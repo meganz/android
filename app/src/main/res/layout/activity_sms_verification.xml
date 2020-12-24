@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/scroller_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroller_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
-		<LinearLayout android:layout_width="match_parent"
-		              android:layout_height="wrap_content"
-		              android:background="#40B0D7"
-		              android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/blue_400_blue_200"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/title"
@@ -22,176 +25,190 @@
                 android:layout_marginBottom="36dp"
                 android:gravity="center"
                 android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-			<ImageView android:layout_width="wrap_content"
-			           android:layout_height="wrap_content"
-			           android:layout_gravity="center"
-			           android:src="@drawable/il_verify_phone_big"/>
-		</LinearLayout>
-		<TextView android:id="@+id/verify_account_helper"
-		          android:layout_width="match_parent"
-		          android:layout_height="wrap_content"
-		          android:padding="24dp"
-		          android:textSize="16sp"/>
-		<RelativeLayout android:id="@+id/verify_account_country_selector"
-		                android:layout_width="match_parent"
-		                android:layout_height="56dp"
-		                android:layout_marginLeft="24dp"
-		                android:layout_marginRight="24dp"
-		>
-			<ImageView android:id="@+id/verify_account_country_icon"
-			           android:layout_width="wrap_content"
-			           android:layout_height="wrap_content"
-			           android:layout_alignParentLeft="true"
-			           android:layout_marginTop="20dp"
-			           android:src="@drawable/ic_country"
-			/>
-			<TextView android:id="@+id/verify_account_country_label"
-			          android:layout_width="match_parent"
-			          android:layout_height="wrap_content"
-			          android:layout_marginLeft="8dp"
-			          android:layout_marginBottom="5dp"
-			          android:layout_toRightOf="@+id/verify_account_country_icon"
-			          android:text="@string/sms_region_label"
-			          android:textColor="@color/accentColor"
-			          android:visibility="gone"
-			/>
-			<TextView android:id="@+id/verify_account_selected_country" android:layout_width="wrap_content"
-			          android:layout_height="wrap_content"
-			          android:layout_marginLeft="8dp"
-			          android:layout_marginTop="22dp"
-			          android:layout_toRightOf="@+id/verify_account_country_icon"
-			          android:text="@string/sms_region_label"
-			          android:textSize="14sp"
-			/>
-			<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
-			           android:layout_alignParentRight="true"
-			           android:layout_marginTop="20dp"
-			           android:src="@drawable/ic_g_arrow_next"/>
-			<View android:id="@+id/verify_account_divider1" android:layout_width="match_parent"
-			      android:layout_height="1dp"
-			      android:layout_alignParentBottom="true"
-			      android:background="#1F000000"
-			/>
-		</RelativeLayout>
-		<TextView android:id="@+id/verify_account_invalid_country_code" android:layout_width="match_parent"
-		          android:layout_height="wrap_content"
-		          android:layout_marginLeft="26dp"
-		          android:layout_marginTop="10dp"
-		          android:layout_marginRight="26dp"
-		          android:layout_marginBottom="10dp"
-		          android:text="@string/verify_account_invalid_country_code"
-		          android:textColor="#FFFF333A"
-		          android:visibility="gone"
-		/>
-		<RelativeLayout android:layout_width="match_parent"
-		                android:layout_height="56dp"
-		                android:layout_marginLeft="24dp"
-		                android:layout_marginTop="10dp"
-		                android:layout_marginRight="24dp"
-		                android:focusable="true"
-		                android:focusableInTouchMode="true">
-			<ImageView android:id="@+id/verify_account_phone_icon"
-			           android:layout_width="wrap_content"
-			           android:layout_height="wrap_content"
-			           android:layout_alignParentLeft="true"
-			           android:layout_marginTop="20dp"
-			           android:src="@drawable/ic_verify_phone"
-			/>
-			<TextView android:id="@+id/verify_account_phone_number_label"
-			          android:layout_width="match_parent"
-			          android:layout_height="wrap_content"
-			          android:layout_marginLeft="8dp"
-			          android:layout_toRightOf="@+id/verify_account_phone_icon"
-			          android:text="@string/verify_account_phone_number_placeholder"
-			          android:textColor="@color/accentColor"
-			          android:visibility="gone"
-			/>
-			<EditText android:id="@+id/verify_account_phone_number_input"
-			          android:layout_width="match_parent"
-			          android:layout_height="wrap_content"
-			          android:layout_marginLeft="8dp"
-			          android:layout_marginTop="22dp"
-			          android:layout_toRightOf="@+id/verify_account_phone_icon"
-			          android:background="@null"
-			          android:hint="@string/verify_account_phone_number_placeholder"
-			          android:inputType="phone"
-			          android:maxLength="20"
-			          android:maxLines="1"
-			          android:textColorHint="#8A000000"
-			          android:textSize="14sp"
-			/>
-			<ImageView android:id="@+id/verify_account_invalid_phone_number_icon" android:layout_width="wrap_content"
-			           android:layout_height="wrap_content"
-			           android:layout_alignParentRight="true"
-			           android:layout_marginTop="20dp"
-			           android:src="@drawable/ic_input_warning"
-			           android:tint="@color/red_600_red_300"
-			           android:visibility="gone"
-			/>
-			<View android:id="@+id/verify_account_divider2" android:layout_width="match_parent"
-			      android:layout_height="1dp"
-			      android:layout_alignParentBottom="true"
-			      android:background="#1F000000"
-			/>
-		</RelativeLayout>
-		<TextView android:id="@+id/verify_account_invalid_phone_number" android:layout_width="match_parent"
-		          android:layout_height="wrap_content"
-		          android:layout_marginLeft="26dp"
-		          android:layout_marginTop="10dp"
-		          android:layout_marginRight="26dp"
-		          android:layout_marginBottom="10dp"
-		          android:text="@string/verify_account_invalid_phone_number"
-		          android:textColor="#FFFF333A"
-		          android:visibility="gone"
-		/>
-		<RelativeLayout android:layout_width="match_parent"
-		                android:layout_height="wrap_content"
-		                android:layout_margin="24dp">
-			<Button
-				android:id="@+id/verify_account_next_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignParentRight="true"
-				android:layout_centerVertical="true"
-				android:layout_marginTop="10dp"
-				android:background="@drawable/background_accent_button"
-				android:minHeight="0dp"
-				android:paddingLeft="16dp"
-				android:paddingTop="10dp"
-				android:paddingRight="16dp"
-				android:paddingBottom="10dp"
-				android:layout_marginLeft="10dp"
-				android:text="@string/general_next"
-				android:textColor="@color/white"/>
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                android:textColor="@color/white_087_grey_087"/>
 
-			<TextView
-				android:id="@+id/verify_account_not_now_button"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_centerVertical="true"
-				android:layout_marginTop="10dp"
-				android:layout_toLeftOf="@+id/verify_account_next_button"
-				android:minHeight="0dp"
-				android:paddingLeft="16dp"
-				android:paddingTop="10dp"
-				android:paddingRight="16dp"
-				android:paddingBottom="10dp"
-				android:text="@string/verify_account_not_now_button"
-				android:textAllCaps="true"
-				android:textColor="@color/accentColor"
-				android:textStyle="bold"/>
-		</RelativeLayout>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/il_verify_phone_big" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/verify_account_helper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
+
+        <RelativeLayout
+            android:id="@+id/verify_account_country_selector"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp">
+
+            <ImageView
+                android:id="@+id/verify_account_country_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_country"
+                app:tint="?android:attr/textColorPrimary"/>
+
+            <TextView
+                android:id="@+id/verify_account_country_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toEndOf="@+id/verify_account_country_icon"
+                android:text="@string/sms_region_label"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/verify_account_selected_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="22dp"
+                android:layout_toEndOf="@+id/verify_account_country_icon"
+                android:text="@string/sms_region_label"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_g_arrow_next" />
+
+            <View
+                android:id="@+id/verify_account_divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/grey_012_white_012"
+                android:layout_alignParentBottom="true"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/verify_account_invalid_country_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="26dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="26dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/verify_account_invalid_country_code"
+            android:textColor="?attr/colorError"
+            android:visibility="gone"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="24dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+
+            <ImageView
+                android:id="@+id/verify_account_phone_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_verify_phone"
+                app:tint="?android:attr/textColorPrimary"/>
+
+            <TextView
+                android:id="@+id/verify_account_phone_number_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@+id/verify_account_phone_icon"
+                android:text="@string/verify_account_phone_number_placeholder"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/verify_account_phone_number_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="22dp"
+                android:layout_toEndOf="@+id/verify_account_phone_icon"
+                android:background="@null"
+                android:hint="@string/verify_account_phone_number_placeholder"
+                android:inputType="phone"
+                android:maxLength="20"
+                android:maxLines="1"
+                android:theme="@style/TextAppearance.Mega.Body2.Secondary"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textColorHint="?attr/textColorHint"/>
+
+            <ImageView
+                android:id="@+id/verify_account_invalid_phone_number_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_input_warning"
+                app:tint="@color/red_600_red_300"
+                android:visibility="gone" />
+
+            <View
+                android:id="@+id/verify_account_divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:background="@color/grey_012_white_012" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/verify_account_invalid_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="26dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="26dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/verify_account_invalid_phone_number"
+            android:textColor="?attr/colorError"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp">
+
+            <Button
+                android:id="@+id/verify_account_next_button"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                style="?attr/materialButtonStyle"
+                android:text="@string/general_next" />
+
+            <Button
+                android:id="@+id/verify_account_not_now_button"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="10dp"
+                android:layout_toStartOf="@+id/verify_account_next_button"
+                android:text="@string/verify_account_not_now_button"
+                style="?attr/borderlessButtonStyle"/>
+
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/sms_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="@string/sms_logout"
-            android:visibility="gone"
             android:layout_marginTop="60dp"
-            android:layout_marginBottom="20dp"/>
-	</LinearLayout>
+            android:layout_marginBottom="20dp"
+            android:visibility="gone" />
+    </LinearLayout>
 </ScrollView>

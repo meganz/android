@@ -392,7 +392,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:src="@drawable/ic_import_to_cloud_grey"
+                        android:src="@drawable/ic_import_to_cloud_white"
                         android:visibility="visible"
                         app:tint="?android:attr/textColorSecondary" />
 

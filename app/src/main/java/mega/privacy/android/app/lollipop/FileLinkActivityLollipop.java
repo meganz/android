@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +37,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.io.File;
@@ -48,6 +51,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -89,6 +93,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	MultipleRequestListenerLink importLinkMultipleListener = null;
 
 	CoordinatorLayout fragmentContainer;
+	AppBarLayout appBarLayout;
 	CollapsingToolbarLayout collapsingToolbar;
 	ImageView iconView;
 	ImageView imageView;
@@ -97,8 +102,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 	ScrollView scrollView;
 	TextView sizeTextView;
-	TextView importButton;
-	TextView downloadButton;
+	Button importButton;
+	Button downloadButton;
 	Button buttonPreviewContent;
 	LinearLayout optionsBar;
 	MegaNode document = null;
@@ -114,6 +119,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	public static final int FILE_LINK = 1;
 
 	private String mKey;
+
+	private MenuItem shareMenuItem;
+	private Drawable upArrow;
+	private Drawable drawableShare;
 
 	@Override
 	public void onDestroy(){
@@ -181,6 +190,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		setContentView(R.layout.activity_file_link);
 		fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_link_fragment_container);
 
+		appBarLayout = findViewById(R.id.app_bar);
 		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_link_info_collapse_toolbar);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -196,7 +206,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
 		/*Icon & image in Toolbar*/
 		iconViewLayout = (RelativeLayout) findViewById(R.id.file_link_icon_layout);
@@ -214,13 +223,11 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		buttonPreviewContent.setVisibility(View.GONE);
 
-		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
-		downloadButton.setText(getString(R.string.general_save_to_device).toUpperCase(Locale.getDefault()));
+		downloadButton = findViewById(R.id.file_link_button_download);
 		downloadButton.setOnClickListener(this);
 		downloadButton.setVisibility(View.INVISIBLE);
 
-		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setText(getString(R.string.add_to_cloud).toUpperCase(Locale.getDefault()));
+		importButton = findViewById(R.id.file_link_button_import);
 		importButton.setOnClickListener(this);
 		importButton.setVisibility(View.GONE);
 
@@ -246,12 +253,17 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		// Inflate the menu items for use in the action bar
 		getMenuInflater().inflate(R.menu.file_folder_link_action, menu);
 
-		collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.white));
-		collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
-//		collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
+		upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+		upArrow = upArrow.mutate();
+
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_social_share_white);
+		drawableShare = drawableShare.mutate();
+
+		shareMenuItem = menu.findItem(R.id.share_link);
+
+		trySetupCollapsingToolbar();
 
 		return super.onCreateOptionsMenu(menu);
-
 	}
 
 	@Override
@@ -270,6 +282,57 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			}
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void trySetupCollapsingToolbar() {
+		if (shareMenuItem == null || document == null) {
+			return;
+		}
+
+		if (preview != null) {
+			appBarLayout.addOnOffsetChangedListener((appBarLayout, offset) -> {
+				if (offset == 0) {
+					// Expanded
+					setColorFilterWhite();
+				} else {
+					if (offset < 0 && Math.abs(offset) >= appBarLayout.getTotalScrollRange() / 2) {
+						// Collapsed
+						setColorFilterBlack();
+					} else {
+						setColorFilterWhite();
+					}
+				}
+			});
+
+			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white_alpha_087));
+			collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
+		} else {
+			collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
+			setColorFilterBlack();
+		}
+	}
+
+	private void setColorFilterBlack () {
+		int color = getResources().getColor(R.color.grey_087_white_087);
+		upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
+	}
+
+	private void setColorFilterWhite () {
+		int color = getResources().getColor(R.color.white_alpha_087);
+		upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+		getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
+		if (shareMenuItem != null) {
+			drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+			shareMenuItem.setIcon(drawableShare);
+		}
 	}
 
 	public void askForDecryptionKeyDialog(){
@@ -455,6 +518,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 						}
 					}
 				}
+
+				trySetupCollapsingToolbar();
 
 				if (importClicked){
 					if ((document != null) && (target != null)){
