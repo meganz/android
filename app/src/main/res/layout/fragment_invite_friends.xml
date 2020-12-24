@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/my_account_complete_relative_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/grey_020_dark_grey">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grey_my_account_background"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/invite_contacts_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
             android:gravity="center_horizontal"
+            android:background="?android:attr/colorBackground"
+            android:layout_marginTop="6dp"
             android:orientation="vertical">
 
             <ImageView
@@ -33,11 +36,8 @@
                 android:layout_marginLeft="24dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginRight="24dp"
-                android:fontFamily="sans-serif"
-                android:gravity="center_horizontal"
-                android:lineSpacingMultiplier="1.2"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
+                tools:text="Get 10GB of storage"/>
 
             <Button
                 android:id="@+id/invite_contacts_button"
@@ -49,20 +49,18 @@
                 android:elevation="@dimen/elevation_upgrade_low"
                 android:minHeight="0dp"
                 android:paddingLeft="46dp"
-                android:paddingTop="10dp"
                 android:paddingRight="46dp"
-                android:paddingBottom="10dp"
                 android:stateListAnimator="@anim/button_upgrade_elevation"
                 android:text="@string/invite_contacts"
-                android:textColor="@color/white"
-                android:tint="@android:color/white" />
+                style="?attr/materialButtonStyle"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/how_it_works_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:background="@color/white"
+            android:background="?android:attr/colorBackground"
             android:orientation="vertical">
 
             <TextView

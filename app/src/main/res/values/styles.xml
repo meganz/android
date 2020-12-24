@@ -355,31 +355,6 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="how_it_works">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:text">@string/title_achievement_invite_friends</item>
-        <item name="android:layout_marginTop">24dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:lineSpacingMultiplier">1.31</item>
-        <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:textColor">@color/blue_unlocked_rewards</item>
-    </style>
-
-    <style name="how_works_first_p">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginBottom">16dp</item>
-        <item name="android:layout_marginLeft">24dp</item>
-        <item name="android:layout_marginRight">24dp</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:lineSpacingMultiplier">1.43</item>
-        <item name="android:textColor">@color/grey_achievements_invite_friends</item>
-    </style>
-
     <style name="alert_diaolog_btn">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -387,15 +362,6 @@
         <item name="android:textColor">@color/accentColor</item>
         <item name="android:background">@null</item>
         <item name="android:textAllCaps">true</item>
-    </style>
-
-    <style name="how_works_second_p" parent="how_works_first_p">
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:lineSpacingMultiplier">1.67</item>
-        <item name="android:textStyle">italic</item>
-        <item name="android:textColor">@color/grey_achievements_invite_friends_sub</item>
     </style>
 
     <style name="taken_down_icon">
@@ -712,14 +678,13 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <!--======= Legacy styles(may not be best practice, keep them just for quick development) ========= -->
+    <!--======= Legacy styles(may not be best practice, keep them just for quick development, some are slightly modified) ========= -->
 
     <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
 
     <style name="achievements_subtitle">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Variant</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_alignParentTop">true</item>
@@ -727,5 +692,31 @@
         <item name="android:layout_marginBottom">4dp</item>
         <item name="android:singleLine">false</item>
         <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="how_it_works">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/title_achievement_invite_friends</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Variant</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:textColor">@color/dark_blue_500_200</item>
+    </style>
+
+    <style name="how_works_first_p">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginLeft">24dp</item>
+        <item name="android:layout_marginRight">24dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Body2.Secondary.Variant</item>
+    </style>
+
+    <style name="how_works_second_p" parent="how_works_first_p">
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">24dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Caption.Italic</item>
     </style>
 </resources>

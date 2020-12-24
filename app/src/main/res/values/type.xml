@@ -298,6 +298,11 @@
         <item name="android:letterSpacing">0.035833333</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Italic">
+        <item name="android:textColor">@color/grey_038_white_038</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
     <!-- ======== Password strength hint text ============ -->
     <style name="TextAppearance.InputHint" parent="TextAppearance.Design.Error">
         <item name="android:textSize">12sp</item>

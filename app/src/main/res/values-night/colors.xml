@@ -145,4 +145,6 @@
     <!-- Background color of Achievements screen -->
     <color name="grey_020_dark_grey">@color/dark_grey</color>
 
+    <!--Info Achievements title background -->
+    <color name="white_transparent">@android:color/transparent</color>
 </resources>

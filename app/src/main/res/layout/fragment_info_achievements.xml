@@ -6,14 +6,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grey_my_account_background"
+        android:background="@color/grey_020_dark_grey"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
@@ -45,22 +45,20 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
                 android:layout_marginRight="24dp"
-                android:background="@color/white"
                 android:gravity="center_horizontal"
-                android:lineSpacingMultiplier="1.2"
                 android:paddingLeft="12dp"
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
                 android:paddingBottom="8dp"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/how_it_works_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:background="@color/white"
+            android:background="?android:attr/colorBackground"
             android:orientation="vertical">
 
             <TextView

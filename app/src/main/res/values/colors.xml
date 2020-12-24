@@ -486,4 +486,7 @@
 
     <!-- chat contact text message background -->
     <color name="grey_100_060_white_023">@color/grey_100_alpha_060</color>
+
+    <!--Info Achievements title background -->
+    <color name="white_transparent">@color/white</color>
 </resources>
