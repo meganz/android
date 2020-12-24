@@ -15175,9 +15175,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else if (option == COLOR_STATUS_BAR_ZERO) {
 				Util.resetStatusBarColor(this, this.getWindow());
 			}
-            else if (option == COLOR_STATUS_BAR_SMS_VERIFICATION) {
-                window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_sms_verification));
-            }
 			else if (option == COLOR_STATUS_BAR_SEARCH_DELAY){
 				handler.postDelayed(new Runnable() {
 					@Override

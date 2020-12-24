@@ -290,11 +290,6 @@
         <item name="android:layout">@layout/my_category_preference</item>
     </style>
 
-	<style name="SMSVerificationStyle" parent="Theme.AppCompat.Light.NoActionBar">
-		<item name="colorPrimaryDark">#3490B1</item>
-		<item name="android:windowNoTitle">true</item>
-	</style>
-
 	<style name="SMSVerificationReceiveTxtActivityTheme" parent="Theme.Megaactionbar">
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="colorPrimary">#FFF9F9F9</item>
