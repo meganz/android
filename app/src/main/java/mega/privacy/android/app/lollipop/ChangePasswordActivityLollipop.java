@@ -41,6 +41,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -151,7 +152,10 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		passwdAdvice = (TextView) findViewById(R.id.password_advice_text);
 
 		newPassword1Layout = findViewById(R.id.change_password_newPassword1_layout);
+		newPassword1Layout.setEndIconVisible(false);
 		newPassword1 = findViewById(R.id.change_password_newPassword1);
+		newPassword1.setOnFocusChangeListener((v1, hasFocus) ->
+				newPassword1Layout.setEndIconVisible(hasFocus));
 		newPassword1Error = findViewById(R.id.change_password_newPassword1_error_icon);
 		newPassword1Error.setVisibility(View.GONE);
 
@@ -186,10 +190,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		});
 
-		newPassword1.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(newPassword1Layout, hasFocus));
 
 		newPassword2Layout = findViewById(R.id.change_password_newPassword2_layout);
+		newPassword2Layout.setEndIconVisible(false);
 		newPassword2 = findViewById(R.id.change_password_newPassword2);
+		newPassword2.setOnFocusChangeListener((v1, hasFocus) ->
+				newPassword2Layout.setEndIconVisible(hasFocus));
 		newPassword2Error = findViewById(R.id.change_password_newPassword2_error_icon);
 		newPassword2Error.setVisibility(View.GONE);
 
@@ -210,8 +216,6 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			}
 		});
 
-		newPassword2.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(newPassword2Layout, hasFocus));
-
 		changePasswordButton = (Button) findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
 
@@ -219,7 +223,9 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
         String textToShowTOP = getString(R.string.top);
         try {
-            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>")
+            textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'"
+					+ ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary)
+					+ "\'>")
                     .replace("[/B]", "</font>")
                     .replace("[A]", "<u>")
                     .replace("[/A]", "</u>");

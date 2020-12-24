@@ -290,8 +290,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop"
-            android:label="@string/my_account_change_password"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/my_account_change_password">
         </activity>
 
         <activity
