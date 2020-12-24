@@ -1,6 +1,5 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -9,31 +8,14 @@
         android:id="@+id/folder_link_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:background="@color/white" >
+        android:fitsSystemWindows="true">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_folder_link"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="8dp"
-            app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            tools:context=".FolderLinkActivityLollipop" />
-
-        <TextView
-            android:id="@+id/content_text"
-            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/toolbar_folder_link"
-            android:background="@color/content_text_folder"
-            android:paddingBottom="3dp"
-            android:paddingLeft="8dp"
-            android:paddingTop="3dp"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:minHeight="?attr/actionBarSize"
+            android:elevation="8dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -58,8 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/folder_link_list_empty_image"
                     android:layout_centerHorizontal="true"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="18sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant10" />
             </RelativeLayout>
 
         </RelativeLayout>
@@ -69,41 +50,35 @@
             android:layout_width="fill_parent"
             android:layout_height="48dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/participants_layout"
-            android:gravity="right|center_vertical"
+            android:background="@color/grey_020_grey_700"
+            android:gravity="end|center_vertical"
             android:orientation="horizontal" >
 
-           <Button
-               android:id="@+id/folder_link_import_button"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:textColor="@color/accentColor"
-               android:gravity="center_vertical|center_horizontal"
-               android:stateListAnimator="@null"
-               android:minWidth="0dp"
-               android:layout_marginRight="16dp"
-               android:background="@color/participants_layout"
-               android:text="@string/add_to_cloud"/>
+            <Button
+                android:id="@+id/folder_link_import_button"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:gravity="center"
+                android:text="@string/add_to_cloud" />
 
             <Button
                 android:id="@+id/folder_link_button_download"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/accentColor"
-                android:gravity="center_vertical|center_horizontal"
-                android:stateListAnimator="@null"
-                android:minWidth="0dp"
-                android:layout_marginRight="16dp"
-                android:background="@color/participants_layout"
+                style="?attr/borderlessButtonStyle"
+                android:gravity="center"
+                android:layout_marginEnd="16dp"
                 android:text="@string/general_save_to_device"/>
         </LinearLayout>
 
         <View
             android:id="@+id/separator_3"
             android:layout_width="fill_parent"
-            android:layout_height="1dip"
+            android:layout_height="1dp"
             android:layout_above="@id/options_folder_link_layout"
-            android:background="@color/tour_bar_grey" />
+            android:background="@color/grey_012_white_012" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/folder_link_list_view_browser"
@@ -112,7 +87,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="65dp"
             android:layout_above="@id/separator_3"
-            android:layout_below="@id/content_text"
+            android:layout_below="@id/toolbar_folder_link"
             android:choiceMode="multipleChoice"
             android:clipToPadding="false"/>
 
@@ -129,15 +104,15 @@
         android:id="@+id/folder_link_file_link_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
         android:fitsSystemWindows="true"
         android:visibility="gone">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_folder_link_file_link"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:elevation="8dp" />
 
         <LinearLayout
             android:id="@+id/options_folder_link_file_link_layout"
@@ -147,33 +122,31 @@
             android:gravity="right"
             android:orientation="horizontal" >
 
-            <TextView
+            <Button
                 android:id="@+id/folder_link_file_link_button_import"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp"
-                android:gravity="center_vertical"
-                android:visibility="invisible"/>
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:gravity="center"
+                android:text="@string/add_to_cloud" />
 
-            <TextView
+            <Button
                 android:id="@+id/folder_link_file_link_button_download"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp"
-                android:gravity="center_vertical"
-                android:visibility="invisible"/>
+                android:layout_height="wrap_content"
+                style="?attr/borderlessButtonStyle"
+                android:gravity="center"
+                android:layout_marginEnd="16dp"
+                android:text="@string/general_save_to_device"/>
         </LinearLayout>
 
         <View
             android:id="@+id/folder_link_separator_3"
             android:layout_width="fill_parent"
-            android:layout_height="1dip"
+            android:layout_height="1dp"
             android:layout_above="@id/options_folder_link_file_link_layout"
-            android:background="@color/separator_grey" />
+            android:background="@color/grey_012_white_012" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -202,17 +175,16 @@
                     <TextView
                         android:id="@+id/folder_link_file_link_name"
                         android:layout_below="@id/folder_link_file_link_icon"
-                        android:textColor="@color/black"
-                        android:fontFamily="sans-serif-medium"
+                        android:textAppearance="?attr/textAppearanceSubtitle1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                     <View
                         android:id="@+id/folder_link_separator_1"
                         android:layout_width="fill_parent"
-                        android:layout_height="1dip"
+                        android:layout_height="1dp"
                         android:layout_below="@id/folder_link_file_link_name"
-                        android:background="@color/separator_grey"/>
+                        android:background="@color/grey_012_white_012"/>
 
                     <!-- SIZE LAYOUT -->
 
@@ -230,11 +202,11 @@
 
                             <ImageView
                                 android:id="@+id/folder_link_file_link_size_image"
-                                style="@style/dialogActionButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@drawable/info_ic"
-                                android:layout_centerVertical="true"/>
+                                android:layout_centerVertical="true"
+                                app:tint="?android:attr/textColorSecondary" />
 
                         </RelativeLayout>
 
@@ -248,15 +220,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/file_properties_info_size_file"
-                                android:textColor="@color/black"
-                                android:textStyle="bold" />
+                                android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                             <TextView
                                 android:id="@+id/folder_link_file_link_size"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/folder_link_file_link_info_menu_size"
-                                android:textColor="@color/grey_info_menu" />
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
                         </RelativeLayout>
                     </LinearLayout>
 
@@ -264,8 +235,8 @@
                         android:id="@+id/folder_link_separator_2"
                         android:layout_width="fill_parent"
                         android:layout_below="@id/folder_link_file_link_size_layout"
-                        android:layout_height="1dip"
-                        android:background="@color/separator_grey"/>
+                        android:layout_height="1dp"
+                        android:background="@color/grey_012_white_012"/>
 
                 </RelativeLayout>
             </ScrollView>

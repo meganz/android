@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/folder_link_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -44,31 +44,28 @@
                 android:singleLine="true"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
 
             <TextView
                 android:id="@+id/folder_link_info_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/folder_link_name_text"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
                 android:singleLine="true"
-                android:maxLines="1"
-                android:ellipsize="middle"/>
+                android:ellipsize="middle" />
 
         </RelativeLayout>
 
 
     </LinearLayout>
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -94,12 +91,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_b_save_to_device"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"  />
 
                 <TextView
                     android:id="@+id/option_download_text"
@@ -109,8 +106,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -128,8 +124,9 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_import_to_cloud_grey"
-                    android:visibility="visible" />
+                    android:src="@drawable/ic_import_to_cloud_white"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_import_text"
@@ -139,8 +136,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

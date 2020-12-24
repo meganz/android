@@ -144,7 +144,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_import_to_cloud_grey"
+                    android:src="@drawable/ic_import_to_cloud_white"
                     android:visibility="visible" />
 
                 <TextView
