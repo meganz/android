@@ -29,6 +29,7 @@ import java.io.File;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -94,8 +95,6 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
         logout = getIntent().getBooleanExtra("logout", false);
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         passwordReminderLayout = findViewById(R.id.password_reminder_layout);
         passwordReminderCloseButton = findViewById(R.id.password_reminder_close_image_button);
         passwordReminderCloseButton.setOnClickListener(this);
@@ -138,7 +137,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             passwordReminderCloseButton.setVisibility(View.GONE);
             dialogTest.setText(R.string.remember_pwd_dialog_text);
             passwordReminderDismissButton.setText(R.string.general_dismiss);
-            passwordReminderDismissButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            passwordReminderDismissButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
             testPasswordDismissButton.setVisibility(View.VISIBLE);
             proceedToLogout.setVisibility(View.GONE);
         }
@@ -174,7 +173,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             }
         });
 
-        passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
+        passwordLayout.setEndIconVisible(false);
+        passwordText.setOnFocusChangeListener((v1, hasFocus) ->
+                passwordLayout.setEndIconVisible(hasFocus));
 
         if (testingPassword) {
             setTestPasswordLayout();

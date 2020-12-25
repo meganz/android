@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/recovery_key_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <!-- Title -->
@@ -23,8 +23,7 @@
             android:layout_marginLeft="18dp"
             android:layout_marginTop="8dp"
             android:text="@string/recovery_key_bottom_sheet"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp"/>
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant3"/>
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -51,12 +50,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_print"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/recovery_key_print_text"
@@ -66,15 +65,14 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_option_print"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/recovery_key_copytoclipboard_layout"
@@ -88,12 +86,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginLeft="5dp"
                     android:paddingLeft="-2dp"
                     android:paddingRight="-2dp"
                     android:visibility="visible"
-                    android:src="@drawable/ic_b_clipboard"/>
+                    android:src="@drawable/ic_b_clipboard"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/recovery_key_copytoclipboard_text"
@@ -103,8 +101,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/option_copy_to_clipboard"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -123,7 +120,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_pick_file_system"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/recovery_key_saveTo_fileSystem_text"
@@ -133,8 +131,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/option_save_on_filesystem"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
         </LinearLayout>

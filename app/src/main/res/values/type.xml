@@ -37,11 +37,6 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
-    <!-- Mainly for login/create account screen titles -->
-    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps">
-        <item name="android:textAllCaps">true</item>
-    </style>
-
     <style name="TextAppearance.Mega.Subtitle1.Red">
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
@@ -79,10 +74,20 @@
         <item name="android:letterSpacing">-0.00875</item>
     </style>
 
+    <!-- 0.5px -->
+    <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant3">
+        <item name="android:letterSpacing">0.03125</item>
+    </style>
+
     <!-- Medium, normal, 16sp, 0.15px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Mainly for login/create account screen titles -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.AllCaps">
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <!-- Medium, normal, 16sp, 0px, textColorPrimary -->

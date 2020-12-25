@@ -64,7 +64,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="2dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="?attr/colorError" />
+                        app:tint="?attr/colorError" />
 
                 </RelativeLayout>
 
@@ -100,7 +100,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="2dp"
                         android:src="@drawable/ic_input_warning"
-                        android:tint="?attr/colorError" />
+                        app:tint="?attr/colorError" />
 
                 </RelativeLayout>
 

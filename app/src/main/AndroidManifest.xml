@@ -266,8 +266,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.TestPasswordActivity"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
