@@ -11,9 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,8 +21,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -292,14 +288,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setTitle(getString(R.string.zip_browser_activity));
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-		}
 		zipLayout = (RelativeLayout) findViewById(R.id.zip_layout);
 		recyclerView = (RecyclerView) findViewById(R.id.zip_list_view_browser);
 		recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
