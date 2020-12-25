@@ -17,8 +17,7 @@
             android:layout_marginTop="60dp"
             android:layout_marginBottom="58dp"
             android:layout_marginRight="60dp"
-            android:layout_marginLeft="60dp"
-            android:layout_above="@+id/qr_code_link">
+            android:layout_marginLeft="60dp">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -32,26 +31,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/qr_code_link"
-            android:textColor="@color/black"
             android:layout_gravity="center"
-            android:layout_above="@+id/qr_code_button_copy_link"
             android:layout_marginBottom="15dp"
-            android:textSize="16sp"/>
+            android:textAppearance="?attr/textAppearanceSubtitle1" />
 
         <Button
+            android:id="@+id/qr_code_button_copy_link"
+            style="?attr/materialButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/qr_code_button_copy_link"
             android:layout_gravity="center"
-            android:elevation="6dp"
-            android:background="@drawable/background_button_white"
             android:layout_marginBottom="40dp"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"
             android:paddingLeft="16dp"
+            android:paddingTop="8dp"
             android:paddingRight="16dp"
-            android:textSize="14sp"
-            android:text="@string/button_copy_link"/>
+            android:paddingBottom="8dp"
+            android:text="@string/button_copy_link" />
 
     </LinearLayout>
 

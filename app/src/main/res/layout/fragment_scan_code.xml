@@ -19,14 +19,13 @@
         app:frameAspectRatioHeight="1"
         app:frameSize="0.75"
         app:frameThickness="2dp"
-        app:maskColor="#77000000">
+        app:maskColor="@color/grey_alpha_045">
     </com.budiyev.android.codescanner.CodeScannerView>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@color/white"
+        android:textAppearance="@style/TextAppearance.Mega.Body1.Variant"
         android:layout_marginTop="2dp"
         android:layout_marginRight="73dp"
         android:layout_marginLeft="73dp"
