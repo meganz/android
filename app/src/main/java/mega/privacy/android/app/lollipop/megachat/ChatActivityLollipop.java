@@ -67,6 +67,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
@@ -283,12 +284,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private long numberToLoad;
     private ArrayList<Integer> recoveredSelectedPositions = null;
 
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
+    private AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
     private AlertDialog errorReactionsDialog;
     private boolean errorReactionsDialogIsShown;
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
-    private android.app.AlertDialog dialogCall;
+    private AlertDialog dialogCall;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -1519,7 +1520,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         logError("Error openChatRoom");
         if (errorOpenChatDialog == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
             builder.setTitle(getString(R.string.chat_error_open_title))
                     .setMessage(getString(R.string.chat_error_open_message))
                     .setPositiveButton(getString(R.string.general_ok), (dialog, whichButton) -> finish());
@@ -3539,7 +3540,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         final Button endJoinButton = dialoglayout.findViewById(R.id.end_join_button);
         final Button cancelButton = dialoglayout.findViewById(R.id.cancel_button);
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setView(dialoglayout);
         dialogCall = builder.create();
         isJoinCallDialogShown = true;
@@ -3607,13 +3608,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message= getResources().getString(R.string.confirmation_clear_group_chat);
         builder.setTitle(R.string.title_confirmation_clear_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
@@ -3642,13 +3637,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message= getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
@@ -3896,7 +3885,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     void showSendLocationDialog () {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(R.string.title_activity_maps)
                 .setMessage(R.string.explanation_send_location)
                 .setPositiveButton(getString(R.string.button_continue),
@@ -4670,13 +4659,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         if(messages.size()==1){
             builder.setMessage(R.string.confirmation_delete_one_message);
@@ -4705,13 +4688,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         builder.setMessage(R.string.confirmation_delete_one_message);
         builder.setPositiveButton(R.string.context_remove, dialogClickListener)
@@ -8151,13 +8128,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         final long sizeC = size;
         final ChatController chatC = new ChatController(this);
 
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -8657,7 +8628,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void showOverquotaAlert(boolean prewarning){
         logDebug("prewarning: " + prewarning);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setTitle(getString(R.string.overquota_alert_title));
 
         if(prewarning){
@@ -9192,7 +9163,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         try {
             builder.setMessage(R.string.confirmation_to_reconnect).setPositiveButton(R.string.general_ok, dialogClickListener)
                     .setNegativeButton(R.string.general_cancel, dialogClickListener).show().setCanceledOnTouchOutside(false);
@@ -9543,7 +9514,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * @param typeError Type of Error.
      */
     public void createLimitReactionsAlertDialog(long typeError) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         dialogBuilder.setMessage(typeError == REACTION_ERROR_TYPE_USER
                 ? getString(R.string.limit_reaction_per_user, MAX_REACTIONS_PER_USER)
                 : getString(R.string.limit_reaction_per_message, MAX_REACTIONS_PER_MESSAGE))

@@ -18,6 +18,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,7 +27,6 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -842,7 +843,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         protected void onPostExecute(final Integer type) {
             logDebug("onPostExecute QueryIfContactSouldBeAddedTask");
             if (showDialog) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(addContactActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(addContactActivityLollipop, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
                 builder.setCancelable(false);
 
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -2807,7 +2808,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
     private void showConfirmationDeleteFromChat (final MegaContactAdapter contact) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -3270,7 +3271,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 
         if((getChatLinkBox.isChecked() || createNewChatLink) && (chatTitle == null || chatTitle.trim().isEmpty())){
-            new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal)
+            new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setTitle(getString(R.string.enter_group_name))
                     .setMessage(getString(R.string.alert_enter_group_name))
                     .setPositiveButton(getString(R.string.general_ok), null)

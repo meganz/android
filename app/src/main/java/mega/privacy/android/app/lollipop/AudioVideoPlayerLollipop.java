@@ -2608,9 +2608,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     /**
-     * Create an AlertDialog.Builder with a "Do not show again" CheckBox.
+     * Create an MaterialAlertDialogBuilder with a "Do not show again" CheckBox.
      *
-     * @return the first is AlertDialog.Builder, the second is CheckBox
+     * @return the first is MaterialAlertDialogBuilder, the second is CheckBox
      */
     private Pair<MaterialAlertDialogBuilder, CheckBox> confirmationDialog() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
