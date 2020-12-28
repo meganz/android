@@ -38,6 +38,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -63,6 +65,7 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -3370,6 +3373,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
 			askForSMSVerification();
 		}
+
+		showCookieDialog();
 	}
 
 	/**
@@ -3572,6 +3577,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			hideFabButton();
 			showHideBottomNavigationView(true);
 		}
+	}
+
+	private void showCookieDialog() {
+		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+				.setView(R.layout.dialog_cookie)
+				.setPositiveButton(R.string.dialog_cookie_accept, null)
+				.setNegativeButton(R.string.dialog_cookie_settings, null)
+				.create();
+
+		dialog.show();
+
+		((TextView) dialog.findViewById(R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
 	public void destroySMSVerificationFragment() {
