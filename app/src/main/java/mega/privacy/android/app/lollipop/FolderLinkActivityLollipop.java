@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,7 +21,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.StatFs;
-import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -34,7 +32,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -45,22 +42,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
@@ -1025,7 +1023,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					else{
 						try{
 							logWarning("API_EARGS - show alert dialog");
-							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 							builder.setMessage(getString(R.string.link_broken));
 							builder.setTitle(getString(R.string.general_error_word));
 							builder.setCancelable(false);
@@ -1061,7 +1059,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				else{
 					try{
 						logWarning("No link - show alert dialog");
-						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+						MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 
@@ -1141,7 +1139,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					if(request.getFlag()){
 						logWarning("Login into a folder with invalid decryption key");
 						try{
-							AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+							MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 							builder.setMessage(getString(R.string.general_error_invalid_decryption_key));
 							builder.setTitle(getString(R.string.general_error_word));
 
@@ -1280,8 +1278,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					}
 				}
 				else{
-					try{ 
-						AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					try{
+						MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 			            builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 						
@@ -1313,7 +1311,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			else{
 				logWarning("Error: " + e.getErrorCode() + " " + e.getErrorString());
 				try{
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 					if(e.getErrorCode() == MegaError.API_EBLOCKED){
 						builder.setMessage(getString(R.string.folder_link_unavaible_ToS_violation));

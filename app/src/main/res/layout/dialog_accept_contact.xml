@@ -20,8 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
             rounded:corner_radius="30dp"/>
 
         <TextView
@@ -44,23 +42,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="34dp"
-        android:textSize="16sp"
-        android:textColor="?android:attr/textColorSecondary"/>
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
     <Button
         android:id="@+id/accept_contact_invite"
+        style="?attr/materialButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_accent_button"
-        android:textColor="@color/white"
-        android:text="@string/contact_invite"/>
+        android:text="@string/contact_invite" />
 
     <Button
         android:id="@+id/view_contact"
+        style="?attr/materialButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_accent_button"
-        android:textColor="@color/white"
-        android:text="@string/contact_view"/>
+        android:text="@string/contact_view" />
 
 </LinearLayout>

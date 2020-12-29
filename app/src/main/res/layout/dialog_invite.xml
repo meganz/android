@@ -12,16 +12,14 @@
         android:id="@+id/dialog_invite_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="@color/black"
+        android:textAppearance="@style/TextAppearance.Mega.Headline6"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:id="@+id/dialog_invite_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@color/grey_info_menu"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
         android:layout_marginBottom="28dp"/>
 
     <Button
@@ -29,12 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="36dp"
         android:layout_marginLeft="-10dp"
-        android:textAlignment="center"
-        android:background="@android:color/transparent"
-        android:elevation="0dp"
-        android:textColor="@color/accentColor"
-        android:text="@string/general_ok"
-        android:textSize="14sp"/>
+        style="?attr/borderlessButtonStyle"
+        android:text="@string/general_ok"/>
 
 
 </LinearLayout>

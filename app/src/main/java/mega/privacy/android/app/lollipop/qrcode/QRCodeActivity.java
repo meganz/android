@@ -9,11 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
 import com.google.android.material.tabs.TabLayout;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +48,6 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
 
@@ -70,7 +70,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
 
     private QRCodePageAdapter qrCodePageAdapter;
 
-    private DrawerLayout drawerLayout;
+    private LinearLayout rootLevelLayout;
 
     private int qrCodeFragment;
 
@@ -120,7 +120,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         aB.setDisplayHomeAsUpEnabled(true);
         tB.setTitle(getString(R.string.section_qr_code).toUpperCase());
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        rootLevelLayout = findViewById(R.id.root_level_layout);
 
         qrCodePageAdapter =new QRCodePageAdapter(getSupportFragmentManager(),this);
 
@@ -132,8 +132,6 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         }else {
             initActivity();
         }
-
-        changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
     }
 
     @Override
@@ -299,7 +297,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 String myEmail = megaApi.getMyEmail();
                 qrFile = buildQrFile(this,myEmail + QR_IMAGE_FILE_NAME);
                 if (qrFile == null) {
-                    showSnackbar(drawerLayout, getString(R.string.general_error));
+                    showSnackbar(rootLevelLayout, getString(R.string.general_error));
                 }
                 else {
                     if (qrFile.exists()) {
@@ -318,12 +316,12 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                         }
 
                         if (availableFreeSpace < qrFile.length()) {
-                            showSnackbar(drawerLayout, getString(R.string.error_not_enough_free_space));
+                            showSnackbar(rootLevelLayout, getString(R.string.error_not_enough_free_space));
                             return;
                         }
                         File newQrFile = new File(parentPath, myEmail + QR_IMAGE_FILE_NAME);
                         if (newQrFile == null) {
-                            showSnackbar(drawerLayout, getString(R.string.general_error));
+                            showSnackbar(rootLevelLayout, getString(R.string.general_error));
                         }
                         else {
                             try {
@@ -333,15 +331,15 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                                 dst.transferFrom(src, 0, src.size());       // copy the first file to second.....
                                 src.close();
                                 dst.close();
-                                showSnackbar(drawerLayout, getString(R.string.success_download_qr, parentPath));
+                                showSnackbar(rootLevelLayout, getString(R.string.success_download_qr, parentPath));
                             } catch (IOException e) {
-                                showSnackbar(drawerLayout, getString(R.string.general_error));
+                                showSnackbar(rootLevelLayout, getString(R.string.general_error));
                                 e.printStackTrace();
                             }
                         }
                     }
                     else {
-                        showSnackbar(drawerLayout, getString(R.string.error_download_qr));
+                        showSnackbar(rootLevelLayout, getString(R.string.error_download_qr));
                     }
                 }
             }
@@ -373,7 +371,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 startActivity(Intent.createChooser(share, getString(R.string.context_share)));
             }
             else {
-                showSnackbar(drawerLayout, getString(R.string.error_share_qr));
+                showSnackbar(rootLevelLayout, getString(R.string.error_share_qr));
             }
         }
     }
@@ -405,16 +403,16 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     public void resetSuccessfully (boolean success) {
         logDebug("resetSuccessfully");
         if (success){
-            showSnackbar(drawerLayout, getString(R.string.qrcode_reset_successfully));
+            showSnackbar(rootLevelLayout, getString(R.string.qrcode_reset_successfully));
         }
         else {
-            showSnackbar(drawerLayout, getString(R.string.qrcode_reset_not_successfully));
+            showSnackbar(rootLevelLayout, getString(R.string.qrcode_reset_not_successfully));
         }
     }
 
     public void showSnackbar(View view, String s){
         if (view == null) {
-            showSnackbar(SNACKBAR_TYPE, drawerLayout, s);
+            showSnackbar(SNACKBAR_TYPE, rootLevelLayout, s);
         }
         else {
             showSnackbar(SNACKBAR_TYPE, view, s);

@@ -261,7 +261,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         int w = bitMatrix.getWidth();
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
-        int color = ContextCompat.getColor(context, R.color.lollipop_primary_color);
+        int color = ContextCompat.getColor(context, R.color.red_600_red_300);
 
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);

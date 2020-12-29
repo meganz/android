@@ -145,10 +145,6 @@ public class ZipListAdapterLollipop  extends RecyclerView.Adapter<ZipListAdapter
 				holder.imageView.setImageResource(MimeTypeList.typeForName(zipNode.getName()).getIconResourceId());
 			}
 		}
-
-		if (positionClicked == -1){
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-		}
 	}
 
 	@Override public long getItemId(int position) {

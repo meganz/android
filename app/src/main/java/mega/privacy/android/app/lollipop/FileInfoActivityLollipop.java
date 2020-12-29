@@ -429,7 +429,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 case R.id.action_file_contact_list_permissions:{
 
                     //Change permissions
-                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
+                    MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(fileInfoActivityLollipop, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
                     dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 
                     final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -1934,9 +1934,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    }
 		};
 
-		if (moveToRubbish){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			int stringMessageID;
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        if (moveToRubbish){
+            int stringMessageID;
             if (getPrimaryFolderHandle() == handle) {
                 stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
             } else if (getSecondaryFolderHandle() == handle) {
@@ -1949,8 +1949,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
 		else{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-			String message= getResources().getString(R.string.confirmation_delete_from_mega);
+            String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
@@ -2078,7 +2077,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(node.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -2481,7 +2480,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
 
             if (node.isFolder()){
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileInfoActivityLollipop, R.style.AppCompatAlertDialogStyleAddContacts);
+                MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(fileInfoActivityLollipop, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
                 dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -2941,7 +2940,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2988,7 +2987,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         final long [] hashesC = hashes;
         final long sizeC=size;
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3076,7 +3075,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     public void changePermissions(){
         logDebug("changePermissions");
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
@@ -3095,7 +3094,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     }
 
     public void showConfirmationRemoveContactFromShare(final String email) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         String message = getResources().getString(R.string.remove_contact_shared_folder, email);
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeShare(email))
@@ -3141,7 +3140,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     }
 
     public void showConfirmationRemoveMultipleContactFromShare (final ArrayList<MegaShare> contacts){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         String message= getResources().getString(R.string.remove_multiple_contacts_shared_folder,contacts.size());
         builder.setMessage(message)
                 .setPositiveButton(R.string.general_remove, (dialog, which) -> removeMultipleShares(contacts))
