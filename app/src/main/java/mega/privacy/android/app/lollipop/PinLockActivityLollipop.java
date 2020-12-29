@@ -323,7 +323,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	}
 
 	private void changeStatusbarColorToRed() {
-	    getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.red_900_red_400));
+	    getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.red_900_400_080));
     }
 
 	private void addAlphanumericPin(){
