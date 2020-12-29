@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUserAlert;
@@ -142,7 +144,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -154,9 +156,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.notification_new_contact_request), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -201,7 +207,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -213,9 +219,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_contact_request_notification_cancelled), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -260,7 +270,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -272,9 +282,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.notification_new_contact), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -319,7 +333,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -331,9 +345,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_account_notification_deleted), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -378,7 +396,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -390,12 +408,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.notification_reminder_contact_request), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
-					textToShow = textToShow.replace("[C]", "<font color=\'#686868\'>");
-					textToShow = textToShow.replace("[/C]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -438,7 +458,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -451,9 +471,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_deleted), getNicknameForNotificationsSection(context, email));
 
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -498,7 +522,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -510,9 +534,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_contact_notification_blocked), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -557,7 +585,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -569,9 +597,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_accepted), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -615,7 +647,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -627,9 +659,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_outgoing_contact_request_denied), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -673,7 +709,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -685,9 +721,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_ignored), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -731,7 +771,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -743,9 +783,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_accepted), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -789,7 +833,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.section_contacts).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.green_notif_contacts));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.jade_600));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
@@ -801,9 +845,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 				String textToShow = String.format(context.getString(R.string.subtitle_incoming_contact_request_denied), getNicknameForNotificationsSection(context, email));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -847,7 +895,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
@@ -860,9 +908,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = String.format(context.getString(R.string.notification_new_shared_folder), getNicknameForNotificationsSection(context, email));
 
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -908,7 +960,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
@@ -938,9 +990,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 					textToShow = String.format(context.getString(R.string.notification_deleted_shared_folder), getNicknameForNotificationsSection(context, email));
 				}
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -982,7 +1038,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
@@ -1011,9 +1067,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -1060,7 +1120,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.itemLayout.setVisibility(View.VISIBLE);
 
 				section = context.getString(R.string.title_incoming_shares_explorer).toUpperCase();
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.yellow_notif_shares));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 				holder.sectionIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_y_arrow_in));
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
@@ -1074,9 +1134,13 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				String textToShow = context.getResources().getQuantityString(R.plurals.subtitle_notification_deleted_items, itemCount, getNicknameForNotificationsSection(context, email), itemCount);
 
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
@@ -1266,12 +1330,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
 					textToShow = textToShow.replace("[/B]", "</font>");
-					textToShow = textToShow.replace("[C]", "<font color=\'#686868\'>");
-					textToShow = textToShow.replace("[/C]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -1336,12 +1402,14 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				}
 
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#686868\'>");
-                    textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#060000\'>");
-                    textToShow = textToShow.replace("[/B]", "</font>");
-                    textToShow = textToShow.replace("[C]", "<font color=\'#686868\'>");
-                    textToShow = textToShow.replace("[/C]", "</font>");
+					textToShow = textToShow.replace("[A]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+							+ "\'>");
+					textToShow = textToShow.replace("[/A]", "</font>");
+					textToShow = textToShow.replace("[B]", "<font color=\'"
+							+ ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+							+ "\'>");
+					textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}
                 Spanned result = null;
@@ -1398,7 +1466,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 
 		if(alert.getSeen()==false){
 			holder.newText.setVisibility(View.VISIBLE);
-			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
+			holder.itemLayout.setBackgroundColor(ColorUtils.getThemeColor(context, android.R.attr.colorBackground));
 
 			if(position<(notifications.size()-1)){
 				MegaUserAlert nextAlert = (MegaUserAlert) getItem(position+1);
@@ -1422,7 +1490,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		}
 		else{
 			holder.newText.setVisibility(View.GONE);
-			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.color_background_new_messages));
+			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_020_grey_700));
 
 			LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
 			textParams.setMargins(scaleWidthPx(16, outMetrics), 0, scaleWidthPx(16, outMetrics), 0);

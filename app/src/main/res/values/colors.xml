@@ -174,7 +174,6 @@
     <color name="accent_color_30_opacity">#4D00BFA5</color>
 
     <color name="yellow_notif_shares">#FFFFA500</color>
-    <color name="green_notif_contacts">#FF00897B</color>
 
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
@@ -312,6 +311,8 @@
 
     <color name="green_400">#56C13E</color>
     <color name="green_500">#31B500</color>
+
+    <color name="jade_600">#00897B</color>
 
     <color name="salmon_300">#F37476</color>
     <color name="salmon_700">#E42930</color>
@@ -492,4 +493,7 @@
 
     <!--Info Achievements title background -->
     <color name="white_transparent">@color/white</color>
+
+    <!-- Same to colorSecondary -->
+    <color name="teal_300_teal_200">@color/teal_300</color>
 </resources>

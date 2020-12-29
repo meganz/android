@@ -32,6 +32,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -180,9 +181,13 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
 
                 String textToShow = String.format(getString(R.string.context_empty_notifications));
                 try{
-                    textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+                    textToShow = textToShow.replace("[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.black_white)
+                            + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
-                    textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+                    textToShow = textToShow.replace("[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+                            + "\'>");
                     textToShow = textToShow.replace("[/B]", "</font>");
                 }
                 catch (Exception e){}

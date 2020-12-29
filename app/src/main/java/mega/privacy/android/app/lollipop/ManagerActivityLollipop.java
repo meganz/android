@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -15295,9 +15296,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						+ "\'>");
 			}
 			else {
-				textToShow = textToShow.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(this, R.color.red_600_alpha_038)
-						+ "\'>");
+				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");
 			}
 			textToShow = textToShow.replace("[/A]", "</font>");
 		}
