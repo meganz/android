@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -59,8 +60,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         contentView = binding.root
-        mainLinearLayout = binding.root
-        items_layout = binding.root
+        mainLinearLayout = binding.root.linear_layout
+        items_layout = binding.root.linear_layout
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
     }

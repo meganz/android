@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Deel afbeelding door middel van</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Deel koppeling</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">Link verwijderen</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Haal Link op</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">Deel contact met gesprek</string>
     <string name="context_view_shared_folders" context="open a shared folder">Bekijk gedeelde mappen</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Delen</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">Deling beheren</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -598,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Kan geselecteerd bestand niet openen</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Bestand uitpakken</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">Probleem met het bestandssysteem</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">Bestandssysteem probleem</string>
     <string name="general_error" context="error message while browsing the local filesystem">Fout opgetreden bij uitvoeren van actie</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">Afbeelding weergave</string>
@@ -704,10 +704,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads voltooid</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">Kenmerken</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Opslag</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">PIN Slot</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Toegangscode Slot</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compressie verbruikt veel stroom; MEGA vereist dat u uw apparaat actief oplaadt als de te comprimeren video\'s groter zijn dan %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">Indien ingeschakeld, uploadt u informatie over waar uw foto\'s zijn gemaakt, dus wees voorzichtig wanneer u ze deelt.</string>
 
@@ -800,21 +800,21 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto\'s en video\'s</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Niet ingesteld</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">PIN Slot</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Toegangscode Slot</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">Wijzig Toegangscode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">Uw lokale bestanden worden verwijderd en u wordt uitgelogd na 10 mislukte pogingen</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Foutieve code</string>
     <plurals name="pin_lock_incorrect_alert">
-        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Verkeerde PIN, probeer nogmaals. U heeft 1 poging over</item>
-        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Foute PIN code, probeer nogmaals. U heeft %2d pogingen te gaan</item>
+        <item context="Error message when not typing the Passcode correctly and only have 1 attempt left." quantity="one">Foute Toegangscode, probeer nogmaals. U heeft 1 poging over</item>
+        <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Foute Toegangscode, probeer nogmaals. U heeft %2d pogingen over</item>
     </plurals>
-    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Pincodes komen niet overeen</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Voer uw pincode in</string>
-    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Voer uw pincode opnieuw in</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Voer uw nieuwe pincode in</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Voer uw nieuwe pincode opnieuw in</string>
+    <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Toegangscodes komen niet overeen</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Voer uw Toegangscode in</string>
+    <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Voer uw Toegangscode opnieuw in</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Voer uw nieuwe Toegangscode in</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Voer uw Toegangscode opnieuw in</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All uw lokale gegevens worden verwijderd en u wordt uitgelogd over %1d seconden</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">Over</string>
@@ -914,10 +914,10 @@
     <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.nz to upgrade your account</string>
     -->
 
-    <string name="pin_lock_type" context="Title to choose the type of Passcode">Soort PIN-Code</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4 cijferige PIN</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6 cijferige PIN</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Alfanumerieke PIN</string>
+    <string name="pin_lock_type" context="Title to choose the type of Passcode">Toegangscode Type</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 cijferige Toegangscode</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 cijferige Toegangscode</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alfanumerieke toegangscode</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs zijn niet ingeschakeld</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs zijn nu uitgeschakeld</string>
@@ -1216,8 +1216,8 @@
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
     -->
 
-    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">De gespreksgeschiedenis van de chat is gewist</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Fout. De geschiedenis van de chat was niet correct gewist</string>
+    <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Gespreksgeschiedenis is gewist</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Een fout heeft opgetreden. De gespreksgeschiedenis is niet volledig gewist.</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Deelnemers toevoegen</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Deelnemer verwijderen</string>
@@ -2319,7 +2319,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Beheer Gesprek Koppeling</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Gecodeerde Sleutel Rotatie Inschakelen</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">Gecodeerde Sleutel Rotatie ingeschakeld</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek creëren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">Sleutel rotatie is uitgeschakeld voor gesprekken met meer dan 100 deelnemers.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Kan deze chat niet omzetten in privé omdat de deelnemerslimiet is overschreden.</string>
@@ -2849,8 +2849,8 @@
 
     <string name="storage_root_label" context="Storage root label">Opslag root</string>
 
-    <string name="failed_label" context="Label describing some action failed">Mislukt</string>
-    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Uw overdrachten worden onderbroken. Upgrade uw account of wacht %s om door te gaan.</string>
+    <string name="failed_label" context="The label that describes that a transfer failed.">Mislukt</string>
+    <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">Uw overdrachten zijn onderbroken. Upgrade uw account of wacht %s om door te gaan.</string>
     <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Overdracht van quota</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">Opslag boven tegoed</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">Neem meer overdracht tegoed</string>
@@ -2920,8 +2920,8 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% van %2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Ingeschakelde speciale informatie voor gespreksberichten</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Uitgeschakelde speciale informatie voor gespreksberichten</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">U Heeft de maximale limiet van %d reacties bereikt.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Dit bericht heeft de maximale limiet van %d reacties bereikt.</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.appcompat.widget.DrawableUtils
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.elevation.ElevationOverlayProvider
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -77,7 +78,7 @@ object ColorUtils {
 
     @JvmStatic
     fun setEditTextUnderlineColor(editText: EditText, @ColorRes color: Int) {
-        doSetEditTextUnderlineColor(editText, false, editText.resources.getColor(color))
+        doSetEditTextUnderlineColor(editText, false, ContextCompat.getColor(editText.context, color))
     }
 
     @JvmStatic
@@ -92,7 +93,7 @@ object ColorUtils {
 
     @JvmStatic
     fun getColorHexString(context: Context, @ColorRes color: Int): String {
-        return String.format("#%06X", context.resources.getColor(color) and 0xFFFFFF)
+        return String.format("#%06X", ContextCompat.getColor(context, color) and 0xFFFFFF)
     }
 
     @JvmStatic

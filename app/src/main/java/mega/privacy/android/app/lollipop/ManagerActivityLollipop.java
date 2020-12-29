@@ -220,6 +220,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
@@ -4841,7 +4842,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 if (parentNode != null) {
                     if (megaApi.getRootNode() != null) {
                         if (parentNode.getHandle() == megaApi.getRootNode().getHandle() || parentHandleBrowser == -1) {
-                            aB.setTitle(getString(R.string.title_mega_info_empty_screen).toUpperCase());
+                            aB.setTitle(getString(R.string.section_cloud_drive).toUpperCase());
                             firstNavigationLevel = true;
                         }
                         else {
@@ -5064,13 +5065,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						titleId = R.string.sortby_type_photo_first;
 						break;
 					case DOCUMENTS:
-						titleId = R.string.category_documents;
+						titleId = R.string.section_documents;
 						break;
 					case AUDIO:
 						titleId = R.string.upload_to_audio;
 						break;
                     case VIDEO:
-                        titleId = R.string.upload_to_video;
+                        titleId = R.string.sortby_type_video_first;
                         break;
 				}
 
@@ -6109,13 +6110,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	mNavController.navigate(
     			HomepageFragmentDirections.Companion.actionHomepageToFullscreenOffline(path, false),
 				new NavOptions.Builder().setLaunchSingleTop(true).build());
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-				&& !checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-			ActivityCompat.requestPermissions(this,
-					new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-					REQUEST_WRITE_STORAGE);
-		}
 	}
 
 	public void fullscreenOfflineFragmentOpened(OfflineFragment fragment) {
@@ -10464,7 +10458,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.MODE0);
 	}
 
-	public void showNodeOptionsPanel(MegaNode node, int mode){
+	public void showNodeOptionsPanel(MegaNode node, int mode) {
 		logDebug("showNodeOptionsPanel");
 
 		if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
@@ -10473,6 +10467,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment(mode);
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
+
+	public void showNodeLabelsPanel(@NonNull MegaNode node) {
+        logDebug("showNodeLabelsPanel");
+
+        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            bottomSheetDialogFragment.dismiss();
+        }
+
+        selectedNode = node;
+        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.getHandle());
+        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
+    }
 
 	public void showOptionsPanel(MegaOffline sNode){
 		logDebug("showNodeOptionsPanel-Offline");

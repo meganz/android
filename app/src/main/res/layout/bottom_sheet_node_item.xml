@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/node_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,15 +12,15 @@
         android:id="@+id/node_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_vertical">
 
         <RelativeLayout
             android:id="@+id/node_relative_layout_thumb"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp">
+            android:layout_marginStart="12dp">
 
             <ImageView
                 android:id="@+id/node_thumbnail"
@@ -36,8 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
-            android:layout_toStartOf="@+id/permissions_icon"
-            android:layout_toEndOf="@id/node_relative_layout_thumb">
+            android:layout_toEndOf="@id/node_relative_layout_thumb"
+            android:layout_toStartOf="@+id/permissions_icon">
 
             <RelativeLayout
                 android:id="@+id/node_name_layout"
@@ -48,25 +48,25 @@
                     android:id="@+id/node_name_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:ellipsize="middle"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
 
                 <RelativeLayout
                     android:id="@+id/node_relative_layout_icon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="6dp"
                     android:layout_marginTop="3dp"
-                    android:layout_toRightOf="@id/node_name_text">
+                    android:layout_marginStart="6dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toEndOf="@id/node_name_text">
 
                     <ImageView
                         android:id="@+id/node_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        app:tint="?android:attr/textColorSecondary" />
+                        app:tint="?android:attr/textColorSecondary"/>
 
                 </RelativeLayout>
 
@@ -81,21 +81,21 @@
                     android:id="@+id/node_info_versions_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:background="@null"
                     android:src="@drawable/ic_versions_small"
+                    android:background="@null"
+                    android:layout_marginEnd="8dp"
+                    android:layout_centerVertical="true"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/node_info_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/node_info_versions_icon"
-                    android:ellipsize="middle"
                     android:singleLine="true"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
+                    android:layout_toEndOf="@id/node_info_versions_icon"
+                    android:ellipsize="middle"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"/>
             </RelativeLayout>
 
         </RelativeLayout>
@@ -104,19 +104,19 @@
             android:id="@+id/permissions_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="47dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="47dp"
-            android:background="@null"
-            app:tint="?android:attr/textColorSecondary" />
+            app:tint="?android:attr/textColorSecondary"
+            android:background="@null"/>
 
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="16dp"
-        android:background="@color/grey_012_white_012" />
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -124,119 +124,39 @@
         android:scrollbars="vertical">
 
         <LinearLayout
-            android:id="@+id/items_layout_bottom_sheet_node"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/items_layout_bottom_sheet_node">
 
             <!-- Options -->
             <LinearLayout
+                android:id="@+id/option_properties_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/option_properties_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/option_properties_image"
-                        style="@style/dialogActionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:src="@drawable/info_ic"
-                        android:visibility="visible"
-                        app:tint="?android:attr/textColorSecondary" />
-
-                    <TextView
-                        android:id="@+id/option_properties_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="18dp"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp"
-                        android:textAppearance="?attr/textAppearanceSubtitle1" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="72dp"
-                    android:background="@color/grey_012_white_012" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_download_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/option_download_image"
+                    android:id="@+id/option_properties_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_save_to_device"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
-                    android:id="@+id/option_download_text"
+                    android:id="@+id/option_properties_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:text="@string/general_save_to_device"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_offline_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/option_offline_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_save_offline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_offline_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:layout_weight="5"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/file_properties_available_offline"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/file_properties_switch"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="1" />
             </LinearLayout>
 
             <LinearLayout
@@ -252,56 +172,210 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
                     android:src="@drawable/ic_view_in_folder"
                     android:visibility="visible" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/view_in_folder_label"
+                    android:layout_marginStart="18dp"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/option_favourite_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/option_favourite_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_add_favourite"
+                    app:tint="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/option_favourite_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:text="@string/view_in_folder_label"
+                    android:text="@string/file_properties_favourite"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/option_label_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/option_label_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:src="@drawable/ic_label"
+                    app:tint="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/option_label_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="5"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_label"
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+                <TextView
+                    android:id="@+id/option_label_current"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:drawablePadding="8dp"
+                    android:gravity="end|center_vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="16sp"
+                    tools:drawableRight="@drawable/ic_circle_label"
+                    tools:text="@string/label_red"
+                    tools:textColor="@color/label_red" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012"/>
+
+            <LinearLayout
+                android:id="@+id/option_download_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_download_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_b_save_to_device"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/option_download_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:text="@string/general_save_to_device"
+                    android:layout_marginStart="18dp"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/option_offline_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/option_offline_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:layout_marginStart="5dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_b_save_offline"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/option_offline_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="5"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/file_properties_available_offline"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                    />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/file_properties_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/separator_download_options"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/grey_012_white_012"
-                android:orientation="vertical" />
+                android:layout_marginStart="72dp"
+                android:orientation="vertical"
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_link_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_link_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/link_ic"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                   />
 
                 <TextView
                     android:id="@+id/option_link_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_get_link_menu"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
@@ -311,27 +385,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_remove_link_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_remove_link"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_remove_link_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_remove_link_menu"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
@@ -341,27 +415,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_share_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_social_share_white"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/general_share"
                     android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
@@ -371,25 +445,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_share_folder_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_share"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_share_folder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_share_folder"
@@ -401,29 +475,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/send_chat_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_send_to_contact"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/send_chat_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_send_file_to_chat"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -431,67 +505,67 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_clear_share_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    app:tint="?android:attr/textColorSecondary"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_remove_share"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_clear_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_clean_shares_menu"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/separator_share_options"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/grey_012_white_012"
-                android:orientation="vertical" />
+                android:layout_marginStart="72dp"
+                android:orientation="vertical"
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_rename_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    app:tint="?android:attr/textColorSecondary"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_rename"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_rename_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_rename"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -499,27 +573,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_move_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_move"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_move_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/general_move_to"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
@@ -529,29 +603,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_copy_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_menu_copy"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_copy_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_copy"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -559,67 +633,67 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_restore_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_b_restore"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_restore_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_restore"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/separator_modify_options"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/grey_012_white_012"
-                android:orientation="vertical" />
+                android:layout_marginStart="72dp"
+                android:orientation="vertical"
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_open_with_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_b_open_with"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_open_with_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/external_play"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -627,45 +701,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_open_folder_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
                     android:src="@drawable/ic_upload_pick_file"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_open_folder_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/search_open_location"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/separator_open_options"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginLeft="72dp"
-                android:background="@color/grey_012_white_012"
-                android:orientation="vertical" />
+                android:layout_marginStart="72dp"
+                android:orientation="vertical"
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_leave_share_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_leave_share_image"
@@ -673,21 +747,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/leave_share_ic"
-                    android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_leave_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/alert_leave_share"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
             </LinearLayout>
 
             <LinearLayout
@@ -695,29 +769,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_rubbish_bin_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_rubbish_bin"
-                    android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_rubbish_bin_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
             </LinearLayout>
 
             <LinearLayout
@@ -725,29 +799,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:id="@+id/option_remove_image"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_remove"
-                    android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_remove_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
                     android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:layout_marginStart="18dp"
                     android:text="@string/context_remove"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
             </LinearLayout>
 
         </LinearLayout>

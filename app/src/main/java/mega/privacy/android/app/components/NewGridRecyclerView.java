@@ -18,8 +18,6 @@ public class NewGridRecyclerView extends RecyclerView {
     private int widthTotal = 0;
     private int spanCount = 2;
 
-    private boolean mIsLinear;
-    
     public NewGridRecyclerView(Context context) {
         super(context);
         init(context, null);
@@ -88,23 +86,21 @@ public class NewGridRecyclerView extends RecyclerView {
     }
     
     public int findFirstCompletelyVisibleItemPosition() {
-        return getLayoutManager().findFirstCompletelyVisibleItemPosition();
+        LinearLayoutManager layoutManager = (LinearLayoutManager)getLayoutManager();
+        if (layoutManager == null) return RecyclerView.NO_POSITION;
+        return layoutManager.findFirstCompletelyVisibleItemPosition();
     }
     
     public int findFirstVisibleItemPosition() {
-        return getLayoutManager().findFirstVisibleItemPosition();
-    }
-
-    @Override
-    public LinearLayoutManager getLayoutManager() {
-        return mIsLinear ? mLinearLayoutManager : manager;
+        LinearLayoutManager layoutManager = (LinearLayoutManager)getLayoutManager();
+        if (layoutManager == null) return RecyclerView.NO_POSITION;
+        return layoutManager.findFirstVisibleItemPosition();
     }
 
     /**
      * Empower the RecyclerView to change to Linear Layout as needed
      */
     public void switchToLinear() {
-        mIsLinear = true;
         mLinearLayoutManager = new LinearLayoutManager(getContext());
         setLayoutManager(mLinearLayoutManager);
     }
@@ -113,7 +109,6 @@ public class NewGridRecyclerView extends RecyclerView {
      * Turn back to use the well-configured CustomizedGridLayoutManager
      */
     public void switchBackToGrid() {
-        mIsLinear = false;
         mLinearLayoutManager = null;
         setLayoutManager(manager);
         calculateSpanCount();

@@ -7,57 +7,59 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:paddingHorizontal="24dp"
+        android:paddingHorizontal="16dp"
         android:paddingTop="12dp"
         android:paddingBottom="14dp"
-        tools:viewBindingIgnore="true"
         tools:layout_width="match_parent"
-        >
+        tools:viewBindingIgnore="true">
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_photo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            app:icon="@drawable/ic_photos"
             app:layout_constraintEnd_toStartOf="@+id/category_document"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/category_document"
-            app:name="@string/sortby_type_photo_first"
-            app:icon="@drawable/ic_photos" />
+            app:name="@string/sortby_type_photo_first" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_document"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            app:icon="@drawable/ic_documents"
             app:layout_constraintEnd_toStartOf="@+id/category_audio"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_photo"
             app:layout_constraintTop_toTopOf="@+id/category_audio"
-            app:name="@string/category_documents"
-            app:icon="@drawable/ic_documents" />
+            app:name="@string/category_documents" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_audio"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            app:icon="@drawable/ic_audios"
             app:layout_constraintEnd_toStartOf="@+id/category_video"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_document"
             app:layout_constraintTop_toTopOf="@+id/category_video"
-            app:name="@string/upload_to_audio"
-            app:icon="@drawable/ic_audios" />
+            app:name="@string/upload_to_audio" />
 
         <mega.privacy.android.app.components.CategoryButton
             android:id="@+id/category_video"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:icon="@drawable/ic_videos"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/category_audio"
             app:layout_constraintTop_toTopOf="parent"
             app:name="@string/sortby_type_video_first"
-            app:icon="@drawable/ic_videos"
             tools:layout_editor_absoluteY="16dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

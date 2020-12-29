@@ -116,7 +116,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.3_343";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.4_347";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
@@ -579,7 +579,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						}
 						break;
 					case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-						clearIncomingCallNotification(chatId);
+						clearIncomingCallNotification(callId);
 						removeValues(chatId);
 						break;
 					case MegaChatCall.CALL_STATUS_DESTROYED:
@@ -1550,7 +1550,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			wakeLock.release();
 		}
 
-		clearIncomingCallNotification(chatId);
+		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 
