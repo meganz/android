@@ -152,4 +152,7 @@
 
     <!-- SMSVerificationActivity background and status bar -->
     <color name="blue_400_blue_200">@color/dark_blue_200</color>
+
+    <!-- Same to colorSecondary -->
+    <color name="teal_300_teal_200">@color/teal_200</color>
 </resources>

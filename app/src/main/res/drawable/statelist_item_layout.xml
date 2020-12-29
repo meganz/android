@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
    <item android:state_activated="true"
-         android:drawable="@color/accentColor" />
+         android:drawable="@color/teal_300_teal_200" />
    <item android:drawable="@android:color/transparent" />
 </selector>

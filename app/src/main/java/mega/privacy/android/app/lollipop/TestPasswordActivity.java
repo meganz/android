@@ -228,7 +228,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
         passwordLayout.setError(null);
         passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
         passwordErrorImage.setVisibility(View.GONE);
-        testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+        testPasswordbackupRecoveryKeyButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
         confirmPasswordButton.setEnabled(true);
         confirmPasswordButton.setAlpha(1F);
     }
@@ -243,9 +243,9 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium);
             passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium);
             icon = ContextCompat.getDrawable(this, R.drawable.ic_accept_test);
-            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_unlocked_rewards), PorterDuff.Mode.SRC_ATOP));
+            icon.setColorFilter(new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.green_500_green_400), PorterDuff.Mode.SRC_ATOP));
             passwordErrorImage.setImageDrawable(icon);
-            testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+            testPasswordbackupRecoveryKeyButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
             passwordText.setEnabled(false);
             passwordReminderSucceeded();
         }

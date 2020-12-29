@@ -1,10 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:background="@drawable/statelist_item_layout"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:descendantFocusability="blocksDescendants"
+	android:background="@drawable/statelist_item_layout"
 	android:orientation="vertical"
-    android:id="@+id/notification_list_item_layout" >
+	android:id="@+id/notification_list_item_layout">
 
 	<RelativeLayout
 		android:id="@+id/notification_title_layout"
@@ -22,14 +23,15 @@
 			android:src="@drawable/ic_y_arrow_in"
 			android:layout_marginRight="4dp"
 			android:background="@null"
-			android:layout_centerVertical="true"/>
+			android:layout_centerVertical="true"
+			app:tint="@color/orange_400_orange_300"/>
 
 		<TextView
 			android:id="@+id/notification_title_text"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_toRightOf="@id/notification_title_icon"
-			android:textColor="@color/yellow_notif_shares"
+			android:textColor="@color/orange_400_orange_300"
 			android:maxLines="1"
 			android:text="SECTION"
 			android:textStyle="bold"
@@ -63,11 +65,9 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_toRightOf="@id/notification_first_line_icon"
-				android:textColor="?android:attr/textColorPrimary"
+				android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant"
 				android:layout_marginTop="2dp"
-				android:fontFamily="sans-serif-medium"
-				android:ellipsize="end"
-				android:textSize="16sp"/>
+				android:ellipsize="end" />
 		</RelativeLayout>
 
 		<RelativeLayout
@@ -83,7 +83,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginLeft="12dp"
 				android:background="@drawable/dark_rounded_chat_own_message"
-				android:textColor="@color/white"
+				android:textColor="?attr/colorOnSecondary"
 				android:text="@string/new_label_notification_item"
 				android:maxLines="1"
 				android:paddingTop="3dp"
@@ -114,9 +114,8 @@
 		android:id="@+id/notifications_date"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:textColor="?android:attr/textColorSecondary"
 		android:layout_marginLeft="16dp"
-		android:textSize="12sp"
+		style="@style/TextAppearance.Mega.Caption.Secondary"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="12dp"
 		android:text="25 July 2017, 12:25 PM"
@@ -127,7 +126,7 @@
 		android:id="@+id/notifications_separator"
 		android:layout_width="match_parent"
 		android:layout_height="1dp"
-		android:background="@color/grid_item_separator"
+		android:background="@color/grey_012_white_012"
 		android:orientation="horizontal" />
 </LinearLayout>
 
