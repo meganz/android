@@ -41,6 +41,10 @@
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Red.18">
+        <item name="textSize">18sp</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Error">
         <item name="android:textColor">?attr/colorError</item>
     </style>

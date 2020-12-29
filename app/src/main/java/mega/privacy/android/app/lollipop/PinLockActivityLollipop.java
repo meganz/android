@@ -9,6 +9,8 @@ import android.os.Handler;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -112,7 +114,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-//		dbH = new DatabaseHandler(this);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		prefs = dbH.getPreferences();
 		att = dbH.getAttributes();
@@ -179,7 +180,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		redLayout.setVisibility(View.GONE);
 
 		textLogout = (TextView) findViewById(R.id.alert_text);
-		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20));
 		//Margins
 		RelativeLayout.LayoutParams textLogoutParams = (RelativeLayout.LayoutParams)textLogout.getLayoutParams();
 		textLogoutParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0);
@@ -234,6 +234,8 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				//Log out!!
 				logWarning("INTENTS==10 - LOGOUT");
 				redLayout.setVisibility(View.VISIBLE);
+                changeStatusbarColorToRed();
+
 				textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
 				hideKeyboard(this);
@@ -242,6 +244,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 					public void onTick(long millisUntilFinished) {
 						redLayout.setVisibility(View.VISIBLE);
+                        changeStatusbarColorToRed();
 						textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 					}
 
@@ -249,7 +252,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						logWarning("Logout!!!");
 						attemps=0;
 						att.setAttemps(attemps);
-//						dbH.setAttributes(att);
 						dbH.setAttrAttemps(attemps);
 						AccountController accountController = new AccountController(getApplicationContext());
 						accountController.logout(pinLockActivity, megaApi);
@@ -261,11 +263,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			//Show alert
 			logDebug("Attemps less than 5: " + attemps);
 			warningLayout.setVisibility(View.VISIBLE);
+			unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		}
 		else{
 			//Hide alert
 			logDebug("Number of attemps: " + attemps);
 			warningLayout.setVisibility(View.INVISIBLE);
+            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		}
 
 		if (prefs != null){
@@ -317,6 +321,10 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			}
 		}
 	}
+
+	private void changeStatusbarColorToRed() {
+	    getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.red_900_red_400));
+    }
 
 	private void addAlphanumericPin(){
 		logDebug("addAlphanumericPin");
@@ -915,6 +923,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						//Log out!!
 						logDebug("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
+                        changeStatusbarColorToRed();
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
 				    	if(passSixthLetter!=null){
@@ -930,6 +939,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 						     public void onTick(long millisUntilFinished) {
 						    	 redLayout.setVisibility(View.VISIBLE);
+                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -954,11 +964,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 							message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 		            	showSnackbar(message);
 
@@ -1029,6 +1041,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     public void onTick(long millisUntilFinished) {
 //						         mTextField.setText("seconds remaining: " + );
 						    	 redLayout.setVisibility(View.VISIBLE);
+                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -1053,11 +1066,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 			        	showSnackbar(message);
 
@@ -1119,6 +1134,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						//Log out!!
 						logDebug("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
+                        changeStatusbarColorToRed();
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
 						passwordText.setCursorVisible(false);
@@ -1129,6 +1145,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 						     public void onTick(long millisUntilFinished) {
 						    	 redLayout.setVisibility(View.VISIBLE);
+                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -1153,11 +1170,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 
 			        	showSnackbar(message);
@@ -1217,6 +1236,7 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     public void onTick(long millisUntilFinished) {
 //						         mTextField.setText("seconds remaining: " + );
 						    	 redLayout.setVisibility(View.VISIBLE);
+                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -1241,11 +1261,13 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
 		            		warningLayout.setVisibility(View.INVISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1);
 		            	}
 		            	else{
 		            		message = getResources().getQuantityString(R.plurals.pin_lock_incorrect_alert,
 									MAX_ATTEMPS-attemps, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
+                            unlockText.setTextAppearance(R.style.TextAppearance_Mega_Subtitle1_Red_18);
 		            	}
 			        	showSnackbar(message);
 

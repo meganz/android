@@ -267,8 +267,8 @@
     </style>
 
     <style name="ColorControlStyle" parent="Theme.Mega">
-        <item name="android:colorControlNormal">@color/text_secondary</item>
-        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="android:colorControlNormal">?android:attr/textColorSecondary</item>
+        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">

@@ -99,6 +99,8 @@
 
     <color name="red_500_red_300">@color/red_300</color>
 
+    <color name="red_900_red_400">@color/red_400_alpha_080</color>
+
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">@color/white_alpha_005</color>
 

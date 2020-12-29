@@ -1,23 +1,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_container_pin_lock"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:fitsSystemWindows="true"
     android:gravity="center_horizontal"
     android:stackFromBottom="true"
-    android:windowSoftInputMode="stateVisible"
-    tools:context=".PinLockActivityLollipop" >
+    android:windowSoftInputMode="stateVisible">
 
     <LinearLayout
         android:id="@+id/warning_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="horizontal"
         android:visibility="invisible">
@@ -27,7 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal|center_vertical"
-            android:src="@drawable/ic_input_warning" />
+            android:src="@drawable/ic_input_warning"
+            app:tint="@color/black_white" />
 
         <TextView
             android:id="@+id/warning_text"
@@ -35,7 +33,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/pin_lock_alert"
-            android:textColor="@color/black" />
+            android:textColor="?android:attr/textColorPrimary" />
     </LinearLayout>
 
     <TextView
@@ -47,23 +45,21 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="20dp"
         android:gravity="center_horizontal"
-        android:textColor="@color/lollipop_primary_color"
-        android:textSize="24sp" />
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
     <LinearLayout
         android:id="@+id/four_pin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/unlock_text_view"
-        android:background="@color/white"
         android:gravity="center_horizontal"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_first"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -71,9 +67,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_second"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -81,9 +77,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_third"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -91,9 +87,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/pass_fourth"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionDone"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -105,16 +101,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/unlock_text_view"
-        android:background="@color/white"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:visibility="gone">
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_first"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -122,9 +117,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_second"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -132,9 +127,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_third"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -142,9 +137,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_fourth"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -152,9 +147,9 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_fifth"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionNext"
             android:inputType="numberPassword"
             android:maxLength="1"
@@ -162,36 +157,35 @@
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/six_pass_sixth"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="left"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
             android:imeOptions="actionDone"
             android:inputType="numberPassword"
             android:maxLength="1"
             android:theme="@style/ColorControlStyle" />
     </LinearLayout>
-    
+
     <LinearLayout
         android:id="@+id/alphanumeric_pin_layout"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/unlock_text_view"
-        android:background="@color/white"
         android:gravity="center_horizontal"
-        android:orientation="horizontal" 
+        android:orientation="horizontal"
         android:visibility="gone">
-        
+
         <EditText
             android:id="@+id/alphanumeric_text"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:imeOptions="actionDone"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif"
             android:inputType="textPassword"
-            android:theme="@style/ColorControlStyle" />
-        
+            android:textColor="?android:attr/textColorSecondary"
+            android:textColorHint="?attr/textColorHint"
+            android:theme="@style/TextAppearance.Mega.Body2.Secondary" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -199,16 +193,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/alphanumeric_pin_layout"
-        android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"
-        android:orientation="horizontal" >
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/pin_three_dots"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_three_dots" />
+            android:src="@drawable/ic_three_dots"
+            app:tint="?android:attr/textColorSecondary" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_pin"
@@ -222,71 +217,64 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/abc"
-            android:textColor="@color/textGrey"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+            android:textColor="?android:attr/textColorSecondary" />
     </LinearLayout>
 
     <RelativeLayout
-	    android:id="@+id/buttons_layout"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-	    android:layout_below="@id/switch_layout"
-	    android:background="@color/white">
+        android:id="@+id/buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/switch_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp">
 
         <Button
             android:id="@+id/button_logout"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:background="@android:color/transparent"
-            android:layout_alignParentLeft="true"
-            android:layout_gravity="left"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="start"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:padding="5dp"
-            android:stateListAnimator="@null"/>
-	    
+            android:padding="5dp" />
+
         <Button
             android:id="@+id/button_enter"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/accentColor"
-            android:background="@android:color/transparent"
-            android:layout_alignParentRight="true"
-            android:layout_gravity="right"
-            android:gravity="right"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:gravity="end"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="5dp"
-            android:stateListAnimator="@null"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/red_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@color/mega_transparency"
-        android:gravity="center_horizontal|center_vertical" >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/red_900_red_400"
+        android:gravity="center_horizontal|center_vertical">
 
         <TextView
             android:id="@+id/alert_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
             android:gravity="center_horizontal|center_vertical"
-            android:textColor="@color/white" />
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textColor="@color/white_087_grey_087" />
     </RelativeLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/myCoordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/myCoordinatorLayout"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
 
 </RelativeLayout>

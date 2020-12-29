@@ -388,7 +388,7 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
     private void RequestTxt() {
         logDebug("shouldDisableNextButton is " + shouldDisableNextButton);
         if(!shouldDisableNextButton){
-            nextButton.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_300_grey_600));
+            nextButton.setBackgroundColor(ContextCompat.getColor(this,R.color.grey_600_white_087));
             String phoneNumber = PhoneNumberUtils.formatNumberToE164(phoneNumberInput.getText().toString(),selectedCountryCode);
             logDebug("Phone number is " + phoneNumber);
             shouldDisableNextButton = true;
