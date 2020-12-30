@@ -1,177 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/white"
-              android:orientation="vertical">
-	<com.google.android.material.appbar.AppBarLayout
-		android:id="@+id/account_verification_app_bar_layout"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:theme="@style/Theme.Megaactionbar">
-		<androidx.appcompat.widget.Toolbar
-			android:id="@+id/account_verification_toolbar"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="?attr/colorPrimary"
-			android:minHeight="?attr/actionBarSize"
-			app:popupTheme="@style/Theme.Megaactionbar"
-			app:theme="@style/Theme.Megaactionbar"
-			app:titleTextAppearance="@style/ToolbarTitle"/>
-	</com.google.android.material.appbar.AppBarLayout>
-	<TextView android:layout_width="match_parent"
-	          android:layout_height="wrap_content"
-	          android:layout_marginTop="24dp"
-	          android:paddingLeft="24dp"
-	          android:paddingRight="24dp"
-	          android:text="@string/verify_account_enter_txt_label"
-	          android:textSize="16sp"/>
-	<TextView android:id="@+id/entered_phone_number"
-	          android:layout_width="match_parent"
-	          android:layout_height="wrap_content"
-	          android:layout_marginBottom="24dp"
-	          android:paddingLeft="24dp"
-	          android:paddingRight="24dp"
-	          android:text="(+64) 123456789"
-	          android:textColor="@color/accentColor"
-	          android:textSize="16sp"
-	/>
-	<LinearLayout
-		android:id="@+id/verify_account_input_code_layout"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:layout_marginTop="24dp"
-		android:orientation="horizontal"
-	>
-		<mega.privacy.android.app.components.EditTextPIN
-			android:id="@+id/verify_account_input_code_first"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_gravity="left"
-			android:imeOptions="actionNext"
-			android:inputType="number"
-			android:maxLength="1"
-			android:textColor="?android:attr/textColorPrimary"
-			android:textSize="32sp"
-			android:theme="@style/ColorControlStyle"/>
-		<mega.privacy.android.app.components.EditTextPIN
-			android:id="@+id/verify_account_input_code_second"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_gravity="left"
-			android:imeOptions="actionNext"
-			android:inputType="number"
-			android:maxLength="1"
-			android:textColor="?android:attr/textColorPrimary"
-			android:textSize="32sp"
-			android:theme="@style/ColorControlStyle"/>
-		<mega.privacy.android.app.components.EditTextPIN
-			android:id="@+id/verify_account_input_code_third"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_gravity="left"
-			android:imeOptions="actionNext"
-			android:inputType="number"
-			android:maxLength="1"
-			android:textColor="?android:attr/textColorPrimary"
-			android:textSize="32sp"
-			android:theme="@style/ColorControlStyle"/>
-		<mega.privacy.android.app.components.EditTextPIN
-			android:id="@+id/verify_account_input_code_fourth"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_gravity="left"
-			android:imeOptions="actionNext"
-			android:inputType="number"
-			android:maxLength="1"
-			android:textColor="?android:attr/textColorPrimary"
-			android:textSize="32sp"
-			android:theme="@style/ColorControlStyle"/>
-		<mega.privacy.android.app.components.EditTextPIN
-			android:id="@+id/verify_account_input_code_fifth"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_gravity="left"
-			android:imeOptions="actionNext"
-			android:inputType="number"
-			android:maxLength="1"
-			android:textColor="?android:attr/textColorPrimary"
-			android:textSize="32sp"
-			android:theme="@style/ColorControlStyle"/>
-		<mega.privacy.android.app.components.EditTextPIN
-			android:id="@+id/verify_account_input_code_sixth"
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_gravity="left"
-			android:imeOptions="actionNext"
-			android:inputType="number"
-			android:maxLength="1"
-			android:textColor="?android:attr/textColorPrimary"
-			android:textSize="32sp"
-			android:theme="@style/ColorControlStyle"/>
-	</LinearLayout>
-	<TextView android:id="@+id/verify_account_pin_error"
-	          android:layout_width="match_parent"
-	          android:layout_height="wrap_content"
-	          android:layout_marginTop="10dp"
-	          android:gravity="center"
-	          android:paddingLeft="24dp"
-	          android:paddingRight="24dp"
-	          android:text="@string/verify_account_incorrect_code"
-	          android:textColor="#FFFF333A"
-	          android:visibility="gone"
-	          android:textSize="12sp"
-	/>
-	<TextView android:id="@+id/verify_account_resend"
-	          android:layout_width="match_parent"
-	          android:layout_height="wrap_content"
-	          android:paddingLeft="24dp"
-	          android:paddingRight="24dp"
-	          android:layout_marginTop="24dp"
-	          android:text="@string/verify_account_resend_label"
-	          android:textColor="@color/black"
-	          android:visibility="gone"
-	          android:textSize="14sp"
-	/>
-	<RelativeLayout android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginTop="30dp"
-	                android:paddingLeft="24dp"
-	                android:paddingRight="24dp"
-	>
-		<Button
-			android:id="@+id/verify_account_confirm_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentRight="true"
-			android:layout_centerVertical="true"
-			android:layout_marginLeft="8dp"
-			android:layout_marginTop="10dp"
-			android:background="@drawable/background_accent_button"
-			android:minHeight="0dp"
-			android:paddingLeft="16dp"
-			android:paddingTop="10dp"
-			android:paddingRight="16dp"
-			android:paddingBottom="10dp"
-			android:text="@string/general_confirm_button"
-			android:textColor="@color/white"/>
-		<TextView
-			android:id="@+id/verify_account_back_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_centerVertical="true"
-			android:layout_marginTop="10dp"
-			android:layout_toLeftOf="@+id/verify_account_confirm_button"
-			android:minHeight="0dp"
-			android:paddingLeft="16dp"
-			android:paddingTop="10dp"
-			android:paddingRight="16dp"
-			android:paddingBottom="10dp"
-			android:text="@string/general_back_button"
-			android:textAllCaps="true"
-			android:textColor="@color/accentColor"
-			android:textStyle="bold"/>
-	</RelativeLayout>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/account_verification_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <TextView
+        style="@style/TextAppearance.Mega.Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/verify_account_enter_txt_label" />
+
+    <TextView
+        android:id="@+id/entered_phone_number"
+        style="@style/TextAppearance.Mega.Subtitle1.AccentColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp" />
+
+    <LinearLayout
+        android:id="@+id/verify_account_input_code_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <mega.privacy.android.app.components.EditTextPIN
+            android:id="@+id/verify_account_input_code_first"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textSize="32sp"
+            android:theme="@style/ColorControlStyle" />
+
+        <mega.privacy.android.app.components.EditTextPIN
+            android:id="@+id/verify_account_input_code_second"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textSize="32sp"
+            android:theme="@style/ColorControlStyle" />
+
+        <mega.privacy.android.app.components.EditTextPIN
+            android:id="@+id/verify_account_input_code_third"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textSize="32sp"
+            android:theme="@style/ColorControlStyle" />
+
+        <mega.privacy.android.app.components.EditTextPIN
+            android:id="@+id/verify_account_input_code_fourth"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textSize="32sp"
+            android:theme="@style/ColorControlStyle" />
+
+        <mega.privacy.android.app.components.EditTextPIN
+            android:id="@+id/verify_account_input_code_fifth"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textSize="32sp"
+            android:theme="@style/ColorControlStyle" />
+
+        <mega.privacy.android.app.components.EditTextPIN
+            android:id="@+id/verify_account_input_code_sixth"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textSize="32sp"
+            android:theme="@style/ColorControlStyle" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/verify_account_pin_error"
+        style="@style/TextAppearance.Mega.Subtitle1.Error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/verify_account_incorrect_code"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/verify_account_resend"
+        style="@style/TextAppearance.Mega.Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/verify_account_resend_label"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp">
+
+        <Button
+            android:id="@+id/verify_account_confirm_button"
+            style="?attr/materialButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:minHeight="0dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="10dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="10dp"
+            android:text="@string/general_confirm_button" />
+
+        <Button
+            android:id="@+id/verify_account_back_button"
+            style="?attr/borderlessButtonStyle"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_toStartOf="@+id/verify_account_confirm_button"
+            android:minHeight="0dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="10dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="10dp"
+            android:text="@string/general_back_button" />
+    </RelativeLayout>
 </LinearLayout>

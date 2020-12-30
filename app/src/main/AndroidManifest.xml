@@ -429,10 +429,10 @@
             android:launchMode="singleTask"
             android:label="@string/app_name">
         </activity>
-	    <activity android:name=".SMSVerificationActivity" />
 
-	    <activity android:name=".SMSVerificationReceiveTxtActivity"
-	              android:theme="@style/SMSVerificationReceiveTxtActivityTheme"/>
+        <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
+
+        <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"

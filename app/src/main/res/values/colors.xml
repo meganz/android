@@ -366,7 +366,7 @@
 
     <color name="red_500_red_300">@color/red_500</color>
 
-    <color name="red_900_400_080">@color/red_900_alpha_080</color>
+    <color name="red_900_080_red_400_080">@color/red_900_alpha_080</color>
 
     <!-- Solid color. e.g. Grid item background -->
     <color name="white_white_005">?android:attr/colorBackground</color>
