@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/manage_transfer_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -37,9 +37,8 @@
             android:layout_marginTop="16dp"
             android:layout_marginLeft="13dp"
             android:layout_marginRight="13dp"
-            android:textColor="@color/file_list_first_row"
             android:ellipsize="middle"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
             android:singleLine="true"/>
 
         <ImageView
@@ -57,7 +56,7 @@
             android:layout_height="25dp"
             android:layout_toEndOf="@id/manage_transfer_completed_image"
             android:layout_below="@+id/manage_transfer_filename"
-            android:textColor="@color/file_list_second_row"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
             android:layout_marginEnd="13dp"
             android:singleLine="true"
             android:ellipsize="middle"/>
@@ -68,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:background="@color/sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -98,7 +97,8 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_menu_search"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_view_text"
@@ -108,8 +108,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/view_in_folder_label"
                     android:layout_marginStart="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <View
@@ -117,7 +116,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_get_link_layout"
@@ -131,12 +130,12 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:alpha="0.54"
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/link_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_get_link_text"
@@ -146,8 +145,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_get_link_menu"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <LinearLayout
@@ -166,7 +164,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_retry"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary"/>
 
                 <TextView
                     android:id="@+id/option_retry_text"
@@ -176,8 +175,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/general_retry"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
             <View
@@ -185,7 +183,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/sliding_panel_separator"/>
+                android:background="@color/grey_012_white_012"/>
 
             <LinearLayout
                 android:id="@+id/option_clear_layout"
@@ -202,7 +200,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
@@ -214,8 +212,8 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/general_clear"
-                    android:textColor="@color/dark_primary_color"
-                    android:textSize="16sp"/>
+                    android:textColor="@color/red_600_red_300"
+                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
             </LinearLayout>
 
         </LinearLayout>

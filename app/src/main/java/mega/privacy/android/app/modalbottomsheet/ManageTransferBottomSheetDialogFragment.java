@@ -17,6 +17,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MimeTypeList.*;
@@ -84,7 +85,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             type.setImageResource(R.drawable.ic_upload_transfers);
         }
 
-        location.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+        location.setTextColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
         RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
         params.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 
@@ -96,7 +97,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case STATE_FAILED:
-                location.setTextColor(ContextCompat.getColor(context, R.color.expired_red));
+                location.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
                 location.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);
