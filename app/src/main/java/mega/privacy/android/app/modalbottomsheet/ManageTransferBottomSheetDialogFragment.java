@@ -91,7 +91,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         switch (transfer.getState()) {
             case STATE_COMPLETED:
                 location.setText(transfer.getPath());
-                stateIcon.setImageResource(R.drawable.ic_complete_transfer);
+                stateIcon.setImageResource(R.drawable.ic_transfers_completed);
                 retryOption.setVisibility(View.GONE);
                 break;
 

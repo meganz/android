@@ -17,7 +17,7 @@
             android:id="@+id/empty_hint_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:src="@drawable/empty_offline_portrait" />
+            android:src="@drawable/empty_offline_portrait" />
 
         <TextView
             android:id="@+id/empty_hint_text"

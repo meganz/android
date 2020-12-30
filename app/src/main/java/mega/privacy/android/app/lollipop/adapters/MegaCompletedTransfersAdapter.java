@@ -23,6 +23,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -149,11 +150,11 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		switch (transfer.getState()) {
 			case STATE_COMPLETED:
 				holder.textViewCompleted.setText(transfer.getPath());
-				holder.imageViewCompleted.setImageResource(R.drawable.ic_complete_transfer);
+				holder.imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed);
 				break;
 
 			case STATE_FAILED:
-				holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.expired_red));
+				holder.textViewCompleted.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
 				holder.textViewCompleted.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
                 params1.rightMargin = 0;
 				holder.imageViewCompleted.setImageBitmap(null);
@@ -172,8 +173,6 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 		}
 
         holder.imageViewCompleted.setLayoutParams(params1);
-
-		holder.itemLayout.setBackgroundColor(Color.WHITE);
 	}
 
 	@Override

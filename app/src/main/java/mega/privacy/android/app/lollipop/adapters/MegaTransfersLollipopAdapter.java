@@ -130,7 +130,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 
 		if (transferType == TYPE_DOWNLOAD) {
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
-			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.green_unlocked_rewards));
+			holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.green_500_green_400));
 			MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 			holder.document = transfer.getNodeHandle();
 
@@ -221,7 +221,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 				case STATE_QUEUED:
 					if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
 							|| (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
-						holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.over_quota_yellow));
+						holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 
 						if (transferType == TYPE_DOWNLOAD) {
 							holder.progressText.setText(String.format("%s %s", getProgress(transfer), context.getString(R.string.label_transfer_over_quota)));
@@ -259,7 +259,6 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 			}
 		}
 
-		holder.itemLayout.setBackgroundColor(Color.WHITE);
 		holder.optionRemove.setTag(holder);
 		holder.optionPause.setTag(holder);
 	}

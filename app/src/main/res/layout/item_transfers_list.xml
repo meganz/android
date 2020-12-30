@@ -1,96 +1,97 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/transfers_list_item_layout"
-	android:layout_width="fill_parent"
-	android:layout_height="72dp"
-	android:layout_marginEnd="13dp"
-	android:descendantFocusability="blocksDescendants">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/transfers_list_item_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="72dp"
+    android:layout_marginEnd="13dp"
+    android:descendantFocusability="blocksDescendants">
 
-<ImageView
+    <ImageView
         android:id="@+id/transfers_list_thumbnail"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:scaleType="fitCenter"
-        android:layout_centerVertical="true"/>
-    
+        android:layout_centerVertical="true"
+        android:scaleType="fitCenter" />
+
     <ImageView
         android:id="@+id/transfers_list_small_icon"
         android:layout_width="21dp"
         android:layout_height="21dp"
-        android:src="@drawable/ic_download_transfers"
+        android:layout_alignTop="@id/transfers_list_thumbnail"
         android:layout_alignEnd="@id/transfers_list_thumbnail"
-        android:layout_alignTop="@id/transfers_list_thumbnail" />
-    
+        android:src="@drawable/ic_download_transfers" />
+
     <TextView
         android:id="@+id/transfers_list_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/transfers_list_thumbnail"
+        android:layout_marginStart="13dp"
         android:layout_marginTop="16dp"
-        android:layout_marginLeft="13dp"
-		android:layout_toLeftOf="@+id/transfers_list_option_pause"
-        android:textColor="@color/file_list_first_row"
+        android:layout_toStartOf="@+id/transfers_list_option_pause"
+        android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:ellipsize="middle"
-        android:textSize="16sp"
-		android:singleLine="true"/>
-    
+        android:singleLine="true"
+        android:textAppearance="?attr/textAppearanceSubtitle1" />
+
     <ImageView
         android:id="@+id/transfers_list_completed_image"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_marginBottom="14dp"
-        android:layout_toEndOf="@id/transfers_list_thumbnail"
         android:layout_below="@id/transfers_list_filename"
-        android:layout_alignStart="@id/transfers_list_filename" />
-    
+        android:layout_alignStart="@id/transfers_list_filename"
+        android:layout_marginBottom="14dp"
+        android:layout_toEndOf="@id/transfers_list_thumbnail" />
+
     <TextView
         android:id="@+id/transfers_list_completed_text"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:layout_toEndOf="@id/transfers_list_completed_image"
         android:layout_below="@+id/transfers_list_filename"
-        android:textColor="@color/file_list_second_row"
-		android:singleLine="true"
-		android:ellipsize="middle"/>
+        android:layout_toEndOf="@id/transfers_list_completed_image"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
-	<ImageButton
-		android:id="@+id/transfers_list_option_remove"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentEnd="true"
-		android:layout_centerVertical="true"
-		android:layout_marginEnd="16dp"
-		android:background="@null"
-		android:src="@drawable/ic_close_grey" />
+    <ImageButton
+        android:id="@+id/transfers_list_option_remove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:background="@null"
+        android:src="@drawable/ic_close_grey"
+        app:tint="?android:attr/textColorSecondary" />
 
-	<ImageView
-		android:id="@+id/transfers_list_option_pause"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerVertical="true"
-		android:layout_marginStart="16dp"
-		android:layout_marginEnd="24dp"
-		android:layout_toStartOf="@id/transfers_list_option_remove"
-		android:background="@null"
-		android:src="@drawable/ic_pause" />
+    <ImageView
+        android:id="@+id/transfers_list_option_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_toStartOf="@id/transfers_list_option_remove"
+        android:background="@null"
+        android:src="@drawable/ic_pause"
+        app:tint="?android:attr/textColorSecondary" />
 
     <TextView
         android:id="@+id/transfers_progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-		android:layout_marginStart="13dp"
-		android:layout_toEndOf="@id/transfers_list_thumbnail"
-        android:layout_below="@+id/transfers_list_filename"/>
+        android:layout_below="@+id/transfers_list_filename"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@id/transfers_list_thumbnail"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
     <TextView
         android:id="@+id/transfers_speed_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
-		android:textColor="@color/text_secondary"
-		android:layout_marginStart="9dp"
         android:layout_below="@+id/transfers_list_filename"
-        android:layout_toEndOf="@+id/transfers_progress_text"/>
+        android:layout_marginStart="9dp"
+        android:layout_toEndOf="@+id/transfers_progress_text"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
 </RelativeLayout>
 

@@ -13,6 +13,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaCompletedTransfersAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 
 import static mega.privacy.android.app.DatabaseHandler.MAX_TRANSFERS;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -37,13 +38,17 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 
 		View v = initView(inflater, container);
 
-		emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.ic_zero_portrait_transfers : R.drawable.ic_zero_landscape_saved_for_offline);
+		emptyImage.setImageResource(isScreenInPortrait(context) ? R.drawable.empty_transfer_portrait : R.drawable.empty_transfer_landscape);
 
 		String textToShow = context.getString(R.string.completed_transfers_empty_new);
 		try {
-			textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'"
+					+ ColorUtils.getColorHexString(context, R.color.black_white)
+					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
-			textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
+			textToShow = textToShow.replace("[B]", "<font color=\'"
+					+ ColorUtils.getColorHexString(context, R.color.grey_300_grey_600)
+					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		} catch (Exception e) {
 			logWarning("Exception formatting string", e);
