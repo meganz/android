@@ -139,6 +139,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -3374,7 +3375,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			askForSMSVerification();
 		}
 
-		showCookieDialog();
+//		showCookieDialog();
 	}
 
 	/**
@@ -3581,9 +3582,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private void showCookieDialog() {
 		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+				.setCancelable(false)
 				.setView(R.layout.dialog_cookie)
-				.setPositiveButton(R.string.dialog_cookie_accept, null)
-				.setNegativeButton(R.string.dialog_cookie_settings, null)
+				.setPositiveButton(R.string.dialog_cookie_accept, (positiveDialog, which) -> {
+					// do something
+				})
+				.setNegativeButton(R.string.dialog_cookie_settings, (negativeDialog, which) -> {
+					startActivity(new Intent(ManagerActivityLollipop.this, CookiePreferencesActivity.class));
+				})
 				.create();
 
 		dialog.show();
@@ -4765,6 +4771,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		checkBeforeShowSMSVerificationDialog();
+
+		if (MegaApplication.isCookieBannerEnabled()) {
+			showCookieDialog();
+		}
 
         psaViewModel.checkPsa();
     }

@@ -128,6 +128,22 @@
 			app:iconSpaceReserved="false" />
 
 		<androidx.preference.Preference
+			android:key="settings_about_cookie_policy"
+			android:title="Cookie Policy"
+			android:summary=""
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+		<androidx.preference.Preference
+			android:key="settings_cookie"
+			android:title="Cookie Settings"
+			android:summary=""
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+		<androidx.preference.Preference
 			android:key="settings_about_terms_of_service"
 			android:title="@string/settings_about_terms_of_service"
 			android:summary=""

@@ -612,4 +612,11 @@
         <item name="android:minWidth">0dp</item>
         <item name="android:button">@drawable/selector_label</item>
     </style>
+
+    <style name="Widget.Mega.Button.Policy" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:textAppearance">?textAppearanceCaption</item>
+    </style>
 </resources>

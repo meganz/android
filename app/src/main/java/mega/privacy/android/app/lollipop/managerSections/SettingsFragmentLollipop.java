@@ -24,6 +24,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
+import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity;
@@ -123,6 +124,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         aboutKarere.setOnPreferenceClickListener(this);
         cancelAccount = findPreference(KEY_CANCEL_ACCOUNT);
         cancelAccount.setOnPreferenceClickListener(this);
+        findPreference(KEY_ABOUT_COOKIE_POLICY).setOnPreferenceClickListener(this);
+        findPreference(KEY_COOKIE_SETTINGS).setOnPreferenceClickListener(this);
 
         updateCancelAccountSetting();
 
@@ -345,6 +348,16 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             case KEY_CANCEL_ACCOUNT:
                 ((ManagerActivityLollipop) context).askConfirmationDeleteAccount();
+                break;
+
+            case KEY_ABOUT_COOKIE_POLICY:
+                viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setData(Uri.parse("https://mega.nz/cookie"));
+                startActivity(viewIntent);
+                break;
+
+            case KEY_COOKIE_SETTINGS:
+                startActivity(new Intent(context, CookiePreferencesActivity.class));
                 break;
         }
 

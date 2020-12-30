@@ -188,6 +188,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean wasLocalVideoEnable = false;
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
+	private static boolean isCookieBannerEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -1930,5 +1931,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public void setCookieBannerEnabled(boolean enabled) {
+		isCookieBannerEnabled = enabled;
+	}
+
+	public static boolean isCookieBannerEnabled() {
+		return isCookieBannerEnabled;
 	}
 }

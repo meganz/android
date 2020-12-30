@@ -193,6 +193,12 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 megaApplication.updateBusinessStatus();
 
                 break;
+
+            case MegaEvent.EVENT_MISC_FLAGS_READY:
+                megaApplication.setCookieBannerEnabled(api.isCookieBannerEnabled());
+                megaApplication.sendBroadcast(new Intent(BROADCAST_ACTION_COOKIE_DIALOG));
+
+                break;
         }
     }
 }
