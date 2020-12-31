@@ -108,7 +108,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         nodeThumb = contentView.findViewById(R.id.node_attachment_thumbnail);
         nodeName = contentView.findViewById(R.id.node_attachment_name_text);
         nodeInfo = contentView.findViewById(R.id.node_attachment_info_text);
-        RelativeLayout nodeIconLayout = contentView.findViewById(R.id.node_attachment_relative_layout_icon);
 
         optionView = contentView.findViewById(R.id.option_view_layout);
         TextView optionViewText = contentView.findViewById(R.id.option_view_text);
@@ -126,7 +125,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             optionSaveOffline.setVisibility(View.GONE);
             optionImport.setVisibility(View.GONE);
         }
-        nodeIconLayout.setVisibility(View.GONE);
 
         if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             nodeName.setMaxWidth(scaleWidthPx(275, outMetrics));

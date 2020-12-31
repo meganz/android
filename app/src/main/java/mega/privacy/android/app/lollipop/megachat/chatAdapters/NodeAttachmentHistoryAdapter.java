@@ -639,7 +639,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
 
         if (!multipleSelect) {
             logDebug("Not multiselect");
-            holder.itemLayout.setBackgroundColor(Color.WHITE);
+            holder.itemLayout.setBackground(null);
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
@@ -660,7 +660,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         } else {
             logDebug("Multiselection ON");
             if (this.isItemChecked(position)) {
-                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.new_multiselect_color));
                 RelativeLayout.LayoutParams paramsMultiselect = (RelativeLayout.LayoutParams)holder.imageView.getLayoutParams();
                 paramsMultiselect.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
                 paramsMultiselect.width = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,48,context.getResources().getDisplayMetrics());
@@ -668,8 +667,9 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.imageView.setLayoutParams(paramsMultiselect);
                 holder.imageView.setImageResource(R.drawable.ic_select_folder);
             } else {
-                holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.white));
                 logDebug("Check the thumb");
+                holder.itemLayout.setBackground(null);
+                holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
                 if (node.hasThumbnail()) {
                     logDebug("Node has thumbnail");
