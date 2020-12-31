@@ -1,104 +1,92 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:background="@color/white">
+    android:descendantFocusability="blocksDescendants">
 
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="36dp"
-		android:background="@color/white"
-		android:id="@+id/version_file_header_layout">
+    <RelativeLayout
+        android:id="@+id/version_file_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="36dp">
 
-		<TextView
-			android:id="@+id/version_file_header_title"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_alignParentLeft="true"
-			android:layout_centerVertical="true"
-			android:layout_marginLeft="16dp"
-			android:textColor="?android:attr/textColorPrimary"
-			android:maxLines="1"
-			android:singleLine="true"
-			android:ellipsize="end"
-			android:textSize="14sp"
-			android:fontFamily="sans-serif-light"
-			android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/version_file_header_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Medium" />
 
-		<TextView
-			android:id="@+id/version_file_header_size"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:textColor="?android:attr/textColorPrimary"
-			android:layout_marginRight="16dp"
-			android:layout_alignParentRight="true"
-			android:layout_centerVertical="true"
-			android:textSize="14sp"
-			android:fontFamily="sans-serif-light"
-			android:textStyle="bold"
-			android:ellipsize="end"
-			android:maxLines="1"/>
-	</RelativeLayout>
+        <TextView
+            android:id="@+id/version_file_header_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Medium" />
+    </RelativeLayout>
 
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="72dp"
-		android:layout_below="@+id/version_file_header_layout"
-		android:id="@+id/version_file_item_layout">
-		<ImageView
-			android:id="@+id/version_file_thumbnail"
-			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:scaleType="fitCenter"
-			android:layout_centerVertical="true" />
-		<RelativeLayout
-			android:id="@+id/version_file_three_dots_layout"
-			android:layout_width="wrap_content"
-			android:layout_height="match_parent"
-			android:layout_alignParentRight="true">
+    <RelativeLayout
+        android:id="@+id/version_file_item_layout"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_below="@+id/version_file_header_layout">
 
-			<ImageView
-				android:id="@+id/version_file_three_dots"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:src="@drawable/ic_dots_vertical_grey"
-				android:background="@null"
-				android:layout_marginRight="10dp"
-				android:layout_centerVertical="true" />
+        <ImageView
+            android:id="@+id/version_file_thumbnail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter" />
 
-		</RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/version_file_three_dots_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true">
 
-		<TextView
-			android:id="@+id/version_file_filename"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_toRightOf="@id/version_file_thumbnail"
-			android:layout_toLeftOf="@id/version_file_three_dots_layout"
-			android:layout_marginTop="15dp"
-			android:layout_marginLeft="12dp"
-			android:textColor="@color/file_list_first_row"
-			android:maxLines="1"
-			android:singleLine="true"
-			android:ellipsize="middle"
-			android:textSize="16sp"/>
+            <ImageView
+                android:id="@+id/version_file_three_dots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_dots_vertical_grey"
+                app:tint="?android:attr/textColorSecondary" />
 
-		<TextView
-			android:id="@+id/version_file_filesize"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_toRightOf="@id/version_file_thumbnail"
-			android:layout_toLeftOf="@id/version_file_three_dots_layout"
-			android:layout_below="@+id/version_file_filename"
-			android:textColor="@color/file_list_second_row"
-			android:layout_marginLeft="13dp"
-			android:textSize="14sp"
-			android:ellipsize="end"
-			android:maxLines="1"/>
+        </RelativeLayout>
 
-	</RelativeLayout>
+        <TextView
+            android:id="@+id/version_file_filename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="15dp"
+            android:layout_toStartOf="@id/version_file_three_dots_layout"
+            android:layout_toEndOf="@id/version_file_thumbnail"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textAppearance="?attr/textAppearanceSubtitle1" />
 
+        <TextView
+            android:id="@+id/version_file_filesize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/version_file_filename"
+            android:layout_marginStart="13dp"
+            android:layout_toStartOf="@id/version_file_three_dots_layout"
+            android:layout_toEndOf="@id/version_file_thumbnail"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
-
-    
+    </RelativeLayout>
 </RelativeLayout>
 

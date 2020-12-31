@@ -1,21 +1,15 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -24,16 +18,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
@@ -68,7 +62,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
-	Toolbar tB;
+    MaterialToolbar tB;
 	VersionsFileActivity versionsFileActivity = this;
 
 	MegaNode selectedNode;
@@ -79,8 +73,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	RelativeLayout container;
 	RecyclerView listView;
 	LinearLayoutManager mLayoutManager;
-	ImageView emptyImage;
-	TextView emptyText;
 
 	ArrayList<MegaNode> nodeVersions;
 
@@ -88,14 +80,8 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	
 	VersionsFileAdapter adapter;
 	public String versionsSize = null;
-	
-	long parentHandle = INVALID_HANDLE;
 
 	private ActionMode actionMode;
-	
-	ProgressDialog statusDialog;
-
-	MegaPreferences prefs = null;
 	
 	MenuItem selectMenuItem;
 	MenuItem unSelectMenuItem;
@@ -280,8 +266,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		megaApi.addGlobalListener(this);
 
 		handler = new Handler();
-
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -290,7 +274,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 		setContentView(R.layout.activity_versions_file);
 
 		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_versions_file);
+		tB = findViewById(R.id.toolbar_versions_file);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 //			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -314,11 +298,6 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				checkScroll();
 			}
 		});
-
-		emptyImage = (ImageView) findViewById(R.id.versions_file_empty_image);
-		emptyText = (TextView) findViewById(R.id.versions_file_empty_text);
-		emptyImage.setImageResource(R.drawable.ic_empty_contacts);
-		emptyText.setText(R.string.contacts_list_empty_text);
 
 		long nodeHandle = INVALID_HANDLE;
 
@@ -344,16 +323,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 				GetVersionsSizeTask getVersionsSizeTask = new GetVersionsSizeTask();
 				getVersionsSizeTask.execute();
 
-				if (nodeVersions.size() != 0){
-					emptyImage.setVisibility(View.GONE);
-					emptyText.setVisibility(View.GONE);
-					listView.setVisibility(View.VISIBLE);
-				}
-				else{
-					emptyImage.setVisibility(View.VISIBLE);
-					emptyText.setVisibility(View.VISIBLE);
-					listView.setVisibility(View.GONE);
-				}
+				listView.setVisibility(View.VISIBLE);
 
 				if (adapter == null){
 
@@ -472,7 +442,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	void showDeleteVersionHistoryDialog () {
 		logDebug("showDeleteVersionHistoryDialog");
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(R.string.title_delete_version_history)
 				.setMessage(R.string.text_delete_version_history)
 				.setPositiveButton(R.string.context_delete, (dialog, which) -> deleteVersionHistory())
@@ -811,7 +781,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 
 	public void checkRevertVersion() {
 		if (getAccessLevel() <= ACCESS_READWRITE) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 			builder.setCancelable(false)
 					.setTitle(R.string.permissions_error_label)
 					.setMessage(R.string.alert_not_enough_permissions_revert)
@@ -868,7 +838,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void showConfirmationRemoveVersion() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getResources().getQuantityString(R.plurals.title_dialog_delete_version, 1))
 				.setMessage(getString(R.string.content_dialog_delete_version))
 				.setPositiveButton(R.string.context_delete, (dialog, which) -> removeVersion())
@@ -878,7 +848,7 @@ public class VersionsFileActivity extends PinActivityLollipop implements MegaReq
 	}
 
 	public void showConfirmationRemoveVersions(final List<MegaNode> removeNodes) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		String message;
 		String title;
 

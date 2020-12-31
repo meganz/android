@@ -353,8 +353,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:label="@string/app_name">
         </activity>
 
         <activity

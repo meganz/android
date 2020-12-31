@@ -51,8 +51,7 @@
                 android:layout_below="@+id/node_attachment_name_text"
                 android:ellipsize="middle"
                 android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
         </RelativeLayout>
 
