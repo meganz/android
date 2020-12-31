@@ -97,4 +97,12 @@ public class SettingsConstants {
 
     /* Advance settings  */
     public static final String KEY_HTTPS_ONLY = "settings_use_https_only";
+
+    /* Cookie settings  */
+    public static final String KEY_COOKIE_ACCEPT = "settings_cookie_accept";
+    public static final String KEY_COOKIE_ESSENTIAL = "settings_cookie_essential";
+    public static final String KEY_COOKIE_PREFERENCE = "settings_cookie_preference";
+    public static final String KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics";
+    public static final String KEY_COOKIE_ADVERTISING = "settings_cookie_advertising";
+    public static final String KEY_COOKIE_THIRD_PARTY = "settings_cookie_third_party";
 }
