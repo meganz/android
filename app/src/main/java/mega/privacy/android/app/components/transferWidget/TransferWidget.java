@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.transferWidget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -12,12 +13,13 @@ import androidx.core.content.ContextCompat;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
 public class TransferWidget {
@@ -40,6 +42,13 @@ public class TransferWidget {
         button = transfersWidget.findViewById(R.id.transfers_button);
         progressBar = transfersWidget.findViewById(R.id.transfers_progress);
         status = transfersWidget.findViewById(R.id.transfers_status);
+
+        if (Util.isDarkMode(context)) {
+            int color = ColorUtils.getColorForElevation(context, 6f);
+            ((GradientDrawable) transfersWidget.findViewById(R.id.transfers_relative_layout)
+                    .getBackground()).setColor(color);
+            ((GradientDrawable) button.getBackground()).setColor(color);
+        }
     }
 
     /**
