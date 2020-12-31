@@ -75,8 +75,8 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         optionRevert.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
-        LinearLayout separatorRevert = contentView.findViewById(R.id.separator_revert);
-        LinearLayout separatorDelete = contentView.findViewById(R.id.separator_delete);
+        View separatorRevert = contentView.findViewById(R.id.separator_revert);
+        View separatorDelete = contentView.findViewById(R.id.separator_delete);
 
         nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
         nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
