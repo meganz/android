@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.*
 import java.util.*
 
@@ -46,6 +47,19 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             enabledCookies.value?.remove(cookie)
         }
 
+        enabledCookies.notifyObserver()
+        updateCookies()
+    }
+
+    fun toggleCookies(enable: Boolean) {
+        if (enable) {
+            enabledCookies.value?.addAll(Cookie.values())
+        } else {
+            enabledCookies.value?.clear()
+            enabledCookies.value?.add(Cookie.ESSENTIAL)
+        }
+
+        enabledCookies.notifyObserver()
         updateCookies()
     }
 
@@ -104,22 +118,16 @@ class CookieSettingsViewModel @ViewModelInject constructor(
 
     private fun updateCookies() {
         add(Completable.fromAction {
-            val cookies = enabledCookies.value
-            val result: Int
-
-            if (cookies?.isEmpty() == true || cookies?.contains(Cookie.ESSENTIAL) == false) {
-                result = 0
-            } else {
-                val bitSet = BitSet(Cookie.values().size)
-
-                cookies?.forEach { setting ->
-                    bitSet[setting.value] = true
-                }
-
-                result = bitSet.toLongArray().first().toInt()
+            val bitSet = BitSet(Cookie.values().size).apply {
+                this[0] = true // Essential cookies are always enabled
             }
 
-            megaApi.setCookieSettings(result)
+            enabledCookies.value?.forEach { setting ->
+                bitSet[setting.value] = true
+            }
+
+            val bitSetToDecimal = bitSet.toLongArray().first().toInt()
+            megaApi.setCookieSettings(bitSetToDecimal)
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

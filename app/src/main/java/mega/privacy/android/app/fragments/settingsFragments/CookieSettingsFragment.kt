@@ -35,22 +35,8 @@ class CookieSettingsFragment : SettingsBaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.getEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
-    }
 
-    private fun showConfiguration(settings: Set<Cookie>?) {
-        settings?.forEach { setting ->
-            when (setting) {
-                ESSENTIAL -> {
-                    acceptCookiesPreference.isChecked = true
-                    essentialCookiesPreference.isChecked = true
-                }
-                PREFERENCE -> preferenceCookiesPreference.isChecked = true
-                ANALYTICS -> analyticsCookiesPreference.isChecked = true
-                ADVERTISEMENT -> advertisingCookiesPreference.isChecked = true
-                THIRDPARTY -> thirdPartyCookiesPreference.isChecked = true
-            }
-        }
+        viewModel.getEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
 
         acceptCookiesPreference.onPreferenceChangeListener = this
         preferenceCookiesPreference.onPreferenceChangeListener = this
@@ -59,17 +45,30 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
     }
 
+    private fun showConfiguration(settings: Set<Cookie>?) {
+        essentialCookiesPreference.isChecked = settings?.contains(ESSENTIAL) == true
+        preferenceCookiesPreference.isChecked = settings?.contains(PREFERENCE) == true
+        analyticsCookiesPreference.isChecked = settings?.contains(ANALYTICS) == true
+        advertisingCookiesPreference.isChecked = settings?.contains(ADVERTISEMENT) == true
+        thirdPartyCookiesPreference.isChecked = settings?.contains(THIRDPARTY) == true
+
+        acceptCookiesPreference.isChecked = preferenceCookiesPreference.isChecked ||
+                analyticsCookiesPreference.isChecked ||
+                advertisingCookiesPreference.isChecked ||
+                thirdPartyCookiesPreference.isChecked
+    }
+
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
 
         when (preference?.key) {
-            acceptCookiesPreference.key -> viewModel.changeCookie(ESSENTIAL, enable)
+            acceptCookiesPreference.key -> viewModel.toggleCookies(enable)
             preferenceCookiesPreference.key -> viewModel.changeCookie(PREFERENCE, enable)
             analyticsCookiesPreference.key -> viewModel.changeCookie(ANALYTICS, enable)
             advertisingCookiesPreference.key -> viewModel.changeCookie(ADVERTISEMENT, enable)
             thirdPartyCookiesPreference.key -> viewModel.changeCookie(THIRDPARTY, enable)
         }
 
-        return true
+        return false
     }
 }
