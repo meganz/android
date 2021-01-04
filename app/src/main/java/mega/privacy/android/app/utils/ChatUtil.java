@@ -1115,7 +1115,7 @@ public class ChatUtil {
 
         long days = seconds % SECONDS_IN_DAY;
         long weeks = seconds % SECONDS_IN_WEEK;
-        long months = seconds % SECONDS_IN_MONTH_31;
+        long months = seconds % SECONDS_IN_MONTH_30;
         long years = seconds % SECONDS_IN_YEAR;
 
         if (years == 0) {
@@ -1123,7 +1123,7 @@ public class ChatUtil {
         }
 
         if (months == 0) {
-            if (seconds / SECONDS_IN_MONTH_31 == 1) {
+            if (seconds / SECONDS_IN_MONTH_30 == 1) {
                 return RETENTION_TIME_DIALOG_OPTION_MONTH;
             } else {
                 return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
@@ -1169,7 +1169,7 @@ public class ChatUtil {
             case 2:
                 return SECONDS_IN_WEEK;
             case 3:
-                return SECONDS_IN_MONTH_31;
+                return SECONDS_IN_MONTH_30;
             default:
                 return DISABLED_RETENTION_TIME;
         }
@@ -1188,7 +1188,7 @@ public class ChatUtil {
         long hours = seconds % SECONDS_IN_HOUR;
         long days = seconds % SECONDS_IN_DAY;
         long weeks = seconds % SECONDS_IN_WEEK;
-        long months = seconds % SECONDS_IN_MONTH_31;
+        long months = seconds % SECONDS_IN_MONTH_30;
         long years = seconds % SECONDS_IN_YEAR;
 
         if (years == 0) {
@@ -1196,7 +1196,7 @@ public class ChatUtil {
         }
 
         if (months == 0) {
-            int month = (int) (seconds / SECONDS_IN_MONTH_31);
+            int month = (int) (seconds / SECONDS_IN_MONTH_30);
             return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_months, month, month);
         }
 

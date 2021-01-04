@@ -178,6 +178,7 @@ public class Constants {
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
     public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
+    public static final int SECONDS_IN_MONTH_30 = SECONDS_IN_DAY * 30;
     public static final int SECONDS_IN_MONTH_31 = SECONDS_IN_DAY * 31;
     public static final int SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
 

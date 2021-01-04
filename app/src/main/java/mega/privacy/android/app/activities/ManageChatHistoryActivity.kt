@@ -38,6 +38,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         private const val OPTION_YEARS = 4
 
         private const val MINIMUM_VALUE_NUMBER_PICKER = 1
+        private const val DAYS_IN_A_WEEK_VALUE = 7
+        private const val DAYS_IN_A_MONTH_VALUE = 30
         private const val MAXIMUM_VALUE_NUMBER_PICKER_HOURS = 24
         private const val MAXIMUM_VALUE_NUMBER_PICKER_DAYS = 31
         private const val MAXIMUM_VALUE_NUMBER_PICKER_WEEKS = 4
@@ -244,8 +246,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             return
         }
 
-        val numberMonths = seconds / SECONDS_IN_MONTH_31
-        val months = seconds - numberMonths * SECONDS_IN_MONTH_31
+        val numberMonths = seconds / SECONDS_IN_MONTH_30
+        val months = seconds - numberMonths * SECONDS_IN_MONTH_30
 
         if (months == 0L) {
             updatePickersValues(
@@ -306,22 +308,37 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     /**
      * Method that transforms the chosen option into the most correct form:
      * - If the option selected is 24 hours, it becomes 1 day.
+     * - If the selected option is 7 days, it becomes 1 week.
      * - If the selected option is 31 days, it becomes 1 month.
+     * - If the selected option is 4 weeks, it becomes 1 month.
      * - If the selected option is 12 months, it becomes 1 year.
      */
     private fun updateOptionsAccordingly(){
-        if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_HOURS &&
-                binding.textPicker.value == OPTION_HOURS){
-                    updatePickersValues(
-                        OPTION_DAYS,
-                        getMaximumValueOfNumberPicker(OPTION_DAYS),
-                        MINIMUM_VALUE_NUMBER_PICKER
-                    )
+        if (binding.textPicker.value == OPTION_HOURS &&
+            binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+        ) {
+            updatePickersValues(
+                OPTION_DAYS,
+                getMaximumValueOfNumberPicker(OPTION_DAYS),
+                MINIMUM_VALUE_NUMBER_PICKER
+            )
             return
         }
 
-        if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_DAYS &&
-            binding.textPicker.value == OPTION_DAYS){
+        if (binding.textPicker.value == OPTION_DAYS &&
+            binding.numberPicker.value == DAYS_IN_A_WEEK_VALUE
+        ) {
+            updatePickersValues(
+                OPTION_WEEKS,
+                getMaximumValueOfNumberPicker(OPTION_WEEKS),
+                MINIMUM_VALUE_NUMBER_PICKER
+            )
+            return
+        }
+
+        if (binding.textPicker.value == OPTION_DAYS &&
+            binding.numberPicker.value == DAYS_IN_A_MONTH_VALUE
+        ) {
             updatePickersValues(
                 OPTION_MONTHS,
                 getMaximumValueOfNumberPicker(OPTION_MONTHS),
@@ -330,8 +347,20 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             return
         }
 
-        if(binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_MONTHS &&
-            binding.textPicker.value == OPTION_MONTHS){
+        if (binding.textPicker.value == OPTION_WEEKS &&
+            binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
+        ) {
+            updatePickersValues(
+                OPTION_MONTHS,
+                getMaximumValueOfNumberPicker(OPTION_MONTHS),
+                MINIMUM_VALUE_NUMBER_PICKER
+            )
+            return
+        }
+
+        if (binding.textPicker.value == OPTION_MONTHS &&
+            binding.numberPicker.value == MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
+        ) {
             updatePickersValues(
                 OPTION_YEARS,
                 getMaximumValueOfNumberPicker(OPTION_YEARS),
@@ -448,7 +477,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                         secondInOption = SECONDS_IN_WEEK
                     }
                     OPTION_MONTHS -> {
-                        secondInOption = SECONDS_IN_MONTH_31
+                        secondInOption = SECONDS_IN_MONTH_30
                     }
                     OPTION_YEARS -> {
                         secondInOption = SECONDS_IN_YEAR
