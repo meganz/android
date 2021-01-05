@@ -226,9 +226,15 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
      * @param numberValue The current value of number picker
      */
     private fun updatePickersValues(textValue: Int, maximumValue: Int, numberValue: Int) {
-        binding.textPicker.value = textValue
-        binding.numberPicker.maxValue = maximumValue
-        binding.numberPicker.value = numberValue
+        if (maximumValue < numberValue) {
+            binding.textPicker.value = OPTION_HOURS
+            binding.numberPicker.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
+            binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
+        } else {
+            binding.textPicker.value = textValue
+            binding.numberPicker.maxValue = maximumValue
+            binding.numberPicker.value = numberValue
+        }
         fillPickerText(binding.numberPicker.value)
     }
 
