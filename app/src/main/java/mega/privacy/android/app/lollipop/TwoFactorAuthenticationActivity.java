@@ -167,13 +167,6 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color_secondary));
-        }
-
         twoFactorAuthenticationActivity = this;
 
         tB = (Toolbar) findViewById(R.id.toolbar);

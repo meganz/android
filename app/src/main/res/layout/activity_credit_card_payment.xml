@@ -98,7 +98,7 @@
 
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <EditText
 	        android:id="@+id/address2_cc"
@@ -109,7 +109,7 @@
 
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <EditText
 	        android:id="@+id/city_cc"
@@ -120,7 +120,7 @@
 
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <EditText
 	        android:id="@+id/state_cc"
@@ -131,7 +131,7 @@
 
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <Spinner 
             android:id="@+id/country_cc"
@@ -147,7 +147,7 @@
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
 	       	android:singleLine="true"
-			android:theme="@style/ColorControlStyle"/>
+			android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
         
         <TextView
             android:id="@+id/payment_details_cc"
@@ -183,7 +183,7 @@
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <EditText
 	        android:id="@+id/last_name_cc"
@@ -193,7 +193,7 @@
 	        android:layout_gravity="center"
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <EditText
 	        android:id="@+id/credit_card_number_cc"
@@ -204,7 +204,7 @@
 	        android:imeOptions="actionNext"
 	        android:singleLine="true"
 	        android:inputType="number"
-			android:theme="@style/ColorControlStyle" />
+			android:theme="@style/ThemeOverlay.ColorControlSecondary" />
         
         <LinearLayout 
             android:layout_width="match_parent"
@@ -239,7 +239,7 @@
 		        android:inputType="number"
 		        android:imeOptions="actionDone"
 	        	android:singleLine="true"
-				android:theme="@style/ColorControlStyle" />
+				android:theme="@style/ThemeOverlay.ColorControlSecondary" />
             
         </LinearLayout>
         

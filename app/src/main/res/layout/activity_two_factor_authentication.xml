@@ -6,18 +6,13 @@
     android:layout_height="match_parent"
     android:id="@+id/container_2fa"
     android:fitsSystemWindows="true"
-    android:background="@color/camera_uploads_list_view">
+    android:background="@color/grey_020_dark_grey">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         tools:context=".lollipop.TwoFactorAuthenticationActivity" />
 
     <ScrollView
@@ -25,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
-        android:background="@color/white">
+        android:background="?android:attr/colorBackground">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -35,7 +30,7 @@
                 android:id="@+id/container_2fa_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/camera_uploads_list_view">
+                android:background="@color/grey_020_dark_grey">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -81,9 +76,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="32dp"
-                    android:textSize="16sp"
-                    android:fontFamily="roboto"
-                    android:textColor="?android:attr/textColorSecondary"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant"/>
 
                 <Button
                     android:id="@+id/button_enable_2fa"
@@ -92,12 +85,7 @@
                     android:layout_below="@id/content_2fa"
                     android:layout_marginBottom="72dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@drawable/background_accent_button"
-                    android:elevation="8dp"
-                    android:textColor="@color/white"
-                    android:fontFamily="roboto"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
+                    style="?attr/materialButtonStyle"
                     android:text="@string/button_setup_2fa"/>
 
             </RelativeLayout>
@@ -110,8 +98,8 @@
         android:id="@+id/scroll_container_verify"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"
-        android:background="@color/white">
+        android:background="?android:attr/colorBackground"
+        android:layout_below="@+id/toolbar">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -127,23 +115,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/explain_qr_seed_2fa_1"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
-                    android:paddingTop="17dp"
-                    android:fontFamily="roboto"/>
+                    android:paddingTop="17dp" />
 
                 <TextView
                     android:id="@+id/explain_qr_seed_2fa_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="14sp"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="3dp"
-                    android:fontFamily="roboto"
                     android:layout_below="@+id/explain_qr_seed_2fa_1"/>
 
                 <RelativeLayout
@@ -357,11 +341,7 @@
                     android:layout_below="@+id/seed_2fa"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="32dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:background="@drawable/background_accent_button"
-                    android:elevation="8dp"
-                    android:textColor="@color/white"
+                    style="?attr/materialButtonStyle"
                     android:text="@string/open_app_button"/>
 
                 <Button
@@ -371,13 +351,8 @@
                     android:layout_below="@+id/button_open_with_2fa"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="24dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:background="@color/white"
-                    android:elevation="0dp"
-                    android:textColor="@color/accentColor"
                     android:text="@string/general_next"
-                    style="?android:attr/borderlessButtonStyle"/>
+                    style="?attr/borderlessButtonStyle"/>
 
             </RelativeLayout>
 
@@ -393,14 +368,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/explain_confirm_2fa"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingTop="24dp"
                     android:paddingBottom="24dp"
-                    android:fontFamily="roboto"
-                    android:background="@color/camera_uploads_list_view"/>
+                    android:background="@color/grey_020_dark_grey"/>
 
                 <LinearLayout
                     android:id="@+id/six_pin_2fa_layout"
@@ -421,7 +394,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/ColorControlStyle"/>
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_second"
@@ -433,7 +406,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_third"
@@ -445,7 +418,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_fourth"
@@ -457,7 +430,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_fifth"
@@ -469,7 +442,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pass_sixth"
@@ -481,18 +454,17 @@
                         android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/pin_2fa_error"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="12sp"
+                    android:textAppearance="?attr/textAppearanceCaption"
                     android:layout_marginBottom="40dp"
                     android:text="@string/pin_error_2fa"
                     android:textColor="@color/red_600_red_300"
-                    android:fontFamily="roboto"
                     android:layout_below="@+id/six_pin_2fa_layout"
                     android:layout_centerHorizontal="true"
                     android:layout_marginLeft="5dp"
@@ -509,19 +481,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/toolbar"
-        android:visibility="gone"
-        android:background="@color/white">
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@color/white">
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/camera_uploads_list_view">
+                android:background="@color/grey_020_dark_grey">
 
                 <ImageView
                     android:id="@+id/image_2fa_enabled"
@@ -619,26 +589,19 @@
                     android:id="@+id/button_export_rk"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/background_accent_button"
-                    android:elevation="8dp"
+                    style="?attr/materialButtonStyle"
                     android:layout_margin="10dp"
-                    android:textColor="@color/white"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
                     android:text="@string/option_export_recovery_key"/>
 
                 <Button
                     android:id="@+id/button_dismiss_rk"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
                     android:layout_toRightOf="@+id/button_export_rk"
                     android:layout_marginLeft="20dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
                     android:layout_margin="10dp"
                     android:text="@string/general_close"
-                    style="?android:attr/borderlessButtonStyle"/>
+                    style="?attr/borderlessButtonStyle"/>
 
 
             </RelativeLayout>

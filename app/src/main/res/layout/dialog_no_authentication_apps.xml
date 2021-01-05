@@ -50,9 +50,6 @@
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:text="@string/general_cancel"
-                android:textSize="14sp"
-                android:fontFamily="roboto"
-                android:textColor="@color/accentColor"
                 android:layout_marginRight="8dp"/>
 
             <Button
@@ -60,10 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
-                android:text="@string/context_open_link"
-                android:textSize="14sp"
-                android:fontFamily="roboto"
-                android:textColor="@color/accentColor"/>
+                android:text="@string/context_open_link" />
 
         </LinearLayout>
 

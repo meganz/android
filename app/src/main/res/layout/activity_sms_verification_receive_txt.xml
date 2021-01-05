@@ -52,7 +52,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:textSize="32sp"
-            android:theme="@style/ColorControlStyle" />
+            android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/verify_account_input_code_second"
@@ -63,7 +63,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:textSize="32sp"
-            android:theme="@style/ColorControlStyle" />
+            android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/verify_account_input_code_third"
@@ -74,7 +74,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:textSize="32sp"
-            android:theme="@style/ColorControlStyle" />
+            android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/verify_account_input_code_fourth"
@@ -85,7 +85,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:textSize="32sp"
-            android:theme="@style/ColorControlStyle" />
+            android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/verify_account_input_code_fifth"
@@ -96,7 +96,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:textSize="32sp"
-            android:theme="@style/ColorControlStyle" />
+            android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
         <mega.privacy.android.app.components.EditTextPIN
             android:id="@+id/verify_account_input_code_sixth"
@@ -107,7 +107,7 @@
             android:inputType="number"
             android:maxLength="1"
             android:textSize="32sp"
-            android:theme="@style/ColorControlStyle" />
+            android:theme="@style/ThemeOverlay.ColorControlSecondary" />
     </LinearLayout>
 
     <TextView

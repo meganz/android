@@ -34,7 +34,7 @@
 		android:layout_below="@id/dialog_cancel_text"
 		android:hint="@string/hint_cancel_subscriptions"
 		android:scrollHorizontally="false"
-		android:theme="@style/ColorControlStyle"
+		android:theme="@style/ThemeOverlay.ColorControlSecondary"
 		android:textSize="14sp"
 		android:textColor="?android:attr/textColorPrimary"
 		android:layout_marginTop="15dp"/>

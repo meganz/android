@@ -22,7 +22,7 @@
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
 				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:theme="@style/ColorControlStyle"/>
+				android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
 			<LinearLayout
 				android:id="@+id/administrator_text_layout"
@@ -62,7 +62,7 @@
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
 				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:theme="@style/ColorControlStyle"/>
+				android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
 			<LinearLayout
 				android:id="@+id/member_text_layout"
@@ -102,7 +102,7 @@
 				android:ellipsize="marquee"
 				android:layout_gravity="center_vertical"
 				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:theme="@style/ColorControlStyle"/>
+				android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
 			<LinearLayout
 				android:id="@+id/observer_text_layout"

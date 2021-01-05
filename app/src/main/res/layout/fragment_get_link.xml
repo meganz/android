@@ -110,7 +110,7 @@
                     android:layout_toRightOf="@id/link_without_key_image"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16dp"
-                    android:theme="@style/ColorControlStyle"/>
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -142,7 +142,7 @@
                     android:layout_marginRight="16dp"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16dp"
-                    android:theme="@style/ColorControlStyle"/>
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
             </RelativeLayout>
 
@@ -175,7 +175,7 @@
                     android:checked="true"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textSize="16dp"
-                    android:theme="@style/ColorControlStyle"/>
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
             </RelativeLayout>
 

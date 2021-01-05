@@ -411,8 +411,7 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/app_name">
         </activity>
 
         <activity

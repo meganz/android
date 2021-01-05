@@ -224,7 +224,7 @@
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_second_login"
@@ -236,7 +236,7 @@
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_third_login"
@@ -248,7 +248,7 @@
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fouth_login"
@@ -260,7 +260,7 @@
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_fifth_login"
@@ -272,7 +272,7 @@
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                     <mega.privacy.android.app.components.EditTextPIN
                         android:id="@+id/pin_sixth_login"
@@ -284,7 +284,7 @@
                         android:maxLength="1"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="32sp"
-                        android:theme="@style/ColorControlStyle" />
+                        android:theme="@style/ThemeOverlay.ColorControlSecondary" />
                 </LinearLayout>
 
                 <TextView

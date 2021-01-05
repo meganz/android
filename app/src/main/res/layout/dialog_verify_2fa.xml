@@ -14,12 +14,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:fontFamily="roboto"
+            android:textAppearance="@style/TextAppearance.Mega.Headline6"
+            android:textColor="@color/white_087_grey_087"
             android:elevation="4dp"
             android:padding="10dp"
-            android:background="@color/lollipop_primary_color"/>
+            android:background="@color/red_600_red_400"/>
 
         <RelativeLayout
             android:id="@+id/container_confirm_2fa_verify"
@@ -33,10 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/explain_confirm_2fa"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:gravity="center"
-                android:fontFamily="roboto"
                 android:layout_marginTop="40dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
@@ -61,7 +58,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/ColorControlStyle" />
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_second_verify"
@@ -73,7 +70,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/ColorControlStyle" />
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_third_verify"
@@ -85,7 +82,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/ColorControlStyle" />
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_fouth_verify"
@@ -97,7 +94,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/ColorControlStyle" />
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_fifth_verify"
@@ -109,7 +106,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/ColorControlStyle" />
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
                 <mega.privacy.android.app.components.EditTextPIN
                     android:id="@+id/pin_sixth_verify"
@@ -121,7 +118,7 @@
                     android:imeOptions="actionNext"
                     android:inputType="number"
                     android:maxLength="1"
-                    android:theme="@style/ColorControlStyle" />
+                    android:theme="@style/ThemeOverlay.ColorControlSecondary" />
             </LinearLayout>
 
             <TextView
@@ -150,22 +147,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lost_your_authenticator_device"
-                    android:textColor="@color/accentColor"
+                    android:textColor="?attr/colorSecondary"
                     android:textSize="13sp"
                     android:layout_centerHorizontal="true"/>
 
             </RelativeLayout>
 
-            <ProgressBar
-                android:id="@+id/progressbar_verify_2fa"
-                style="?android:attr/progressBarStyleLargeInverse"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:visibility="gone"/>
-
         </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressbar_verify_2fa"
+            style="?android:attr/progressBarStyleLargeInverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
     </LinearLayout>
 </ScrollView>

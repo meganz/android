@@ -266,11 +266,6 @@
         <item name="android:windowMinWidthMinor">85%</item>
     </style>
 
-    <style name="ColorControlStyle" parent="Theme.Mega">
-        <item name="android:colorControlNormal">?android:attr/textColorSecondary</item>
-        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
-    </style>
-
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
@@ -716,4 +711,10 @@
         <item name="android:layout_marginBottom">24dp</item>
         <item name="android:textAppearance">@style/TextAppearance.Mega.Caption.Italic</item>
     </style>
+
+    <style name="ThemeOverlay.ColorControlSecondary" parent="">
+        <item name="android:colorControlNormal">?android:attr/textColorSecondary</item>
+        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
+    </style>
+
 </resources>

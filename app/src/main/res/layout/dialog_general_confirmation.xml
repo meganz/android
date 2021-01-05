@@ -24,7 +24,7 @@
             android:id="@+id/confirmation_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:theme="@style/ColorControlStyle"/>
+            android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
         <TextView
             android:id="@+id/do_not_show_text"

@@ -17,7 +17,7 @@
         android:imeOptions="actionDone"
         android:singleLine="true"
         android:textColor="?android:attr/textColorPrimary"
-        android:theme="@style/ColorControlStyle"/>
+        android:theme="@style/ThemeOverlay.ColorControlSecondary"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
