@@ -155,4 +155,7 @@
 
     <!-- Same to colorSecondary -->
     <color name="teal_300_teal_200">@color/teal_200</color>
+
+    <!-- "Contact" title in Notifications Screen -->
+    <color name="jade_600_jade_300">@color/jade_300</color>
 </resources>

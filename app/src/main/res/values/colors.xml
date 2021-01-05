@@ -323,6 +323,7 @@
     <color name="green_400">#56C13E</color>
     <color name="green_500">#31B500</color>
 
+    <color name="jade_300">#4DB6AC</color>
     <color name="jade_600">#00897B</color>
 
     <color name="salmon_300">#F37476</color>
@@ -509,5 +510,8 @@
 
     <!-- Same to colorSecondary -->
     <color name="teal_300_teal_200">@color/teal_300</color>
+
+    <!-- "Contact" title in Notifications Screen -->
+    <color name="jade_600_jade_300">@color/jade_600</color>
 
 </resources>
