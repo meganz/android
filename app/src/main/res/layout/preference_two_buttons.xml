@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -7,20 +8,20 @@
     android:paddingBottom="16dp">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_cookie_policy"
+        android:id="@+id/btn_first"
         style="@style/Widget.Mega.Button.Policy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cookie Policy"
-        android:theme="@style/Theme.MaterialComponents.Bridge" />
+        android:theme="@style/Theme.MaterialComponents.Bridge"
+        tools:text="Cookie Policy" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_privacy_policy"
+        android:id="@+id/btn_second"
         style="@style/Widget.Mega.Button.Policy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:text="Privacy Policy"
-        android:theme="@style/Theme.MaterialComponents.Bridge" />
+        android:theme="@style/Theme.MaterialComponents.Bridge"
+        tools:text="Privacy Policy" />
 
 </LinearLayout>

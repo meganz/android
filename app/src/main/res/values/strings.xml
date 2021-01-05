@@ -2960,5 +2960,12 @@
     <string name="dialog_cookie_settings">COOKIE SETTINGS</string>
     <string name="dialog_cookie_confirmation_message">Are you sure you want to change Cookie Settings?</string>
     <string name="dialog_cookie_confirmation_saved">Cookie Settings changes has been saved.</string>
+    <string name="dialog_cookie_thirdparty_title">Third Party Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle1">Google Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle2">Category: Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
+    <string name="preference_cookies_policies_privacy">"Privacy Policy"</string>
+    <string name="preference_cookies_policies_cookie">"Cookie Policy"</string>
 
 </resources>

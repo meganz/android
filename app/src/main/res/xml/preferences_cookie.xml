@@ -50,12 +50,16 @@
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cookie_accept"
         android:key="settings_cookie_third_party"
-        android:summary="These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information' below for details on all the third party Cookies we use."
+        android:summary="@string/preference_cookies_thirdparty_summary"
         android:title="Third Party Cookies"
         app:allowDividerAbove="true"
         app:allowDividerBelow="false"
         app:iconSpaceReserved="false" />
 
-    <Preference android:layout="@layout/preference_cookie" />
+    <mega.privacy.android.app.components.TwoButtonsPreference
+        android:key="setting_cookie_policies"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="false"
+        app:iconSpaceReserved="false" />
 
 </androidx.preference.PreferenceScreen>

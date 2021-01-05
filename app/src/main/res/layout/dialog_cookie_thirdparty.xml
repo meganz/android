@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_cookie_thirdparty_title"
+        android:textAppearance="?textAppearanceHeadline6"
+        android:textColor="@color/primary_text" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Google Advertising Cookies"
+        android:textAppearance="?textAppearanceSubtitle2"
+        android:textColor="@color/primary_text" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Category: Advertising Cookies"
+        android:textAppearance="?textAppearanceBody2"
+        android:textColor="@color/primary_text" />
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:autoLink="all"
+        android:linksClickable="true"
+        android:text="@string/dialog_cookie_thirdparty_message"
+        android:textAppearance="?textAppearanceBody2"
+        android:textColor="@color/transparent_black2"
+        android:textColorLink="@color/accentColor" />
+
+</LinearLayout>

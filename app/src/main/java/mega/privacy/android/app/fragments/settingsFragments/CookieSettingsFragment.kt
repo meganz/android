@@ -1,7 +1,10 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -9,6 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.CookieSettingsViewModel.Cookie
 import mega.privacy.android.app.fragments.settingsFragments.CookieSettingsViewModel.Cookie.*
@@ -24,6 +28,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     private lateinit var analyticsCookiesPreference: SwitchPreferenceCompat
     private lateinit var advertisingCookiesPreference: SwitchPreferenceCompat
     private lateinit var thirdPartyCookiesPreference: SwitchPreferenceCompat
+    private lateinit var policiesPreference: TwoButtonsPreference
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_cookie)
@@ -34,6 +39,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         analyticsCookiesPreference = findPreference(KEY_COOKIE_ANALYTICS)!!
         advertisingCookiesPreference = findPreference(KEY_COOKIE_ADVERTISING)!!
         thirdPartyCookiesPreference = findPreference(KEY_COOKIE_THIRD_PARTY)!!
+        policiesPreference = findPreference(KEY_COOKIE_POLICIES)!!
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -46,6 +52,16 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         analyticsCookiesPreference.onPreferenceChangeListener = this
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
+        thirdPartyCookiesPreference.setOnPreferenceClickListener {
+            showThirdPartyInfoDialog()
+            true
+        }
+        policiesPreference.setButton1(getString(R.string.preference_cookies_policies_cookie)) {
+            openBrowser("https://mega.nz/cookie".toUri())
+        }
+        policiesPreference.setButton2(getString(R.string.preference_cookies_policies_privacy)) {
+            openBrowser("https://mega.nz/privacy".toUri())
+        }
     }
 
     private fun showConfiguration(settings: Set<Cookie>?) {
@@ -95,11 +111,25 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             .show()
     }
 
+    private fun showThirdPartyInfoDialog() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+            .setView(R.layout.dialog_cookie_thirdparty)
+            .setPositiveButton(android.R.string.yes, null)
+            .create()
+            .show()
+    }
+
     private fun showConfirmationSnackbar() {
         Snackbar.make(
             requireView(),
             R.string.dialog_cookie_confirmation_saved,
             Snackbar.LENGTH_SHORT
         ).show()
+    }
+
+    private fun openBrowser(uri: Uri) {
+        startActivity(Intent(Intent.ACTION_VIEW).apply {
+            data = uri
+        })
     }
 }
