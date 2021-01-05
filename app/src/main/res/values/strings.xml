@@ -2958,5 +2958,7 @@
     <string name="dialog_cookie_policy">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
     <string name="dialog_cookie_accept">ACCEPT COOKIES</string>
     <string name="dialog_cookie_settings">COOKIE SETTINGS</string>
+    <string name="dialog_cookie_confirmation_message">Are you sure you want to change Cookie Settings?</string>
+    <string name="dialog_cookie_confirmation_saved">Cookie Settings changes has been saved.</string>
 
 </resources>
