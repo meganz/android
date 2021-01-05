@@ -90,10 +90,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         isFromContacts = intent.extras!!.getBoolean(IS_FROM_CONTACTS)
 
         if (chatId != MEGACHAT_INVALID_HANDLE) {
-            logDebug("Group info")
             chat = megaChatApi.getChatRoom(chatId)
         } else {
-            logDebug("Contact info")
             val email = intent.extras!!.getString(EMAIL)
 
             if (TextUtil.isTextEmpty(email)) {
@@ -491,7 +489,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
                 }
 
                 val totalSeconds = binding.numberPicker.value * secondInOption
-
                 megaChatApi.setChatRetentionTime(
                     chatId,
                     totalSeconds.toLong(),

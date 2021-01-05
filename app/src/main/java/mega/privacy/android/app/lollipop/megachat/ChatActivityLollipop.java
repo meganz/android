@@ -827,7 +827,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         chatActivity = this;
         chatC = new ChatController(chatActivity);
-
         registerReceiver(historyTruncatedByRetentionTimeReceiver, new IntentFilter(BROADCAST_ACTION_UPDATE_HISTORY_BY_RT));
         registerReceiver(dialogConnectReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG));
         registerReceiver(voiceclipDownloadedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED));
@@ -1518,6 +1517,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         megaChatApi.closeChatRoom(idChat, this);
+
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
             return true;
@@ -1547,7 +1547,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (!initChat()) {
             return;
         }
-
         initializeInputText();
 
         int chatConnection = megaChatApi.getChatConnectionState(idChat);
@@ -6186,33 +6185,36 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * @param msgId Message ID from which the messages are to be deleted.
      */
     private void updateHistoryByRetentionTime(long msgId) {
-        for (AndroidMegaChatMessage message : messages) {
-            if (message != null && message.getMessage() != null &&
-                    message.getMessage().getMsgId() == msgId) {
+        if (messages != null && !messages.isEmpty()) {
+            for (AndroidMegaChatMessage message : messages) {
+                if (message != null && message.getMessage() != null &&
+                        message.getMessage().getMsgId() == msgId) {
 
-                int position = messages.indexOf(message);
+                    int position = messages.indexOf(message);
 
-                if (position < messages.size() - 1) {
-                    List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
-                    messages.clear();
+                    if (position < messages.size() - 1) {
+                        List<AndroidMegaChatMessage> messagesCopy = new ArrayList<>(messages);
+                        messages.clear();
 
-                    for (int i = position + 1; i < messagesCopy.size(); i++) {
-                        messages.add(messagesCopy.get(i));
+                        for (int i = position + 1; i < messagesCopy.size(); i++) {
+                            messages.add(messagesCopy.get(i));
+                        }
+                    } else {
+                        messages.clear();
                     }
-                } else {
-                    messages.clear();
-                }
 
-                updateMessages();
-                break;
+                    updateMessages();
+                    break;
+                }
             }
         }
     }
 
     @Override
     public void onHistoryTruncatedByRetentionTime(MegaChatApiJava api, MegaChatMessage msg) {
-        if (msg == null || messages == null || messages.isEmpty())
+        if (msg == null) {
             return;
+        }
 
         updateHistoryByRetentionTime(msg.getMsgId());
     }
