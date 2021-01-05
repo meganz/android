@@ -17,11 +17,9 @@
             android:layout_gravity="center"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:fontFamily="roboto"
             android:gravity="center"
             android:text="@string/title_enable_2fa"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="20sp" />
+            android:textAppearance="?attr/textAppearanceHeadline6" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -35,11 +33,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
-            android:fontFamily="roboto"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
             android:gravity="center"
-            android:text="@string/two_factor_authentication_explain"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="16sp" />
+            android:text="@string/two_factor_authentication_explain" />
 
         <Button
             android:id="@+id/enable_2fa_button"

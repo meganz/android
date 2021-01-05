@@ -216,7 +216,7 @@
     </style>
 
     <!-- Chat new message -->
-    <style name="TextAppearance.Mega.Body2.Variant5">
+    <style name="TextAppearance.Mega.Body2.Variant5">14sp
         <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 

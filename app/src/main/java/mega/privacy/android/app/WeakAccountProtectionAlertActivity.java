@@ -45,8 +45,6 @@ public class WeakAccountProtectionAlertActivity extends PinActivityLollipop impl
 
         setContentView(R.layout.activity_weak_account_protection_alert);
 
-        getWindow().setStatusBarColor(getResources().getColor(R.color.status_bar_red_alert));
-
         scrollContentLayout = findViewById(R.id.scroll_content_layout);
 
         verifyEmailText = findViewById(R.id.verify_email_text);
