@@ -483,7 +483,6 @@
         <activity
             android:name="mega.privacy.android.app.AuthenticityCredentialsActivity"
             android:label="@string/authenticity_credentials_label"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 

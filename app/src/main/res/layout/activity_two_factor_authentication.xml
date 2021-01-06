@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/container_2fa"
     android:fitsSystemWindows="true"
-    android:background="@color/grey_020_dark_grey">
+    android:background="@color/grey_020_white_012">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -30,7 +30,7 @@
                 android:id="@+id/container_2fa_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/grey_020_dark_grey">
+                android:background="@color/grey_020_white_012">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -373,7 +373,7 @@
                     android:paddingRight="16dp"
                     android:paddingTop="24dp"
                     android:paddingBottom="24dp"
-                    android:background="@color/grey_020_dark_grey"/>
+                    android:background="@color/grey_020_white_012"/>
 
                 <LinearLayout
                     android:id="@+id/six_pin_2fa_layout"
@@ -491,7 +491,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/grey_020_dark_grey">
+                android:background="@color/grey_020_white_012">
 
                 <ImageView
                     android:id="@+id/image_2fa_enabled"

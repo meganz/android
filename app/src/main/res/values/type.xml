@@ -119,17 +119,12 @@
     </style>
 
     <!--- 0.5px -->
-    <style name="TextAppearance.Mega.Subtitle2.Variant" parent="TextAppearance.MaterialComponents.Subtitle2">
+    <style name="TextAppearance.Mega.Subtitle2.Variant">
         <item name="android:letterSpacing">0.035714286</item>
     </style>
 
-    <style name="TextAppearance.Mega.Subtitle2.Variant.Medium">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="fontFamily">sans-serif-medium</item>
-    </style>
-
     <!--- 0.5px, Medium, AllCap -->
-    <style name="TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps">
+    <style name="TextAppearance.Mega.Subtitle2.Variant.AllCaps">
         <item name="android:textAllCaps">true</item>
     </style>
 
@@ -356,5 +351,10 @@
         <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <!-- Authenticity your credentials, 13sp -->
+    <style name="TextAppearance.Mega.SmallCredential" parent="TextAppearance.Mega.Body2.Secondary.Variant" >
+        <item name="android:textSize">13sp</item>
     </style>
 </resources>

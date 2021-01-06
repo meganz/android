@@ -30,7 +30,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginRight="21dp"
                 android:text="@string/unlocked_rewards_title"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" />
 
             <TableLayout
                 android:id="@+id/unlocked_rewards_content_table"
@@ -81,7 +81,7 @@
                                     android:layout_marginLeft="2dp"
                                     android:layout_toRightOf="@+id/unlocked_storage_text"
                                     android:textColor="@color/dark_blue_500_200"
-                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps"/>
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps"/>
                             </RelativeLayout>
 
                             <TextView
@@ -126,7 +126,7 @@
                                     android:layout_marginLeft="2dp"
                                     android:layout_toRightOf="@+id/unlocked_transfer_text"
                                     android:textColor="@color/green_500_green_400"
-                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.Medium.AllCaps" /> />
+                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AllCaps" /> />
                             </RelativeLayout>
 
                             <TextView
