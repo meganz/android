@@ -60,6 +60,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -149,8 +150,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
-
         if (savedInstanceState != null) {
             isFullScreenEnabled = savedInstanceState.getBoolean(IS_FULL_SCREEN_ENABLED, false);
         } else {
@@ -183,7 +182,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         setFullScreenFab.setVisibility(View.GONE);
         myLocationFab = findViewById(R.id.my_location_fab);
         Drawable myLocationFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_small_location));
-        myLocationFabDrawable.setAlpha(143);
         myLocationFab.setImageDrawable(myLocationFabDrawable);
         myLocationFab.setOnClickListener(this);
         myLocationFab.setVisibility(View.GONE);
@@ -203,7 +201,7 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         geocoder = new Geocoder(this, Locale.getDefault());
 
-        fullscreenIconMarker = drawableBitmap(mutateIconSecondary(this, R.drawable.ic_send_location, R.color.dark_primary_color_secondary));
+        fullscreenIconMarker = drawableBitmap(mutateIconSecondary(this, R.drawable.ic_send_location, R.color.red_800));
     }
 
     /**
@@ -287,7 +285,6 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
         } else {
             setFullScreenFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_location));
         }
-        setFullScreenFabDrawable.setAlpha(143);
         setFullScreenFab.setImageDrawable(setFullScreenFabDrawable);
     }
 
@@ -428,7 +425,9 @@ public class MapsActivity extends PinActivityLollipop implements OnMapReadyCallb
                             currentAddress = new MapAddress(latLng, getString(R.string.current_location_landscape_label, addressLine), addressLine);
                             String textToShow = String.format(currentAddress.getName());
                             try {
-                                textToShow = textToShow.replace("[A]", "<font color=\'#8c8c8c\'>");
+                                textToShow = textToShow.replace("[A]", "<font color=\'"
+                                        + ColorUtils.getColorHexString(MapsActivity.this, R.color.grey_500_grey_400)
+                                        + "\'>");
                                 textToShow = textToShow.replace("[/A]", "</font>");
                             } catch (Exception e) {
                                 e.printStackTrace();

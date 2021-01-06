@@ -12,12 +12,8 @@
         android:id="@+id/toolbar_maps"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        app:titleTextAppearance="@style/ToolbarTitle"
-        app:popupTheme="@style/Theme.Megaactionbar"
-        app:theme="@style/Theme.Megaactionbar"
+        android:minHeight="?attr/actionBarSize"
         tools:context=".lollipop.megachat" />
 
     <RelativeLayout
@@ -31,36 +27,37 @@
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
         <ImageView
             android:id="@+id/fullscreen_marker_icon_shadow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/icon_marker_shadow"
-            android:layout_centerHorizontal="true"
             android:layout_alignBottom="@+id/fullscreen_marker_icon"
-            android:paddingBottom="55dp"/>
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/icon_marker_shadow"
+            android:paddingBottom="55dp" />
 
         <ImageView
             android:id="@+id/fullscreen_marker_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_send_location"
-            android:tint="@color/dark_primary_color_secondary"
             android:layout_centerInParent="true"
-            android:paddingBottom="24dp"/>
+            android:paddingBottom="24dp"
+            android:src="@drawable/ic_send_location"
+            app:tint="@color/red_800" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/set_fullscreen_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
-            app:fabCustomSize="45dp"
+            android:layout_marginTop="10dp"
+            android:alpha="0.9"
             android:scaleType="center"
+            app:tint="@color/grey_alpha_054"
             app:backgroundTint="@color/white"
-            android:alpha="0.9"/>
+            app:fabCustomSize="45dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/my_location_fab"
@@ -69,10 +66,11 @@
             android:layout_alignParentRight="true"
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
-            app:fabCustomSize="45dp"
+            android:alpha="0.9"
             android:scaleType="center"
+            app:tint="@color/grey_alpha_054"
             app:backgroundTint="@color/white"
-            android:alpha="0.9"/>
+            app:fabCustomSize="45dp" />
 
         <ProgressBar
             android:id="@+id/progressbar_maps"
@@ -80,12 +78,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="gone"/>
+            android:visibility="gone" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/send_current_location_layout"
-        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_alignParentBottom="true">
@@ -96,66 +93,63 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            android:alpha="0.56"
-            android:src="@drawable/ic_location"/>
+            android:src="@drawable/ic_location"
+            app:tint="?android:attr/textColorSecondary" />
 
         <TextView
             android:id="@+id/address_name_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="?android:attr/textColorPrimary"
-            android:layout_marginTop="16dp"
             android:layout_marginLeft="32dp"
+            android:layout_marginTop="16dp"
             android:layout_marginRight="16dp"
-            android:maxLines="1"
+            android:layout_toRightOf="@id/address_icon"
             android:ellipsize="end"
-            android:layout_toRightOf="@id/address_icon"/>
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant" />
 
         <TextView
             android:id="@+id/address_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="?android:attr/textColorSecondary"
+            android:layout_below="@id/address_name_label"
+            android:layout_alignLeft="@+id/address_name_label"
             android:layout_marginTop="5dp"
             android:layout_marginRight="16dp"
-            android:maxLines="1"
             android:ellipsize="end"
-            android:layout_below="@id/address_name_label"
-            android:layout_alignLeft="@+id/address_name_label"/>
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/send_current_location_layout_landscape"
-        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"
+        android:background="@color/white"
         android:visibility="gone">
 
         <ImageView
             android:id="@+id/address_icon_landscape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_centerVertical="true"
-            android:alpha="0.56"
-            android:src="@drawable/ic_location"/>
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_location"
+            app:tint="?android:attr/textColorSecondary" />
 
         <TextView
             android:id="@+id/address_name_label_landscape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="?android:attr/textColorPrimary"
             android:layout_centerVertical="true"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="16dp"
-            android:maxLines="1"
+            android:layout_toRightOf="@id/address_icon_landscape"
             android:ellipsize="end"
-            android:layout_toRightOf="@id/address_icon_landscape"/>
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant" />
 
     </RelativeLayout>
 
