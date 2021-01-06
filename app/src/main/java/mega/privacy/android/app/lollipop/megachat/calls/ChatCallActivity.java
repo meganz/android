@@ -3247,11 +3247,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         int keyCode = event.getKeyCode();
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                app.muteOrUnmute(false);
+                if(app.isAnIncomingCallRinging()){
+                    app.muteOrUnmute(false);
+                }
                 return false;
 
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                app.muteOrUnmute(true);
+                if(app.isAnIncomingCallRinging()){
+                    app.muteOrUnmute(true);
+                }
                 return false;
 
             default:
