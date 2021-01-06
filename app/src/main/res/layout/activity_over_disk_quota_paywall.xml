@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scroll_content_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -25,13 +24,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="23dp"
-                android:fontFamily="sans-serif-light"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="23dp"
                 android:text="@string/over_disk_quota_paywall_header"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textAppearance="@style/TextAppearance.Mega.Headline6.Medium" />
         </RelativeLayout>
 
         <LinearLayout
@@ -47,9 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="27dp"
                 android:text="@string/over_disk_quota_paywall_title"
-                android:textColor="@color/grey_alpha_087"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant1" />
 
             <TextView
                 android:id="@+id/over_disk_quota_paywall_text"
@@ -57,8 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
                 android:text="We have contacted you by email to %1$s on %2$s, but you still have %3$s files taking up %4$s in your MEGA account, which requires you to have PRO Lite."
-                android:textColor="@color/grey_alpha_087"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
                 tools:ignore="HardcodedText" />
 
             <LinearLayout
@@ -80,8 +73,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
                     android:text="@string/over_disk_quota_paywall_deletion_warning"
-                    android:textColor="@color/grey_alpha_087"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             </LinearLayout>
 
@@ -92,9 +84,7 @@
 
                 <Button
                     android:id="@+id/dismiss_button"
-                    style="@style/ButtonStyleWithoutBorder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="?attr/borderlessButtonStyle"
                     android:layout_gravity="end"
                     android:layout_marginEnd="26dp"
                     android:layout_toStartOf="@+id/upgrade_button"
@@ -102,24 +92,17 @@
                     android:paddingTop="10dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="10dp"
-                    android:text="@string/general_dismiss"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    android:text="@string/general_dismiss" />
 
                 <Button
                     android:id="@+id/upgrade_button"
-                    style="@style/ButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="?attr/materialButtonStyle"
                     android:layout_alignParentEnd="true"
-                    android:background="@drawable/background_accent_button"
                     android:paddingStart="16dp"
                     android:paddingTop="10dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="10dp"
-                    android:text="@string/my_account_upgrade_pro"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
+                    android:text="@string/my_account_upgrade_pro" />
             </RelativeLayout>
 
         </LinearLayout>

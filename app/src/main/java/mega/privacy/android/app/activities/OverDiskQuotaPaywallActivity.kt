@@ -19,6 +19,7 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRAD
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PinActivityLollipop
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
 import mega.privacy.android.app.utils.LogUtil.*
@@ -187,7 +188,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
-            text = text.replace("[M]", "<font color='" + ContextCompat.getColor(applicationContext, R.color.mega) + "'>")
+            text = text.replace("[M]", "<font color='" + ColorUtils.getThemeColorHexString(applicationContext, R.attr.colorError) + "'>")
             text = text.replace("[/M]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)

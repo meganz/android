@@ -99,6 +99,11 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <!-- Medium, normal, 18sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant1">
+        <item name="textSize">18sp</item>
+    </style>
+
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
     <!-- Medium, 14sp, 0px, textColorPrimary-->
     <style name="TextAppearance.Mega.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
