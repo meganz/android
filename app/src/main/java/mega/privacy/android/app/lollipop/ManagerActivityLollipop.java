@@ -19,6 +19,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
@@ -2436,6 +2437,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
+		getProLayout.setBackgroundColor(Util.isDarkMode(this)
+				? ColorUtils.getColorForElevation(this, 8f) : Color.WHITE);
 		String getProTextString = getString(R.string.get_pro_account);
 		try {
 			getProTextString = getProTextString.replace("[A]", "\n");

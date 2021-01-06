@@ -35,10 +35,9 @@
             android:elevation="0dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
+            style="?attr/borderlessButtonStyle"
             android:stateListAnimator="@null"
-            android:text="@string/general_cancel"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            android:text="@string/general_cancel" />
 
         <Button
             android:id="@+id/btnRight_upgrade"
@@ -51,7 +50,6 @@
             android:paddingRight="5dp"
             android:stateListAnimator="@null"
             android:text="@string/my_account_upgrade_pro_panel"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp" />
+            style="?attr/borderlessButtonStyle" />
     </LinearLayout>
 </LinearLayout>
