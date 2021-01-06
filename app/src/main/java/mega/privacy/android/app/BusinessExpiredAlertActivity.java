@@ -12,6 +12,7 @@ import androidx.core.text.HtmlCompat;
 
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -77,7 +78,7 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'" + ColorUtils.getColorHexString(this, R.color.black_white) + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
