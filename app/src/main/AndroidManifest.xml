@@ -416,8 +416,7 @@
 
         <activity
             android:name="mega.privacy.android.app.BusinessExpiredAlertActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar">
+            android:label="@string/app_name">
         </activity>
 
         <activity
@@ -639,7 +638,6 @@
         <activity
             android:name=".activities.OverDiskQuotaPaywallActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 
