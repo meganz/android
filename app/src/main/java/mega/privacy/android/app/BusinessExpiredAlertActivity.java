@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
 import mega.privacy.android.app.lollipop.MyAccountInfo;
@@ -57,7 +58,7 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
         RelativeLayout.LayoutParams expiredImageParams = (RelativeLayout.LayoutParams) expiredImage.getLayoutParams();
 
         if (megaApi.isMasterBusinessAccount()) {
-            expiredImageLayout.setBackgroundColor(getResources().getColor(R.color.expired_business_admin));
+            expiredImageLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.gradient_business_admin_expired_bg));
             expiredImageParams.addRule(RelativeLayout.CENTER_IN_PARENT);
             if (isScreenInPortrait(this)) {
                 expiredImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_account_expired_admin_portrait));
@@ -66,9 +67,9 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             expiredText.setText(R.string.expired_admin_business_text);
             expiredSubtext.setVisibility(View.GONE);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.expired_business_admin_statusbar));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.old_pink_900));
         } else {
-            expiredImageLayout.setBackgroundColor(getResources().getColor(R.color.expired_business_user));
+            expiredImageLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.gradient_business_user_expired_bg));
             expiredImageParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             expiredImageParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
             if (isScreenInPortrait(this)) {
@@ -85,7 +86,7 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             expiredText.setText(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY));
             expiredSubtext.setVisibility(View.VISIBLE);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.expired_business_user_statusbar));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.dark_blue_300));
         }
 
         expiredImage.setLayoutParams(expiredImageParams);

@@ -334,10 +334,15 @@
     <color name="lime_green_500">#13E03C</color>
 
     <color name="dark_blue_200">#85D2ED</color>
+    <color name="dark_blue_300">#5AC0E6</color>
     <color name="dark_blue_400">#3FB2E2</color>
     <color name="dark_blue_500">#2BA6DE</color>
 
     <color name="ambar_700">#FFA003</color>
+
+    <!-- For business admin account expired background color -->
+    <color name="old_pink_800">#B00E5E</color>
+    <color name="old_pink_900">#8A0955</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
