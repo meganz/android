@@ -564,6 +564,7 @@
         <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.Mega.Body.Text</item>
         <item name="buttonBarNegativeButtonStyle">@style/Widget.Mega.NegativeButton.Dialog</item>
         <item name="buttonBarPositiveButtonStyle">@style/Widget.Mega.PositiveButton.Dialog</item>
+        <item name="colorControlNormal">@color/grey_054_white_054</item>
     </style>
 
     <style name="MaterialAlertDialog.Mega.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">

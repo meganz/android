@@ -15,6 +15,8 @@ import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +56,7 @@ public class ContactInfoListDialog {
     /**
      * proportion of screen height under portrait mode
      */
-    private static final float HEIGHT_P = 0.5f;
+    private static final float HEIGHT_P = 0.7f;
     /**
      * proportion of screen width under landscape mode
      */
@@ -100,7 +102,7 @@ public class ContactInfoListDialog {
         }
 
         listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
-        dialog = new AlertDialog.Builder(context)
+        dialog = new MaterialAlertDialogBuilder(context)
                 .setTitle(current.getName())
                 .setView(contentView)
                 .setCancelable(false)

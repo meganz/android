@@ -14,20 +14,19 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
-        android:elevation="4dp"
         android:orientation="horizontal"
-        android:paddingLeft="110dp">
+        android:paddingStart="150dp"
+        android:paddingEnd="10dp">
 
         <Button
             android:id="@+id/btn_cancel"
-            style="@style/alert_diaolog_btn"
-            android:layout_marginRight="10dp"
+            style="?attr/borderlessButtonStyle"
+            android:layout_marginEnd="10dp"
             android:text="@string/button_cancel" />
 
         <Button
             android:id="@+id/btn_ok"
-            style="@style/alert_diaolog_btn"
+            style="?attr/borderlessButtonStyle"
             android:text="@string/general_ok" />
     </LinearLayout>
 </RelativeLayout>

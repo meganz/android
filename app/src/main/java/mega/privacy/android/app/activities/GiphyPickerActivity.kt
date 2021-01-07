@@ -27,6 +27,7 @@ import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_PICK_GIF
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -102,9 +103,9 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         var emptyTextSearch = getString(R.string.empty_search_giphy)
 
         try {
-            endOfList = endOfList.replace("[A]", "<font color=\'#999999\'>")
+            endOfList = endOfList.replace("[A]", "<font color='${ColorUtils.getColorHexString(this,R.color.grey_300_grey_600)}'>")
             endOfList = endOfList.replace("[/A]", "</font>")
-            emptyTextSearch = emptyTextSearch.replace("[A]", "<font color=\'#000000\'>")
+            emptyTextSearch = emptyTextSearch.replace("[A]", "<font color='${ColorUtils.getColorHexString(this,R.color.black_white)}'>")
             emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)
