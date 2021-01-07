@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaChatSession;
 import jp.wasabeef.blurry.Blurry;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.RelativeLayout.TRUE;
+import static mega.privacy.android.app.utils.AvatarUtil.getRadius;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -424,12 +425,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
 
         /*Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
-
-        holder.avatarImage.setImageBitmap(defaultBitmap);
         Bitmap bitmap = getImageAvatarCall(chatRoom, peer.getPeerId());
-        if (bitmap != null) {
+        if(bitmap != null){
             holder.avatarImage.setImageBitmap(bitmap);
+            holder.avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
+        }else{
+            Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
+            holder.avatarImage.setImageBitmap(defaultBitmap);
+            holder.avatarImage.setCornerRadius(dp2px(getRadius(defaultBitmap), outMetrics));
         }
 
         displayAvatar(position, holder, peer);
@@ -592,6 +595,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     ViewHolderGroupCall holder = getHolder(position);
                     if (holder != null) {
                         holder.avatarImage.setImageBitmap(avatar);
+                        holder.avatarImage.setCornerRadius(dp2px(getRadius(avatar), outMetrics));
                     } else {
                         notifyItemChanged(position);
                     }

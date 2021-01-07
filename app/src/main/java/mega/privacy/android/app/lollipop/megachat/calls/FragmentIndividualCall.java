@@ -16,6 +16,7 @@ import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getRadius;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -128,8 +129,14 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
 
         /*Avatar*/
         Bitmap bitmap = getImageAvatarCall(chatRoom, peerid);
-        avatarImage.setImageBitmap(bitmap != null ? bitmap :
-                getDefaultAvatarCall(context, chatRoom, peerid));
+        if(bitmap != null){
+            avatarImage.setImageBitmap(bitmap);
+            avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
+        }else{
+            Bitmap defaultAvatar = getDefaultAvatarCall(context, chatRoom, peerid);
+            avatarImage.setImageBitmap(defaultAvatar);
+            avatarImage.setCornerRadius(dp2px(getRadius(defaultAvatar), outMetrics));
+        }
     }
 
     /**
@@ -257,6 +264,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
     public void setAvatar(long peerId, Bitmap bitmap) {
         if (!isItMe(chatId, peerid, clientid) && peerId == peerid && bitmap != null && avatarImage != null) {
             avatarImage.setImageBitmap(bitmap);
+            avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
         }
     }
 
