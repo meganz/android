@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="27dp"
                 android:text="@string/over_disk_quota_paywall_title"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant1" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant2" />
 
             <TextView
                 android:id="@+id/over_disk_quota_paywall_text"

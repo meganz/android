@@ -224,7 +224,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_referral"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
 
@@ -249,7 +249,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_referral"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
                             </LinearLayout>
@@ -472,7 +472,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_install_app"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
 
@@ -497,7 +497,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_install_app"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
                             </LinearLayout>
@@ -722,7 +722,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_registration"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
 
@@ -747,7 +747,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_registration"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
 
@@ -854,7 +854,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_storage_text_install_desktop"
                                         android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
 
@@ -879,7 +879,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_install_desktop"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.SmallSubtitle" />
+                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                                 </RelativeLayout>
 

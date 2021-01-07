@@ -20,7 +20,7 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <!-- ================== Subtitle ====================== -->
+    <!-- ================== Subtitle 1 ====================== -->
 
     <!-- In material design, typically for AlertDialog title, Popup menu, AutoCompleteTextView,
      TextInputEditText, Action bar subtitle -->
@@ -100,9 +100,11 @@
     </style>
 
     <!-- Medium, normal, 18sp, 0px, textColorPrimary -->
-    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant1">
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant2">
         <item name="textSize">18sp</item>
     </style>
+
+    <!--===============  Subtitle 2 =====================-->
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
     <!-- Medium, 14sp, 0px, textColorPrimary-->
@@ -136,7 +138,7 @@
     <!-- ================== Body1 ====================== -->
 
     <!-- In material design, for the CheckedTextView -->
-    <!-- Regular, 16sp, 0.15px, textColorPrimary-->
+    <!-- Regular, 16sp, 0.5px, textColorPrimary-->
     <style name="TextAppearance.Mega.Body1" parent="TextAppearance.MaterialComponents.Body1">
     </style>
 
@@ -171,6 +173,12 @@
     <!-- Regular, 14sp, -0.35px, textColorSecondary-->
     <style name="TextAppearance.Mega.Body2.Secondary.Variant2">
         <item name="android:letterSpacing">-0.025</item>
+    </style>
+
+    <!-- Regular, 13sp, 0px, Authenticity your credentials, 13sp -->
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant3" >
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textSize">13sp</item>
     </style>
 
     <!-- Regular, 14sp, 0px, textColorPrimary-->
@@ -216,7 +224,7 @@
     </style>
 
     <!-- Chat new message -->
-    <style name="TextAppearance.Mega.Body2.Variant5">14sp
+    <style name="TextAppearance.Mega.Body2.Variant5">
         <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 
@@ -295,6 +303,11 @@
         <item name="android:letterSpacing">0.020833333</item>
     </style>
 
+    <!-- Regular, 11sp, 0px, Achievements small caption -->
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant2">
+        <item name="android:textSize">11sp</item>
+    </style>
+
     <!-- Medium, Accent -->
     <style name="TextAppearance.Mega.Caption.Accent">
         <item name="android:textColor">?attr/colorSecondary</item>
@@ -349,17 +362,5 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
         <item name="textAllCaps">false</item>
         <item name="android:letterSpacing">0.017857143</item>
-    </style>
-
-    <!-- Achievements small caption -->
-    <style name="TextAppearance.Mega.SmallSubtitle" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textSize">11sp</item>
-        <item name="android:letterSpacing">0</item>
-        <item name="android:textColor">?android:attr/textColorSecondary</item>
-    </style>
-
-    <!-- Authenticity your credentials, 13sp -->
-    <style name="TextAppearance.Mega.SmallCredential" parent="TextAppearance.Mega.Body2.Secondary.Variant" >
-        <item name="android:textSize">13sp</item>
     </style>
 </resources>
