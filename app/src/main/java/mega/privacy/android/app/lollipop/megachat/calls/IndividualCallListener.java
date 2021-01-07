@@ -35,6 +35,7 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
 
         if (isSmallCamera && isLocal) {
             this.surfaceView.setZOrderMediaOverlay(true);
+            this.surfaceView.setZOrderOnTop(true);
         } else if (!isSmallCamera) {
             if (!isLocal) {
                 this.surfaceView.setZOrderOnTop(false);
