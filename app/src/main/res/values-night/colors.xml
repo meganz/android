@@ -162,4 +162,7 @@
 
     <!--  Upgrade account mask color  -->
     <color name="grey_020_white_20">@color/white_alpha_020</color>
+
+    <!-- Two factor authentication credentials background -->
+    <color name="grey_020_grey_800">@color/grey_800</color>
 </resources>
