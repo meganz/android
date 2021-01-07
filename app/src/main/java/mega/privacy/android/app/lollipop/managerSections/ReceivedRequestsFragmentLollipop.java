@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaContactRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 
 public class ReceivedRequestsFragmentLollipop extends Fragment {
 
@@ -190,8 +191,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		}
 		List<MegaContactRequest> users = adapterList.getSelectedRequest();
 
-		actionMode.setTitle(getResources()
-				.getQuantityString(R.plurals.general_num_request, users.size(), users.size()));
+		actionMode.setTitle(getQuantityString(R.plurals.general_num_request, users.size(), users.size()));
 
 		try {
 			actionMode.invalidate();

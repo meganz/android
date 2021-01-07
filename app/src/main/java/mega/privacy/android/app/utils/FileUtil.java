@@ -20,18 +20,15 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.net.URLConnection;
@@ -53,6 +50,7 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -70,6 +68,7 @@ public class FileUtil {
     public static final String OLD_RK_FILE = MAIN_DIR + File.separator + "MEGARecoveryKey.txt";
 
     public static final String JPG_EXTENSION = ".jpg";
+    public static final String TXT_EXTENSION = ".txt";
 
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
@@ -77,7 +76,7 @@ public class FileUtil {
     private static final String PRIMARY_VOLUME_NAME = "primary";
 
     public static String getRecoveryKeyFileName() {
-        return MegaApplication.getInstance().getApplicationContext().getString(R.string.general_rk) + ".txt";
+        return getString(R.string.general_rk) + TXT_EXTENSION;
     }
 
     public static boolean isAudioOrVideo(MegaNode node) {
@@ -139,7 +138,8 @@ public class FileUtil {
         }
 
         ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE,
-                context.getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+                getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+
         return false;
     }
 
@@ -171,7 +171,9 @@ public class FileUtil {
             }
         }
 
-        ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error), -1);
+        ((ManagerActivityLollipop) context)
+                .showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+
         return false;
     }
 
@@ -246,7 +248,7 @@ public class FileUtil {
     }
 
     public static File createTemporalTextFile(Context context, String name, String data) {
-        String fileName = name + ".txt";
+        String fileName = name + TXT_EXTENSION;
 
         return createTemporalFile(context, fileName, data);
     }
@@ -580,7 +582,7 @@ public class FileUtil {
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+        context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
     }
 
     /**
@@ -612,7 +614,7 @@ public class FileUtil {
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(
-                Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+                Intent.createChooser(shareIntent, getString(R.string.context_share)));
     }
 
     /**
@@ -627,7 +629,7 @@ public class FileUtil {
         shareIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extention) + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+        context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
     }
 
     /**
@@ -751,7 +753,7 @@ public class FileUtil {
     public static String getFileFolderInfo(File file) {
         File[] fList = file.listFiles();
         if (fList == null) {
-            return MegaApplication.getInstance().getString(R.string.file_browser_empty_folder);
+            return getString(R.string.file_browser_empty_folder);
         }
 
         int numFolders = 0;

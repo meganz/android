@@ -76,6 +76,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class InviteContactActivity extends PinActivityLollipop implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
@@ -415,8 +416,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         logDebug("setTitleAB");
         if (aB != null) {
             if (addedContacts.size() > 0) {
-                aB.setSubtitle(getResources()
-                        .getQuantityString(R.plurals.general_selection_num_contacts,
+                aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
                                 addedContacts.size(), addedContacts.size()));
             } else {
                 aB.setSubtitle(null);

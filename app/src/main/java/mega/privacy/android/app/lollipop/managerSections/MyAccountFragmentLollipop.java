@@ -68,7 +68,6 @@ import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
@@ -79,6 +78,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -403,8 +403,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				visibleContacts.add(contacts.get(i));
 			}
 		}
-		connections.setText(context.getResources()
-				.getQuantityString(R.plurals.general_selection_num_contacts,
+		connections.setText(getQuantityString(R.plurals.general_selection_num_contacts,
 						visibleContacts.size(), visibleContacts.size()));
 	}
 
