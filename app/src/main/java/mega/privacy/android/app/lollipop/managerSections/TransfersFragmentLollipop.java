@@ -194,6 +194,10 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 	 * @return The position of the updated transfer if success, INVALID_POSITION otherwise.
 	 */
 	public int tryToUpdateTransfer(MegaTransfer transfer) {
+		if (transfer == null) {
+			return INVALID_POSITION;
+		}
+
 		try {
 			ListIterator<MegaTransfer> li = tL.listIterator();
 
@@ -232,10 +236,12 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 			}
 		}
 		MegaTransfer transfer = megaApi.getTransferByTag(tag);
-		tL.set(index, transfer);
-		logDebug("The transfer with index : " + index + "has been paused/resumed, left: " + tL.size());
+		if (transfer != null) {
+			tL.set(index, transfer);
+			logDebug("The transfer with index : " + index + "has been paused/resumed, left: " + tL.size());
 
-		adapter.notifyItemChanged(index);
+			adapter.notifyItemChanged(index);
+		}
 	}
 
 	/**
