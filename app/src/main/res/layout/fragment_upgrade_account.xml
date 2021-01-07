@@ -207,7 +207,7 @@
                                 android:layout_below="@+id/image_pro_i"
                                 android:text="@string/pro1_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/pro_account"
+                                android:textColor="@color/red_600_red_300"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -344,7 +344,7 @@
                                 android:layout_below="@+id/image_pro_ii"
                                 android:text="@string/pro2_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/pro_account"
+                                android:textColor="@color/red_600_red_300"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>
@@ -481,7 +481,7 @@
                                 android:layout_below="@+id/image_pro_iii"
                                 android:text="@string/pro3_account"
                                 android:textAllCaps="true"
-                                android:textColor="@color/pro_account"
+                                android:textColor="@color/red_600_red_300"
                                 android:textSize="18sp" />
                         </RelativeLayout>
                     </RelativeLayout>

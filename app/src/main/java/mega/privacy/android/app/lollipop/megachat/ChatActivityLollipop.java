@@ -912,7 +912,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         muteIconToolbar.setVisibility(View.GONE);
         badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext(),
-                R.color.pro_account, R.color.white_dark_grey, R.color.white_dark_grey);
+                R.color.red_600_red_300, R.color.white_dark_grey, R.color.white_dark_grey);
 
         upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white)
                 .mutate();

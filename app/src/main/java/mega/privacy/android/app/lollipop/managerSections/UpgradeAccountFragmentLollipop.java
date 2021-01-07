@@ -334,7 +334,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case PRO_I:
 				case PRO_II:
 				case PRO_III:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context,R.color.red_600_red_300));
 					break;
 				case PRO_LITE:
 					color = String.valueOf(ContextCompat.getColor(context,R.color.lite_account));
@@ -416,17 +416,17 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					break;
 				}
 				case PRO_I:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 					paymentTitle.setText(getString(R.string.pro1_account));
 					break;
 				}
 				case PRO_II:{
-					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
+					paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 					paymentTitle.setText(getString(R.string.pro2_account));
 					break;
 				}
 				case PRO_III: {
-                    paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.pro_account));
+                    paymentTitle.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
                     paymentTitle.setText(getString(R.string.pro3_account));
                     break;
                 }
@@ -1052,19 +1052,19 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 				case FREE:
 				default:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.free_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.free_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.green_500_green_400));
 					break;
 				case PRO_I:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro1_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.red_600_red_300));
 					break;
 				case PRO_II:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro2_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.red_600_red_300));
 					break;
 				case PRO_III:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.pro3_account));
-					color = String.valueOf(ContextCompat.getColor(context, R.color.pro_account));
+					color = String.valueOf(ContextCompat.getColor(context, R.color.red_600_red_300));
 					break;
 				case PRO_LITE:
 					textToShow = getString(R.string.type_of_my_account, getString(R.string.prolite_account));

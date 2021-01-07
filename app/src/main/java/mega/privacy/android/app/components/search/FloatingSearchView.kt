@@ -231,7 +231,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun initDrawables() {
-        menuBtnDrawable = BadgeDrawerArrowDrawable(context, R.color.pro_account,
+        menuBtnDrawable = BadgeDrawerArrowDrawable(context, R.color.red_600_red_300,
             R.color.white_dark_grey, R.color.white_dark_grey)
         menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot)
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)

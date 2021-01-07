@@ -472,10 +472,6 @@
     <color name="grey_010_white_087">@color/grey_010</color>
     <color name="teal_300_grey_087">@color/teal_300</color>
 
-    <!-- choose & upgrade related colors -->
-    <color name="free_account">#2BB200</color>
-    <color name="pro_account">#F0373A</color>
-
     <color name="homepage_background">#EEF2F1</color>
 
     <color name="new_multiselect_color">#1A0ABFA5</color>

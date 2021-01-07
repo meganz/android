@@ -145,7 +145,7 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
             logWarning("aB is null");
         }
 
-        badgeDrawable = new BadgeDrawerArrowDrawable(this, R.color.pro_account,
+        badgeDrawable = new BadgeDrawerArrowDrawable(this, R.color.red_600_red_300,
                 R.color.white_dark_grey, R.color.white_dark_grey);
 
         updateNavigationToolbarIcon();

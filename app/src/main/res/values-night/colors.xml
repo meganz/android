@@ -109,10 +109,6 @@
     <color name="grey_010_white_087">@color/white_alpha_087</color>
     <color name="teal_300_grey_087">@color/grey_alpha_087</color>
 
-    <!-- choose & upgrade related colors -->
-    <color name="free_account">#8CD670</color>
-    <color name="pro_account">@color/red_300</color>
-
     <color name="homepage_background">@color/dark_grey</color>
 
     <color name="grey_700_grey_300">@color/grey_300</color>
