@@ -18,7 +18,6 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -44,67 +43,55 @@ public class CreateChatListener extends ChatBaseListener {
 
     private long[] handles;
     private int totalCounter;
-    private long idChat;
+    private long idChat = MEGACHAT_INVALID_HANDLE;
     private String link;
     private String key;
     private String password;
 
     public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long fileHandle, Context context, int action) {
         super(context);
-        this.counter = usersNoChat.size();
-        this.chats = chats;
-        this.usersNoChat = usersNoChat;
+
+        initializeValues(chats, usersNoChat, action);
         this.fileHandle = fileHandle;
-        this.action = action;
     }
 
     public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long[] handles, Context context, int action, long idChat) {
         super(context);
-        this.counter = usersNoChat.size();
-        if (chats != null && !chats.isEmpty()) {
-            this.totalCounter = usersNoChat.size() + chats.size();
-        } else {
-            this.totalCounter = this.counter;
-        }
-        this.chats = chats;
-        this.usersNoChat = usersNoChat;
+
+        initializeValues(chats, usersNoChat, action);
         this.handles = handles;
-        this.action = action;
         this.idChat = idChat;
     }
 
     public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, long[] handles, Context context, int action) {
         super(context);
-        this.counter = usersNoChat.size();
-        if (chats != null && !chats.isEmpty()) {
-            this.totalCounter = usersNoChat.size() + chats.size();
-        } else {
-            this.totalCounter = this.counter;
-        }
-        this.chats = chats;
-        this.usersNoChat = usersNoChat;
+
+        initializeValues(chats, usersNoChat, action);
         this.handles = handles;
-        this.action = action;
-        this.idChat = MEGACHAT_INVALID_HANDLE;
     }
 
     public CreateChatListener(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, String link, String key, String password, Context context, int action) {
         super(context);
-        this.counter = usersNoChat.size();
 
-        if (chats != null && !chats.isEmpty()) {
-            this.totalCounter = usersNoChat.size() + chats.size();
-        } else {
-            this.totalCounter = this.counter;
-        }
-
-        this.chats = chats;
-        this.usersNoChat = usersNoChat;
+        initializeValues(chats, usersNoChat, action);
         this.link = link;
         this.key = key;
         this.password = password;
+    }
+
+    /**
+     * Initializes the common values of all constructors.
+     *
+     * @param chats       List of existing chats.
+     * @param usersNoChat List of contacts without chat.
+     * @param action      Action to manage.
+     */
+    private void initializeValues(ArrayList<MegaChatRoom> chats, ArrayList<MegaUser> usersNoChat, int action) {
+        this.counter = usersNoChat.size();
+        this.totalCounter = chats != null && !chats.isEmpty() ? usersNoChat.size() + chats.size() : this.counter;
+        this.chats = chats;
+        this.usersNoChat = usersNoChat;
         this.action = action;
-        this.idChat = MEGACHAT_INVALID_HANDLE;
     }
 
     @Override

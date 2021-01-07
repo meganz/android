@@ -1833,8 +1833,6 @@ public class ChatController {
         String extraKey = intent.getStringExtra(EXTRA_KEY);
         String extraPassword = intent.getStringExtra(EXTRA_PASSWORD);
 
-
-
         if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
             if (contactHandles != null && contactHandles.length > 0) {
                 ArrayList<MegaChatRoom> chats = new ArrayList<>();

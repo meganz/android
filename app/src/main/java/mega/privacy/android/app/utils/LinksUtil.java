@@ -131,23 +131,7 @@ public class LinksUtil {
      * @return The link without the decryption key.
      */
     public static String getLinkWithoutKey(String linkWithKey) {
-        if (linkWithKey.contains("#!") || linkWithKey.contains("#F!")) {
-            //old file or folder link format
-            String[] s = linkWithKey.split("!");
-
-            if (s.length == 3) {
-                return s[0] + "!" + s[1];
-            }
-        } else {
-            // new file or folder link format
-            String[] s = linkWithKey.split("#");
-
-            if (s.length == 2) {
-                return s[0];
-            }
-        }
-
-        return null;
+        return getLinkWithoutKeyOrOnlyKey(linkWithKey, false);
     }
 
     /**
@@ -157,19 +141,30 @@ public class LinksUtil {
      * @return The decryption key of the link.
      */
     public static String getKeyLink(String linkWithKey) {
+        return getLinkWithoutKeyOrOnlyKey(linkWithKey, true);
+    }
+
+    /**
+     * Splits the link from its decryption key and returns the link or decryption key,
+     * depending on the value received on onlyKey param.
+     *
+     * @param linkWithKey The link with the decryption key
+     * @return The link without the decryption key or the decryption key of the link.
+     */
+    public static String getLinkWithoutKeyOrOnlyKey(String linkWithKey, boolean onlyKey) {
         if (linkWithKey.contains("#!") || linkWithKey.contains("#F!")) {
             //old file or folder link format
             String[] s = linkWithKey.split("!");
 
             if (s.length == 3) {
-                return s[2];
+                return onlyKey ? s[2] : s[0] + "!" + s[1];
             }
         } else {
             // new file or folder link format
             String[] s = linkWithKey.split("#");
 
             if (s.length == 2) {
-                return s[1];
+                return onlyKey ? s[1] : s[0];
             }
         }
 
