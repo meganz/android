@@ -162,7 +162,7 @@
                     android:id="@+id/upgrade_prolite_layout_transparent"
                     android:layout_width="match_parent"
                     android:layout_height="95dp"
-                    android:background="#90ffffff"
+                    android:background="@color/white_054_dark_grey_054"
                     android:visibility="gone" />
 
             </RelativeLayout>
@@ -299,7 +299,7 @@
                     android:id="@+id/upgrade_pro_i_layout_transparent"
                     android:layout_width="match_parent"
                     android:layout_height="93dp"
-                    android:background="#90ffffff"
+                    android:background="@color/white_054_dark_grey_054"
                     android:visibility="gone" />
 
             </RelativeLayout>
@@ -437,7 +437,7 @@
                     android:id="@+id/upgrade_pro_ii_layout_transparent"
                     android:layout_width="match_parent"
                     android:layout_height="93dp"
-                    android:background="#90ffffff"
+                    android:background="@color/white_054_dark_grey_054"
                     android:visibility="gone" />
             </RelativeLayout>
 
@@ -563,7 +563,7 @@
                     android:id="@+id/upgrade_pro_iii_layout_transparent"
                     android:layout_width="match_parent"
                     android:layout_height="93dp"
-                    android:background="#90ffffff"
+                    android:background="@color/white_054_dark_grey_054"
                     android:visibility="gone" />
 
             </RelativeLayout>
@@ -680,7 +680,7 @@
                                         android:id="@+id/storage_business"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textColor="@color/black_white"
+                                        android:textColor="?android:attr/textColorSecondary"
                                         android:textSize="15sp" />
                                 </RelativeLayout>
                             </TableRow>
@@ -698,7 +698,7 @@
                                         android:id="@+id/bandwidth_business"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:textColor="@color/black_white"
+                                        android:textColor="?android:attr/textColorSecondary"
                                         android:textSize="15sp" />
                                 </RelativeLayout>
                             </TableRow>
@@ -753,7 +753,7 @@
         android:id="@+id/semitransparent_layer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/status_bar_login"
+        android:background="@color/grey_020_white_20"
         android:visibility="gone" />
 
     <include

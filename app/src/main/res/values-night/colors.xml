@@ -158,4 +158,12 @@
 
     <!-- "Contact" title in Notifications Screen -->
     <color name="jade_600_jade_300">@color/jade_300</color>
+
+    <!--    Mask color for current plan-->
+    <color name="white_054_dark_grey_054">@color/dark_grey_alpha_054</color>
+
+    <color name="white_050_dark_grey_050">@color/dark_grey_alpha_050</color>
+
+    <!--  Upgrade account mask color  -->
+    <color name="grey_020_white_20">@color/white_alpha_020</color>
 </resources>

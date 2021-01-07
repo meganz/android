@@ -245,6 +245,7 @@
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_015">#26FFFFFF</color>
     <color name="white_alpha_018">#2EFFFFFF</color>
+    <color name="white_alpha_020">#33FFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
@@ -257,6 +258,8 @@
     <color name="black">#000000</color>
     <color name="black_87_opacity">#DE000000</color>
     <color name="dark_grey">#121212</color>
+    <color name="dark_grey_alpha_050">#80121212</color>
+    <color name="dark_grey_alpha_054">#89121212</color>
 
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
@@ -280,6 +283,7 @@
     <color name="grey_alpha_006">#0F000000</color>
     <color name="grey_alpha_012">#1E000000</color>
     <color name="grey_alpha_015">#26000000</color>
+    <color name="grey_alpha_020">#33000000</color>
     <color name="grey_alpha_026">#42000000</color>
     <color name="grey_alpha_033">#54000000</color>
     <color name="grey_alpha_038">#60000000</color>
@@ -519,4 +523,12 @@
     <color name="jade_600_jade_300">@color/jade_600</color>
 
     <color name="scroll_bubble">#90727272</color>
+
+    <!--    Mask color for current plan-->
+    <color name="white_054_dark_grey_054">@color/white_alpha_054</color>
+
+    <color name="white_050_dark_grey_050">@color/white_alpha_050</color>
+
+    <!--  Upgrade account mask color  -->
+    <color name="grey_020_white_20">@color/grey_alpha_020</color>
 </resources>
