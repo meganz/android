@@ -1662,6 +1662,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * @param visible   true if visible, false otherwise
      */
     private void setGroupalSubtitleToolbarVisibility(boolean visible) {
+        if (subtitleCall.getVisibility() == View.VISIBLE) {
+            visible = false;
+        }
+
         groupalSubtitleToolbar.setVisibility(visible ? View.VISIBLE : View.GONE);
 
         if (visible) {
