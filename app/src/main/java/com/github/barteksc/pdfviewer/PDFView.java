@@ -722,8 +722,8 @@ public class PDFView extends RelativeLayout {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setCancelable(false);
 
-        if ((t.getLocalizedMessage() != null && t.getLocalizedMessage().equals("Password required or incorrect password."))
-                || (t.getMessage() != null && t.getMessage().equals("Password required or incorrect password."))) {
+        if ("Password required or incorrect password.".equals(t.getLocalizedMessage())
+                || ("Password required or incorrect password.").equals(t.getMessage())) {
             if (pdfViewer.getMaxIntents() > 0) {
                 View layout = pdfViewer.getLayoutInflater().inflate(R.layout.dialog_pdf_password, null);
                 final TextInputLayout passwordLayout = layout.findViewById(R.id.password_layout);
