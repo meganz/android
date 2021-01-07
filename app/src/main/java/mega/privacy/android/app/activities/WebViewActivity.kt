@@ -223,7 +223,7 @@ class WebViewActivity : BaseActivity() {
             REQUEST_ALL -> {
                 if (!hasPermissions(this, WRITE_EXTERNAL_STORAGE)) {
                     WRITE_EXTERNAL_STORAGE
-                } else if (hasPermissions(this, CAMERA)) {
+                } else if (!hasPermissions(this, CAMERA)) {
                     CAMERA
                 } else {
                     RECORD_AUDIO
@@ -240,7 +240,7 @@ class WebViewActivity : BaseActivity() {
                 WRITE_EXTERNAL_STORAGE
             }
             REQUEST_CAMERA_AND_RECORD_AUDIO -> {
-                if (hasPermissions(this, CAMERA)) {
+                if (!hasPermissions(this, CAMERA)) {
                     CAMERA
                 } else {
                     RECORD_AUDIO
