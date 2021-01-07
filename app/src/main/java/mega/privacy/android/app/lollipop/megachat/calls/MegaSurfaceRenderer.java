@@ -210,7 +210,7 @@ public class MegaSurfaceRenderer implements Callback {
         if (isSmallCamera) {
             paint.reset();
             paint.setXfermode(modesrcover);
-            canvas.drawRoundRect(dstRectf, px2dp(CORNER_RADIUS, outMetrics), px2dp(CORNER_RADIUS, outMetrics), paint);
+            canvas.drawRoundRect(dstRectf, dp2px(CORNER_RADIUS, outMetrics), dp2px(CORNER_RADIUS, outMetrics), paint);
             paint.setXfermode(modesrcin);
         } else {
             paint = null;

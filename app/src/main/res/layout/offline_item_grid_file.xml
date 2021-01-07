@@ -1,0 +1,62 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="219dp"
+    android:layout_margin="2dp"
+    android:background="@drawable/background_item_grid_new">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/grid_node_item_width"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="1dp"
+        android:paddingTop="1dp"
+        android:paddingRight="1dp"
+        app:actualImageScaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/ic_selected"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="7dp"
+        android:src="@drawable/ic_select_folder"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/grid_node_item_width"
+        android:background="@color/black_12_alpha" />
+
+    <FrameLayout
+        android:id="@+id/filename_container"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        android:layout_marginTop="@dimen/grid_node_item_width">
+
+        <TextView
+            android:id="@+id/filename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="32dp"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            android:textColor="@color/primary_text"
+            android:textSize="14sp"
+            tools:text="name" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:background="@null"
+            android:src="@drawable/ic_dots_vertical_grey" />
+    </FrameLayout>
+</FrameLayout>

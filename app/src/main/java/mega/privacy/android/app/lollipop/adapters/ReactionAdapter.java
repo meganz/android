@@ -32,7 +32,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.dp2px;
 
 public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -147,7 +147,7 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(holder.itemNumUsersReaction.getLayoutParams());
             params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
             params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            params.setMarginEnd(px2dp(8, outMetrics));
+            params.setMarginEnd(dp2px(8, outMetrics));
             params.addRule(RelativeLayout.END_OF, emoji == null ? R.id.item_emoji_reaction_text : R.id.item_emoji_reaction);
             holder.itemNumUsersReaction.setLayoutParams(params);
             holder.itemNumUsersReaction.setGravity(Gravity.CENTER_VERTICAL);

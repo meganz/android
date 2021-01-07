@@ -25,7 +25,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
@@ -145,7 +144,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 		holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
         RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
-        params1.rightMargin = px2dp(5, context.getResources().getDisplayMetrics());
+        params1.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 
 		switch (transfer.getState()) {
 			case STATE_COMPLETED:

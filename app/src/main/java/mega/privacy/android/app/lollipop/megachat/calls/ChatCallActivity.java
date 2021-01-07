@@ -54,6 +54,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.utils.TextUtil;
 
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiJava;
@@ -73,11 +74,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -699,7 +697,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         titleToolbar = tB.findViewById(R.id.title_toolbar);
         titleToolbar.setText(" ");
-        titleToolbar.setMaxWidthEmojis(px2dp(TITLE_TOOLBAR, getOutMetrics()));
+        titleToolbar.setMaxWidthEmojis(dp2px(TITLE_TOOLBAR, getOutMetrics()));
 
         subtitleToobar = tB.findViewById(R.id.subtitle_toolbar);
         callInProgressChrono = tB.findViewById(R.id.simple_chronometer);
@@ -1981,7 +1979,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             mutateContactCallLayout.setVisibility(View.GONE);
         }else{
             String name = chatC.getParticipantFirstName(chat.getPeerHandle(0));
-            if (isTextEmpty(name)) {
+            if (TextUtil.isTextEmpty(name)) {
                 if (megaChatApi != null) {
                     name = megaChatApi.getContactEmail(callChat.getSessionsPeerid().get(0));
                 }
@@ -3047,7 +3045,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (peersOnCall.size() < NECESSARY_CHANGE_OF_SIZES) {
             marginTop = 0;
         } else if (peersOnCall.size() == NECESSARY_CHANGE_OF_SIZES || peersOnCall.size() == 4) {
-            marginTop = height + px2dp(60, getOutMetrics());
+            marginTop = height + dp2px(60, getOutMetrics());
         }
 
         recyclerViewLayout.setPadding(0, marginTop, 0, 0);
@@ -3249,11 +3247,15 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         int keyCode = event.getKeyCode();
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                app.muteOrUnmute(false);
+                if(app.isAnIncomingCallRinging()){
+                    app.muteOrUnmute(false);
+                }
                 return false;
 
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                app.muteOrUnmute(true);
+                if(app.isAnIncomingCallRinging()){
+                    app.muteOrUnmute(true);
+                }
                 return false;
 
             default:

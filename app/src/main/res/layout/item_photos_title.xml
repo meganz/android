@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="item"
+            type="mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem" />
+    </data>
+
+    <TextView
+        android:id="@+id/grid_title"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:paddingHorizontal="16dp"
+        android:fontFamily="roboto"
+        android:gravity="center_vertical|start"
+        android:text="@{item.modifiedDate}"
+        android:textColor="@color/primary_text"
+        android:textSize="12sp"
+        tools:text="July 2020" />
+</layout>
