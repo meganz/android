@@ -1007,7 +1007,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         recordView = findViewById(R.id.record_view);
         recordView.setVisibility(View.GONE);
         bubbleLayout = findViewById(R.id.bubble_layout);
-        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.black_white));
+        BubbleDrawable myBubble = new BubbleDrawable(BubbleDrawable.CENTER, ContextCompat.getColor(this,R.color.grey_900_grey_100));
         myBubble.setCornerRadius(CORNER_RADIUS_BUBBLE);
         myBubble.setPointerAlignment(BubbleDrawable.RIGHT);
         myBubble.setPadding(PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE, PADDING_BUBBLE);
@@ -1570,7 +1570,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     + "\'>");
             textToShowB = textToShowB.replace("[/A]", "</font>");
             textToShowB = textToShowB.replace("[B]", "<font color=\'"
-                    + ColorUtils.getColorHexString(this, R.color.black_white)
+                    + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
                     + "\'>");
             textToShowB = textToShowB.replace("[/B]", "</font>");
         } catch (Exception e) {

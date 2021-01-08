@@ -182,7 +182,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 String textToShow = String.format(getString(R.string.context_empty_notifications));
                 try{
                     textToShow = textToShow.replace("[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(context, R.color.black_white)
+                            + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
                             + "\'>");
                     textToShow = textToShow.replace("[/A]", "</font>");
                     textToShow = textToShow.replace("[B]", "<font color=\'"

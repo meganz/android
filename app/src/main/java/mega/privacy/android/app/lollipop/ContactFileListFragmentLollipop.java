@@ -49,6 +49,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -368,10 +369,15 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 				}
 				String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -450,10 +456,15 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;
@@ -523,10 +534,15 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_incoming));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;

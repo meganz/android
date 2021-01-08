@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -438,10 +439,15 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 
 			try {
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
 			} catch (Exception e) {
 				logWarning("Exception formatting string", e);
 			}

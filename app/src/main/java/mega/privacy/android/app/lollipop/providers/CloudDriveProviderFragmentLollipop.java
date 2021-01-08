@@ -38,6 +38,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -461,10 +462,15 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 					}
 					String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;
@@ -485,10 +491,15 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 					}
 					String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
 					try{
-						textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-						textToShow = textToShow.replace("[/A]", "</font>");
-						textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-						textToShow = textToShow.replace("[/B]", "</font>");
+						textToShow = textToShow.replace(
+								"[A]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+										+ "\'>"
+						).replace("[/A]", "</font>").replace(
+								"[B]", "<font color=\'"
+										+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+										+ "\'>"
+						).replace("[/B]", "</font>");
 					}
 					catch (Exception e){}
 					Spanned result = null;

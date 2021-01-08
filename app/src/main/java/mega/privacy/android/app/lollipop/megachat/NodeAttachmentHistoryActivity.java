@@ -220,7 +220,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		String textToShow = String.format(getString(R.string.context_empty_shared_files));
 		try{
-			textToShow = textToShow.replace("[A]", "<font color=\'" + getColorHexString(this, R.color.black_white) + "\'>");
+			textToShow = textToShow.replace("[A]", "<font color=\'" + getColorHexString(this, R.color.grey_900_grey_100) + "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'" + getColorHexString(this, R.color.grey_300_grey_600) + "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");

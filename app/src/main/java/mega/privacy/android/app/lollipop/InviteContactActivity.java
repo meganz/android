@@ -59,6 +59,7 @@ import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;
@@ -472,10 +473,15 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         logDebug("showEmptyTextView");
         String textToShow = getString(R.string.context_empty_contacts).toUpperCase();
         try {
-            textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-            textToShow = textToShow.replace("[/B]", "</font>");
+            textToShow = textToShow.replace(
+                    "[A]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
+                            + "\'>"
+            ).replace("[/A]", "</font>").replace(
+                    "[B]", "<font color=\'"
+                            + ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)
+                            + "\'>"
+            ).replace("[/B]", "</font>");
         } catch (Exception e) {
             logError(e.toString());
         }

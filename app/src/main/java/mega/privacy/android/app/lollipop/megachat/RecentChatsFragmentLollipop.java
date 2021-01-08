@@ -602,7 +602,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     + ">");
             textToShow = textToShow.replace("[/A]", "</font>");
             textToShow = textToShow.replace("[B]", "<font color=" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.black_white)
+                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
                     + ">");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {

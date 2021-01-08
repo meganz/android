@@ -205,7 +205,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
             textToShow = textToShow.replace("[B]", "<font color=\'" +
-                    ColorUtils.getColorHexString(requireActivity(), R.color.black_white)
+                    ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
                     + "\'>");
             textToShow = textToShow.replace("[/B]", "</font>");
         }

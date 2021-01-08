@@ -79,7 +79,7 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'" + ColorUtils.getColorHexString(this, R.color.black_white) + "\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'" + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100) + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);

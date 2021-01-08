@@ -63,6 +63,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaContactsLollipopAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -908,10 +909,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 				String textToShow = String.format(context.getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -995,10 +1001,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 				String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 				try{
-					textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-					textToShow = textToShow.replace("[/A]", "</font>");
-					textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-					textToShow = textToShow.replace("[/B]", "</font>");
+					textToShow = textToShow.replace(
+							"[A]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+									+ "\'>"
+					).replace("[/A]", "</font>").replace(
+							"[B]", "<font color=\'"
+									+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+									+ "\'>"
+					).replace("[/B]", "</font>");
 				}
 				catch (Exception e){}
 				Spanned result = null;
@@ -1196,10 +1207,15 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			String textToShow = String.format(getString(R.string.context_empty_contacts)).toUpperCase();
 			try{
-				textToShow = textToShow.replace("[A]", "<font color=\'#000000\'>");
-				textToShow = textToShow.replace("[/A]", "</font>");
-				textToShow = textToShow.replace("[B]", "<font color=\'#7a7a7a\'>");
-				textToShow = textToShow.replace("[/B]", "</font>");
+				textToShow = textToShow.replace(
+						"[A]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_900_grey_100)
+								+ "\'>"
+				).replace("[/A]", "</font>").replace(
+						"[B]", "<font color=\'"
+								+ ColorUtils.getColorHexString(requireContext(), R.color.grey_300_grey_600)
+								+ "\'>"
+				).replace("[/B]", "</font>");
 			}
 			catch (Exception e){}
 			Spanned result = null;

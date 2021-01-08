@@ -271,7 +271,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         try {
             textToShow = textToShow.replace(
                 "[A]", "<font color=\'"
-                        + getColorHexString(requireContext(), R.color.black_white)
+                        + getColorHexString(requireContext(), R.color.grey_900_grey_100)
                         + "\'>"
             ).replace("[/A]", "</font>").replace(
                 "[B]", "<font color=\'"

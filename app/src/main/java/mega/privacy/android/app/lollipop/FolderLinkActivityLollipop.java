@@ -500,7 +500,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		String textToShow = getString(R.string.file_browser_empty_folder_new);
 		try{
 			textToShow = textToShow.replace("[A]", "<font color=\'"
-					+ ColorUtils.getColorHexString(this, R.color.black_white)
+					+ ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
 					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'"

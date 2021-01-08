@@ -43,7 +43,7 @@ public class CompletedTransfersFragmentLollipop extends TransfersBaseFragment {
 		String textToShow = context.getString(R.string.completed_transfers_empty_new);
 		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'"
-					+ ColorUtils.getColorHexString(context, R.color.black_white)
+					+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
 					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 			textToShow = textToShow.replace("[B]", "<font color=\'"

@@ -138,7 +138,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         String textToShow = String.format(context.getString(R.string.context_empty_recents)).toUpperCase();
         try {
             textToShow = textToShow.replace("[A]","<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.black_white)
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
                     + "\'>");
             textToShow = textToShow.replace("[/A]","</font>");
             textToShow = textToShow.replace("[B]","<font color=\'"

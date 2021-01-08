@@ -192,7 +192,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
         try {
             textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.black_white)
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
                     + "\'>");
             textToShowFreeStorage = textToShowFreeStorage.replace("[/A]", "</font>");
         } catch (Exception e) {
@@ -203,7 +203,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
         String textToShowFreeBandwidth = "[A] " + getString(R.string.limited_bandwith) + "[/A] " + getString(R.string.label_transfer_quota_upgrade_account);
         try {
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[A]", "<font color=\'"
-                    + ColorUtils.getColorHexString(context, R.color.black_white)
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
                     + "\'>");
             textToShowFreeBandwidth = textToShowFreeBandwidth.replace("[/A]", "</font>");
         } catch (Exception e) {

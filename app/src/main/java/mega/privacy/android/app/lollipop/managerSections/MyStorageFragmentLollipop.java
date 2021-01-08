@@ -177,7 +177,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 					usedSpaceString = usedSpaceString.replace("[A]", "<b><font face=\"sans-serif-light\">");
 					usedSpaceString = usedSpaceString.replace("[/A]", "</font></b>");
 					usedSpaceString = usedSpaceString.replace("[B]", "<font color=" +
-							ColorUtils.getColorHexString(requireActivity(), R.color.black_white)
+							ColorUtils.getColorHexString(requireActivity(), R.color.grey_900_grey_100)
 							+ ">");
 					usedSpaceString = usedSpaceString.replace("[/B]", "</font>");
 				} catch (Exception e) {

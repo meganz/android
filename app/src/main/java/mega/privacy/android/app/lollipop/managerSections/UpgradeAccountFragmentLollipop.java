@@ -277,9 +277,9 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 						String businessTransferQuota = getString(R.string.unlimited_transfer_quota);
 
 						try {
-							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.black_white) + "'>");
+							businessStorageSpace = businessStorageSpace.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
 							businessStorageSpace = businessStorageSpace.replace("[/A]", "</font>");
-							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.black_white) + "'>");
+							businessTransferQuota = businessTransferQuota.replace("[A]", "<font color='" + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100) + "'>");
 							businessTransferQuota = businessTransferQuota.replace("[/A]", "</font>");
 						} catch (Exception e) {
 							logError("Exception formatting string", e);
@@ -324,7 +324,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		format.setCurrency(Currency.getInstance(currency));
 		String stringPrice = format.format(price);
 
-		String color = ColorUtils.getColorHexString(context,R.color.black_white);
+		String color = ColorUtils.getColorHexString(context,R.color.grey_900_grey_100);
 		if (monthlyBasePrice) {
 			if (product.getMonths() != 1) {
 				return HtmlCompat.fromHtml("", HtmlCompat.FROM_HTML_MODE_LEGACY);
@@ -445,7 +445,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
             String textGoogleWallet = getString(R.string.payment_method_google_wallet);
             try{
                 textGoogleWallet = textGoogleWallet.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
 						+ "\'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
 			} catch (Exception e) {
@@ -465,7 +465,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			String textCreditCardText = getString(R.string.payment_method_credit_card);
 			try{
 				textCreditCardText = textCreditCardText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
 						+ "\'>");
 				textCreditCardText = textCreditCardText.replace("[/A]", "</font>");
 			} catch (Exception e) {
@@ -485,7 +485,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			String textFortumoText = getString(R.string.payment_method_fortumo);
 			try{
 				textFortumoText = textFortumoText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
 						+ "\'>");
 				textFortumoText = textFortumoText.replace("[/A]", "</font>");
 			} catch (Exception e) {
@@ -505,7 +505,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			String textCentiliText = getString(R.string.payment_method_centili);
 			try{
 				textCentiliText = textCentiliText.replace("[A]", "<font color=\'"
-						+ ColorUtils.getColorHexString(context, R.color.black_white)
+						+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
 						+ "\'>");
 				textCentiliText = textCentiliText.replace("[/A]", "</font>");
 			} catch (Exception e) {
@@ -593,7 +593,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 		try {
 			textToShow = textToShow.replace("[A]", "<font color=\'"
-					+ ColorUtils.getColorHexString(context, R.color.black_white)
+					+ ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
 					+ "\'>");
 			textToShow = textToShow.replace("[/A]", "</font>");
 		} catch (Exception e) {
