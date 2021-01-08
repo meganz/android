@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.MegaApiUtils.getInfoFolder
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaAccountDetails.ACCOUNT_TYPE_FREE
 import nz.mega.sdk.MegaNode
@@ -37,8 +38,8 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     companion object {
         private const val ALPHA_VIEW_DISABLED = 0.3f
         private const val ALPHA_VIEW_ENABLED = 1.0f
-
         private const val INVALID_EXPIRATION_TIME = -1L
+        private const val THUMBNAIL_CORNER = 4F
     }
 
     private lateinit var binding: FragmentGetLinkBinding
@@ -181,12 +182,24 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         } else if (node.hasThumbnail()) {
             var thumb = ThumbnailUtils.getThumbnailFromCache(node)
             if (thumb != null) {
-                binding.nodeThumbnail.setImageBitmap(thumb)
+                binding.nodeThumbnail.setImageBitmap(
+                    getRoundedBitmap(
+                        context,
+                        thumb,
+                        dp2px(THUMBNAIL_CORNER, outMetrics)
+                    )
+                )
             } else {
                 thumb = ThumbnailUtils.getThumbnailFromFolder(node, context)
 
                 if (thumb != null) {
-                    binding.nodeThumbnail.setImageBitmap(thumb)
+                    binding.nodeThumbnail.setImageBitmap(
+                        getRoundedBitmap(
+                            context,
+                            thumb,
+                            dp2px(THUMBNAIL_CORNER, outMetrics)
+                        )
+                    )
                 } else {
                     binding.nodeThumbnail.setImageResource(typeForName(node.name).iconResourceId)
                 }
