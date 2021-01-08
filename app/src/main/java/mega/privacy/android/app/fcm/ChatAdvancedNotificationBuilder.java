@@ -584,13 +584,9 @@ public final class ChatAdvancedNotificationBuilder {
     private Bitmap setUserAvatar(MegaChatRoom chat){
         logDebug("Chat ID: " + chat.getChatId());
         if(!chat.isGroup()) {
-            File avatar = buildAvatarFile(context, chatC.getParticipantEmail(chat.getPeerHandle(0)) + ".jpg");
-            if (isFileAvailable(avatar) && avatar.length() > 0) {
-                BitmapFactory.Options bOpts = new BitmapFactory.Options();
-                Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-                if (bitmap != null)
-                    return getCircleBitmap(bitmap);
-            }
+            Bitmap bitmap = getImageAvatarCall(chat, chat.getPeerHandle(0));
+            if (bitmap != null)
+                return getCircleBitmap(bitmap);
         }
         return createDefaultAvatar(chat);
     }
@@ -658,7 +654,6 @@ public final class ChatAdvancedNotificationBuilder {
 
                 NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSimple);
                 notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
-
                 notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify)
                         .setShowWhen(true)
                         .setGroup(groupKey)
@@ -823,6 +818,7 @@ public final class ChatAdvancedNotificationBuilder {
         MegaChatRoom chatToAnswer = megaChatApi.getChatRoom(chatIdCallToAnswer);
         int notificationId = getCallNotificationId(callToAnswer.getId());
         boolean hasVideoInitialCall = callToAnswer.hasVideoInitialCall();
+        boolean shouldVibrate = !participatingInACall();
 
         PendingIntent intentIgnore = getPendingIntent(hasVideoInitialCall, chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.IGNORE, notificationId);
         PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
@@ -899,7 +895,6 @@ public final class ChatAdvancedNotificationBuilder {
         if (!numberButtons.equals(THREE_BUTTONS) && !numberButtons.equals(VERTICAL_TWO_BUTTONS)) {
             expandedView.setViewVisibility(R.id.small_layout, View.VISIBLE);
             expandedView.setViewVisibility(R.id.big_layout, GONE);
-
             if (chatToAnswer.isGroup()) {
                 expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming));
                 expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
@@ -946,17 +941,29 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create a channel for android Oreo or higher
-            NotificationChannel channel = new NotificationChannel(notificationChannelIdIncomingCall, notificationChannelNameIncomingCall, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription("");
+            String channelId = shouldVibrate ? notificationChannelIdIncomingCall :
+                    NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID;
+
+            String channelName = shouldVibrate ? notificationChannelNameIncomingCall :
+                    NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME;
+
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
+            if (shouldVibrate) {
+                channel.setVibrationPattern(patternIncomingCall);
+            }else{
+                channel.setVibrationPattern(new long[]{ 0L });
+            }
             channel.enableLights(true);
-            channel.enableVibration(true);
+            channel.enableVibration(shouldVibrate);
+            channel.setDescription("");
 
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
 
             notificationManager.createNotificationChannel(channel);
-            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdIncomingCall);
+
+            NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, channelId);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -969,15 +976,12 @@ public final class ChatAdvancedNotificationBuilder {
                     .setShowWhen(true)
                     .setAutoCancel(false)
                     .setDeleteIntent(intentIgnore)
-                    .setVibrate(patternIncomingCall)
                     .setColor(ContextCompat.getColor(context, R.color.mega))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             notifyCall(notificationId, notificationBuilderO.build());
 
         } else {
-            long[] pattern = {0, 1000};
-            Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
@@ -989,11 +993,16 @@ public final class ChatAdvancedNotificationBuilder {
                     .setFullScreenIntent(callScreen, true)
                     .setShowWhen(true)
                     .setAutoCancel(false)
-                    .setDefaults(Notification.FLAG_ONGOING_EVENT)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setDeleteIntent(intentIgnore)
-                    .setVibrate(pattern)
-                    .setSound(defaultSoundUri)
                     .setColor(ContextCompat.getColor(context, R.color.mega));
+
+            if (shouldVibrate) {
+                notificationBuilder.setVibrate(patternIncomingCall);
+            } else {
+                notificationBuilder.setDefaults(Notification.DEFAULT_SOUND)
+                        .setVibrate(new long[]{0L});
+            }
 
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
@@ -1269,7 +1278,6 @@ public final class ChatAdvancedNotificationBuilder {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             notificationManager.createNotificationChannel(channel);
-
             NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdInProgressMissedCall);
             notificationBuilderO
                     .setSmallIcon(R.drawable.ic_stat_notify)
@@ -1293,7 +1301,6 @@ public final class ChatAdvancedNotificationBuilder {
             notify(notificationId, notificationBuilderO.build());
         }
         else {
-
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle(context.getString(R.string.missed_call_notification_title))

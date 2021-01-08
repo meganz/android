@@ -2951,6 +2951,8 @@
 
     <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don't remove the place holder, it's to set the name of the transfer. Example: The priority change of the transfer 'video.mp4' failed.">The priority change of the transfer \'%1$s\' failed.</string>
 
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
     <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
     <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
     <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
