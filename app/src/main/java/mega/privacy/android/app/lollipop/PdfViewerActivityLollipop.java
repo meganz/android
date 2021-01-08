@@ -127,6 +127,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
@@ -424,22 +425,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop
                         megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                     }
                 }
+
                 if (savedInstanceState != null && ! isFolderLink) {
                     MegaNode node = null;
+
                     if (fromChat) {
                         node = nodeChat;
-                    }
-                    else if (type == FILE_LINK_ADAPTER) {
+                    } else if (type == FILE_LINK_ADAPTER) {
                         node = currentDocument;
-                    }
-                    else {
+                    } else {
                         node = megaApi.getNodeByHandle(handle);
                     }
-                    if (node != null){
-                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+
+                    String url = null;
+
+                    if (node != null) {
+                        url = megaApi.httpServerGetLocalLink(node);
+
+                        if (url != null) {
+                            uri = Uri.parse(url);
+                        }
                     }
-                    else {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
+
+                    if (node == null || url == null || uri == null) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming), MEGACHAT_INVALID_HANDLE);
                     }
                 }
             }

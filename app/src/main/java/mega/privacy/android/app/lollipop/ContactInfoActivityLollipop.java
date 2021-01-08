@@ -123,8 +123,8 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
@@ -1035,7 +1035,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch (requestCode) {
 			case REQUEST_CAMERA:
-			case RECORD_AUDIO:
+			case REQUEST_RECORD_AUDIO:
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
 						checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
 					startCall();

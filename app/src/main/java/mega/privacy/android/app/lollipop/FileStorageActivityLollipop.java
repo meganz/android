@@ -697,7 +697,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void setFiles(File path) {
 		logDebug("setFiles");
 		List<FileDocument> documents = new ArrayList<FileDocument>();
-		if (!path.canRead()) {
+
+		if (path == null || !path.canRead()) {
 			showErrorAlertDialog(getString(R.string.error_io_problem),
 					true, this);
 			return;
@@ -705,16 +706,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		File[] files = path.listFiles();
 
-		if(files != null)
-		{
+		if (files != null) {
 			logDebug("Number of files: " + files.length);
+
 			for (File file : files) {
 				FileDocument document = new FileDocument(file);
 				if (document.isHidden()) {
 					continue;
 				}
+
 				documents.add(document);
 			}
+
 			Collections.sort(documents, new CustomComparator());
 		}
 
