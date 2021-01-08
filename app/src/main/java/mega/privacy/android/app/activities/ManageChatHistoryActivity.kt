@@ -38,7 +38,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         private const val OPTION_YEARS = 4
 
         private const val MINIMUM_VALUE_NUMBER_PICKER = 1
-        private const val DAYS_IN_A_WEEK_VALUE = 7
         private const val DAYS_IN_A_MONTH_VALUE = 30
         private const val MAXIMUM_VALUE_NUMBER_PICKER_HOURS = 24
         private const val MAXIMUM_VALUE_NUMBER_PICKER_DAYS = 31
@@ -312,7 +311,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
     /**
      * Method that transforms the chosen option into the most correct form:
      * - If the option selected is 24 hours, it becomes 1 day.
-     * - If the selected option is 7 days, it becomes 1 week.
      * - If the selected option is 31 days, it becomes 1 month.
      * - If the selected option is 4 weeks, it becomes 1 month.
      * - If the selected option is 12 months, it becomes 1 year.
@@ -324,17 +322,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             updatePickersValues(
                 OPTION_DAYS,
                 getMaximumValueOfNumberPicker(OPTION_DAYS),
-                MINIMUM_VALUE_NUMBER_PICKER
-            )
-            return
-        }
-
-        if (binding.textPicker.value == OPTION_DAYS &&
-            binding.numberPicker.value == DAYS_IN_A_WEEK_VALUE
-        ) {
-            updatePickersValues(
-                OPTION_WEEKS,
-                getMaximumValueOfNumberPicker(OPTION_WEEKS),
                 MINIMUM_VALUE_NUMBER_PICKER
             )
             return
