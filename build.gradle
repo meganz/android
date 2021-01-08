@@ -1,18 +1,24 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
-    ext.kotlin_version = '1.4.10'
-    ext.anko_version = '0.10.8'
+    ext.gradleVersion = '4.1.1'
+    ext.kotlinVersion = '1.4.10'
+    ext.navigationVersion = '2.3.0'
+    ext.googleServicesVersion = '4.3.4'
+    ext.hiltVersion = "2.29.1-alpha"
+    ext.huaweiServicesVersion = "1.4.1.300"
+
     repositories {
         jcenter()
         google()
         maven { url 'http://developer.huawei.com/repo/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
-        classpath 'com.google.gms:google-services:4.3.4'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.huawei.agconnect:agcp:1.2.1.301'
+        classpath "com.android.tools.build:gradle:$gradleVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
+        classpath "com.google.gms:google-services:$googleServicesVersion"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
+        classpath "com.huawei.agconnect:agcp:$huaweiServicesVersion"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -37,4 +43,35 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+// Define versions in a single place
+ext {
+    // Sdk and tools
+    compileSdkVersion = 29
+    minSdkVersion = 21
+    targetSdkVersion = 29
+    buildToolsVerion = '29.0.3'
+
+    // App dependencies
+    appCompatVersion = '1.2.0'
+    daggerVersion = "2.24"
+    constraintLayoutVersion = '2.0.3'
+    coroutinesVersion = "1.4.1"
+    fragmentKtxVersion = '1.2.5'
+    glideVersion = '4.10.0'
+    gsonVersion = '2.8.5'
+    ktxVersion = '1.3.2'
+    lifecycleVersion = '2.2.0'
+    materialVersion = '1.2.1'
+    recyclerViewVersion = '1.1.0'
+    roomVersion = '2.2.5'
+    viewPagerVersion = '1.0.0'
+    cardViewVersion = '1.0.0'
+    legacySupportVersion = 'v4:1.0.0'
+    hiltAndroidXVersion = '1.0.0-alpha02'
+    rxJavaVersion = '3.0.4'
+    rxAndroidVersion = '3.0.0'
+    ankoVersion = '0.10.8'
+    frescoVersion = '2.3.0'
 }

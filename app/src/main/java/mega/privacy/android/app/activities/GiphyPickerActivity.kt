@@ -200,20 +200,20 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
             numColumns = NUM_COLUMNS_PORTRAIT
             widthScreen = outMetrics.widthPixels
 
-            paramsEmptyImage.topMargin = px2dp(EMPTY_IMAGE_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
-            paramsEmptyText.topMargin = px2dp(EMPTY_TEXT_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
+            paramsEmptyImage.topMargin = dp2px(EMPTY_IMAGE_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
+            paramsEmptyText.topMargin = dp2px(EMPTY_TEXT_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
         } else if (screenOrientation == ORIENTATION_LANDSCAPE) {
             numColumns = NUM_COLUMNS_LANDSCAPE
             widthScreen = outMetrics.heightPixels
 
-            paramsEmptyImage.topMargin = px2dp(EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE, resources.displayMetrics)
+            paramsEmptyImage.topMargin = dp2px(EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE, resources.displayMetrics)
             paramsEmptyText.topMargin = EMPTY_TEXT_MARGIN_TOP_LANDSCAPE
         }
 
         binding.emptyGiphyImage.layoutParams = paramsEmptyImage
         binding.emptyGiphyText.layoutParams = paramsEmptyText
 
-        screenGifWidth = (widthScreen / numColumns) - (px2dp(GIF_MARGIN, outMetrics) * numColumns)
+        screenGifWidth = (widthScreen / numColumns) - (dp2px(GIF_MARGIN, outMetrics) * numColumns)
         staggeredGridLayoutManager = StaggeredGridLayoutManager(numColumns, RecyclerView.VERTICAL)
         binding.giphyList.layoutManager = staggeredGridLayoutManager
 

@@ -2,7 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import androidx.core.content.ContextCompat;
+
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -73,7 +73,7 @@ public class AddContactsLollipopAdapter extends RecyclerView.Adapter<AddContacts
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = v.findViewById(R.id.name_chip);
-        holder.textViewName.setMaxWidthEmojis(px2dp(MAX_WIDTH_ADD_CONTACTS, outMetrics));
+        holder.textViewName.setMaxWidthEmojis(dp2px(MAX_WIDTH_ADD_CONTACTS, outMetrics));
         holder.textViewName.setTypeEllipsize(TextUtils.TruncateAt.MIDDLE);
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);

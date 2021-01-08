@@ -2,8 +2,13 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -23,15 +28,17 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
@@ -72,23 +79,13 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         private ImageView actionIcon;
         private TextView time;
         private ImageButton threeDots;
-        private LinearLayout mediaLayout;
-        private RecyclerView mediaRecycler;
+        public ImageView imageFavourite;
+        public ImageView imageLabel;
 
         private long document = -1;
 
         public long getDocument() {
             return document;
-        }
-
-        public void setImageThumbnail(Bitmap image) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.imageThumbnail.getLayoutParams();
-            params.width = params.height = px2dp(36, outMetrics);
-            int margin = px2dp(18, outMetrics);
-            params.setMargins(margin, margin, margin, 0);
-
-            this.imageThumbnail.setLayoutParams(params);
-            this.imageThumbnail.setImageBitmap(getRoundedBitmap(context, image, THUMB_ROUND_PIXEL));
         }
 
         public ImageView getImageThumbnail() {
@@ -120,8 +117,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         holder.sharedIcon = v.findViewById(R.id.shared_image);
         holder.actionIcon = v.findViewById(R.id.action_image);
         holder.time = v.findViewById(R.id.time_text);
-        holder.mediaLayout = v.findViewById(R.id.media_bucket_layout);
-        holder.mediaRecycler = v.findViewById(R.id.media_recyler);
+        holder.imageFavourite = v.findViewById(R.id.img_favourite);
+        holder.imageLabel = v.findViewById(R.id.img_label);
 
         v.setTag(holder);
         return holder;
@@ -195,13 +192,11 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             holder.time.setText(item.getTime());
 
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageThumbnail.getLayoutParams();
-            params.width = params.height = px2dp(48, outMetrics);
-            int margin = px2dp(12, outMetrics);
+            params.width = params.height = dp2px(48, outMetrics);
+            int margin = dp2px(12, outMetrics);
             params.setMargins(margin, margin, margin, 0);
             holder.imageThumbnail.setLayoutParams(params);
             holder.imageThumbnail.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-
-            holder.mediaLayout.setVisibility(View.GONE);
 
             if (nodeList.size() == 1) {
                 holder.document = node.getHandle();
@@ -209,39 +204,24 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.threeDots.setOnClickListener(this);
                 holder.title.setText(node.getName());
 
-                Bitmap thumbnail = getThumbnailFromCache(node);
-                if (thumbnail == null) {
-                    thumbnail = getThumbnailFromFolder(node, context);
-                    if (thumbnail == null) {
-                        try {
-                            if (node.hasThumbnail()) {
-                                thumbnail = getThumbnailFromMegaList(node, context, holder, megaApi, this);
-                            } else {
-                                createThumbnailList(context, node, holder, megaApi, this);
-                            }
-                        } catch (Exception e) {
-                            logError("Error getting or creating node thumbnail", e);
-                            e.printStackTrace();
-                        }
-                    }
+                if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+                    Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+                    holder.imageLabel.setImageDrawable(drawable);
+                    holder.imageLabel.setVisibility(View.VISIBLE);
+                } else {
+                    holder.imageLabel.setVisibility(View.GONE);
                 }
-                if (thumbnail != null) {
-                    holder.setImageThumbnail(thumbnail);
-                }
+
+                holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
             } else {
                 holder.threeDots.setVisibility(View.INVISIBLE);
                 holder.threeDots.setOnClickListener(null);
+                holder.imageLabel.setVisibility(View.GONE);
+                holder.imageFavourite.setVisibility(View.GONE);
 
                 if (bucket.isMedia()) {
-                    holder.mediaLayout.setVisibility(View.VISIBLE);
                     holder.title.setText(getMediaTitle(nodeList));
                     holder.imageThumbnail.setImageResource(R.drawable.media);
-
-                    MediaRecentsAdapter adapter = new MediaRecentsAdapter(context, fragment, bucket.getNodes(), bucket);
-
-                    holder.mediaRecycler.setHasFixedSize(true);
-                    holder.mediaRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-                    holder.mediaRecycler.setAdapter(adapter);
                 } else {
                     holder.title.setText(context.getString(R.string.title_bucket, node.getName(), (nodeList.size() - 1)));
                 }
@@ -330,7 +310,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                     break;
                 }
                 if (node != null) {
-                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
+                    ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
                 }
                 break;
             }
@@ -338,12 +318,14 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 MegaNodeList nodeList = getMegaNodeListOfItem(item);
                 if (nodeList == null) break;
                 if (nodeList.size() == 1) {
-                    ((RecentsFragment) fragment).openFile(node, false,
-                        v.findViewById(R.id.thumbnail_view), RecentsFragment.OPEN_FROM_ROOT_SINGLE);
+                    ((RecentsFragment) fragment).openFile(node, false, v.findViewById(R.id.thumbnail_view));
                     break;
                 }
-                if (item.getBucket() == null) break;
-                ((RecentsFragment) fragment).openMultipleBucket(item.getBucket());
+                MegaRecentActionBucket bucket = item.getBucket();
+                if (bucket == null) break;
+
+                ((RecentsFragment)fragment).getSelectedBucketModel().select(bucket, megaApi.getRecentActions());
+                Navigation.findNavController(v).navigate(HomepageFragmentDirections.Companion.actionHomepageToRecentBucket(),new NavOptions.Builder().build());
                 break;
             }
         }
@@ -392,7 +374,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         return recentsItems.get(position).getDate();
     }
 
-    private int[] getNodePosition(long handle, boolean rootLevel) {
+    private int[] getNodePosition(long handle) {
         int position = INVALID_POSITION;
         int subListPosition = INVALID_POSITION;
         for (int i = 0; i < recentsItems.size(); i++) {
@@ -404,69 +386,29 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
             if (nodes == null) {
                 continue;
             }
-            if (rootLevel) {
-                MegaNode node = nodes.get(0);
-                if (node != null && node.getHandle() == handle) {
-                    position = i;
-                    break;
-                }
-            } else {
-                for (int j = 0, len = nodes.size(); j < len; j++) {
-                    MegaNode node = nodes.get(j);
-                    if (node != null && node.getHandle() == handle) {
-                        position = i;
-                        subListPosition = j;
-                        break;
-                    }
-                }
-                if (position != INVALID_POSITION) {
-                    break;
-                }
+            MegaNode node = nodes.get(0);
+            if (node != null && node.getHandle() == handle) {
+                position = i;
+                break;
             }
         }
-        return new int[] { position, subListPosition };
+        return new int[]{position, subListPosition};
     }
 
-    public void scrollToSubListNode(RecyclerView recyclerView, long handle) {
-        if (recentsItems == null || recentsItems.isEmpty()) {
-            return;
-        }
-
-        int[] positions = getNodePosition(handle, false);
-        if (positions[0] == INVALID_POSITION || positions[1] == INVALID_POSITION) {
-            return;
-        }
-
-        RecyclerView.ViewHolder viewHolder
-            = recyclerView.findViewHolderForLayoutPosition(positions[0]);
-        if (viewHolder instanceof ViewHolderBucket) {
-            ((ViewHolderBucket) viewHolder).mediaRecycler.scrollToPosition(positions[1]);
-        }
-    }
-
-    public ImageView getThumbnailView(RecyclerView recyclerView, long handle, boolean rootLevel) {
+    public ImageView getThumbnailView(RecyclerView recyclerView, long handle) {
         if (recentsItems == null || recentsItems.isEmpty()) {
             return null;
         }
 
-        int[] positions = getNodePosition(handle, rootLevel);
+        int[] positions = getNodePosition(handle);
         if (positions[0] == INVALID_POSITION) {
             return null;
         }
 
         RecyclerView.ViewHolder viewHolder
-            = recyclerView.findViewHolderForLayoutPosition(positions[0]);
+                = recyclerView.findViewHolderForLayoutPosition(positions[0]);
         if (viewHolder instanceof ViewHolderBucket) {
-            if (rootLevel) {
-                return ((ViewHolderBucket) viewHolder).imageThumbnail;
-            } else {
-                RecyclerView.ViewHolder subListViewHolder =
-                    ((ViewHolderBucket) viewHolder).mediaRecycler.findViewHolderForLayoutPosition(
-                        positions[1]);
-                if (subListViewHolder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
-                    return ((MediaRecentsAdapter.ViewHolderMediaBucket) subListViewHolder).getThumbnail();
-                }
-            }
+            return ((ViewHolderBucket) viewHolder).imageThumbnail;
         }
 
         return null;

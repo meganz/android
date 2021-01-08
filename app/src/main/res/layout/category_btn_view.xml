@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/imageView_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:srcCompat="@drawable/ic_photos" />
+
+    <TextView
+        android:id="@+id/textView_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/text_photo_span"
+        android:textSize="12sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="@+id/imageView_category"
+        app:layout_constraintStart_toStartOf="@+id/imageView_category"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView_category"
+        tools:text="@string/sortby_type_photo_first" />
+</merge>
