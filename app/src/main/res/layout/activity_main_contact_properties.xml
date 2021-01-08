@@ -15,10 +15,6 @@
                 android:id="@+id/toolbar_main_contact_properties"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:titleTextAppearance="@style/ToolbarTitle"
-                app:popupTheme="@style/Theme.Megaactionbar.InfoScreens"
-                app:theme="@style/Theme.Megaactionbar.InfoScreens"
                 tools:context=".ContactPropertiesActivityLollipop" />
 
             <FrameLayout

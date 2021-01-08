@@ -148,8 +148,7 @@
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactFileListActivityLollipop"
             android:label="@string/contact_properties_activity"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:launchMode="singleTop">
         </activity>
 
         <activity

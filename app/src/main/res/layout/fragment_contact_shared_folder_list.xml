@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/shared_folder_list_container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white">
+                android:layout_height="wrap_content">
 
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/contact_shared_folder_list_view"
@@ -18,5 +17,5 @@
 	        android:layout_alignParentRight="true"
 	        android:layout_below="@+id/contact_shared_folder_list_view"
 	        android:background="@android:color/transparent"
-	        android:textColor="@color/accentColor"/>
+	        android:textColor="?attr/colorSecondary"/>
 </RelativeLayout>

@@ -142,13 +142,6 @@ public class SearchByDateActivityLollipop extends PinActivityLollipop implements
 
         setContentView(R.layout.search_by_date_activity_layout);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
-        }
-
         fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_search_date);
 
         tB = (Toolbar) findViewById(R.id.toolbar_search);
