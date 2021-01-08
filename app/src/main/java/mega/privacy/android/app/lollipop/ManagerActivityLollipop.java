@@ -10617,6 +10617,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logWarning("usedSpaceLayout is NULL");
 		}
 
+		updateSubscriptionLevel(app.getMyAccountInfo());
+
 		switch (storageState) {
 			case MegaApiJava.STORAGE_STATE_GREEN:
 				usedSpacePB.setProgressDrawable(getResources().getDrawable(
