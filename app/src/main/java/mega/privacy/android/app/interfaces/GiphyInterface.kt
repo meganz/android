@@ -3,6 +3,13 @@ package mega.privacy.android.app.interfaces
 import mega.privacy.android.app.objects.GifData
 
 interface GiphyInterface {
+
+    companion object {
+        const val NON_EMPTY = 0
+        const val EMPTY_SEARCH = 1
+        const val EMPTY_DOWN_SERVER = 2
+    }
+
     /**
      * Opens the GIF viewer showing the selected GIF.
      *
@@ -11,11 +18,14 @@ interface GiphyInterface {
     fun openGifViewer(gifData: GifData?)
 
     /**
-     * Shows the empty state if the result of the request is empty.
+     * Shows the empty state if the result of the request is empty or server is down.
      *
-     * @param emptyList True if the request is empty, false otherwise.
+     * @param emptyState The state of the view. It can be:
+     *   - NON_EMPTY: Hides empty view.
+     *   - EMPTY_SEARCH: Shows empty view due to empty search.
+     *   - EMPTY_DOWN_SERVER: Shows empty view due to down server.
      */
-    fun setEmptyState(emptyList: Boolean)
+    fun setEmptyState(emptyState: Int)
 
     /**
      * Gets the height of a GIF to display on screen from its real width, real height and width available on the screen.
