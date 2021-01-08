@@ -70,11 +70,7 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -136,6 +132,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -920,10 +917,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         participantsLayout.setVisibility(View.GONE);
         iconStateToolbar.setVisibility(View.GONE);
         privateIconToolbar.setVisibility(View.GONE);
-        muteIconToolbar.setVisibility(View.GONE);
-        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
-        updateNavigationToolbarIcon();
 
+        muteIconToolbar.setVisibility(View.GONE);
+        badgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext(), R.color.dark_primary_color);
+        updateNavigationToolbarIcon();
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
@@ -950,8 +947,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         gifButton = findViewById(R.id.gif_chat);
 
         keyboardHeight = getOutMetrics().heightPixels / 2 - getActionBarHeight(this, getResources());
-        marginBottomDeactivated = px2dp(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
-        marginBottomActivated = px2dp(MARGIN_BUTTON_ACTIVATED, getOutMetrics());
+        marginBottomDeactivated = dp2px(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
+        marginBottomActivated = dp2px(MARGIN_BUTTON_ACTIVATED, getOutMetrics());
 
         callInProgressLayout = findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
@@ -1017,7 +1014,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         bubbleLayout.setBackground(myBubble);
         bubbleLayout.setVisibility(View.GONE);
         bubbleText = findViewById(R.id.bubble_text);
-        bubbleText.setMaxWidth(px2dp(MAX_WIDTH_BUBBLE, getOutMetrics()));
+        bubbleText.setMaxWidth(dp2px(MAX_WIDTH_BUBBLE, getOutMetrics()));
         recordButton.setRecordView(recordView);
         myAudioRecorder = new MediaRecorder();
         showInputText();
@@ -1456,7 +1453,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             maxWidth = HINT_LAND;
         }
-        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, textChat.getPaint(), px2dp(maxWidth, getOutMetrics()), typeEllipsize);
+        CharSequence textF = TextUtils.ellipsize(spannableStringBuilder, textChat.getPaint(), dp2px(maxWidth, getOutMetrics()), typeEllipsize);
         return textF;
     }
 
@@ -2796,7 +2793,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             value = MARGIN_BUTTON_DEACTIVATED;
             if(recordButtonState == RECORD_BUTTON_DEACTIVATED) {
                 logDebug("DESACTIVATED");
-                marginRight = px2dp(14, getOutMetrics());
+                marginRight = dp2px(14, getOutMetrics());
             }
         }
         else if(recordButtonState == RECORD_BUTTON_ACTIVATED) {
@@ -2811,8 +2808,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) recordButtonLayout.getLayoutParams();
-        params.height = px2dp(value, getOutMetrics());
-        params.width = px2dp(value, getOutMetrics());
+        params.height = dp2px(value, getOutMetrics());
+        params.width = dp2px(value, getOutMetrics());
         params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         params.setMargins(0, 0, marginRight, marginBottom);
@@ -2948,7 +2945,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean checkPermissionsCall() {
         logDebug("checkPermissionsCall");
         return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
-                && checkPermissions(Manifest.permission.RECORD_AUDIO, RECORD_AUDIO);
+                && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO);
     }
 
     private boolean checkPermissionsTakePicture() {
@@ -3000,7 +2997,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case REQUEST_CAMERA:
-            case RECORD_AUDIO:{
+            case REQUEST_RECORD_AUDIO:{
                 logDebug("REQUEST_CAMERA || RECORD_AUDIO");
                 if (checkPermissionsCall()) {
                     startCall();
@@ -9106,60 +9103,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return new File(storageDir, imageFileName + ".jpg");
     }
 
+    /**
+     * Manages the result after pick an image with camera.
+     */
     private void onCaptureImageResult() {
-        logDebug("onCaptureImageResult");
-        if (mOutputFilePath != null) {
-            File f = new File(mOutputFilePath);
-            if(f!=null){
-                try {
-                    File publicFile = copyImageFile(f);
-                    //Remove mOutputFilePath
-                    if (f.exists()) {
-                        if (f.isDirectory()) {
-                            if(f.list().length <= 0){
-                                f.delete();
-                            }
-                        }else{
-                            f.delete();
-                        }
-                    }
-                    if(publicFile!=null){
-                        Uri finalUri = Uri.fromFile(publicFile);
-                        galleryAddPic(finalUri);
-                        uploadPictureOrVoiceClip(publicFile.getPath());
-                    }
+        if (mOutputFilePath == null) {
+            logDebug("mOutputFilePath is null");
+            return;
+        }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+        File f = new File(mOutputFilePath);
+
+        File publicFile = FileUtil.copyFileToDCIM(f);
+        //Remove mOutputFilePath
+        if (f.exists()) {
+            if (f.isDirectory()) {
+                if (f.list() != null && f.list().length <= 0) {
+                    f.delete();
                 }
+            } else {
+                f.delete();
             }
-
         }
-    }
 
-    public File copyImageFile(File fileToCopy) throws IOException {
-        logDebug("copyImageFile");
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
-        if (!storageDir.exists()) {
-            storageDir.mkdir();
-        }
-        File copyFile = new File(storageDir, fileToCopy.getName());
-        copyFile.createNewFile();
-        copy(fileToCopy, copyFile);
-        return copyFile;
-    }
-
-    public static void copy(File src, File dst) throws IOException {
-        logDebug("copy");
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
+        Uri finalUri = Uri.fromFile(publicFile);
+        galleryAddPic(finalUri);
+        uploadPictureOrVoiceClip(publicFile.getPath());
     }
 
     private void galleryAddPic(Uri contentUri) {

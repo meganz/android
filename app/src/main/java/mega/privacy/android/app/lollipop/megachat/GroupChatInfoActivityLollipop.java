@@ -643,7 +643,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        input.setEmojiSize(px2dp(EMOJI_SIZE, getOutMetrics()));
+        input.setEmojiSize(dp2px(EMOJI_SIZE, getOutMetrics()));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
@@ -1155,7 +1155,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case RECORD_AUDIO:
+            case REQUEST_RECORD_AUDIO:
             case REQUEST_CAMERA:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     controlCallPermissions();

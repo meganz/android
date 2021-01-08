@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="mega.privacy.android.app.utils.Util" />
+
+        <import type="mega.privacy.android.app.utils.TimeUtils" />
+
+        <import type="mega.privacy.android.app.utils.OfflineUtils" />
+
+        <import type="mega.privacy.android.app.MimeTypeThumbnail" />
+
+        <variable
+            name="itemOperationViewModel"
+            type="mega.privacy.android.app.fragments.homepage.ItemOperationViewModel" />
+
+        <variable
+            name="actionModeViewModel"
+            type="mega.privacy.android.app.fragments.homepage.ActionModeViewModel" />
+
+        <variable
+            name="item"
+            type="mega.privacy.android.app.fragments.homepage.NodeItem" />
+
+        <variable
+            name="megaApi"
+            type="nz.mega.sdk.MegaApiJava" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="219dp"
+        android:layout_margin="2dp"
+        android:background="@{item.selected ? @drawable/background_item_grid_selected : @drawable/background_item_grid_new}"
+        android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.onItemClick(item) : actionModeViewModel.onNodeClick(item)}"
+        android:onLongClick="@{()->actionModeViewModel.onNodeLongClick(item)}">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/grid_node_item_width"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="1dp"
+            android:paddingTop="1dp"
+            android:paddingRight="1dp"
+            app:actualImageScaleType="fitCenter"
+            app:defaultThumbnail="@{MimeTypeThumbnail.typeForName(item.node.name).iconResourceId}"
+            app:thumbnail="@{item.thumbnail}" />
+
+        <!-- For Video only, vido icon and duration -->
+        <FrameLayout
+            android:id="@+id/video_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="147dp"
+            android:background="@drawable/gradient_cam_uploads"
+            app:visibleGone="@{item.video}">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@drawable/ic_play_arrow_white_24dp"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="33dp"
+                android:layout_marginTop="2dp"
+                android:text="@{TimeUtils.getVideoDuration(item.node.duration)}"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/ic_selected"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="7dp"
+            android:src="@drawable/ic_select_folder"
+            android:visibility="@{item.selected ? View.VISIBLE : View.GONE}" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/grid_node_item_width"
+            android:background="@color/black_12_alpha" />
+
+        <LinearLayout
+            android:id="@+id/filename_container"
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:layout_marginTop="@dimen/grid_node_item_width"
+            android:onClick="@{()->actionModeViewModel.selectedNodes.empty ? itemOperationViewModel.showNodeItemOptions(item) : actionModeViewModel.onNodeClick(item)}"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/filename"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:singleLine="true"
+                android:text="@{item.node.name}"
+                android:textColor="@{item.node.isTakenDown() ? @color/dark_primary_color : @color/primary_text }"
+                android:textSize="14sp"
+                tools:text="2048.jpg" />
+
+            <ImageView
+                android:id="@+id/taken_down"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="@null"
+                android:src="@drawable/ic_input_warning"
+                app:tint="@color/login_warning"
+                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="@null"
+                android:src="@drawable/ic_dots_vertical_grey" />
+        </LinearLayout>
+    </FrameLayout>
+</layout>

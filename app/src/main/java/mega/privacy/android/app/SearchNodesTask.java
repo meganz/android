@@ -129,6 +129,9 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
                 if (drawerItem == null) return;
 
                 switch (drawerItem) {
+                    case HOMEPAGE:
+                        parent = megaApi.getRootNode();
+                        break;
                     case CLOUD_DRIVE: {
                         parent = megaApi.getNodeByHandle(managerA.getParentHandleBrowser());
                         break;
@@ -156,9 +159,6 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
 
                             parent = megaApi.getNodeByHandle(managerA.getParentHandleLinks());
                         }
-                        break;
-                    }
-                    case SAVED_FOR_OFFLINE: {
                         break;
                     }
                     case RUBBISH_BIN: {
@@ -302,13 +302,25 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
     }
 
     public static ArrayList<MegaNode> getSearchedNodes(ArrayList<String> handles) {
+        long[] handleValues = new long[handles.size()];
+
+        for (int i = 0; i < handles.size(); i++) {
+            handleValues[i] = Long.parseLong(handles.get(i));
+        }
+
+        return getSearchedNodes(handleValues);
+    }
+
+    public static ArrayList<MegaNode> getSearchedNodes(long[] handles) {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         ArrayList<MegaNode> nodes = new ArrayList<>();
 
-        for (String handle : handles) {
-            MegaNode node = megaApi.getNodeByHandle(Long.parseLong(handle));
-            if (node != null) {
-                nodes.add(node);
+        if (handles != null) {
+            for (long handle : handles) {
+                MegaNode node = megaApi.getNodeByHandle(handle);
+                if (node != null) {
+                    nodes.add(node);
+                }
             }
         }
 

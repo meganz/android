@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
+import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -76,6 +78,14 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     @Override
     public void onUserAlertsUpdate(MegaApiJava api, ArrayList<MegaUserAlert> userAlerts) {
         megaApplication.updateAppBadge();
+
+        notifyNotificationCountChange(api);
+    }
+
+    private void notifyNotificationCountChange(MegaApiJava api) {
+        ArrayList<MegaContactRequest> incomingContactRequests = api.getIncomingContactRequests();
+        EventNotifierKt.notifyNotificationCountChange(api.getNumUnreadUserAlerts()
+                + (incomingContactRequests == null ? 0 : incomingContactRequests.size()));
     }
 
     @Override
@@ -115,6 +125,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         if (requests == null) return;
 
         megaApplication.updateAppBadge();
+
+        notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);
