@@ -337,10 +337,10 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 					color = String.valueOf(ContextCompat.getColor(context,R.color.red_600_red_300));
 					break;
 				case PRO_LITE:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.lite_account));
+					color = String.valueOf(ContextCompat.getColor(context,R.color.orange_400_orange_300));
 					break;
 				case BUSINESS:
-					color = String.valueOf(ContextCompat.getColor(context,R.color.business_account));
+					color = String.valueOf(ContextCompat.getColor(context,R.color.dark_blue_500_200));
 					break;
 			}
 

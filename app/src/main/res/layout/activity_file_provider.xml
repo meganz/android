@@ -52,7 +52,7 @@
 
     <View
         android:id="@+id/separator"
-        android:background="@color/separator_grey"
+        android:background="@color/grey_012_white_012"
         android:layout_width = "fill_parent"
         android:layout_height="1dip"
         android:layout_above="@id/options_provider_layout"/>

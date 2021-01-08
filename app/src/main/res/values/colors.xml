@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="business_account">#2BA6DE</color>
+<!--    <color name="business_account">#2BA6DE</color>-->
 
-    <color name="pressed_mega">#CCcc0000</color>
-    <color name="text_tab_alpha">#99ffffff</color>
-    <color name="text_secondary">#7a7a7a</color>
-    <color name="separator_grey">#10000000</color>
-    <color name="background_secondary">#eeeeee</color>
+<!--    <color name="pressed_mega">#CCcc0000</color>-->
+<!--    <color name="text_tab_alpha">#99ffffff</color>-->
+<!--    <color name="text_secondary">#7a7a7a</color>-->
+<!--    <color name="separator_grey">#10000000</color>-->
+<!--    <color name="background_secondary">#eeeeee</color>-->
     <color name="background_create_account">#f4f4f4</color>
     <color name="mega">#d90007</color>
-    <color name="mega_transparency">#CCdb0605</color>
-    <color name="text_login">#FF000000</color>
-    <color name="transparency_white">#80FFFFFF</color>
+<!--    <color name="mega_transparency">#CCdb0605</color>-->
+<!--    <color name="text_login">#FF000000</color>-->
+<!--    <color name="transparency_white">#80FFFFFF</color>-->
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>
     <color name="transfer_progress">#cccccc</color>
     <color name="navigation_drawer_mail">#858585</color>
-    <color name="navigation_drawer_text">#d2d2d2</color>
-    <color name="navigation_drawer_background_odd">#292929</color>
-    <color name="navigation_drawer_background">#222222</color>
-    <color name="color_navigation_drawer_selected">#1AFFFFFF</color>
+<!--    <color name="navigation_drawer_text">#d2d2d2</color>-->
+<!--    <color name="navigation_drawer_background_odd">#292929</color>-->
+<!--    <color name="navigation_drawer_background">#222222</color>-->
+<!--    <color name="color_navigation_drawer_selected">#1AFFFFFF</color>-->
     <color name="file_list_first_row">#000000</color>
     <color name="file_list_second_row">#848484</color>
-    <color name="file_list_selected_row">#1A000000</color>
-    <color name="new_file_list_selected_row">#0A000000</color>
+<!--    <color name="file_list_selected_row">#1A000000</color>-->
+<!--    <color name="new_file_list_selected_row">#0A000000</color>-->
     <color name="border_file_properties">#cccccc</color>
     <color name="file_properties_text_available">#666666</color>
     <color name="grey_info_menu">#999999</color>
@@ -66,7 +66,7 @@
     <color name="tab_pressed">#ee0008</color>
 
     <color name="transparent_black">#80000000</color>
-    <color name="transparent_mega">#80db0605</color>
+<!--    <color name="transparent_mega">#80db0605</color>-->
 
     <color name="delimiterColor">#e6e6e6</color>
     <color name="contactSelected">#1A00BFA5</color>
@@ -133,12 +133,12 @@
     <color name="disable_fab_chat_call">#444444</color>
     <color name="disable_fab_invite_contact">#A9E3D8</color>
 
-    <color name="disabled_radio_button_label">#FF8C8F90</color>
+<!--    <color name="disabled_radio_button_label">#FF8C8F90</color>-->
 
-    <color name="color_background_versions">#FFF2F2F2</color>
+<!--    <color name="color_background_versions">#FFF2F2F2</color>-->
 
 
-    <color name="black_p50">#9f000000</color>
+<!--    <color name="black_p50">#9f000000</color>-->
 
     <color name="turn_on_notifications_background">#FF00A38C</color>
     <color name="turn_on_notifications_statusbar">#FF008270</color>
@@ -188,10 +188,10 @@
     <color name="business_alert_background">#FFF6F6F6</color>
     <color name="expired_red">#FFE1000F</color>
     <color name="grace_yellow">#FFF29907</color>
-    <color name="expired_business_admin_statusbar">#825572</color>
-    <color name="expired_business_user_statusbar">#29A6D1</color>
-    <color name="expired_business_admin">#966B87</color>
-    <color name="expired_business_user">#44BCE6</color>
+<!--    <color name="expired_business_admin_statusbar">#825572</color>-->
+<!--    <color name="expired_business_user_statusbar">#29A6D1</color>-->
+<!--    <color name="expired_business_admin">#966B87</color>-->
+<!--    <color name="expired_business_user">#44BCE6</color>-->
 
     <color name="black_12_alpha">#1F000000</color>
     <color name="black_40_alpha">#66000000</color>

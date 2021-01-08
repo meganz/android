@@ -88,7 +88,7 @@
 
         <View
             android:id="@+id/separator3"
-            android:background="@color/separator_grey"
+            android:background="@color/grey_012_white_012"
             android:layout_width = "match_parent"
             android:layout_height="1dip"
             android:layout_below="@id/relative_layout_day"/>
@@ -204,7 +204,7 @@
 
         <View
             android:id="@+id/separator_from"
-            android:background="@color/separator_grey"
+            android:background="@color/grey_012_white_012"
             android:layout_width = "match_parent"
             android:layout_height="1dip"
             android:layout_below="@id/relative_layout_from"/>
@@ -263,7 +263,7 @@
 
         <View
             android:id="@+id/separator_to"
-            android:background="@color/separator_grey"
+            android:background="@color/grey_012_white_012"
             android:layout_width = "match_parent"
             android:layout_height="1dip"
             android:layout_below="@id/relative_layout_to"/>

@@ -47,7 +47,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/separator_grey"/>
+            android:background="@color/grey_012_white_012"/>
 
         <LinearLayout
             android:orientation="vertical"
@@ -184,7 +184,7 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/separator_grey"/>
+                android:background="@color/grey_012_white_012"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -264,7 +264,7 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/separator_grey"/>
+                android:background="@color/grey_012_white_012"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -345,7 +345,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/separator_grey"/>
+            android:background="@color/grey_012_white_012"/>
 
         <LinearLayout
             android:id="@+id/buttons_layout"

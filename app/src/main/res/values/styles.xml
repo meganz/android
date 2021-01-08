@@ -155,9 +155,9 @@
         <item name="textAllCaps">false</item>
     </style>
 
-    <style name="MyCustomTabTextAppearance.Secondary" parent="MyCustomTabTextAppearance">
-        <item name="android:textColor">@color/text_tab_alpha</item>
-    </style>
+<!--    <style name="MyCustomTabTextAppearance.Secondary" parent="MyCustomTabTextAppearance">-->
+<!--        <item name="android:textColor">@color/text_tab_alpha</item>-->
+<!--    </style>-->
 
     <style name="NavDrawerAccountUsedSpaceText">
         <item name="android:layout_height">wrap_content</item>
