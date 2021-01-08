@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -47,6 +46,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -114,24 +114,9 @@ public class MegaNodeUtil {
          */
         private static AlertDialog alertTakenDown = null;
 
-        public static class TakenDownAlertFragment extends DialogFragment {
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-                dialogBuilder.setTitle(getActivity().getString(R.string.general_not_available))
-                             .setMessage(getActivity().getString(R.string.error_download_takendown_node)).setNegativeButton(R.string.general_dismiss, (dialog, i) -> {
-                    dialog.dismiss();
-                    getActivity().finish();
-                });
-                alertTakenDown = dialogBuilder.create();
-
-                setCancelable(false);
-
-                return alertTakenDown;
-            }
-        }
-
         /**
+         * Shows a taken down alert.
+         *
          * @param activity the activity is the page where dialog is shown
          */
         public static void showTakenDownAlert(final AppCompatActivity activity) {
@@ -142,7 +127,14 @@ public class MegaNodeUtil {
                 return;
             }
 
-            new TakenDownAlertFragment().show(activity.getSupportFragmentManager(), "taken_down");
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+            dialogBuilder.setTitle(getString(R.string.general_not_available))
+                    .setMessage(getString(R.string.error_download_takendown_node))
+                    .setNegativeButton(R.string.general_dismiss, (dialog, i) -> activity.finish());
+
+            alertTakenDown = dialogBuilder.create();
+            alertTakenDown.setCancelable(false);
+            alertTakenDown.show();
         }
     }
 
