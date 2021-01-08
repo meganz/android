@@ -8098,13 +8098,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.bottom_navigation_item_shared_items: {
 				if (drawerItem == DrawerItem.SHARED_ITEMS) {
-					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
-						parentHandleIncoming = -1;
+					if (getTabItemShares() == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE) {
+						parentHandleIncoming = INVALID_HANDLE;
 						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
-						parentHandleOutgoing = -1;
+					} else if (getTabItemShares() == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE){
+						parentHandleOutgoing = INVALID_HANDLE;
 						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					} else if (getTabItemShares() == LINKS_TAB && parentHandleLinks != INVALID_HANDLE) {
+						parentHandleLinks = INVALID_HANDLE;
+						refreshFragment(FragmentTag.LINKS.getTag());
 					}
+
 					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
