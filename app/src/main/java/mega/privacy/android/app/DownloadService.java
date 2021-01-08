@@ -1651,8 +1651,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if(!transfer.isFolderTransfer()){
 							errorCount++;
 						}
-						File file = new File(transfer.getPath());
-						file.delete();
+
+						if (!isTextEmpty(transfer.getPath())) {
+							File file = new File(transfer.getPath());
+							file.delete();
+						}
 					}
 				}
 			}

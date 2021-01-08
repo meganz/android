@@ -2965,6 +2965,8 @@
     <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Link: %1$s\n\nKey: %2$s</string>
     <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">Link: %1$s\n\nPassword: %2$s</string>
 
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
     <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
     <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
     <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
