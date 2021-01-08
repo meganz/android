@@ -69,6 +69,8 @@ public class FileUtil {
 
     public static final String JPG_EXTENSION = ".jpg";
     public static final String TXT_EXTENSION = ".txt";
+    public static final String _3GP_EXTENSION = ".3gp";
+    public static final String ANY_TYPE_FILE = "*/*";
 
     private static final String VOLUME_EXTERNAL = "external";
     private static final String VOLUME_INTERNAL = "internal";
@@ -378,16 +380,19 @@ public class FileUtil {
         return isLocal(context, file) && file.getAbsolutePath().endsWith(".tmp");
     }
 
+    /**
+     * Copies a file from source to dest
+     *
+     * @param source Source file.
+     * @param dest   Final copied file.
+     * @throws IOException if some error happens while copying.
+     */
     public static void copyFile(File source, File dest) throws IOException {
-        logDebug("copyFile");
-
         if (!source.getAbsolutePath().equals(dest.getAbsolutePath())) {
-            FileChannel inputChannel = null;
-            FileChannel outputChannel = null;
             FileInputStream inputStream = new FileInputStream(source);
             FileOutputStream outputStream = new FileOutputStream(dest);
-            inputChannel = inputStream.getChannel();
-            outputChannel = outputStream.getChannel();
+            FileChannel inputChannel = inputStream.getChannel();
+            FileChannel outputChannel = outputStream.getChannel();
             outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
             inputChannel.close();
             outputChannel.close();
@@ -796,6 +801,29 @@ public class FileUtil {
         }
 
         return totalSize;
+    }
+
+    /**
+     * Copies a file to DCIM directory.
+     *
+     * @param fileToCopy File to copy.
+     * @return The copied file on DCIM.
+     */
+    public static File copyFileToDCIM(File fileToCopy) {
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
+        if (!storageDir.exists()) {
+            storageDir.mkdir();
+        }
+
+        File copyFile = new File(storageDir, fileToCopy.getName());
+        try {
+            copyFile(fileToCopy, copyFile);
+        } catch (IOException e) {
+            logError("IOException copying file.", e);
+            copyFile.delete();
+        }
+
+        return copyFile;
     }
 }
 
