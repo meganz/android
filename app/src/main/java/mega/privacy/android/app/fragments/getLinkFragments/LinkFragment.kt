@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.getLinkFragments
 
 import android.app.DatePickerDialog
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -171,6 +172,8 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      * Sets the thumbnail of the node to which is getting or managing the link.
      */
     private fun setThumbnail() {
+        var thumb: Bitmap? = null
+
         if (node.isFolder) {
             binding.nodeThumbnail.setImageDrawable(
                 ResourcesCompat.getDrawable(
@@ -179,31 +182,23 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
                     null
                 )
             )
-        } else if (node.hasThumbnail()) {
-            var thumb = ThumbnailUtils.getThumbnailFromCache(node)
-            if (thumb != null) {
-                binding.nodeThumbnail.setImageBitmap(
-                    getRoundedBitmap(
-                        context,
-                        thumb,
-                        dp2px(THUMBNAIL_CORNER, outMetrics)
-                    )
-                )
-            } else {
-                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context)
 
-                if (thumb != null) {
-                    binding.nodeThumbnail.setImageBitmap(
-                        getRoundedBitmap(
-                            context,
-                            thumb,
-                            dp2px(THUMBNAIL_CORNER, outMetrics)
-                        )
-                    )
-                } else {
-                    binding.nodeThumbnail.setImageResource(typeForName(node.name).iconResourceId)
-                }
+            return
+        } else if (node.hasThumbnail()) {
+            thumb = ThumbnailUtils.getThumbnailFromCache(node)
+            if (thumb == null) {
+                thumb = ThumbnailUtils.getThumbnailFromFolder(node, context)
             }
+        }
+
+        if (thumb != null) {
+            binding.nodeThumbnail.setImageBitmap(
+                getRoundedBitmap(
+                    context,
+                    thumb,
+                    dp2px(THUMBNAIL_CORNER, outMetrics)
+                )
+            )
         } else {
             binding.nodeThumbnail.setImageResource(typeForName(node.name).iconResourceId)
         }
@@ -326,19 +321,20 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
             binding.expiryDateSwitch.isChecked = false
         }
 
-        if (isPro && node.expirationTime > 0) {
-            if (!isSwitchClick) {
-                binding.expiryDateSwitch.isChecked = false
+        if (!isPro) {
+            getLinkInterface.showUpgradeToProWarning()
+            return
+        }
+
+        if (isSwitchClick && node.expirationTime > 0) {
+            binding.expiryDateSetText.apply {
+                visibility = GONE
+                text = null
             }
 
-            binding.expiryDateSetText.visibility = GONE
-            binding.expiryDateSetText.text = null
-
             nC.exportLink(node)
-        } else if (isPro) {
-            showDatePicker()
         } else {
-            getLinkInterface.showUpgradeToProWarning()
+            showDatePicker()
         }
     }
 
