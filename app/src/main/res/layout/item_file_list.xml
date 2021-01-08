@@ -121,7 +121,6 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="3dp"
             android:layout_toEndOf="@+id/img_favourite"
-            android:alpha="0.35"
             android:background="@null"
             android:src="@drawable/link_ic"
             app:tint="?android:attr/textColorSecondary"

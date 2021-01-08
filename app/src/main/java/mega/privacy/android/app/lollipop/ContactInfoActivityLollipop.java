@@ -83,6 +83,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1351,7 +1352,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);
 		input.requestFocus();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 		input.setEmojiSize(dp2px(EMOJI_SIZE, outMetrics));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2097,7 +2098,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         
         input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
@@ -2312,7 +2313,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         
         confirmationLayout.addView(dontShowAgain, params);
         
@@ -2356,7 +2357,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         
         final CheckBox dontShowAgain =new CheckBox(this);
         dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        dontShowAgain.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
         
         confirmationLayout.addView(dontShowAgain, params);
         

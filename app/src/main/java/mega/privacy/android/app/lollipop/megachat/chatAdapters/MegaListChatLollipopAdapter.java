@@ -52,6 +52,7 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerFragment;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -275,9 +276,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					((ViewHolderNormalChatList)holder).circlePendingMessages.setAlpha(.4f);
 
-					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(context.getResources().getColor(R.color.text_secondary));
-					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(context.getResources().getColor(R.color.text_secondary));
-					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+					int textColor = ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary);
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(textColor);
+					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(textColor);
+					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(textColor);
 				}
 				else{
 					((ViewHolderNormalChatList)holder).imageView.setAlpha(1.0f);

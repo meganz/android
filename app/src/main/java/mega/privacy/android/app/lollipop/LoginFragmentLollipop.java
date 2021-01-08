@@ -62,6 +62,7 @@ import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2388,7 +2389,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mail));
-        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2544,7 +2545,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 //		input.setId(EDIT_TEXT_ID);
         input.setSingleLine();
         input.setHint(getString(R.string.edit_text_insert_mk));
-        input.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);

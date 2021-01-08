@@ -252,7 +252,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
             if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
                 holder.imageView.setAlpha(.4f);
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
                 holder.permissionsIcon.setAlpha(.2f);
                 holder.itemView.setOnClickListener(null);
             } else {
@@ -326,7 +326,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 }
             } else{
                 holder.imageView.setAlpha(.4f);
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
                 holder.itemView.setOnClickListener(null);
                 holder.itemView.setOnLongClickListener(null);
             }
@@ -386,7 +386,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
             if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
                 holder.folderIcon.setAlpha(.4f);
-                holder.folderName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
                 holder.itemView.setOnClickListener(null);
             } else {
                 holder.folderIcon.setAlpha(1.0f);
@@ -456,7 +456,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 }
             } else{
                 holder.fileThumbnail.setAlpha(.4f);
-                holder.fileName.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+                holder.fileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
                 holder.itemView.setOnClickListener(null);
                 holder.itemView.setOnLongClickListener(null);
             }

@@ -94,7 +94,7 @@
     </style>
 
     <style name="PreferencesScreen" parent="Theme.Megaactionbar">
-        <item name="colorControlNormal">@color/text_secondary</item>
+        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="Theme.Megaactionbar.InfoScreens" parent="Theme.AppCompat.Light.NoActionBar">

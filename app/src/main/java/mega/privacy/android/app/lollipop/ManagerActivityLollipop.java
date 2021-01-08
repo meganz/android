@@ -8291,7 +8291,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 //		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -8407,7 +8407,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		});
 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
 		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -8587,7 +8587,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 //		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setHint(getString(R.string.edit_text_insert_pass));
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -9994,7 +9994,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		});
 		input.setSingleLine();
 		input.setHint(getString(R.string.context_new_contact_name));
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);

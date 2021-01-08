@@ -75,6 +75,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -2482,7 +2483,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		});
 
 		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
@@ -2793,7 +2794,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		});
 
 		input.setSingleLine();
-		input.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.text_secondary));
+		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 		if (isURL) {
 			input.setHint(getString(R.string.context_new_link_name));
 		}
@@ -2949,7 +2950,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
         final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isDirectory());
 //		input.setId(EDIT_TEXT_ID);
         input.setSingleLine();
-        input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
 //		input.setHint(getString(R.string.context_new_folder_name));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 

@@ -33,6 +33,7 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.EXTRA_PROMP
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
@@ -311,7 +312,7 @@ abstract class NodeSaver(
 
         val notShowAgain = CheckBox(context)
         notShowAgain.setText(R.string.checkbox_not_show_again)
-        notShowAgain.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+        notShowAgain.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary))
         confirmationLayout.addView(notShowAgain, params)
 
         AlertDialog.Builder(context)

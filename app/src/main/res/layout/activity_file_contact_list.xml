@@ -109,7 +109,7 @@
                     android:layout_below="@id/file_contact_list_empty_image"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="@dimen/standard_margin"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="16sp" />
             </RelativeLayout>
 

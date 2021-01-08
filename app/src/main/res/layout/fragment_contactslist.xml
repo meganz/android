@@ -33,7 +33,7 @@
                 android:id="@+id/contact_list_empty_text_first"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
+                android:textColor="?android:attr/textColorSecondary"
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="sans-serif"
                 android:textSize="14sp"/>

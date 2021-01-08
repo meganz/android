@@ -39,6 +39,7 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
@@ -645,7 +646,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         layout.addView(queueSizeInput, params);
 
         queueSizeInput.setSingleLine();
-        queueSizeInput.setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
+        queueSizeInput.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
         queueSizeInput.setHint(getString(R.string.label_mega_byte));
         queueSizeInput.setImeOptions(EditorInfo.IME_ACTION_DONE);
         queueSizeInput.setOnEditorActionListener((v, actionId, event) -> {

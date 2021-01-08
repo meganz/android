@@ -17,7 +17,7 @@
         android:maxLength="4"
         android:singleLine="true"
         android:textColor="?android:attr/textColorPrimary"
-        android:textColorHint="@color/text_secondary"
+        android:textColorHint="?android:attr/textColorSecondary"
         android:theme="@style/ThemeOverlay.ColorControlSecondary" />
 
     <LinearLayout
