@@ -462,15 +462,12 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
                 binding.emptyGiphyView.visibility = GONE
                 binding.giphyListView.visibility = VISIBLE
             }
-            EMPTY_SEARCH -> {
+            EMPTY_SEARCH or EMPTY_DOWN_SERVER -> {
                 binding.emptyGiphyView.visibility = VISIBLE
-                binding.emptyGiphyText.text = emptyText
                 binding.giphyListView.visibility = GONE
-            }
-            EMPTY_DOWN_SERVER -> {
-                binding.emptyGiphyView.visibility = VISIBLE
-                binding.emptyGiphyText.text = StringResourcesUtils.getString(R.string.server_down_giphy)
-                binding.giphyListView.visibility = GONE
+                binding.emptyGiphyText.text =
+                    if (emptyState == EMPTY_SEARCH) emptyText
+                    else StringResourcesUtils.getString(R.string.server_down_giphy)
             }
         }
     }
