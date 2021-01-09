@@ -219,7 +219,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.grey_087_white_087));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else{
-			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.accentColor));
+			transferQuotaUsedText.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 
 			if (megaApi.isBusinessAccount()) {
 				transferQuotaUsedText.setText(myAccountInfo.getUsedTransferFormatted());
