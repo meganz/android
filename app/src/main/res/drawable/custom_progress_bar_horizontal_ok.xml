@@ -3,9 +3,11 @@
     <item android:id="@android:id/background">
         <shape>
             <gradient
-                android:angle="90"
-                android:endColor="?attr/trackColor"
-                android:startColor="?attr/trackColor" />
+                android:angle="270"
+                android:centerColor="#26000000"
+                android:centerY="0.50"
+                android:endColor="#26000000"
+                android:startColor="#26000000" />
         </shape>
     </item>
     <item android:id="@android:id/secondaryProgress">
@@ -23,8 +25,8 @@
             <shape>
                 <gradient
                     android:angle="90"
-                    android:endColor="?attr/colorSecondary"
-                    android:startColor="?attr/colorSecondary" />
+                    android:endColor="@color/teal_300_teal_200"
+                    android:startColor="@color/teal_300_teal_200" />
             </shape>
         </clip>
     </item>

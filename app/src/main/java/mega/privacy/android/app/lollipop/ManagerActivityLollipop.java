@@ -21,17 +21,18 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -10633,24 +10634,21 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		updateSubscriptionLevel(app.getMyAccountInfo());
 
-		switch (storageState) {
-			case MegaApiJava.STORAGE_STATE_GREEN:
-				usedSpacePB.setProgressDrawable(getResources().getDrawable(
-						R.drawable.custom_progress_bar_horizontal_ok));
-				break;
-
-			case MegaApiJava.STORAGE_STATE_ORANGE:
-				usedSpacePB.setProgressDrawable(getResources().getDrawable(
-						R.drawable.custom_progress_bar_horizontal_warning));
-				break;
-
-			case MegaApiJava.STORAGE_STATE_RED:
-			case MegaApiJava.STORAGE_STATE_PAYWALL:
-				((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
-				usedSpacePB.setProgressDrawable(getResources().getDrawable(
-						R.drawable.custom_progress_bar_horizontal_exceed));
-				break;
-		}
+        int resId = R.drawable.custom_progress_bar_horizontal_ok;
+        switch (storageState) {
+            case MegaApiJava.STORAGE_STATE_GREEN:
+                break;
+            case MegaApiJava.STORAGE_STATE_ORANGE:
+                resId = R.drawable.custom_progress_bar_horizontal_warning;
+                break;
+            case MegaApiJava.STORAGE_STATE_RED:
+            case MegaApiJava.STORAGE_STATE_PAYWALL:
+                ((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
+                resId = R.drawable.custom_progress_bar_horizontal_exceed;
+                break;
+        }
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), resId, null);
+        usedSpacePB.setProgressDrawable(drawable);
 	}
 
 	public void selectSortByContacts(int _orderContacts){
