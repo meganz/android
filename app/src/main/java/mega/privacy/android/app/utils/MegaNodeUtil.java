@@ -22,6 +22,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -708,7 +710,7 @@ public class MegaNodeUtil {
         boolean onlyOneIncomingShare = n != null && handleList == null;
         int numIncomingShares = onlyOneIncomingShare ? 1 : handleList.size();
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         builder.setMessage(context.getResources().getQuantityString(R.plurals.confirmation_leave_share_folder, numIncomingShares))
                 .setPositiveButton(R.string.general_leave, (dialog, which) -> {
                     if (onlyOneIncomingShare) {

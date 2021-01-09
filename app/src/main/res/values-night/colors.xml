@@ -161,8 +161,11 @@
     <color name="white_050_dark_grey_050">@color/dark_grey_alpha_050</color>
 
     <!--  Upgrade account mask color  -->
-    <color name="grey_020_white_20">@color/white_alpha_020</color>
+    <color name="grey_020_white_020">@color/white_alpha_020</color>
 
     <!-- Two factor authentication credentials background -->
     <color name="grey_020_grey_800">@color/grey_800</color>
+
+    <!--    For disabled alert dialog borderless button-->
+    <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
 </resources>

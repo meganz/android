@@ -299,6 +299,9 @@
     <color name="teal_500">#00A07F</color>
     <color name="teal_600">#009372</color>
 
+    <color name="teal_200_alpha_038">#616DD2BF</color>
+    <color name="teal_300_alpha_038">#6100BFA5</color>
+
     <color name="teal_300_alpha_006">#0F00B092</color>
     <color name="teal_400_alpha_036">#5C00B092</color>
     <color name="teal_400_alpha_050">#8000B092</color>
@@ -529,8 +532,12 @@
     <color name="white_050_dark_grey_050">@color/white_alpha_050</color>
 
     <!--  Upgrade account mask color  -->
-    <color name="grey_020_white_20">@color/grey_alpha_020</color>
+    <color name="grey_020_white_020">@color/grey_alpha_020</color>
 
     <!-- Two factor authentication credentials background -->
     <color name="grey_020_grey_800">@color/grey_020</color>
+
+    <!--    For disabled alert dialog borderless button-->
+    <color name="teal_300_038_teal_200_038">@color/teal_300_alpha_038</color>
+
 </resources>

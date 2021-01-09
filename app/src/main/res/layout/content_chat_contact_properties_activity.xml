@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="mega.privacy.android.app.lollipop.ContactInfoActivityLollipop"
-    tools:showIn="@layout/activity_chat_contact_properties">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
         android:id="@+id/chat_contact_properties_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
-        <include layout="@layout/item_call_in_progress_layout"
+        <include
+            layout="@layout/item_call_in_progress_layout"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
 
@@ -26,53 +23,49 @@
             android:id="@+id/chat_contact_properties_info_options_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:paddingTop="14dp"
-            android:paddingLeft="72dp"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingStart="72dp"
+            android:paddingTop="14dp">
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
                 android:id="@+id/chat_contact_properties_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="52dp"
                 android:maxLines="1"
-                android:layout_marginRight="52dp"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                app:emojiSize="14sp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1"
+                app:emojiSize="14sp" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_email_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="2"
+                android:layout_marginEnd="52dp"
                 android:ellipsize="end"
-                android:layout_marginRight="52dp"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
+                android:maxLines="2"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_nickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="2"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginBottom="7dp"
                 android:ellipsize="end"
+                android:maxLines="2"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="7dp"
-                android:layout_marginRight="52dp"
-                android:textStyle="bold"
-                android:textColor="@color/accentColor"
                 android:text="@string/add_nickname"
-                android:textSize="14sp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2"
+                android:textColor="?attr/colorSecondary" />
         </LinearLayout>
 
         <View
             android:id="@+id/divider_info_options_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/black_12_alpha" />
+            android:background="@color/grey_012_white_012" />
 
         <!-- CHAT ACTIONS LAYOUT -->
         <LinearLayout
@@ -80,14 +73,14 @@
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:layout_marginTop="8dp"
-            android:orientation="horizontal" >
-            
+            android:orientation="horizontal">
+
             <RelativeLayout
                 android:id="@+id/chat_contact_properties_chat_send_message_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:gravity="center">
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -100,17 +93,18 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:src="@drawable/ic_chat_fill" />
+                        android:src="@drawable/ic_chat_fill"
+                        app:tint="?attr/colorSecondary" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_send_message_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/chat_contact_properties_send_message_icon"
-                        android:text="@string/message_button"
-                        android:maxLines="1"
-                        android:ellipsize="end"
                         android:layout_centerHorizontal="true"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/message_button"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="12sp" />
                 </RelativeLayout>
@@ -121,8 +115,8 @@
                 android:id="@+id/chat_contact_properties_chat_call_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:gravity="center">
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -133,20 +127,20 @@
                         android:id="@+id/chat_contact_properties_call_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:tint="@color/accentColor"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/ic_call" />
+                        android:layout_marginBottom="8dp"
+                        android:src="@drawable/ic_call"
+                        app:tint="?attr/colorSecondary" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_call_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/chat_contact_properties_call_icon"
-                        android:text="@string/call_button"
-                        android:maxLines="1"
-                        android:ellipsize="end"
                         android:layout_centerHorizontal="true"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="@string/call_button"
                         android:textColor="?android:attr/textColorPrimary"
                         android:textSize="12sp" />
                 </RelativeLayout>
@@ -157,8 +151,8 @@
                 android:id="@+id/chat_contact_properties_chat_video_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:gravity="center">
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -171,20 +165,20 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:tint="@color/accentColor"
-                        android:src="@drawable/ic_video" />
+                        android:src="@drawable/ic_video"
+                        app:tint="?attr/colorSecondary" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_video_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/chat_contact_properties_video_icon"
-                        android:text="@string/video_button"
                         android:layout_centerHorizontal="true"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="12sp"
+                        android:ellipsize="end"
                         android:maxLines="1"
-                        android:ellipsize="end"/>
+                        android:text="@string/video_button"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="12sp" />
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -195,7 +189,7 @@
             android:id="@+id/divider_chat_options_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:background="@color/black_12_alpha" />
+            android:background="@color/grey_012_white_012" />
 
         <!-- INCOMING SHARED FOLDERS LAYOUT -->
 
@@ -203,48 +197,47 @@
             android:id="@+id/chat_contact_properties_shared_folders_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginLeft="72dp"
-            android:layout_gravity="left|center_vertical">
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="72dp">
 
             <TextView
                 android:id="@+id/chat_contact_properties_shared_folders_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left|center_vertical"
+                android:layout_gravity="start|center_vertical"
                 android:text="@string/title_incoming_shares_explorer"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
             <Button
                 android:id="@+id/chat_contact_properties_shared_folders_button"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:minWidth="0dp"
-                android:layout_marginRight="16dp"
-                android:background="@android:color/transparent"
-                android:textColor="@color/accentColor"/>
+                android:layout_marginEnd="16dp"
+                android:minWidth="0dp" />
         </RelativeLayout>
+
         <RelativeLayout
             android:id="@+id/shared_folder_list_container"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
             android:visibility="gone">
 
-	        <FrameLayout
-		        android:id="@+id/fragment_container_shared_folders"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"/>
+            <FrameLayout
+                android:id="@+id/fragment_container_shared_folders"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </RelativeLayout>
+
         <View
             android:id="@+id/divider_shared_folder_layout"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/black_12_alpha" />
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <!-- NOTIFICATIONS LAYOUT -->
 
@@ -252,9 +245,8 @@
             android:id="@+id/chat_contact_properties_notifications_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@color/white"
-            android:orientation="horizontal"
-            android:layout_marginLeft="72dp">
+            android:layout_marginStart="72dp"
+            android:orientation="horizontal">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -265,10 +257,9 @@
                     android:id="@+id/chat_contact_properties_notifications_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="left|center_vertical"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_gravity="start|center_vertical"
                     android:text="@string/title_properties_chat_notifications_contact"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
                 <TextView
                     android:id="@+id/chat_contact_properties_notifications_muted_text"
@@ -276,13 +267,12 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/chat_contact_properties_notifications_text"
                     android:layout_gravity="start|center_vertical"
-                    android:textColor="@color/black_40_alpha"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/chat_contact_properties_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
@@ -301,10 +291,10 @@
 
         <View
             android:id="@+id/divider_notifications_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/black_12_alpha" />
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <!-- SHARE CONTACT LAYOUT -->
 
@@ -312,37 +302,37 @@
             android:id="@+id/chat_contact_properties_share_contact_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_gravity="left|center_vertical">
+            android:layout_gravity="start|center_vertical">
 
             <ImageView
                 android:id="@+id/chat_contact_properties_share_contact_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:src="@drawable/ic_b_share_to_contact" />
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_b_share_to_contact"
+                app:tint="?android:attr/textColorPrimary" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_share_contact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/chat_contact_properties_share_contact_icon"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="32dp"
+                android:layout_toEndOf="@id/chat_contact_properties_share_contact_icon"
                 android:text="@string/title_properties_chat_share_contact"
-                android:textSize="16dp"
-                android:textColor="?android:attr/textColorPrimary"/>
+                android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
         </RelativeLayout>
 
         <View
             android:id="@+id/divider_share_contact_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/black_12_alpha" />
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <!-- VERIFY CREDENTIALS LAYOUT -->
 
@@ -360,22 +350,22 @@
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:src="@drawable/ic_credentials" />
+                android:src="@drawable/ic_credentials"
+                app:tint="?android:attr/textColorPrimary" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginStart="32dp"
-                android:layout_toEndOf="@id/chat_contact_properties_verify_credentials_icon"
-                android:layout_centerVertical="true">
+                android:layout_toEndOf="@id/chat_contact_properties_verify_credentials_icon">
 
                 <TextView
                     android:id="@+id/chat_contact_properties_verify_credentials"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/label_verify_credentials"
-                    android:textSize="16sp"
-                    android:textColor="?android:attr/textColorPrimary"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
                 <RelativeLayout
                     android:id="@+id/chat_contact_properties_verify_credentials_info_layout"
@@ -388,17 +378,16 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="8dp"
-                        android:src="@drawable/ic_verified"/>
+                        android:src="@drawable/ic_verified" />
 
                     <TextView
                         android:id="@+id/chat_contact_properties_verify_credentials_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
                         android:layout_toEndOf="@+id/chat_contact_properties_verify_credentials_info_icon"
                         android:text="@string/label_not_verified"
-                        android:layout_centerVertical="true"
-                        android:textSize="14sp"
-                        android:textColor="@color/emoji_icons"/>
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
                 </RelativeLayout>
 
@@ -406,11 +395,11 @@
 
             <View
                 android:id="@+id/divider_verify_credentials_layout"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginStart="72dp"
                 android:layout_alignParentBottom="true"
-                android:background="@color/black_12_alpha" />
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
 
         </RelativeLayout>
 
@@ -420,39 +409,37 @@
             android:id="@+id/chat_contact_properties_chat_files_shared_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_gravity="left|center_vertical">
+            android:layout_gravity="start|center_vertical">
 
             <ImageView
                 android:id="@+id/chat_contact_properties_chat_files_shared_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:alpha="0.54"
-                android:src="@drawable/ic_share" />
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_share"
+                app:tint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_chat_files_shared"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/chat_contact_properties_chat_files_shared_icon"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="32dp"
+                android:layout_toEndOf="@id/chat_contact_properties_chat_files_shared_icon"
                 android:text="@string/title_chat_shared_files_info"
-                android:textSize="16dp"
-                android:textColor="?android:attr/textColorPrimary"/>
+                android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
         </RelativeLayout>
 
         <View
             android:id="@+id/divider_chat_files_shared_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/black_12_alpha" />
-
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <!-- CLEAR LAYOUT -->
 
@@ -460,38 +447,37 @@
             android:id="@+id/chat_contact_properties_clear_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_gravity="left|center_vertical">
+            android:layout_gravity="start|center_vertical">
 
             <ImageView
                 android:id="@+id/chat_contact_properties_clear_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:alpha="0.64"
-                android:src="@drawable/ic_clear_history" />
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_clear_history"
+                app:tint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/chat_contact_properties_clear_icon"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="32dp"
+                android:layout_toEndOf="@id/chat_contact_properties_clear_icon"
                 android:text="@string/title_properties_chat_clear"
-                android:textSize="16dp"
-                android:textColor="?android:attr/textColorPrimary"/>
+                android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
         </RelativeLayout>
 
         <View
             android:id="@+id/divider_clear_chat_layout"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/black_12_alpha" />
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <!-- REMOVE CONTACT LAYOUT -->
 
@@ -505,22 +491,22 @@
                 android:id="@+id/chat_contact_properties_remove_contact_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left|center_vertical"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:src="@drawable/ic_r_remove"/>
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_r_remove"
+                app:tint="@color/red_600_red_300" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_remove_contact_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginLeft="32dp"
-                android:layout_toRightOf="@id/chat_contact_properties_remove_contact_icon"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="32dp"
+                android:layout_toEndOf="@id/chat_contact_properties_remove_contact_icon"
                 android:text="@string/title_properties_remove_contact"
-                android:textSize="16dp"
-                android:textColor="@color/red_600_red_300"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
 
         </RelativeLayout>
 

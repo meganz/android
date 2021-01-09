@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nickname_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <!-- Title -->
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:gravity="center_vertical"
-        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
         android:paddingTop="16dp">
 
         <TextView
@@ -22,14 +22,13 @@
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
             android:text="@string/nickname_title"
-            android:textColor="@color/transparent_black"
-            android:textSize="16sp" />
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant2" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/black_12_alpha" />
+            android:background="@color/grey_012_white_012" />
 
     </RelativeLayout>
 
@@ -58,13 +57,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_rename_nickname"
-                    android:tint="@color/black"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorPrimary" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="56dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp">
 
@@ -74,14 +73,13 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:text="@string/title_edit_profile_info"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_alignParentBottom="true"
-                        android:background="@color/black_12_alpha" />
+                        android:background="@color/grey_012_white_012" />
                 </RelativeLayout>
             </LinearLayout>
 
@@ -98,19 +96,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_remove_nickname"
-                    android:tint="@color/black"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorPrimary" />
 
                 <TextView
                     android:id="@+id/remove_nickname_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_remove"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

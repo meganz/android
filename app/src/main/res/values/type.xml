@@ -113,6 +113,11 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal">
+        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
@@ -150,6 +155,11 @@
     <!-- Chat contact send contact info -->
     <style name="TextAppearance.Mega.Body1.Variant2">
         <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
+    <!-- Labels in contact info -->
+    <style name="TextAppearance.Mega.Body1.Variant3">
+        <item name="android:letterSpacing">0</item>
     </style>
 
     <!-- ================== Body2 ====================== -->

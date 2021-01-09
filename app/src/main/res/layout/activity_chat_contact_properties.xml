@@ -1,114 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/fragment_container"
-    android:fitsSystemWindows="true"
-    android:background="@color/white"
-    tools:context=".lollipop.ContactInfoActivityLollipop">
+    android:fitsSystemWindows="true">
 
-        <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="168dp"
         android:fitsSystemWindows="true">
 
-            <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
-                android:id="@+id/collapse_toolbar"
+        <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
+            android:id="@+id/collapse_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.Mega.DefaultToolBar"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleGravity="start|top"
+            app:expandedTitleMarginBottom="14dp"
+            app:expandedTitleMarginStart="72dp"
+            app:expandedTitleMarginTop="86dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:lineSpacingMultiplier="1.2"
+            app:maxLines="2">
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
                 android:fitsSystemWindows="true"
-                app:contentScrim="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                android:theme="@style/Theme.Megaactionbar.InfoScreens"
-                app:collapsedTitleTextAppearance="@style/ToolbarTitle"
-                app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
-                app:expandedTitleGravity="start|top"
-                app:expandedTitleMarginTop="86dp"
-                app:expandedTitleMarginStart="72dp"
-                app:expandedTitleMarginBottom="14dp"
-                app:maxLines="2"
-                app:lineSpacingMultiplier="1.2">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_collapseMode="parallax"
-                    android:fitsSystemWindows="true">
-
-                    <RelativeLayout
-                        android:id="@+id/chat_contact_properties_image_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:id="@+id/chat_contact_properties_toolbar_image"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:adjustViewBounds="true"
-                            android:fitsSystemWindows="true"
-                            android:scaleType="centerCrop" />
-                    </RelativeLayout>
-
-                    <View
-                        android:id="@+id/gradient_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/full_gradient_shape" />
-
-                </FrameLayout>
-
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:titleTextAppearance="@style/ToolbarTitle"
-                    app:popupTheme="@style/Theme.Megaactionbar.InfoScreens"
-                    app:theme="@style/Theme.Megaactionbar.InfoScreens"
-                    app:layout_collapseMode="pin"/>
+                app:layout_collapseMode="parallax">
 
                 <RelativeLayout
-                    android:id="@+id/layout_title"
+                    android:id="@+id/chat_contact_properties_image_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:orientation="vertical"
-                    app:layout_collapseMode="pin">
+                    android:layout_height="match_parent">
 
-                    <mega.privacy.android.app.components.twemoji.EmojiTextView
-                        android:id="@+id/first_line_toolbar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="72dp"
-                        android:layout_marginEnd="36dp"
-                        android:textSize="20sp"
-                        app:emojiSize="18sp"
-                        android:paddingTop="6dp"
-                        android:textColor="@color/white"
-                        android:maxLines="2"
-                        android:textAppearance="@style/ToolbarTitle.Secondary" />
-
-                    <mega.privacy.android.app.components.MarqueeTextView
-                        android:id="@+id/second_line_toolbar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:layout_below="@+id/first_line_toolbar"
-                        android:layout_marginLeft="72dp"
-                        android:textColor="@color/white"
-                        android:ellipsize="none"
-                        android:singleLine="true"
-                        android:textAppearance="@style/ToolbarTitle.Secondary"
-                        android:paddingBottom="9dp"/>
+                    <ImageView
+                        android:id="@+id/chat_contact_properties_toolbar_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:adjustViewBounds="true"
+                        android:fitsSystemWindows="true"
+                        android:scaleType="centerCrop" />
                 </RelativeLayout>
 
-            </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
-        </com.google.android.material.appbar.AppBarLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/full_gradient_shape" />
 
+            </FrameLayout>
 
-        <include layout="@layout/content_chat_contact_properties_activity" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.AllCaps" />
+
+            <RelativeLayout
+                android:id="@+id/layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="vertical"
+                app:layout_collapseMode="pin">
+
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/first_line_toolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="36dp"
+                    android:maxLines="2"
+                    android:paddingTop="6dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
+                    android:textSize="20sp"
+                    app:emojiSize="18sp" />
+
+                <mega.privacy.android.app.components.MarqueeTextView
+                    android:id="@+id/second_line_toolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/first_line_toolbar"
+                    android:layout_marginStart="72dp"
+                    android:ellipsize="none"
+                    android:paddingBottom="9dp"
+                    android:singleLine="true"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+        </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <include layout="@layout/content_chat_contact_properties_activity" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
