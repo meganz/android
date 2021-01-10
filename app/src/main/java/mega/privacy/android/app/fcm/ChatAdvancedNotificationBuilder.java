@@ -228,7 +228,7 @@ public final class ChatAdvancedNotificationBuilder {
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+            notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
         }
 
         notificationBuilder.setShowWhen(true);
@@ -437,7 +437,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setAutoCancel(true)
                     .setShowWhen(true)
                     .setGroup(groupKey)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             messagingStyleContentO = new NotificationCompat.MessagingStyle(getTitleChat(chat));
         } else {
             notificationBuilder = new Notification.Builder(context)
@@ -447,7 +447,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setGroup(groupKey);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             messagingStyleContent = new Notification.MessagingStyle(getTitleChat(chat));
@@ -657,7 +657,7 @@ public final class ChatAdvancedNotificationBuilder {
                 }
 
                 NotificationCompat.Builder notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSimple);
-                notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
                 notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify)
                         .setShowWhen(true)
@@ -688,7 +688,7 @@ public final class ChatAdvancedNotificationBuilder {
                     notificationBuilderO = new NotificationCompat.Builder(context, notificationChannelIdChatSummaryNoVibrate);
                 }
 
-                notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilderO.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
                 notificationBuilderO.setSmallIcon(R.drawable.ic_stat_notify)
                         .setShowWhen(true)
@@ -704,7 +704,7 @@ public final class ChatAdvancedNotificationBuilder {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             notificationBuilder.setSmallIcon(R.drawable.ic_stat_notify)
@@ -970,7 +970,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setAutoCancel(false)
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(patternIncomingCall)
-                    .setColor(ContextCompat.getColor(context, R.color.mega))
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             notifyCall(notificationId, notificationBuilderO.build());
@@ -993,7 +993,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setDeleteIntent(intentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
@@ -1107,7 +1107,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setAutoCancel(false)
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(patternIncomingCall)
-                    .setColor(ContextCompat.getColor(context, R.color.mega))
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             notifyCall(notificationId, notificationBuilderO.build());
@@ -1128,7 +1128,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setDeleteIntent(pendingIntentIgnore)
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
@@ -1279,7 +1279,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setVibrate(pattern)
                     .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent)
-                    .setColor(ContextCompat.getColor(context, R.color.mega))
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
                     .setPriority(NotificationManager.IMPORTANCE_HIGH);
 
             if (!isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
@@ -1304,7 +1304,7 @@ public final class ChatAdvancedNotificationBuilder {
                     .setContentIntent(pendingIntent);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {

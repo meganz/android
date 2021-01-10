@@ -195,7 +195,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         notificationBuilder.setShowWhen(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.mega));
+            notificationBuilder.setColor(ContextCompat.getColor(context,R.color.red_600_red_300));
         }
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -296,7 +296,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setGroup(GROUP_KEY_IPC)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             if (beep) {
                 Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -325,7 +325,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setGroup(GROUP_KEY_IPC);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             if (beep) {
@@ -388,7 +388,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
                     .setGroup(GROUP_KEY_APC)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             notificationBuilderO.setSound(defaultSoundUri);
@@ -414,7 +414,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setGroup(GROUP_KEY_APC);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.mega));
+                notificationBuilder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -474,7 +474,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setGroupSummary(true)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             return notificationBuilderO.build();
         }
@@ -483,7 +483,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setColor(ContextCompat.getColor(context, R.color.mega));
+                builder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
             builder.setSmallIcon(R.drawable.ic_stat_notify)
                     .setShowWhen(true)
@@ -493,7 +493,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setContentIntent(pendingIntent);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setColor(ContextCompat.getColor(context, R.color.mega));
+                builder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             return builder.build();
@@ -522,7 +522,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setGroupSummary(true)
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             return notificationBuilderO.build();
         }
@@ -538,7 +538,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setContentIntent(pendingIntent);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setColor(ContextCompat.getColor(context, R.color.mega));
+                builder.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             return builder.build();
@@ -588,7 +588,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setAutoCancel(true).setTicker(title)
                     .setContentTitle(title).setContentText(email)
                     .setOngoing(false)
-                    .setColor(ContextCompat.getColor(context, R.color.mega));
+                    .setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             notificationBuilderO.setSound(defaultSoundUri);
@@ -619,7 +619,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
                     .setOngoing(false);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.mega));
+                mBuilderCompat.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
             }
 
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);

@@ -833,7 +833,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setOngoing(true).setContentTitle(message)
 					.setContentText(actionString)
 					.setOnlyAlertOnce(true)
-					.setColor(ContextCompat.getColor(this, R.color.mega));
+					.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 			notification = mBuilderCompat.build();
 		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -844,7 +844,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setOngoing(true).setContentTitle(message)
 					.setContentText(actionString)
 					.setOnlyAlertOnce(true)
-					.setColor(ContextCompat.getColor(this, R.color.mega));
+					.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 			notification = mBuilder.build();
 		} else {
@@ -1570,7 +1570,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setOngoing(false);
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
+				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.red_600_red_300));
 			}
 
 			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());

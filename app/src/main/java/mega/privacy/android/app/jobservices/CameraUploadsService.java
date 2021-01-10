@@ -1902,7 +1902,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mBuilder.setSubText(subText);
         } else {
-            mBuilder.setColor(ContextCompat.getColor(this, R.color.mega))
+            mBuilder.setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setContentInfo(subText);
         }
         mNotification = mBuilder.build();
@@ -1935,7 +1935,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             builder.setContentText(contentText);
         } else {
             builder.setContentInfo(contentText)
-                    .setColor(ContextCompat.getColor(this, R.color.mega));
+                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
         }
         mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, builder.build());

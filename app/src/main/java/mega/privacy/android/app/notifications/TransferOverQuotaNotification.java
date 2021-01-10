@@ -74,7 +74,7 @@ public class TransferOverQuotaNotification {
             NotificationCompat.Builder builderCompat = new NotificationCompat.Builder(app.getApplicationContext(), NOTIFICATION_CHANNEL_DOWNLOAD_ID);
 
             builderCompat.setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(app, R.color.mega))
+                    .setColor(ContextCompat.getColor(app, R.color.red_600_red_300))
                     .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                     .setContent(customView)
                     .setContentIntent(clickPendingIntent)
@@ -86,7 +86,7 @@ public class TransferOverQuotaNotification {
             Notification.Builder builder = new Notification.Builder(app.getApplicationContext());
 
             builder.setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(app, R.color.mega))
+                    .setColor(ContextCompat.getColor(app, R.color.red_600_red_300))
                     .setContent(customView)
                     .setContentIntent(clickPendingIntent)
                     .setOngoing(false)

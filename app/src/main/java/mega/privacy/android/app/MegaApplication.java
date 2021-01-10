@@ -1121,7 +1121,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setAutoCancel(true)
 						.setSound(defaultSoundUri)
 						.setContentIntent(pendingIntent)
-						.setColor(ContextCompat.getColor(this, R.color.mega));
+						.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
 				Drawable d = getResources().getDrawable(R.drawable.ic_folder_incoming, getTheme());
 				notificationBuilderO.setLargeIcon(((BitmapDrawable) d).getBitmap());
@@ -1140,7 +1140,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						.setContentIntent(pendingIntent);
 
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.mega));
+					notificationBuilder.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 				}
 
 				Drawable d;

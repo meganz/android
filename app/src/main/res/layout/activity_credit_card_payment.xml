@@ -75,7 +75,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="@color/mega"
+                android:textColor="@color/red_600_red_300"
                 android:layout_toRightOf="@id/pro_title_cc"  
                 android:layout_alignLeft="@id/pro_bandwidth_title_cc"            
                 android:layout_below="@id/pro_image_cc"/>

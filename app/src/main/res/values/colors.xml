@@ -8,14 +8,14 @@
 <!--    <color name="separator_grey">#10000000</color>-->
 <!--    <color name="background_secondary">#eeeeee</color>-->
     <color name="background_create_account">#f4f4f4</color>
-    <color name="mega">#d90007</color>
+<!--    <color name="mega">#d90007</color>-->
 <!--    <color name="mega_transparency">#CCdb0605</color>-->
 <!--    <color name="text_login">#FF000000</color>-->
 <!--    <color name="transparency_white">#80FFFFFF</color>-->
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>
     <color name="transfer_progress">#cccccc</color>
-    <color name="navigation_drawer_mail">#858585</color>
+<!--    <color name="navigation_drawer_mail">#858585</color>-->
 <!--    <color name="navigation_drawer_text">#d2d2d2</color>-->
 <!--    <color name="navigation_drawer_background_odd">#292929</color>-->
 <!--    <color name="navigation_drawer_background">#222222</color>-->
