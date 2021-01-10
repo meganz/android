@@ -223,13 +223,13 @@
     <color name="black_bottom_sheets_icon_tint">#8F000000</color>
 
     <!-- NODE LABELS -->
-    <color name="label_red">#FF625D</color>
-    <color name="label_orange">#F9A646</color>
-    <color name="label_yellow">#F4CE4A</color>
-    <color name="label_green">#6DCB50</color>
-    <color name="label_blue">#4BB8F3</color>
-    <color name="label_purple">#D088E1</color>
-    <color name="label_grey">#A4A4A7</color>
+<!--    <color name="label_red">#FF625D</color>-->
+<!--    <color name="label_orange">#F9A646</color>-->
+<!--    <color name="label_yellow">#F4CE4A</color>-->
+<!--    <color name="label_green">#6DCB50</color>-->
+<!--    <color name="label_blue">#4BB8F3</color>-->
+<!--    <color name="label_purple">#D088E1</color>-->
+<!--    <color name="label_grey">#A4A4A7</color>-->
 
     <!-- ======================= Dark mode refactoring =====================  -->
 
@@ -326,6 +326,7 @@
     <color name="orange_300">#FFB640</color>
     <color name="orange_400">#FFA500</color>
 
+    <color name="green_300">#78CC64</color>
     <color name="green_400">#56C13E</color>
     <color name="green_500">#31B500</color>
 
@@ -333,6 +334,7 @@
     <color name="jade_600">#00897B</color>
 
     <color name="salmon_300">#F37476</color>
+    <color name="salmon_400">#FF5252</color>
     <color name="salmon_700">#E42930</color>
 
     <color name="lime_green_200">#A9F2A5</color>
@@ -344,11 +346,17 @@
     <color name="dark_blue_400">#3FB2E2</color>
     <color name="dark_blue_500">#2BA6DE</color>
 
+    <color name="blue_300">#00C0FD</color>
+    <color name="blue_200">#61D2FF</color>
+
     <color name="ambar_700">#FFA003</color>
 
     <!-- For business admin account expired background color -->
     <color name="old_pink_800">#B00E5E</color>
     <color name="old_pink_900">#8A0955</color>
+
+    <color name="purple_200">#CE91D3</color>
+    <color name="purple_300">#B965C1</color>
 
     <!-- ======================== Color pair: light_dark ================== -->
 
@@ -540,4 +548,12 @@
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_300_alpha_038</color>
 
+    <!-- Label red -->
+    <color name="salmon_400_salmon_300">@color/salmon_400</color>
+    <!-- Label green -->
+    <color name="green_400_green_300">@color/green_400</color>
+    <!-- Label blue -->
+    <color name="blue_300_blue_200">@color/blue_300</color>
+    <!-- Label purple -->
+    <color name="purple_300_purple_200">@color/purple_300</color>
 </resources>

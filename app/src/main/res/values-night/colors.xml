@@ -168,4 +168,13 @@
 
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
+
+    <!-- Label red -->
+    <color name="salmon_400_salmon_300">@color/salmon_300</color>
+    <!-- Label green -->
+    <color name="green_400_green_300">@color/green_300</color>
+    <!-- Label blue -->
+    <color name="blue_300_blue_200">@color/blue_200</color>
+    <!-- Label purple -->
+    <color name="purple_300_purple_200">@color/purple_200</color>
 </resources>

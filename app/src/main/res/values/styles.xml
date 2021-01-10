@@ -475,13 +475,6 @@
         <item name="android:background">@drawable/rounded_dialog</item>
     </style>
 
-    <style name="Widget.Mega.RadioButton.Label" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:layout_marginStart">16dp</item>
-        <item name="android:paddingStart">32dp</item>
-        <item name="android:minWidth">0dp</item>
-        <item name="android:button">@drawable/selector_label</item>
-    </style>
-
     <!-- =================== Dark mode refactor start ======================= -->
 
     <!-- Contained button, inherited elevation: 2dp, TextAppearance=?attr/textAppearanceButton  -->
@@ -718,4 +711,10 @@
         <item name="colorControlNormal">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="Widget.Mega.RadioButton.Label" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:paddingStart">32dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:button">@drawable/selector_label</item>
+    </style>
 </resources>

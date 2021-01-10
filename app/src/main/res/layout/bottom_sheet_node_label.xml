@@ -5,7 +5,6 @@
     android:id="@+id/node_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <TextView
@@ -13,10 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:gravity="center_vertical"
-        android:padding="16dp"
         android:text="@string/title_label"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/transparent_black2" />
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -35,8 +32,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_red"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_red"
-                app:buttonTint="@color/label_red" />
+                app:buttonTint="@color/salmon_400_salmon_300" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_orange"
@@ -44,8 +42,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_orange"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_orange"
-                app:buttonTint="@color/label_orange" />
+                app:buttonTint="@color/orange_400_orange_300" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_yellow"
@@ -53,8 +52,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_yellow"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_yellow"
-                app:buttonTint="@color/label_yellow" />
+                app:buttonTint="@color/yellow_600_yellow_300" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_green"
@@ -62,8 +62,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_green"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_green"
-                app:buttonTint="@color/label_green" />
+                app:buttonTint="@color/green_400_green_300" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_blue"
@@ -71,8 +72,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_blue"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_blue"
-                app:buttonTint="@color/label_blue" />
+                app:buttonTint="@color/blue_300_blue_200" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_purple"
@@ -80,8 +82,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_purple"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_purple"
-                app:buttonTint="@color/label_purple" />
+                app:buttonTint="@color/purple_300_purple_200" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_label_grey"
@@ -89,8 +92,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="@string/label_grey"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:textColor="@color/label_item_text_grey"
-                app:buttonTint="@color/label_grey" />
+                app:buttonTint="@color/grey_300" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radio_remove"
@@ -98,10 +102,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:button="@drawable/ic_close_white"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 android:text="@string/action_remove_label"
-                android:textColor="@color/dark_primary_color"
+                android:textColor="@color/red_600_red_300"
                 android:visibility="gone"
-                app:buttonTint="@color/dark_primary_color"
+                app:buttonTint="@color/red_600_red_300"
                 tools:visibility="visible" />
         </RadioGroup>
     </androidx.core.widget.NestedScrollView>

@@ -804,19 +804,19 @@ public class MegaNodeUtil {
     public static int getNodeLabelColor(int nodeLabel) {
         switch (nodeLabel) {
             case MegaNode.NODE_LBL_RED:
-                return R.color.label_red;
+                return R.color.salmon_400_salmon_300;
             case MegaNode.NODE_LBL_ORANGE:
-                return R.color.label_orange;
+                return R.color.orange_400_orange_300;
             case MegaNode.NODE_LBL_YELLOW:
-                return R.color.label_yellow;
+                return R.color.yellow_600_yellow_300;
             case MegaNode.NODE_LBL_GREEN:
-                return R.color.label_green;
+                return R.color.green_400_green_300;
             case MegaNode.NODE_LBL_BLUE:
-                return R.color.label_blue;
+                return R.color.blue_300_blue_200;
             case MegaNode.NODE_LBL_PURPLE:
-                return R.color.label_purple;
+                return R.color.purple_300_purple_200;
             default:
-                return R.color.label_grey;
+                return R.color.grey_300;
         }
     }
 }

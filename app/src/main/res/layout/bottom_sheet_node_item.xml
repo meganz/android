@@ -263,7 +263,7 @@
                     android:textSize="16sp"
                     tools:drawableRight="@drawable/ic_circle_label"
                     tools:text="@string/label_red"
-                    tools:textColor="@color/label_red" />
+                    tools:textColor="@color/salmon_400_salmon_300" />
             </LinearLayout>
 
             <LinearLayout
