@@ -142,7 +142,7 @@ public class Constants {
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;
-    public static final int RECORD_AUDIO = 4;
+    public static final int REQUEST_RECORD_AUDIO = 4;
     public static final int REQUEST_UPLOAD_CONTACT = 5;
     public static final int REQUEST_READ_STORAGE = 6;
 
@@ -385,6 +385,8 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID = "InProgressMissedCallNotification";
     public static final String NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME = "MEGA In Progress and Missed Calls";
     public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_ID = "ChatIncomingCallNotification";
+    public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_ID = "ChatIncomingCallNotificationNoVibrate";
+    public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_NO_VIBRATE_NAME = "MEGA Incoming Calls (no vibration)";
     public static final String NOTIFICATION_CHANNEL_INCOMING_CALLS_NAME = "MEGA Incoming Calls";
     public static final String NOTIFICATION_CHANNEL_CONTACTS_ID = "ContactNotification";
     public static final String NOTIFICATION_CHANNEL_CONTACTS_NAME = "MEGA Contact";
@@ -472,6 +474,7 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
+    public static final int PERMISSIONS_TYPE = 4;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -524,6 +527,7 @@ public class Constants {
     public static final String INCOMING_VIDEO_CALL = "INCOMING_VIDEO_CALL";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
+    public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
     public static final String COPIED_TEXT_LABEL = "Copied Text";
     public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
 
@@ -533,6 +537,7 @@ public class Constants {
     public static final int INVALID_TYPE_PERMISSIONS = -1;
     public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
+    public static final int INVALID_VIEW_TYPE = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 

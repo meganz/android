@@ -140,6 +140,8 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
+import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -1776,7 +1778,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 
-			case RECORD_AUDIO:
+			case REQUEST_RECORD_AUDIO:
 				if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
@@ -4804,7 +4806,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 
         if (!TextUtils.isEmpty(psa.getUrl())) {
-            Intent intent = new Intent(this, WebViewActivityLollipop.class);
+            Intent intent = new Intent(this, WebViewActivity.class);
             intent.setData(Uri.parse(psa.getUrl()));
             startActivity(intent);
             psaViewModel.dismissPsa(psa.getId());
@@ -11105,7 +11107,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case R.id.lost_authentication_device: {
 				try {
 					String url = "https://mega.nz/recovery";
-					Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+					Intent openTermsIntent = new Intent(this, WebViewActivity.class);
 					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					openTermsIntent.setData(Uri.parse(url));
 					startActivity(openTermsIntent);
