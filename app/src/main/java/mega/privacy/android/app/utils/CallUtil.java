@@ -66,8 +66,9 @@ public class CallUtil {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
         MegaHandleList listCallsRequestSent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsRingIn = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
+        MegaHandleList listCallsTerminating = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION);
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
         MegaHandleList listCalls = megaChatApi.getChatCalls();
 
@@ -77,7 +78,7 @@ public class CallUtil {
         }
 
         logDebug("There is some call in progress");
-        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsRingIn.size())) {
+        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsTerminating.size() + listCallsRingIn.size())) {
             logDebug("I'm not participating in any of the calls there");
             return false;
         }
@@ -974,7 +975,7 @@ public class CallUtil {
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
             return false;
         }
 
@@ -1042,19 +1043,16 @@ public class CallUtil {
     /**
      * Method for removing the incoming call notification.
      *
-     * @param chatIdIncomingCall The chat ID wit the call.
+     * @param callIdIncomingCall The call ID
      */
-    public static void clearIncomingCallNotification(long chatIdIncomingCall) {
-        logDebug("Clear the notification in chat: " + chatIdIncomingCall);
+    public static void clearIncomingCallNotification(long callIdIncomingCall) {
+        logDebug("Clear the notification in chat: " + callIdIncomingCall);
+        if(callIdIncomingCall == MEGACHAT_INVALID_HANDLE)
+            return;
 
         try {
             NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getBaseContext().getSystemService(NOTIFICATION_SERVICE);
-
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdIncomingCall);
-            if (call == null)
-                return;
-
-            notificationManager.cancel(getCallNotificationId(call.getId()));
+            notificationManager.cancel(getCallNotificationId(callIdIncomingCall));
         } catch (Exception e) {
             logError("EXCEPTION", e);
         }

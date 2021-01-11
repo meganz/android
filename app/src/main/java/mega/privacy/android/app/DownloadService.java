@@ -196,6 +196,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		startForeground();
+
 		rootNode = megaApi.getRootNode();
 
 		// delay 1 second to refresh the pause notification to prevent update is missed
@@ -210,6 +213,30 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
+	}
+
+	private void startForeground() {
+		if (megaApi.getNumPendingDownloads() <= 0) {
+			return;
+		}
+
+		try {
+			startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
+					notificationChannelName, mNotificationManager,
+					new NotificationCompat.Builder(DownloadService.this, notificationChannelId),
+					mBuilder));
+			isForeground = true;
+		} catch (Exception e) {
+			logWarning("Error starting foreground.", e);
+			isForeground = false;
+		}
+	}
+
+	private void stopForeground() {
+		isForeground = false;
+		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
+		stopSelf();
 	}
 
 	@Override
@@ -278,6 +305,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_RESTART_SERVICE)) {
 			MegaTransferData transferData = megaApi.getTransferData(null);
 			if (transferData == null) {
+				stopForeground();
 				return;
 			}
 
@@ -297,6 +325,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			if (transfersCount > 0) {
 				updateProgressNotification();
+			} else {
+				stopForeground();
 			}
 
 			launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
@@ -527,10 +557,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			try{ wl.release(); } catch(Exception ex) {}
 
         showCompleteNotification(handle);
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
-		stopSelf();
+		stopForeground();
 		rootNode = null;
 		int total = megaApi.getNumPendingDownloads();
 		logDebug("onQueueComplete: total of files before reset " + total);
@@ -1407,10 +1434,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void cancel() {
 		logDebug("cancel");
 		canceled = true;
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
-		stopSelf();
+		stopForeground();
 		rootNode = null;
 	}
 
@@ -1627,8 +1651,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if(!transfer.isFolderTransfer()){
 							errorCount++;
 						}
-						File file = new File(transfer.getPath());
-						file.delete();
+
+						if (!isTextEmpty(transfer.getPath())) {
+							File file = new File(transfer.getPath());
+							file.delete();
+						}
 					}
 				}
 			}
@@ -1825,36 +1852,42 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				MegaApplication.setLoggingIn(isLoggingIn);
 //				finish();
 			}
-		}
-		else{
+		} else {
 			logDebug("Public node received");
+
 			if (e.getErrorCode() != MegaError.API_OK) {
 				logError("Public node error");
 				return;
 			}
-			else {
-				MegaNode node = request.getPublicMegaNode();
 
-				if (node != null) {
-					if (currentDir.isDirectory()) {
-						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
-					} else {
-						currentFile = currentDir;
-					}
+			MegaNode node = request.getPublicMegaNode();
+			if (node == null) {
+				logError("Public node is null");
+				return;
+			}
 
-					String appData = getSDCardAppData(intent);
+			if (currentDir == null) {
+				logError("currentDir is null");
+				return;
+			}
 
-                    logDebug("Public node download launched");
-					if(!wl.isHeld()) wl.acquire();
-					if(!lock.isHeld()) lock.acquire();
-					if (currentDir.isDirectory()){
-						logDebug("To downloadPublic(dir)");
-						if (!isTextEmpty(appData)) {
-							megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
-						} else {
-							megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
-						}
-					}
+			if (currentDir.isDirectory()) {
+				currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
+			} else {
+				currentFile = currentDir;
+			}
+
+			String appData = getSDCardAppData(intent);
+
+			logDebug("Public node download launched");
+			if (!wl.isHeld()) wl.acquire();
+			if (!lock.isHeld()) lock.acquire();
+			if (currentDir.isDirectory()) {
+				logDebug("To downloadPublic(dir)");
+				if (!isTextEmpty(appData)) {
+					megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
+				} else {
+					megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
 				}
 			}
 		}

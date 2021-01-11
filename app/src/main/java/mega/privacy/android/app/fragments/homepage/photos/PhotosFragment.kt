@@ -310,7 +310,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         })
 
         if (viewModel.searchMode) {
-            listView.switchToLinearLayout()
+            listView.switchToLinear()
             listView.adapter = searchAdapter
         } else {
             configureGridLayoutManager()
@@ -328,7 +328,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         if (viewModel.searchMode) return
 
-        listView.switchToLinearLayout()
+        listView.switchToLinear()
         listView.adapter = searchAdapter
         listView.addItemDecoration(itemDecoration)
 
@@ -340,7 +340,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun exitSearch() {
         if (!viewModel.searchMode) return
 
-        listView.switchBackToGridLayout()
+        listView.switchBackToGrid()
         configureGridLayoutManager()
         listView.adapter = browseAdapter
         listView.removeItemDecoration(itemDecoration)

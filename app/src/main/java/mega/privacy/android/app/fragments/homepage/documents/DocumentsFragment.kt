@@ -179,14 +179,14 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private fun switchListGridView(isList: Boolean) {
         viewModel.isList = isList
         if (isList) {
-            listView.switchToLinearLayout()
+            listView.switchToLinear()
             listView.adapter = listAdapter
 
             if (listView.itemDecorationCount == 0) {
                 listView.addItemDecoration(itemDecoration)
             }
         } else {
-            listView.switchBackToGridLayout()
+            listView.switchBackToGrid()
             listView.adapter = gridAdapter
             listView.removeItemDecoration(itemDecoration)
 

@@ -1,10 +1,15 @@
 package mega.privacy.android.app.utils;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,9 +30,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -41,6 +46,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -108,24 +114,9 @@ public class MegaNodeUtil {
          */
         private static AlertDialog alertTakenDown = null;
 
-        public static class TakenDownAlertFragment extends DialogFragment {
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
-                dialogBuilder.setTitle(getActivity().getString(R.string.general_not_available))
-                             .setMessage(getActivity().getString(R.string.error_download_takendown_node)).setNegativeButton(R.string.general_dismiss, (dialog, i) -> {
-                    dialog.dismiss();
-                    getActivity().finish();
-                });
-                alertTakenDown = dialogBuilder.create();
-
-                setCancelable(false);
-
-                return alertTakenDown;
-            }
-        }
-
         /**
+         * Shows a taken down alert.
+         *
          * @param activity the activity is the page where dialog is shown
          */
         public static void showTakenDownAlert(final AppCompatActivity activity) {
@@ -136,7 +127,14 @@ public class MegaNodeUtil {
                 return;
             }
 
-            new TakenDownAlertFragment().show(activity.getSupportFragmentManager(), "taken_down");
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
+            dialogBuilder.setTitle(getString(R.string.general_not_available))
+                    .setMessage(getString(R.string.error_download_takendown_node))
+                    .setNegativeButton(R.string.general_dismiss, (dialog, i) -> activity.finish());
+
+            alertTakenDown = dialogBuilder.create();
+            alertTakenDown.setCancelable(false);
+            alertTakenDown.show();
         }
     }
 
@@ -203,7 +201,7 @@ public class MegaNodeUtil {
 
             disputeButton.setOnClickListener(button -> {
                 listener.onDisputeClicked();
-                Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                 openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 openTermsIntent.setData(Uri.parse(DISPUTE_URL));
                 context.startActivity(openTermsIntent);
@@ -745,5 +743,70 @@ public class MegaNodeUtil {
         }
 
         return true;
+    }
+
+    /**
+     * Gets the tinted circle Drawable for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @param resources     Android resources
+     * @return              Drawable
+     */
+    public static Drawable getNodeLabelDrawable(int nodeLabel, Resources resources) {
+        Drawable drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_circle_label, null);
+        drawable.setTint(ResourcesCompat.getColor(resources, getNodeLabelColor(nodeLabel), null));
+        return drawable;
+    }
+
+    /**
+     * Gets the String resource reference for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @return              String resource reference
+     */
+    @StringRes
+    public static int getNodeLabelText(int nodeLabel) {
+        switch (nodeLabel) {
+            case MegaNode.NODE_LBL_RED:
+                return R.string.label_red;
+            case MegaNode.NODE_LBL_ORANGE:
+                return R.string.label_orange;
+            case MegaNode.NODE_LBL_YELLOW:
+                return R.string.label_yellow;
+            case MegaNode.NODE_LBL_GREEN:
+                return R.string.label_green;
+            case MegaNode.NODE_LBL_BLUE:
+                return R.string.label_blue;
+            case MegaNode.NODE_LBL_PURPLE:
+                return R.string.label_purple;
+            default:
+                return R.string.label_grey;
+        }
+    }
+
+    /**
+     * Gets the Color resource reference for the provided {@link MegaNode} Label
+     *
+     * @param nodeLabel     {@link MegaNode} Label
+     * @return              Color resource reference
+     */
+    @ColorRes
+    public static int getNodeLabelColor(int nodeLabel) {
+        switch (nodeLabel) {
+            case MegaNode.NODE_LBL_RED:
+                return R.color.label_red;
+            case MegaNode.NODE_LBL_ORANGE:
+                return R.color.label_orange;
+            case MegaNode.NODE_LBL_YELLOW:
+                return R.color.label_yellow;
+            case MegaNode.NODE_LBL_GREEN:
+                return R.color.label_green;
+            case MegaNode.NODE_LBL_BLUE:
+                return R.color.label_blue;
+            case MegaNode.NODE_LBL_PURPLE:
+                return R.color.label_purple;
+            default:
+                return R.color.label_grey;
+        }
     }
 }

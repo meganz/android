@@ -73,16 +73,15 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 return
             }
 
-            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0)
-                == Constants.OFFLINE_ADAPTER
+            if (intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, 0) == OFFLINE_ADAPTER
             ) {
                 val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
 
                 when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
-                    Constants.SCROLL_TO_POSITION -> {
+                    SCROLL_TO_POSITION -> {
                         scrollToNode(handle)
                     }
-                    Constants.UPDATE_IMAGE_DRAG -> {
+                    UPDATE_IMAGE_DRAG -> {
                         hideDraggingThumbnail(handle)
                     }
                 }
@@ -153,7 +152,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     ): View? {
         requireContext().registerReceiver(
             receiverUpdatePosition,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
+            IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION)
         )
 
         binding = FragmentOfflineBinding.inflate(inflater, container, false)
@@ -544,7 +543,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             mime.isImage -> {
                 val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
+                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
                 intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
                 val screenPosition = getThumbnailScreenPosition(position)
@@ -581,7 +580,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.node.name)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
@@ -618,7 +617,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 } else {
                     callManager {
                         it.showSnackbar(
-                            Constants.SNACKBAR_TYPE,
+                            SNACKBAR_TYPE,
                             getString(R.string.intent_not_available),
                             MEGACHAT_INVALID_HANDLE
                         )
@@ -645,7 +644,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle.toLong())
-                pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
+                pdfIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, viewModel.path)
 
@@ -883,7 +882,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         val inflater = mode!!.menuInflater
 
         inflater.inflate(R.menu.offline_browser_action, menu)
-        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ACCENT) }
+        callManager { it.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT) }
         checkScroll()
 
         return true
@@ -903,7 +902,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("ActionBarCallBack::onDestroyActionMode")
 
         viewModel.clearSelection()
-        callManager { it.changeStatusBarColor(Constants.COLOR_STATUS_BAR_ZERO_DELAY) }
+        callManager { it.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY) }
         checkScroll()
     }
 

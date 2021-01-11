@@ -7,6 +7,8 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
@@ -29,6 +31,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -76,6 +79,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         private ImageView actionIcon;
         private TextView time;
         private ImageButton threeDots;
+        public ImageView imageFavourite;
+        public ImageView imageLabel;
 
         private long document = -1;
 
@@ -112,6 +117,8 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
         holder.sharedIcon = v.findViewById(R.id.shared_image);
         holder.actionIcon = v.findViewById(R.id.action_image);
         holder.time = v.findViewById(R.id.time_text);
+        holder.imageFavourite = v.findViewById(R.id.img_favourite);
+        holder.imageLabel = v.findViewById(R.id.img_label);
 
         v.setTag(holder);
         return holder;
@@ -196,9 +203,21 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
                 holder.threeDots.setVisibility(View.VISIBLE);
                 holder.threeDots.setOnClickListener(this);
                 holder.title.setText(node.getName());
+
+                if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+                    Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+                    holder.imageLabel.setImageDrawable(drawable);
+                    holder.imageLabel.setVisibility(View.VISIBLE);
+                } else {
+                    holder.imageLabel.setVisibility(View.GONE);
+                }
+
+                holder.imageFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
             } else {
                 holder.threeDots.setVisibility(View.INVISIBLE);
                 holder.threeDots.setOnClickListener(null);
+                holder.imageLabel.setVisibility(View.GONE);
+                holder.imageFavourite.setVisibility(View.GONE);
 
                 if (bucket.isMedia()) {
                     holder.title.setText(getMediaTitle(nodeList));
@@ -314,8 +333,9 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public int getItemViewType(int pos) {
-        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size())
-            return super.getItemViewType(pos);
+        if (recentsItems == null || recentsItems.isEmpty()
+                || pos < 0 || pos >= recentsItems.size())
+            return INVALID_VIEW_TYPE;
 
         return recentsItems.get(pos).getViewType();
     }

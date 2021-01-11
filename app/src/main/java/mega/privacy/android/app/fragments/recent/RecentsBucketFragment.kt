@@ -45,7 +45,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private lateinit var listView: RecyclerView
 
-    private lateinit var mAdapter: MultipleBucketAdapter
+    private var mAdapter: MultipleBucketAdapter? = null
 
     private lateinit var bucket: BucketSaved
 
@@ -86,32 +86,36 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
-        mAdapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
+        if(mAdapter == null) {
+            mAdapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
+            listView.adapter = mAdapter
 
-        if (bucket.isMedia) {
-            val numCells: Int = if (Util.isScreenInPortrait(activity)) 4 else 6
-            val gridLayoutManager =
-                GridLayoutManager(activity, numCells, GridLayoutManager.VERTICAL, false)
+            if (bucket.isMedia) {
+                val numCells: Int = if (Util.isScreenInPortrait(activity)) 4 else 6
+                val gridLayoutManager =
+                    GridLayoutManager(activity, numCells, GridLayoutManager.VERTICAL, false)
 
-            listView.layoutManager = gridLayoutManager
-        } else {
-            val linearLayoutManager = LinearLayoutManager(activity)
+                listView.layoutManager = gridLayoutManager
+            } else {
+                val linearLayoutManager = LinearLayoutManager(activity)
 
-            listView.layoutManager = linearLayoutManager
-            listView.addItemDecoration(SimpleDividerItemDecoration(activity, outMetrics))
-        }
-
-        listView.adapter = mAdapter
-        listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                checkScroll()
+                listView.layoutManager = linearLayoutManager
+                listView.addItemDecoration(SimpleDividerItemDecoration(activity, outMetrics))
             }
-        })
 
-        listView.clipToPadding = false
-        listView.setHasFixedSize(true)
+            listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    checkScroll()
+                }
+            })
+
+            listView.clipToPadding = false
+            listView.setHasFixedSize(true)
+        } else {
+            mAdapter?.setNodes(nodes)
+        }
     }
 
     private fun setupFastScroller(nodes: List<MegaNode>) {
