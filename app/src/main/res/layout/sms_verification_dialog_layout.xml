@@ -18,9 +18,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="25dp"
                 android:text="@string/add_phone_number_label"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textStyle="bold"
-                android:textSize="18sp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Bold" />
             <ImageView
                 android:id="@+id/image_storage_status"
                 android:layout_width="wrap_content"
@@ -31,42 +29,12 @@
                 android:src="@drawable/il_verify_phone_circle"/>
             <TextView
                 android:id="@+id/sv_dialog_msg"
-                style="@style/GetFreeXxGbWhen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
-                android:gravity="start"
-                android:lineSpacingMultiplier="1.27"
-                android:textAlignment="textStart"/>
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginTop="35dp"
-                android:layout_marginBottom="18dp"
-                android:orientation="horizontal">
-                <Button
-                    android:id="@+id/sv_btn_horizontal_not_now"
-                    style="?attr/materialButtonStyle"
-                    android:layout_marginRight="20dp"
-                    android:background="@android:color/transparent"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"
-                    android:text="@string/verify_account_not_now_button"/>
-                <Button
-                    android:id="@+id/sv_btn_horizontal_add"
-                    style="?attr/materialButtonStyle"
-                    android:layout_marginLeft="22dp"
-                    android:layout_marginRight="24dp"
-                    android:background="@android:color/transparent"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"
-                    android:text="@string/general_add"/>
-            </LinearLayout>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

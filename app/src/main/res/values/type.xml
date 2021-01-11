@@ -108,6 +108,12 @@
         <item name="textSize">18sp</item>
     </style>
 
+    <!-- Bold, 18sp, 0px, textColorPrimary -->
+    <style name="TextAppearance.Mega.Subtitle1.Bold">
+        <item name="textSize">18sp</item>
+        <item name="textStyle">bold</item>
+    </style>
+
     <!--===============  Subtitle 2 =====================-->
 
     <!-- In material design, for the NavigationView(Left Navigation Drawer) itemTextAppearance -->
