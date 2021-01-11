@@ -12,6 +12,8 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getTotalSize
 import mega.privacy.android.app.utils.SDCardOperator
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.showSnackbar
 import java.io.File
 import javax.inject.Inject
@@ -62,40 +64,18 @@ class OfflineNodeSaver @Inject constructor(
         }
 
         runOnUiThread {
-            if (totalFiles == 0) {
-                showSnackbar(
-                    context,
-                    context.resources.getQuantityString(
-                        R.plurals.empty_folders, nodes.size
-                    )
-                )
+            val textToShow = if (totalFiles == 0) {
+                getQuantityString(R.plurals.empty_folders, nodes.size)
+            } else if (totalFiles == alreadyExists && totalFiles == 1) {
+                getString(R.string.general_already_downloaded)
             } else if (totalFiles == alreadyExists) {
-                if (totalFiles == 1) {
-                    showSnackbar(
-                        context, context.resources.getString(R.string.general_already_downloaded)
-                    )
-                } else {
-                    showSnackbar(
-                        context,
-                        context.resources.getQuantityString(
-                            R.plurals.file_already_downloaded, totalFiles, totalFiles
-                        )
-                    )
-                }
+                getQuantityString(R.plurals.file_already_downloaded, totalFiles, totalFiles)
+            } else if (totalFiles == 1) {
+                getString(R.string.copy_already_downloaded)
             } else {
-                if (totalFiles == 1) {
-                    showSnackbar(
-                        context, context.resources.getString(R.string.copy_already_downloaded)
-                    )
-                } else {
-                    showSnackbar(
-                        context,
-                        context.resources.getQuantityString(
-                            R.plurals.download_finish, totalFiles, totalFiles
-                        )
-                    )
-                }
+                getQuantityString(R.plurals.download_finish, totalFiles, totalFiles)
             }
+            showSnackbar(context, textToShow)
         }
     }
 
