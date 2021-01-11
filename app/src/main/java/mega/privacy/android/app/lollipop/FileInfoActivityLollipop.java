@@ -84,6 +84,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.CameraUploadUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1935,9 +1936,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			int stringMessageID;
-            if (getPrimaryFolderHandle() == handle) {
+            if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
                 stringMessageID = R.string.confirmation_move_cu_folder_to_rubbish;
-            } else if (getSecondaryFolderHandle() == handle) {
+            } else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
                 stringMessageID = R.string.confirmation_move_mu_folder_to_rubbish;
             } else {
                 stringMessageID = R.string.confirmation_move_to_rubbish;
