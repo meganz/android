@@ -37,6 +37,10 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant3">
+        <item name="android:textColor">@color/grey_012_white_012</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red">
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>

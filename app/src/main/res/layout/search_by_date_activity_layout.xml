@@ -1,85 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_container_search_date"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context=".lollipop.SearchByDateActivityLollipop" >
+    tools:context=".lollipop.SearchByDateActivityLollipop">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_search"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:titleTextAppearance="@style/ToolbarTitle.Secondary"
-        android:background="?attr/colorPrimary"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        tools:context=".FileProviderActivityLollipop" />
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_below="@id/toolbar_search"
-        android:background="@color/new_background_fragment"
         android:layout_height="match_parent" >
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_below="@+id/toolbar_search">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent">
+            android:layout_height="48dp">
 
             <TextView
                 android:id="@+id/title_set_day"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_set_day"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:textSize="16dp"
-                android:textColor="?android:attr/textColorSecondary"/>
+                android:layout_marginStart="16dp"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
         </RelativeLayout>
         
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/white">
+            android:layout_height="48dp">
             <ImageButton
                 android:id="@+id/remove_day"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_close_grey"
-                android:background="@android:color/transparent"
+                android:background="@null"
                 android:visibility="gone"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="13dp"/>
+                android:layout_marginEnd="13dp"/>
 
             <RelativeLayout
                 android:id="@+id/relative_layout_day"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:layout_toLeftOf="@+id/remove_day">
+                android:layout_toStartOf="@+id/remove_day">
                 <TextView
                     android:id="@+id/text_view_day"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" "
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
-                    android:textSize="16dp"
-                    android:textColor="@color/black_12_alpha"
+                    android:layout_marginStart="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant3"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -90,88 +78,69 @@
             android:id="@+id/separator3"
             android:background="@color/grey_012_white_012"
             android:layout_width = "match_parent"
-            android:layout_height="1dip"
-            android:layout_below="@id/relative_layout_day"/>
+            android:layout_height="1dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
+            android:layout_height="wrap_content">
+
             <Button
                 android:id="@+id/button_last_month"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:elevation="2dp"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginBottom="32dp"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textSize="16dp"
-                android:textColor="@color/black"
                 android:text="@string/general_search_month" />
             <Button
                 android:id="@+id/button_last_year"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:layout_toRightOf="@+id/button_last_month"
-                android:elevation="2dp"
+                android:layout_toEndOf="@+id/button_last_month"
                 android:layout_marginTop="32dp"
                 android:layout_marginBottom="32dp"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textSize="16dp"
-                android:textColor="@color/black"
                 android:text="@string/general_search_year" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent">
+            android:layout_height="48dp">
 
             <TextView
                 android:id="@+id/title_set_period"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/label_set_period"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:textSize="16dp"
-                android:textColor="?android:attr/textColorSecondary"/>
+                android:layout_marginStart="16dp"
+                android:textAllCaps="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:background="@color/white">
+            android:layout_height="72dp">
 
             <ImageButton
                 android:id="@+id/remove_period_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_close_grey"
-                android:background="@android:color/transparent"
+                android:background="@null"
                 android:visibility="gone"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="13dp"/>
+                android:layout_marginEnd="13dp"/>
 
             <RelativeLayout
                 android:id="@+id/relative_layout_from"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:layout_toLeftOf="@+id/remove_period_from">
+                android:layout_toStartOf="@+id/remove_period_from">
                 <TextView
                     android:id="@+id/title_text_view_from"
                     android:layout_width="wrap_content"
@@ -179,10 +148,9 @@
                     android:text="From"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
-                    android:textSize="14dp"
-                    android:textColor="?android:attr/textColorSecondary"/>
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
                 <TextView
                     android:id="@+id/text_view_from"
@@ -190,10 +158,9 @@
                     android:layout_height="wrap_content"
                     android:text=" "
                     android:layout_below="@+id/title_text_view_from"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
-                    android:textSize="16dp"
-                    android:textColor="@color/black_12_alpha"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant3"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -206,31 +173,28 @@
             android:id="@+id/separator_from"
             android:background="@color/grey_012_white_012"
             android:layout_width = "match_parent"
-            android:layout_height="1dip"
-            android:layout_below="@id/relative_layout_from"/>
+            android:layout_height="1dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:background="@color/white">
+            android:layout_height="72dp">
 
             <ImageButton
                 android:id="@+id/remove_period_to"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_close_grey"
-                android:background="@android:color/transparent"
+                android:background="@null"
                 android:visibility="gone"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="13dp"/>
+                android:layout_marginEnd="13dp"/>
 
             <RelativeLayout
                 android:id="@+id/relative_layout_to"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:layout_toLeftOf="@+id/remove_period_to">
+                android:layout_toStartOf="@+id/remove_period_to">
                 <TextView
                     android:id="@+id/title_text_view_to"
                     android:layout_width="wrap_content"
@@ -238,10 +202,9 @@
                     android:text="To"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
-                    android:textSize="14dp"
-                    android:textColor="?android:attr/textColorSecondary"/>
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
                 <TextView
                     android:id="@+id/text_view_to"
@@ -249,10 +212,9 @@
                     android:layout_height="wrap_content"
                     android:text=" "
                     android:layout_below="@+id/title_text_view_to"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="16dp"
-                    android:textSize="16dp"
-                    android:textColor="@color/black_12_alpha"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="16dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant3"
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:maxWidth="250dp"/>
@@ -265,46 +227,30 @@
             android:id="@+id/separator_to"
             android:background="@color/grey_012_white_012"
             android:layout_width = "match_parent"
-            android:layout_height="1dip"
-            android:layout_below="@id/relative_layout_to"/>
+            android:layout_height="1dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
+            android:layout_height="wrap_content">
             <Button
                 android:id="@+id/button_cancel"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:elevation="2dp"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="8dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="47dp"
                 android:layout_marginBottom="32dp"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textSize="16dp"
-                android:textColor="@color/black"
                 android:text="@string/general_cancel" />
             <Button
                 android:id="@+id/button_apply"
+                style="?attr/materialButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:layout_toRightOf="@+id/button_cancel"
-                android:elevation="2dp"
+                android:layout_toEndOf="@+id/button_cancel"
                 android:layout_marginTop="47dp"
                 android:layout_marginBottom="32dp"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textSize="16dp"
-                android:textColor="@color/black"
                 android:text="@string/general_apply" />
         </RelativeLayout>
 
