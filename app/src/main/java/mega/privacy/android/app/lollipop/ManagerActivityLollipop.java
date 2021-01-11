@@ -5889,7 +5889,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
+
 				showGlobalAlertDialogsIfNeeded();
+				initCuSync();
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -16033,6 +16035,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			retryTransfer(transfer);
 		}
 	}
+
+    /**
+     * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
+     */
+    private void initCuSync() {
+        if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuBackup() == null) {
+            CuSyncManager.INSTANCE.setPrimaryBackup();
+        }
+
+        if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuBackup() == null) {
+            CuSyncManager.INSTANCE.setSecondaryBackup();
+        }
+    }
 
     /**
      * Checks if there are failed or cancelled transfers.
