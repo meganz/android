@@ -20,6 +20,10 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="TextAppearance.Mega.Headline6.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
     <!-- ================== Subtitle 1 ====================== -->
 
     <!-- In material design, typically for AlertDialog title, Popup menu, AutoCompleteTextView,

@@ -12,10 +12,8 @@
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif"
-            android:textSize="20sp"
             android:text="@string/file_storage_loading"
-            android:textColor="@color/black"
+            android:textAppearance="@style/TextAppearance.Mega.Headline6.Secondary"
             android:visibility="gone"/>
 
         <androidx.recyclerview.widget.RecyclerView
