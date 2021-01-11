@@ -136,7 +136,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHand
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
@@ -1036,14 +1035,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public void download(){
 
         if (type == OFFLINE_ADAPTER) {
-            Intent launchIntent = getIntent();
-            if (launchIntent == null) {
-                return;
-            }
-            long handle = launchIntent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE);
-            if (handle == INVALID_HANDLE) {
-                return;
-            }
             MegaOffline node = dbH.findByHandle(handle);
             if (node == null) {
                 return;

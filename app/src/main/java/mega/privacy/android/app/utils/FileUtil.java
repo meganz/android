@@ -438,7 +438,7 @@ public class FileUtil {
     }
 
     /**
-     * Check if the file is already exists in targetPath.
+     * Checks if the file already exists in targetPath.
      *
      * @param file       File to check.
      * @param targetPath Path where the file is checked for.

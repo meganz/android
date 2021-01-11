@@ -171,15 +171,19 @@ public class SDCardOperator {
     }
 
     /**
-     * Check if the file is already exists in targetPath.
+     * Checks if the file already exists in targetPath.
      *
      * @param file       File to check.
      * @param targetPath Path where the file is checked for.
      */
     public boolean fileExistsInTargetPath(File file, String targetPath) {
-        String name = file.getName();
         DocumentFile parent = getDocumentFileByPath(targetPath);
-        DocumentFile destFile = parent.findFile(name);
+        if (parent == null) {
+            return false;
+        }
+
+        DocumentFile destFile = parent.findFile(file.getName());
+
         return destFile != null && destFile.length() == file.length();
     }
 
