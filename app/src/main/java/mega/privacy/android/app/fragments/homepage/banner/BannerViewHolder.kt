@@ -30,16 +30,17 @@ class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
         image.setImageURI(data?.imageLocation.plus(data?.image))
         title.text = data?.title
         description.text = data?.description
-//        val link = data?.url
 
-        (findView(R.id.imageView_dismiss) as ImageView  ).setOnClickListener {
+        (findView(R.id.imageView_dismiss) as ImageView).setOnClickListener {
             data?.run {
                 viewModel.dismissBanner(data)
             }
         }
 
-        itemView.setOnClickListener {
-            actOnActionLink(itemView.context, REFERRAL)
+        data?.url?.let { link ->
+            itemView.setOnClickListener {
+                actOnActionLink(itemView.context, link)
+            }
         }
     }
 

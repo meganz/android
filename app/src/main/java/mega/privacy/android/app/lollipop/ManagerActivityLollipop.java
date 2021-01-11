@@ -2122,7 +2122,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
-			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
+			getter.getMegaContacts(megaApi, TimeUtils.WEEK);
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();

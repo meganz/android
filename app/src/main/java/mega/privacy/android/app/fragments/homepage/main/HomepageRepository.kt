@@ -31,6 +31,12 @@ class HomepageRepository @Inject constructor(
         return bannerList
     }
 
+    /**
+     * Get the resource id of the "dot" drawable showing on the avatar
+     *
+     * @param status the chat status
+     * @return int the drawable Id
+     */
     fun getChatStatusDrawableId(status: Int) = when (status) {
         MegaChatApi.STATUS_ONLINE -> R.drawable.ic_online
         MegaChatApi.STATUS_AWAY -> R.drawable.ic_away
@@ -45,10 +51,18 @@ class HomepageRepository @Inject constructor(
         )
     }
 
+    /**
+     * Get the round actual avatar
+     *
+     * @return Pair<Boolean, Bitmap> <true, bitmap> if succeed, or <false, null>
+     */
     suspend fun loadAvatar(): Pair<Boolean, Bitmap>? = withContext(Dispatchers.IO) {
         getCircleAvatar(context, megaApi.myEmail)
     }
 
+    /**
+     * Get the actual avatar from the server and save it to the cache folder
+     */
     suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
@@ -64,9 +78,7 @@ class HomepageRepository @Inject constructor(
                 request: MegaRequest,
                 e: MegaError
             ) {
-                Log.i("Alex", "error:${e.errorString}")
                 if (e.errorCode == MegaError.API_OK) {
-                    Log.i("Alex", "bannerlistsize:${request.megaBannerList.size()}")
                     bannerList.value = MegaUtilsAndroid.bannersToArray(request.megaBannerList)
                 } else if (e.errorCode == MegaError.API_ENOENT) {
                     bannerList.value = null

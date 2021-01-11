@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
@@ -292,6 +291,9 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Set up the view pager, tab layout and fragments contained in the Homepage main bottom sheet
+     */
     private fun setupBottomSheetUI() {
         viewPager = rootView.findViewById(R.id.view_pager)
         val adapter = BottomSheetPagerAdapter(this)
@@ -332,6 +334,9 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Set up the banner view pager layout
+     */
     @Suppress("UNCHECKED_CAST")
     private fun setupBannerView() {
         bannerViewPager =
@@ -344,8 +349,8 @@ class HomepageFragment : Fragment() {
             .setIndicatorStyle(IndicatorStyle.CIRCLE)
             .setIndicatorSliderGap(Util.dp2px(6f))
             .setIndicatorSliderRadius(
-                Util.dp2px(4f),
-                Util.dp2px(4f)
+                Util.dp2px(3f),
+                Util.dp2px(3f)
             )
             .setIndicatorGravity(IndicatorGravity.CENTER)
             .setIndicatorSliderColor(
@@ -380,17 +385,10 @@ class HomepageFragment : Fragment() {
 
         viewModel.bannerList.observe(viewLifecycleOwner) {
             if (it == null || it.isEmpty()) {
-                Log.i("Alex", "null bannerlist")
-//                bannerViewPager.visibility = View.GONE
-                bottomSheetBehavior.peekHeight =
-                    rootView.height - category.bottom
+                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
             } else {
-                Log.i("Alex", "banners.size:${it.size}")
-//                bannerViewPager.visibility = View.VISIBLE
                 bannerViewPager.refreshData(it)
                 bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-//                    Log.i("Alex", "dismiss banner id: ${banners[0].id}")
-//                    megaApi.dismissBanner(banners[0].id)
             }
         }
     }

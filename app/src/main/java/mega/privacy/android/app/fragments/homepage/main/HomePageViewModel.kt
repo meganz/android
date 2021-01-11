@@ -6,16 +6,20 @@ import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
-import nz.mega.sdk.*
+import mega.privacy.android.app.utils.TimeUtils
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaBanner
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 
 class HomePageViewModel @ViewModelInject constructor(
     private val repository: HomepageRepository
 ) : ViewModel() {
     private var lastGetBannerTime = 0L
+    private val getBannerThreshold = 6 * TimeUtils.HOUR
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
@@ -52,6 +56,7 @@ class HomePageViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).observeForever(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java).observeForever(chatOnlineStatusObserver)
 
+        // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
             loadAvatar(true)
         }
@@ -71,6 +76,11 @@ class HomePageViewModel @ViewModelInject constructor(
         _avatar.value = repository.getDefaultAvatar()
     }
 
+    /**
+     * Generate and show the round avatar based on the actual avatar stored in the cache folder.
+     * Try to retrieve the avatar from the server if it has not been cached.
+     * Showing the default avatar if the retrieve failed
+     */
     private fun loadAvatar(retry: Boolean = false) {
         viewModelScope.launch {
             repository.loadAvatar()?.also {
@@ -100,14 +110,23 @@ class HomePageViewModel @ViewModelInject constructor(
 
     fun isRootNodeNull() = repository.isRootNodeNull()
 
+    /**
+     * Retrieve the latest banner list from the server.
+     * The time threshold is set to 6 hours for preventing too frequent
+     * API requests
+     */
     fun updateBannersIfNeeded() {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastGetBannerTime > 1000) {
+        if (currentTime - lastGetBannerTime > getBannerThreshold) {
             lastGetBannerTime = currentTime
             viewModelScope.launch { repository.loadBannerList() }
         }
     }
 
+    /**
+     * Dismiss the banner for this account.
+     * The banner would never be given again by the server once being dismissed
+     */
     fun dismissBanner(banner: MegaBanner) {
         repository.dismissBanner(banner.id)
         _bannerList.value?.remove(banner)

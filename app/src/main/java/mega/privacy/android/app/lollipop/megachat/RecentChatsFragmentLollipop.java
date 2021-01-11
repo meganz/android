@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -1867,7 +1868,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     private void loadMegaContacts() {
-        contactGetter.getMegaContacts(megaApi, MegaContactGetter.DAY);
+        contactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
     }
 
     class FilterChatsTask extends AsyncTask<String, Void, Void> {

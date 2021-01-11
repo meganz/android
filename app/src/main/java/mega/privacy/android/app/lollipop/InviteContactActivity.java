@@ -61,6 +61,7 @@ import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
@@ -823,7 +824,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
     private void getMegaContact() {
         //clear cache
         isGettingMegaContact = true;
-        megaContactGetter.getMegaContacts(megaApi, MegaContactGetter.DAY);
+        megaContactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
     }
 
     private void onGetContactCompleted() {

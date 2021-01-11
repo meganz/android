@@ -39,7 +39,11 @@ public class TimeUtils implements Comparator<Calendar> {
     private static final int TIME_OF_CHANGE = 8;
     private static final int INITIAL_PERIOD_TIME = 0;
 
-    public static final int DAY = 24 * 60 * 60 * 1000;
+    public static final long SECOND = 1000;
+    public static final long MINUTE = 60 * SECOND;
+    public static final long HOUR = 60 * MINUTE;
+    public static final long DAY = 24 * HOUR;
+    public static final long WEEK = 7 * DAY;
 
     int type;
 
