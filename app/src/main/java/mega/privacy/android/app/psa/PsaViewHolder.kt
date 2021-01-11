@@ -6,7 +6,7 @@ import android.text.TextUtils
 import android.view.View
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop
+import mega.privacy.android.app.activities.WebViewActivity
 
 /**
  * The view holder for normal PSA view, implementing the display logic of PSA.
@@ -38,7 +38,7 @@ class PsaViewHolder(
             binding.leftButton.text = psa.positiveText
             binding.leftButton.setOnClickListener {
                 val context = binding.root.context
-                val intent = Intent(context, WebViewActivityLollipop::class.java)
+                val intent = Intent(context, WebViewActivity::class.java)
                 intent.data = Uri.parse(psa.positiveLink)
                 context.startActivity(intent)
                 dismissPsa(psa.id)

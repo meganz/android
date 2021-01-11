@@ -7,10 +7,13 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.FileUtil.copyFile
+import mega.privacy.android.app.utils.FileUtil.fileExistsInTargetPath
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getTotalSize
 import mega.privacy.android.app.utils.SDCardOperator
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.showSnackbar
 import java.io.File
 import javax.inject.Inject
@@ -26,32 +29,21 @@ class OfflineNodeSaver @Inject constructor(
     /**
      * Save an offline node into device.
      *
-     * @param handle the handle of the offline node to save
+     * @param nodes the offline nodes to save
      * @param highPriority whether this download is high priority or not
      * @param activityStarter a high-order function to launch activity when needed
      */
-    fun save(handle: Long, highPriority: Boolean, activityStarter: (Intent, Int) -> Unit) {
-        save(activityStarter, savingProducer = {
-            val node = dbHandler.findByHandle(handle)
-
-            if (node == null) {
-                null
-            } else {
-                OfflineSaving(getTotalSize(getOfflineFile(context, node)), highPriority, node)
-            }
-        })
-    }
-
-    /**
-     * Save an offline node into device.
-     *
-     * @param node the offline node to save
-     * @param highPriority whether this download is high priority or not
-     * @param activityStarter a high-order function to launch activity when needed
-     */
-    fun save(node: MegaOffline, highPriority: Boolean, activityStarter: (Intent, Int) -> Unit) {
+    fun save(
+        nodes: List<MegaOffline>,
+        highPriority: Boolean,
+        activityStarter: (Intent, Int) -> Unit
+    ) {
         save(activityStarter) {
-            OfflineSaving(getTotalSize(getOfflineFile(context, node)), highPriority, node)
+            var totalSize = 0L
+            for (node in nodes) {
+                totalSize += getTotalSize(getOfflineFile(context, node))
+            }
+            OfflineSaving(totalSize, highPriority, nodes)
         }
     }
 
@@ -60,15 +52,33 @@ class OfflineNodeSaver @Inject constructor(
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?
     ) {
-        doDownload(
-            getOfflineFile(context, (saving as OfflineSaving).node),
-            parentPath, externalSDCard, sdCardOperator
-        )
+        var totalFiles = 0
+        var alreadyExists = 0
+
+        val nodes = (saving as OfflineSaving).nodes
+        for (node in nodes) {
+            val res = doDownload(
+                getOfflineFile(context, node),
+                parentPath, externalSDCard, sdCardOperator
+            )
+
+            totalFiles += res.first
+            alreadyExists += res.second
+        }
 
         runOnUiThread {
-            showSnackbar(
-                context, context.resources.getQuantityString(R.plurals.download_finish, 1, 1)
-            )
+            val textToShow = if (totalFiles == 0) {
+                getQuantityString(R.plurals.empty_folders, nodes.size)
+            } else if (totalFiles == alreadyExists && totalFiles == 1) {
+                getString(R.string.general_already_downloaded)
+            } else if (totalFiles == alreadyExists) {
+                getQuantityString(R.plurals.file_already_downloaded, totalFiles, totalFiles)
+            } else if (totalFiles == 1) {
+                getString(R.string.copy_already_downloaded)
+            } else {
+                getQuantityString(R.plurals.download_finish, totalFiles, totalFiles)
+            }
+            showSnackbar(context, textToShow)
         }
     }
 
@@ -77,7 +87,7 @@ class OfflineNodeSaver @Inject constructor(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?
-    ) {
+    ): Pair<Int, Int> {
         if (file.isDirectory) {
             val dstDir = File(parentPath, file.name)
 
@@ -85,20 +95,39 @@ class OfflineNodeSaver @Inject constructor(
                 dstDir.mkdirs()
             }
 
-            val children = file.listFiles() ?: return
+            val children = file.listFiles() ?: return Pair(0, 0)
+
+            var totalFiles = 0
+            var alreadyExists = 0
 
             children.forEach {
-                doDownload(it, dstDir.absolutePath, externalSDCard, sdCardOperator)
+                val res = doDownload(it, dstDir.absolutePath, externalSDCard, sdCardOperator)
+                totalFiles += res.first
+                alreadyExists += res.second
             }
+
+            return Pair(totalFiles, alreadyExists)
         } else {
             if (externalSDCard && sdCardOperator != null) {
+                if (sdCardOperator.fileExistsInTargetPath(file, parentPath)) {
+                    return Pair(1, 1)
+                }
+
                 try {
                     sdCardOperator.moveFile(parentPath, file)
                 } catch (e: Exception) {
                     logError("Error moving file to the sd card path with exception", e);
                 }
+
+                return Pair(1, 0)
             } else {
+                if (fileExistsInTargetPath(file, parentPath)) {
+                    return Pair(1, 1)
+                }
+
                 copyFile(file, File(parentPath, file.name))
+
+                return Pair(1, 0)
             }
         }
     }

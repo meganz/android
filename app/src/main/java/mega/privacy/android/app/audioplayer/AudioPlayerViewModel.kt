@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.qualifiers.ActivityContext
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.MegaNodeSaver
@@ -34,6 +35,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     private val megaNodeSaver: MegaNodeSaver,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
+    private val dbHandler: DatabaseHandler,
 ) : BaseRxViewModel() {
 
     private val _snackbarToShow = MutableLiveData<Triple<Int, String, Long>>()
@@ -52,7 +54,8 @@ class AudioPlayerViewModel @ViewModelInject constructor(
      * @param activityStarter function to start activity
      */
     fun saveOfflineNode(handle: Long, activityStarter: (Intent, Int) -> Unit) {
-        offlineNodeSaver.save(handle, false, activityStarter)
+        val node = dbHandler.findByHandle(handle) ?: return
+        offlineNodeSaver.save(listOf(node), false, activityStarter)
     }
 
     /**

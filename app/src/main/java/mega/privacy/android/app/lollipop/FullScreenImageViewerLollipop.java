@@ -20,7 +20,6 @@ import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 import androidx.appcompat.app.ActionBar;
@@ -60,6 +59,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -72,7 +72,7 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
+import mega.privacy.android.app.components.saver.OfflineNodeSaver;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -158,6 +158,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	NodeController nC;
+	private OfflineNodeSaver offlineNodeSaver;
 	boolean isFileLink;
 
 	private MegaFullScreenImageAdapterLollipop adapterMega;
@@ -334,8 +335,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			downloadIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			downloadIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			renameIcon.setVisible(false);
 			moveIcon.setVisible(false);
@@ -482,6 +483,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			if (node == null) {
+				getlinkIcon.setVisible(false);
+				removelinkIcon.setVisible(false);
+				shareIcon.setVisible(false);
+				propertiesIcon.setVisible(false);
+				downloadIcon.setVisible(false);
+				renameIcon.setVisible(false);
+				moveIcon.setVisible(false);
+				copyIcon.setVisible(false);
+				moveToTrashIcon.setVisible(false);
+				removeIcon.setVisible(false);
+				chatIcon.setVisible(false);
+
+				return super.onCreateOptionsMenu(menu);
+			}
 
 			downloadIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -770,9 +786,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			case R.id.full_image_viewer_download: {
 
-				if (adapterType == OFFLINE_ADAPTER){
+				if (adapterType == OFFLINE_ADAPTER) {
+					if (offlineNodeSaver == null) {
+						offlineNodeSaver = new OfflineNodeSaver(this, dbH);
+					}
+					offlineNodeSaver.save(Collections.singletonList(mOffListImages.get(positionG)), false, (intent, code) -> {
+						startActivityForResult(intent, code);
+						return Unit.INSTANCE;
+					});
 					break;
-
 				}else if (adapterType == ZIP_ADAPTER){
 					break;
 
@@ -2209,6 +2231,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		logDebug("onActivityResult");
 
 		if (intent == null) {
+			return;
+		}
+
+		if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 

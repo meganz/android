@@ -70,11 +70,7 @@ import android.widget.Toast;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -138,6 +134,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNot
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMessageBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2939,7 +2936,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean checkPermissionsCall() {
         logDebug("checkPermissionsCall");
         return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
-                && checkPermissions(Manifest.permission.RECORD_AUDIO, RECORD_AUDIO);
+                && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO);
     }
 
     private boolean checkPermissionsTakePicture() {
@@ -2991,7 +2988,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 break;
             }
             case REQUEST_CAMERA:
-            case RECORD_AUDIO:{
+            case REQUEST_RECORD_AUDIO:{
                 logDebug("REQUEST_CAMERA || RECORD_AUDIO");
                 if (checkPermissionsCall()) {
                     startCall();
@@ -9099,60 +9096,32 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return new File(storageDir, imageFileName + ".jpg");
     }
 
+    /**
+     * Manages the result after pick an image with camera.
+     */
     private void onCaptureImageResult() {
-        logDebug("onCaptureImageResult");
-        if (mOutputFilePath != null) {
-            File f = new File(mOutputFilePath);
-            if(f!=null){
-                try {
-                    File publicFile = copyImageFile(f);
-                    //Remove mOutputFilePath
-                    if (f.exists()) {
-                        if (f.isDirectory()) {
-                            if(f.list().length <= 0){
-                                f.delete();
-                            }
-                        }else{
-                            f.delete();
-                        }
-                    }
-                    if(publicFile!=null){
-                        Uri finalUri = Uri.fromFile(publicFile);
-                        galleryAddPic(finalUri);
-                        uploadPictureOrVoiceClip(publicFile.getPath());
-                    }
+        if (mOutputFilePath == null) {
+            logDebug("mOutputFilePath is null");
+            return;
+        }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+        File f = new File(mOutputFilePath);
+
+        File publicFile = FileUtil.copyFileToDCIM(f);
+        //Remove mOutputFilePath
+        if (f.exists()) {
+            if (f.isDirectory()) {
+                if (f.list() != null && f.list().length <= 0) {
+                    f.delete();
                 }
+            } else {
+                f.delete();
             }
-
         }
-    }
 
-    public File copyImageFile(File fileToCopy) throws IOException {
-        logDebug("copyImageFile");
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "Camera");
-        if (!storageDir.exists()) {
-            storageDir.mkdir();
-        }
-        File copyFile = new File(storageDir, fileToCopy.getName());
-        copyFile.createNewFile();
-        copy(fileToCopy, copyFile);
-        return copyFile;
-    }
-
-    public static void copy(File src, File dst) throws IOException {
-        logDebug("copy");
-        InputStream in = new FileInputStream(src);
-        OutputStream out = new FileOutputStream(dst);
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
+        Uri finalUri = Uri.fromFile(publicFile);
+        galleryAddPic(finalUri);
+        uploadPictureOrVoiceClip(publicFile.getPath());
     }
 
     private void galleryAddPic(Uri contentUri) {

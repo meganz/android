@@ -772,7 +772,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     fun saveNodeToDevice(node: MegaOffline) {
-        viewModel.saveNodeToDevice(node) { intent, code ->
+        viewModel.saveNodeToDevice(listOf(node)) { intent, code ->
             startActivityForResult(intent, code)
         }
     }
@@ -857,6 +857,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         logDebug("ActionBarCallBack::onActionItemClicked")
 
         when (item!!.itemId) {
+            R.id.cab_menu_download -> {
+                viewModel.saveNodeToDevice(viewModel.getSelectedNodes()) { intent, code ->
+                    startActivityForResult(intent, code)
+                }
+                viewModel.clearSelection()
+            }
             R.id.cab_menu_share_out -> {
                 OfflineUtils.shareOfflineNodes(requireContext(), viewModel.getSelectedNodes())
                 viewModel.clearSelection()
