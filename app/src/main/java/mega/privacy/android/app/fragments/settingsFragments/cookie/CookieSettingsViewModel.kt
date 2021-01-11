@@ -47,12 +47,11 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     fun toggleCookies(enable: Boolean) {
         if (enable) {
             enabledCookies.value?.addAll(CookieType.values())
+            enabledCookies.notifyObserver()
         } else {
-            enabledCookies.value?.clear()
-            enabledCookies.value?.add(CookieType.ESSENTIAL)
+            resetCookies()
         }
 
-        enabledCookies.notifyObserver()
         updateCookieSettings()
     }
 
@@ -65,6 +64,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                     enabledCookies.postValue(configuration.toMutableSet())
                 },
                 onError = { error ->
+                    resetCookies()
                     logDebug(error.stackTraceToString())
                 }
             )
@@ -85,5 +85,9 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
+    }
+
+    private fun resetCookies() {
+        enabledCookies.postValue(mutableSetOf(CookieType.ESSENTIAL))
     }
 }

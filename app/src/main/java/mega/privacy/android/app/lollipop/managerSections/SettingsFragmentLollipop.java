@@ -21,6 +21,7 @@ import java.io.File;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
@@ -351,9 +352,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 break;
 
             case KEY_ABOUT_COOKIE_POLICY:
-                viewIntent = new Intent(Intent.ACTION_VIEW);
-                viewIntent.setData(Uri.parse("https://mega.nz/cookie"));
-                startActivity(viewIntent);
+                Intent intent = new Intent(context, WebViewActivity.class);
+                intent.setData(Uri.parse("https://mega.nz/cookie"));
+                startActivity(intent);
                 break;
 
             case KEY_COOKIE_SETTINGS:

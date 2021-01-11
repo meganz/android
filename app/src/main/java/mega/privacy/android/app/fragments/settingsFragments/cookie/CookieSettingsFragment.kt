@@ -48,7 +48,9 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         super.onActivityCreated(savedInstanceState)
 
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
-        viewModel.onUpdateResult().observe(viewLifecycleOwner) { showConfirmationSnackbar() }
+        viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
+            if (success) showConfirmationSnackbar()
+        }
 
         acceptCookiesPreference.onPreferenceChangeListener = this
         preferenceCookiesPreference.onPreferenceChangeListener = this
@@ -68,7 +70,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     }
 
     private fun showConfiguration(settings: Set<CookieType>?) {
-        essentialCookiesPreference.isChecked = settings?.contains(ESSENTIAL) == true
+        essentialCookiesPreference.isChecked = true
         preferenceCookiesPreference.isChecked = settings?.contains(PREFERENCE) == true
         analyticsCookiesPreference.isChecked = settings?.contains(ANALYTICS) == true
         advertisingCookiesPreference.isChecked = settings?.contains(ADVERTISEMENT) == true
