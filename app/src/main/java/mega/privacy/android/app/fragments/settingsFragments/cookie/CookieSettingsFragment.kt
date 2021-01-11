@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.settingsFragments
+package mega.privacy.android.app.fragments.settingsFragments.cookie
 
 import android.content.DialogInterface
 import android.content.Intent
@@ -12,10 +12,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.*
-import mega.privacy.android.app.fragments.settingsFragments.CookieSettingsViewModel.Cookie
-import mega.privacy.android.app.fragments.settingsFragments.CookieSettingsViewModel.Cookie.*
+import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.*
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment() {
@@ -45,7 +47,8 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel.getEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
+        viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
+        viewModel.onUpdateResult().observe(viewLifecycleOwner) { showConfirmationSnackbar() }
 
         acceptCookiesPreference.onPreferenceChangeListener = this
         preferenceCookiesPreference.onPreferenceChangeListener = this
@@ -64,7 +67,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         }
     }
 
-    private fun showConfiguration(settings: Set<Cookie>?) {
+    private fun showConfiguration(settings: Set<CookieType>?) {
         essentialCookiesPreference.isChecked = settings?.contains(ESSENTIAL) == true
         preferenceCookiesPreference.isChecked = settings?.contains(PREFERENCE) == true
         analyticsCookiesPreference.isChecked = settings?.contains(ANALYTICS) == true
@@ -93,7 +96,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             showConfirmationDialog(action)
         } else {
             action.invoke()
-            showConfirmationSnackbar()
         }
 
         return false
@@ -104,7 +106,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             .setMessage(R.string.dialog_cookie_confirmation_message)
             .setPositiveButton(android.R.string.yes) { _: DialogInterface, _: Int ->
                 action.invoke()
-                showConfirmationSnackbar()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()
@@ -128,7 +129,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     }
 
     private fun openBrowser(uri: Uri) {
-        startActivity(Intent(Intent.ACTION_VIEW).apply {
+        startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
             data = uri
         })
     }

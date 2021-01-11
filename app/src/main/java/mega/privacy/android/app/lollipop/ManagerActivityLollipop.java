@@ -141,7 +141,6 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;

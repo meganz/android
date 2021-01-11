@@ -154,6 +154,7 @@ dependencies {
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
+    implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
@@ -167,8 +168,6 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
