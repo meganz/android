@@ -87,7 +87,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
         mainLinearLayout = contentView.findViewById(R.id.contact_attachment_bottom_sheet);
         LinearLayout titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
-        LinearLayout separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
+        View separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
         items_layout = contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
@@ -108,7 +108,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         optionStartConversation.setOnClickListener(this);
         optionInvite.setOnClickListener(this);
 
-        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
+        View separatorInfo = contentView.findViewById(R.id.separator_info);
 
         if (isScreenInPortrait(context)) {
             titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));

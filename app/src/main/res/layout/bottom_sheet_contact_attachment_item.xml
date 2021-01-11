@@ -6,7 +6,6 @@
     android:id="@+id/contact_attachment_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -36,8 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="16dp"
-            android:layout_toRightOf="@id/contact_attachment_relative_layout_avatar">
+            android:layout_marginLeft="16dp">
 
             <ImageView
                 android:id="@+id/contact_attachment_state_circle"
@@ -57,8 +55,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
                 app:emojiSize="14sp" />
 
             <mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -69,21 +66,20 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
                 app:emojiSize="12sp" />
 
         </RelativeLayout>
 
     </LinearLayout>
 
-    <LinearLayout
+    <View
         android:id="@+id/contact_title_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
         android:orientation="vertical"
-        android:background="@color/chat_sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012"/>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -109,11 +105,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/info_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_view_text"
@@ -123,8 +119,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_view_contacts"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -140,11 +135,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/info_ic"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_info_text"
@@ -154,16 +149,15 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_info_info_file"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
-            <LinearLayout
+            <View
                 android:id="@+id/separator_info"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/chat_sliding_panel_separator"
+                android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
             <LinearLayout
@@ -179,11 +173,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:alpha="0.54"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_chat"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_start_conversation_text"
@@ -193,8 +187,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_send_message"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -224,8 +217,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/contact_invite"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

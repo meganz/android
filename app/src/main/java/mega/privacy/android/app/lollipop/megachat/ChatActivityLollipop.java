@@ -8538,6 +8538,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
         logDebug("userhandle: " + userhandle + ", lastGreen: " + lastGreen);
+
+        if (chatRoom == null) {
+            return;
+        }
+
         if(!chatRoom.isGroup() && userhandle == chatRoom.getPeerHandle(0)){
             logDebug("Update last green");
             minutesLastGreen = lastGreen;

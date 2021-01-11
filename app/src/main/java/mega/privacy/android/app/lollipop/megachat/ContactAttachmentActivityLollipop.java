@@ -4,11 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,8 +15,6 @@ import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -67,7 +62,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
 	Toolbar tB;
-	ContactAttachmentActivityLollipop contactAttachmentActivityLollipop = this;
 	public String selectedEmail;
 
 	RelativeLayout container;
@@ -174,13 +168,6 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 			}
 		} else {
 			finish();
-		}
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 		}
 
 		setContentView(R.layout.activity_contact_attachment_chat);
