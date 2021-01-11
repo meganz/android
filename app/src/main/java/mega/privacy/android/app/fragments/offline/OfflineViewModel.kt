@@ -407,8 +407,8 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    fun saveNodeToDevice(node: MegaOffline, activityStarter: (Intent, Int) -> Unit) {
-        nodeSaver.save(node, false, activityStarter)
+    fun saveNodeToDevice(nodes: List<MegaOffline>, activityStarter: (Intent, Int) -> Unit) {
+        nodeSaver.save(nodes, false, activityStarter)
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
