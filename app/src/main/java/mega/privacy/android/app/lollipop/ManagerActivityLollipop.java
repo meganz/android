@@ -119,7 +119,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -159,6 +163,8 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUsecase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUsecase;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -341,6 +347,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+
+    @Inject
+	GetCookieSettingsUsecase getCookieSettingsUsecase;
+
+    @Inject
+	UpdateCookieSettingsUsecase updateCookieSettingsUsecase;
 
 	public int accountFragment;
 
@@ -3375,8 +3387,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (firstLogin && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
 			askForSMSVerification();
 		}
-
-//		showCookieDialog();
 	}
 
 	/**
@@ -3585,12 +3595,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
 				.setCancelable(false)
 				.setView(R.layout.dialog_cookie)
-				.setPositiveButton(R.string.dialog_cookie_accept, (positiveDialog, which) -> {
-					// do something
-				})
-				.setNegativeButton(R.string.dialog_cookie_settings, (negativeDialog, which) -> {
-					startActivity(new Intent(ManagerActivityLollipop.this, CookiePreferencesActivity.class));
-				})
+				.setPositiveButton(R.string.dialog_cookie_accept, (positiveDialog, which) ->
+						updateCookieSettingsUsecase.acceptAll()
+								.subscribeOn(Schedulers.io())
+								.observeOn(AndroidSchedulers.mainThread())
+								.subscribe()
+				)
+				.setNegativeButton(R.string.dialog_cookie_settings, (negativeDialog, which) ->
+						startActivity(new Intent(ManagerActivityLollipop.this, CookiePreferencesActivity.class))
+				)
 				.create();
 
 		dialog.show();
@@ -4774,7 +4787,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		checkBeforeShowSMSVerificationDialog();
 
 		if (MegaApplication.isCookieBannerEnabled()) {
-			showCookieDialog();
+			getCookieSettingsUsecase.shouldShowDialog()
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((showDialog, throwable) -> {
+						if (showDialog) showCookieDialog();
+					});
 		}
 
         psaViewModel.checkPsa();

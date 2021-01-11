@@ -11,10 +11,6 @@ class GetCookieSettingsUsecase @Inject constructor(
     private val megaApi: MegaApiAndroid
 ) {
 
-    companion object {
-        private const val TAG = "GetCookieSettingsUsecase"
-    }
-
     fun run(): Single<Set<CookieType>> =
         Single.create { emitter ->
             val listener = object : MegaRequestListenerInterface {
@@ -47,7 +43,7 @@ class GetCookieSettingsUsecase @Inject constructor(
 
                         emitter.onSuccess(result)
                     } else {
-                        emitter.onError(RuntimeException("$TAG: ${error.errorString}"))
+                        emitter.onError(RuntimeException("${error.errorCode}: ${error.errorString}"))
                     }
                 }
 
@@ -57,7 +53,7 @@ class GetCookieSettingsUsecase @Inject constructor(
                     error: MegaError
                 ) {
                     megaApi.removeRequestListener(this)
-                    emitter.onError(RuntimeException("$TAG: ${error.errorString}"))
+                    emitter.onError(RuntimeException("${error.errorCode}: ${error.errorString}"))
                 }
             }
 
@@ -67,4 +63,8 @@ class GetCookieSettingsUsecase @Inject constructor(
                 megaApi.removeRequestListener(listener)
             })
         }
+
+    fun shouldShowDialog(): Single<Boolean> =
+        run().map { it.isNullOrEmpty() }
+            .onErrorReturn { true }
 }

@@ -11,10 +11,6 @@ class UpdateCookieSettingsUsecase @Inject constructor(
     private val megaApi: MegaApiAndroid
 ) {
 
-    companion object {
-        private const val TAG = "UpdateCookieSettingsUsecase"
-    }
-
     fun run(cookies: Set<CookieType>?): Completable =
         Completable.create { emitter ->
             if (cookies.isNullOrEmpty()) {
@@ -43,7 +39,7 @@ class UpdateCookieSettingsUsecase @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         emitter.onComplete()
                     } else {
-                        emitter.onError(RuntimeException("$TAG: ${error.errorString}"))
+                        emitter.onError(RuntimeException("${error.errorCode}: ${error.errorString}"))
                     }
                 }
 
@@ -53,7 +49,7 @@ class UpdateCookieSettingsUsecase @Inject constructor(
                     error: MegaError
                 ) {
                     megaApi.removeRequestListener(this)
-                    emitter.onError(RuntimeException("$TAG: ${error.errorString}"))
+                    emitter.onError(RuntimeException("${error.errorCode}: ${error.errorString}"))
                 }
             }
 
@@ -72,4 +68,7 @@ class UpdateCookieSettingsUsecase @Inject constructor(
                 megaApi.removeRequestListener(listener)
             })
         }
+
+    fun acceptAll(): Completable =
+        run(CookieType.values().toMutableSet())
 }
