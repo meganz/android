@@ -195,6 +195,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             case MegaEvent.EVENT_MISC_FLAGS_READY:
                 megaApplication.setCookieBannerEnabled(api.isCookieBannerEnabled());
+                megaApplication.checkEnabledCookies();
 
                 break;
         }

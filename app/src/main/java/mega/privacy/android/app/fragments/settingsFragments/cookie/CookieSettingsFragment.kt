@@ -11,6 +11,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.TwoButtonsPreference
@@ -53,7 +54,10 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     private fun setupObservers() {
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
-            if (success) showConfirmationSnackbar()
+            if (success) {
+                showConfirmationSnackbar()
+                (context?.applicationContext as MegaApplication?)?.checkEnabledCookies()
+            }
         }
     }
 
