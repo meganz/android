@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
@@ -166,13 +167,15 @@ class HomepageFragment : Fragment() {
             showOfflineMode()
         }
 
-        viewModel.updateBannersIfNeeded()
+        Log.i("Alex", "onResume")
+        viewModel.getBanners()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
         tabsChildren.clear()
+        Log.i("Alex", "onDestroyView")
         requireContext().unregisterReceiver(networkReceiver)
     }
 
@@ -440,7 +443,12 @@ class HomepageFragment : Fragment() {
     private fun setBottomSheetPeekHeight() {
         rootView.viewTreeObserver?.addOnPreDrawListener (object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
-                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
+                if (bannerViewPager.data.isNotEmpty()) {
+                    bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+                } else {
+                    bottomSheetBehavior.peekHeight = rootView.height - category.bottom
+                }
+
                 if (bottomSheetBehavior.peekHeight > 0) {
                     rootView.viewTreeObserver?.removeOnPreDrawListener(this)
                 }

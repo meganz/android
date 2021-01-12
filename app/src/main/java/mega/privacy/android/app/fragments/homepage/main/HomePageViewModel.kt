@@ -18,8 +18,6 @@ import nz.mega.sdk.MegaRequest
 class HomePageViewModel @ViewModelInject constructor(
     private val repository: HomepageRepository
 ) : ViewModel() {
-    private var lastGetBannerTime = 0L
-    private val getBannerThreshold = 6 * TimeUtils.HOUR
 
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
@@ -111,16 +109,10 @@ class HomePageViewModel @ViewModelInject constructor(
     fun isRootNodeNull() = repository.isRootNodeNull()
 
     /**
-     * Retrieve the latest banner list from the server.
-     * The time threshold is set to 6 hours for preventing too frequent
-     * API requests
+     * Get banner list from the server or from memory cache
      */
-    fun updateBannersIfNeeded() {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastGetBannerTime > getBannerThreshold) {
-            lastGetBannerTime = currentTime
-            viewModelScope.launch { repository.loadBannerList() }
-        }
+    fun getBanners() {
+        viewModelScope.launch { repository.loadBannerList() }
     }
 
     /**
