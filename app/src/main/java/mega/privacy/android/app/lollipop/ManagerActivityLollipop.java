@@ -1618,15 +1618,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch(requestCode){
-			case REQUEST_READ_CONTACTS:{
-				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-					if (checkPermission(Manifest.permission.READ_CONTACTS)){
-						Intent phoneContactIntent = new Intent(this, PhoneContactsActivityLollipop.class);
-						this.startActivity(phoneContactIntent);
-					}
-				}
-				break;
-			}
 			case REQUEST_UPLOAD_CONTACT:{
 				uploadContactInfo(infoManager, parentNodeManager);
 				break;
