@@ -277,6 +277,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         node = megaApi.getNodeByHandle(handle)
 
         if (node.isExported) {
+            invalidateOptionsMenu()
             linkWithoutKey = getLinkWithoutKey(node.publicLink)
             key = getKeyLink(node.publicLink)
         }
@@ -413,7 +414,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_get_link, menu)
 
-        val visible = visibleFragment == GET_LINK_FRAGMENT
+        val visible = node.isExported && visibleFragment == GET_LINK_FRAGMENT
 
         menu?.findItem(R.id.action_share)?.isVisible = visible
         menu?.findItem(R.id.action_chat)?.isVisible = visible

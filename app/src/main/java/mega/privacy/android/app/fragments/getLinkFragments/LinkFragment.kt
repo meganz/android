@@ -41,6 +41,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         private const val ALPHA_VIEW_ENABLED = 1.0f
         private const val INVALID_EXPIRATION_TIME = -1L
         private const val THUMBNAIL_CORNER = 4F
+        private const val LAST_MINUTE = "2359"
     }
 
     private lateinit var binding: FragmentGetLinkBinding
@@ -49,7 +50,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     private lateinit var linkWithoutKey: String
     private lateinit var key: String
 
-    private var isPro: Boolean = false
+    private var isPro = false
     private lateinit var node: MegaNode
 
     private lateinit var nC: NodeController
@@ -460,7 +461,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         val date = cal.time
         val dfTimestamp = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        val dateString = dfTimestamp.format(date) + "2359"
+        val dateString = dfTimestamp.format(date) + LAST_MINUTE
         val timestamp = calculateTimestamp(dateString).toInt()
 
         nC.exportLinkTimestamp(node, timestamp)

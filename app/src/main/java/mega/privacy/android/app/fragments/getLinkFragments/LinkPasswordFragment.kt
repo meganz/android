@@ -25,7 +25,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
 
     private lateinit var binding: FragmentSetLinkPasswordBinding
 
-    private var isPasswordValid: Boolean = false
+    private var isPasswordValid = false
 
     private lateinit var veryWeakShape: Drawable
     private lateinit var weakShape: Drawable
