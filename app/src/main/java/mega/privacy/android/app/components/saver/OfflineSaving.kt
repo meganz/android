@@ -10,13 +10,15 @@ import mega.privacy.android.app.utils.MegaApiUtils
 class OfflineSaving(
     totalSize: Long,
     highPriority: Boolean,
-    val node: MegaOffline
+    val nodes: List<MegaOffline>
 ) : Saving(totalSize, highPriority) {
 
     override fun hasUnsupportedFile(context: Context): Boolean {
-        return if (node.isFolder) {
-            false
-        } else {
+        for (node in nodes) {
+            if (node.isFolder) {
+                continue
+            }
+
             unsupportedFileName = node.name
             val checkIntent = Intent(Intent.ACTION_GET_CONTENT)
             checkIntent.type = MimeTypeList.typeForName(node.name).type
@@ -27,5 +29,7 @@ class OfflineSaving(
                 true
             }
         }
+
+        return false
     }
 }

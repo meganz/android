@@ -442,6 +442,17 @@ public class FileUtil {
         return file != null && file.exists();
     }
 
+    /**
+     * Checks if the file already exists in targetPath.
+     *
+     * @param file       File to check.
+     * @param targetPath Path where the file is checked for.
+     */
+    public static boolean fileExistsInTargetPath(File file, String targetPath) {
+        File destFile = new File(targetPath, file.getName());
+        return destFile.exists() && destFile.length() == file.length();
+    }
+
     public static boolean isFileDownloadedLatest(File downloadedFile, MegaNode node) {
         return downloadedFile.lastModified() - node.getModificationTime() * 1000 >= 0;
     }
