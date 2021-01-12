@@ -79,23 +79,6 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                 }
                 break;
             }
-            case R.id.main_fab_chat: {
-                logDebug("Main FAB chat click!");
-                ((ManagerActivityLollipop)context).animateFABCollection();
-                break;
-            }
-            case R.id.first_fab_chat: {
-                logDebug("Create new chat");
-                break;
-            }
-            case R.id.second_fab_chat: {
-                logDebug("Second FAB chat click");
-                break;
-            }
-            case R.id.third_fab_chat: {
-                logDebug("Third FAB chat click");
-                break;
-            }
         }
     }
 }

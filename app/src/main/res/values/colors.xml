@@ -50,7 +50,7 @@
 
     <color name="transparent_white">#CCFFFFFF</color>
 
-    <color name="orange">#FFFFBB33</color>
+<!--    <color name="orange">#FFFFBB33</color>-->
     <color name="blue">#FF33B5E5</color>
     <color name="upgrade_grey">#8d8d8d</color>
     <color name="filter_icon">#8d8d94</color>

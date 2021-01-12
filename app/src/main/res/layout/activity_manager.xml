@@ -168,68 +168,6 @@
             android:visibility="gone" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/fab_collection_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent_white"
-        android:fitsSystemWindows="true"
-        android:gravity="bottom|end"
-        android:visibility="gone">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/third_fab_chat"
-            android:layout_width="@dimen/fab_button_diameter"
-            android:layout_height="@dimen/fab_button_diameter"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="200dp"
-            android:src="@drawable/ic_add_white"
-            android:visibility="invisible"
-            app:backgroundTint="@color/orange"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/second_fab_chat"
-            android:layout_width="@dimen/fab_button_diameter"
-            android:layout_height="@dimen/fab_button_diameter"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="140dp"
-            android:src="@drawable/ic_add_white"
-            android:visibility="invisible"
-            app:backgroundTint="@color/orange"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/first_fab_chat"
-            android:layout_width="@dimen/fab_button_diameter"
-            android:layout_height="@dimen/fab_button_diameter"
-            android:layout_gravity="bottom|end"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="80dp"
-            android:src="@drawable/ic_add_white"
-            android:tint="@color/white"
-            android:visibility="invisible"
-            app:backgroundTint="@color/accentColor"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/main_fab_chat"
-            android:layout_width="@dimen/fab_button_diameter"
-            android:layout_height="@dimen/fab_button_diameter"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_add_white"
-            app:backgroundTint="@color/accentColor"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"

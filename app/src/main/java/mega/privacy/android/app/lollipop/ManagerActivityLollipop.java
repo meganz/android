@@ -392,16 +392,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	private BadgeDrawerArrowDrawable badgeDrawable;
 
-	//COLLECTION FAB BUTTONS
-	CoordinatorLayout fabButtonsLayout;
-	FloatingActionButton mainFabButtonChat;
-	FloatingActionButton firstFabButtonChat;
-	FloatingActionButton secondFabButtonChat;
-	FloatingActionButton thirdFabButtonChat;
-	private Animation openFabAnim,closeFabAnim,rotateLeftAnim,rotateRightAnim, collectionFABLayoutOut;
-	boolean isFabOpen=false;
-	//
-
 	MegaPreferences prefs = null;
 	ChatSettings chatSettings = null;
 	MegaAttributes attr = null;
@@ -2371,61 +2361,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		//FAB buttonaB.
 		fabButton = (FloatingActionButton) findViewById(R.id.floating_button);
 		fabButton.setOnClickListener(new FabButtonListener(this));
-
-		//Collection of FAB for CHAT
-		fabButtonsLayout = (CoordinatorLayout) findViewById(R.id.fab_collection_layout);
-		mainFabButtonChat = (FloatingActionButton) findViewById(R.id.main_fab_chat);
-		mainFabButtonChat.setOnClickListener(new FabButtonListener(this));
-		firstFabButtonChat = (FloatingActionButton) findViewById(R.id.first_fab_chat);
-		firstFabButtonChat.setOnClickListener(new FabButtonListener(this));
-		secondFabButtonChat = (FloatingActionButton) findViewById(R.id.second_fab_chat);
-		secondFabButtonChat.setOnClickListener(new FabButtonListener(this));
-		thirdFabButtonChat = (FloatingActionButton) findViewById(R.id.third_fab_chat);
-		thirdFabButtonChat.setOnClickListener(new FabButtonListener(this));
-
-		collectionFABLayoutOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.collection_fab_layout_out);
-		collectionFABLayoutOut.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				logDebug("onAnimationEnd");
-				fabButtonsLayout.setVisibility(View.GONE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-		});
-		openFabAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.open_fab);
-		closeFabAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.close_fab);
-		closeFabAnim.setAnimationListener(new Animation.AnimationListener() {
-			@Override
-			public void onAnimationStart(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				logDebug("onAnimationEnd");
-//				mainFabButtonChat.setVisibility(View.GONE);
-//				fabButtonsLayout.startAnimation(collectionFABLayoutOut);
-				fabButtonsLayout.setVisibility(View.GONE);
-				fabButton.show();
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-		});
-
-		rotateRightAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_right);
-		rotateLeftAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_left);
 
 		//PRO PANEL
 		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
@@ -14715,35 +14650,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void updateMailNavigationView(String email){
 		logDebug("updateMailNavigationView");
 		nVEmail.setText(megaApi.getMyEmail());
-	}
-
-	public void animateFABCollection(){
-		logDebug("animateFABCollection");
-
-		if(isFabOpen){
-			mainFabButtonChat.startAnimation(rotateLeftAnim);
-			firstFabButtonChat.startAnimation(closeFabAnim);
-			secondFabButtonChat.startAnimation(closeFabAnim);
-			thirdFabButtonChat.startAnimation(closeFabAnim);
-			firstFabButtonChat.setClickable(false);
-			secondFabButtonChat.setClickable(false);
-			thirdFabButtonChat.setClickable(false);
-			isFabOpen = false;
-			logDebug("Close COLLECTION FAB");
-
-		} else {
-			mainFabButtonChat.startAnimation(rotateRightAnim);
-			firstFabButtonChat.startAnimation(openFabAnim);
-			secondFabButtonChat.startAnimation(openFabAnim);
-			thirdFabButtonChat.startAnimation(openFabAnim);
-			firstFabButtonChat.setClickable(true);
-			secondFabButtonChat.setClickable(true);
-			thirdFabButtonChat.setClickable(true);
-			isFabOpen = true;
-			hideFabButton();
-			fabButtonsLayout.setVisibility(View.VISIBLE);
-			logDebug("Open COLLECTION FAB");
-		}
 	}
 
 	public void hideFabButton(){
