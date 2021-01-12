@@ -4774,7 +4774,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param psa the PSA to show
 	 */
     private void showPsa(Psa psa) {
-        if (psa == null || drawerItem != DrawerItem.HOMEPAGE) {
+        if (psa == null || drawerItem != DrawerItem.HOMEPAGE
+				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
         	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
         	adjustNavHostViewHeight(true);
             return;
@@ -5691,8 +5692,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
 
-    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE);
-    	adjustNavHostViewHeight(true);
+		updatePsaViewVisibility();
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
@@ -5772,6 +5772,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (destinationId == R.id.homepageFragment) {
 				mHomepageScreen = HomepageScreen.HOMEPAGE;
+				updatePsaViewVisibility();
 				// Showing the bottom navigation view immediately because the initial dimension
 				// of Homepage bottom sheet is calculated based on it
 				showBNVImmediate();
@@ -5792,6 +5793,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 			} else if (destinationId == R.id.offline_file_info) {
 				mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+				updatePsaViewVisibility();
 				abL.setVisibility(View.GONE);
 				showHideBottomNavigationView(true);
 				return;
@@ -5799,6 +5801,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
 			supportInvalidateOptionsMenu();
@@ -7985,6 +7988,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			transfersWidgetLayout.setLayoutParams(params);
         }
     }
+
+    /**
+	 * Update the PSA view visibility. It should only visible in root homepage tab.
+	 */
+    private void updatePsaViewVisibility() {
+		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
+				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
+		adjustNavHostViewHeight(true);
+	}
 
     /**
 	 * Adjust the height of NavHostView according to the visibility of the PSA view.
