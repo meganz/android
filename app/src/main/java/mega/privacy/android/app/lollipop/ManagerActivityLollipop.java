@@ -3601,7 +3601,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 								.subscribe()
 				)
 				.setNegativeButton(R.string.dialog_cookie_alert_settings, (negativeDialog, which) ->
-						startActivity(new Intent(ManagerActivityLollipop.this, CookiePreferencesActivity.class))
+						startActivity(new Intent(this, CookiePreferencesActivity.class))
 				)
 				.create();
 

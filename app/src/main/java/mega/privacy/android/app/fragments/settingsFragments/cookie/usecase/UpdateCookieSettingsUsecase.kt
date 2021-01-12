@@ -54,7 +54,7 @@ class UpdateCookieSettingsUsecase @Inject constructor(
             }
 
             val bitSet = BitSet(CookieType.values().size).apply {
-                this[0] = true // Essential cookies are always enabled
+                this[CookieType.ESSENTIAL.value] = true // Essential cookies are always enabled
             }
 
             cookies.forEach { setting ->
