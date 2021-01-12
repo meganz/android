@@ -61,9 +61,10 @@
         <item name="actionModeBackground">?attr/colorPrimary</item>
         <item name="actionModeCloseDrawable">@drawable/action_mode_close</item>
         <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
+        <!-- we need this to tint the overflow icon (3 dots) -->
+        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
 
         <!-- Action bar only used in Action mode (overlap the tool bar), thus only need to set action mode style -->
-<!--        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>-->
 <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
 
         <item name="preferenceTheme">@style/PreferenceStyle</item>

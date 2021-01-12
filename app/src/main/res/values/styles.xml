@@ -48,8 +48,8 @@
         <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
         <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
-        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>
         <item name="elevation">0dp</item>
         <item name="android:elevation">0dp</item>
 
@@ -84,8 +84,8 @@
         <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
         <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
-        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>
 
         <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
         <!-- You can also set colorControlNormal, colorControlActivated
@@ -122,8 +122,8 @@
         <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
         <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
         <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
-        <item name="android:actionBarTheme">@style/Widget.ActionMode.ActionBar</item>
+        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
+        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>
         <item name="elevation">0dp</item>
         <item name="android:elevation">0dp</item>
 
@@ -144,10 +144,6 @@
 <!--        <item name="colorControlNormal">@color/material_on_surface_emphasis_medium</item>-->
 <!--        <item name="actionMenuTextColor">@color/material_on_surface_emphasis_medium</item>-->
 <!--    </style>-->
-
-    <style name="Widget.ActionMode.ActionBar" parent="@style/ThemeOverlay.AppCompat.DayNight">
-        <item name="colorControlNormal">?attr/colorSecondary</item>
-    </style>
 
     <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">14sp</item>
@@ -596,6 +592,10 @@
     <style name="Widget.Mega.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="colorControlNormal">?attr/colorSecondary</item>
         <item name="titleTextStyle">@style/TextAppearance.Mega.Subtitle1.AccentColor</item>
+    </style>
+
+    <style name="Widget.Mega.ActionBar" parent="@style/ThemeOverlay.AppCompat.DayNight">
+        <item name="colorControlNormal">?attr/colorSecondary</item>
     </style>
 
     <!-- Tab layout -->
