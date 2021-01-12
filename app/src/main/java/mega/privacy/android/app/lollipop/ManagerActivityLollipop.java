@@ -4774,7 +4774,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param psa the PSA to show
 	 */
     private void showPsa(Psa psa) {
-        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+        if (psa == null || drawerItem != DrawerItem.HOMEPAGE) {
+        	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
+        	adjustNavHostViewHeight(true);
             return;
         }
 
@@ -4787,6 +4789,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 
         psaViewHolder.bind(psa);
+		adjustNavHostViewHeight(true);
     }
 
     public void checkBeforeShowSMSVerificationDialog() {
@@ -5688,7 +5691,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
 
-    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
+    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE);
+    	adjustNavHostViewHeight(true);
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
@@ -7981,6 +7985,35 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			transfersWidgetLayout.setLayoutParams(params);
         }
     }
+
+    /**
+	 * Adjust the height of NavHostView according to the visibility of the PSA view.
+	 * When the PSA view is visible, the FAB within homepage should be displayed above
+	 * the PSA view, limit the height of NavHostView is an easier way to do that.
+	 *
+	 * @param needPost in some cases, e.g. go back from transfer fragment, the BNV isn't visible
+	 *                 when we call this function, so we need post this function call to the
+	 *                 next draw cycle.
+	 */
+    private void adjustNavHostViewHeight(boolean needPost) {
+    	if (drawerItem != DrawerItem.HOMEPAGE) {
+    		return;
+		}
+
+    	if (psaViewHolder.visible()) {
+    		if (fragmentLayout.getMeasuredHeight() <= 0 || psaViewHolder.psaLayoutHeight() <= 0 || needPost) {
+    			handler.post(() -> adjustNavHostViewHeight(false));
+			} else {
+				LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+				params.height = fragmentLayout.getMeasuredHeight() - psaViewHolder.psaLayoutHeight();
+				mNavHostView.setLayoutParams(params);
+			}
+		} else {
+    		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+    		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+    		mNavHostView.setLayoutParams(params);
+		}
+	}
 
 	private void closeUpgradeAccountFragment() {
 		setFirstNavigationLevel(true);
