@@ -505,7 +505,7 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity"
-            android:label="@string/dialog_cookie_settings"
+            android:label="@string/dialog_cookie_alert_settings"
             android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop" />
 

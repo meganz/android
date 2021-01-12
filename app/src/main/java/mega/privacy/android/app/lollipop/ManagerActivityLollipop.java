@@ -258,7 +258,6 @@ import nz.mega.sdk.MegaEvent;
 import nz.mega.sdk.MegaFolderInfo;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
@@ -3594,14 +3593,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private void showCookieDialog() {
 		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
 				.setCancelable(false)
-				.setView(R.layout.dialog_cookie)
-				.setPositiveButton(R.string.dialog_cookie_accept, (positiveDialog, which) ->
+				.setView(R.layout.dialog_cookie_alert)
+				.setPositiveButton(R.string.dialog_cookie_alert_accept, (positiveDialog, which) ->
 						updateCookieSettingsUsecase.acceptAll()
 								.subscribeOn(Schedulers.io())
 								.observeOn(AndroidSchedulers.mainThread())
 								.subscribe()
 				)
-				.setNegativeButton(R.string.dialog_cookie_settings, (negativeDialog, which) ->
+				.setNegativeButton(R.string.dialog_cookie_alert_settings, (negativeDialog, which) ->
 						startActivity(new Intent(ManagerActivityLollipop.this, CookiePreferencesActivity.class))
 				)
 				.create();

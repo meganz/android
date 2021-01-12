@@ -129,7 +129,7 @@
 
 		<androidx.preference.Preference
 			android:key="settings_about_cookie_policy"
-			android:title="Cookie Policy"
+			android:title="@string/settings_about_cookie_policy"
 			android:summary=""
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
@@ -137,7 +137,7 @@
 
 		<androidx.preference.Preference
 			android:key="settings_cookie"
-			android:title="Cookie Settings"
+			android:title="@string/settings_about_cookie_settings"
 			android:summary=""
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"

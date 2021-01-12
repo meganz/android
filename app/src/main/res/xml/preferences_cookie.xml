@@ -5,15 +5,15 @@
 
     <androidx.preference.SwitchPreferenceCompat
         android:key="settings_cookie_accept"
-        android:title="Accept Cookies"
+        android:title="@string/preference_cookies_accept"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cookie_accept"
         android:key="settings_cookie_essential"
-        android:summary="Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent."
-        android:title="Essential Cookies"
+        android:summary="@string/preference_cookies_essential_summary"
+        android:title="@string/preference_cookies_essential_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:defaultValue="true"
@@ -23,8 +23,8 @@
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cookie_accept"
         android:key="settings_cookie_preference"
-        android:summary="Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout."
-        android:title="Preference Cookies"
+        android:summary="@string/preference_cookies_preference_summary"
+        android:title="@string/preference_cookies_preference_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
@@ -32,8 +32,8 @@
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cookie_accept"
         android:key="settings_cookie_performance_analytics"
-        android:summary="Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements."
-        android:title="Performance and Analytics Cookies"
+        android:summary="@string/preference_cookies_performance_summary"
+        android:title="@string/preference_cookies_performance_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
@@ -41,8 +41,8 @@
     <androidx.preference.SwitchPreferenceCompat
         android:dependency="settings_cookie_accept"
         android:key="settings_cookie_advertising"
-        android:summary="Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant."
-        android:title="Advertising Cookies"
+        android:summary="@string/preference_cookies_advertising_summary"
+        android:title="@string/preference_cookies_advertising_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
@@ -51,7 +51,7 @@
         android:dependency="settings_cookie_accept"
         android:key="settings_cookie_third_party"
         android:summary="@string/preference_cookies_thirdparty_summary"
-        android:title="Third Party Cookies"
+        android:title="@string/preference_cookies_thirdparty_title"
         app:allowDividerAbove="true"
         app:allowDividerBelow="false"
         app:iconSpaceReserved="false" />

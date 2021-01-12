@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Before you continue"
+        android:text="@string/dialog_cookie_alert_title"
         android:textAppearance="?textAppearanceHeadline6"
         android:textColor="@color/primary_text" />
 
@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:linksClickable="true"
-        android:text="@string/dialog_cookie_policy"
+        android:text="@string/dialog_cookie_alert_message"
         android:textAppearance="?textAppearanceSubtitle1"
         android:textColor="@color/transparent_black2"
         android:textColorLink="@color/accentColor" />

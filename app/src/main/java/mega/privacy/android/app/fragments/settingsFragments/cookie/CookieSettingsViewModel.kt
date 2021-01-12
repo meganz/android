@@ -56,7 +56,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     }
 
     private fun getCookieSettings() {
-        getCookieSettingsUsecase.run()
+        getCookieSettingsUsecase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -72,7 +72,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     }
 
     private fun updateCookieSettings() {
-        updateCookieSettingsUsecase.run(enabledCookies.value)
+        updateCookieSettingsUsecase.update(enabledCookies.value)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

@@ -11,7 +11,7 @@ class UpdateCookieSettingsUsecase @Inject constructor(
     private val megaApi: MegaApiAndroid
 ) {
 
-    fun run(cookies: Set<CookieType>?): Completable =
+    fun update(cookies: Set<CookieType>?): Completable =
         Completable.create { emitter ->
             if (cookies.isNullOrEmpty()) {
                 emitter.onError(IllegalArgumentException("Cookies are null or empty"))
@@ -70,5 +70,5 @@ class UpdateCookieSettingsUsecase @Inject constructor(
         }
 
     fun acceptAll(): Completable =
-        run(CookieType.values().toMutableSet())
+        update(CookieType.values().toMutableSet())
 }

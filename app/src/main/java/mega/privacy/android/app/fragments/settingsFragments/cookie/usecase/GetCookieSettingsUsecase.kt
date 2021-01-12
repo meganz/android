@@ -11,7 +11,7 @@ class GetCookieSettingsUsecase @Inject constructor(
     private val megaApi: MegaApiAndroid
 ) {
 
-    fun run(): Single<Set<CookieType>> =
+    fun get(): Single<Set<CookieType>> =
         Single.create { emitter ->
             val listener = object : MegaRequestListenerInterface {
                 override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
@@ -65,6 +65,5 @@ class GetCookieSettingsUsecase @Inject constructor(
         }
 
     fun shouldShowDialog(): Single<Boolean> =
-        run().map { it.isNullOrEmpty() }
-            .onErrorReturn { true }
+        get().map { it.isNullOrEmpty() }.onErrorReturn { true }
 }

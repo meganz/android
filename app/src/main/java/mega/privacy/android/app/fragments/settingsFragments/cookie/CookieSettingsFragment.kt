@@ -46,12 +46,18 @@ class CookieSettingsFragment : SettingsBaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        setupObservers()
+        setupView()
+    }
 
+    private fun setupObservers() {
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
             if (success) showConfirmationSnackbar()
         }
+    }
 
+    private fun setupView() {
         acceptCookiesPreference.onPreferenceChangeListener = this
         preferenceCookiesPreference.onPreferenceChangeListener = this
         analyticsCookiesPreference.onPreferenceChangeListener = this
@@ -105,7 +111,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
 
     private fun showConfirmationDialog(action: () -> Unit) {
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
-            .setMessage(R.string.dialog_cookie_confirmation_message)
+            .setMessage(R.string.preference_cookies_confirmation_message)
             .setPositiveButton(android.R.string.yes) { _: DialogInterface, _: Int ->
                 action.invoke()
             }
@@ -125,7 +131,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     private fun showConfirmationSnackbar() {
         Snackbar.make(
             requireView(),
-            R.string.dialog_cookie_confirmation_saved,
+            R.string.preference_cookies_confirmation_saved,
             Snackbar.LENGTH_SHORT
         ).show()
     }

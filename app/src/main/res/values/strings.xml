@@ -2957,15 +2957,28 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 
-    <string name="dialog_cookie_policy">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
-    <string name="dialog_cookie_accept">ACCEPT COOKIES</string>
-    <string name="dialog_cookie_settings">COOKIE SETTINGS</string>
-    <string name="dialog_cookie_confirmation_message">Are you sure you want to change Cookie Settings?</string>
-    <string name="dialog_cookie_confirmation_saved">Cookie Settings changes has been saved.</string>
+    <string name="settings_about_cookie_policy">Cookie Policy</string>
+    <string name="settings_about_cookie_settings">Cookie Settings</string>
+    <string name="dialog_cookie_alert_title">Before you continue</string>
+    <string name="dialog_cookie_alert_message">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
+    <string name="dialog_cookie_alert_accept">ACCEPT COOKIES</string>
+    <string name="dialog_cookie_alert_settings">COOKIE SETTINGS</string>
     <string name="dialog_cookie_thirdparty_title">Third Party Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1">Google Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2">Category: Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept">Accept Cookies</string>
+    <string name="preference_cookies_confirmation_message">Are you sure you want to change Cookie Settings?</string>
+    <string name="preference_cookies_confirmation_saved">Cookie Settings changes has been saved.</string>
+    <string name="preference_cookies_essential_title">Essential Cookies</string>
+    <string name="preference_cookies_essential_summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
+    <string name="preference_cookies_preference_title">Preference Cookies</string>
+    <string name="preference_cookies_preference_summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
+    <string name="preference_cookies_performance_title">Performance and Analytics Cookies</string>
+    <string name="preference_cookies_performance_summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
+    <string name="preference_cookies_advertising_title">Advertising Cookies</string>
+    <string name="preference_cookies_advertising_summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
+    <string name="preference_cookies_thirdparty_title">Third Party Cookies</string>
     <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
     <string name="preference_cookies_policies_privacy">"Privacy Policy"</string>
     <string name="preference_cookies_policies_cookie">"Cookie Policy"</string>
