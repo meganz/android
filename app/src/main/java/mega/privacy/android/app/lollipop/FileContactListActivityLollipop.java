@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -337,8 +335,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 		handler = new Handler();
 
-		getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
-		
 		listContacts = new ArrayList<MegaShare>();
 		
 		Display display = getWindowManager().getDefaultDisplay();

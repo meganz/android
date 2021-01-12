@@ -6623,9 +6623,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers);
 		retryTransfers = menu.findItem(R.id.action_menu_retry_transfers);
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
-		playTransfersMenuIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_play_white, R.color.black));
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
-		pauseTransfersMenuIcon.setIcon(mutateIconSecondary(this, R.drawable.ic_pause_white, R.color.black));
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		takePicture = menu.findItem(R.id.action_take_picture);
 		searchByDate = menu.findItem(R.id.action_search_by_date);

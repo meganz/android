@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/file_contact_list_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -28,9 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter"
-                rounded:border_color="@color/border_file_properties"
-                rounded:border_width="0dp"
-                rounded:corner_radius="20dp" />
+                app:corner_radius="20dp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -46,31 +43,28 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                rounded:emojiSize="14sp"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:emojiSize="14sp"/>
 
             <TextView
                 android:id="@+id/file_contact_list_contact_mail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/file_contact_list_contact_name_text"
-                android:textSize="14sp"
                 android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="middle"/>
 
         </RelativeLayout>
     </LinearLayout>
 
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/sliding_panel_separator"/>
+        android:background="@color/grey_012_white_012"/>
 
     <LinearLayout
         android:id="@+id/items_layout"
@@ -91,12 +85,12 @@
                 style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.54"
                 android:paddingBottom="2dp"
                 android:layout_marginLeft="5dp"
                 android:paddingTop="2dp"
                 android:src="@drawable/info_ic"
-                android:visibility="visible" />
+                android:visibility="visible"
+                app:tint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/file_contact_list_option_info_text"
@@ -106,17 +100,16 @@
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
                 android:text="@string/contact_properties_activity"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
 
-        <LinearLayout
+        <View
             android:id="@+id/separator_info"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
             android:orientation="vertical"
-            android:background="@color/sliding_panel_separator"/>
+            android:background="@color/grey_012_white_012"/>
 
         <LinearLayout
             android:id="@+id/file_contact_list_option_permissions_layout"
@@ -130,12 +123,12 @@
                 style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:alpha="0.54"
                 android:layout_marginLeft="5dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 android:src="@drawable/ic_change_permissions"
-                android:visibility="visible" />
+                android:visibility="visible"
+                app:tint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/file_contacts_list_option_permissions_text"
@@ -145,15 +138,14 @@
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
                 android:text="@string/file_properties_shared_folder_change_permissions"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
 
-        <LinearLayout
+        <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginLeft="72dp"
-            android:background="@color/sliding_panel_separator"/>
+            android:background="@color/grey_012_white_012"/>
 
         <LinearLayout
             android:id="@+id/file_contact_list_option_delete_layout"
@@ -170,7 +162,7 @@
                 android:layout_marginLeft="5dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:tint="@color/dark_primary_color"
+                app:tint="@color/red_600_red_300"
                 android:src="@drawable/ic_remove"
                 android:visibility="visible" />
 
@@ -182,8 +174,7 @@
                 android:paddingTop="2dp"
                 android:layout_marginLeft="18dp"
                 android:text="@string/context_remove"
-                android:textColor="@color/dark_primary_color"
-                android:textSize="16sp"/>
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

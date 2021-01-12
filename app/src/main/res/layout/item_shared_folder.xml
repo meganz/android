@@ -19,8 +19,6 @@
             android:layout_height="fill_parent"
             android:scaleType="fitCenter"
             android:layout_centerInParent="true"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
     </RelativeLayout>
 
@@ -63,8 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="13dp"
-            android:textColor="@color/file_list_first_row"
-            android:textSize="16sp"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
             rounded:emojiSize="14sp"
             android:singleLine="true"
             android:maxLines="1"/>
@@ -90,10 +87,9 @@
         android:layout_below="@id/shared_folder_contact_name_layout"
         android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
         android:layout_marginLeft="13dp"
-        android:textSize="14sp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/file_list_second_row" />
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
 </RelativeLayout>
 

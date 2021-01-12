@@ -155,8 +155,7 @@
             android:name="mega.privacy.android.app.lollipop.FileContactListActivityLollipop"
             android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar.InfoScreens">
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity

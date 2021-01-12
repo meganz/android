@@ -85,7 +85,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         titleNameContactPanel.setMaxWidthEmojis(scaleWidthPx(200, outMetrics));
         titleMailContactPanel.setMaxWidth(scaleWidthPx(200, outMetrics));
 
-        LinearLayout separatorInfo = contentView.findViewById(R.id.separator_info);
+        View separatorInfo = contentView.findViewById(R.id.separator_info);
 
         String fullName = contact != null ? getMegaUserNameDB(contact) : nonContactEmail;
 
