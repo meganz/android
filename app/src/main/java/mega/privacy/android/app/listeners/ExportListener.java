@@ -4,14 +4,19 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import android.content.Intent;
+
+import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.interfaces.GetLinkInterface;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaError.*;
 import static nz.mega.sdk.MegaRequest.*;
 
@@ -26,6 +31,10 @@ public class ExportListener extends BaseListener {
     private int numberExport;
     private int pendingExport;
     private StringBuilder exportedLinks;
+
+    public ExportListener(Context context) {
+        super(context);
+    }
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -120,9 +129,17 @@ public class ExportListener extends BaseListener {
         if (e.getErrorCode() == MegaError.API_OK && request.getLink() != null) {
             if (shareIntent != null) {
                 startShareIntent(context, shareIntent, request.getLink());
+            } else if (context instanceof GetLinkActivity) {
+                ((GetLinkActivity) context).setLink();
             }
         } else {
             logError("Error exporting node: " + e.getErrorString());
+
+            if (context instanceof GetLinkActivity
+                    && e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
+                ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
+                        context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
+            }
         }
     }
 }
