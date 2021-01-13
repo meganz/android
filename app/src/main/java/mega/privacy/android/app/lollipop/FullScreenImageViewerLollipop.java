@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -61,7 +62,7 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
+import mega.privacy.android.app.components.saver.OfflineNodeSaver;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -149,6 +150,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	int positionToRemove = -1;
 
 	NodeController nC;
+	private OfflineNodeSaver offlineNodeSaver;
 	boolean isFileLink;
 
 	private MegaFullScreenImageAdapterLollipop adapterMega;
@@ -325,8 +327,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			downloadIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			downloadIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			renameIcon.setVisible(false);
 			moveIcon.setVisible(false);
@@ -776,9 +778,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			}
 			case R.id.full_image_viewer_download: {
 
-				if (adapterType == OFFLINE_ADAPTER){
+				if (adapterType == OFFLINE_ADAPTER) {
+					if (offlineNodeSaver == null) {
+						offlineNodeSaver = new OfflineNodeSaver(this, dbH);
+					}
+					offlineNodeSaver.save(Collections.singletonList(mOffListImages.get(positionG)), false, (intent, code) -> {
+						startActivityForResult(intent, code);
+						return Unit.INSTANCE;
+					});
 					break;
-
 				}else if (adapterType == ZIP_ADAPTER){
 					break;
 
@@ -1957,6 +1965,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		logDebug("onActivityResult");
 
 		if (intent == null) {
+			return;
+		}
+
+		if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 
