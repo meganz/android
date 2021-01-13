@@ -95,6 +95,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static android.media.AudioManager.STREAM_RING;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -189,6 +190,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean wasLocalVideoEnable = false;
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
+	public static boolean isSpeakerOn = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -618,6 +620,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				return;
 
 			if (intent.getAction().equals(VOLUME_CHANGED_ACTION) && rtcAudioManagerRingInCall != null) {
+				int type = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_TYPE);
+				if(type != STREAM_RING)
+					return;
+
 				int newVolume = (Integer) intent.getExtras().get(EXTRA_VOLUME_STREAM_VALUE);
 				if (newVolume != INVALID_VOLUME) {
 					rtcAudioManagerRingInCall.checkVolume(newVolume);
@@ -625,6 +631,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		}
 	};
+
+	public boolean isAnIncomingCallRinging() {
+		return rtcAudioManagerRingInCall != null;
+	}
 
 	BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
 		@Override
@@ -1594,6 +1604,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
 				filterScreen.addAction(Intent.ACTION_USER_PRESENT);
 				registerReceiver(screenOnOffReceiver, filterScreen);
+
 				registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
 				registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
@@ -1613,7 +1624,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     /**
      * Remove the incoming call AppRTCAudioManager.
      */
-    private void removeRTCAudioManagerRingIn() {
+    public void removeRTCAudioManagerRingIn() {
         if (rtcAudioManagerRingInCall == null)
             return;
 

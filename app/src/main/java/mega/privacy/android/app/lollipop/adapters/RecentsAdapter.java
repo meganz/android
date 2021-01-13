@@ -341,8 +341,9 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
 
     @Override
     public int getItemViewType(int pos) {
-        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size())
-            return super.getItemViewType(pos);
+        if (recentsItems == null || recentsItems.isEmpty()
+                || pos < 0 || pos >= recentsItems.size())
+            return INVALID_VIEW_TYPE;
 
         return recentsItems.get(pos).getViewType();
     }

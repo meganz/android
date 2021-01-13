@@ -64,8 +64,8 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -1161,7 +1161,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
             case R.id.lost_authentication_device: {
                 try {
                     String url = "https://mega.nz/recovery";
-                    Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(this, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);

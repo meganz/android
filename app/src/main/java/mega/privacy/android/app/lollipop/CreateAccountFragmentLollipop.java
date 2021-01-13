@@ -35,6 +35,7 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -443,7 +444,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				startActivity(browserIntent);
                 try {
                     String url = "https://mega.nz/terms";
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
@@ -458,7 +459,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.top:
                 logDebug("Show terms of password");
                 try {
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(openTermsIntent);

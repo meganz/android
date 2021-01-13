@@ -39,6 +39,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -618,6 +619,11 @@ public class BaseActivity extends AppCompatActivity {
             }
             case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
                 snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
+                snackbar.show();
+                break;
+
+            case PERMISSIONS_TYPE:
+                snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
                 snackbar.show();
                 break;
         }
