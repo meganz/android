@@ -55,7 +55,7 @@
             android:id="@+id/relative_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/transparent_black"
+            android:background="@color/grey_alpha_050"
             android:layout_below="@+id/exo_progress"
             android:paddingTop="8dp">
 

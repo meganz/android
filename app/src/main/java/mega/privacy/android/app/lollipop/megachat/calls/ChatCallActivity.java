@@ -1210,7 +1210,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         if (reconnectingLayout.isShown() && !reconnectingText.getText().equals(getString(R.string.connected_message)))
             return;
 
-        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.ambar_700));
+        reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.amber_700));
         reconnectingText.setText(getString(R.string.reconnecting_message));
         reconnectingLayout.setVisibility(View.VISIBLE);
         reconnectingLayout.setAlpha(1);
@@ -2901,7 +2901,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         if (participantsWithPoorConnection == totalParticipants) {
             if (reconnectingLayout.getVisibility() != View.VISIBLE) {
-                reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.ambar_700));
+                reconnectingLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.amber_700));
                 reconnectingText.setText(getString(R.string.poor_internet_connection_message));
                 reconnectingLayout.setVisibility(View.VISIBLE);
                 reconnectingLayout.setAlpha(1);

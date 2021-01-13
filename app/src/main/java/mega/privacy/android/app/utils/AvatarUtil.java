@@ -166,7 +166,7 @@ public class AvatarUtil {
             case AVATAR_PHONE_COLOR:
                 return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.color_default_avatar_phone);
             default:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.lollipop_primary_color);
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.red_600_red_300);
         }
     }
 

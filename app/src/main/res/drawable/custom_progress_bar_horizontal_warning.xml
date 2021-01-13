@@ -28,8 +28,8 @@
 		<clip>
 			<shape>
 				<gradient
-					android:startColor="@color/used_space_warning"
-					android:endColor="@color/used_space_warning"
+					android:startColor="@color/amber_600"
+					android:endColor="@color/amber_600"
 					android:angle="90" />
 			</shape>
 		</clip>

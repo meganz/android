@@ -293,7 +293,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
 					((ViewHolderNormalChatList)holder).textViewDate.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
-					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+					((ViewHolderNormalChatList)holder).textViewContactName.setTextColor(ContextCompat.getColor(context, R.color.black));
 				}
 			}
 			else{
@@ -1904,7 +1904,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("Message type TYPE_CONTAINS_META:CONTAINS_META_GEOLOCATION");
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.VISIBLE);
 					((ViewHolderNormalChatList)holder).voiceClipOrLocationText.setText(R.string.title_geolocation_message);
-					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.file_list_first_row));
+					((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.black));
 					((ViewHolderNormalChatList)holder).textViewContent.setText("");
 					if(lastMsgSender==megaChatApi.getMyUserHandle()){
 
@@ -1975,7 +1975,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						logDebug("The last message is mine: " + lastMsgSender);
 						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						if(lastMessageString!=null) {
 							Spannable myMessage = new SpannableString(lastMessageString);
@@ -2064,7 +2064,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					if (lastMsgSender == megaChatApi.getMyUserHandle()) {
 						Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						Spannable myMessage = new SpannableString(giphyTitle);
 						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2110,7 +2110,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 						logDebug("The last message is mine: " + lastMsgSender);
 						Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 						Spannable myMessage = new SpannableString(invalidMetaMessage);
 						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2184,7 +2184,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
 					Spannable me = new SpannableString(context.getString(R.string.word_me) + " ");
-					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_second_row)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					CharSequence indexedText = TextUtils.concat(me, myMessage);
@@ -2258,7 +2258,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 					logDebug("The last message is mine: " + lastMsgSender);
 					Spannable me = new SpannableString(context.getString(R.string.word_me)+" ");
-					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.file_list_first_row)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					me.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, me.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
 					if(lastMessageString!=null) {
 						Spannable myMessage = new SpannableString(lastMessageString);

@@ -524,7 +524,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.fileGridIconForFile.setVisibility(View.GONE);
                 holder.imageViewThumb.setVisibility(View.VISIBLE);
                 holder.imageViewThumb.setImageBitmap(thumb);
-                holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
+                holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.grey_010));
 
             } else {
                 temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
@@ -534,7 +534,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
-                    holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
+                    holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.grey_010));
 
                 } else {
                     try {
@@ -548,7 +548,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                         holder.imageViewIcon.setVisibility(View.GONE);
                         holder.imageViewThumb.setVisibility(View.VISIBLE);
                         holder.imageViewThumb.setImageBitmap(thumb);
-                        holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
+                        holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.grey_010));
                     }
                 }
             }
@@ -561,7 +561,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 holder.fileGridIconForFile.setVisibility(View.GONE);
                 holder.imageViewThumb.setVisibility(View.VISIBLE);
                 holder.imageViewThumb.setImageBitmap(thumb);
-                holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
+                holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.grey_010));
             } else {
                 temp = ThumbnailUtils.getThumbnailFromFolder(node,context);
 
@@ -570,7 +570,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                     holder.fileGridIconForFile.setVisibility(View.GONE);
                     holder.imageViewThumb.setVisibility(View.VISIBLE);
                     holder.imageViewThumb.setImageBitmap(thumb);
-                    holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.new_background_fragment));
+                    holder.thumbLayoutForFile.setBackgroundColor(ContextCompat.getColor(context,R.color.grey_010));
                 } else {
                     try {
                         ThumbnailUtilsLollipop.createThumbnailGrid(context,node,holder,megaApi,this);

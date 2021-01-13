@@ -42,7 +42,7 @@
         android:layout_toRightOf="@id/referral_bonus_relative_layout_avatar"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="13dp"
-        android:textColor="@color/file_list_first_row"
+        android:textColor="@color/black"
         android:maxLines="1"
         android:singleLine="true"
         android:ellipsize="end"

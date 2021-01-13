@@ -43,7 +43,7 @@
         android:layout_marginLeft="13dp"
         android:textSize="16sp"
         android:maxLines="1"
-        android:textColor="@color/file_list_first_row" />
+        android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/contact_request_list_content"

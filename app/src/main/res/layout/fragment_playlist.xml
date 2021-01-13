@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:layout_alignParentTop="true"
-            android:background="@color/new_background_fragment">
+            android:background="@color/grey_010">
 
             <TextView
                 android:id="@+id/content_text"

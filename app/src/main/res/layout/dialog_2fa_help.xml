@@ -28,28 +28,20 @@
 
         <Button
             android:id="@+id/play_store_button_help"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="?android:attr/borderlessButtonStyle"
+            style="?attr/borderlessButtonStyle"
             android:text="@string/play_store_label"
-            android:textSize="14sp"
-            android:fontFamily="roboto"
-            android:textColor="@color/accentColor"
-            android:gravity="right|center_vertical"
-            android:layout_gravity="right"
+            android:gravity="end|center_vertical"
+            android:layout_gravity="end"
             android:layout_marginTop="25dp"/>
 
         <Button
             android:id="@+id/cancel_button_help"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="?android:attr/borderlessButtonStyle"
+            style="?attr/borderlessButtonStyle"
             android:text="@string/general_cancel"
-            android:textSize="14sp"
-            android:fontFamily="roboto"
-            android:textColor="@color/accentColor"
-            android:gravity="right|center_vertical"
-            android:layout_gravity="right"
+            android:gravity="end|center_vertical"
+            android:layout_gravity="end"
             android:layout_marginTop="12dp"/>
 
     </LinearLayout>

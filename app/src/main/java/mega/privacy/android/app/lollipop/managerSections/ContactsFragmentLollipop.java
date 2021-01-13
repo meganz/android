@@ -422,11 +422,11 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			}
 			else{
 				logDebug("Default color to the avatar");
-				p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+				p.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 			}
 		}
 		else {
-			p.setColor(ContextCompat.getColor(context, R.color.lollipop_primary_color));
+			p.setColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 		}
 
 		int radius;

@@ -192,7 +192,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_below="@id/call_toolbar"
-                android:background="@color/ambar_700"
+                android:background="@color/amber_700"
                 android:visibility="gone">
 
                 <TextView

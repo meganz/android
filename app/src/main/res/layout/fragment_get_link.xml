@@ -254,7 +254,7 @@
                     android:id="@+id/transparent_key_layout_expiry_date"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/transparent_white"/>
+                    android:background="@color/white_alpha_080"/>
 
             </RelativeLayout>
 
@@ -335,7 +335,7 @@
                     android:id="@+id/transparent_key_layout_password_protection"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/transparent_white"/>
+                    android:background="@color/white_alpha_080"/>
 
             </RelativeLayout>
         </LinearLayout>

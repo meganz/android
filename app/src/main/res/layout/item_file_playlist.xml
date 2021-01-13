@@ -29,7 +29,7 @@
         android:layout_toRightOf="@id/container_thumbnail"
         android:layout_marginTop="15dp"
         android:layout_marginLeft="12dp"
-        android:textColor="@color/file_list_first_row"
+        android:textColor="@color/black"
         android:singleLine="true"
         android:ellipsize="middle"
         android:textSize="16sp"/>

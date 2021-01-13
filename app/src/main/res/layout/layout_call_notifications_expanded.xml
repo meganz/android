@@ -40,7 +40,7 @@
                     android:ellipsize="end"
                     android:layout_marginEnd="4dp"
                     android:maxLines="1"
-                    android:textColor="@color/file_list_first_row"
+                    android:textColor="@color/black"
                     android:textSize="14sp" />
                 <ImageView
                     android:id="@+id/chat_status"

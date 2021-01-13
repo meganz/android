@@ -211,7 +211,7 @@
             android:id="@+id/file_grid_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/new_background_fragment" />
+            android:background="@color/grey_012_white_012" />
 
         <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/file_grid_filesize"
