@@ -2346,12 +2346,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	private void setVoiceClipOrLocationLayout(ImageView image, TextView text, int resource, boolean isRead) {
 		if (isRead) {
-			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.ic_mic_read_message));
-			text.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_read_message));
+			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.grey_300_grey_600));
+			text.setTextColor(ContextCompat.getColor(context, R.color.grey_300_grey_600));
 		}
 		else {
-			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.ic_mic_unread_message));
-			text.setTextColor(ContextCompat.getColor(context, R.color.ic_mic_unread_message));
+			image.setImageDrawable(mutateIconSecondary(context, resource, R.color.teal_300_teal_200));
+			text.setTextColor(ContextCompat.getColor(context, R.color.teal_300_teal_200));
 		}
 	}
 
