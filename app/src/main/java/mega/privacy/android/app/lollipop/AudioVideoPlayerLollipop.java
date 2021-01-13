@@ -293,7 +293,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private boolean fromShared = false;
     private int typeExport = -1;
-    private AlertDialog renameDialog;
     boolean moveToRubbish = false;
     private ProgressDialog moveToTrashStatusDialog;
     private boolean loop = false;
@@ -2473,7 +2472,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 break;
             }
             case R.id.full_video_viewer_rename: {
-                renameDialog = showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this);
+                showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this);
                 break;
             }
             case R.id.full_video_viewer_move: {

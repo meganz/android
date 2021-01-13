@@ -96,7 +96,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             resetAccountDetailsTimeStamp();
                         }
                         else {
-                            ((ContactFileListActivityLollipop) context).refreshAfterMovingToRubbish();
+                            ((ContactFileListActivityLollipop) context).actionConfirmed();
                         }
                     }
                     else if (actionListener== MULTIPLE_RESTORED_FROM_RUBBISH){

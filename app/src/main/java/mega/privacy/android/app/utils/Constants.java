@@ -500,6 +500,8 @@ public class Constants {
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
 
+    public static final int SCROLLING_UP_DIRECTION = -1;
+
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
     public static final String CHAT_ID = "CHAT_ID";

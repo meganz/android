@@ -38,7 +38,7 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.ViewHolderImportFiles> implements View.OnClickListener {
-    private static final int MAX_VISIBLE_ITEMS_AT_BEGINNING = 4;
+    public static final int MAX_VISIBLE_ITEMS_AT_BEGINNING = 4;
     private static final int LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING = 3;
     private static final int ITEM_HEIGHT = 72;
 

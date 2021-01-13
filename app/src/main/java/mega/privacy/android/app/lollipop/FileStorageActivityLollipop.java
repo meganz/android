@@ -182,8 +182,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private ActionBar aB;
 	
 	private ActionMode actionMode;
-	
-	private AlertDialog newFolderDialog;
+
 	private AlertDialog setDownloadLocationDialog;
 	private boolean isSetDownloadLocationShown;
 	private boolean confirmationChecked;
@@ -203,7 +202,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                 return true;
 
             case R.id.cab_menu_create_folder:
-				newFolderDialog = showNewFolderDialog(this, this);
+				showNewFolderDialog(this, this);
                 return true;
 
             case R.id.cab_menu_select_all:

@@ -208,8 +208,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	private ChatExplorerFragment chatExplorer;
 	private ImportFilesFragment importFileFragment;
 
-	private AlertDialog newFolderDialog;
-
 	private ProgressDialog statusDialog;
 
 	private List<ShareInfo> filePreparedInfos;
@@ -1808,15 +1806,17 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 								body.append(sharedText3);
 							}
 
-							long parentHandle = handle;
-							MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+							MegaNode parentNode = megaApi.getNodeByHandle(handle);
 							if(parentNode == null){
 								parentNode = megaApi.getRootNode();
 							}
 
-							newFolderDialog = isURL
-									? showNewURLFileDialog(this, parentNode, body.toString(), sharedText2)
-									: showNewFileDialog(this, parentNode, body.toString());
+							if (isURL) {
+								showNewURLFileDialog(this, parentNode, body.toString(), sharedText2);
+							} else {
+								showNewFileDialog(this, parentNode, body.toString());
+							}
+
 							return;
 						}
 					}
@@ -2039,11 +2039,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 					showSnackbar(getString(R.string.context_folder_already_exists));
 				}
 			}
-			else{
-				return;
-			}
 		}
-
 	}
 
 	/*
@@ -2260,7 +2256,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 				break;
 			}
 			case R.id.cab_menu_create_folder:{
-	        	newFolderDialog = showNewFolderDialog(this, this);
+	        	showNewFolderDialog(this, this);
         		break;
 			}
 			case R.id.cab_menu_new_chat:{

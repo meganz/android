@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Looper;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -58,12 +57,14 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
@@ -410,24 +411,13 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		String emptyRoot = context.getString(R.string.context_empty_cloud_drive);
-		String emptyGeneral = context.getString(R.string.file_browser_empty_folder_new);
+		emptyRootText = HtmlCompat.fromHtml(
+				formatEmptyScreenText(StringResourcesUtils.getString(R.string.context_empty_cloud_drive)),
+				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		try {
-			emptyRoot = emptyRoot.replace("[A]", "<font color='#000000'>");
-			emptyRoot = emptyRoot.replace("[/A]", "</font>");
-			emptyRoot = emptyRoot.replace("[B]", "<font color='#7a7a7a'>");
-			emptyRoot = emptyRoot.replace("[/B]", "</font>");
-			emptyGeneral = emptyGeneral.replace("[A]", "<font color='#000000'>");
-			emptyGeneral = emptyGeneral.replace("[/A]", "</font>");
-			emptyGeneral = emptyGeneral.replace("[B]", "<font color='#7a7a7a'>");
-			emptyGeneral = emptyGeneral.replace("[/B]", "</font>");
-		} catch (Exception e) {
-			logWarning("Exception formatting string", e);
-		}
-
-		emptyRootText = HtmlCompat.fromHtml(emptyRoot, HtmlCompat.FROM_HTML_MODE_LEGACY);
-		emptyGeneralText = HtmlCompat.fromHtml(emptyGeneral, HtmlCompat.FROM_HTML_MODE_LEGACY);
+		emptyGeneralText = HtmlCompat.fromHtml(
+				formatEmptyScreenText(StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
+				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
 		super.onViewCreated(view, savedInstanceState);
 	}
@@ -464,7 +454,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			emptyTextViewFirst.setText(updateEmptyScreen());
+			updateEmptyScreen();
 		} else {
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
@@ -472,17 +462,17 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 	}
 
-	private Spanned updateEmptyScreen() {
+	private void updateEmptyScreen() {
 		if (megaApi.getRootNode().getHandle() == parentHandle) {
 			emptyImageView.setImageResource(isScreenInPortrait(context)
 					? R.drawable.ic_empty_cloud_drive : R.drawable.cloud_empty_landscape);
 
-			return emptyRootText;
+			emptyTextViewFirst.setText(emptyRootText);
 		} else {
 			emptyImageView.setImageResource(isScreenInPortrait(context)
 					? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
 
-			return emptyGeneralText;
+			emptyTextViewFirst.setText(emptyGeneralText);
 		}
 	}
 

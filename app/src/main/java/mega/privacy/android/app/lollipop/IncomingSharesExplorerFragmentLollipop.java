@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -57,6 +56,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
@@ -64,7 +64,7 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -399,24 +399,13 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		String emptyRoot = context.getString(R.string.context_empty_incoming);
-		String emptyGeneral = context.getString(R.string.file_browser_empty_folder_new);
+		emptyRootText = HtmlCompat.fromHtml(
+			formatEmptyScreenText(StringResourcesUtils.getString(R.string.context_empty_incoming)),
+			HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		try {
-			emptyRoot = emptyRoot.replace("[A]", "<font color='#000000'>");
-			emptyRoot = emptyRoot.replace("[/A]", "</font>");
-			emptyRoot = emptyRoot.replace("[B]", "<font color='#7a7a7a'>");
-			emptyRoot = emptyRoot.replace("[/B]", "</font>");
-			emptyGeneral = emptyGeneral.replace("[A]", "<font color='#000000'>");
-			emptyGeneral = emptyGeneral.replace("[/A]", "</font>");
-			emptyGeneral = emptyGeneral.replace("[B]", "<font color='#7a7a7a'>");
-			emptyGeneral = emptyGeneral.replace("[/B]", "</font>");
-		} catch (Exception e) {
-			logWarning("Exception formatting string", e);
-		}
-
-		emptyRootText = HtmlCompat.fromHtml(emptyRoot, HtmlCompat.FROM_HTML_MODE_LEGACY);
-		emptyGeneralText = HtmlCompat.fromHtml(emptyGeneral, HtmlCompat.FROM_HTML_MODE_LEGACY);
+		emptyGeneralText = HtmlCompat.fromHtml(
+				formatEmptyScreenText(StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
+				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
 		super.onViewCreated(view, savedInstanceState);
 	}
@@ -467,21 +456,21 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			recyclerView.setVisibility(View.GONE);
-			emptyTextViewFirst.setText(updateEmptyScreen());
+			updateEmptyScreen();
 		}
 	}
 
-	private Spanned updateEmptyScreen() {
+	private void updateEmptyScreen() {
 		if (parentHandle == INVALID_HANDLE) {
 			emptyImageView.setImageResource(isScreenInPortrait(context)
 					? R.drawable.incoming_shares_empty : R.drawable.incoming_empty_landscape);
 
-			return emptyRootText;
+			emptyTextViewFirst.setText(emptyRootText);
 		} else {
 			emptyImageView.setImageResource(isScreenInPortrait(context)
 					? R.drawable.ic_zero_portrait_empty_folder : R.drawable.ic_zero_landscape_empty_folder);
 
-			return emptyGeneralText;
+			emptyTextViewFirst.setText(emptyGeneralText);
 		}
 	}
 

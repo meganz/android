@@ -67,4 +67,23 @@ public class TextUtil {
 
         return text.length();
     }
+
+    /**
+     * Formats a String of an empty screen.
+     *
+     * @param emptyString The text to format.
+     * @return The string formatted.
+     */
+    public static String formatEmptyScreenText(String emptyString) {
+        try {
+            emptyString = emptyString.replace("[A]", "<font color='#000000'>");
+            emptyString = emptyString.replace("[/A]", "</font>");
+            emptyString = emptyString.replace("[B]", "<font color='#7a7a7a'>");
+            emptyString = emptyString.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Exception formatting string", e);
+        }
+
+        return emptyString;
+    }
 }

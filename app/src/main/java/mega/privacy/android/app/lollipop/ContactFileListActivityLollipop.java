@@ -1178,13 +1178,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 		return -1;
 	}
 
-	public void refreshAfterMovingToRubbish() {
-		if (cflF != null && cflF.isVisible()) {
-			cflF.clearSelections();
-			cflF.hideMultipleSelect();
-		}
-	}
-
 	public void openAdvancedDevices(long handleToDownload, boolean highPriority) {
 		logDebug("handleToDownload: " + handleToDownload + ", highPriority: " + highPriority);
 		String externalPath = getExternalCardPath();

@@ -27,6 +27,8 @@ import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter.MAX_VISIBLE_ITEMS_AT_BEGINNING;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 
 public class ImportFilesFragment extends BaseFragment {
 
@@ -48,7 +50,7 @@ public class ImportFilesFragment extends BaseFragment {
 
     public void changeActionBarElevation() {
         ((FileExplorerActivityLollipop) context).changeActionBarElevation(
-                binding.scrollContainerImport.canScrollVertically(-1),
+                binding.scrollContainerImport.canScrollVertically(SCROLLING_UP_DIRECTION),
                 FileExplorerActivityLollipop.IMPORT_FRAGMENT);
     }
 
@@ -88,7 +90,9 @@ public class ImportFilesFragment extends BaseFragment {
         binding.showMoreLayout.setOnClickListener(v -> showMoreClick());
 
         if (filePreparedInfos != null) {
-            binding.showMoreLayout.setVisibility(filePreparedInfos.size() <= 4 ? GONE : VISIBLE);
+            binding.showMoreLayout.setVisibility(filePreparedInfos.size() <= MAX_VISIBLE_ITEMS_AT_BEGINNING
+                    ? GONE : VISIBLE);
+
             binding.contentText.setText(getResources().getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
 
             if (adapter == null) {
@@ -124,14 +128,6 @@ public class ImportFilesFragment extends BaseFragment {
     public void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
-    }
-
-    public void setNameFiles(HashMap<String, String> nameFiles) {
-        this.nameFiles = nameFiles;
-    }
-
-    public HashMap<String, String> getNameFiles() {
-        return nameFiles;
     }
 
     class GetNamesAsyncTask extends AsyncTask<Void, Void, Void> {
