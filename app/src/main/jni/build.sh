@@ -477,7 +477,6 @@ if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* ndk-build finished for x86_64"
 fi
 
-echo "AQUIII"
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
     ${NDK_BUILD} -j8 APP_ABI=arm64-v8a

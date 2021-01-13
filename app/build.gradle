@@ -173,6 +173,7 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation files('src/main/libs/libwebrtc.jar')
 }
 
 apply plugin: 'com.google.gms.google-services'
