@@ -11,6 +11,7 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
@@ -158,6 +159,17 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<ImportFilesAdapter.
                     }
                 }
         );
+
+        holder.name.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        holder.name.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                hideKeyboardView(context, v, 0);
+                v.clearFocus();
+                return true;
+            }
+
+            return false;
+        });
 
         holder.thumbnail.setVisibility(VISIBLE);
 
