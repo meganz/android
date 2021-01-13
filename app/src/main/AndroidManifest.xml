@@ -201,7 +201,6 @@
 
         <activity android:name="mega.privacy.android.app.providers.FileProviderActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:screenOrientation="locked">
 
             <intent-filter>

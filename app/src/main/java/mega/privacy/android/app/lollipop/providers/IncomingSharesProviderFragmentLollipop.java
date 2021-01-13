@@ -62,9 +62,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 
 	ImageView emptyImageView;
-	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-	TextView contentText;
 
 	int deepBrowserTree = -1;
 
@@ -227,12 +225,8 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());
-		
-		contentText = (TextView) v.findViewById(R.id.provider_content_text);
-		contentText.setVisibility(View.GONE);
 
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
-		emptyTextView = (LinearLayout) v.findViewById(R.id.provider_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
 
 		if (context instanceof FileProviderActivity){
@@ -243,7 +237,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		}
 		
 		if (adapter == null){
-			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, INCOMING_SHARES_PROVIDER_ADAPTER);
+			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, INCOMING_SHARES_PROVIDER_ADAPTER);
 		}
 		listView.setAdapter(adapter);
 
@@ -431,7 +425,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			if (parentNode != null){
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+				emptyTextViewFirst.setVisibility(View.GONE);
 
 				changeActionBarTitle(parentNode.getName());
 				
@@ -461,7 +455,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		else{
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
+			emptyTextViewFirst.setVisibility(View.GONE);
 			deepBrowserTree=0;
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setIncomingDeepBrowserTree(deepBrowserTree);
@@ -495,7 +489,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+				emptyTextViewFirst.setVisibility(View.VISIBLE);
 
 				if (parentHandle==-1) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -556,7 +550,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+				emptyTextViewFirst.setVisibility(View.GONE);
 			}
 		}
 	}

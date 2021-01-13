@@ -41,10 +41,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -180,7 +181,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private String emailTemp = null;
     private String passwdTemp = null;
 
-    Toolbar tB;
+    MaterialToolbar tB;
     LinearLayout loginVerificationLayout;
     InputMethodManager imm;
     private EditTextPIN firstPin;
@@ -433,7 +434,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         parkAccountButton.setLayoutParams(parkButtonParams);
         parkAccountButton.setOnClickListener(this);
 
-        tB  =(Toolbar) v.findViewById(R.id.toolbar_login);
+        tB  = v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
         loginVerificationLayout.setVisibility(View.GONE);
         lostYourDeviceButton = (RelativeLayout) v.findViewById(R.id.lost_authentication_device);
@@ -2639,29 +2640,25 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private AlertDialog confirmLogoutDialog;
     private void showConfirmLogoutDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog,int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        backToLoginForm();
-                        backWhileLogin = true;
-                        MegaApplication.setLoggingIn(false);
-                        LoginActivityLollipop.isFetchingNodes = false;
-                        loginClicked = false;
-                        firstTime = true;
-                        if (megaChatApi == null){
-                            megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
-                        }
-                        megaChatApi.logout(new ChatLogoutListener(getContext()));
-                        megaApi.localLogout(LoginFragmentLollipop.this);
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        dialog.dismiss();
-                        break;
-                }
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which) {
+                case DialogInterface.BUTTON_POSITIVE:
+                    backToLoginForm();
+                    backWhileLogin = true;
+                    MegaApplication.setLoggingIn(false);
+                    LoginActivityLollipop.isFetchingNodes = false;
+                    loginClicked = false;
+                    firstTime = true;
+                    if (megaChatApi == null){
+                        megaChatApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaChatApi();
+                    }
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
+                    megaApi.localLogout(LoginFragmentLollipop.this);
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    dialog.dismiss();
+                    break;
             }
         };
         String message= getString(R.string.confirm_cancel_login);

@@ -44,7 +44,6 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 
 public class CloudDriveProviderFragmentLollipop extends Fragment{
@@ -64,10 +63,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	LinearLayoutManager mLayoutManager;
 
 	ImageView emptyImageView;
-	LinearLayout emptyTextView;
 	TextView emptyTextViewFirst;
-
-	TextView contentText;
 
 	Stack<Integer> lastPositionStack;
 
@@ -229,12 +225,8 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());
-		
-		contentText = (TextView) v.findViewById(R.id.provider_content_text);
-		contentText.setVisibility(View.GONE);
 
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
-		emptyTextView = (LinearLayout) v.findViewById(R.id.provider_list_empty_text);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
 
 		if (context instanceof FileProviderActivity){
@@ -244,17 +236,6 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 	
 		if (parentHandle == -1)
 		{
-			//QA Report #6608 - do not remember last folder
-			//Find in the database the last parentHandle
-//			prefs = dbH.getPreferences();
-//			if (prefs != null) {
-//				String lastFolder = prefs.getLastFolderCloud();
-//				if(lastFolder != null) {
-//					if (lastFolder.compareTo("") != 0){
-//						parentHandle = Long.parseLong(lastFolder);
-//					}
-//				}
-//			}
 			parentHandle = megaApi.getRootNode().getHandle();
 		}			
 		
@@ -283,7 +264,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		}
 
 		if (adapter == null){
-			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, emptyTextView, CLOUD_DRIVE_PROVIDER_ADAPTER);
+			adapter = new MegaProviderLollipopAdapter(context, this, nodes, parentHandle, listView, emptyImageView, CLOUD_DRIVE_PROVIDER_ADAPTER);
 		}
 
 		listView.setAdapter(adapter);
@@ -405,7 +386,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);			
+            emptyTextViewFirst.setVisibility(View.GONE);
 			
 			nodes = megaApi.getChildren(parentNode);
 			setNodes(nodes);
@@ -453,7 +434,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			if (adapter.getItemCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+                emptyTextViewFirst.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
 					if(context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 						emptyImageView.setImageResource(R.drawable.cloud_empty_landscape);
@@ -514,7 +495,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
+                emptyTextViewFirst.setVisibility(View.GONE);
 			}
 		}
 	}

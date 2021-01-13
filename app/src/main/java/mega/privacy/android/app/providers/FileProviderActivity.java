@@ -16,6 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
+
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.app.ActivityCompat;
@@ -26,7 +28,6 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -64,9 +65,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -95,7 +98,9 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
-
+/**
+ * This activity is launched by 3rd apps, for example, when compose email pick attachments from MEGA.
+ */
 @SuppressLint("NewApi") 
 public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
@@ -110,7 +115,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	private CountDownTimer timer;
 
-	private Toolbar tB;
+	private MaterialToolbar tB;
 	private ActionBar aB;
 
 	private ScrollView scrollView;
@@ -205,6 +210,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		super.onCreate(savedInstanceState);
 
+        ColorUtils.setStatusBarTextColor(this);
+
 		fileProviderActivity = this;
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -232,9 +239,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		UserCredentials credentials = dbH.getCredentials();
 		if (credentials == null) {
 			loginLogin.setVisibility(View.VISIBLE);
-			if (scrollView != null) {
-				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
-			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			loginLoggingIn.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
@@ -251,8 +255,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			logDebug("dbH.getCredentials() NOT null");
 
 			if (megaApi.getRootNode() == null) {
-				changeStatusBarColor(this, this.getWindow(), R.color.transparent_black);
-
 				logDebug("megaApi.getRootNode() == null");
 
 				lastEmail = credentials.getEmail();
@@ -265,9 +267,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
-					if (scrollView != null) {
-						scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
-					}
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					loggingInText.setVisibility(View.VISIBLE);
@@ -394,8 +393,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
-
-				changeStatusBarColor(this, getWindow(), R.color.dark_primary_color);
 			}
 		}
 	}
@@ -466,9 +463,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		prepareNodesText = findViewById(R.id.login_prepare_nodes_text);
 		serversBusyText = findViewById(R.id.login_servers_busy_text);
 
-		tB = findViewById(R.id.toolbar);
-
-		changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
+		tB = findViewById(R.id.toolbar_login);
 
 		loginVerificationLayout = findViewById(R.id.login_2fa);
 		loginVerificationLayout.setVisibility(View.GONE);
@@ -1119,6 +1114,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 			}
 		} else {
+		    MegaApplication.setLoggingIn(false);
 			super.onBackPressed();
 		}
 	}
@@ -1162,6 +1158,21 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				downloadAndAttach(selectedNodes.size(), hashes);
 				break;
 			}
+            case R.id.lost_authentication_device: {
+                try {
+                    String url = "https://mega.nz/recovery";
+                    Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    openTermsIntent.setData(Uri.parse(url));
+                    startActivity(openTermsIntent);
+                }
+                catch (Exception e){
+                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    startActivity(viewIntent);
+                }
+                break;
+            }
 		}
 	}
 
@@ -1237,9 +1248,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (!isOnline(this)) {
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
-			if (scrollView != null) {
-				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
-			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
@@ -1258,9 +1266,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		loginLogin.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
-		if (scrollView != null) {
-			scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
-		}
 		generatingKeysText.setVisibility(View.VISIBLE);
 		loginProgressBar.setVisibility(View.VISIBLE);
 		loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1317,9 +1322,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (!isOnline(this)) {
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
-			if (scrollView != null) {
-				scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
-			}
 			loginCreateAccount.setVisibility(View.INVISIBLE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
@@ -1359,7 +1361,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 	}
 
-	public void showAB(Toolbar tB) {
+	public void showAB(MaterialToolbar tB) {
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 
@@ -1367,16 +1369,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setDisplayHomeAsUpEnabled(true);
-
-		changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
 	}
 
 	public void hideAB() {
 		if (aB != null) {
 			aB.hide();
 		}
-
-		changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
 	}
 
 	public void setParentHandle(long parentHandle) {
@@ -1443,7 +1441,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					is2FAEnabled = true;
 					showAB(tB);
 					loginLogin.setVisibility(View.GONE);
-					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
 					loginCreateAccount.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.GONE);
 					generatingKeysText.setVisibility(View.GONE);
@@ -1466,9 +1463,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				if (!is2FAEnabled) {
 					loginLoggingIn.setVisibility(View.GONE);
 					loginLogin.setVisibility(View.VISIBLE);
-					if (scrollView != null) {
-						scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
-					}
 					loginCreateAccount.setVisibility(View.INVISIBLE);
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
@@ -1496,9 +1490,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					hideAB();
 				}
 				loginLoggingIn.setVisibility(View.VISIBLE);
-				if (scrollView != null) {
-					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.white));
-				}
 				generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
@@ -1523,9 +1514,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
-				if (scrollView != null) {
-					scrollView.setBackgroundColor(ContextCompat.getColor(this, R.color.background_create_account));
-				}
 				loginCreateAccount.setVisibility(View.INVISIBLE);
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
@@ -1569,8 +1557,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				MegaApplication.setLoggingIn(false);
 				afterFetchNodes();
-
-				changeStatusBarColor(this, this.getWindow(), R.color.lollipop_dark_primary_color);
 			}
 		}
 	}
@@ -1845,9 +1831,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void activateButton(Boolean show) {
 		attachButton.setEnabled(show);
 		if (show) {
-			attachButton.setTextColor(ContextCompat.getColor(this, R.color.accentColor));
+			attachButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
 		} else {
-			attachButton.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
+			attachButton.setTextColor(ContextCompat.getColor(this, R.color.teal_300_038_teal_200_038));
 		}
 	}
 
