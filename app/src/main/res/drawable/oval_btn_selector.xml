@@ -4,7 +4,7 @@
     <!-- pressed state -->
     <item android:state_pressed="true">
         <shape android:shape="oval">
-            <solid android:color="@color/pressed_color" />
+            <solid android:color="@color/grey_050" />
         </shape>
     </item>
 

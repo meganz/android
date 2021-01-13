@@ -185,9 +185,9 @@
     <color name="statusbar_tour_3">#FFCC7300</color>
     <color name="statusbar_tour_4">#FF00948C</color>
 
-    <color name="business_alert_background">#FFF6F6F6</color>
-    <color name="expired_red">#FFE1000F</color>
-    <color name="grace_yellow">#FFF29907</color>
+<!--    <color name="business_alert_background">#FFF6F6F6</color>-->
+<!--    <color name="expired_red">#FFE1000F</color>-->
+<!--    <color name="grace_yellow">#FFF29907</color>-->
 <!--    <color name="expired_business_admin_statusbar">#825572</color>-->
 <!--    <color name="expired_business_user_statusbar">#29A6D1</color>-->
 <!--    <color name="expired_business_admin">#966B87</color>-->
@@ -197,30 +197,31 @@
     <color name="black_40_alpha">#66000000</color>
     <color name="black_54_alpha">#89000000</color>
 
-    <color name="red_alert">#FF6464</color>
+<!--    <color name="red_alert">#FF6464</color>-->
     <color name="status_bar_red_alert">#CF4949</color>
 
-    <color name="reconnecting_bar">#FFF5A623</color>
-    <color name="voice_clip_bubble">#323232</color>
-    <color name="background_recording">#78252525</color>
+<!--    <color name="reconnecting_bar">#FFF5A623</color>-->
+<!--    <color name="voice_clip_bubble">#323232</color>-->
+<!--    <color name="background_recording">#78252525</color>-->
 
-    <color name="light_toolbar_title">#A8A8A8</color>
-    <color name="giphy_search_text">#121212</color>
-    <color name="giphy_loading_background">#ECECEC</color>
+<!--    <color name="light_toolbar_title">#A8A8A8</color>-->
+<!--    <color name="giphy_search_text">#121212</color>-->
+<!--    <color name="giphy_loading_background">#ECECEC</color>-->
 
-    <color name="border_avatar_call">#4DFFFFFF</color>
+<!--    <color name="border_avatar_call">#4DFFFFFF</color>-->
 
+    <color name="expired_red">#FFE1000F</color>
     <color name="over_quota_yellow">#FFFFB42B</color>
-    <color name="background_own_reaction_added">#0F00BFA5</color>
+<!--    <color name="background_own_reaction_added">#0F00BFA5</color>-->
 
-    <color name="pressed_color">#E7E7E7</color>
+<!--    <color name="pressed_color">#E7E7E7</color>-->
 
-    <color name="homepage_title">#dd000000</color>
-    <color name="homepage_content">#89000000</color>
+<!--    <color name="homepage_title">#dd000000</color>-->
+<!--    <color name="homepage_content">#89000000</color>-->
 
-    <color name="homepage_fab_label_text_color">#ff373737</color>
+<!--    <color name="homepage_fab_label_text_color">#ff373737</color>-->
 
-    <color name="black_bottom_sheets_icon_tint">#8F000000</color>
+<!--    <color name="black_bottom_sheets_icon_tint">#8F000000</color>-->
 
     <!-- NODE LABELS -->
 <!--    <color name="label_red">#FF625D</color>-->
@@ -247,6 +248,7 @@
     <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_020">#33FFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
+    <color name="white_alpha_030">#4DFFFFFF</color>
     <color name="white_alpha_033">#54FFFFFF</color>
     <color name="white_alpha_038">#60FFFFFF</color>
     <color name="white_alpha_045">#73FFFFFF</color>
@@ -494,6 +496,9 @@
     <!-- chat status color -->
     <!-- Offline -->
     <color name="grey_700_grey_300">@color/grey_700</color>
+
+    <!-- homepage upload FAB tint -->
+    <color name="grey_900_grey_050">@color/grey_900</color>
 
     <!-- Available offline disabled text color -->
     <color name="grey_700_026_grey_300_026">@color/grey_700_alpha_026</color>

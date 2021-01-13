@@ -8914,7 +8914,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             case MegaChatCall.CALL_STATUS_RECONNECTING:
                 subtitleChronoCall.setVisibility(View.GONE);
-                callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.reconnecting_bar));
+                callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.orange_400));
                 showCallInProgressLayout(getString(R.string.reconnecting_message), false, callInThisChat);
                 callInProgressLayout.setOnClickListener(this);
                 break;

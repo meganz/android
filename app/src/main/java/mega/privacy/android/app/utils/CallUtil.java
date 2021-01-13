@@ -247,7 +247,7 @@ public class CallUtil {
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_RECONNECTING) {
             activateChrono(false, callInProgressChrono, null);
-            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.reconnecting_bar));
+            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.orange_400));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
         } else {
 
