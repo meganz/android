@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_social_share_white"
+        android:orderInCategory="100"
+        android:title="@string/context_send_file_to_chat"
+        MEGA:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_chat"
+        android:icon="@drawable/ic_send_to_contact"
+        android:orderInCategory="100"
+        android:title="@string/general_share"
+        MEGA:iconTint="@color/white"
+        MEGA:showAsAction="ifRoom" />
+</menu>

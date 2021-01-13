@@ -335,6 +335,18 @@
         <item name="android:textColor">@color/pass_weak</item>
     </style>
 
+    <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/green_unlocked_rewards</item>
+    </style>
+
+    <style name="InputTextAppearanceGood" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/pass_good</item>
+    </style>
+
+    <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
+        <item name="android:textColor">@color/blue_unlocked_rewards</item>
+    </style>
+
 	<style name="SMSVerificationStyle" parent="Theme.AppCompat.Light.NoActionBar">
 		<item name="colorPrimaryDark">#3490B1</item>
 		<item name="android:windowNoTitle">true</item>
@@ -356,17 +368,6 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="InputTextAppearanceMedium" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/green_unlocked_rewards</item>
-    </style>
-
-    <style name="InputTextAppearanceGood" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/pass_good</item>
-    </style>
-
-    <style name="InputTextAppearanceStrong" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/blue_unlocked_rewards</item>
-    </style>
     <style name="CardViewTheme" parent="CardView">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
@@ -611,6 +612,14 @@
         <item name="colorControlActivated">@android:color/transparent</item>
         <item name="colorControlHighlight">@color/accentColor</item>
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
+    </style>
+
+    <style name="GetLinkOptionsStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
     </style>
 
     <style name="Widget.Mega.RadioButton.Label" parent="Widget.AppCompat.CompoundButton.RadioButton">

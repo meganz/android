@@ -112,6 +112,7 @@ import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
@@ -1303,7 +1304,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
                     return false;
                 }
-				showGetLinkActivity(node.getHandle());
+
+                showGetLinkActivity(this, node.getHandle());
 				break;
 			}
 			case R.id.cab_menu_file_info_remove_link: {
@@ -1971,13 +1973,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
-	}
-
-	public void showGetLinkActivity(long handle){
-        logDebug("Handle: " + handle);
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
 	}
 
 	public void setIsGetLink(boolean value){

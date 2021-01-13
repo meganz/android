@@ -109,6 +109,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -627,8 +628,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 						return false;
 					}
+
 					shareIt = false;
-			    	showGetLinkActivity(node.getHandle());
+			    	showGetLinkActivity(this, node.getHandle());
 					break;
 				}
 
@@ -1786,13 +1788,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
-	}
-
-	public void showGetLinkActivity(long handle){
-		logDebug("Handle: " + handle);
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
 	}
 
 	public void setIsGetLink(boolean value){
