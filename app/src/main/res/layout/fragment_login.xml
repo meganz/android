@@ -417,18 +417,6 @@
                 android:gravity="center_horizontal"
                 android:text="@string/servers_busy" />
         </LinearLayout>
-
-        <include
-            layout="@layout/forgot_password_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <include
-            layout="@layout/park_account_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
     </LinearLayout>
 
 </ScrollView>

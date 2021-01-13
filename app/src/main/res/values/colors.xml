@@ -51,40 +51,40 @@
     <color name="transparent_white">#CCFFFFFF</color>
 
 <!--    <color name="orange">#FFFFBB33</color>-->
-    <color name="blue">#FF33B5E5</color>
-    <color name="upgrade_grey">#8d8d8d</color>
-    <color name="filter_icon">#8d8d94</color>
-    <color name="upgrade_white">#b9ffffff</color>
-    <color name="ic_mic_read_message">#9e9e9e</color>
-    <color name="ic_mic_unread_message">#00bfa5</color>
+<!--    <color name="blue">#FF33B5E5</color>-->
+<!--    <color name="upgrade_grey">#8d8d8d</color>-->
+<!--    <color name="filter_icon">#8d8d94</color>-->
+<!--    <color name="upgrade_white">#b9ffffff</color>-->
+<!--    <color name="ic_mic_read_message">#9e9e9e</color>-->
+<!--    <color name="ic_mic_unread_message">#00bfa5</color>-->
 
-    <color name="primary_text">#de000000</color>
-    <color name="secondary_text">#8a000000</color>
-    <color name="forgot_pass_text">#91000000</color>
-    <color name="mail_my_account">#8a000000</color>
+<!--    <color name="primary_text">#de000000</color>-->
+<!--    <color name="secondary_text">#8a000000</color>-->
+<!--    <color name="forgot_pass_text">#91000000</color>-->
+<!--    <color name="mail_my_account">#8a000000</color>-->
 
-    <color name="tab_pressed">#ee0008</color>
+<!--    <color name="tab_pressed">#ee0008</color>-->
 
     <color name="transparent_black">#80000000</color>
 <!--    <color name="transparent_mega">#80db0605</color>-->
 
-    <color name="delimiterColor">#e6e6e6</color>
-    <color name="contactSelected">#1A00BFA5</color>
+<!--    <color name="delimiterColor">#e6e6e6</color>-->
+<!--    <color name="contactSelected">#1A00BFA5</color>-->
     <color name="accentColor">#FF00BFA5</color>
-    <color name="accentColorTransparent">#5900BFA5</color>
-    <color name="accentColorLight">#9900BFA5</color>
+<!--    <color name="accentColorTransparent">#5900BFA5</color>-->
+<!--    <color name="accentColorLight">#9900BFA5</color>-->
     <color name="accentColorDark">#FF009884</color>
-    <color name="textGrey">#6d6f70</color>
+<!--    <color name="textGrey">#6d6f70</color>-->
 
-    <color name="filePropertiesToolBar">#2284b1</color>
+<!--    <color name="filePropertiesToolBar">#2284b1</color>-->
 
     <color name="tour_bar_grey">#dddddd</color>
     <color name="tour_bar_red">#cc0000</color>
 
-    <color name="small_letter_upgrade_account">#8a333333</color>
+<!--    <color name="small_letter_upgrade_account">#8a333333</color>-->
 
     <color name="chat_background">#08000000</color>
-    <color name="message_background">#0f000000</color>
+<!--    <color name="message_background">#0f000000</color>-->
 
     <color name="chat_sliding_panel_separator">#dcdcdcdc</color>
     <color name="gradient_avatar_chat">#44000000</color>

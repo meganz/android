@@ -96,10 +96,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
-    private AlertDialog insertMailDialog;
     private AlertDialog insertMKDialog;
-
-    private LoginFragmentLollipop loginFragment = this;
 
     private TextView loginTitle;
     private TextView newToMega;
@@ -125,20 +122,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private TextView prepareNodesText;
     private TextView serversBusyText;
     private ScrollView scrollView;
-
-    private RelativeLayout forgotPassLayout;
-    private TextView forgotPassTitle;
-    private TextView forgotPassFirstP;
-    private TextView forgotPassSecondP;
-    private TextView forgotPassAction;
-    private Button yesMK;
-    private Button noMK;
-
-    private RelativeLayout parkAccountLayout;
-    private TextView parkAccountTitle;
-    private TextView parkAccountFirstP;
-    private TextView parkAccountSecondP;
-    private Button parkAccountButton;
 
     private ProgressBar loginInProgressPb;
     private TextView loginInProgressInfo;
@@ -377,63 +360,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         queryingSignupLinkText.setVisibility(View.GONE);
         confirmingAccountText.setVisibility(View.GONE);
         serversBusyText.setVisibility(View.GONE);
-
-        forgotPassLayout = (RelativeLayout) v.findViewById(R.id.forgot_pass_full_layout);
-        forgotPassTitle = (TextView) v.findViewById(R.id.title_forgot_pass_layout);
-        RelativeLayout.LayoutParams forgotPassTitleParams = (RelativeLayout.LayoutParams)forgotPassTitle.getLayoutParams();
-        forgotPassTitleParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(70, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassTitle.setLayoutParams(forgotPassTitleParams);
-
-        forgotPassFirstP = (TextView) v.findViewById(R.id.first_par_forgot_pass_layout);
-        RelativeLayout.LayoutParams firstParParams = (RelativeLayout.LayoutParams)forgotPassFirstP.getLayoutParams();
-        firstParParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassFirstP.setLayoutParams(firstParParams);
-
-        forgotPassSecondP = (TextView) v.findViewById(R.id.second_par_forgot_pass_layout);
-        RelativeLayout.LayoutParams secondParParams = (RelativeLayout.LayoutParams)forgotPassSecondP.getLayoutParams();
-        secondParParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassSecondP.setLayoutParams(secondParParams);
-
-        forgotPassAction = (TextView) v.findViewById(R.id.action_forgot_pass_layout);
-        RelativeLayout.LayoutParams actionParams = (RelativeLayout.LayoutParams)forgotPassAction.getLayoutParams();
-        actionParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(25, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        forgotPassAction.setLayoutParams(actionParams);
-
-        yesMK = (Button) v.findViewById(R.id.yes_MK_button);
-        LinearLayout.LayoutParams yesMKParams = (LinearLayout.LayoutParams)yesMK.getLayoutParams();
-        yesMKParams.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(25, outMetrics), 0, 0);
-        yesMK.setLayoutParams(yesMKParams);
-        yesMK.setOnClickListener(this);
-        yesMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-
-        noMK = (Button) v.findViewById(R.id.no_MK_button);
-        LinearLayout.LayoutParams noMKParams = (LinearLayout.LayoutParams)noMK.getLayoutParams();
-        noMKParams.setMargins(scaleWidthPx(16, outMetrics), scaleHeightPx(25, outMetrics), 0, 0);
-        noMK.setLayoutParams(noMKParams);
-        noMK.setOnClickListener(this);
-        noMK.setBackground(ContextCompat.getDrawable(context, R.drawable.ripple_upgrade));
-
-        parkAccountLayout = (RelativeLayout) v.findViewById(R.id.park_account_layout);
-        parkAccountTitle = (TextView) v.findViewById(R.id.title_park_account_layout);
-        RelativeLayout.LayoutParams parkAccountTitleParams = (RelativeLayout.LayoutParams)parkAccountTitle.getLayoutParams();
-        parkAccountTitleParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(70, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        parkAccountTitle.setLayoutParams(parkAccountTitleParams);
-
-        parkAccountFirstP = (TextView) v.findViewById(R.id.first_par_park_account_layout);
-        RelativeLayout.LayoutParams parkAccountFParams = (RelativeLayout.LayoutParams)parkAccountFirstP.getLayoutParams();
-        parkAccountFParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        parkAccountFirstP.setLayoutParams(parkAccountFParams);
-
-        parkAccountSecondP = (TextView) v.findViewById(R.id.second_par_park_account_layout);
-        RelativeLayout.LayoutParams parkAccountSParams = (RelativeLayout.LayoutParams)parkAccountSecondP.getLayoutParams();
-        parkAccountSParams.setMargins(scaleWidthPx(24, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(24, outMetrics), 0);
-        parkAccountSecondP.setLayoutParams(parkAccountSParams);
-
-        parkAccountButton = (Button) v.findViewById(R.id.park_account_button);
-        RelativeLayout.LayoutParams parkButtonParams = (RelativeLayout.LayoutParams)parkAccountButton.getLayoutParams();
-        parkButtonParams.setMargins(0, scaleHeightPx(25, outMetrics),  scaleWidthPx(24, outMetrics), 0);
-        parkAccountButton.setLayoutParams(parkButtonParams);
-        parkAccountButton.setOnClickListener(this);
 
         tB  = v.findViewById(R.id.toolbar_login);
         loginVerificationLayout = (LinearLayout) v.findViewById(R.id.login_2fa);
@@ -1516,11 +1442,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 onRegisterClick(v);
                 break;
             }
-            case R.id.park_account_button:{
-                logDebug("Click to park account");
-                showDialogInsertMail(false);
-                break;
-            }
             case R.id.button_forgot_pass:{
                 logDebug("Click on button_forgot_pass");
                 try {
@@ -1537,17 +1458,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 break;
             }
-            case R.id.yes_MK_button:{
-                logDebug("Click on yes_MK_button");
-                showDialogInsertMail(true);
-                break;
-            }
-            case R.id.no_MK_button:{
-                logDebug("Click on no_MK_button");
-                showParkAccountLayout();
-                break;
-            }
-
             case R.id.login_text_view:
                 numberOfClicksKarere++;
                 if (numberOfClicksKarere == 5){
@@ -1598,41 +1508,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 break;
             }
         }
-    }
-
-
-    public void showForgotPassLayout(){
-        logDebug("showForgotPassLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.VISIBLE);
-    }
-
-    public void hideForgotPassLayout(){
-        logDebug("hideForgotPassLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.VISIBLE);
-        closeCancelDialog();
-    }
-
-    public void showParkAccountLayout(){
-        logDebug("showParkAccountLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.VISIBLE);
-    }
-
-    public void hideParkAccountLayout(){
-        logDebug("hideParkAccountLayout");
-        loginLoggingIn.setVisibility(View.GONE);
-        forgotPassLayout.setVisibility(View.GONE);
-        parkAccountLayout.setVisibility(View.GONE);
-        loginLogin.setVisibility(View.VISIBLE);
-        closeCancelDialog();
     }
 
     /*
@@ -2324,188 +2199,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
-    public void showDialogInsertMail(final boolean reset){
-        logDebug("reset: " + reset);
-
-        LinearLayout layout = new LinearLayout(context);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(scaleWidthPx(20, outMetrics), 0, scaleWidthPx(17, outMetrics), 0);
-
-        final EditText input = new EditText(context);
-        layout.addView(input, params);
-
-        final RelativeLayout error_layout = new RelativeLayout(context);
-        layout.addView(error_layout, params1);
-
-        final ImageView error_icon = new ImageView(context);
-        error_icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_input_warning));
-        error_layout.addView(error_icon);
-        RelativeLayout.LayoutParams params_icon = (RelativeLayout.LayoutParams) error_icon.getLayoutParams();
-
-
-        params_icon.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        error_icon.setLayoutParams(params_icon);
-
-        error_icon.setColorFilter(ContextCompat.getColor(context, R.color.red_600_red_300));
-
-        final TextView textError = new TextView(context);
-        error_layout.addView(textError);
-        RelativeLayout.LayoutParams params_text_error = (RelativeLayout.LayoutParams) textError.getLayoutParams();
-        params_text_error.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params_text_error.addRule(RelativeLayout.CENTER_VERTICAL);
-        params_text_error.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        params_text_error.setMargins(scaleWidthPx(3, outMetrics), 0,0,0);
-        textError.setLayoutParams(params_text_error);
-
-        textError.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
-
-        error_layout.setVisibility(View.GONE);
-
-//		input.setId(EDIT_TEXT_ID);
-        input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-        input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                if(error_layout.getVisibility() == View.VISIBLE){
-                    error_layout.setVisibility(View.GONE);
-                    input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
-                }
-            }
-        });
-        input.setSingleLine();
-        input.setHint(getString(R.string.edit_text_insert_mail));
-        input.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-        input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-//		input.setSelectAllOnFocus(true);
-        input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-                logDebug("OK RESET PASSWORD");
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    String value = input.getText().toString().trim();
-                    String emailError = Util.getEmailError(value, context);
-                    if (emailError != null) {
-                        logWarning("Mail incorrect");
-//                        input.setError(emailError);
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                        textError.setText(emailError);
-                        error_layout.setVisibility(View.VISIBLE);
-                        input.requestFocus();
-                    } else {
-                        if(reset){
-                            logDebug("Ask for link to reset pass");
-                            megaApi.resetPassword(value, true, loginFragment);
-                        }
-                        else{
-                            logDebug("Ask for link to park account");
-                            megaApi.resetPassword(value, false, loginFragment);
-                        }
-                        insertMailDialog.dismiss();
-                    }
-                }
-                else{
-                    logDebug("Other IME" + actionId);
-                }
-                return false;
-            }
-        });
-        input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
-        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    showKeyboardDelayed(v);
-                }
-                else{
-                    hideKeyboardDelayed(v);
-                }
-            }
-        });
-        String title;
-        String text;
-        String buttonText;
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        if(reset){
-            title= getString(R.string.title_alert_reset_with_MK);
-            text = getString(R.string.text_alert_reset_with_MK);
-            buttonText=getString(R.string.context_send);
-        }
-        else{
-            title= getString(R.string.park_account_dialog_title);
-            text = getString(R.string.dialog_park_account);
-            buttonText=getString(R.string.park_account_button);
-        }
-        builder.setTitle(title);
-        builder.setMessage(text);
-        builder.setPositiveButton(buttonText,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-                    }
-                });
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                hideKeyboard((LoginActivityLollipop)context, InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-        });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                input.getBackground().mutate().clearColorFilter();
-            }
-        });
-        builder.setView(layout);
-        insertMailDialog = builder.create();
-        insertMailDialog.show();
-        insertMailDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logDebug("OK BTTN PASSWORD");
-                String value = input.getText().toString().trim();
-                String emailError = Util.getEmailError(value, context);
-                if (emailError != null) {
-                    logWarning("Mail incorrect");
-//                    input.setError(emailError);
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(context, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                    textError.setText(emailError);
-                    error_layout.setVisibility(View.VISIBLE);
-                    input.requestFocus();
-                } else {
-                    if(reset){
-                        logDebug("Ask for link to reset pass");
-                        megaApi.resetPassword(value, true, loginFragment);
-                    }
-                    else{
-                        logDebug("Ask for link to park account");
-                        megaApi.resetPassword(value, false, loginFragment);
-                    }
-
-                    insertMailDialog.dismiss();
-                }
-            }
-        });
-    }
-
     /*
      * Display keyboard
      */
@@ -2684,22 +2377,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             return 2;
         }
         else{
-
-            if(forgotPassLayout.getVisibility()==View.VISIBLE){
-                logDebug("Forgot Pass layout is VISIBLE");
-                hideForgotPassLayout();
-                return 1;
-            }
             if(on2faPage) {
                 logDebug("Back from 2fa page");
                 showConfirmLogoutDialog();
                 return 2;
-            }
-
-            if(parkAccountLayout.getVisibility()==View.VISIBLE){
-                logDebug("Park account layout is VISIBLE");
-                hideParkAccountLayout();
-                return 1;
             }
 
             ((LoginActivityLollipop) context).isBackFromLoginPage = true;

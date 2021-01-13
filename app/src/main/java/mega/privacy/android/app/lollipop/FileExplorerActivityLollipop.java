@@ -1186,14 +1186,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	    return super.onPrepareOptionsMenu(menu);
 	}
-	
-	private View getTabIndicator(Context context, String title) {
-        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
-
-        TextView tv = (TextView) view.findViewById(R.id.textView);
-        tv.setText(title);
-        return view;
-    }
 
 	private void setRootTitle(){
 		logDebug("setRootTitle");

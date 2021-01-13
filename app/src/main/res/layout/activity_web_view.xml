@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/embed_web_browser_loading_title"
-                android:textColor="@color/primary_text"
+                android:textColor="?android:attr/textColorPrimary"
                 android:textSize="20sp" />
 
             <LinearLayout
@@ -56,7 +56,7 @@
                     android:layout_marginStart="24dp"
                     android:fontFamily="sans-serif"
                     android:text="@string/embed_web_browser_loading_message"
-                    android:textColor="@color/secondary_text"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textSize="14sp" />
 
             </LinearLayout>
