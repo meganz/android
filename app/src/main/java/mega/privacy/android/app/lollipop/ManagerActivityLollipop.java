@@ -4774,7 +4774,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param psa the PSA to show
 	 */
     private void showPsa(Psa psa) {
-        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+        if (psa == null || drawerItem != DrawerItem.HOMEPAGE
+				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
+        	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
+        	adjustNavHostViewHeight(true);
             return;
         }
 
@@ -4787,6 +4790,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 
         psaViewHolder.bind(psa);
+		adjustNavHostViewHeight(true);
     }
 
     public void checkBeforeShowSMSVerificationDialog() {
@@ -5688,7 +5692,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
 
-    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
+		updatePsaViewVisibility();
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
@@ -5768,6 +5772,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (destinationId == R.id.homepageFragment) {
 				mHomepageScreen = HomepageScreen.HOMEPAGE;
+				updatePsaViewVisibility();
 				// Showing the bottom navigation view immediately because the initial dimension
 				// of Homepage bottom sheet is calculated based on it
 				showBNVImmediate();
@@ -5788,6 +5793,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 			} else if (destinationId == R.id.offline_file_info) {
 				mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+				updatePsaViewVisibility();
 				abL.setVisibility(View.GONE);
 				showHideBottomNavigationView(true);
 				return;
@@ -5795,6 +5801,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
 			supportInvalidateOptionsMenu();
@@ -7981,6 +7988,44 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			transfersWidgetLayout.setLayoutParams(params);
         }
     }
+
+    /**
+	 * Update the PSA view visibility. It should only visible in root homepage tab.
+	 */
+    private void updatePsaViewVisibility() {
+		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
+				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
+		adjustNavHostViewHeight(true);
+	}
+
+    /**
+	 * Adjust the height of NavHostView according to the visibility of the PSA view.
+	 * When the PSA view is visible, the FAB within homepage should be displayed above
+	 * the PSA view, limit the height of NavHostView is an easier way to do that.
+	 *
+	 * @param needPost in some cases, e.g. go back from transfer fragment, the BNV isn't visible
+	 *                 when we call this function, so we need post this function call to the
+	 *                 next draw cycle.
+	 */
+    private void adjustNavHostViewHeight(boolean needPost) {
+    	if (drawerItem != DrawerItem.HOMEPAGE) {
+    		return;
+		}
+
+    	if (psaViewHolder.visible()) {
+    		if (fragmentLayout.getMeasuredHeight() <= 0 || psaViewHolder.psaLayoutHeight() <= 0 || needPost) {
+    			handler.post(() -> adjustNavHostViewHeight(false));
+			} else {
+				LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+				params.height = fragmentLayout.getMeasuredHeight() - psaViewHolder.psaLayoutHeight();
+				mNavHostView.setLayoutParams(params);
+			}
+		} else {
+    		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+    		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+    		mNavHostView.setLayoutParams(params);
+		}
+	}
 
 	private void closeUpgradeAccountFragment() {
 		setFirstNavigationLevel(true);

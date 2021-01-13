@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background_button_white"
-    android:paddingBottom="20dp">
+    android:paddingBottom="20dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <View
         android:layout_width="match_parent"

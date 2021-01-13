@@ -62,13 +62,30 @@ class PsaViewHolder(
     }
 
     /**
+     * Check if the PSA view is visible.
+     *
+     * @return if the PSA view is visible
+     */
+    fun visible() = binding.root.visibility == View.VISIBLE
+
+    /**
+     * Get height of the PSA view.
+     *
+     * @return height of the PSA view
+     */
+    fun psaLayoutHeight() = binding.root.measuredHeight
+
+    /**
      * Hide PSA view and dismiss it in server.
      *
      * @param id the id of the PSA
      */
     private fun dismissPsa(id: Int) {
-        viewModel.dismissPsa(id)
+        // ManagerActivity will check visibility of PSA view when dismiss PSA
+        // (receive null Psa event), so we need change visibility before calling
+        // ViewModel.
         binding.root.visibility = View.GONE
+        viewModel.dismissPsa(id)
         bound = false
     }
 }
