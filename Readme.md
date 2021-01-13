@@ -60,7 +60,7 @@ sudo apt install build-essential swig automake libtool autoconf cmake
 
 8. Build SDK by running `./build.sh all` at `app/src/main/jni/`. You could also run `./build.sh clean` to clean the previous configuration. **IMPORTANT:** check that the build process finished successfully, it should finish with the **Task finished OK** message. Otherwise, modify `LOG_FILE` variable in `build.sh` from `/dev/null` to a certain text file and run `./build.sh all` again for viewing the build errors.
 
-9. Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
+9. Download the link https://mega.nz/file/1qQTUIzY#Q3euQPnLZ5jpJCOE3GgNUfXp4Xw7nuuE_BG2eX73byI, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
 
 10. Open the project with Android Studio, let it build the project and hit _*Run*_.
 

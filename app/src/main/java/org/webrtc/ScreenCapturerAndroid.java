@@ -18,7 +18,7 @@ import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import android.view.Surface;
 
 /**
@@ -73,6 +73,11 @@ public class ScreenCapturerAndroid implements VideoCapturer, VideoSink {
     if (isDisposed) {
       throw new RuntimeException("capturer is disposed.");
     }
+  }
+
+  @Nullable
+  public MediaProjection getMediaProjection() {
+    return mediaProjection;
   }
 
   @Override

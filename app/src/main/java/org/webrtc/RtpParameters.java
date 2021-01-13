@@ -10,11 +10,12 @@
 
 package org.webrtc;
 
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import java.lang.Double;
 import java.lang.String;
 import java.util.List;
 import java.util.Map;
+import org.webrtc.MediaStreamTrack;
 
 /**
  * The parameters for an {@code RtpSender}, as defined in
@@ -26,6 +27,22 @@ import java.util.Map;
  * default value".
  */
 public class RtpParameters {
+  public enum DegradationPreference {
+    /** Does not degrade resolution or framerate. */
+    DISABLED,
+    /** Degrade resolution in order to maintain framerate. */
+    MAINTAIN_FRAMERATE,
+    /** Degrade framerate in order to maintain resolution. */
+    MAINTAIN_RESOLUTION,
+    /** Degrade a balance of framerate and resolution. */
+    BALANCED;
+
+    @CalledByNative("DegradationPreference")
+    static DegradationPreference fromNativeIndex(int nativeIndex) {
+      return values()[nativeIndex];
+    }
+  }
+
   public static class Encoding {
     // If non-null, this represents the RID that identifies this encoding layer.
     // RIDs are used to identify layers in simulcast.
@@ -33,6 +50,19 @@ public class RtpParameters {
     // Set to true to cause this encoding to be sent, and false for it not to
     // be sent.
     public boolean active = true;
+    // The relative bitrate priority of this encoding. Currently this is
+    // implemented for the entire RTP sender by using the value of the first
+    // encoding parameter.
+    // See: https://w3c.github.io/webrtc-priority/#enumdef-rtcprioritytype
+    // "very-low" = 0.5
+    // "low" = 1.0
+    // "medium" = 2.0
+    // "high" = 4.0
+    public double bitratePriority = 1.0;
+    // The relative DiffServ Code Point priority for this encoding, allowing
+    // packets to be marked relatively higher or lower without affecting
+    // bandwidth allocations.
+    @Priority public int networkPriority = Priority.LOW;
     // If non-null, this represents the Transport Independent Application
     // Specific maximum bandwidth defined in RFC3890. If null, there is no
     // maximum bitrate.
@@ -51,17 +81,20 @@ public class RtpParameters {
     public Long ssrc;
 
     // This constructor is useful for creating simulcast layers.
-    Encoding(String rid, boolean active, Double scaleResolutionDownBy) {
+    public Encoding(String rid, boolean active, Double scaleResolutionDownBy) {
       this.rid = rid;
       this.active = active;
       this.scaleResolutionDownBy = scaleResolutionDownBy;
     }
 
     @CalledByNative("Encoding")
-    Encoding(String rid, boolean active, Integer maxBitrateBps, Integer minBitrateBps,
-        Integer maxFramerate, Integer numTemporalLayers, Double scaleResolutionDownBy, Long ssrc) {
+    Encoding(String rid, boolean active, double bitratePriority, @Priority int networkPriority,
+        Integer maxBitrateBps, Integer minBitrateBps, Integer maxFramerate,
+        Integer numTemporalLayers, Double scaleResolutionDownBy, Long ssrc) {
       this.rid = rid;
       this.active = active;
+      this.bitratePriority = bitratePriority;
+      this.networkPriority = networkPriority;
       this.maxBitrateBps = maxBitrateBps;
       this.minBitrateBps = minBitrateBps;
       this.maxFramerate = maxFramerate;
@@ -79,6 +112,17 @@ public class RtpParameters {
     @CalledByNative("Encoding")
     boolean getActive() {
       return active;
+    }
+
+    @CalledByNative("Encoding")
+    double getBitratePriority() {
+      return bitratePriority;
+    }
+
+    @CalledByNative("Encoding")
+    @Priority
+    int getNetworkPriority() {
+      return networkPriority;
     }
 
     @Nullable
@@ -229,20 +273,25 @@ public class RtpParameters {
 
   public final String transactionId;
 
+  /**
+   * When bandwidth is constrained and the RtpSender needs to choose between degrading resolution or
+   * degrading framerate, degradationPreference indicates which is preferred.
+   */
+  @Nullable public DegradationPreference degradationPreference;
+
   private final Rtcp rtcp;
 
   private final List<HeaderExtension> headerExtensions;
 
   public final List<Encoding> encodings;
-  // Codec parameters can't currently be changed between getParameters and
-  // setParameters. Though in the future it will be possible to reorder them or
-  // remove them.
+
   public final List<Codec> codecs;
 
   @CalledByNative
-  RtpParameters(String transactionId, Rtcp rtcp, List<HeaderExtension> headerExtensions,
-      List<Encoding> encodings, List<Codec> codecs) {
+  RtpParameters(String transactionId, DegradationPreference degradationPreference, Rtcp rtcp,
+      List<HeaderExtension> headerExtensions, List<Encoding> encodings, List<Codec> codecs) {
     this.transactionId = transactionId;
+    this.degradationPreference = degradationPreference;
     this.rtcp = rtcp;
     this.headerExtensions = headerExtensions;
     this.encodings = encodings;
@@ -252,6 +301,11 @@ public class RtpParameters {
   @CalledByNative
   String getTransactionId() {
     return transactionId;
+  }
+
+  @CalledByNative
+  DegradationPreference getDegradationPreference() {
+    return degradationPreference;
   }
 
   @CalledByNative

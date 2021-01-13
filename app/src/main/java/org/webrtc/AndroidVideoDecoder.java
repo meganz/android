@@ -14,7 +14,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaFormat;
 import android.os.SystemClock;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import android.view.Surface;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -56,7 +56,7 @@ class AndroidVideoDecoder implements VideoDecoder, VideoSink {
 
   private final MediaCodecWrapperFactory mediaCodecWrapperFactory;
   private final String codecName;
-  private final VideoCodecType codecType;
+  private final VideoCodecMimeType codecType;
 
   private static class FrameInfo {
     final long decodeStartTimeMs;
@@ -129,7 +129,7 @@ class AndroidVideoDecoder implements VideoDecoder, VideoSink {
   @Nullable private MediaCodecWrapper codec;
 
   AndroidVideoDecoder(MediaCodecWrapperFactory mediaCodecWrapperFactory, String codecName,
-      VideoCodecType codecType, int colorFormat, @Nullable EglBase.Context sharedContext) {
+      VideoCodecMimeType codecType, int colorFormat, @Nullable EglBase.Context sharedContext) {
     if (!isSupportedColorFormat(colorFormat)) {
       throw new IllegalArgumentException("Unsupported color format: " + colorFormat);
     }
@@ -180,7 +180,7 @@ class AndroidVideoDecoder implements VideoDecoder, VideoSink {
 
     try {
       codec = mediaCodecWrapperFactory.createByCodecName(codecName);
-    } catch (IOException | IllegalArgumentException e) {
+    } catch (IOException | IllegalArgumentException | IllegalStateException e) {
       Logging.e(TAG, "Cannot create media decoder " + codecName);
       return VideoCodecStatus.FALLBACK_SOFTWARE;
     }
@@ -191,7 +191,7 @@ class AndroidVideoDecoder implements VideoDecoder, VideoSink {
       }
       codec.configure(format, surface, null, 0);
       codec.start();
-    } catch (IllegalStateException e) {
+    } catch (IllegalStateException | IllegalArgumentException e) {
       Logging.e(TAG, "initDecode failed", e);
       release();
       return VideoCodecStatus.FALLBACK_SOFTWARE;
@@ -244,10 +244,6 @@ class AndroidVideoDecoder implements VideoDecoder, VideoSink {
       // Need to process a key frame first.
       if (frame.frameType != EncodedImage.FrameType.VideoFrameKey) {
         Logging.e(TAG, "decode() - key frame required first");
-        return VideoCodecStatus.NO_OUTPUT;
-      }
-      if (!frame.completeFrame) {
-        Logging.e(TAG, "decode() - complete frame required first");
         return VideoCodecStatus.NO_OUTPUT;
       }
     }
@@ -463,7 +459,10 @@ class AndroidVideoDecoder implements VideoDecoder, VideoSink {
   private void deliverByteFrame(
       int result, MediaCodec.BufferInfo info, int rotation, Integer decodeTimeMs) {
     // Load dimensions from shared memory under the dimension lock.
-    int width, height, stride, sliceHeight;
+    int width;
+    int height;
+    int stride;
+    int sliceHeight;
     synchronized (dimensionLock) {
       width = this.width;
       height = this.height;

@@ -21,17 +21,13 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Handler;
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import android.util.Range;
 import android.view.Surface;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import org.webrtc.CameraEnumerationAndroid.CaptureFormat;
-
-import static mega.privacy.android.app.utils.CallUtil.disableLocalCamera;
 
 @TargetApi(21)
 class Camera2Session implements CameraSession {
@@ -102,7 +98,6 @@ class Camera2Session implements CameraSession {
       checkIsOnCameraThread();
       final boolean startFailure = (captureSession == null) && (state != SessionState.STOPPED);
       state = SessionState.STOPPED;
-      disableLocalCamera();
       stopInternal();
       if (startFailure) {
         callback.onFailure(FailureType.DISCONNECTED, "Camera disconnected / evicted.");

@@ -393,9 +393,10 @@ echo "* libwebsockets is ready"
 
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
-    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm.a | cut -d " " -f 1`
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "d876e79e728f58c8c9387f02914591f61ccf5066" ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/t81HSYJI#KQNzSEqmGVSXfwmQx2HMJy3Jo2AcDfYm4oiMP_CFW6s"
+    WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
+    pwd
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "b66778a32c38976748a0f35a9ae204532e69f54e" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/1qQTUIzY#Q3euQPnLZ5jpJCOE3GgNUfXp4Xw7nuuE_BG2eX73byI"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
@@ -476,6 +477,7 @@ if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* ndk-build finished for x86_64"
 fi
 
+echo "AQUIII"
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
     ${NDK_BUILD} -j8 APP_ABI=arm64-v8a

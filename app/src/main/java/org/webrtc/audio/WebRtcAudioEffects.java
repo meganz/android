@@ -15,8 +15,7 @@ import android.media.audiofx.AudioEffect;
 import android.media.audiofx.AudioEffect.Descriptor;
 import android.media.audiofx.NoiseSuppressor;
 import android.os.Build;
-import androidx.annotation.Nullable;
-
+import android.support.annotation.Nullable;
 import java.util.UUID;
 import org.webrtc.Logging;
 
@@ -220,14 +219,14 @@ class WebRtcAudioEffects {
   // Returns true if an effect of the specified type is available. Functionally
   // equivalent to (NoiseSuppressor|AutomaticGainControl|...).isAvailable(), but
   // faster as it avoids the expensive OS call to enumerate effects.
-  private static boolean isEffectTypeAvailable(UUID effectType, UUID blackListedUuid) {
+  private static boolean isEffectTypeAvailable(UUID effectType, UUID blockListedUuid) {
     Descriptor[] effects = getAvailableEffects();
     if (effects == null) {
       return false;
     }
     for (Descriptor d : effects) {
       if (d.type.equals(effectType)) {
-        return !d.uuid.equals(blackListedUuid);
+        return !d.uuid.equals(blockListedUuid);
       }
     }
     return false;

@@ -10,7 +10,7 @@
 
 package org.webrtc;
 
-import androidx.annotation.Nullable;
+import android.support.annotation.Nullable;
 import java.nio.ByteBuffer;
 
 public class NV12Buffer implements VideoFrame.Buffer {
