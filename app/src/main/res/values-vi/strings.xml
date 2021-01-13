@@ -71,7 +71,7 @@
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">Lỗi. Không tìm thấy thư mục secondary media, xin chọn một thư mục mới</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Không phát hiện bộ lưu trữ ngoài</string>
-    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Thư mục đã được chỉnh cho "Chỉ Được Xem". Không thể tải lên bất kỳ nội dung nào.</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Thư mục được đặt là “chỉ được xem”. Không thể tải lên bất kỳ nội dung nào.</string>
 
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Tác vụ này sẽ xóa tệp tin chứa Mã Khóa Phục Hồi khỏi máy</string>
     <!--
@@ -598,7 +598,7 @@
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Không thể mở tệp đã chọn</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Đang giải nén tệp</string>
 
-    <string name="error_io_problem" context="error message while browsing the local filesystem">Tệp tin hệ thống có vấn đề</string>
+    <string name="error_io_problem" context="error message while browsing the local filesystem">File system có vấn đề</string>
     <string name="general_error" context="error message while browsing the local filesystem">Lỗi phát sinh khi thi hành tác vụ</string>
 
     <string name="full_screen_image_viewer_label" context="title of the image gallery">Trang xem ảnh</string>
@@ -886,6 +886,11 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Hình ảnh</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Video</string>
 
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">hàng tháng</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">hàng năm</string>
 
@@ -928,7 +933,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">Quý trình hiện diễn ra lâu hơn dự đoán. Xin chờ.</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">Tài Khoản Miễn Phí</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">Tài khoản hạng Pro Lite</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">Tài Khoản Pro Lite</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">Tài khoản hạng Pro I</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">Tài khoản hạng Pro II</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">Tài khoản hạng Pro III</string>
@@ -1217,7 +1222,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Lịch sử tin nhắn chát đã được dọn sạch</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Lỗi phát sinh. Lịch sử cuộc chát chưa được xoá sạch.</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Lỗi phát sinh. Lịch sử cuộc chát chưa được xóa sạch</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Thêm thành viên</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Mời ra khỏi cuộc chát</string>
@@ -1260,7 +1265,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">Loại bỏ %s khỏi cuộc chát?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">Chỉ được xem</string>
+    <string name="observer_permission_label_participants_panel" context="Label to explain the read only participant permission in the options panel of the group info screen">Chỉ được xem</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1649,7 +1654,7 @@
     <string name="file_properties_shared_folder_public_link_name">Đường liên kết</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Toàn quyền</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Chỉ được xem</string>
+    <string name="file_properties_shared_folder_read_only" context="Label to explain the read only participant permission in the options panel of the group info screen">Chỉ được xem</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Cho xem và sửa</string>
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Phiên truyền tải bị dừng!</string>
@@ -2780,7 +2785,7 @@
 
     <string name="error_remove_business_contact" context="Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz">Không thể xóa tên %1$s khỏi sổ liên lạc vì đây là nhân viên trong tài khoản Doanh Nghiệp này.</string>
     <string name="grace_period_admin_alert" context="When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information">Đã có vấn đề xảy ra với việc thanh toán gần đây. Xin truy cập MEGA bằng trình duyệt web trên máy tính để biết thêm thông tin.</string>
-    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Tài khoản doanh nghiệp của quý khách đã hết hạn</string>
+    <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Tài khoản doanh nghiệp đã hết hạn</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Đã có vấn đề xảy ra với việc xử lý thanh toán gần đây. Tài khoản sẽ bị giới hạn chức năng cho đến khi việc thanh toán được thực hiện giải quyết trên phiên bản nền web.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Tài khoản của bạn hiện đang bị [B]đình chỉ[/B]. Bạn chỉ có khả năng xem duyệt dữ liệu của mình.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Mặc dù MEGA không có quyền truy cập vào dữ liệu của bạn, nhưng người quản trị tài khoản doanh nghiệp sẽ có khả năng xem nội dung Camera Uploads có trong tài khoản nhân viên của bạn</string>
@@ -2840,7 +2845,7 @@
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Luôn lưu các mục tải về vào vị trí này?</string>
 
     <string name="view_in_folder_label" context="Action to show any file in its location">Xem trong thư mục</string>
-    <string name="browse_files_label" context="Title of a screen to browse files">Browse files</string>
+    <string name="browse_files_label" context="Title of a screen to browse files">Duyệt tệp tin</string>
 
     <string name="file_provider_title" context="Title of the File Provider activity">Đính kèm từ&#8230;</string>
 
@@ -2894,6 +2899,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Số điện thoại đã được xóa bỏ thành công.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Xóa số điện thoại không thành công.</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Tài khoản bạn đang cố khôi phục đang bị chặn.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Tài khoản của quý khách bị khóa. Vui lòng liên hệ support&#64;mega.nz</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Tài khoản nhân viên của bạn đã bị đình chỉ bởi ban quản trị. Xin liên hệ với ban tổng quản lý tài khoản doanh nghiệp của bạn để tìm hiểu lý do.</string>
@@ -2908,6 +2915,16 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Xem</string>
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Chứng thực của %s</string>
+
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Tìm trong GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Không tìm thấy [A]ảnh GIF[/A] nào</string>
@@ -2924,4 +2941,19 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="title_label" context="Title text to show label selector.">Label</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 </resources>

@@ -71,7 +71,7 @@
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">第二媒體資料夾不存在，請選擇一個新的資料夾</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">未能偵測到外部儲存空間(例如：記憶卡)</string>
-    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">此為唯讀資料夾，您沒有上傳的權限。</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">此為唯讀資料夾。您沒有上傳的權限。</string>
 
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">您正在移除您以前匯出的還原金鑰檔案</string>
     <!--
@@ -886,6 +886,11 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">照片</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">影片</string>
 
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
 
@@ -928,7 +933,7 @@
     <string name="servers_busy" context="message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock">這個過程花費的時間比預期的長。請稍候。</string>
 
     <string name="my_account_free" context="Label in My Account section to show user account type">免費帳戶</string>
-    <string name="my_account_prolite" context="Label in My Account section to show user account type">PRO Lite 帳戶</string>
+    <string name="my_account_prolite" context="Label in My Account section to show user account type">專業版Lite帳戶</string>
     <string name="my_account_pro1" context="Label in My Account section to show user account type">PRO I 帳戶</string>
     <string name="my_account_pro2" context="Label in My Account section to show user account type">PRO II 帳戶</string>
     <string name="my_account_pro3" context="Label in My Account section to show user account type">PRO III 帳戶</string>
@@ -1260,7 +1265,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">確定要把%s從這個聊天對話中移除？</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">僅能閱讀</string>
+    <string name="observer_permission_label_participants_panel" context="Label to explain the read only participant permission in the options panel of the group info screen">僅能閱讀</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1649,7 +1654,7 @@
     <string name="file_properties_shared_folder_public_link_name">連結</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">全權訪問</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">僅能閱讀</string>
+    <string name="file_properties_shared_folder_read_only" context="Label to explain the read only participant permission in the options panel of the group info screen">僅能閱讀</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">讀取與編輯</string>
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">傳輸已暫停！</string>
@@ -2392,12 +2397,12 @@
     <string name="title_account_notification_deleted" context="Title of the historic notification for an account deleted">帳戶已刪除</string>
     <string name="subtitle_account_notification_deleted" context="Subtitle of the historic notification for an account deleted">[B]帳戶[/B][A]%s[/A][B]已刪除。[/B]</string>
 
-    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]您公開分享的檔案[/A][B]%s[/B][C]已被刪除。[/C]</string>
-    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]您公開分享的資料夾[/A][B]%s[/B][C]已被刪除。[/C]</string>
+    <string name="subtitle_file_takedown_notification" context="Subtitle of file takedown historic notification">[A]您公開分享的檔案[/A][B]%s[/B][C]已被移除。[/C]</string>
+    <string name="subtitle_folder_takedown_notification" context="Subtitle of folder takedown historic notification">[A]您公開分享的資料夾[/A][B]%s[/B][C]已被移除。[/C]</string>
 
     <string name="message_file_takedown_pop_out_notification" context="Popup notification text on mouse-over of taken down file.">此檔案接獲下架通知且已被移除</string>
-    <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">此資料夾接獲下架通知且已被移除</string>
-    <string name="dispute_takendown_file" context="option to dispute taken down file or folder">爭議被刪除</string>
+    <string name="message_folder_takedown_pop_out_notification" context="Popup notification text on mouse-over taken down folder.">此資料夾已認定需被移除。</string>
+    <string name="dispute_takendown_file" context="option to dispute taken down file or folder">爭議移除</string>
     <string name="error_download_takendown_node" context="Error shown when download a file that has violated ToS/AUP.">由於ToS/AUP違規而無法存取</string>
     <plurals name="alert_taken_down_files">
         <item context="Alert shown when one file was not downloaded due to ToS/AUP violation, Singular of taken down file. 1 file" quantity="one">由於違反服務條款 / 可接受使用政策，%d個檔案未下載。</item>
@@ -2783,7 +2788,7 @@
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">您的商業帳戶已過期</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">處理您的付款時出現問題。在電腦版網頁瀏覽器中修復此問題之前，MEGA僅限於檢視。</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">您的帳戶目前[B]暫停使用[/B]。您只能瀏覽您的資料。</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">儘管MEGA無權存取您的資料，但您的組織管理員是可以控制和檢視您使用者帳戶中的「相機上傳」。</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">儘管MEGA無權存取您的資料，但您的商業帳戶管理員是可以控制和檢視您使用者帳戶中的相機上傳。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出錯了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">請聯繫您的商業帳戶管理員來解決問題並啟用您的帳戶。</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 將自動增加，沒有額外費用，純粹用於商業目的。</string>
@@ -2834,7 +2839,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">於%1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您確定要移除這%1$d個資料夾的所有共享嗎？</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您確定要終止這%1$d個資料夾的共享嗎？</string>
 
     <string name="download_location" context="Download location label">下載地址</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">總是儲存在此位置？</string>
@@ -2894,6 +2899,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">您的手機號碼已成功移除。</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">您的手機號碼移除失敗。</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">您欲重置的帳號已被鎖定。</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">您的帳號已被鎖定。請連繫support&#64;mega.nz</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">您的帳戶已被您的管理員停用。相關詳細資訊，請與您的商業帳戶管理員聯絡。</string>
@@ -2908,6 +2915,16 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">查看</string>
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的憑證</string>
+
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">搜尋GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">找不到[A]GIFs[/A]</string>
@@ -2924,4 +2941,19 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">停用聊天訊息的特別資訊</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已達到%d個回應的最大限制。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此訊息已達到%d個回應的最大限制。</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="title_label" context="Title text to show label selector.">Label</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 </resources>

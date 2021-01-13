@@ -71,7 +71,7 @@
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">Folder media sekunder tidak ada, silahkan pilih folder baru</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">Tidak ada penyimpanan eksternal yang terdeteksi</string>
-    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Folder ini hanya bisa dibaca. Anda tidak memiliki izin untuk mengupload</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Folder ini hanya-baca. Anda tidak memiliki izin untuk mengupload</string>
 
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Anda menghapus file Recovery Key yang telah diekspor sebelumnya</string>
     <!--
@@ -886,6 +886,11 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Foto</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Video</string>
 
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">per bulan</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per tahun</string>
 
@@ -1217,7 +1222,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Riwayat obrolan telah dihapus</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Kesalahan terjadi. Sejarah obrolan belum berhasil dihapus.</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Telah terjadi kesalahan. Riwayat obrolan belum berhasil dihapus</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Tambahkan peserta</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Hapus peserta</string>
@@ -1260,7 +1265,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">Hapus %s dari chat ini?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">Hanya-baca</string>
+    <string name="observer_permission_label_participants_panel" context="Label to explain the read only participant permission in the options panel of the group info screen">Hanya-baca</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1649,7 +1654,7 @@
     <string name="file_properties_shared_folder_public_link_name">Link</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Akses penuh</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Hanya-baca</string>
+    <string name="file_properties_shared_folder_read_only" context="Label to explain the read only participant permission in the options panel of the group info screen">Hanya-baca</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">Read &amp; write</string>
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">Transfer dihentikan!</string>
@@ -2285,7 +2290,7 @@
     <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">Semua pemindahan akan dibatalkan, apakah anda ingin masuk?</string>
     <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">Semua pemindahan akan dibatalkan, apakah anda ingin keluar?</string>
 
-    <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Read only</string>
+    <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">Hanya-baca</string>
 
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]dari %2$s digunakan[/B]</string>
 
@@ -2783,7 +2788,7 @@
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">Akun bisnis Anda kedaluwarsa</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Terjadi masalah saat memproses pembayaran anda. MEGA terbatas hanya untuk melihat sampai masalah ini telah diperbaiki di browser web desktop.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Akun Anda saat ini [B]ditangguhkan[/B]. Anda hanya dapat menelusuri data Anda.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Meskipun MEGA tidak memiliki akses ke data anda, administrator organisasi anda memiliki kemampuan untuk mengontrol dan melihat Unggahan Kamera di akun pengguna anda</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Meskipun MEGA tidak dapat mengakses data anda, administrator akun bisnis anda memiliki kemampuan untuk mengontrol dan melihat Unggahan Kamera di akun pengguna anda</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Ada yang salah</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Hubungi administrator akun bisnis Anda untuk menyelesaikan masalah dan aktifkan akun Anda.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Akan otomatis naik, tanpa biaya tambahan, untuk tujuan usaha yang benar.</string>
@@ -2824,7 +2829,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Menghubungkan kembali</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">Anda kembali.</string>
-    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Koneksi internet buruk</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Sambungan Internet buruk</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Rekaman&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Buat file baru</string>
@@ -2834,7 +2839,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">pada %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Anda yakin ingin berhenti berbagi %1$d folder?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">Anda yakin ingin berhenti berbagi %1$d folder ini?</string>
 
     <string name="download_location" context="Download location label">Download lokasi</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">Selalu simpan ke lokasi ini?</string>
@@ -2894,6 +2899,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Nomor telepon anda telah berhasil dihapus.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Penghapusan nomor telepon Anda gagal.</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Akun yang anda coba untuk reset telah diblokir</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Akun anda telah di-blok. Harap kontak support&#64;mega.nz</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">Akun Anda telah dinonaktifkan oleh administrator Anda. Anda dapat menghubungi administrator akun bisnis Anda untuk rincian lebih lanjut.</string>
@@ -2908,6 +2915,16 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">Lihat</string>
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s kredensial</string>
+
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Telusuri GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">[A]GIF[/A] Tidak ditemukan</string>
@@ -2924,4 +2941,19 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Info khusus yang dinonaktifkan untuk pesan obrolan</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Anda telah mencapai batas maksimum %d reaksi.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Pesan ini telah mencapai batas maksimum %d reaksi.</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="title_label" context="Title text to show label selector.">Label</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 </resources>

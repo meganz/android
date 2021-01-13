@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端的应用程序提供由用户控制的加密云储存服务。不同于其他云储存供应商，您的数据仅由用户客户端设备进行加密与解密，而从不经由我们加解密。\n\n您可以通过智能手机或平板电脑上传您的文件，并且随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，共享，重命名或删除文件。与您的联系人共享文件夹并随时查看其更新。此加密方式也代表我们无法存取或重新设定您的密码，因此您必须牢牢记住它（除非您有备份恢复密钥），否则您将无法存取您所储存的文件。\n\n端到端用户加密的MEGA视频聊天是完全隐私的，自2016年起一直通过浏览器提供。它已扩展至我们的移动应用程序并可通过多个设备访问聊天历史记录。用户还可以轻松地将文件添加至MEGA云盘的聊天中。\n\n注册用户只要参与奖励计划即可获得50GB免费储存空间，也可付费获得更高配额：\n\n\nPRO LITE订阅：每月€4.99或每年€49.99，您会获得每月400GB的存储空间和1TB的传输流量。\nPRO I订阅：每月€9.99或每年€99.99，您会获得每月2TB的存储空间和2TB的传输流量。\nPRO II订阅：每月€19.99或每年€199.99，您会获得每月8TB的存储空间和8TB的传输流量。\nPRO III订阅：每月€29.99或每年€299.99，您会获得每月16TB的存储空间和16TB的传输流量。\n\n此订阅将会自动更新续订，续订内容与您一开始选择的订阅时间与价格一致。如需管理您的订阅内容，请点击您手机上的Play商店图标，以您的Google账号登入（如果您还没有这样做），然后点击MEGA App。您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - >拍照并将照片上传至MEGA\nREAD_CONTACTS - >从您的设备中轻松地添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供端到端加密音频/视频通话\n\n\n为了增强用户对MEGA系统的信心，所有的客户端代码都已发布，因此如果您对其感兴趣，您可以评估加密过程。我们的移动应用程序的代码位于：https://github.com/meganz/android\n\n若了解更多信息，请查看我们的网站：\n请参阅https://mega.nz/terms \n\n\n桌面 - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - >拍照并将照片上传至MEGA\nREAD_CONTACTS - >从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android\n\n若了解更多内容，请查看我们的网站：\n参见https://mega.nz/terms \n\n\n网页客户端 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA是全面专注隐私保护的云端存储平台。</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 查看器</string>
@@ -71,7 +71,7 @@
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">次级媒体文件夹不存在，请选择一个新文件夹</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">未检测到任何外接存储</string>
-    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">该共享文件夹的权限为只读，您不能上传资料。</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">此文件夹为只读，您没有上传权限</string>
 
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">您即将删除已保存的恢复密钥。</string>
     <!--
@@ -378,7 +378,7 @@
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">图片分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享链接</string>
-    <string name="context_delete_link" context="Delete a link label">Delete link</string>
+    <string name="context_delete_link" context="Delete a link label">删除链接</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">获取链接</string>
 
     <!--<string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>-->
@@ -445,7 +445,7 @@
     <string name="context_send_contact" context="menu item">共享联系人至聊天</string>
     <string name="context_view_shared_folders" context="open a shared folder">查看共享文件夹</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">分享</string>
-    <string name="manage_share" context="Menu option to manage a shared folder.">Manage share</string>
+    <string name="manage_share" context="Menu option to manage a shared folder.">管理共享</string>
     <!--
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
     -->
@@ -704,7 +704,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">相机上传完成</string>
-    <string name="settings_features" context="settings of the Features section">Features</string>
+    <string name="settings_features" context="settings of the Features section">功能</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">储存空间</string>
     <string name="settings_pin_lock" context="Settings of the Passcode">密码锁</string>
@@ -801,7 +801,7 @@
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">未设定</string>
     <string name="settings_pin_lock_switch" context="Settings of the Passcode">密码锁</string>
-    <string name="settings_change_passcode" context="Settings option to change Passcode.">Change Passcode</string>
+    <string name="settings_change_passcode" context="Settings option to change Passcode.">更改应用锁密码</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">输入</string>
     <string name="pin_lock_alert" context="error message when not typing the Passcode code correctly">您的本地文件将被删除，您将在10次尝试失败后注销</string>
@@ -885,6 +885,11 @@
     <string name="sortby_type" context="Title of sort by media type options">媒体类型</string>
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">照片</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">影片</string>
+
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
@@ -1217,7 +1222,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">聊天记录已删除</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">发生错误。聊天记录未清除成功。</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">错误，聊天记录未成功清除</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">添加与会者</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">删除与会者</string>
@@ -1260,7 +1265,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">要将%s从会话中删除吗？</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">只读</string>
+    <string name="observer_permission_label_participants_panel" context="Label to explain the read only participant permission in the options panel of the group info screen">只读</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1327,7 +1332,7 @@
     <string name="sms_logout" context="Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout">[A]登出[/A]，使用其他帐户登录</string>
     <string name="confirm_logout_from_sms_verification" context="On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation.">确定要退出当前帐户吗？</string>
     <string name="non_format_text_deleted_message_by" context="Text shown when a message has been deleted in the chat">%1$s 删除了信息</string>
-    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">Chat history has been cleared</string>
+    <string name="history_cleared_message" context="Text shown when the chat history has been successfully deleted.">聊天记录已清除</string>
     <string name="non_format_history_cleared_by" context="Text shown when the chat history was cleared by someone">%1$s 清空了聊天记录</string>
 
     <!--
@@ -1649,7 +1654,7 @@
     <string name="file_properties_shared_folder_public_link_name">链接</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">完全访问权限</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">只读</string>
+    <string name="file_properties_shared_folder_read_only" context="Label to explain the read only participant permission in the options panel of the group info screen">只读</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">可读写</string>
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">传输已暂停！</string>
@@ -2285,7 +2290,7 @@
     <string name="login_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">所有传输将被取消，您确定要登录吗？</string>
     <string name="logout_warning_abort_transfers" context="Popup message shown if an user try to login while there is still living transfer">所有传输将被取消，您确定要登出吗？</string>
 
-    <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">仅能阅读</string>
+    <string name="subtitle_read_only_permissions" context="Label to explain the read only participant permission in the options panel of the group info screen">只读</string>
 
     <string name="used_space" context="Label shown the total space and the used space in an account">[A]%1$s [/A][B]的 %2$s已使用[/B]</string>
 
@@ -2319,7 +2324,7 @@
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">管理聊天链接</string>
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">启用加密密钥轮换</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">Encrypted Key Rotation enabled</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">已开启加密密钥轮换</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">密钥轮换相对更为安全，但不允许您创建聊天链接，新参与者将无法看到过去的消息。</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">密钥轮换将被禁用当参与者超过100人时。</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">由于参与人数已达上限，无法将此聊天转换为私密聊天。</string>
@@ -2552,7 +2557,7 @@
     <string name="call_error_too_many_participants" context="Message show when a call cannot be established because there are too many participants in the group call">参与人数已达上限，您无法加入此通话。</string>
     <string name="call_error_too_many_participants_join" context="Message show when a call cannot be established because there are too many participants in the group">由于参与人数已达上限，您无法加入通话。</string>
     <string name="call_error_too_many_video" context="Message show when a user cannot activate the video in a group call because the max number of videos has been reached">已使用视频的参与人数已达上限，您无法开启视频。</string>
-    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">You are not allowed to put the call on hold.</string>
+    <string name="call_error_call_on_hold" context="Message show when a user cannot put the call on hold">您无法保留通话。</string>
 
     <string name="error_open_file_with" context="Error message shown when a file cannot be opened by other app using the open with option menu">错误。此文件无法打开。</string>
     <string name="incoming_call_starting" context="Subtitle of the call screen when a incoming call is just starting">来电&#8230;&#8230;</string>
@@ -2654,7 +2659,7 @@
     <string name="ongoing_call_messages" context="Text shown in the list of chats when there is a call in progress but I am not on it">正在进行通话</string>
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s已开始群组通话。点击加入。</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">点击返回通话</string>
-    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
+    <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">您目前正在通话</string>
 
     <string name="message_joined_public_chat_autoinvitation" formatted="false" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime.">[A]%1$s[/A][B]已加入群组聊天。[/B]</string>
 
@@ -2674,17 +2679,17 @@
     <string name="muted_contact_micro" context="Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call">%s 该通话已静音</string>
     <string name="muted_own_micro" context="Subtitle of the call screen when I muted the current individual call">已静音</string>
     <string name="call_on_hold" context="Subtitle of the call screen when the call is on hold">通话保持</string>
-    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s is on hold</string>
-    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">Hold and Answer</string>
-    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">Hold and Join</string>
-    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">End and Answer</string>
-    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">End and Join</string>
+    <string name="session_on_hold" context="Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold">%s正在保留通话</string>
+    <string name="hold_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other.">保留通话并应答</string>
+    <string name="hold_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other.">保留通话并加入</string>
+    <string name="end_and_answer_call_incoming" context="The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other.">结束通话并应答</string>
+    <string name="end_and_join_call_incoming" context="The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other.">结束通话并加入</string>
 
     <string name="copy_already_downloaded" context="when trying to download a file that is already downloaded in the device and has to copy in another path">文件已下载。已复制到所选路径。</string>
 
     <string name="title_join_call" context="Title of the dialog shown when you want to join a group call">加入通话</string>
     <string name="text_join_call" context="Text of the dialog shown when you want to join a group call">加入该通话需结束您的当前通话。</string>
-    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">To join this call you have to end or hold the current call.</string>
+    <string name="text_join_another_call" context="Text of the dialog shown when you want to join a group call but you are in another active call">加入该通话需结束或保留当前通话。</string>
 
     <string name="hint_enter_chat_link" context="Hint shown in the open chat link alert dialog">输入聊天链接</string>
 
@@ -2757,9 +2762,9 @@
     <string name="error_upload_voice_clip" context="Text shown when it tries to upload a voice message and occurs an error to process the action">上传语音信息时出错。</string>
 
     <string name="title_notification_incoming_call" context="Title of the notification shown on the action bar when there is a incoming call">来电</string>
-    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">Incoming group call</string>
-    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">Incoming video call</string>
-    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">Incoming audio call</string>
+    <string name="title_notification_incoming_group_call" context="Title of the notification shown on the action bar when there is a incoming group call">群组通话来电</string>
+    <string name="title_notification_incoming_individual_video_call" context="Title of the notification shown on the action bar when there is an individual incoming video call">视频通话来电</string>
+    <string name="title_notification_incoming_individual_audio_call" context="Title of the notification shown on the action bar when there is an individual incoming audio call">语音通话来电</string>
 
     <string name="embed_web_browser_loading_title" context="The title of progress dialog when loading web content">读取中</string>
     <string name="embed_web_browser_loading_message" context="The message of progress dialog when loading web content">请等待&#8230;</string>
@@ -2783,11 +2788,11 @@
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">您的企业帐户已到期</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">处理您的付款时出现问题。在桌面浏览器中修复此问题前，MEGA仅限于查看。</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">当前您的帐户已被[B]禁用[/B]。您只能浏览数据。</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">尽管MEGA无法访问您的数据，但您的企业管理员可以控制并查看用户的帐户中的“相机上传”文件。</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA无法访问您的数据，而您的企业帐户管理员有权控制并查看用户帐户中的“相机上传”文件。</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">出错了</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">请联系您的企业帐户管理员解决此问题并激活帐户。</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">**将自动增加，不收取额外费用，并用于真正的商业目的</string>
-    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]Storage[/A] **</string>
+    <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]存储空间[/A] **</string>
     <string name="unlimited_transfer_quota" context="Label to indicate an unlimited transfer quota. Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style.">无限[A]传输流量[/A]</string>
 
     <string name="logout_warning_offline" context="Warning message to alert user about logout in My Account section if has offline files.">登出帐户后，保存在“离线”中的文件将从您的设备中删除。</string>
@@ -2824,7 +2829,7 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">正在重新连接</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">已重连。</string>
-    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Poor internet connection</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">当前网络连接不佳</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">正在录音&#8230;&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">创建新文档</string>
@@ -2834,7 +2839,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">于%1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您确定要从%1$d文件夹中删除所有共享吗？</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">您确定要停止分享这%1$d个文件夹吗？</string>
 
     <string name="download_location" context="Download location label">下载地址</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">总是保存到此位置？</string>
@@ -2851,7 +2856,7 @@
 
     <string name="failed_label" context="The label that describes that a transfer failed.">传输失败</string>
     <string name="warning_transfer_over_quota" context="Text warning of transfer over quota">您的传输已中止。升级您的帐户或等待%s后继续。</string>
-    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">Transfer over quota</string>
+    <string name="label_transfer_over_quota" context="Label indicating transfer over quota">超出传输流量</string>
     <string name="label_storage_over_quota" context="Label indicating storage over quota">超出存储空间上限</string>
     <string name="label_get_more_transfer_quota" context="Label indicating the action ‘upgrate account’ to get more transfer quota">获取更多流量</string>
     <string name="warning_folder_not_exists" context="Warning show to the user when a folder does not exist">文件不存在。</string>
@@ -2894,6 +2899,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">您的手机号已成功解除绑定。</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">您的手机号码移除失败。</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">您要重置的账号已被封锁。</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">您的账号已被锁定。请连系support&#64;mega.nz</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">您的帐户已被管理员禁用。请联系您的企业帐户管理员了解详情。</string>
@@ -2909,9 +2916,19 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的凭证</string>
 
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">搜索GIPHY</string>
-    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
-    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
+    <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">无[A]GIFs[/A]动图</string>
+    <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">这是搜索结果的[A]结尾[/A]</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">恢复传输？</string>
     <string name="option_resume_transfers" context="Option to  resume all transfers">恢复传输</string>
@@ -2920,8 +2937,23 @@
 
     <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">已下载%1$d%%，共计%2$s</string>
 
-    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">Enabled special info for chat messages</string>
-    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Disabled special info for chat messages</string>
-    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
-    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
+    <string name="show_info_chat_msg_enabled" context="Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option">已为聊天消息开启特别信息</string>
+    <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">已为聊天消息关闭特别信息</string>
+    <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已达到%d个态度的最大上限。</string>
+    <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此消息已达到%d个态度的最大上限。</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="title_label" context="Title text to show label selector.">Label</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 </resources>

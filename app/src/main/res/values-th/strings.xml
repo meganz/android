@@ -71,7 +71,7 @@
 
     <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist">ไม่มีโฟลเดอร์มีเดียสำรองอยู่ กรุณาเลือกโฟลเดอร์ใหม่</string>
     <string name="no_external_SD_card_detected" context="when no external card exists">ไม่พบที่เก็บข้อมูลภายนอก</string>
-    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">โฟลเดอร์นี้อ่านอย่างเดียว คุณไม่มีสิทธิ์อัปโหลด</string>
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">โฟลเดอร์นี้เป็นแบบอ่านอย่างเดียว คุณไม่ได้รับอนุญาตให้อัปโหลด</string>
 
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">คุณกำลังลบไฟล์คีย์การกู้คืนที่ส่งออกก่อนหน้านี้</string>
     <!--
@@ -886,6 +886,11 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">รูปถ่าย</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">วิดีโอ</string>
 
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+
     <string name="per_month" context="in payments, for example: 4.99€ per month">ต่อเดือน</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">ต่อปี</string>
 
@@ -1260,7 +1265,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">ลบ %s ออกจากการสนทนานี้หรือไม่</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">อ่านอย่างเดียว</string>
+    <string name="observer_permission_label_participants_panel" context="Label to explain the read only participant permission in the options panel of the group info screen">อ่านอย่างเดียว</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1649,7 +1654,7 @@
     <string name="file_properties_shared_folder_public_link_name">ลิงก์</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">เข้าถึงแบบเต็มที่</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">อ่านอย่างเดียว</string>
+    <string name="file_properties_shared_folder_read_only" context="Label to explain the read only participant permission in the options panel of the group info screen">อ่านอย่างเดียว</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">อ่านและเขียน</string>
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">หยุดการถ่ายโอนชั่วคราวแล้ว</string>
@@ -2318,10 +2323,10 @@
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">รับลิงก์แชท</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">จัดการลิงก์แชท</string>
 
-    <string name="make_chat_private_option" context="Title of the option to make a public chat private">เปิดใช้งานเข้ารหัสการหมุนคีย์</string>
-    <string name="private_chat" context="Title of the view to inform that a chat is private">เปิดใช้งานเข้ารหัสการหมุนคีย์แล้ว</string>
-    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนคีย์ จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
-    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">การเข้ารหัสการหมุนคีย์ถูกปิดใช้งาน เมื่อการสนทนามีผู้เข้าร่วมมากกว่า 100 คน</string>
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">เปิดใช้งานการหมุนเวียนคีย์เข้ารหัส</string>
+    <string name="private_chat" context="Title of the view to inform that a chat is private">เปิดใช้งานการหมุนเวียนคีย์เข้ารหัส</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนเวียนคีย์ จะเพิ่มความปลอดภัยอีกเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">การหมุนเวียนคีย์เข้ารหัสถูกปิดใช้งาน เมื่อการสนทนามีผู้เข้าร่วมมากกว่า 100 คน</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">ไม่สามารถแปลงแชทเป็นส่วนตัวได้เนื่องจากมีผู้เข้าร่วมถึงจำนวนสูงสุดแล้ว</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ได้สร้างลิงก์แชท[/B]</string>
@@ -2347,15 +2352,15 @@
 
     <string name="alert_invalid_preview" context="Message on the alert to close a chat preview if the link is invalid">ตัวอย่างแชทนี้ไม่สามารถใช้ได้อีกต่อไป หากคุณออกจากหน้าตัวอย่าง คุณจะไม่สามารถเปิดอีกครั้งได้</string>
 
-    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ได้เปิดใช้งานเข้ารหัสการหมุนคีย์[/B]</string>
+    <string name="message_set_chat_private" context="Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] ได้เปิดใช้งานการหมุนเวียนคีย์เข้ารหัส[/B]</string>
 
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">ลิงก์แชทไม่ถูกต้อง</string>
 
-    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">เข้ารหัสการหมุนคีย์</string>
-    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนคีย์ จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">การหมุนเวียนคีย์เข้ารหัส</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนเวียนคีย์ จะเพิ่มความปลอดภัยอีกเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนคีย์ จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนเวียนคีย์ จะเพิ่มความปลอดภัยอีกเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
     <string name="action_open_chat_link" context="Menu item">เปิดลิงก์แชท</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">คำเชิญให้ติดต่อ %s มีการส่งไปแล้วและสามารถดูได้ในแท็บคำขอที่ส่งแล้ว</string>
@@ -2662,7 +2667,7 @@
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">การเข้ารหัส Key Rotation ไม่อนุญาตให้คุณรับลิงก์แชทโดยไม่ต้องสร้างแชทกลุ่มใหม่</string>
     <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">คุณต้องการสร้างแชทกลุ่มใหม่และรับลิงก์แชทหรือไม่</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนคีย์ จะเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">การหมุนเวียนคีย์ จะเพิ่มความปลอดภัยอีกเล็กน้อย แต่ไม่อนุญาตให้คุณสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่ก็จะไม่เห็นข้อความที่ผ่านมาเช่นกัน</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">คุณเข้าร่วมแชทสำเร็จแล้ว</string>
 
@@ -2783,7 +2788,7 @@
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">บัญชีธุรกิจของคุณหมดอายุแล้ว</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">พบปัญหาในการดำเนินการชำระเงินของคุณ MEGA ถูกจำกัดให้ดูได้เฉพาะเมื่อปัญหานี้ที่ได้รับการแก้ไขในเว็บเบราว์เซอร์เดสก์ท็อปเท่านั้น</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">บัญชีของคุณ[B]ถูกระงับ[/B]ในขณะนี้ คุณสามารถเรียกดูได้แค่ข้อมูลของคุณเท่านั้น</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">แม้ว่า MEGA จะไม่เข้าถึงข้อมูลของคุณ แต่ผู้ดูแลระบบองค์กรของคุณมีความสามารถในการควบคุมและดูการอัปโหลดจากกล้องในบัญชีผู้ใช้ของคุณได้</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">แม้ว่า MEGA จะไม่สามารถเข้าถึงข้อมูลของคุณได้ แต่ผู้ดูแลระบบบัญชีธุรกิจของคุณก็มีความสามารถในการควบคุมและดูการอัปโหลดจากกล้องในบัญชีผู้ใช้ของคุณได้</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">มีบางอย่างผิดพลาด</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">ติดต่อผู้ดูแลระบบบัญชีธุรกิจของคุณเพื่อแก้ไขปัญหาและเปิดใช้งานบัญชีของคุณ</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** จะเพิ่มให้โดยอัตโนมัติและไม่มีการคิดค่าธรรมเนียมเพิ่มเติม เพื่อให้ตรงตามวัตถุประสงค์ทางธุรกิจที่แท้จริง</string>
@@ -2834,7 +2839,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">เมื่อ %1$s</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">คุณแน่ใจหรือไม่ว่าต้องการลบการแชร์ทั้งหมดจาก %1$d โฟลเดอร์</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">คุณแน่ใจหรือไม่ว่าต้องการหยุดแชร์ %1$d โฟลเดอร์นี้</string>
 
     <string name="download_location" context="Download location label">ที่ตั้งดาวน์โหลด</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">บันทึกไปยังตําแหน่งนี้เสมอหรือไม่</string>
@@ -2894,6 +2899,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">หมายเลขโทรศัพท์ของคุณถูกลบเรียบร้อยแล้ว</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">การลบหมายเลขโทรศัพท์ของคุณล้มเหลว</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">บัญชีที่คุณจะรีเซ็ตนี้ได้ถูกบล็อกแล้ว</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">บัญชีของคุณถูกบล็อก กรุณาติดต่อ support&#64;mega.nz</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">บัญชีของคุณถูกปิดใช้งานโดยผู้ดูแลระบบของคุณ กรุณาติดต่อผู้ดูแลระบบบัญชีธุรกิจของคุณเพื่อขอรายละเอียดเพิ่มเติม</string>
@@ -2908,6 +2915,16 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">ดู</string>
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">ข้อมูลประจำตัวของ %s</string>
+
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">ค้นหาใน GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">ไม่พบ [A]GIF[/A]</string>
@@ -2924,4 +2941,19 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">ปิดใช้ข้อมูลพิเศษสำหรับข้อความแชทแล้ว</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">คุณแสดงความรู้ถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="title_label" context="Title text to show label selector.">Label</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 </resources>

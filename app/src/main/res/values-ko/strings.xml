@@ -818,7 +818,7 @@
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">%1d초 후 모든 로컬 데이터가 삭제되고 로그아웃 됩니다</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">대하여</string>
-    <string name="settings_about_privacy_policy" context="App means “Application”">개인 정보 보호 정책</string>
+    <string name="settings_about_privacy_policy" context="App means “Application”">개인정보 보호정책</string>
     <string name="settings_about_terms_of_service" context="">이용 약관</string>
     <string name="settings_about_gdpr" context="setting menu that links to the GDPR terms">Data Protection Regulation</string>
     <string name="settings_about_app_version" context="App means “Application”">앱 버전</string>
@@ -885,6 +885,11 @@
     <string name="sortby_type" context="Title of sort by media type options">미디어 유형</string>
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">사진</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">동영상</string>
+
+    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
+    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">월간</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">연간</string>
@@ -1260,7 +1265,7 @@
 
     <string name="confirmation_remove_chat_contact" context="Text of the confirm dialog shown when it wants to remove a contact from a chat">%s님을 이 대화에서 제거할까요?</string>
 
-    <string name="observer_permission_label_participants_panel" context="Refers to access rights for a file folder.">읽기 전용</string>
+    <string name="observer_permission_label_participants_panel" context="Label to explain the read only participant permission in the options panel of the group info screen">읽기 전용</string>
     <!--
     <string name="member_permission_label_participants_panel" context="Label to show the participant permission in the options panel of the group info screen">Member</string>
     -->
@@ -1649,7 +1654,7 @@
     <string name="file_properties_shared_folder_public_link_name">링크</string>
 
     <string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">완전 접근</string>
-    <string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">읽기 전용</string>
+    <string name="file_properties_shared_folder_read_only" context="Label to explain the read only participant permission in the options panel of the group info screen">읽기 전용</string>
     <string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;)">읽기와 쓰기</string>
 
     <string name="attachment_uploading_state_paused" context="State of an attachment message when the upload is in progress but the queue of transfers is paused.">전송 일시정지됨!</string>
@@ -1711,7 +1716,7 @@
 
     <string name="unlocked_storage_title" context="title of the section for unlocked storage quota">저장공간 할당량</string>
 
-    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">초대 보너스</string>
+    <string name="title_referral_bonuses" context="title of the section for referral bonuses in achivements section (maximum 24 chars)">추천 보너스</string>
     <string name="title_install_app" context="title of the section for install a mobile app in achivements section (maximum 24 chars)">모바일 앱 설치</string>
     <string name="title_add_phone" context="Title of the section for add phone number in achivements section (maximum 24 chars)">휴대 전화 번호 추가</string>
     <string name="title_regitration" context="title of the section for install megasync in achivements section (maximum 24 chars)">가입 보너스</string>
@@ -2783,7 +2788,7 @@
     <string name="expired_business_title" context="A dialog title shown to users when their business account is expired.">당신의 비즈니스 계정이 만료되었습니다</string>
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">결제를 처리하는 과정에 문제가 있었습니다. 이 문제가 데스크톱 브라우저에서 해결될 때까지 MEGA가 보기 전용으로 제한됩니다.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
-    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 조직 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
+    <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
     <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">뭔가 잘못 됐습니다</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** 정식 사업 목적으로만, 추가 비용 없이, 자동으로 증가됩니다</string>
@@ -2834,7 +2839,7 @@
 
     <string name="general_date_label" context="Label indicating a date. Keep the placeholder, is to set the date.">%1$s에</string>
 
-    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">%1$d개의 폴더에서 모든 공유를 삭제하시겠습니까?</string>
+    <string name="alert_remove_several_shares" context="Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders">이 %1$d개의 폴더에서 공유를 중단하시겠습니까?</string>
 
     <string name="download_location" context="Download location label">다운로드 위치</string>
     <string name="confirmation_download_location" context="Text asking confirmation for download location">항상 이 위치에 저장할까요?</string>
@@ -2894,6 +2899,8 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">전화번호가 성공적으로 삭제되었습니다.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">전화 번호 삭제 실패</string>
 
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">재설정하려고 시도한 계정이 차단되었습니다.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">계정이 막혔습니다. support&#64;mega.nz로 연락하세요</string>
     <string name="error_business_disabled" context="Error message appears to sub-users of a business account when they try to login and they are disabled.">당신의 계정은 관리자에 의해 정지되었습니다. 자세한 사항은 비즈니스 계정 관리자에게 연락하세요.</string>
@@ -2908,6 +2915,16 @@
     <string name="action_see" context="Text of an action button indicating something was successful and it can checks it by pressing it">보기</string>
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s님의 자격증명</string>
+
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">GIPHY 검색</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">[A]GIF[/A] 찾지 못함</string>
@@ -2924,4 +2941,19 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">대화 메시지의 특별 정보 해제</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">당신은 최대 반응 한도 %d개에 도달하였습니다.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">이 메시지는 최대 반응 한도 %d개에 도달하였습니다.</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="title_label" context="Title text to show label selector.">Label</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
 </resources>
