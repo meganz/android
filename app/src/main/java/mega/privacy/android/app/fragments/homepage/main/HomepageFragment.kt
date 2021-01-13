@@ -284,11 +284,6 @@ class HomepageFragment : Fragment() {
         }
         mediator.attach()
 
-        if (!isOnline(context)) {
-            viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
-            rootView.category.isVisible = false
-        }
-
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
