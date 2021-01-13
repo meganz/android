@@ -13,10 +13,10 @@
         android:id="@+id/web_progress_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gradient_avatar_chat"
+        android:background="@color/grey_alpha_026"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
@@ -32,10 +32,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
                 android:text="@string/embed_web_browser_loading_title"
-                android:textColor="@color/primary_text"
-                android:textSize="20sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Headline6.Medium" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -54,10 +52,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="24dp"
-                    android:fontFamily="sans-serif"
                     android:text="@string/embed_web_browser_loading_message"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
             </LinearLayout>
 

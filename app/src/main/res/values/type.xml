@@ -132,6 +132,10 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Secondary">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>

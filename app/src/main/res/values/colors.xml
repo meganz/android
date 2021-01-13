@@ -87,7 +87,7 @@
     <color name="message_background">#0f000000</color>
 
     <color name="chat_sliding_panel_separator">#dcdcdcdc</color>
-    <color name="gradient_avatar_chat">#44000000</color>
+<!--    <color name="gradient_avatar_chat">#44000000</color>-->
 
     <color name="status_connected">#13e03c</color>
 <!--    <color name="status_busy">#eb4444</color>-->

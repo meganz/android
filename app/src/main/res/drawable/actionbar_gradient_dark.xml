@@ -4,6 +4,6 @@
     <gradient
         android:angle="90"
         android:endColor="@android:color/transparent"
-        android:startColor="@color/gradient_avatar_chat"/>
+        android:startColor="@color/grey_alpha_026"/>
     <corners android:radius="0dp" />
 </shape>
