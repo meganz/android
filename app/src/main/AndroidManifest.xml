@@ -282,8 +282,7 @@
         <activity
             android:name="mega.privacy.android.app.activities.GetLinkActivity"
             android:configChanges="screenSize|orientation"
-            android:label="@string/context_get_link_menu"
-            android:theme="@style/Theme.Megaactionbar.Secondary">
+            android:label="@string/context_get_link_menu">
         </activity>
 
         <activity

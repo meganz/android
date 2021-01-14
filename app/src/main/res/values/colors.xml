@@ -99,7 +99,7 @@
 
     <color name="fab_mask">#D96B6B6B</color>
 
-    <color name="copyright_text">#FF333333</color>
+<!--    <color name="copyright_text">#FF333333</color>-->
 
     <color name="transparent_transparent_black">#35000000</color>
     <color name="status_bar_login">#33000000</color>
@@ -139,11 +139,6 @@
 <!--    <color name="black_p50">#9f000000</color>-->
 
     <color name="login_title">#FFD90007</color>
-    <color name="login_warning">#FFFF333A</color>
-    <color name="lollipop_dark_primary_color">#b4070c</color>
-    <color name="transparent_black">#80000000</color>
-    <color name="pass_weak">#FFFFD300</color>
-    <color name="pass_good">#FF13E03C</color>
 
     <color name="turn_on_notifications_background">#FF00A38C</color>
     <color name="turn_on_notifications_statusbar">#FF008270</color>

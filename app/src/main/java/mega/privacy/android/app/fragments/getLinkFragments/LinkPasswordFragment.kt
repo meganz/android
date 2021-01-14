@@ -57,12 +57,13 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         strongShape = ContextCompat.getDrawable(context, R.drawable.passwd_strong)!!
         emptyShape = ContextCompat.getDrawable(context, R.drawable.shape_password)!!
 
-        veryWeakColor = ContextCompat.getColor(context, R.color.login_warning)
-        weakColor = ContextCompat.getColor(context, R.color.pass_weak)
-        mediumColor = ContextCompat.getColor(context, R.color.green_unlocked_rewards)
-        goodColor = ContextCompat.getColor(context, R.color.pass_good)
-        strongColor = ContextCompat.getColor(context, R.color.blue_unlocked_rewards)
+        veryWeakColor = ContextCompat.getColor(context, R.color.red_600_red_300)
+        weakColor = ContextCompat.getColor(context, R.color.yellow_600_yellow_300)
+        mediumColor = ContextCompat.getColor(context, R.color.green_500_green_400)
+        goodColor = ContextCompat.getColor(context, R.color.lime_green_500_200)
+        strongColor = ContextCompat.getColor(context, R.color.dark_blue_500_200)
 
+        binding.passwordLayout.isEndIconVisible = false
         with(binding.passwordText) {
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -92,13 +93,11 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
             })
 
             setOnFocusChangeListener { _, hasFocus ->
-                setPasswordToggle(
-                    binding.passwordLayout,
-                    hasFocus
-                )
+                binding.passwordLayout.isEndIconVisible = hasFocus
             }
         }
 
+        binding.confirmPasswordLayout.isEndIconVisible = false
         with(binding.confirmPasswordText) {
             addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
@@ -116,10 +115,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
             })
 
             setOnFocusChangeListener { _, hasFocus ->
-                setPasswordToggle(
-                    binding.confirmPasswordLayout,
-                    hasFocus
-                )
+                binding.confirmPasswordLayout.isEndIconVisible = hasFocus
             }
 
             setOnEditorActionListener { _, actionId, _ ->

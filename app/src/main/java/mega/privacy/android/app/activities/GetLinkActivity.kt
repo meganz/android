@@ -8,7 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
@@ -78,7 +78,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
         binding.toolbarGetLink.visibility = GONE
         setSupportActionBar(binding.toolbarGetLink)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -100,9 +99,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
 
         when (visibleFragment) {
             GET_LINK_FRAGMENT -> {
-                window.statusBarColor =
-                    ContextCompat.getColor(this, R.color.lollipop_dark_primary_color)
-
                 if (!this::linkFragmentTitle.isInitialized) {
                     linkFragmentTitle =
                         if (node.isExported) getString(R.string.edit_link_option).toUpperCase(
@@ -123,7 +119,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
                 ft.replace(R.id.fragment_container_get_link, linkFragment)
             }
             COPYRIGHT_FRAGMENT -> {
-                window.statusBarColor = ContextCompat.getColor(this, R.color.transparent_black)
                 supportActionBar?.hide()
 
                 if (!this::copyrightFragment.isInitialized) {
@@ -192,7 +187,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     }
 
     override fun showUpgradeToProWarning() {
-        val upgradeToProDialogBuilder = AlertDialog.Builder(this, R.style.ResumeTransfersWarning)
+        val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
         upgradeToProDialogBuilder.setTitle(R.string.upgrade_pro)
             .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")

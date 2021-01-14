@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scroll_view_get_link"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/get_link_main_linear_layout"
@@ -91,10 +91,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:fontFamily="sans-serif-medium"
                     android:text="@string/learn_more_option"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
 
             </LinearLayout>
 
@@ -139,17 +137,15 @@
                     android:layout_marginTop="3dp"
                     android:text="@string/subtitle_set_expiry_date"
                     android:textAllCaps="true"
-                    android:textAppearance="?attr/textAppearanceSubtitle2" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
                 <TextView
                     android:id="@+id/expiry_date_set_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@string/title_set_password_protection"
                     android:textAllCaps="true"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
+                    tools:text="APRIL 13 2020" />
 
             </LinearLayout>
 
@@ -176,11 +172,9 @@
                 android:id="@+id/password_protection_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
                 android:text="@string/title_set_password_protection"
                 android:textAllCaps="true"
-                android:textColor="@color/accentColor"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
 
             <TextView
                 android:id="@+id/password_protection_pro_only_text"
@@ -190,7 +184,7 @@
                 android:layout_marginTop="3dp"
                 android:text="@string/subtitle_set_expiry_date"
                 android:textAllCaps="true"
-                android:textAppearance="?attr/textAppearanceSubtitle2" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
             <TextView
                 android:id="@+id/password_protection_set_text"
@@ -201,9 +195,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@+id/password_protection_set_toggle"
                 android:ellipsize="middle"
-                android:fontFamily="sans-serif-medium"
                 android:singleLine="true"
-                android:textSize="14sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
             <ImageView
                 android:id="@+id/password_protection_set_toggle"
@@ -211,12 +204,13 @@
                 android:layout_height="24dp"
                 android:layout_below="@id/password_protection_text"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_b_shared_read"
+                android:src="@drawable/ic_b_see"
+                app:tint="@color/grey_012_white_038"
                 tools:ignore="ContentDescription" />
 
             <Button
                 android:id="@+id/reset_password_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_below="@id/password_protection_set_text"
                 android:layout_marginStart="-16dp"
                 android:layout_marginTop="12dp"
@@ -224,7 +218,7 @@
 
             <Button
                 android:id="@+id/remove_password_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_below="@id/password_protection_set_text"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="12dp"
@@ -256,10 +250,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/link_title_text"
                 android:layout_marginTop="4dp"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
         </RelativeLayout>
-
 
         <View
             android:layout_width="wrap_content"
@@ -284,7 +277,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/key_title_text"
                 android:layout_marginTop="4dp"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
 
         </RelativeLayout>
 
@@ -304,18 +297,18 @@
 
             <Button
                 android:id="@+id/copy_link_button"
-                style="@style/AccentBorderBackgroundBorderlessButton"
+                style="?attr/materialButtonOutlinedStyle"
                 android:text="@string/button_copy_link" />
 
             <Button
                 android:id="@+id/copy_key_button"
-                style="@style/AccentBorderBackgroundBorderlessButton"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginStart="16dp"
                 android:text="@string/button_copy_key" />
 
             <Button
                 android:id="@+id/copy_password_button"
-                style="@style/AccentBorderBackgroundBorderlessButton"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginStart="8dp"
                 android:text="@string/button_copy_password" />
 

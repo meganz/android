@@ -43,7 +43,7 @@
             android:paddingEnd="24dp"
             android:paddingBottom="50dp"
             android:text="@string/decryption_key_explanation"
-            android:textAppearance="?attr/textAppearanceSubtitle2"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/decryption_key_title" />

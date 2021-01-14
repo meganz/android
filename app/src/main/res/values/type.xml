@@ -53,6 +53,10 @@
         <item name="textSize">18sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Red.20">
+        <item name="textSize">20sp</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Error">
         <item name="android:textColor">?attr/colorError</item>
     </style>
