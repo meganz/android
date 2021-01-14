@@ -27,6 +27,7 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveListener;
@@ -42,7 +43,6 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
@@ -960,8 +960,8 @@ public class NodeController {
             ((ManagerActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, ((ManagerActivityLollipop) context));
         }
-        else if(context instanceof GetLinkActivityLollipop){
-            megaApi.exportNode(document, ((GetLinkActivityLollipop) context));
+        else if(context instanceof GetLinkActivity){
+            megaApi.exportNode(document, new ExportListener(context));
         }
         else  if(context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
@@ -982,8 +982,8 @@ public class NodeController {
             ((ManagerActivityLollipop) context).setIsGetLink(true);
             megaApi.exportNode(document, timestamp, ((ManagerActivityLollipop) context));
         }
-        else if (context instanceof GetLinkActivityLollipop){
-            megaApi.exportNode(document, timestamp, ((GetLinkActivityLollipop) context));
+        else if (context instanceof GetLinkActivity){
+            megaApi.exportNode(document, timestamp, new ExportListener(context));
         }
         else if (context instanceof FullScreenImageViewerLollipop){
             ((FullScreenImageViewerLollipop) context).setIsGetLink(true);
