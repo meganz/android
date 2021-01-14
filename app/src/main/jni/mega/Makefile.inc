@@ -119,7 +119,7 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/mega_evt_queue.h \
 	    sdk/include/mega/raid.h \
 		sdk/include/mega/testhooks.h \
-		sdk/src/heartbeats.h
+		sdk/include/mega/heartbeats.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp

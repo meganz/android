@@ -34,6 +34,8 @@ public class CallNotificationIntentService extends IntentService implements Mega
     MegaApplication app;
 
     private long chatIdIncomingCall;
+    private long callIdIncomingCall = MEGACHAT_INVALID_HANDLE;
+
     private long chatIdCurrentCall;
     private boolean hasVideoInitialCall;
 
@@ -55,7 +57,11 @@ public class CallNotificationIntentService extends IntentService implements Mega
         chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
         chatIdIncomingCall = intent.getExtras().getLong(CHAT_ID_OF_INCOMING_CALL, MEGACHAT_INVALID_HANDLE);
         hasVideoInitialCall = intent.getExtras().getBoolean(INCOMING_VIDEO_CALL, false);
-        clearIncomingCallNotification(chatIdIncomingCall);
+        MegaChatCall incomingCall = megaChatApi.getChatCall(chatIdIncomingCall);
+        if(incomingCall != null){
+            callIdIncomingCall = incomingCall.getId();
+            clearIncomingCallNotification(callIdIncomingCall);
+        }
 
         final String action = intent.getAction();
         if (action == null)
@@ -79,8 +85,15 @@ public class CallNotificationIntentService extends IntentService implements Mega
                         }
                     }
                 } else {
-                    logDebug("Hanging up current call ... ");
-                    megaChatApi.hangChatCall(chatIdCurrentCall, this);
+                    MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
+                    if (currentCall == null) {
+                        logDebug("Answering incoming call ...");
+                        addChecksForACall(chatIdIncomingCall, false);
+                        megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
+                    } else {
+                        logDebug("Hanging up current call ... ");
+                        megaChatApi.hangChatCall(chatIdCurrentCall, this);
+                    }
                 }
                 break;
 
@@ -93,17 +106,14 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 logDebug("Ignore incoming call... ");
                 megaChatApi.setIgnoredCall(chatIdIncomingCall);
                 MegaApplication.getInstance().stopSounds();
-                clearIncomingCallNotification(chatIdIncomingCall);
+                clearIncomingCallNotification(callIdIncomingCall);
                 stopSelf();
                 break;
 
             case HOLD_ANSWER:
             case HOLD_JOIN:
                 MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
-                if (currentCall == null)
-                    break;
-
-                if (currentCall.isOnHold()) {
+                if (currentCall == null || currentCall.isOnHold()) {
                     logDebug("Answering incoming call ...");
                     addChecksForACall(chatIdIncomingCall, false);
                     megaChatApi.answerChatCall(chatIdIncomingCall, hasVideoInitialCall, this);
@@ -115,30 +125,6 @@ public class CallNotificationIntentService extends IntentService implements Mega
 
             default:
                 throw new IllegalArgumentException("Unsupported action: " + action);
-        }
-
-    }
-
-    /**
-     * Method for removing the incoming call notification.
-     *
-     * @param chatIdIncomingCall The chat ID wit the call.
-     */
-    public void clearIncomingCallNotification(long chatIdIncomingCall) {
-        logDebug("Clear the notification in chat: " + chatIdIncomingCall);
-        try {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (megaChatApi == null)
-                return;
-
-            MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
-            if (call == null)
-                return;
-
-            int notificationId = MegaApiJava.userHandleToBase64(chatIdIncomingCall).hashCode();
-            notificationManager.cancel(notificationId);
-        } catch (Exception e) {
-            logError("EXCEPTION", e);
         }
     }
 
@@ -157,7 +143,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getChatHandle() == chatIdIncomingCall) {
                     logDebug("Incoming call hung up. ");
-                    clearIncomingCallNotification(chatIdIncomingCall);
+                    clearIncomingCallNotification(callIdIncomingCall);
                     stopSelf();
                 } else if (request.getChatHandle() == chatIdCurrentCall) {
                     logDebug("Current call hung up. Answering incoming call ...");
@@ -184,7 +170,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 i.setAction(SECOND_CALL);
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 this.startActivity(i);
-                clearIncomingCallNotification(chatIdIncomingCall);
+                clearIncomingCallNotification(callIdIncomingCall);
                 stopSelf();
                 Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
                 this.sendBroadcast(closeIntent);

@@ -39,6 +39,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import nz.mega.sdk.MegaApiAndroid;
@@ -169,7 +170,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 						String temp = s.toString();
 						containerPasswdElements.setVisibility(View.VISIBLE);
 
-						checkPasswordStrenght(temp.trim());
+						checkPasswordStrength(temp.trim());
 					}
 					else{
 						passwdValid = false;
@@ -711,12 +712,12 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 	void verifyQuitError(){
 		isErrorShown = false;
 		pinError.setVisibility(View.GONE);
-		firstPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		secondPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
-		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+		firstPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		secondPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		thirdPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fourthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		fifthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+		sixthPin.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
 	}
 
 	void verifyShowError(){
@@ -827,7 +828,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			case R.id.lost_authentication_device: {
 				try {
 					String url = "https://mega.nz/recovery";
-					Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+					Intent openTermsIntent = new Intent(this, WebViewActivity.class);
 					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					openTermsIntent.setData(Uri.parse(url));
 					startActivity(openTermsIntent);
@@ -842,7 +843,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
             case R.id.top:
                 logDebug("Show top");
                 try {
-                    Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(this, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(openTermsIntent);
@@ -861,7 +862,8 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 		}
 	}
 
-	public void checkPasswordStrenght(String s) {
+	public void checkPasswordStrength(String s) {
+		newPassword1Layout.setErrorEnabled(false);
 
 		if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length() < 4){
 			firstShape.setBackground(ContextCompat.getDrawable(this, R.drawable.passwd_very_weak));
@@ -951,6 +953,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 
 		newPassword1Error.setVisibility(View.GONE);
 		newPassword1Layout.setError(" ");
+		newPassword1Layout.setErrorEnabled(true);
 	}
 
 	public void onResetPasswordClick(boolean hasMk){

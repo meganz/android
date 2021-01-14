@@ -9,18 +9,20 @@ public class Product implements Parcelable{
 	private int level;
 	private int months;
 	private int storage;
-	private int amount;
 	private int transfer;
+	private int amount;
+	private String currency;
 	private boolean isBusiness;
 
-	public Product (long _handle, int _level, int _months, int _storage, int _amount, int _transfer, boolean _isBusiness){
-		this.handle=_handle;
-		this.level = _level;
-		this.months = _months;
-		this.storage = _storage;
-		this.amount = _amount;
-		this.transfer = _transfer;
-		this.isBusiness = _isBusiness;
+	public Product(long handle, int level, int months, int storage, int transfer, int amount, String currency, boolean isBusiness) {
+		this.handle = handle;
+		this.level = level;
+		this.months = months;
+		this.storage = storage;
+		this.transfer = transfer;
+		this.amount = amount;
+		this.currency = currency;
+		this.isBusiness = isBusiness;
 	}
 
 	public long getHandle() {
@@ -55,6 +57,14 @@ public class Product implements Parcelable{
 		this.storage = storage;
 	}
 
+	public int getTransfer() {
+		return transfer;
+	}
+
+	public void setTransfer(int transfer) {
+		this.transfer = transfer;
+	}
+
 	public int getAmount() {
 		return amount;
 	}
@@ -63,12 +73,12 @@ public class Product implements Parcelable{
 		this.amount = amount;
 	}
 
-	public int getTransfer() {
-		return transfer;
+	public String getCurrency() {
+		return currency;
 	}
 
-	public void setTransfer(int transfer) {
-		this.transfer = transfer;
+	public void setCurrency(String currency) {
+		this.currency = currency;
 	}
 
 	public boolean isBusiness() {
@@ -96,7 +106,4 @@ public class Product implements Parcelable{
 		out.writeInt(transfer);
 		out.writeInt(isBusiness ? 1 : 0);
 	}
-
-
-
 }

@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/make_chat_private_option"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:layout_gravity="left"
                 android:fontFamily="sans-serif-light"
                 android:textStyle="bold"/>
@@ -42,7 +42,7 @@
                 android:layout_marginTop="14dp"
                 android:textSize="16sp"
                 android:gravity="left"
-                android:textColor="@color/mail_my_account"
+                android:textColor="@color/secondary_text"
                 android:layout_gravity="center_horizontal"/>
 
             <TextView
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:gravity="left"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="sans-serif-light"
                 android:textStyle="bold"

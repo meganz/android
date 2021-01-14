@@ -1,204 +1,312 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.components.TwoLineCheckPreference;
+import mega.privacy.android.app.listeners.SetAttrUserListener;
+import nz.mega.sdk.MegaChatApi;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static mega.privacy.android.app.utils.Util.isOffline;
+import static mega.privacy.android.app.utils.Util.isOnline;
 
-public class SettingsChatFragment extends SettingsBaseFragment implements Preference.OnPreferenceClickListener {
+public class SettingsChatFragment extends SettingsBaseFragment {
 
-    ChatSettings chatSettings;
+    private MegaChatPresenceConfig statusConfig;
+    private Preference chatNotificationsPreference;
+    private ListPreference statusChatListPreference;
+    private SwitchPreferenceCompat autoAwaySwitch;
+    private Preference chatAutoAwayPreference;
+    private TwoLineCheckPreference chatPersistenceCheck;
+    private SwitchPreferenceCompat enableLastGreenChatSwitch;
+    private ListPreference chatAttachmentsChatListPreference;
+    private SwitchPreferenceCompat richLinksSwitch;
 
-    private SwitchPreferenceCompat chatNotificationsSwitch;
-    private Preference chatSoundPreference;
-    private SwitchPreferenceCompat chatVibrateSwitch;
-    private SwitchPreferenceCompat chatDndSwitch;
-
-    public SettingsChatFragment () {
+    public SettingsChatFragment() {
         super();
-
-        chatSettings = dbH.getChatSettings();
     }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences_chat);
 
-        chatNotificationsSwitch = findPreference(KEY_CHAT_NOTIFICATIONS);
-        chatNotificationsSwitch.setOnPreferenceClickListener(this);
+        chatNotificationsPreference = findPreference(KEY_CHAT_NOTIFICATIONS_CHAT);
+        chatNotificationsPreference.setOnPreferenceClickListener(this);
+        chatNotificationsPreference.setOnPreferenceChangeListener(this);
+        updateNotifChat();
 
-        chatSoundPreference = findPreference(KEY_CHAT_SOUND);
-        chatSoundPreference.setVisible(true);
-        chatSoundPreference.setOnPreferenceClickListener(this);
+        statusChatListPreference = findPreference(KEY_CHAT_STATUS);
+        statusChatListPreference.setOnPreferenceChangeListener(this);
 
-        chatVibrateSwitch = findPreference(KEY_CHAT_VIBRATE);
-        chatVibrateSwitch.setVisible(true);
-        chatVibrateSwitch.setEnabled(true);
-        chatVibrateSwitch.setOnPreferenceClickListener(this);
+        autoAwaySwitch = findPreference(KEY_CHAT_AUTOAWAY_SWITCH);
+        autoAwaySwitch.setOnPreferenceClickListener(this);
 
-        chatDndSwitch = findPreference(KEY_CHAT_DND);
-        chatDndSwitch.setVisible(false);
-        chatDndSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
-            if (((SwitchPreferenceCompat) preference).isChecked()) {
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, null);
-            } else {
-                createMuteNotificationsChatAlertDialog(((ChatPreferencesActivity) context), null);
-            }
-            return false;
-        });
+        chatAutoAwayPreference = findPreference(KEY_CHAT_AUTOAWAY_PREFERENCE);
+        chatAutoAwayPreference.setOnPreferenceClickListener(this);
 
-        chatNotificationsSwitch.setChecked(getGeneralNotification().equals(NOTIFICATIONS_ENABLED));
+        chatPersistenceCheck = findPreference(KEY_CHAT_PERSISTENCE);
+        chatPersistenceCheck.setOnPreferenceClickListener(this);
 
-        updateSwitch();
+        enableLastGreenChatSwitch = findPreference(KEY_CHAT_LAST_GREEN);
+        enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
+
+        chatAttachmentsChatListPreference = findPreference(KEY_CHAT_SEND_ORIGINALS);
+        chatAttachmentsChatListPreference.setOnPreferenceChangeListener(this);
+
+        richLinksSwitch = findPreference(KEY_CHAT_RICH_LINK);
+        richLinksSwitch.setOnPreferenceClickListener(this);
 
         if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
-    }
 
-    /**
-     * Method to update the UI items when the Push notification Settings change.
-     */
-    public void updateSwitch() {
-        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
-        String option = NOTIFICATIONS_ENABLED;
+        //Get chat status
+        statusConfig = megaChatApi.getPresenceConfig();
+        if (statusConfig != null) {
+            logDebug("ChatStatus pending: " + statusConfig.isPending() + ", status: " + statusConfig.getOnlineStatus());
 
-        if (pushNotificationSettings != null) {
-            if (pushNotificationSettings.isGlobalChatsDndEnabled()) {
-                option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
-            } else {
-                option = NOTIFICATIONS_ENABLED;
+            statusChatListPreference.setValue(statusConfig.getOnlineStatus() + "");
+            statusChatListPreference.setSummary(statusConfig.getOnlineStatus() == MegaChatApi.STATUS_INVALID ?
+                    getString(R.string.recovering_info) : statusChatListPreference.getEntry());
+
+            showPresenceChatConfig();
+
+            if (megaChatApi.isSignalActivityRequired()) {
+                megaChatApi.signalPresenceActivity();
             }
-        }
 
-        if (option.equals(NOTIFICATIONS_DISABLED)) {
-            chatDndSwitch.setVisible(false);
-            return;
-        }
-
-        chatNotificationsSwitch.setChecked(option.equals(NOTIFICATIONS_ENABLED));
-
-        if (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())) {
-            dbH.setVibrationEnabledChat(true + "");
-            chatSettings.setVibrationEnabled(true + "");
-            chatVibrateSwitch.setChecked(true);
         } else {
-            dbH.setVibrationEnabledChat(false + "");
-            chatSettings.setVibrationEnabled(false + "");
-            chatVibrateSwitch.setChecked(false);
+            waitPresenceConfig();
         }
 
-        if (isTextEmpty(chatSettings.getNotificationsSound())) {
-            Uri defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri);
-            chatSoundPreference.setSummary(defaultSound == null ? getString(R.string.settings_chat_silent_sound_not) : defaultSound.getTitle(context));
-        } else if (chatSettings.getNotificationsSound().equals(INVALID_OPTION)) {
-            chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
-        } else {
-            String soundString = chatSettings.getNotificationsSound();
-            if (soundString.equals("true")) {
-                Uri defaultSoundUri2 = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                Ringtone defaultSound2 = RingtoneManager.getRingtone(context, defaultSoundUri2);
-                chatSoundPreference.setSummary(defaultSound2.getTitle(context));
-                dbH.setNotificationSoundChat(defaultSoundUri2.toString());
-            } else {
-                Ringtone sound = RingtoneManager.getRingtone(context, Uri.parse(soundString));
-                if (sound != null) {
-                    chatSoundPreference.setSummary(sound.getTitle(context));
-                } else {
-                    logWarning("Sound is null");
-                }
-            }
-        }
+        /*Chat video quality*/
+        chatAttachmentsChatListPreference.setValue(isSendOriginalAttachments() ? 1 + "" : 0 + "");
+        chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 
-        chatDndSwitch.setVisible(true);
-
-        if (option.equals(NOTIFICATIONS_ENABLED)) {
-            chatDndSwitch.setChecked(false);
-            chatDndSwitch.setSummary(getString(R.string.mute_chatroom_notification_option_off));
-        } else {
-            chatDndSwitch.setChecked(true);
-            long timestampMute = pushNotificationSettings.getGlobalChatsDnd();
-            chatDndSwitch.setSummary(getCorrectStringDependingOnOptionSelected(timestampMute));
-        }
-
-        getPreferenceScreen().addPreference(chatSoundPreference);
-        getPreferenceScreen().addPreference(chatVibrateSwitch);
+        /*Rich URL Previews*/
+        richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
     }
 
     @Override
     public boolean onPreferenceClick(Preference preference) {
 
-        if(megaChatApi.isSignalActivityRequired()){
+        if (megaChatApi.isSignalActivityRequired()) {
             megaChatApi.signalPresenceActivity();
         }
 
+        if (isOffline(context))
+            return false;
+
         switch (preference.getKey()) {
-            case KEY_CHAT_NOTIFICATIONS:
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, chatNotificationsSwitch.isChecked() ? NOTIFICATIONS_ENABLED : NOTIFICATIONS_DISABLED, null);
+            case KEY_CHAT_NOTIFICATIONS_CHAT:
+                startActivity(new Intent(context, ChatNotificationsPreferencesActivity.class));
                 break;
 
-            case KEY_CHAT_VIBRATE:
-                if (chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled())) {
-                    dbH.setVibrationEnabledChat(false + "");
-                    chatSettings.setVibrationEnabled(false + "");
-                } else {
-                    dbH.setVibrationEnabledChat(true + "");
-                    chatSettings.setVibrationEnabled(true + "");
+            case KEY_CHAT_AUTOAWAY_SWITCH:
+                statusConfig = megaChatApi.getPresenceConfig();
+                if (statusConfig != null) {
+                    if (statusConfig.isAutoawayEnabled()) {
+                        logDebug("Change AUTOAWAY chat to false");
+                        megaChatApi.setPresenceAutoaway(false, 0);
+                        getPreferenceScreen().removePreference(chatAutoAwayPreference);
+                    } else {
+                        logDebug("Change AUTOAWAY chat to true");
+                        megaChatApi.setPresenceAutoaway(true, 300);
+                        getPreferenceScreen().addPreference(chatAutoAwayPreference);
+                        chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, 5));
+                    }
                 }
                 break;
 
-            case KEY_CHAT_SOUND:
-                ((ChatPreferencesActivity) context).changeSound(chatSettings.getNotificationsSound());
+            case KEY_CHAT_AUTOAWAY_PREFERENCE:
+                ((ChatPreferencesActivity) context).showAutoAwayValueDialog();
+                break;
+
+            case KEY_CHAT_PERSISTENCE:
+                megaChatApi.setPresencePersist(!statusConfig.isPersist());
+                break;
+
+            case KEY_CHAT_LAST_GREEN:
+                ((ChatPreferencesActivity) context).enableLastGreen(enableLastGreenChatSwitch.isChecked());
+                break;
+
+            case KEY_CHAT_RICH_LINK:
+                megaApi.enableRichPreviews(richLinksSwitch.isChecked(), new SetAttrUserListener(context));
                 break;
         }
 
         return true;
     }
 
-    public void setNotificationSound (Uri uri){
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (isOffline(context))
+            return false;
 
-        String chosenSound = "-1";
-        if(uri!=null){
-            Ringtone sound = RingtoneManager.getRingtone(context, uri);
+        int newStatus;
+        switch (preference.getKey()) {
+            case KEY_CHAT_NOTIFICATIONS_CHAT:
+                updateNotifChat();
+                break;
 
-            String title = sound.getTitle(context);
+            case KEY_CHAT_STATUS:
+                statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+                newStatus = Integer.parseInt((String) newValue);
+                megaChatApi.setOnlineStatus(newStatus);
+                break;
 
-            if(title!=null){
-                logDebug("Title sound notification: " + title);
-                chatSoundPreference.setSummary(title);
+            case KEY_CHAT_SEND_ORIGINALS:
+                newStatus = Integer.parseInt((String) newValue);
+                if (newStatus == 0) {
+                    dbH.setSendOriginalAttachments(false + "");
+                    chatAttachmentsChatListPreference.setValue(newStatus + "");
+                } else if (newStatus == 1) {
+                    dbH.setSendOriginalAttachments(true + "");
+                    chatAttachmentsChatListPreference.setValue(newStatus + "");
+                }
+                chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
+                break;
+        }
+
+        return true;
+    }
+
+    /**
+     * Method for updating chat notifications.
+     */
+    public void updateNotifChat() {
+        MegaPushNotificationSettings pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
+
+        String option = NOTIFICATIONS_ENABLED;
+        if (pushNotificationSettings != null && pushNotificationSettings.isGlobalChatsDndEnabled()) {
+            option = pushNotificationSettings.getGlobalChatsDnd() == 0 ? NOTIFICATIONS_DISABLED : NOTIFICATIONS_DISABLED_X_TIME;
+        }
+
+        switch (option) {
+            case NOTIFICATIONS_DISABLED:
+                chatNotificationsPreference.setSummary(getString(R.string.mute_chatroom_notification_option_off));
+                break;
+
+            case NOTIFICATIONS_ENABLED:
+                chatNotificationsPreference.setSummary(getString(R.string.mute_chat_notification_option_on));
+                break;
+
+            default:
+                chatNotificationsPreference.setSummary(getCorrectStringDependingOnOptionSelected(pushNotificationSettings.getGlobalChatsDnd()));
+        }
+    }
+
+    /**
+     * Method for updating the rich link previews option.
+     */
+    public void updateEnabledRichLinks() {
+        if (MegaApplication.isEnabledRichLinks() == richLinksSwitch.isChecked())
+            return;
+
+        richLinksSwitch.setOnPreferenceClickListener(null);
+        richLinksSwitch.setChecked(MegaApplication.isEnabledRichLinks());
+        richLinksSwitch.setOnPreferenceClickListener(this);
+    }
+
+    /**
+     * Method for updating the presence configuration.
+     *
+     * @param cancelled If it is cancelled
+     */
+    public void updatePresenceConfigChat(boolean cancelled) {
+        if (!cancelled) {
+            statusConfig = megaChatApi.getPresenceConfig();
+        }
+
+        showPresenceChatConfig();
+    }
+
+    /**
+     * Method for showing and hiding what is needed while waiting for presence config.
+     */
+    private void waitPresenceConfig() {
+        getPreferenceScreen().removePreference(autoAwaySwitch);
+        getPreferenceScreen().removePreference(chatAutoAwayPreference);
+        getPreferenceScreen().removePreference(chatPersistenceCheck);
+        statusChatListPreference.setValue(MegaChatApi.STATUS_OFFLINE + "");
+        statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+        enableLastGreenChatSwitch.setEnabled(false);
+    }
+
+    private void showPresenceChatConfig() {
+        statusChatListPreference.setValue(statusConfig.getOnlineStatus() + "");
+        statusChatListPreference.setSummary(statusChatListPreference.getEntry());
+
+        if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_ONLINE ||
+                statusConfig.getOnlineStatus() != MegaChatApi.STATUS_OFFLINE) {
+            getPreferenceScreen().addPreference(chatPersistenceCheck);
+            chatPersistenceCheck.setChecked(statusConfig.isPersist());
+        }
+
+        if (statusConfig.getOnlineStatus() != MegaChatApi.STATUS_ONLINE) {
+            getPreferenceScreen().removePreference(autoAwaySwitch);
+            getPreferenceScreen().removePreference(chatAutoAwayPreference);
+
+            if (statusConfig.getOnlineStatus() == MegaChatApi.STATUS_OFFLINE) {
+                getPreferenceScreen().removePreference(chatPersistenceCheck);
             }
+        } else if (statusConfig.isPersist()) {
+            getPreferenceScreen().removePreference(autoAwaySwitch);
+            getPreferenceScreen().removePreference(chatAutoAwayPreference);
+        } else {
+            getPreferenceScreen().addPreference(autoAwaySwitch);
+            if (statusConfig.isAutoawayEnabled()) {
+                int timeout = (int) statusConfig.getAutoawayTimeout() / 60;
+                autoAwaySwitch.setChecked(true);
+                getPreferenceScreen().addPreference(chatAutoAwayPreference);
+                chatAutoAwayPreference.setSummary(getString(R.string.settings_autoaway_value, timeout));
+            } else {
+                autoAwaySwitch.setChecked(false);
+                getPreferenceScreen().removePreference(chatAutoAwayPreference);
+            }
+        }
 
-            chosenSound = uri.toString();
+        enableLastGreenChatSwitch.setEnabled(true);
+        if (!enableLastGreenChatSwitch.isChecked()) {
+            enableLastGreenChatSwitch.setOnPreferenceClickListener(null);
+            enableLastGreenChatSwitch.setChecked(statusConfig.isLastGreenVisible());
         }
-        else{
-            chatSoundPreference.setSummary(getString(R.string.settings_chat_silent_sound_not));
-        }
+        enableLastGreenChatSwitch.setOnPreferenceClickListener(this);
+    }
 
-        if(chatSettings==null){
-            chatSettings = new ChatSettings();
-            chatSettings.setNotificationsSound(chosenSound);
-            dbH.setChatSettings(chatSettings);
-        }
-        else{
-            chatSettings.setNotificationsSound(chosenSound);
-            dbH.setNotificationSoundChat(chosenSound);
-        }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+        setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
+        return v;
+    }
 
+    public void setOnlineOptions(boolean isOnline) {
+        chatNotificationsPreference.setEnabled(isOnline);
+        statusChatListPreference.setEnabled(isOnline);
+        autoAwaySwitch.setEnabled(isOnline);
+        chatAutoAwayPreference.setEnabled(isOnline);
+        chatPersistenceCheck.setEnabled(isOnline);
+        enableLastGreenChatSwitch.setEnabled(isOnline);
+        chatAttachmentsChatListPreference.setEnabled(isOnline);
+        richLinksSwitch.setEnabled(isOnline);
     }
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -8,33 +7,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -55,7 +45,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
-
 
 public class LoginActivityLollipop extends BaseActivity implements MegaRequestListenerInterface {
 
@@ -254,7 +243,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     }
                     case CHOOSE_ACCOUNT_FRAGMENT: {
                         if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                            chooseAccountFragment.onFreeClick(null);
+                            chooseAccountFragment.onFreeClick();
                         }
                         break;
                     }
@@ -323,14 +312,16 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             case TOUR_FRAGMENT: {
                 logDebug("Show TOUR_FRAGMENT");
 
-                String recoveryKeyUrl = null;
-                if (intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_RESET_PASS)) {
-                    recoveryKeyUrl = intentReceived.getDataString();
+                if (ACTION_RESET_PASS.equals(intentReceived.getAction())) {
+                    tourFragment = TourFragmentLollipop.newInstance(intentReceived.getDataString(), null);
+                } else if (ACTION_PARK_ACCOUNT.equals(intentReceived.getAction())) {
+                    tourFragment = TourFragmentLollipop.newInstance(null, intentReceived.getDataString());
+                } else {
+                    tourFragment = TourFragmentLollipop.newInstance(null, null);
                 }
-                tourFragment = TourFragmentLollipop.newInstance(recoveryKeyUrl);
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, tourFragment).commit();
+                ft.replace(R.id.fragment_container_login, tourFragment).commitNowAllowingStateLoss();
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
@@ -343,7 +334,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commit();
+                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commitNowAllowingStateLoss();
+
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
@@ -492,7 +484,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
                 if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                    chooseAccountFragment.onFreeClick(null);
+                    chooseAccountFragment.onFreeClick();
                 }
                 break;
             }

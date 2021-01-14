@@ -100,7 +100,7 @@
                     android:layout_toRightOf="@id/recent_chat_list_name"
                     android:background="@null"
                     android:src="@drawable/ic_private_chat"
-                    android:alpha="0.26"
+                    android:alpha="0.54"
                     android:layout_gravity="center_vertical"/>
 
                 <ImageView

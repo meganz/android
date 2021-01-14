@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -15,7 +16,6 @@ import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -95,6 +95,13 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 
 		if (matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS)) {
 			logDebug("Open business invite link");
+			openWebLink(url);
+			return;
+		}
+
+		//MEGA DROP link
+		if (matchRegexs(url, MEGA_DROP_LINK_REGEXS)) {
+			logDebug("Open MEGAdrop link");
 			openWebLink(url);
 			return;
 		}
@@ -395,12 +402,6 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 			}
 		}
 
-		//MEGA DROP link
-		if (matchRegexs(url, MEGA_DROP_LINK_REGEXS)) { //https://mega.nz/megadrop
-			setError(getString(R.string.error_MEGAdrop_not_supported));
-			return;
-		}
-
 		// Browser open the link which does not require app to handle
 		logDebug("Browser open link: " + url);
 		checkIfRequiresTransferSession(url);
@@ -421,7 +422,7 @@ public class OpenLinkActivity extends PinActivityLollipop implements MegaRequest
 	}
 
 	public void openWebLink(String url) {
-		Intent openIntent = new Intent(this, WebViewActivityLollipop.class);
+		Intent openIntent = new Intent(this, WebViewActivity.class);
 		openIntent.setData(Uri.parse(url));
 		startActivity(openIntent);
 		finish();

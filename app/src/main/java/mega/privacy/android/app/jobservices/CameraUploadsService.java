@@ -27,7 +27,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.exifinterface.media.ExifInterface;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +67,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -693,7 +693,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     } else {
                         totalToUpload++;
                         long lastModified = getLastModifiedTime(file);
-                        megaApi.startUpload(path, parent, CU_UPLOAD, file.getFileName(), lastModified / 1000, this);
+                        megaApi.startUpload(path, parent, APP_DATA_CU, file.getFileName(), lastModified / 1000, this);
                     }
                 } else {
                     logDebug("Local file is unavailable, delete record from database.");

@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="15dp"
-            android:text="@string/text_join__another_call"
+            android:text="@string/text_join_another_call"
             android:layout_gravity="left"
             android:layout_marginBottom="31dp"
             android:textColor="@color/grey_info_menu"

@@ -271,7 +271,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 
-            paramsMicroSurface.setMargins(0, px2dp(16, outMetrics), px2dp(16, outMetrics), 0);
+            paramsMicroSurface.setMargins(0, dp2px(16, outMetrics), dp2px(16, outMetrics), 0);
             muteLayout.setLayoutParams(paramsMicroSurface);
             muteLayout.setVisibility(View.VISIBLE);
             return;

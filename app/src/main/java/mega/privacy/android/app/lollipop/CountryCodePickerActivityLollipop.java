@@ -112,7 +112,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
 
     public void changeActionBarElevation(boolean withElevation) {
         if(withElevation) {
-            final float elevation = Util.px2dp(4,outMetrics);
+            final float elevation = Util.dp2px(4,outMetrics);
             abL.postDelayed(new Runnable() {
 
                 @Override

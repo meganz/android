@@ -941,7 +941,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
 
-        params.setMargins(px2dp(ADDED_CONTACT_VIEW_MARGIN_LEFT, outMetrics), 0, 0, 0);
+        params.setMargins(dp2px(ADDED_CONTACT_VIEW_MARGIN_LEFT, outMetrics), 0, 0, 0);
         View rowView = inflater.inflate(R.layout.selected_contact_item, null, false);
         rowView.setLayoutParams(params);
         rowView.setId(id);

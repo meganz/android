@@ -8,7 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
-import androidx.core.content.ContextCompat;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.SparseBooleanArray;
@@ -214,10 +214,10 @@ public class PhoneContactsLollipopAdapter extends RecyclerView.Adapter<PhoneCont
 		holder.contactLayout = rowView.findViewById(R.id.contact_list_item_layout);
 		holder.contactNameTextView = rowView.findViewById(R.id.contact_explorer_name);
 		if(!isScreenInPortrait(mContext)){
-			holder.contactNameTextView.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics()));
+			holder.contactNameTextView.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_LAND, mContext.getResources().getDisplayMetrics()));
 		}
 		else{
-			holder.contactNameTextView.setMaxWidth(px2dp(MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics()));
+			holder.contactNameTextView.setMaxWidth(dp2px(MAX_WIDTH_CONTACT_NAME_PORT, mContext.getResources().getDisplayMetrics()));
 		}
 
 		holder.phoneEmailTextView = rowView.findViewById(R.id.contact_explorer_phone_mail);

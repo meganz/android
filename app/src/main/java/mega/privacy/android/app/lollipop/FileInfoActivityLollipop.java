@@ -24,7 +24,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -596,7 +595,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
         Rect rect = new Rect();
         getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
-        params.setMargins(px2dp(16, outMetrics), px2dp(90, outMetrics) + rect.top, 0, px2dp(14, outMetrics));
+        params.setMargins(dp2px(16, outMetrics), dp2px(90, outMetrics) + rect.top, 0, dp2px(14, outMetrics));
         iconToolbarLayout.setLayoutParams(params);
 
         imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
@@ -628,11 +627,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
         ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
         if(!isScreenInPortrait(this)){
-            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_LAND, outMetrics));
-            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
+            ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_LAND, outMetrics));
+            ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
         }else{
-            ownerLabel.setMaxWidthEmojis(px2dp(MAX_WIDTH_FILENAME_PORT, outMetrics));
-            ownerInfo.setMaxWidth(px2dp(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
+            ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_PORT, outMetrics));
+            ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_PORT_2, outMetrics));
         }
         ownerLayout.setVisibility(View.GONE);
 
@@ -693,6 +692,12 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         if (adapterType == OFFLINE_ADAPTER){
             collapsingToolbar.setTitle(getIntent().getStringExtra(NAME).toUpperCase());
             availableOfflineLayout.setVisibility(View.GONE);
+
+            View view = findViewById(R.id.available_offline_separator);
+            if (view != null) {
+                view.setVisibility(View.GONE);
+            }
+
             sharedLayout.setVisibility(View.GONE);
             dividerSharedLayout.setVisibility(View.GONE);
             dividerLinkLayout.setVisibility(View.GONE);
@@ -777,6 +782,15 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 if (node.isFolder()) {
                     modifiedLayout.setVisibility(View.GONE);
+
+                    if (isEmptyFolder(node)) {
+                        availableOfflineLayout.setVisibility(View.GONE);
+
+                        View view = findViewById(R.id.available_offline_separator);
+                        if (view != null) {
+                            view.setVisibility(View.GONE);
+                        }
+                    }
                 } else {
                     modifiedLayout.setVisibility(View.VISIBLE);
                 }
@@ -828,8 +842,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
                     offlineSwitch.setEnabled(true);
-                    offlineSwitch.setOnClickListener(this);
-                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+                    availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
                 }else{
                     offlineSwitch.setEnabled(false);
                     availableOfflineView.setTextColor(ContextCompat.getColor(this, R.color.invite_button_deactivated));
@@ -1147,7 +1161,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         }
                     });
 
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.name_my_account));
+                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.primary_text));
                     collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
                     collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
                 }
@@ -1784,8 +1798,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_OPEN_FOLDER);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("locationFileInfo", true);
                 if (adapterType == OFFLINE_ADAPTER){
                     intent.putExtra("offline_adapter", true);

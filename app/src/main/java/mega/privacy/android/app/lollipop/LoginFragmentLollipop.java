@@ -15,13 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -45,6 +38,15 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -55,6 +57,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -799,19 +802,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     return v;
-                } else if (action.equals(ACTION_PARK_ACCOUNT)) {
-                    String link = intentReceived.getDataString();
-                    if (link != null) {
-                        logDebug("Link to parkAccount: " + link);
-                        showConfirmationParkAccount(link);
-                        return v;
-                    } else {
-                        logError("Error when parking account - show error message");
-                        showAlert(context, getString(R.string.general_text_error), getString(R.string.general_error_word));
-                        return v;
-                    }
-                }
-                else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
+                } else if (action.equals(ACTION_CANCEL_DOWNLOAD)) {
                     ((LoginActivityLollipop)context).showConfirmationCancelAllTransfers();
 
                 } else if (action.equals(ACTION_SHOW_WARNING_ACCOUNT_BLOCKED)) {
@@ -1103,12 +1094,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     void verifyQuitError(){
         isErrorShown = false;
         pinError.setVisibility(View.GONE);
-        firstPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-        secondPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
-        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+        firstPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+        secondPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+        thirdPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+        fourthPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+        fifthPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
+        sixthPin.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
     }
 
     void verifyShowError(){
@@ -1546,7 +1537,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 logDebug("Click on button_forgot_pass");
                 try {
                     String url = "https://mega.nz/recovery";
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
@@ -1606,7 +1597,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.lost_authentication_device: {
                 try {
                     String url = "https://mega.nz/recovery";
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
@@ -1748,7 +1739,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 firstRequestUpdate = false;
             }
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
             if (request.getTotalBytes() > 0){
                 double progressValue = 100.0 * request.getTransferredBytes() / request.getTotalBytes();
                 if ((progressValue > 99) || (progressValue < 0)){
@@ -1946,7 +1937,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //			loginProgressBar.setVisibility(View.GONE);
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivityLollipop.isFetchingNodes = true;
             disableLoginButton();
@@ -2561,37 +2552,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
             }
         }, 50);
-    }
-
-    public void showConfirmationParkAccount(String link){
-        logDebug("link: " + link);
-
-        final String linkUrl = link;
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        logDebug("Call to Change Password Activity: " + linkUrl);
-                        Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
-                        intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
-                        intent.setData(Uri.parse(linkUrl));
-                        startActivity(intent);
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
-        builder.setTitle(getResources().getString(R.string.park_account_dialog_title));
-        String message= getResources().getString(R.string.park_account_text_last_step);
-        builder.setMessage(message).setPositiveButton(R.string.park_account_button, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
     }
 
     public void showDialogInsertMKToChangePass(String link){

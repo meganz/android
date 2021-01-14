@@ -23,6 +23,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
@@ -31,10 +32,11 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 58;
+	private static final int DATABASE_VERSION = 59;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -52,6 +54,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle";
 	private static final String TABLE_SYNC_RECORDS = "syncrecords";
 	private static final String TABLE_MEGA_CONTACTS = "megacontacts";
+	private static final String TABLE_SD_TRANSFERS = "sdtransfers";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -216,6 +219,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_LAST_PUBLIC_HANDLE_TYPE = "lastpublichandletype";
 	private static final String KEY_STORAGE_STATE = "storagestate";
 	private static final String KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle";
+	private static final String KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus";
 
 	private static final String KEY_PENDING_MSG_ID_CHAT = "idchat";
 	private static final String KEY_PENDING_MSG_TIMESTAMP = "timestamp";
@@ -239,6 +243,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_MEGA_CONTACTS_LOCAL_NAME + " TEXT,"
             + KEY_MEGA_CONTACTS_EMAIL + " TEXT,"
             + KEY_MEGA_CONTACTS_PHONE_NUMBER + " TEXT)";
+
+	private static final String KEY_SD_TRANSFERS_TAG = "sdtransfertag";
+	private static final String KEY_SD_TRANSFERS_NAME = "sdtransfername";
+	private static final String KEY_SD_TRANSFERS_SIZE = "sdtransfersize";
+	private static final String KEY_SD_TRANSFERS_HANDLE = "sdtransferhandle";
+	private static final String KEY_SD_TRANSFERS_APP_DATA = "sdtransferappdata";
+    private static final String KEY_SD_TRANSFERS_PATH = "sdtransferpath";
+	private static final String CREATE_SD_TRANSFERS_TABLE = "CREATE TABLE IF NOT EXISTS "
+			+ TABLE_SD_TRANSFERS + "("
+			+ KEY_ID + " INTEGER PRIMARY KEY, " 	//0
+			+ KEY_SD_TRANSFERS_TAG + " INTEGER, "	//1
+			+ KEY_SD_TRANSFERS_NAME + " TEXT, "		//2
+			+ KEY_SD_TRANSFERS_SIZE + " TEXT, "		//3
+			+ KEY_SD_TRANSFERS_HANDLE + " TEXT, "	//4
+			+ KEY_SD_TRANSFERS_PATH + " TEXT, "		//5
+			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";	//6
 
     private static DatabaseHandler instance;
 
@@ -346,7 +366,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //17
 				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //18
 				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //19
-				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "'" 		    //20
+				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//20
+				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"											//21 - True if the queue is paused, false otherwise
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -376,10 +397,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_TRANSFER_FILENAME + " TEXT, " + KEY_TRANSFER_TYPE + " TEXT, " +
-				KEY_TRANSFER_STATE+ " TEXT, "+ KEY_TRANSFER_SIZE+ " TEXT, " + KEY_TRANSFER_HANDLE + " TEXT, " + KEY_TRANSFER_PATH + " TEXT, " +
-				KEY_TRANSFER_OFFLINE + " BOOLEAN, " + KEY_TRANSFER_TIMESTAMP + " TEXT, " + KEY_TRANSFER_ERROR + " TEXT, " +
-				KEY_TRANSFER_ORIGINAL_PATH + " TEXT, " + KEY_TRANSFER_PARENT_HANDLE + " TEXT" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY, "						//0
+				+ KEY_TRANSFER_FILENAME + " TEXT, "						//1
+				+ KEY_TRANSFER_TYPE + " TEXT, "							//2
+				+ KEY_TRANSFER_STATE + " TEXT, "						//3
+				+ KEY_TRANSFER_SIZE + " TEXT, "							//4
+				+ KEY_TRANSFER_HANDLE + " TEXT, "						//5
+				+ KEY_TRANSFER_PATH + " TEXT, "							//6
+				+ KEY_TRANSFER_OFFLINE + " BOOLEAN, "					//7
+				+ KEY_TRANSFER_TIMESTAMP + " TEXT, "					//8
+				+ KEY_TRANSFER_ERROR + " TEXT, "						//9
+				+ KEY_TRANSFER_ORIGINAL_PATH + " TEXT, "				//10
+				+ KEY_TRANSFER_PARENT_HANDLE + " TEXT"					//11
+				+ ")";
 		db.execSQL(CREATE_COMPLETED_TRANSFER_TABLE);
 
 		String CREATE_EPHEMERAL = "CREATE TABLE IF NOT EXISTS " + TABLE_EPHEMERAL + "("
@@ -406,6 +436,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_SYNC_RECORDS_TABLE);
 
         db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
+
+        db.execSQL(CREATE_SD_TRANSFERS_TABLE);
 	}
 
 	@Override
@@ -802,7 +834,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 54) {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " = '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "';");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_MY_CHAT_FILES_FOLDER_HANDLE + " = '" + encrypt(String.valueOf(INVALID_HANDLE)) + "';");
 		}
 
 		if (oldVersion <= 55) {
@@ -821,13 +853,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " = '" + encrypt("false") + "';");
 
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_OFFLINE + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_OFFLINE + " = '" + encrypt("false") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_TIMESTAMP + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_TIMESTAMP + " = '" + encrypt(System.currentTimeMillis() + "") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ERROR + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ERROR + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_ORIGINAL_PATH + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_ORIGINAL_PATH + " = '" + encrypt("") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_COMPLETED_TRANSFERS + " ADD COLUMN " + KEY_TRANSFER_PARENT_HANDLE + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt("") + "';");
+			db.execSQL("UPDATE " + TABLE_COMPLETED_TRANSFERS + " SET " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt(INVALID_HANDLE + "") + "';");
+		}
+
+		if (oldVersion <= 58) {
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_TRANSFER_QUEUE_STATUS + " = '" + encrypt("false") + "';");
+
+			db.execSQL(CREATE_SD_TRANSFERS_TABLE);
 		}
 	}
 
@@ -1805,7 +1846,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String originalPath = decrypt(cursor.getString(10));
 		long parentHandle = Long.parseLong(decrypt(cursor.getString(11)));
 
-		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path, offline, timeStamp, error, originalPath, parentHandle);
+		return new AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path,
+				offline, timeStamp, error, originalPath, parentHandle);
 	}
 
 	public long setCompletedTransfer(AndroidCompletedTransfer transfer){
@@ -1829,6 +1871,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		return id;
+	}
+
+	/**
+	 * Checks if a completed transfer exists before add it to DB.
+	 * If so, does nothing. If not, adds the transfer to the DB.
+	 *
+	 * @param transfer The transfer to check and add.
+	 */
+	public void setCompletedTransferWithCheck(AndroidCompletedTransfer transfer){
+		if (alreadyExistsAsCompletedTransfer(transfer)) {
+			return;
+		}
+
+		setCompletedTransfer(transfer);
+	}
+
+	/**
+	 * Checks if a completed transfer exists.
+	 *
+	 * @param transfer The completed transfer to check.
+	 * @return True if the transfer already exists, false otherwise.
+	 */
+	private boolean alreadyExistsAsCompletedTransfer(AndroidCompletedTransfer transfer) {
+		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS
+				+ " WHERE " + KEY_TRANSFER_FILENAME + " = '" + encrypt(transfer.getFileName())
+				+ "' AND " + KEY_TRANSFER_TYPE + " = '" + encrypt(transfer.getType() + "")
+				+ "' AND " + KEY_TRANSFER_STATE + " = '" + encrypt(transfer.getState() + "")
+				+ "' AND " + KEY_TRANSFER_SIZE + " = '" + encrypt(transfer.getSize())
+				+ "' AND " + KEY_TRANSFER_HANDLE + " = '" + encrypt(transfer.getNodeHandle())
+				+ "' AND " + KEY_TRANSFER_PATH + " = '" + encrypt(transfer.getPath())
+				+ "' AND " + KEY_TRANSFER_OFFLINE + " = '" + encrypt(transfer.getIsOfflineFile() + "")
+				+ "' AND " + KEY_TRANSFER_ERROR + " = '" + encrypt(transfer.getError())
+				+ "' AND " + KEY_TRANSFER_ORIGINAL_PATH + " = '" + encrypt(transfer.getOriginalPath())
+				+ "' AND " + KEY_TRANSFER_PARENT_HANDLE + " = '" + encrypt(transfer.getParentHandle() + "") + "'";
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		return cursor != null && cursor.getCount() > 0;
 	}
 
 	public void emptyCompletedTransfers(){
@@ -1979,6 +2058,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_STORAGE_STATE, encrypt(Integer.toString(attr.getStorageState())));
 		values.put(KEY_LAST_PUBLIC_HANDLE_TYPE, encrypt(Integer.toString(attr.getLastPublicHandleType())));
 		values.put(KEY_MY_CHAT_FILES_FOLDER_HANDLE, encrypt(Long.toString(attr.getMyChatFilesFolderHandle())));
+		values.put(KEY_TRANSFER_QUEUE_STATUS, encrypt(attr.getTransferQueueStatus()));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 
@@ -2009,6 +2089,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String storageState = decrypt(cursor.getString(18));
 			String lastPublicHandleType = decrypt(cursor.getString(19));
 			String myChatFilesFolderHandle = decrypt(cursor.getString(20));
+			String transferQueueStatus = decrypt(cursor.getString(21));
 
 			attr = new MegaAttributes(online,
 					intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
@@ -2018,7 +2099,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					staging, lastPublicHandle, lastPublicHandleTimeStamp,
 					lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
 					storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
-					myChatFilesFolderHandle);
+					myChatFilesFolderHandle, transferQueueStatus);
 		}
 		cursor.close();
 
@@ -2262,7 +2343,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(),db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2287,7 +2368,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(),db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2312,7 +2393,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(), db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2404,121 +2485,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return false;
 	}
 
-	public MegaOffline findByHandle(long handle){
-        logDebug("findByHandle: " + handle);
-
-		MegaOffline offline = null;
-
-		//Get the foreign key of the node
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(String.valueOf(handle)) + "'";
-
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				int _id = -1;
-				int _parent = -1;
-				String _handle = null;
-				String _path = null;
-				String _name = null;
-				String _type = null;
-				int _incoming = 0;
-				String _handleIncoming = null;
-
-				_id = Integer.parseInt(cursor.getString(0));
-				_handle = decrypt(cursor.getString(1));
-				_path = decrypt(cursor.getString(2));
-				_name = decrypt(cursor.getString(3));
-				_parent = cursor.getInt(4);
-				_type = decrypt(cursor.getString(5));
-				_incoming = cursor.getInt(6);
-				_handleIncoming = decrypt(cursor.getString(7));
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
-				cursor.close();
-				return offline;
-			}
-		}
-		cursor.close();
-		return null;
+	public MegaOffline findByHandle(long handle) {
+        return findByHandle(String.valueOf(handle));
 	}
 
-	public MegaOffline findByHandle(String handle){
-
-		MegaOffline offline = null;
+	public MegaOffline findByHandle(String handle) {
 		//Get the foreign key of the node
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(handle) + "'";
-
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '"
+				+ encrypt(handle) + "'";
 		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int id = Integer.parseInt(cursor.getString(0));
+				String nodeHandle = decrypt(cursor.getString(1));
+				String path = decrypt(cursor.getString(2));
+				String name = decrypt(cursor.getString(3));
+				int parent = cursor.getInt(4);
+				String type = decrypt(cursor.getString(5));
+				int incoming = cursor.getInt(6);
+				String handleIncoming = decrypt(cursor.getString(7));
 
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				int _id = -1;
-				int _parent = -1;
-				String _handle = null;
-				String _path = null;
-				String _name = null;
-				String _type = null;
-				int _incoming = 0;
-				String _handleIncoming = null;
-
-				_id = Integer.parseInt(cursor.getString(0));
-				_handle = decrypt(cursor.getString(1));
-				_path = decrypt(cursor.getString(2));
-				_name = decrypt(cursor.getString(3));
-				_parent = cursor.getInt(4);
-				_type = decrypt(cursor.getString(5));
-				_incoming = cursor.getInt(6);
-				_handleIncoming = decrypt(cursor.getString(7));
-
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
 				cursor.close();
-				return offline;
+				return new MegaOffline(id,nodeHandle, path, name, parent, type,  incoming,
+						handleIncoming);
 			}
+			cursor.close();
 		}
-		cursor.close();
 		return null;
-
-	}
-
-	public MegaOffline findByHandle(String handle, SQLiteDatabase db){
-
-		MegaOffline offline = null;
-		//Get the foreign key of the node
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(handle) + "'";
-
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				int _id = -1;
-				int _parent = -1;
-				String _handle = null;
-				String _path = null;
-				String _name = null;
-				String _type = null;
-				int _incoming = 0;
-				String _handleIncoming = null;
-
-				_id = Integer.parseInt(cursor.getString(0));
-				_handle = decrypt(cursor.getString(1));
-				_path = decrypt(cursor.getString(2));
-				_name = decrypt(cursor.getString(3));
-				_parent = cursor.getInt(4);
-				_type = decrypt(cursor.getString(5));
-				_incoming = cursor.getInt(6);
-				_handleIncoming = decrypt(cursor.getString(7));
-
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
-				cursor.close();
-				return offline;
-			}
-		}
-		cursor.close();
-		return null;
-
 	}
 
 	public ArrayList<MegaOffline> findByParentId(int parentId){
@@ -3727,7 +3720,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	public long getMyChatFilesFolderHandle() {
 		logInfo("Getting the storage state from DB");
-		return getLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, MegaApiJava.INVALID_HANDLE);
+		return getLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, INVALID_HANDLE);
 	}
 
 	/**
@@ -3738,6 +3731,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setMyChatFilesFolderHandle(long myChatFilesFolderHandle) {
 		logInfo("Setting the storage state in the DB");
 		setLongValue(TABLE_ATTRIBUTES, KEY_MY_CHAT_FILES_FOLDER_HANDLE, myChatFilesFolderHandle);
+	}
+
+	/**
+	 * Get the status of the transfer queue.
+	 *
+	 * @return True if the queue is paused, false otherwise.
+	 */
+	public boolean getTransferQueueStatus() {
+		logInfo("Getting the storage state from DB");
+		return getBooleanValue(TABLE_ATTRIBUTES, KEY_TRANSFER_QUEUE_STATUS, false);
+	}
+
+	/**
+	 * Set the status of the transfer queue.
+	 *
+	 * @param transferQueueStatus True if the queue is paused, false otherwise.
+	 */
+	public void setTransferQueueStatus(boolean transferQueueStatus) {
+		logInfo("Setting the storage state in the DB");
+		setStringValue(TABLE_ATTRIBUTES, KEY_TRANSFER_QUEUE_STATUS, transferQueueStatus + "");
 	}
 
 	public String getShowNotifOff (){
@@ -3832,11 +3845,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             lastPublicHandleType = attributes.getLastPublicHandleType();
 		} catch (Exception e) {
 			logWarning("EXCEPTION getting last public handle info.", e);
-			lastPublicHandle = MegaApiJava.INVALID_HANDLE;
+			lastPublicHandle = INVALID_HANDLE;
 		}
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 		onCreate(db);
-		if (lastPublicHandle != MegaApiJava.INVALID_HANDLE) {
+		if (lastPublicHandle != INVALID_HANDLE) {
 		    try{
 		        setLastPublicHandle(lastPublicHandle);
 		        setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp);
@@ -4129,4 +4142,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         cursor.close();
     }
+
+	public ArrayList<SDTransfer> getSDTransfers() {
+		ArrayList<SDTransfer> sdTransfers = new ArrayList<>();
+		String selectQuery = "SELECT * FROM " + TABLE_SD_TRANSFERS;
+
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor != null && cursor.moveToLast()) {
+			do {
+				int tag = Integer.parseInt(cursor.getString(1));
+				String name = decrypt(cursor.getString(2));
+				String size = decrypt(cursor.getString(3));
+				String nodeHandle = decrypt(cursor.getString(4));
+				String path = decrypt(cursor.getString(5));
+				String appData = decrypt(cursor.getString(6));
+
+				sdTransfers.add(new SDTransfer(tag, name, size, nodeHandle, path, appData));
+			} while (cursor.moveToPrevious());
+
+			cursor.close();
+		}
+
+		return sdTransfers;
+	}
+
+	public long addSDTransfer(SDTransfer transfer) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_SD_TRANSFERS_TAG, transfer.getTag());
+		values.put(KEY_SD_TRANSFERS_NAME, encrypt(transfer.getName()));
+		values.put(KEY_SD_TRANSFERS_SIZE, encrypt(transfer.getSize()));
+		values.put(KEY_SD_TRANSFERS_HANDLE, encrypt(transfer.getNodeHandle()));
+		values.put(KEY_SD_TRANSFERS_PATH, encrypt(transfer.getPath()));
+		values.put(KEY_SD_TRANSFERS_APP_DATA, encrypt(transfer.getAppData()));
+
+		return db.insert(TABLE_SD_TRANSFERS, null, values);
+	}
+
+	public void removeSDTransfer(int tag) {
+		db.delete(TABLE_SD_TRANSFERS,
+				KEY_SD_TRANSFERS_TAG + "=" + tag,
+				null);
+	}
 }

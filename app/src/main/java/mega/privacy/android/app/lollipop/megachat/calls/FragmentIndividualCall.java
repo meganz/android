@@ -330,14 +330,14 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             if (surfaceView.getVisibility() == View.VISIBLE) {
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, videoLayout.getId());
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, videoLayout.getId());
-                marginTop = px2dp(12, outMetrics);
+                marginTop = dp2px(12, outMetrics);
             } else {
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_RIGHT, avatarLayout.getId());
                 paramsMicroSurface.addRule(RelativeLayout.ALIGN_TOP, avatarLayout.getId());
-                marginTop = px2dp(3, outMetrics);
+                marginTop = dp2px(3, outMetrics);
 
             }
-            paramsMicroSurface.setMargins(0, marginTop, px2dp(4, outMetrics), 0);
+            paramsMicroSurface.setMargins(0, marginTop, dp2px(4, outMetrics), 0);
             muteLayout.setLayoutParams(paramsMicroSurface);
             muteLayout.setVisibility(View.VISIBLE);
 

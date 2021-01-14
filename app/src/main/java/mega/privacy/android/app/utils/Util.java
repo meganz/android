@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -34,15 +33,19 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.core.content.ContextCompat;
-import android.text.Html;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
+import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -50,7 +53,6 @@ import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -164,30 +166,29 @@ public class Util {
 		if(activity == null){
 			return;
 		}
-		
-		try{ 
+
+		try{
 			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
 			dialogBuilder.setPositiveButton(activity.getString(android.R.string.ok), (dialog, which) -> {
-						dialog.dismiss();
-						if (finish) {
-							activity.finish();
-						}
-					});
+				dialog.dismiss();
+				if (finish) {
+					activity.finish();
+				}
+			});
 			dialogBuilder.setOnCancelListener(dialog -> {
 				if (finish) {
 					activity.finish();
 				}
 			});
-		
-		
+
 			AlertDialog dialog = dialogBuilder.create();
 			dialog.setCanceledOnTouchOutside(false);
 			dialog.setCancelable(false);
-			dialog.show(); 
+			dialog.show();
 			brandAlertDialog(dialog);
 		}
 		catch(Exception ex){
-			Util.showToast(activity, message); 
+			Util.showToast(activity, message);
 		}
 	}
 	
@@ -435,18 +436,14 @@ public class Util {
 	/**
 	 * Convert dp to px.
 	 *
-	 * Note: the name of this function is wrong since the beginning, we should rename it in
-	 * the future.
-	 *
 	 * @param dp dp value
 	 * @param outMetrics display metrics
-	 * @return corresponding px value
+	 * @return corresponding dp value
 	 */
-	public static int px2dp (float dp, DisplayMetrics outMetrics){
-	
+	public static int dp2px(float dp, DisplayMetrics outMetrics) {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
-	
+
 	/*
 	 * AES encryption
 	 */
@@ -1407,7 +1404,7 @@ public class Util {
 				"android");
 
 		return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId)
-				: px2dp(24, context.getResources().getDisplayMetrics());
+				: dp2px(24, context.getResources().getDisplayMetrics());
 	}
 
 	public static MegaPreferences getPreferences (Context context) {
@@ -1707,8 +1704,7 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-    public static Spanned getSpannedHtmlText(String string) {
-
+	public static Spanned getSpannedHtmlText(String string) {
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
 			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
 		}
@@ -1803,7 +1799,7 @@ public class Util {
 	 * @param outMetrics	DisplayMetrics of the current device.
 	 */
 	public static void changeViewElevation(ActionBar aB, boolean withElevation, DisplayMetrics outMetrics) {
-		float elevation = px2dp(4, outMetrics);
+		float elevation = dp2px(4, outMetrics);
 
 		if (withElevation) {
 			aB.setElevation(elevation);
@@ -1812,8 +1808,35 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Gets a reference to a given drawable and prepares it for use with tinting through.
+	 *
+	 * @param resId the resource id for the given drawable
+	 * @return a wrapped drawable ready fo use
+	 * with {@link DrawableCompat}'s tinting methods
+	 * @throws Resources.NotFoundException
+	 */
+	public static Drawable getWrappedDrawable(Context context, @DrawableRes int resId)
+			throws Resources.NotFoundException {
+		return DrawableCompat.wrap(ResourcesCompat.getDrawable(context.getResources(),
+				resId, null));
+	}
+
 	public static LocalDate fromEpoch(long seconds) {
 		return LocalDate.from(
 				LocalDateTime.ofInstant(Instant.ofEpochSecond(seconds), ZoneId.systemDefault()));
+	}
+
+	/**
+	 * Method for displaying a snack bar when is Offline.
+	 *
+	 * @return True, is is Offline. False it is Online.
+	 */
+	public static boolean isOffline(Context context) {
+		if (!isOnline(context)) {
+			Util.showSnackbar(context, context.getString(R.string.error_server_connection_problem));
+			return true;
+		}
+		return false;
 	}
 }

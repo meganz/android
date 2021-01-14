@@ -67,8 +67,6 @@ public class TransferWidget {
      *                          - MegaTransfer.TYPE_UPLOAD if upload transfer
      */
     public void update(int transferType) {
-        if (!isOnline(context)) return;
-
         if (context instanceof ManagerActivityLollipop) {
             if (ManagerActivityLollipop.getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
                 MegaApplication.getTransfersManagement().setFailedTransfers(false);

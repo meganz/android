@@ -34,7 +34,7 @@
 					android:id="@+id/administrator_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/name_my_account"
+					android:textColor="@color/primary_text"
 					android:fontFamily="roboto"
 					android:gravity="left"/>
 
@@ -42,7 +42,7 @@
 					android:id="@+id/administrator_subtitle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/mail_my_account"
+					android:textColor="@color/secondary_text"
 					android:fontFamily="roboto"
 					android:gravity="left"/>
 
@@ -76,7 +76,7 @@
 					android:id="@+id/member_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/name_my_account"
+					android:textColor="@color/primary_text"
 					android:fontFamily="roboto"
 					android:gravity="left"/>
 
@@ -84,7 +84,7 @@
 					android:id="@+id/member_subtitle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/mail_my_account"
+					android:textColor="@color/secondary_text"
 					android:fontFamily="roboto"
 					android:gravity="left"/>
 
@@ -118,7 +118,7 @@
 					android:id="@+id/observer_title"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/name_my_account"
+					android:textColor="@color/primary_text"
 					android:fontFamily="roboto"
 					android:gravity="left"/>
 
@@ -126,7 +126,7 @@
 					android:id="@+id/observer_subtitle"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:textColor="@color/mail_my_account"
+					android:textColor="@color/secondary_text"
 					android:fontFamily="roboto"
 					android:gravity="left"/>
 

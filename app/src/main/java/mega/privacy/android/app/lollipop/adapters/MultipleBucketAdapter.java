@@ -2,7 +2,7 @@ package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.RecyclerView;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,17 +12,21 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE6;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -39,10 +43,10 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
 
     private DisplayMetrics outMetrics;
 
-    ArrayList<MegaNode> nodes;
+    List<MegaNode> nodes;
     boolean isMedia;
 
-    public MultipleBucketAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes, boolean isMedia) {
+    public MultipleBucketAdapter(Context context, Object fragment, List<MegaNode> nodes, boolean isMedia) {
         this.context = context;
         this.fragment = fragment;
         this.isMedia = isMedia;
@@ -65,6 +69,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         private ImageView thumbnailList;
         private TextView nameText;
         private TextView infoText;
+        private ImageView imgLabel;
+        private ImageView imgFavourite;
         private ImageView threeDots;
 
         public ViewHolderMultipleBucket(View itemView) {
@@ -80,8 +86,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                 this.thumbnailMedia.setImageBitmap(image);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) this.thumbnailList.getLayoutParams();
-                params.width = params.height = px2dp(36, outMetrics);
-                int margin = px2dp(18, outMetrics);
+                params.width = params.height = dp2px(36, outMetrics);
+                int margin = dp2px(18, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
 
                 this.thumbnailList.setLayoutParams(params);
@@ -119,6 +125,8 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         holder.thumbnailList = v.findViewById(R.id.thumbnail_list);
         holder.nameText = v.findViewById(R.id.name_text);
         holder.infoText = v.findViewById(R.id.info_text);
+        holder.imgLabel = v.findViewById(R.id.img_label);
+        holder.imgFavourite = v.findViewById(R.id.img_favourite);
         holder.threeDots = v.findViewById(R.id.three_dots);
         holder.threeDots.setTag(holder);
         holder.threeDots.setOnClickListener(this);
@@ -140,7 +148,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             thumbnail = getThumbnailFromFolder(node, context);
             if (thumbnail == null) {
                 try {
-                    if (node.hasThumbnail()) {
+                    if (node.hasThumbnail() || isMedia) {
                         thumbnail = getThumbnailFromMegaList(node, context, holder, megaApi, this);
                     } else {
                         createThumbnailList(context, node, holder, megaApi, this);
@@ -155,6 +163,9 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
             holder.listView.setVisibility(View.GONE);
+            holder.imgLabel.setVisibility(View.GONE);
+            holder.imgFavourite.setVisibility(View.GONE);
+
             if (isAudioOrVideo(node)) {
                 holder.videoLayout.setVisibility(View.VISIBLE);
                 holder.videoDuration.setText(getVideoDuration(node.getDuration()));
@@ -168,7 +179,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             } else {
                 size = outMetrics.widthPixels / 6;
             }
-            size -= px2dp(2, outMetrics);
+            size -= dp2px(2, outMetrics);
 
             holder.thumbnailMedia.getLayoutParams().width = size;
             holder.thumbnailMedia.getLayoutParams().height = size;
@@ -184,12 +195,22 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
             holder.nameText.setText(node.getName());
             holder.infoText.setText(getSizeString(node.getSize()) + " · " + formatTime(node.getCreationTime()));
 
+            if (node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
+                Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
+                holder.imgLabel.setImageDrawable(drawable);
+                holder.imgLabel.setVisibility(View.VISIBLE);
+            } else {
+                holder.imgLabel.setVisibility(View.GONE);
+            }
+
+            holder.imgFavourite.setVisibility(node.isFavourite() ? View.VISIBLE : View.GONE);
+
             if (thumbnail != null) {
                 holder.setImageThumbnail(thumbnail);
             } else {
                 RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.thumbnailList.getLayoutParams();
-                params.width = params.height = px2dp(48, outMetrics);
-                int margin = px2dp(12, outMetrics);
+                params.width = params.height = dp2px(48, outMetrics);
+                int margin = dp2px(12, outMetrics);
                 params.setMargins(margin, margin, margin, 0);
                 holder.thumbnailList.setLayoutParams(params);
                 holder.thumbnailList.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -210,7 +231,7 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         return nodes.size();
     }
 
-    private void setNodes(ArrayList<MegaNode> nodes) {
+    public void setNodes(List<MegaNode> nodes) {
         this.nodes = nodes;
         notifyDataSetChanged();
     }
@@ -229,13 +250,14 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
                     ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
                     break;
                 }
-                ((ManagerActivityLollipop) context).showNodeOptionsPanel(node);
+                ((ManagerActivityLollipop) context).showNodeOptionsPanel(node, MODE6);
                 break;
             }
             case R.id.multiple_bucket_layout: {
-                ((RecentsFragment) fragment).openFile(node, true,
-                    v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list),
-                    RecentsFragment.OPEN_FROM_SUB);
+                if (fragment instanceof RecentsBucketFragment) {
+                    ((RecentsBucketFragment) fragment).openFile(node, true,
+                            v.findViewById(isMedia ? R.id.thumbnail_media : R.id.thumbnail_list));
+                }
                 break;
             }
         }
@@ -250,33 +272,5 @@ public class MultipleBucketAdapter extends RecyclerView.Adapter<MultipleBucketAd
         if (!isTextEmpty(name)) return name.substring(0, 1);
 
         return "";
-    }
-
-    public int getNodePosition(long handle) {
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getHandle() == handle) {
-                return i;
-            }
-        }
-        return INVALID_POSITION;
-    }
-
-    public ImageView getThumbnailView(RecyclerView recyclerView, long handle) {
-        if (nodes == null || nodes.isEmpty()) {
-            return null;
-        }
-
-        int position = getNodePosition(handle);
-        if (position == INVALID_POSITION) {
-            return null;
-        }
-
-        RecyclerView.ViewHolder holder = recyclerView.findViewHolderForLayoutPosition(position);
-        if (holder instanceof ViewHolderMultipleBucket) {
-            return isMedia ? ((ViewHolderMultipleBucket) holder).thumbnailMedia
-                : ((ViewHolderMultipleBucket) holder).thumbnailList;
-        }
-
-        return null;
     }
 }

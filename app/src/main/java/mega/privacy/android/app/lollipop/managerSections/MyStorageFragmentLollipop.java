@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
@@ -25,7 +27,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class MyStorageFragmentLollipop extends Fragment {
 
@@ -160,7 +161,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getUsedFormatted().trim().length()<=0){
 			totalUsedSpace.setText(getString(R.string.recovering_info));
-			totalUsedSpace.setTextColor(getResources().getColor(R.color.name_my_account));
+			totalUsedSpace.setTextColor(getResources().getColor(R.color.primary_text));
 			totalUsedSpace.setTypeface(normalTypeface);
 		}
 		else{
@@ -180,7 +181,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 					logWarning("Exception formatting string", e);
 				}
 
-				totalUsedSpace.setText(getSpannedHtmlText(usedSpaceString));
+				totalUsedSpace.setText(HtmlCompat.fromHtml(usedSpaceString, HtmlCompat.FROM_HTML_MODE_LEGACY));
 			}
 		}
 
@@ -208,11 +209,11 @@ public class MyStorageFragmentLollipop extends Fragment {
 
 		if(myAccountInfo.getAccountType()==0){
 			transferQuotaUsedText.setText(context.getString(R.string.not_available));
-			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.name_my_account));
+			transferQuotaUsedText.setTextColor(ContextCompat.getColor(context, R.color.primary_text));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else if(myAccountInfo.getUsedTransferFormatted().trim().length()<=0){
 			transferQuotaUsedText.setText(getString(R.string.recovering_info));
-			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.name_my_account));
+			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.primary_text));
 			transferQuotaUsedText.setTypeface(normalTypeface);
 		} else{
 			transferQuotaUsedText.setTextColor(getResources().getColor(R.color.accentColor));
@@ -231,7 +232,7 @@ public class MyStorageFragmentLollipop extends Fragment {
 					logWarning("Exception formatting string", e);
 				}
 
-				transferQuotaUsedText.setText(getSpannedHtmlText(textToShow));
+				transferQuotaUsedText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 			}
 		}
 	}

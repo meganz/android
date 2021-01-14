@@ -4,15 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.text.Html
-import android.text.Spanned
 import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
@@ -55,7 +54,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         megaApi.getUserData(GetUserDataListener(this))
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
-        window.statusBarColor = resources.getColor(R.color.status_bar_red_alert)
+        window.statusBarColor = ContextCompat.getColor(applicationContext, R.color.status_bar_red_alert)
 
         scrollContentLayout = findViewById(R.id.scroll_content_layout)
 
@@ -157,7 +156,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
      * Uses a @see CountDownTimer to update the remaining time.
      */
     private fun updateDeletionWarningText() {
-        var text: String?
+        var text: String
         val time = TimeUnit.SECONDS.toMillis(deadlineTs) - System.currentTimeMillis()
 
         when {
@@ -188,19 +187,13 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
-            text = text.replace("[M]", "<font color='" + resources.getColor(R.color.mega) + "'>")
+            text = text.replace("[M]", "<font color='" + ContextCompat.getColor(applicationContext, R.color.mega) + "'>")
             text = text.replace("[/M]", "</font>")
         } catch (e: Exception) {
             logWarning("Exception formatting string", e)
         }
 
-        val result: Spanned
-        result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY)
-        } else {
-            Html.fromHtml(text)
-        }
-        deletionWarningText?.text = result
+        deletionWarningText?.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
     /**
