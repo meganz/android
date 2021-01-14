@@ -83,7 +83,7 @@
 
 <!--    <color name="small_letter_upgrade_account">#8a333333</color>-->
 
-    <color name="chat_background">#08000000</color>
+<!--    <color name="chat_background">#08000000</color>-->
 <!--    <color name="message_background">#0f000000</color>-->
 
     <color name="chat_sliding_panel_separator">#dcdcdcdc</color>

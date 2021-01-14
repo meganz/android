@@ -12,8 +12,7 @@
         android:layout_height="40dp"
         android:layout_centerVertical="true"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@null">
+        android:layout_marginEnd="16dp">
 
         <mega.privacy.android.app.components.RoundedImageView
             android:id="@+id/contact_list_thumbnail"
@@ -21,8 +20,6 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:scaleType="fitCenter"
-            rounded:border_color="@color/border_file_properties"
-            rounded:border_width="0dp"
             rounded:corner_radius="20dp" />
 
     </RelativeLayout>
@@ -35,8 +32,6 @@
         android:layout_marginEnd="16dp"
         android:layout_toEndOf="@id/contact_list_relative_layout_avatar"
         android:maxLines="1"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
         rounded:emojiSize="16sp" />
 </RelativeLayout>
