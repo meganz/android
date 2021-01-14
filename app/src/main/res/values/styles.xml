@@ -324,7 +324,7 @@
     </style>
 
     <style name="InputTextAppearanceError" parent="TextAppearance.Design.Error">
-        <item name="android:textColor">@color/dark_primary_color</item>
+        <item name="android:textColor">@color/red_error</item>
     </style>
 
     <style name="InputTextAppearanceVeryWeak" parent="TextAppearance.Design.Error">
@@ -609,7 +609,7 @@
 
     <style name="TransparentEditText">
         <item name="colorControlNormal">@android:color/transparent</item>
-        <item name="colorControlActivated">@android:color/transparent</item>
+        <item name="colorControlActivated">@color/accentColor</item>
         <item name="colorControlHighlight">@color/accentColor</item>
         <item name="android:textCursorDrawable">@drawable/accent_color_cursor</item>
     </style>

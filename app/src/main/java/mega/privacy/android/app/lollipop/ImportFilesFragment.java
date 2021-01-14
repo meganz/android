@@ -12,11 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -24,15 +22,18 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentImportFilesBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter.MAX_VISIBLE_ITEMS_AT_BEGINNING;
+import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 
 public class ImportFilesFragment extends BaseFragment {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
+    public static final int NUM_ERRORS = 2;
 
     private FragmentImportFilesBinding binding;
 
@@ -42,7 +43,6 @@ public class ImportFilesFragment extends BaseFragment {
     boolean areItemsVisible = false;
 
     private List<ShareInfo> filePreparedInfos;
-    HashMap<String, String> nameFiles = new HashMap<>();
 
     public static ImportFilesFragment newInstance() {
         return new ImportFilesFragment();
@@ -64,8 +64,8 @@ public class ImportFilesFragment extends BaseFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         filePreparedInfos = ((FileExplorerActivityLollipop) context).getFilePreparedInfos();
         if (filePreparedInfos != null) {
-            nameFiles = ((FileExplorerActivityLollipop) context).getNameFiles();
-            if (nameFiles == null || nameFiles.size() <= 0) {
+            HashMap<String, String> nameFiles = ((FileExplorerActivityLollipop) context).getNameFiles();
+            if (nameFiles == null || nameFiles.isEmpty()) {
                 new GetNamesAsyncTask().execute();
             }
         }
@@ -82,11 +82,9 @@ public class ImportFilesFragment extends BaseFragment {
         mLayoutManager = new LinearLayoutManager(context);
         binding.fileListView.setLayoutManager(mLayoutManager);
         binding.cloudDriveButton.setOnClickListener(v ->
-                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CLOUD_FRAGMENT));
-
+                confirmImport(FileExplorerActivityLollipop.CLOUD_FRAGMENT));
         binding.chatButton.setOnClickListener(v ->
-                ((FileExplorerActivityLollipop) context).chooseFragment(FileExplorerActivityLollipop.CHAT_FRAGMENT));
-
+                confirmImport(FileExplorerActivityLollipop.CHAT_FRAGMENT));
         binding.showMoreLayout.setOnClickListener(v -> showMoreClick());
 
         if (filePreparedInfos != null) {
@@ -96,16 +94,64 @@ public class ImportFilesFragment extends BaseFragment {
             binding.contentText.setText(getResources().getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
 
             if (adapter == null) {
-                adapter = new ImportFilesAdapter(context, this, filePreparedInfos, nameFiles);
+                adapter = new ImportFilesAdapter(context, this, filePreparedInfos, getNameFiles());
             }
 
-            adapter.setImportNameFiles(nameFiles);
+            adapter.setImportNameFiles(getNameFiles());
             areItemsVisible = binding.showMoreLayout.getVisibility() != VISIBLE;
             adapter.setItemsVisibility(areItemsVisible);
             binding.fileListView.setAdapter(adapter);
         }
 
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    /**
+     * Checks if all the files to import have a right name.
+     * - If so, shows the fragment which the user chose to import.
+     * - If not, shows an error warning.
+     *
+     * @param fragment The fragment chosen by the user.
+     */
+    private void confirmImport(int fragment) {
+        if (adapter != null) {
+            adapter.updateCurrentFocusPosition(binding.fileListView);
+        }
+
+        HashMap<String, String> nameFiles = getNameFiles();
+        int emptyNames = 0;
+        int wrongNames = 0;
+
+        for (String name : nameFiles.values()) {
+            if (name.trim().isEmpty()) {
+                emptyNames++;
+            }
+
+            if (Pattern.compile(NODE_NAME_REGEX).matcher(name).find()) {
+                wrongNames++;
+            }
+
+
+            if (wrongNames >= NUM_ERRORS) {
+                break;
+            }
+        }
+
+        if (wrongNames > 0 || emptyNames > 0) {
+            String warning;
+
+            if (emptyNames > 0 && wrongNames > 0) {
+                warning = StringResourcesUtils.getString(R.string.general_incorrect_names);
+            } else if (emptyNames > 0) {
+                warning = StringResourcesUtils.getQuantityString(R.plurals.empty_names, emptyNames);
+            } else {
+                warning = StringResourcesUtils.getString(R.string.invalid_characters_defined);
+            }
+
+            ((FileExplorerActivityLollipop) context).showSnackbar(warning);
+        } else {
+            ((FileExplorerActivityLollipop) context).chooseFragment(fragment);
+        }
     }
 
     private void showMoreClick() {
@@ -124,19 +170,22 @@ public class ImportFilesFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onSaveInstanceState(@NotNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
+    private HashMap<String, String> getNameFiles() {
+        return ((FileExplorerActivityLollipop) context).getNameFiles();
     }
 
     class GetNamesAsyncTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            HashMap<String, String> nameFiles = new HashMap<>();
+
             for (int i = 0; i < filePreparedInfos.size(); i++) {
-                nameFiles.put(filePreparedInfos.get(i).getTitle(), filePreparedInfos.get(i).getTitle());
+                String name = filePreparedInfos.get(i).getTitle();
+                nameFiles.put(name, name);
             }
+
+            ((FileExplorerActivityLollipop) context).setNameFiles(nameFiles);
             return null;
         }
     }

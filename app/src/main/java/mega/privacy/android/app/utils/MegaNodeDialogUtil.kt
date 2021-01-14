@@ -322,7 +322,7 @@ class MegaNodeDialogUtil {
                         activity,
                         typeText,
                         errorText,
-                        getString(R.string.invalid_characters)
+                        getString(R.string.invalid_characters_defined)
                     )
                 }
                 else -> {

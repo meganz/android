@@ -10,7 +10,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -227,7 +226,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	private boolean importFileF;
 	private int importFragmentSelected = -1;
 	private String action;
-    private androidx.appcompat.app.AlertDialog renameDialog;
 	private HashMap<String, String> nameFiles = new HashMap<>();
 
 	private MegaNode myChatFilesNode;
