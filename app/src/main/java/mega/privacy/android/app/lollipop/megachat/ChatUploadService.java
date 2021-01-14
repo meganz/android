@@ -1131,7 +1131,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								} catch (Exception e) {
 								}
 							}
-						}else if(isVoiceClip(transfer.getPath())){
+						}else if(isVoiceClip(transfer.getAppData())){
 							logDebug("Is voice clip");
 							attachVoiceClips(transfer);
 						}

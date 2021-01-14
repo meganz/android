@@ -1852,36 +1852,42 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				MegaApplication.setLoggingIn(isLoggingIn);
 //				finish();
 			}
-		}
-		else{
+		} else {
 			logDebug("Public node received");
+
 			if (e.getErrorCode() != MegaError.API_OK) {
 				logError("Public node error");
 				return;
 			}
-			else {
-				MegaNode node = request.getPublicMegaNode();
 
-				if (node != null) {
-					if (currentDir.isDirectory()) {
-						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
-					} else {
-						currentFile = currentDir;
-					}
+			MegaNode node = request.getPublicMegaNode();
+			if (node == null) {
+				logError("Public node is null");
+				return;
+			}
 
-					String appData = getSDCardAppData(intent);
+			if (currentDir == null) {
+				logError("currentDir is null");
+				return;
+			}
 
-                    logDebug("Public node download launched");
-					if(!wl.isHeld()) wl.acquire();
-					if(!lock.isHeld()) lock.acquire();
-					if (currentDir.isDirectory()){
-						logDebug("To downloadPublic(dir)");
-						if (!isTextEmpty(appData)) {
-							megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
-						} else {
-							megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
-						}
-					}
+			if (currentDir.isDirectory()) {
+				currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
+			} else {
+				currentFile = currentDir;
+			}
+
+			String appData = getSDCardAppData(intent);
+
+			logDebug("Public node download launched");
+			if (!wl.isHeld()) wl.acquire();
+			if (!lock.isHeld()) lock.acquire();
+			if (currentDir.isDirectory()) {
+				logDebug("To downloadPublic(dir)");
+				if (!isTextEmpty(appData)) {
+					megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
+				} else {
+					megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
 				}
 			}
 		}

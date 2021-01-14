@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,8 +12,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
+import static mega.privacy.android.app.utils.Constants.HANDLE;
 import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
 import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -119,5 +122,63 @@ public class LinksUtil {
 
     public static void resetIsClickAlreadyIntercepted() {
         LinksUtil.isClickAlreadyIntercepted = false;
+    }
+
+    /**
+     * Splits the link from its decryption key and returns the link.
+     *
+     * @param linkWithKey The link with the decryption key.
+     * @return The link without the decryption key.
+     */
+    public static String getLinkWithoutKey(String linkWithKey) {
+        return getLinkWithoutKeyOrOnlyKey(linkWithKey, false);
+    }
+
+    /**
+     * Splits the link from its decryption key and returns the decryption key.
+     *
+     * @param linkWithKey The link with the decryption key
+     * @return The decryption key of the link.
+     */
+    public static String getKeyLink(String linkWithKey) {
+        return getLinkWithoutKeyOrOnlyKey(linkWithKey, true);
+    }
+
+    /**
+     * Splits the link from its decryption key and returns the link or decryption key,
+     * depending on the value received on onlyKey param.
+     *
+     * @param linkWithKey The link with the decryption key
+     * @return The link without the decryption key or the decryption key of the link.
+     */
+    public static String getLinkWithoutKeyOrOnlyKey(String linkWithKey, boolean onlyKey) {
+        if (linkWithKey.contains("#!") || linkWithKey.contains("#F!")) {
+            //old file or folder link format
+            String[] s = linkWithKey.split("!");
+
+            if (s.length == 3) {
+                return onlyKey ? s[2] : s[0] + "!" + s[1];
+            }
+        } else {
+            // new file or folder link format
+            String[] s = linkWithKey.split("#");
+
+            if (s.length == 2) {
+                return onlyKey ? s[1] : s[0];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Launches an intent to show get link activity.
+     *
+     * @param activity Activity which launches the intent.
+     * @param handle   identifier of the node to get or manage its link.
+     */
+    public static void showGetLinkActivity(Activity activity, long handle) {
+        activity.startActivity(new Intent(activity, GetLinkActivity.class)
+                .putExtra(HANDLE, handle));
     }
 }
