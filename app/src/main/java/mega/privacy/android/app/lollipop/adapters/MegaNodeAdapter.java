@@ -138,7 +138,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView imageViewThumb;
         public ImageView imageViewIcon;
         public RelativeLayout thumbLayout;
-        public View separator;
         public ImageView imageViewVideoIcon;
         public TextView videoDuration;
         public RelativeLayout videoInfoLayout, bottomContainer;
@@ -468,7 +467,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         this.listFragment = recyclerView;
-        this.type = type;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication)((Activity)context).getApplication())
@@ -590,11 +588,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.textViewFileName = v.findViewById(R.id.file_grid_filename);
             holderGrid.textViewFileNameForFile = v.findViewById(R.id.file_grid_filename_for_file);
             holderGrid.imageButtonThreeDotsForFile = v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewFileSize = v.findViewById(R.id.file_grid_filesize);
             holderGrid.imageButtonThreeDots = v.findViewById(R.id.file_grid_three_dots);
-            holderGrid.savedOffline = v.findViewById(R.id.file_grid_saved_offline);
-            holderGrid.separator = v.findViewById(R.id.file_grid_separator);
-            holderGrid.publicLinkImage = v.findViewById(R.id.file_grid_public_link);
             holderGrid.takenDownImage = v.findViewById(R.id.file_grid_taken_down);
             holderGrid.takenDownImageForFile = v.findViewById(R.id.file_grid_taken_down_for_file);
             holderGrid.imageViewVideoIcon = v.findViewById(R.id.file_grid_video_icon);
@@ -606,25 +600,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holderGrid.bottomContainer.setOnClickListener(this);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderGrid.textViewFileSize.setMaxWidth(scaleWidthPx(70, outMetrics));
-            } else {
-                holderGrid.textViewFileSize.setMaxWidth(scaleWidthPx(130, outMetrics));
-            }
-            if (holderGrid.textViewFileSize != null) {
-                holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
-            } else {
-                logWarning("textViewMessageInfo is NULL");
-            }
-
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 holderGrid.textViewFileNameForFile.setMaxWidth(scaleWidthPx(70, outMetrics));
             } else {
                 holderGrid.textViewFileNameForFile.setMaxWidth(scaleWidthPx(140, outMetrics));
             }
 
-
-            holderGrid.savedOffline.setVisibility(View.INVISIBLE);
-            holderGrid.publicLinkImage.setVisibility(View.GONE);
             holderGrid.takenDownImage.setVisibility(View.GONE);
             holderGrid.takenDownImageForFile.setVisibility(View.GONE);
 
@@ -672,18 +652,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         logDebug("Node : " + position + " " + node.getHandle());
 
         holder.textViewFileName.setText(node.getName());
-        holder.textViewFileSize.setText("");
         holder.videoInfoLayout.setVisibility(View.GONE);
-
-        if (node.isExported()) {
-            //Node has public link
-            holder.publicLinkImage.setVisibility(View.VISIBLE);
-            if (node.isExpired()) {
-                logWarning("Node exported but expired!!");
-            }
-        } else {
-            holder.publicLinkImage.setVisibility(View.INVISIBLE);
-        }
 
         if (node.isTakenDown()) {
             holder.textViewFileNameForFile.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
@@ -701,50 +670,23 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.itemLayout.setVisibility(View.VISIBLE);
             holder.folderLayout.setVisibility(View.VISIBLE);
             holder.fileLayout.setVisibility(View.GONE);
-            holder.textViewFileSize.setVisibility(View.VISIBLE);
 
             setFolderGridSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
-            if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getInfoFolder(node,context,megaApi));
-            } else {
-                holder.textViewFileSize.setText(getInfoFolder(node,context));
-            }
             holder.imageViewIcon.setVisibility(View.VISIBLE);
             holder.imageViewThumb.setVisibility(View.GONE);
             holder.thumbLayout.setBackgroundColor(Color.TRANSPARENT);
 
-            if (type == INCOMING_SHARES_ADAPTER) {
-                //Show the owner of the shared folder
-                ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
-                for (int j = 0;j < sharesIncoming.size();j++) {
-                    MegaShare mS = sharesIncoming.get(j);
-                    if (mS.getNodeHandle() == node.getHandle()) {
-                        MegaUser user = megaApi.getContact(mS.getUser());
-                        if (user != null) {
-                            holder.textViewFileSize.setText(getMegaUserNameDB(user));
-                        } else {
-                            holder.textViewFileSize.setText(mS.getUser());
-                        }
-                    }
-                }
-            } else if (type == OUTGOING_SHARES_ADAPTER) {
-                //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
-                holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-            }
         } else if (node.isFile()) {
-            //TODO file
             holder.itemLayout.setVisibility(View.VISIBLE);
             holder.folderLayout.setVisibility(View.GONE);
             holder.imageViewThumb.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             holder.imageViewThumb.setVisibility(View.GONE);
             holder.fileLayout.setVisibility(View.VISIBLE);
             holder.textViewFileName.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setVisibility(View.GONE);
 
             holder.textViewFileNameForFile.setText(node.getName());
             long nodeSize = node.getSize();
-            holder.textViewFileSize.setText(getSizeString(nodeSize));
 
             holder.fileGridIconForFile.setVisibility(View.VISIBLE);
             holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
@@ -811,14 +753,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context,R.drawable.background_item_grid));
                 holder.fileGridSelected.setImageDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
-        }
-
-        //Check if is an offline file to show the red arrow
-        if (availableOffline(context, node)) {
-            holder.savedOffline.setVisibility(View.VISIBLE);
-        }
-        else {
-            holder.savedOffline.setVisibility(View.INVISIBLE);
         }
     }
 

@@ -113,7 +113,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         public ImageView imageViewThumb;
         public ImageView imageViewIcon;
         public RelativeLayout thumbLayout;
-        public View separator;
         public ImageView imageViewVideoIcon;
         public TextView videoDuration;
         public RelativeLayout videoInfoLayout;
@@ -401,31 +400,12 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
             holderGrid.textViewFileName = (TextView)v.findViewById(R.id.file_grid_filename);
             holderGrid.textViewFileNameForFile = (TextView)v.findViewById(R.id.file_grid_filename_for_file);
             holderGrid.imageButtonThreeDotsForFile = (ImageButton)v.findViewById(R.id.file_grid_three_dots_for_file);
-            holderGrid.textViewMessageInfo = v.findViewById(R.id.file_grid_filesize);
             holderGrid.imageButtonThreeDots = (ImageButton)v.findViewById(R.id.file_grid_three_dots);
-            holderGrid.savedOffline = (ImageView)v.findViewById(R.id.file_grid_saved_offline);
-            holderGrid.publicLinkImage = (ImageView)v.findViewById(R.id.file_grid_public_link);
-            holderGrid.separator = (View)v.findViewById(R.id.file_grid_separator);
 
             holderGrid.imageViewVideoIcon = (ImageView)v.findViewById(R.id.file_grid_video_icon);
             holderGrid.videoDuration = (TextView)v.findViewById(R.id.file_grid_title_video_duration);
             holderGrid.videoInfoLayout = (RelativeLayout)v.findViewById(R.id.item_file_videoinfo_layout);
             holderGrid.fileGridSelected = (ImageView)v.findViewById(R.id.file_grid_selected);
-
-            if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                holderGrid.textViewMessageInfo.setMaxWidth(scaleWidthPx(70,outMetrics));
-            } else {
-                holderGrid.textViewMessageInfo.setMaxWidth(scaleWidthPx(130,outMetrics));
-            }
-
-            if (holderGrid.textViewMessageInfo != null) {
-                holderGrid.textViewMessageInfo.setVisibility(View.VISIBLE);
-            } else {
-                logWarning("textViewMessageInfo is NULL");
-            }
-
-            holderGrid.savedOffline.setVisibility(View.INVISIBLE);
-            holderGrid.publicLinkImage.setVisibility(View.GONE);
 
             holderGrid.itemLayout.setTag(holderGrid);
             holderGrid.itemLayout.setOnClickListener(this);
@@ -466,7 +446,6 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         logDebug("Node : " + position + " " + node.getName());
 
         holder.textViewFileName.setText(node.getName());
-        holder.textViewMessageInfo.setText("");
         holder.videoInfoLayout.setVisibility(View.GONE);
 
         holder.itemLayout.setVisibility(View.VISIBLE);
@@ -475,11 +454,8 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         holder.imageViewThumb.setVisibility(View.GONE);
         holder.fileLayout.setVisibility(View.VISIBLE);
         holder.textViewFileName.setVisibility(View.VISIBLE);
-        holder.textViewMessageInfo.setVisibility(View.GONE);
 
         holder.textViewFileNameForFile.setText(node.getName());
-        long nodeSize = node.getSize();
-        holder.textViewMessageInfo.setText(getSizeString(nodeSize));
 
         holder.fileGridIconForFile.setVisibility(View.VISIBLE);
         holder.fileGridIconForFile.setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
