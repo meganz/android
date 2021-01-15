@@ -262,9 +262,6 @@ public class MegaNodeUtil {
         shareNodeFromChat(context, node, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE);
     }
 
-    public static void shareNodes(){
-
-    }
 
     /**
      * Method for sharing a node from the chat room.
@@ -281,6 +278,7 @@ public class MegaNodeUtil {
                 shareFile(context, new File(path));
             } else if (node.isExported()) {
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
+
             } else {
                 MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
                 if (messageId == MEGACHAT_INVALID_HANDLE || chatId == MEGACHAT_INVALID_HANDLE) {
@@ -298,9 +296,8 @@ public class MegaNodeUtil {
        if(messagesSelected.isEmpty()){
             return;
        }
-
         if(messagesSelected.size() == 1){
-           MegaNodeList nodeList = messagesSelected.get(0).getMessage().getMegaNodeList();
+            MegaNodeList nodeList = messagesSelected.get(0).getMessage().getMegaNodeList();
            if(nodeList == null || nodeList.size() == 0)
                return;
 
@@ -320,6 +317,7 @@ public class MegaNodeUtil {
 
                listNodes.add(node);
            }
+
            if(listNodes.isEmpty())
                return;
 
@@ -329,7 +327,6 @@ public class MegaNodeUtil {
     }
 
     public static void shareNodesFromChat(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, List<MegaNode> nodes, long chatId) {
-        logDebug("shareNodes:: size "+nodes.size());
 
         if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
             return;
@@ -337,6 +334,7 @@ public class MegaNodeUtil {
 
         List<File> downloadedFiles = new ArrayList<>();
         boolean allDownloadedFiles = true;
+
         for (MegaNode node : nodes) {
             String path = node.isFolder() ? null
                     : getLocalFile(context, node.getName(), node.getSize());
@@ -371,8 +369,10 @@ public class MegaNodeUtil {
 
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
         if(messagesSelected == null || chatId == MEGACHAT_INVALID_HANDLE){
+
             ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
                     new Intent(android.content.Intent.ACTION_SEND));
+
             for (MegaNode node : nodes) {
                 if (!node.isExported()) {
                     megaApi.exportNode(node, exportListener);
@@ -381,6 +381,7 @@ public class MegaNodeUtil {
         }else{
             ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
                     new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
+
             for(AndroidMegaChatMessage androidMessage : messagesSelected){
                 MegaNodeList nodeList = androidMessage.getMessage().getMegaNodeList();
                 if(nodeList == null || nodeList.size() == 0) continue;

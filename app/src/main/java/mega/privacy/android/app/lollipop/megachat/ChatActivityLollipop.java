@@ -102,6 +102,7 @@ import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
@@ -480,7 +481,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
     private boolean isImportOption;
-
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
     private MegaNode myChatFilesFolder;
@@ -506,9 +506,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             forwardMessages(preservedMessagesSelected, false);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
+
             chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, isImportOption
-                            ? MULTIPLE_IMPORT_CONTACT_MESSAGES
-                            : MULTIPLE_FORWARD_MESSAGES);
+                        ? MULTIPLE_IMPORT_CONTACT_MESSAGES
+                        : MULTIPLE_FORWARD_MESSAGES);
 
             isForwardingFromNC = false;
             preservedMsgSelected = null;
@@ -3117,6 +3118,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
+
     public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, boolean isImportOptionChosen){
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
@@ -4384,7 +4386,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            logDebug("onPrepareActionMode");
             List<AndroidMegaChatMessage> selected = adapter.getSelectedMessages();
             if(selected.size() == 0){
                 menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -4399,7 +4400,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 importIcon.setVisible(false);
 
             }else {
-
                 if((chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()){
                     logDebug("Chat without permissions || without preview");
 
@@ -9344,7 +9344,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private void checkIfIsNeededToAskForMyChatFilesFolder() {
         if (existsMyChatFilesFolder()) {
             setMyChatFilesFolder(getMyChatFilesFolder());
-
             if (isForwardingFromNC()) {
                 handleStoredData();
             } else {

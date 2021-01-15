@@ -55,10 +55,10 @@ public class ExportListener extends BaseListener {
      */
     public ExportListener(Context context, Intent shareIntent, long messageId, long chatId){
         super(context);
-
         this.shareIntent = shareIntent;
         this.messageId = messageId;
         this.chatId = chatId;
+        this.numberExport = 1;
     }
 
     /**
@@ -70,7 +70,6 @@ public class ExportListener extends BaseListener {
      */
     public ExportListener(Context context, boolean removeExport, int numberRemove) {
         super(context);
-
         this.removeExport = removeExport;
         this.numberRemove = this.pendingRemove = numberRemove;
     }
@@ -87,6 +86,7 @@ public class ExportListener extends BaseListener {
     public ExportListener(Context context, int numberExport, StringBuilder exportedLinks,
                           Intent shareIntent, ArrayList<AndroidMegaChatMessage> messages, long chatId) {
         super(context);
+
         this.numberExport = numberExport;
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
@@ -137,25 +137,35 @@ public class ExportListener extends BaseListener {
             return;
         }
 
-        if (exportedLinks != null) {
+        if (request != null && request.getLink() != null) {
+            if (shareIntent == null)
+                return;
+
             if (e.getErrorCode() != API_OK) {
                 numberError++;
-            } else {
+            } else if (exportedLinks != null) {
                 exportedLinks.append(request.getLink())
-                    .append("\n\n");
+                        .append("\n\n");
+            }
+
+            if (numberError != 0) {
+                logError(numberError + " errors exporting nodes");
+                showSnackbar(context, context.getResources()
+                        .getQuantityString(R.plurals.context_link_export_error, numberExport));
+                return;
+            }
+
+            if (exportedLinks == null) {
+                startShareIntent(context, shareIntent, request.getLink());
+                return;
             }
 
             pendingExport--;
-            if (pendingExport == 0) {
-                if (numberError < numberExport && shareIntent != null) {
-                    startShareIntent(context, shareIntent, exportedLinks.toString());
-                }
-                if (numberError != 0) {
-                    logError(numberError + " errors exporting nodes");
-                    showSnackbar(context, context.getResources()
-                        .getQuantityString(R.plurals.context_link_export_error, numberExport));
-                }
+
+            if (pendingExport == 0 && numberError < numberExport) {
+                startShareIntent(context, shareIntent, exportedLinks.toString());
             }
+
             return;
         }
 
@@ -165,9 +175,11 @@ public class ExportListener extends BaseListener {
             }
         } else {
             logError("Error exporting node: " + e.getErrorString());
-
-            if (messageId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
-                ChatController chatC = new ChatController(context);
+            ChatController chatC = new ChatController(context);
+            if(messages != null && !messages.isEmpty()){
+                logDebug("Several nodes to import to MEGA and export");
+            }else{
+                logDebug("One node to import to MEGA and export");
                 chatC.importNode(messageId, chatId, true);
             }
         }

@@ -9,6 +9,13 @@ public class TextUtil {
         return string == null || string.isEmpty() || string.trim().isEmpty();
     }
 
+    public static boolean isTextEmpty(StringBuilder string) {
+        if (string == null)
+            return true;
+
+        return isTextEmpty(string.toString());
+    }
+
     /**
      * Method to remove the format placeholders.
      *
