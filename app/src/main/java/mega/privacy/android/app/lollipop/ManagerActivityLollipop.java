@@ -6658,6 +6658,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
+					createFolderMenuItem.setVisible(true);
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
                         thumbViewMenuItem.setVisible(true);
                         setGridListIcon();
