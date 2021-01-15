@@ -743,7 +743,8 @@ public class PDFView extends RelativeLayout {
                     passwordError.setVisibility(GONE);
                 }
 
-                passwordText.setOnFocusChangeListener((v, hasFocus) -> setPasswordToggle(passwordLayout, hasFocus));
+                passwordLayout.setEndIconVisible(false);
+                passwordText.setOnFocusChangeListener((v, hasFocus) -> passwordLayout.setEndIconVisible(hasFocus));
 
                 passwordText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {

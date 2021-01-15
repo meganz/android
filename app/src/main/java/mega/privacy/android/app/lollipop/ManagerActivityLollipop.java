@@ -3531,9 +3531,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
             deleteCurrentFragment();
 
-
-            changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
-
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             supportInvalidateOptionsMenu();
             selectDrawerItemLollipop(drawerItem);
@@ -3556,8 +3553,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		onAskingPermissionsFragment = false;
 
 		pF = null;
-
-		changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
@@ -3701,8 +3696,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		tonF = null;
 
-		changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
-
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
 		selectDrawerItemLollipop(drawerItem);
@@ -3729,11 +3722,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		setTabsVisibility();
 		abL.setVisibility(View.GONE);
-
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.turn_on_notifications_statusbar));
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -7545,7 +7533,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		abL.setVisibility(View.VISIBLE);
 
 		eRKeyF = null;
-		changeStatusBarColor(COLOR_STATUS_BAR_ZERO);
 
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
@@ -15103,44 +15090,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 		}
 		catch (Exception ex) {}
-	}
-
-	public void changeStatusBarColor(int option) {
-		logDebug("changeStatusBarColor");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			final Window window = this.getWindow();
-			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-			window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-			if (option ==  COLOR_STATUS_BAR_ACCENT) {
-				window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.accentColorDark));
-				changeActionBarElevation(true);
-			}
-			else if (option == COLOR_STATUS_BAR_ZERO_DELAY){
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(0);
-					}
-				}, 300);
-			}
-			else if (option == COLOR_STATUS_BAR_ZERO) {
-				Util.resetStatusBarColor(this, this.getWindow());
-			}
-			else if (option == COLOR_STATUS_BAR_SEARCH_DELAY){
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						window.setStatusBarColor(ContextCompat.getColor(getApplicationContext(), R.color.status_bar_search));
-					}
-				}, 300);
-			}
-		}
-		if (option == COLOR_STATUS_BAR_ACCENT){
-			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		}
-		else if (option == COLOR_STATUS_BAR_ZERO_DELAY){
-			drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-		}
 	}
 
 	public void setDrawerLockMode (boolean locked) {

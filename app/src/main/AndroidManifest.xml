@@ -464,7 +464,6 @@
         <activity
             android:name="mega.privacy.android.app.WeakAccountProtectionAlertActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Megaactionbar"
             android:launchMode="singleTop">
         </activity>
 

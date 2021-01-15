@@ -2,6 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/sent_request_item_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -59,7 +60,6 @@
                 android:layout_below="@+id/sent_request_list_contact_name_text"
                 android:textSize="14sp"
                 android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="middle"/>
 
         </RelativeLayout>
@@ -130,7 +130,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
@@ -142,7 +142,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_remove"
-                    android:textColor="@color/dark_primary_color"
+                    android:textColor="@color/red_600_red_300"
                     android:textSize="16sp"/>
             </LinearLayout>
 

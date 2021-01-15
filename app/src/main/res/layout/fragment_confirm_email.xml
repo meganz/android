@@ -77,7 +77,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="2dp"
                 android:src="@drawable/ic_input_warning"
-                android:tint="@color/dark_primary_color" />
+                app:tint="?attr/colorError" />
 
         </RelativeLayout>
 

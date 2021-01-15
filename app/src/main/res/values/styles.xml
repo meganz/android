@@ -16,115 +16,115 @@
         <item name="android:maxHeight">5dp</item>
     </style>
 
-    <!-- Base application theme. -->
-    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+<!--    &lt;!&ndash; Base application theme. &ndash;&gt;-->
+<!--    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/white</item>
+<!--        &lt;!&ndash; colorPrimary is used for the default action bar background &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/white</item>-->
 
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/dark_primary_color</item>
+<!--        &lt;!&ndash; colorPrimaryDark is used for the status bar &ndash;&gt;-->
+<!--        <item name="colorPrimaryDark">@color/dark_primary_color</item>-->
 
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/black</item>
+<!--        &lt;!&ndash; colorAccent is used as the default value for colorControlActivated-->
+<!--             which is used to tint widgets &ndash;&gt;-->
+<!--        <item name="colorAccent">@color/accentColor</item>-->
+<!--        <item name="colorControlNormal">@color/black</item>-->
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
 
-        <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/accentColor</item>
-        <item name="android:actionModeBackground">@color/accentColor</item>
-        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
-        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>
-        <item name="elevation">0dp</item>
-        <item name="android:elevation">0dp</item>
+<!--        <item name="windowActionModeOverlay">true</item>-->
+<!--        <item name="actionModeBackground">@color/accentColor</item>-->
+<!--        <item name="android:actionModeBackground">@color/accentColor</item>-->
+<!--        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>-->
+<!--        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>-->
+<!--        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>-->
+<!--        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>-->
+<!--        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>-->
+<!--        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>-->
+<!--        <item name="elevation">0dp</item>-->
+<!--        <item name="android:elevation">0dp</item>-->
 
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
-        <item name="preferenceTheme">@style/PreferenceStyle</item>
-        <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>
-    </style>
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>-->
+<!--        &lt;!&ndash; You can also set colorControlNormal, colorControlActivated-->
+<!--             colorControlHighlight & colorSwitchThumbNormal. &ndash;&gt;-->
+<!--        <item name="preferenceTheme">@style/PreferenceStyle</item>-->
+<!--        <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>-->
+<!--    </style>-->
 
-    <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+<!--    <style name="Theme.Megaactionbar.Secondary" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/dark_primary_color</item>
+<!--        &lt;!&ndash; colorPrimary is used for the default action bar background &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/dark_primary_color</item>-->
 
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/dark_primary_color_secondary</item>
+<!--        &lt;!&ndash; colorPrimaryDark is used for the status bar &ndash;&gt;-->
+<!--        <item name="colorPrimaryDark">@color/dark_primary_color_secondary</item>-->
 
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlNormal">@color/white</item>
+<!--        &lt;!&ndash; colorAccent is used as the default value for colorControlActivated-->
+<!--             which is used to tint widgets &ndash;&gt;-->
+<!--        <item name="colorAccent">@color/accentColor</item>-->
+<!--        <item name="colorControlNormal">@color/white</item>-->
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
 
-        <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/accentColor</item>
-        <item name="android:actionModeBackground">@color/accentColor</item>
-        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
-        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>
+<!--        <item name="windowActionModeOverlay">true</item>-->
+<!--        <item name="actionModeBackground">@color/accentColor</item>-->
+<!--        <item name="android:actionModeBackground">@color/accentColor</item>-->
+<!--        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>-->
+<!--        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>-->
+<!--        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>-->
+<!--        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>-->
+<!--        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>-->
+<!--        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>-->
 
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
-        <item name="preferenceTheme">@style/PreferenceStyle</item>
-    </style>
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>-->
+<!--        &lt;!&ndash; You can also set colorControlNormal, colorControlActivated-->
+<!--             colorControlHighlight & colorSwitchThumbNormal. &ndash;&gt;-->
+<!--        <item name="preferenceTheme">@style/PreferenceStyle</item>-->
+<!--    </style>-->
 
-    <style name="PreferencesScreen" parent="Theme.Megaactionbar">
-        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
-    </style>
+<!--    <style name="PreferencesScreen" parent="Theme.Megaactionbar">-->
+<!--        <item name="colorControlNormal">?android:attr/textColorSecondary</item>-->
+<!--    </style>-->
 
-    <style name="Theme.Megaactionbar.InfoScreens" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+<!--    <style name="Theme.Megaactionbar.InfoScreens" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        &lt;!&ndash; Customize your theme here. &ndash;&gt;-->
 
-        <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/white</item>
+<!--        &lt;!&ndash; colorPrimary is used for the default action bar background &ndash;&gt;-->
+<!--        <item name="colorPrimary">@color/white</item>-->
 
-        <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/status_bar_search</item>
+<!--        &lt;!&ndash; colorPrimaryDark is used for the status bar &ndash;&gt;-->
+<!--        <item name="colorPrimaryDark">@color/status_bar_search</item>-->
 
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="android:colorControlNormal">@color/black</item>
-        <item name="colorControlNormal">@color/black</item>
+<!--        &lt;!&ndash; colorAccent is used as the default value for colorControlActivated-->
+<!--             which is used to tint widgets &ndash;&gt;-->
+<!--        <item name="colorAccent">@color/accentColor</item>-->
+<!--        <item name="android:colorControlNormal">@color/black</item>-->
+<!--        <item name="colorControlNormal">@color/black</item>-->
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
 
-        <item name="windowActionModeOverlay">true</item>
-        <item name="actionModeBackground">@color/accentColor</item>
-        <item name="android:actionModeBackground">@color/accentColor</item>
-        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>
-        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>
-        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
-        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>
-        <item name="elevation">0dp</item>
-        <item name="android:elevation">0dp</item>
+<!--        <item name="windowActionModeOverlay">true</item>-->
+<!--        <item name="actionModeBackground">@color/accentColor</item>-->
+<!--        <item name="android:actionModeBackground">@color/accentColor</item>-->
+<!--        <item name="actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>-->
+<!--        <item name="android:actionModeCloseDrawable">@drawable/ic_arrow_back_white</item>-->
+<!--        <item name="actionModeStyle">@style/Widget.Mega.ActionMode</item>-->
+<!--        <item name="android:actionModeStyle">@style/Widget.Mega.ActionMode</item>-->
+<!--        <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>-->
+<!--        <item name="android:actionBarTheme">@style/Widget.Mega.ActionBar</item>-->
+<!--        <item name="elevation">0dp</item>-->
+<!--        <item name="android:elevation">0dp</item>-->
 
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>
-        <!-- You can also set colorControlNormal, colorControlActivated
-             colorControlHighlight & colorSwitchThumbNormal. -->
-        <item name="preferenceTheme">@style/PreferenceStyle</item>
-    </style>
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat</item>-->
+<!--        &lt;!&ndash; You can also set colorControlNormal, colorControlActivated-->
+<!--             colorControlHighlight & colorSwitchThumbNormal. &ndash;&gt;-->
+<!--        <item name="preferenceTheme">@style/PreferenceStyle</item>-->
+<!--    </style>-->
 
     <!-- when extending from Widget.MaterialComponents.Toolbar.Surface, the menu icon color
          will have some green on it, and expand all its attrs here doesn't have this issue,
@@ -382,11 +382,11 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="CheckBoxStyleStyle" parent="Theme.Megaactionbar">
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="android:colorControlNormal">?android:attr/textColorSecondary</item>
-        <item name="colorControlNormal">?android:attr/textColorSecondary</item>
-    </style>
+<!--    <style name="CheckBoxStyleStyle" parent="Theme.Megaactionbar">-->
+<!--        <item name="colorAccent">@color/accentColor</item>-->
+<!--        <item name="android:colorControlNormal">?android:attr/textColorSecondary</item>-->
+<!--        <item name="colorControlNormal">?android:attr/textColorSecondary</item>-->
+<!--    </style>-->
 
     <style name="GalleryImageShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>

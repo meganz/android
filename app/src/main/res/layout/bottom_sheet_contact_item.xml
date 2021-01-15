@@ -2,6 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_item_bottom_sheet"
     android:layout_width="match_parent"
@@ -311,7 +312,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:tint="@color/dark_primary_color"
+                    app:tint="@color/red_600_red_300"
                     android:src="@drawable/ic_remove"
                     android:visibility="visible" />
 
@@ -323,7 +324,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_remove"
-                    android:textColor="@color/dark_primary_color"
+                    android:textColor="@color/red_600_red_300"
                     android:textSize="16sp"/>
             </LinearLayout>
         </LinearLayout>

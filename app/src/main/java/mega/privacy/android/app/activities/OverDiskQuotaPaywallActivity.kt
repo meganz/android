@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
@@ -23,8 +22,10 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.LogUtil.logInfo
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils.*
+import mega.privacy.android.app.utils.Util
 import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
@@ -39,6 +40,8 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
     private var proPlanNeeded: Int? = 0
 
     private var deadlineTs: Long = -1
+
+    override fun shouldSetStatusBarTextColor() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +60,13 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
 
-        // show content behind status bar
-        window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+        window?.decorView?.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or if (Util.isDarkMode(this)) {
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-        // make status bar transparent
+            } else {
+                // View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                0x00002000 or 0x00000010
+            }
         window?.statusBarColor = Color.TRANSPARENT
 
         scrollContentLayout = findViewById(R.id.scroll_content_layout)

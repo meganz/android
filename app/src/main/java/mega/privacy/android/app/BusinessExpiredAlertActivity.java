@@ -67,7 +67,6 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             expiredText.setText(R.string.expired_admin_business_text);
             expiredSubtext.setVisibility(View.GONE);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.old_pink_900));
         } else {
             expiredImageLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.gradient_business_user_expired_bg));
             expiredImageParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -86,7 +85,6 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             }
             expiredText.setText(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY));
             expiredSubtext.setVisibility(View.VISIBLE);
-            getWindow().setStatusBarColor(getResources().getColor(R.color.dark_blue_300));
         }
 
         expiredImage.setLayoutParams(expiredImageParams);

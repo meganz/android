@@ -86,31 +86,9 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         }
     }
 
-    void setStatusBarColor (int position) {
-        switch (position) {
-            case 0: {
-                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_1));
-                break;
-            }
-            case 1: {
-                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_2));
-                break;
-            }
-            case 2: {
-                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_3));
-                break;
-            }
-            case 3: {
-                ((LoginActivityLollipop) context).getWindow().setStatusBarColor(ContextCompat.getColor(context, R.color.statusbar_tour_4));
-                break;
-            }
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        setStatusBarColor(viewPager.getCurrentItem());
 
         // For small screen like nexus one or bigger screen, this is to force the scroll view to bottom to show buttons
         // Meanwhile, tour image glide could also be shown
@@ -155,15 +133,11 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
-        setStatusBarColor(0);
 
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 
             @Override
             public void onPageSelected (int position){
-
-                setStatusBarColor(position);
-
                 switch(position){
                     case 0:{
                         firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));

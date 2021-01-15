@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -33,6 +35,8 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -273,7 +277,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                resetStatusBarColor(this, getWindow());
+                setDrawUnderStatusBar(false);
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
@@ -287,7 +291,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                resetStatusBarColor(this, getWindow());
+                setDrawUnderStatusBar(false);
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -301,7 +305,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                resetStatusBarColor(this, getWindow());
+                setDrawUnderStatusBar(false);
                 break;
 
             }
@@ -318,6 +322,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment).commitNowAllowingStateLoss();
+
+                setDrawUnderStatusBar(true);
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
@@ -335,13 +341,39 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
-                resetStatusBarColor(this, getWindow());
+                setDrawUnderStatusBar(false);
                 break;
             }
         }
 
         if( ((MegaApplication) getApplication()).isEsid()){
             showAlertLoggedOut();
+        }
+    }
+
+    @Override
+    protected boolean shouldSetStatusBarTextColor() {
+        return false;
+    }
+
+    private void setDrawUnderStatusBar(boolean drawUnderStatusBar) {
+        Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+
+        if (drawUnderStatusBar) {
+            int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            if (Util.isDarkMode(this)) {
+                visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            } else {
+                // View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                visibility |= 0x00002000 | 0x00000010;
+            }
+            window.getDecorView().setSystemUiVisibility(visibility);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            ColorUtils.setStatusBarTextColor(this);
         }
     }
 
@@ -680,7 +712,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         aB.setDisplayHomeAsUpEnabled(true);
 
         if (visibleFragment == LOGIN_FRAGMENT) {
-            resetStatusBarColor(this, getWindow());
+            setDrawUnderStatusBar(false);
         }
     }
 
@@ -718,7 +750,5 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         if (aB != null){
             aB.hide();
         }
-
-        changeStatusBarColor(this, this.getWindow(), R.color.dark_primary_color);
     }
 }

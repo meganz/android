@@ -1361,12 +1361,6 @@ public class Util {
         return circle;
     }
 
-    public static void changeStatusBarColor(Context context, Window window, @ColorRes int colorId) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.setStatusBarColor(ContextCompat.getColor(context, colorId));
-    }
-
 	/**
 	 * Reset the color of the status bar to the Theme setting
 	 * @param window

@@ -9,7 +9,6 @@ import android.os.Handler;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.content.ContextCompat;
 
 import android.text.Editable;
 import android.text.InputType;
@@ -234,7 +233,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 				//Log out!!
 				logWarning("INTENTS==10 - LOGOUT");
 				redLayout.setVisibility(View.VISIBLE);
-                changeStatusbarColorToRed();
 
 				textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
@@ -244,7 +242,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 					public void onTick(long millisUntilFinished) {
 						redLayout.setVisibility(View.VISIBLE);
-                        changeStatusbarColorToRed();
 						textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 					}
 
@@ -321,10 +318,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 			}
 		}
 	}
-
-	private void changeStatusbarColorToRed() {
-	    getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.red_900_080_red_400_080));
-    }
 
 	private void addAlphanumericPin(){
 		logDebug("addAlphanumericPin");
@@ -923,7 +916,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						//Log out!!
 						logDebug("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
-                        changeStatusbarColorToRed();
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
 				    	if(passSixthLetter!=null){
@@ -939,7 +931,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 						     public void onTick(long millisUntilFinished) {
 						    	 redLayout.setVisibility(View.VISIBLE);
-                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -1041,7 +1032,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     public void onTick(long millisUntilFinished) {
 //						         mTextField.setText("seconds remaining: " + );
 						    	 redLayout.setVisibility(View.VISIBLE);
-                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -1134,7 +1124,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						//Log out!!
 						logDebug("INTENTS==10 - LOGOUT");
 				    	redLayout.setVisibility(View.VISIBLE);
-                        changeStatusbarColorToRed();
 				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 
 						passwordText.setCursorVisible(false);
@@ -1145,7 +1134,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 
 						     public void onTick(long millisUntilFinished) {
 						    	 redLayout.setVisibility(View.VISIBLE);
-                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
@@ -1236,7 +1224,6 @@ public class PinLockActivityLollipop extends BaseActivity implements OnClickList
 						     public void onTick(long millisUntilFinished) {
 //						         mTextField.setText("seconds remaining: " + );
 						    	 redLayout.setVisibility(View.VISIBLE);
-                                 changeStatusbarColorToRed();
 						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
 						     }
 
