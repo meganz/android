@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -1931,7 +1930,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
@@ -4165,7 +4163,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         playerLayout.setVisibility(View.GONE);
         fragmentContainer.setVisibility(View.VISIBLE);
         draggableView.setDraggable(false);
-        tB.setBackgroundColor(ContextCompat.getColor(this, R.color.red_600));
+        tB.setTitleTextColor(WHITE);
         aB.setTitle(getString(R.string.section_playlist));
         supportInvalidateOptionsMenu();
 

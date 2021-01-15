@@ -171,7 +171,6 @@
             android:layout_toEndOf="@id/file_list_versions_icon"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-            app:emojiSize="14sp"
             tools:text="4.6 MB" />
     </RelativeLayout>
 
