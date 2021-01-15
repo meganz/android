@@ -7,7 +7,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/emoji_background"
+        app:cardBackgroundColor="@color/grey_050_grey_800"
         app:cardCornerRadius="1dp"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true">

@@ -162,7 +162,7 @@ public class AvatarUtil {
     public static int getSpecificAvatarColor(String typeColor) {
         switch (typeColor) {
             case AVATAR_GROUP_CHAT_COLOR:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.black_12_alpha);
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.grey_012_white_012);
             case AVATAR_PHONE_COLOR:
                 return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.color_default_avatar_phone);
             default:

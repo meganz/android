@@ -845,7 +845,7 @@ public class BaseActivity extends AppCompatActivity {
     public void showGeneralTransferOverQuotaWarning() {
         if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
         builder.setView(dialogView)
                 .setOnDismissListener(dialog -> {

@@ -109,6 +109,9 @@
     <color name="grey_010_white_087">@color/white_alpha_087</color>
     <color name="teal_300_grey_087">@color/grey_alpha_087</color>
 
+    <!-- transfer over quota progress -->
+    <color name="amber_700_amber_300">@color/amber_300</color>
+
     <color name="homepage_background">@color/dark_grey</color>
 
     <color name="grey_700_grey_300">@color/grey_300</color>

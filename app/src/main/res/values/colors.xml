@@ -160,23 +160,23 @@
     <color name="add_contact_icons">#FF707070</color>
     <color name="user_layer_group_call">#8000BFA5</color>
 
-    <color name="emoji_icons">#61000000</color>
-    <color name="emoji_background">#FFECEFF1</color>
+<!--    <color name="emoji_icons">#61000000</color>-->
+<!--    <color name="emoji_background">#FFECEFF1</color>-->
 
     <color name="dark_primary_color">#FFF30C14</color>
     <color name="dark_primary_color_secondary">#FFD50004</color>
     <color name="status_bar_search">#FFCCCCCC</color>
-    <color name="status_bar_navigation_view">#FF33CCB7</color>
-    <color name="white_50_opacity">#80FFFFFF</color>
-    <color name="white_15_opacity">#26FFFFFF</color>
-    <color name="black_15_opacity">#26000000</color>
-    <color name="accent_color_30_opacity">#4D00BFA5</color>
+<!--    <color name="status_bar_navigation_view">#FF33CCB7</color>-->
+<!--    <color name="white_50_opacity">#80FFFFFF</color>-->
+<!--    <color name="white_15_opacity">#26FFFFFF</color>-->
+<!--    <color name="black_15_opacity">#26000000</color>-->
+<!--    <color name="accent_color_30_opacity">#4D00BFA5</color>-->
 
-    <color name="yellow_notif_shares">#FFFFA500</color>
+<!--    <color name="yellow_notif_shares">#FFFFA500</color>-->
 
     <!-- DIALOGS -->
-    <color name="dialog_title">#FF333333</color>
-    <color name="dialog_text">#FF666666</color>
+<!--    <color name="dialog_title">#FF333333</color>-->
+<!--    <color name="dialog_text">#FF666666</color>-->
 
     <color name="permissions_image_adapter">#FFEEEEEE</color>
 
@@ -193,9 +193,9 @@
 <!--    <color name="expired_business_admin">#966B87</color>-->
 <!--    <color name="expired_business_user">#44BCE6</color>-->
 
-    <color name="black_12_alpha">#1F000000</color>
-    <color name="black_40_alpha">#66000000</color>
-    <color name="black_54_alpha">#89000000</color>
+<!--    <color name="black_12_alpha">#1F000000</color>-->
+<!--    <color name="black_40_alpha">#66000000</color>-->
+<!--    <color name="black_54_alpha">#89000000</color>-->
 
 <!--    <color name="red_alert">#FF6464</color>-->
 <!--    <color name="status_bar_red_alert">#CF4949</color>-->
@@ -210,8 +210,8 @@
 
 <!--    <color name="border_avatar_call">#4DFFFFFF</color>-->
 
-    <color name="expired_red">#FFE1000F</color>
-    <color name="over_quota_yellow">#FFFFB42B</color>
+<!--    <color name="expired_red">#FFE1000F</color>-->
+<!--    <color name="over_quota_yellow">#FFFFB42B</color>-->
 <!--    <color name="background_own_reaction_added">#0F00BFA5</color>-->
 
 <!--    <color name="pressed_color">#E7E7E7</color>-->
@@ -354,6 +354,7 @@
 
     <color name="amber_700">#FFA003</color>
     <color name="amber_600">#FFB300</color>
+    <color name="amber_300">#FFD54F</color>
 
     <!-- For business admin account expired background color -->
     <color name="old_pink_800">#B00E5E</color>
@@ -486,6 +487,9 @@
     <!-- app drawer related related colors -->
     <color name="grey_010_white_087">@color/grey_010</color>
     <color name="teal_300_grey_087">@color/teal_300</color>
+
+    <!-- transfer over quota progress -->
+    <color name="amber_700_amber_300">@color/amber_700</color>
 
     <color name="homepage_background">#EEF2F1</color>
 
