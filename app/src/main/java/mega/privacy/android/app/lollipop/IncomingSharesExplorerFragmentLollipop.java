@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
@@ -165,6 +166,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -178,6 +180,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 

@@ -41,6 +41,7 @@ import mega.privacy.android.app.providers.FileProviderActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.providers.FileProviderActivity.CLOUD_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -92,6 +93,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			((FileProviderActivity) context).hideTabs(true, CLOUD_TAB);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -184,6 +186,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
@@ -313,7 +316,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		if (context instanceof FileProviderActivity){
 			int tabShown = ((FileProviderActivity)context).getTabShown();
 
-			if(tabShown==FileProviderActivity.CLOUD_TAB){
+			if(tabShown== CLOUD_TAB){
 				((FileProviderActivity) context).changeTitle(folder);
 			}
 		}

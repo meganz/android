@@ -58,6 +58,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -165,6 +166,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -178,6 +180,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((FileExplorerActivityLollipop) context).hideTabs(false, CLOUD_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
@@ -267,7 +270,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 
 		((FileExplorerActivityLollipop) context).changeActionBarElevation(
-				recyclerView.canScrollVertically(-1), FileExplorerActivityLollipop.CLOUD_FRAGMENT);
+				recyclerView.canScrollVertically(-1), CLOUD_FRAGMENT);
 	}
 
 	@Override

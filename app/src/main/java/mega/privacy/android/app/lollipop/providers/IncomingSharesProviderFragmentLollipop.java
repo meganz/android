@@ -40,6 +40,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.providers.FileProviderActivity.INCOMING_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -88,6 +89,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			((FileProviderActivity) context).hideTabs(true, INCOMING_TAB);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -180,6 +182,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((FileProviderActivity) context).hideTabs(false, INCOMING_TAB);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}

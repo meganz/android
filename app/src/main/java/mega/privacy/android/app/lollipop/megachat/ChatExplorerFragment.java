@@ -54,6 +54,7 @@ import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CHAT_FRAGMENT;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -293,7 +294,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
             }
             ((FileExplorerActivityLollipop) context).changeActionBarElevation(
-                    canScroll && !addLayoutVisible, FileExplorerActivityLollipop.CHAT_FRAGMENT);
+                    canScroll && !addLayoutVisible, CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
             addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
         }
@@ -443,12 +444,20 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 ((ChatExplorerActivity)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
             else if (context instanceof FileExplorerActivityLollipop){
+                if (addedItems.size() == 1) {
+                    ((FileExplorerActivityLollipop) context).hideTabs(true, CHAT_FRAGMENT);
+                }
+
                 ((FileExplorerActivityLollipop)context).showFabButton(true);
                 ((FileExplorerActivityLollipop)context).setToolbarSubtitle(getString(R.string.selected_items, addedItems.size()));
             }
         }
         else if (addedItems.contains(item)) {
             deleteItem(item);
+
+            if (context instanceof FileExplorerActivityLollipop && addedItems.size() == 0) {
+                ((FileExplorerActivityLollipop) context).hideTabs(false, CHAT_FRAGMENT);
+            }
         }
     }
 

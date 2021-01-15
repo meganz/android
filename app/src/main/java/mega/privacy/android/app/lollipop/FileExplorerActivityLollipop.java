@@ -61,6 +61,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -221,7 +222,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	//Tabs in Cloud
 	private TabLayout tabLayoutExplorer;
 	private FileExplorerPagerAdapter mTabsAdapterExplorer;
-	private ViewPager viewPagerExplorer;
+	private CustomViewPager viewPagerExplorer;
 
 	private ArrayList<MegaNode> nodes;
 
@@ -3477,4 +3478,20 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	    queryAfterSearch = null;
 	    return true;
     }
+
+	/**
+	 * Hides or shows tabs of a section depending on the navigation level
+	 * and if select mode is enabled or not.
+	 *
+	 * @param hide       If true, hides the tabs, else shows them.
+	 * @param currentTab The current tab where the action happens.
+	 */
+	public void hideTabs(boolean hide, int currentTab) {
+		if ((currentTab == CLOUD_FRAGMENT && getCloudExplorerFragment() != null)
+				|| (currentTab == INCOMING_FRAGMENT && getIncomingExplorerFragment() != null)
+				|| (currentTab == CHAT_FRAGMENT && getChatExplorerFragment() != null)) {
+			viewPagerExplorer.disableSwipe(hide);
+			tabLayoutExplorer.setVisibility(hide ? View.GONE : View.VISIBLE);
+		}
+	}
 }
