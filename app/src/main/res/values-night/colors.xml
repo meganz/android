@@ -183,4 +183,8 @@
     <color name="blue_300_blue_200">@color/blue_200</color>
     <!-- Label purple -->
     <color name="purple_300_purple_200">@color/purple_200</color>
+    <!-- Storage progress bar warning -->
+    <color name="amber_600_amber_300">@color/amber_300</color>
+    <!-- Same as progress bar trackColor -->
+    <color name="grey_012_white_023">@color/white_alpha_023</color>
 </resources>

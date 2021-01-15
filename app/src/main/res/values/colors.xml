@@ -13,7 +13,7 @@
 <!--    <color name="text_login">#FF000000</color>-->
 <!--    <color name="transparency_white">#80FFFFFF</color>-->
 <!--    <color name="used_space_warning">#ffb800</color>-->
-    <color name="used_space_exceed">#d52400</color>
+<!--    <color name="used_space_exceed">#d52400</color>-->
 <!--    <color name="transfer_progress">#cccccc</color>-->
 <!--    <color name="navigation_drawer_mail">#858585</color>-->
 <!--    <color name="navigation_drawer_text">#d2d2d2</color>-->
@@ -567,4 +567,8 @@
     <color name="blue_300_blue_200">@color/blue_300</color>
     <!-- Label purple -->
     <color name="purple_300_purple_200">@color/purple_300</color>
+    <!-- Storage progress bar warning -->
+    <color name="amber_600_amber_300">@color/amber_600</color>
+    <!-- Same as progress bar trackColor -->
+    <color name="grey_012_white_023">@color/grey_alpha_012</color>
 </resources>

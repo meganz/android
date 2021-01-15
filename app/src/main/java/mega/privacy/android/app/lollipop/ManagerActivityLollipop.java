@@ -10561,9 +10561,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				}
 
 				String textToShow = String.format(getResources().getString(R.string.used_space), info.getUsedFormatted(), info.getTotalFormatted());
+                String colorString = ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary);
+				switch (storageState) {
+                    case MegaApiJava.STORAGE_STATE_GREEN:
+                        break;
+                    case MegaApiJava.STORAGE_STATE_ORANGE:
+                        colorString = ColorUtils.getColorHexString(this, R.color.amber_600_amber_300);
+                        break;
+                    case MegaApiJava.STORAGE_STATE_RED:
+                    case MegaApiJava.STORAGE_STATE_PAYWALL:
+                        ((MegaApplication) getApplication()).getMyAccountInfo().setUsedPerc(100);
+                        colorString = ColorUtils.getColorHexString(this, R.color.red_600_red_300);
+                        break;
+                }
+
 				try {
 					textToShow = textToShow.replace("[A]", "<font color=\'"
-							+ ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary)
+							+ colorString
 							+ "\'>");
 					textToShow = textToShow.replace("[/A]", "</font>");
 					textToShow = textToShow.replace("[B]", "<font color=\'"
