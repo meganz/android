@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -38,12 +39,19 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void activateActionMode() {
 		if (!adapter.isMultipleSelect()) {
 			super.activateActionMode();
-			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
-					new ActionBarCallBack());
+
+			if (getActivity() != null) {
+				actionMode = ((AppCompatActivity) getActivity())
+						.startSupportActionMode(new ActionBarCallBack(OUTGOING_TAB));
+			}
 		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
+
+		public ActionBarCallBack(int currentTab) {
+			super(currentTab);
+		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {

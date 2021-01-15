@@ -549,12 +549,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     //Tabs in Shares
 	private TabLayout tabLayoutShares;
 	private SharesPageAdapter sharesPageAdapter;
-	private ViewPager viewPagerShares;
+	private CustomViewPager viewPagerShares;
 
 	//Tabs in Contacts
 	private TabLayout tabLayoutContacts;
 	private ContactsPageAdapter contactsPageAdapter;
-	private ViewPager viewPagerContacts;
+	private CustomViewPager viewPagerContacts;
 
 	//Tabs in My Account
 	private TabLayout tabLayoutMyAccount;
@@ -2453,8 +2453,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         //TABS section Contacts
-		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
-		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
+		tabLayoutContacts =  findViewById(R.id.sliding_tabs_contacts);
+		viewPagerContacts = findViewById(R.id.contact_tabs_pager);
 		viewPagerContacts.setOffscreenPageLimit(3);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -2465,8 +2465,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		//TABS section Shared Items
-		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
-		viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);
+		tabLayoutShares =  findViewById(R.id.sliding_tabs_shares);
+		viewPagerShares = findViewById(R.id.shares_tabs_pager);
 		viewPagerShares.setOffscreenPageLimit(3);
 
 		viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -5749,6 +5749,58 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
+	/**
+	 * Hides or shows tabs of a section depending on the navigation level
+	 * and if select mode is enabled or not.
+	 *
+	 * @param hide       If true, hides the tabs, else shows them.
+	 * @param currentTab The current tab where the action happens.
+	 */
+	public void hideTabs(boolean hide, int currentTab) {
+		int visibility = hide ? View.GONE : View.VISIBLE;
+
+		switch (drawerItem) {
+			case SHARED_ITEMS:
+				switch (currentTab) {
+					case INCOMING_TAB:
+						if (!isIncomingAdded()) return;
+						else break;
+
+					case OUTGOING_TAB:
+						if (!isOutgoingAdded()) return;
+						else break;
+
+					case LINKS_TAB:
+						if (!isLinksAdded()) return;
+						else break;
+				}
+
+
+				tabLayoutShares.setVisibility(visibility);
+				viewPagerShares.disableSwipe(hide);
+				break;
+
+			case CONTACTS:
+				switch (currentTab) {
+					case CONTACTS_TAB:
+						if (!isContactsAdded()) return;
+						else break;
+
+					case SENT_REQUESTS_TAB:
+						if (!isSentRequestAdded()) return;
+						else break;
+
+					case RECEIVED_REQUESTS_TAB:
+						if (!isReceivedRequestAdded()) return;
+						else break;
+				}
+
+				tabLayoutContacts.setVisibility(visibility);
+				viewPagerContacts.disableSwipe(hide);
+				break;
+		}
+	}
+
 	private void removeFragment(Fragment fragment) {
 		if (fragment != null && fragment.isAdded()) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -6157,6 +6209,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
         return fbFLol != null && fbFLol.isAdded();
     }
+
+	private boolean isContactsAdded() {
+		return getContactsFragment() != null && cFLol.isAdded();
+	}
+
+	private boolean isSentRequestAdded() {
+		return getSentRequestFragment() != null && sRFLol.isAdded();
+	}
+
+	private boolean isReceivedRequestAdded() {
+		return getReceivedRequestFragment() != null && rRFLol.isAdded();
+	}
 
 	private boolean isIncomingAdded () {
     	if (sharesPageAdapter == null) return false;
