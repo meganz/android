@@ -17,7 +17,7 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:scaleType="centerCrop"
                 android:src="@drawable/storage_full_xl" />
 
@@ -25,8 +25,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="23dp"
+                android:layout_marginTop="47dp"
                 android:text="@string/over_disk_quota_paywall_header"
+                android:textColor="?attr/colorPrimary"
                 android:textAppearance="@style/TextAppearance.Mega.Headline6.Medium" />
         </RelativeLayout>
 

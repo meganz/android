@@ -15,6 +15,8 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
+public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implements ViewPager.OnPageChangeListener {
 
     private static final int HEIGHT_HEADER = 96;
     private static final int HEIGHT_USERS = 56;
@@ -102,7 +104,7 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         infoReactionsPager = contentView.findViewById(R.id.info_reactions_pager);
         infoReactionsPager.addOnPageChangeListener(this);
         separator = new RelativeLayout(context);
-        separator.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+        separator.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_300_teal_200));
 
         final MegaStringList listReactions = megaChatApi.getMessageReactions(chatId, messageId);
         list = getReactionsList(listReactions, false);
@@ -245,10 +247,10 @@ public class InfoReactionsBottomSheet extends ViewPagerBottomSheetDialogFragment
         int numUsers = megaChatApi.getMessageReactionCount(chatId, messageId, reaction);
         if (numUsers > 0 && emoji != null) {
             reactionImage.setEmoji(emoji, true);
-            reactionText.setText(numUsers + "");
+            reactionText.setText(String.valueOf(numUsers));
             reactionText.setTextColor(ContextCompat.getColor(context,
                     isMyOwnReaction(chatId, messageId, reaction)
-                            ? R.color.accentColor : R.color.grey_054_white_054));
+                            ? R.color.teal_300_teal_200 : R.color.grey_054_white_054));
             parent.addView(button);
             return button;
         }
