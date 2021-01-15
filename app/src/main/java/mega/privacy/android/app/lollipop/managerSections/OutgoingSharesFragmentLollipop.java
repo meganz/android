@@ -242,6 +242,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				updateActionModeTitle();
 			}
 		} else if (nodes.get(position).isFolder()) {
+			managerActivity.hideTabs(true, OUTGOING_TAB);
 			managerActivity.increaseDeepBrowserTreeOutgoing();
 			logDebug("deepBrowserTree after clicking folder" + managerActivity.deepBrowserTreeOutgoing);
 
@@ -309,7 +310,8 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		if (managerActivity.deepBrowserTreeOutgoing == 0) {
 			logDebug("deepBrowserTree==0");
 			//In the beginning of the navigation
-			managerActivity.setParentHandleOutgoing(-1);
+			managerActivity.setParentHandleOutgoing(INVALID_HANDLE);
+			managerActivity.hideTabs(false, OUTGOING_TAB);
 
 			managerActivity.setToolbarTitle();
 			findNodes();

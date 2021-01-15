@@ -180,6 +180,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         if (managerActivity.getDeepBrowserTreeLinks() == 0) {
             managerActivity.setParentHandleLinks(INVALID_HANDLE);
+            managerActivity.hideTabs(false, LINKS_TAB);
             findNodes();
         } else if (managerActivity.getDeepBrowserTreeLinks() > 0) {
             MegaNode parentNodeLinks = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
@@ -221,6 +222,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             }
         } else if (nodes.get(position).isFolder()) {
             lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+            managerActivity.hideTabs(true, LINKS_TAB);
             managerActivity.increaseDeepBrowserTreeLinks();
             managerActivity.setParentHandleLinks(nodes.get(position).getHandle());
             managerActivity.supportInvalidateOptionsMenu();

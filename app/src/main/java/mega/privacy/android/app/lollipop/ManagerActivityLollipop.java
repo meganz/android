@@ -5763,18 +5763,26 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case SHARED_ITEMS:
 				switch (currentTab) {
 					case INCOMING_TAB:
-						if (!isIncomingAdded()) return;
-						else break;
+						if (!isIncomingAdded() || !hide && parentHandleIncoming != INVALID_HANDLE) {
+							return;
+						}
+
+						break;
 
 					case OUTGOING_TAB:
-						if (!isOutgoingAdded()) return;
-						else break;
+						if (!isOutgoingAdded() || !hide && parentHandleOutgoing != INVALID_HANDLE) {
+							return;
+						}
+
+						break;
 
 					case LINKS_TAB:
-						if (!isLinksAdded()) return;
-						else break;
-				}
+						if (!isLinksAdded() || !hide && parentHandleLinks != INVALID_HANDLE) {
+							return;
+						}
 
+						break;
+				}
 
 				tabLayoutShares.setVisibility(visibility);
 				viewPagerShares.disableSwipe(hide);
