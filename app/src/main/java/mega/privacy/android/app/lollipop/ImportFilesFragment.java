@@ -33,7 +33,6 @@ import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 public class ImportFilesFragment extends BaseFragment {
 
     public static final String THUMB_FOLDER = "ImportFilesThumb";
-    public static final int NUM_ERRORS = 2;
 
     private FragmentImportFilesBinding binding;
 
@@ -129,11 +128,6 @@ public class ImportFilesFragment extends BaseFragment {
 
             if (Pattern.compile(NODE_NAME_REGEX).matcher(name).find()) {
                 wrongNames++;
-            }
-
-
-            if (wrongNames >= NUM_ERRORS) {
-                break;
             }
         }
 
