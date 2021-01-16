@@ -2275,7 +2275,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(getString(R.string.title_dialog_insert_MK));
         builder.setMessage(getString(R.string.text_dialog_insert_MK));
         builder.setPositiveButton(getString(R.string.general_ok),

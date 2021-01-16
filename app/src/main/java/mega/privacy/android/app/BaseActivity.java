@@ -670,12 +670,12 @@ public class BaseActivity extends AppCompatActivity {
      * The message is different depending if the account belongs to an admin or an user.
      *
      */
-    private void showExpiredBusinessAlert(){
+    protected void showExpiredBusinessAlert(){
         if (isPaused || (expiredBusinessAlert != null && expiredBusinessAlert.isShowing())) {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleNormal);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         builder.setTitle(R.string.expired_business_title);
 
         if (megaApi.isMasterBusinessAccount()) {
@@ -683,7 +683,9 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             String expiredString = getString(R.string.expired_user_business_text);
             try {
-                expiredString = expiredString.replace("[B]", "<b><font color=\'#000000\'>");
+                expiredString = expiredString.replace("[B]", "<b><font color=\'"
+                        + ColorUtils.getColorHexString(this, R.color.black_white)
+                        + "\'>");
                 expiredString = expiredString.replace("[/B]", "</font></b>");
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);

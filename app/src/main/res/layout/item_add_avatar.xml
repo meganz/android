@@ -37,26 +37,24 @@
 
     <TextView
         android:id="@+id/name_chip"
-        style="@style/TransparentBlackTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/chip_layout"
         android:layout_centerHorizontal="true"
         android:ellipsize="end"
-        android:fontFamily="roboto"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary"
         android:gravity="center"
         android:maxWidth="60dp"
         android:singleLine="true"
-        android:textSize="12sp"
         android:visibility="gone"/>
 
-    <TextView
+    <Button
         android:id="@+id/invite_more"
+        style="?attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/chip_layout"
         android:layout_gravity="center_horizontal"
-        android:fontFamily="sans-serif-medium"
         android:text="@string/invite_more"
-        android:textColor="@color/accentColor"
-        android:textSize="14sp"
         android:visibility="gone"/>
 </RelativeLayout>

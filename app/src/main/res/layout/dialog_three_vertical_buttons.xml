@@ -35,20 +35,17 @@
         <Button
             android:id="@+id/dialog_first_button"
             android:layout_gravity="end"
-            android:textSize="14sp"
-            style="@style/TransparentBackgroundButtonWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/dialog_second_button"
             android:layout_gravity="end"
-            android:textSize="14sp"
-            style="@style/TransparentBackgroundButtonWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/dialog_third_button"
             android:layout_gravity="end"
-            android:textSize="14sp"
-            style="@style/TransparentBackgroundButtonWithoutBorder" />
+            style="?attr/borderlessButtonStyle" />
 
     </LinearLayout>
 

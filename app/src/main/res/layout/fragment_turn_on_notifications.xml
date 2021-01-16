@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:background="@color/turn_on_notifications_background">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/turnOnNotifications_fragment_container"
         android:background="@color/turn_on_notifications_background">
 

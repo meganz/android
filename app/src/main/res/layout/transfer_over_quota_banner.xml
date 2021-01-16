@@ -25,7 +25,7 @@
 
         <Button
             android:id="@+id/banner_upgrade_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -34,7 +34,7 @@
 
         <Button
             android:id="@+id/banner_dismiss_button"
-            style="@style/TransparentBackgroundButtonWithoutBorder"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"

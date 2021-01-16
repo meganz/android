@@ -912,7 +912,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			}
 		});
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		builder.setTitle(getString(R.string.context_rename) + " " + new String(document.getName()));
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
@@ -1304,7 +1304,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		if (handleList != null) {
 
 			if (handleList.size() > 0) {
-				androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 				if (handleList.size() > 1) {
 					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
 				} else {

@@ -37,6 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1034,13 +1035,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			}
 		};
 
-		AlertDialog.Builder builder;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			builder = new AlertDialog.Builder(this);
-		}
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 		if(messages.size()==1){
 			builder.setMessage(R.string.confirmation_delete_one_message);
@@ -1546,7 +1541,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		final ArrayList<MegaNode> nodeListC = nodeList;
 		final long sizeC = size;
 
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		LinearLayout confirmationLayout = new LinearLayout(this);
 		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

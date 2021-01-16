@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -68,7 +69,8 @@ class AlertsAndWarnings {
                 return
             }
 
-            val resumeTransfersDialogBuilder = AlertDialog.Builder(context, R.style.ResumeTransfersWarning)
+            val resumeTransfersDialogBuilder =
+                MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
             resumeTransfersDialogBuilder.setTitle(R.string.warning_resume_transfers)
                         .setMessage(R.string.warning_message_resume_transfers)

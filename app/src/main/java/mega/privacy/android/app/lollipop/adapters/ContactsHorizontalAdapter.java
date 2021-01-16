@@ -13,9 +13,12 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.List;
 
@@ -116,7 +119,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = String.format(context.getString(R.string.title_confirm_send_invitation),contact.getLocalName());
         builder.setMessage(message);
         String invite = context.getResources().getString(R.string.contact_invite).toUpperCase();
@@ -138,7 +141,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         final MegaContactGetter.MegaContact megaContact = getItem(position);
         // Bind 'Invite more'.
         if (isInviteMore(megaContact)) {
-            holder.avatar.setImageDrawable(context.getDrawable(R.drawable.invite_more));
+            holder.avatar.setImageResource(R.drawable.invite_more);
             holder.inviteMore.setVisibility(View.VISIBLE);
             holder.textViewName.setVisibility(View.GONE);
             holder.addIcon.setVisibility(View.GONE);
@@ -184,7 +187,8 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
-        TextView textViewName, inviteMore;
+        TextView textViewName;
+        Button inviteMore;
 
         ImageView addIcon;
 

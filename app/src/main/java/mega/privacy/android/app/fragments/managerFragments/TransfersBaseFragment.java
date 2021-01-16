@@ -16,8 +16,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 
 public class TransfersBaseFragment extends BaseFragment {
 
@@ -93,7 +95,16 @@ public class TransfersBaseFragment extends BaseFragment {
      */
     public void setGetMoreQuotaViewVisibility() {
         if (getMoreQuotaView != null) {
-            getMoreQuotaView.setVisibility(isOnTransferOverQuota() ? View.VISIBLE : View.GONE);
+            if (isOnTransferOverQuota()) {
+                getMoreQuotaView.setVisibility(View.VISIBLE);
+                if (Util.isDarkMode(context)) {
+                    getMoreQuotaView.setBackgroundColor(ColorUtils.getColorForElevation(context, 6));
+                } else {
+                    getMoreQuotaView.setBackgroundResource(R.drawable.white_layout_with_broder_shadow);
+                }
+            } else {
+                getMoreQuotaView.setVisibility(View.GONE);
+            }
         }
     }
 }

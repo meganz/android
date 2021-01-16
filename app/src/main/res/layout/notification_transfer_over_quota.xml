@@ -43,13 +43,13 @@
 
             <Button
                 android:id="@+id/dismiss_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/upgrade_button"
-                style="@style/TransparentBackgroundButtonWithoutBorder"
+                style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp" />

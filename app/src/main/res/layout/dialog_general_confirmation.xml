@@ -48,13 +48,13 @@
         <Button
             android:id="@+id/positive_button"
             android:layout_alignParentRight="true"
-            style="@style/TransparentBackgroundButtonWithoutBorder"/>
+            style="?attr/borderlessButtonStyle" />
 
         <Button
             android:id="@+id/negative_button"
             android:layout_toLeftOf="@+id/positive_button"
             android:layout_marginRight="30dp"
-            style="@style/TransparentBackgroundButtonWithoutBorder"/>
+            style="?attr/borderlessButtonStyle" />
     </RelativeLayout>
 
 </LinearLayout>

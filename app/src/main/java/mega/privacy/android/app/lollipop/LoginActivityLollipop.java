@@ -474,8 +474,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         };
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-//		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
         builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation));
         builder.setPositiveButton(R.string.cancel_all_action, dialogClickListener);

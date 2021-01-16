@@ -2,9 +2,7 @@ package mega.privacy.android.app.fragments.getLinkFragments
 
 import android.app.DatePickerDialog
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
@@ -60,10 +58,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
     private var passwordVisible = false
 
-    private lateinit var accentDrawable: Drawable
-    private lateinit var transparentDrawable: Drawable
-    private var accentColor = 0
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -74,12 +68,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        accentDrawable = ContextCompat.getDrawable(context, R.drawable.background_accent_button)!!
-        transparentDrawable =
-            ContextCompat.getDrawable(context, R.drawable.background_button_border_accent)!!
-
-        accentColor = ContextCompat.getColor(context, R.color.accentColor)
-
         isPro = app.myAccountInfo.accountType > ACCOUNT_TYPE_FREE
 
         node = getLinkInterface.getNode()

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
-import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -187,7 +186,10 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
     }
 
     override fun showUpgradeToProWarning() {
-        val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+        val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(
+            this,
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
 
         upgradeToProDialogBuilder.setTitle(R.string.upgrade_pro)
             .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
@@ -300,7 +302,8 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
      * @param data Intent containing the info to share to chat or null if is sharing outside the app.
      */
     private fun showShareKeyOrPasswordDialog(type: Int, data: Intent?) {
-        val shareKeyDialogBuilder = AlertDialog.Builder(this, R.style.ResumeTransfersWarning)
+        val shareKeyDialogBuilder =
+            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
         shareKeyDialogBuilder.setMessage(
             getString(

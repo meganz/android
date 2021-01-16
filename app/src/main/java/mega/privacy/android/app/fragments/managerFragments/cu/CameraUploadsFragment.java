@@ -26,6 +26,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -289,7 +292,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                                     getResources().getString(R.string.cam_sync_wifi),
                                     getResources().getString(R.string.cam_sync_data)
                             });
-            new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle)
+            new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setTitle(getString(R.string.section_photo_sync))
                     .setSingleChoiceItems(adapter, -1, (dialog, which) -> {
                         resetCUTimestampsAndCache();

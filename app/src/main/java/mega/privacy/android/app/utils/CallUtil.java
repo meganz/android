@@ -646,7 +646,7 @@ public class CallUtil {
                     break;
             }
         };
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity, R.style.AppCompatAlertDialogStyle);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         String message = activity.getString(R.string.confirmation_open_camera_on_chat);
         builder.setTitle(R.string.title_confirmation_open_camera_on_chat);
         builder.setMessage(message).setPositiveButton(R.string.context_open_link, dialogClickListener).setNegativeButton(R.string.general_cancel, dialogClickListener).show();

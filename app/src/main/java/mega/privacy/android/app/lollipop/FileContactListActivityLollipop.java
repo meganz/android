@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +9,11 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -127,7 +130,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	Handler handler;
 	DisplayMetrics outMetrics;
 
-	private AlertDialog.Builder dialogBuilder;
+	private MaterialAlertDialogBuilder dialogBuilder;
 
 	private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -329,7 +332,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			return;
 		}
 
-		dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyleAddContacts);
+		dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 
 		megaApi.addGlobalListener(this);
 

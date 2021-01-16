@@ -358,7 +358,7 @@
 
                 <Button
                     android:id="@+id/join_button"
-                    style="@style/AccentButton"
+                    style="?attr/materialButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"

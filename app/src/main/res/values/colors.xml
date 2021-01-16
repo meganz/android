@@ -153,12 +153,12 @@
 <!--    <color name="color_text_new_messages">#B3000000</color>-->
 <!--    <color name="message_background_2">#ffEDE9E8</color>-->
 <!--    <color name="message_background_3">#FFE4EBEA</color>-->
-    <color name="shape_page_number">#E600BFA5</color>
-    <color name="file_playlist_playing">#FFF2FCFA</color>
+<!--    <color name="shape_page_number">#E600BFA5</color>-->
+<!--    <color name="file_playlist_playing">#FFF2FCFA</color>-->
 <!--    <color name="background_button_white">#FFFAFAFA</color>-->
 <!--    <color name="border_button_white">#FFE1E1E1</color>-->
 <!--    <color name="add_contact_icons">#FF707070</color>-->
-    <color name="user_layer_group_call">#8000BFA5</color>
+<!--    <color name="user_layer_group_call">#8000BFA5</color>-->
 
 <!--    <color name="emoji_icons">#61000000</color>-->
 <!--    <color name="emoji_background">#FFECEFF1</color>-->
@@ -303,9 +303,12 @@
     <color name="teal_600">#009372</color>
 
     <color name="teal_200_alpha_038">#616DD2BF</color>
-    <color name="teal_300_alpha_038">#6100BFA5</color>
 
     <color name="teal_300_alpha_006">#0F00B092</color>
+    <color name="teal_300_alpha_038">#6100BFA5</color>
+    <color name="teal_300_alpha_050">#8000BFA5</color>
+    <color name="teal_300_alpha_090">#E600BFA5</color>
+
     <color name="teal_400_alpha_036">#5C00B092</color>
     <color name="teal_400_alpha_050">#8000B092</color>
     <color name="teal_400_alpha_090">#E600B092</color>
