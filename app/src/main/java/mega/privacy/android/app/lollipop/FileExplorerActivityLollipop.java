@@ -108,6 +108,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileExplorerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface {
@@ -3487,11 +3488,35 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	 * @param currentTab The current tab where the action happens.
 	 */
 	public void hideTabs(boolean hide, int currentTab) {
-		if ((currentTab == CLOUD_FRAGMENT && getCloudExplorerFragment() != null)
-				|| (currentTab == INCOMING_FRAGMENT && getIncomingExplorerFragment() != null)
-				|| (currentTab == CHAT_FRAGMENT && getChatExplorerFragment() != null)) {
-			viewPagerExplorer.disableSwipe(hide);
-			tabLayoutExplorer.setVisibility(hide ? View.GONE : View.VISIBLE);
+		switch (currentTab) {
+			case CLOUD_FRAGMENT:
+				MegaNode rootNode = megaApi.getRootNode();
+				long parentHandle = rootNode != null ? rootNode.getHandle() : INVALID_HANDLE;
+
+				if (getCloudExplorerFragment() == null
+						|| (!hide && parentHandleCloud != parentHandle)) {
+					return;
+				}
+
+				break;
+
+			case INCOMING_FRAGMENT:
+				if (getIncomingExplorerFragment() == null
+						|| (!hide && parentHandleIncoming != INVALID_HANDLE)) {
+					return;
+				}
+
+				break;
+
+			case CHAT_FRAGMENT:
+				if (getChatExplorerFragment() == null) {
+					return;
+				}
+
+				break;
 		}
+
+		viewPagerExplorer.disableSwipe(hide);
+		tabLayoutExplorer.setVisibility(hide ? View.GONE : View.VISIBLE);
 	}
 }

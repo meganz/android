@@ -554,6 +554,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		if (n.isFolder()){
 		    searchNodes = null;
+		    ((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 			((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
 
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
@@ -681,7 +682,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			adapter.setParentHandle(parentHandle);
 			((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
-
+			((FileExplorerActivityLollipop) context).hideTabs(false, CLOUD_FRAGMENT);
 
 			return 2;
 		}

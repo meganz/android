@@ -65,6 +65,7 @@ import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
@@ -600,6 +601,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		if (n.isFolder()){
 		    searchNodes = null;
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
 		    ((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
 
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
@@ -665,8 +667,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
 
 		if(((FileExplorerActivityLollipop)context).getDeepBrowserTree()==0){
-			setParentHandle(-1);
-//			uploadButton.setText(getString(R.string.choose_folder_explorer));
+			setParentHandle(INVALID_HANDLE);
+			((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 			findNodes();
 
 			setNodes(nodes);
