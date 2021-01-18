@@ -70,8 +70,8 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
         }
     }
 
-    private lateinit var audioManager: AudioManager
-    private lateinit var audioFocusRequest: AudioFocusRequest
+    private var audioManager: AudioManager? = null
+    private var audioFocusRequest: AudioFocusRequest? = null
     private var audioFocusRequested = false
     private val audioFocusListener =
         OnAudioFocusChangeListener { focusChange ->
@@ -350,7 +350,9 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
 
         mainHandler.removeCallbacks(resumePlayRunnable)
 
-        abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
+        if (audioManager != null) {
+            abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
+        }
 
         viewModel.clear()
 
