@@ -29,6 +29,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -148,12 +149,11 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
                 showMoreLayout.setVisibility(View.VISIBLE);
             }
 
-            if (filePreparedInfos.size() == 1) {
-                contentText.setText("File");
-            }
-            else if (filePreparedInfos.size() > 1) {
-                contentText.setText("Files");
-            }
+            // The first letter of "file/files" should be capital.
+            StringBuilder sb = new StringBuilder(StringResourcesUtils.getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
+            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+            contentText.setText(sb.toString());
+
             if (adapter == null) {
                 adapter = new ImportFilesAdapter(context, this, filePreparedInfos, nameFiles);
 

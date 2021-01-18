@@ -164,7 +164,7 @@ public class AvatarUtil {
             case AVATAR_GROUP_CHAT_COLOR:
                 return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.grey_012_white_012);
             case AVATAR_PHONE_COLOR:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.color_default_avatar_phone);
+                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.grey_500);
             default:
                 return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.red_600_red_300);
         }
@@ -261,7 +261,7 @@ public class AvatarUtil {
         String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
         int color;
         if (contact.isPhoneContact()) {
-            color = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
+            color = ContextCompat.getColor(context, R.color.grey_500);
         } else if (contact.isMegaContact()) {
             color = getColorAvatar(contact.getMegaContactAdapter().getMegaUser());
         } else {

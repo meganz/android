@@ -135,7 +135,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="6dp"
                         android:gravity="center_vertical"
-                        android:textColor="@color/accentColor"
+                        android:textColor="@color/teal_300_teal_200"
                         android:textSize="12sp"
                         android:visibility="gone" />
 

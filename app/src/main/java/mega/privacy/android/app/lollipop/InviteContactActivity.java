@@ -163,7 +163,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
         Context context = getApplicationContext();
-        defaultLocalContactAvatarColor = ContextCompat.getColor(context, R.color.color_default_avatar_phone);
+        defaultLocalContactAvatarColor = ContextCompat.getColor(context, R.color.grey_500);
 
         phoneContacts = new ArrayList<>();
         addedContacts = new ArrayList<>();

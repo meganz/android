@@ -140,6 +140,10 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Secondary">
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>

@@ -36,9 +36,8 @@
                 android:layout_marginRight="25dp"
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="24dp"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
                 android:gravity="center_horizontal"
-                android:textColor="?android:attr/textColorSecondary"
                 android:layout_gravity="center_horizontal"/>
 
             <LinearLayout
@@ -47,31 +46,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
                 android:layout_marginBottom="24dp"
-                android:layout_gravity="right"
+                android:layout_gravity="end"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/horizontal_storage_status_button_dissmiss"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
-                    android:text="@string/general_dismiss"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"/>
+                    style="?attr/borderlessButtonStyle"
+                    android:text="@string/general_dismiss" />
 
                 <Button
                     android:id="@+id/horizontal_storage_status_button_payment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginLeft="22dp"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:stateListAnimator="@null"/>
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="22dp" />
 
             </LinearLayout>
 
@@ -81,44 +68,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:layout_marginBottom="24dp"
-                android:layout_gravity="right"
-                android:gravity="right"
-                android:layout_marginRight="16dp"
+                android:layout_gravity="end"
+                android:gravity="end"
+                android:layout_marginEnd="16dp"
                 android:orientation="vertical">
 
                 <Button
                     android:id="@+id/vertical_storage_status_button_action"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"
-                    android:stateListAnimator="@null"/>
+                    style="?attr/borderlessButtonStyle"/>
 
                 <Button
                     android:id="@+id/vertical_storage_status_button_achievements"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
+                    style="?attr/borderlessButtonStyle"
                     android:text="@string/button_bonus_almost_full_warning"
-                    android:layout_marginTop="30dp"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"/>
+                    android:layout_marginTop="30dp" />
 
                 <Button
                     android:id="@+id/vertical_storage_status_button_dissmiss"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/accentColor"
-                    android:background="@android:color/transparent"
                     android:text="@string/general_dismiss"
                     android:layout_marginTop="30dp"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:stateListAnimator="@null"/>
+                    style="?attr/borderlessButtonStyle"/>
 
             </LinearLayout>
 

@@ -333,10 +333,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:gravity="right"
-                                android:textAllCaps="true"
-                                android:textColor="@color/accentColor"
-                                android:textSize="16sp" />
+                                android:gravity="end"
+                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor"
+                                android:textAllCaps="true" />
 
                         </LinearLayout>
 

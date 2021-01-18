@@ -26,7 +26,7 @@
 <!--    <color name="new_file_list_selected_row">#0A000000</color>-->
 <!--    <color name="border_file_properties">#cccccc</color>-->
 <!--    <color name="file_properties_text_available">#666666</color>-->
-    <color name="grey_info_menu">#999999</color>
+<!--    <color name="grey_info_menu">#999999</color>-->
 <!--    <color name="grid_item_border">#d4d4d4</color>-->
 <!--    <color name="grid_item_separator">#e5e5e5</color>-->
 <!--    <color name="contact_properties_content_detailed">#9a9a9a</color>-->
@@ -34,7 +34,7 @@
 <!--    <color name="contact_list_second_row">#848484</color>-->
 <!--    <color name="photo_sync_month_text">#787878</color>-->
 <!--    <color name="switch_selector_layout">#555555</color>-->
-    <color name="color_default_avatar_phone">#777777</color>
+<!--    <color name="color_default_avatar_phone">#777777</color>-->
 <!--    <color name="content_text_folder">#80333333</color>-->
 <!--    <color name="content_text_background">#f4f4f4</color>-->
 <!--    <color name="adapters_background">#333333</color>-->
@@ -78,7 +78,7 @@
 
 <!--    <color name="filePropertiesToolBar">#2284b1</color>-->
 
-    <color name="tour_bar_grey">#dddddd</color>
+<!--    <color name="tour_bar_grey">#dddddd</color>-->
     <color name="tour_bar_red">#cc0000</color>
 
 <!--    <color name="small_letter_upgrade_account">#8a333333</color>-->
