@@ -9,17 +9,16 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
 
 public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
@@ -107,7 +106,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                                 return;
                             }
 
-                            shareNode(context, node);
+                            MegaNodeUtil.shareMegaChatMessage(context, messagesSelected, chatId);
                         }
                     }
                     break;

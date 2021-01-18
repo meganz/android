@@ -43,7 +43,6 @@ public class ExportListener extends BaseListener {
      */
     public ExportListener(Context context, Intent shareIntent) {
         super(context);
-
         this.shareIntent = shareIntent;
     }
 
@@ -86,13 +85,13 @@ public class ExportListener extends BaseListener {
     public ExportListener(Context context, int numberExport, StringBuilder exportedLinks,
                           Intent shareIntent, ArrayList<AndroidMegaChatMessage> messages, long chatId) {
         super(context);
+        this.shareIntent = shareIntent;
+        this.messages = messages;
+        this.chatId = chatId;
 
         this.numberExport = numberExport;
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
-        this.shareIntent = shareIntent;
-        this.chatId = chatId;
-        this.messages = messages;
     }
 
     /**
@@ -107,11 +106,10 @@ public class ExportListener extends BaseListener {
     public ExportListener(Context context, int numberExport, StringBuilder exportedLinks,
         Intent shareIntent) {
         super(context);
-
+        this.shareIntent = shareIntent;
         this.numberExport = numberExport;
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
-        this.shareIntent = shareIntent;
     }
 
     @Override
@@ -175,9 +173,11 @@ public class ExportListener extends BaseListener {
             }
         } else {
             logError("Error exporting node: " + e.getErrorString());
+
             ChatController chatC = new ChatController(context);
             if(messages != null && !messages.isEmpty()){
                 logDebug("Several nodes to import to MEGA and export");
+                chatC.importNode(messageId, chatId, true);
             }else{
                 logDebug("One node to import to MEGA and export");
                 chatC.importNode(messageId, chatId, true);

@@ -278,7 +278,6 @@ public class MegaNodeUtil {
                 shareFile(context, new File(path));
             } else if (node.isExported()) {
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
-
             } else {
                 MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
                 if (messageId == MEGACHAT_INVALID_HANDLE || chatId == MEGACHAT_INVALID_HANDLE) {
@@ -287,6 +286,13 @@ public class MegaNodeUtil {
                     megaApi.exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), messageId, chatId));
                 }
             }
+        }
+    }
+
+    public static void shareMegaChatMessage(Context context, ArrayList<MegaChatMessage> messagesSelected, long chatId){
+        ArrayList<AndroidMegaChatMessage> androidMessagesSelected = new ArrayList<AndroidMegaChatMessage>();
+        for(MegaChatMessage chatMessage : messagesSelected){
+
         }
     }
 
@@ -327,7 +333,6 @@ public class MegaNodeUtil {
     }
 
     public static void shareNodesFromChat(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, List<MegaNode> nodes, long chatId) {
-
         if (!shouldContinueWithoutError(context, "sharing nodes", nodes)) {
             return;
         }
@@ -361,7 +366,6 @@ public class MegaNodeUtil {
             }
         }
         if (notExportedNodes == 0) {
-
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
                     links.toString());
             return;
