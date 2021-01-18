@@ -32,9 +32,9 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:scaleType="fitCenter"
-            app:defaultThumbnail="@{MimeTypeList.typeForName(item.nodeName).iconResourceId}"
+            app:apDefaultThumbnail="@{MimeTypeList.typeForName(item.nodeName).iconResourceId}"
             app:roundedCornerRadius="4dp"
-            app:thumbnail="@{item.thumbnail}" />
+            app:apThumbnail="@{item.thumbnail}" />
 
         <TextView
             android:layout_width="wrap_content"

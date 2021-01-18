@@ -9,7 +9,7 @@ import java.io.File
 /**
  * DataBinding implementation for set thumbnail and defaultThumbnail.
  */
-@BindingAdapter("thumbnail", "defaultThumbnail")
+@BindingAdapter("apThumbnail", "apDefaultThumbnail")
 fun setPlaylistItemThumbnail(
     imageView: SimpleDraweeView,
     file: File?,
