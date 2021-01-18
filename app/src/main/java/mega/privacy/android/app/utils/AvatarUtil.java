@@ -59,6 +59,10 @@ public class AvatarUtil {
         }
 
         String resultTitle = EmojiUtilsShortcodes.emojify(text);
+        if (isTextEmpty(resultTitle)) {
+            return resultUnknown;
+        }
+
         List<EmojiRange> emojis = EmojiUtils.emojis(resultTitle);
 
         if (emojis != null && emojis.size() > 0 && emojis.get(0).start == 0) {
