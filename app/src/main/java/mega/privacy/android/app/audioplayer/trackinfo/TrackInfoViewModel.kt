@@ -68,10 +68,12 @@ class TrackInfoViewModel @ViewModelInject constructor(
     fun loadTrackInfo(args: TrackInfoFragmentArgs) {
         trackInfoArgs = args
 
+        // ExoPlayer requires API call happens in main thread.
+        loadMetadata(args)
+
         add(
             Completable
                 .fromCallable {
-                    loadMetadata(args)
                     loadNodeInfo(args)
                 }
                 .subscribeOn(Schedulers.io())
