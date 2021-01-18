@@ -58,7 +58,7 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAM
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
@@ -716,9 +716,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         MegaNode parentNode = megaApi.getParentNode(node);
         if (parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT) {
-            intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE);
+            intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE);
         } else {
-            intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, parentNode.getHandle());
+            intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNode.getHandle());
         }
 
         if (mViewModel.isSearchMode()) {

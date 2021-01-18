@@ -16,7 +16,7 @@ data class NodeInfo(
     val thumbnail: File,
     val availableOffline: Boolean,
     val size: String,
-    val location: String,
+    val location: LocationInfo,
     val added: String,
     val lastModified: String,
 )

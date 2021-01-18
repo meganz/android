@@ -544,7 +544,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
                 intent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
+                intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
                 val screenPosition = getThumbnailScreenPosition(position)
                 if (screenPosition != null) {
@@ -585,7 +585,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
-                mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, INVALID_HANDLE)
+                mediaIntent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
                 mediaIntent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
 
                 val screenPosition = getThumbnailScreenPosition(position)

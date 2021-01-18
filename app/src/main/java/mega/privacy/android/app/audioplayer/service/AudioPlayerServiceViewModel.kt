@@ -217,7 +217,7 @@ class AudioPlayerServiceViewModel(
                             OUTGOING_SHARES_ADAPTER,
                             CONTACT_FILE_ADAPTER -> {
                                 val parentHandle = intent.getLongExtra(
-                                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                                    INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                                     INVALID_HANDLE
                                 )
                                 val order = intent.getIntExtra(
@@ -305,7 +305,7 @@ class AudioPlayerServiceViewModel(
                             }
                             FOLDER_LINK_ADAPTER -> {
                                 val parentHandle = intent.getLongExtra(
-                                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                                    INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                                     INVALID_HANDLE
                                 )
                                 val order = intent.getIntExtra(
@@ -426,11 +426,11 @@ class AudioPlayerServiceViewModel(
             CONTACT_FILE_ADAPTER,
             FOLDER_LINK_ADAPTER -> {
                 val oldParentHandle = oldIntent.getLongExtra(
-                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                    INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE
                 )
                 val newParentHandle = intent.getLongExtra(
-                    INTENT_EXTRA_KEY_PARENT_HANDLE,
+                    INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE
                 )
                 return oldType == type && oldParentHandle == newParentHandle

@@ -158,7 +158,8 @@ class TrackInfoViewModel @ViewModelInject constructor(
 
             _nodeInfo.postValue(
                 NodeInfo(
-                    thumbnail, true, getSizeString(file.length()), location,
+                    thumbnail, true, getSizeString(file.length()),
+                    LocationInfo(location, offlineParentPath = node.path),
                     formatLongDateTime(file.lastModified() / 1000),
                     formatLongDateTime(file.lastModified() / 1000)
                 )
@@ -168,6 +169,11 @@ class TrackInfoViewModel @ViewModelInject constructor(
 
             val parent = megaApi.getParentNode(node)
             val topAncestor = getRootParentNode(node)
+
+            val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
+                    || topAncestor.handle == megaApi.rubbishNode.handle
+                    || topAncestor.handle == megaApi.inboxNode.handle
+
             val location = when {
                 args.fromIncomingShare -> {
                     if (parent != null) {
@@ -177,9 +183,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
                     }
                 }
                 parent == null -> context.getString(R.string.tab_incoming_shares)
-                topAncestor.handle == megaApi.rootNode.handle
-                        || topAncestor.handle == megaApi.rubbishNode.handle
-                        || topAncestor.handle == megaApi.inboxNode.handle -> {
+                inCloudDrive -> {
                     if (topAncestor.handle == parent.handle) {
                         getTranslatedNameForParentNode(topAncestor)
                     } else {
@@ -189,12 +193,23 @@ class TrackInfoViewModel @ViewModelInject constructor(
                 else -> parent.name + " (" + context.getString(R.string.tab_incoming_shares) + ")"
             }
 
+            val fragmentHandle = when {
+                args.fromIncomingShare || parent == null -> MegaApiJava.INVALID_HANDLE
+                inCloudDrive -> topAncestor.handle
+                else -> MegaApiJava.INVALID_HANDLE
+            }
+
             val thumbnail = File(getThumbFolder(context), node.base64Handle.plus(JPG_EXTENSION))
             createThumbnailIfNotExists(thumbnail, args.handle)
 
             _nodeInfo.postValue(
                 NodeInfo(
-                    thumbnail, availableOffline(context, node), getSizeString(node.size), location,
+                    thumbnail, availableOffline(context, node), getSizeString(node.size),
+                    LocationInfo(
+                        location,
+                        parentHandle = parent?.handle ?: MegaApiJava.INVALID_HANDLE,
+                        fragmentHandle = fragmentHandle
+                    ),
                     formatLongDateTime(node.creationTime), formatLongDateTime(node.modificationTime)
                 )
             )

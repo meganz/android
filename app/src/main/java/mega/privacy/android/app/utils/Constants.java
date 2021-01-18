@@ -274,7 +274,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
     public static final String INTENT_EXTRA_KEY_ORDER_GET_CHILDREN = "orderGetChildren";
-    public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "parentNodeHandle";
+    public static final String INTENT_EXTRA_KEY_PARENT_NODE_HANDLE = "parentNodeHandle";
     public static final String INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH = "handlesNodesSearch";
     public static final String INTENT_EXTRA_KEY_ARRAY_OFFLINE = "ARRAY_OFFLINE";
     public static final String INTENT_EXTRA_KEY_ACTION_TYPE = "actionType";
@@ -292,6 +292,10 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_COPY_HANDLES = "COPY_HANDLES";
     public static final String INTENT_EXTRA_KEY_COPY_TO = "COPY_TO";
     public static final String INTENT_EXTRA_KEY_CONTACT_EMAIL = "contactEmail";
+    public static final String INTENT_EXTRA_KEY_LOCATION_FILE_INFO = "locationFileInfo";
+    public static final String INTENT_EXTRA_KEY_OFFLINE_ADAPTER = "offline_adapter";
+    public static final String INTENT_EXTRA_KEY_PARENT_HANDLE = "PARENT_HANDLE";
+    public static final String INTENT_EXTRA_KEY_FRAGMENT_HANDLE = "fragmentHandle";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
