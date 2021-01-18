@@ -168,6 +168,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			findNodes();
 			adapter.setParentHandle(INVALID_HANDLE);
 		} else {
+			managerActivity.hideTabs(true, OUTGOING_TAB);
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			logDebug("Parent Handle: " + managerActivity.getParentHandleOutgoing());
 

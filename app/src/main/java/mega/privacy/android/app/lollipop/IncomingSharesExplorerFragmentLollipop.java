@@ -310,6 +310,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleIncoming();
 
+		if (parentHandle != INVALID_HANDLE) {
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
+		}
+
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 

@@ -140,6 +140,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			logWarning("ParentHandle -1");
 			findNodes();
 		} else {
+			managerActivity.hideTabs(true, INCOMING_TAB);
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
 			logDebug("ParentHandle to find children: " + managerActivity.getParentHandleIncoming());
 

@@ -128,6 +128,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             findNodes();
             adapter.setParentHandle(INVALID_HANDLE);
         } else {
+            managerActivity.hideTabs(true, LINKS_TAB);
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
             logDebug("ParentHandle to find children: " + managerActivity.getParentHandleLinks());
 

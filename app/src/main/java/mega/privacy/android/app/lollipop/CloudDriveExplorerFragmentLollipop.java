@@ -61,6 +61,7 @@ import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
 		OnClickListener, CheckScrollInterface {
@@ -331,6 +332,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleCloud();
+
+		if (parentHandle != INVALID_HANDLE && megaApi.getRootNode() != null
+				&& parentHandle != megaApi.getRootNode().getHandle()) {
+			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
+		}
 
 		if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			setParentHandle(-1);
