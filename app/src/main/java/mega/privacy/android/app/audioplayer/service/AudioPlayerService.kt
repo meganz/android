@@ -29,8 +29,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.di.MegaApiFolder
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
+import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -170,13 +169,13 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
                 }
 
                 @Nullable
-                override fun createCurrentContentIntent(player: Player): PendingIntent? =
-                    PendingIntent.getActivity(
-                        applicationContext,
-                        0,
-                        Intent(applicationContext, AudioPlayerActivity::class.java),
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                override fun createCurrentContentIntent(player: Player): PendingIntent? {
+                    val intent = Intent(applicationContext, AudioPlayerActivity::class.java)
+                    intent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
+                    return PendingIntent.getActivity(
+                        applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
                     )
+                }
 
                 @Nullable
                 override fun getCurrentContentText(player: Player): String? {

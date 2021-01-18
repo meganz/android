@@ -90,7 +90,8 @@ class AudioPlayerActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (intent.extras == null) {
+        val extras = intent.extras
+        if (extras == null) {
             finish()
             return
         }
@@ -114,7 +115,6 @@ class AudioPlayerActivity : BaseActivity() {
         setupToolbar()
         setupNavDestListener()
 
-        val extras = intent.extras ?: return
         val playerServiceIntent = Intent(this, AudioPlayerService::class.java)
 
         playerServiceIntent.putExtras(extras)
