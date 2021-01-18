@@ -26,6 +26,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -85,6 +86,11 @@ public class ChatController {
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH;
+    private ExportListener exportListener;
+
+    public void setExportListener(ExportListener exportListener) {
+        this.exportListener = exportListener;
+    }
 
     public ChatController(Context context){
         logDebug("ChatController created");
@@ -1572,12 +1578,11 @@ public class ChatController {
         showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, 0);
     }
 
+
     public void importNode(long idMessage, long idChat, boolean needShareNode) {
         logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
-
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
         MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
-
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
             messages.add(aMessage);
@@ -1608,7 +1613,6 @@ public class ChatController {
 
     public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, boolean needShareNode){
         logDebug("importNodesFromAndroidMessages");
-
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
 
@@ -1620,8 +1624,9 @@ public class ChatController {
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
         if(context instanceof  ChatActivityLollipop){
+
             if(needShareNode){
-                ((ChatActivityLollipop) context).forwardMessages(messages, needShareNode);
+                ((ChatActivityLollipop) context).forwardMessages(messages, needShareNode, exportListener);
             }else{
                 ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
             }
@@ -1679,6 +1684,7 @@ public class ChatController {
         else{
             if (context instanceof ChatActivityLollipop) {
                 ((ChatActivityLollipop) context).storedUnhandledData(messagesSelected, messagesToImport);
+                ((ChatActivityLollipop) context).setExportListener(exportListener);
                 ((ChatActivityLollipop) context).handleStoredData();
             } else if (context instanceof NodeAttachmentHistoryActivity) {
                 ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
@@ -1693,7 +1699,7 @@ public class ChatController {
     }
 
     public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat, int action) {
-        ChatImportToForwardListener listener = new ChatImportToForwardListener(action, messagesSelected, messagesToImport.size(), context, this, idChat);
+        ChatImportToForwardListener listener = new ChatImportToForwardListener(action, messagesSelected, messagesToImport.size(), context, this, idChat, exportListener);
         int errors = 0;
 
         for(int j=0; j<messagesToImport.size();j++){

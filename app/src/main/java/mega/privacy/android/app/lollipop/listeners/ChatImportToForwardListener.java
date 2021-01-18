@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -34,6 +35,17 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
         this.chatId = chatId;
     }
 
+    public ChatImportToForwardListener(int action, ArrayList<MegaChatMessage> messagesSelected, int counter, Context context, ChatController chatC, long chatId, ExportListener exportListener) {
+        super();
+        this.actionListener = action;
+        this.context = context;
+        this.counter = counter;
+        this.messagesSelected = messagesSelected;
+        this.chatC = chatC;
+        this.chatId = chatId;
+        this.exportListener = exportListener;
+    }
+
     int counter = 0;
     int error = 0;
     int actionListener = -1;
@@ -41,6 +53,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
     long chatId;
     ArrayList<MegaChatMessage> messagesSelected;
     ChatController chatC;
+    ExportListener exportListener;
 
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
@@ -106,7 +119,13 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                                 return;
                             }
 
-                            MegaNodeUtil.shareMegaChatMessage(context, messagesSelected, chatId);
+                            long msgId = messagesSelected.get(0).getMsgId();
+                            if(exportListener != null){
+                                exportListener.updateNodeHandle(msgId, node.getHandle());
+                                MegaApplication.getInstance().getMegaApi().exportNode(node, exportListener);
+                            }else{
+                                MegaNodeUtil.shareNode(context, node);
+                            }
                         }
                     }
                     break;

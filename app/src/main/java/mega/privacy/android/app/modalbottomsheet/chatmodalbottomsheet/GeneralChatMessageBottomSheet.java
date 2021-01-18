@@ -385,7 +385,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.forward_layout:
-                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, false);
+                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, false, null);
                 break;
 
             case R.id.edit_layout:
@@ -404,6 +404,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
+
                 shareNodeFromChat(context, node, messageId, chatId);
                 break;
 

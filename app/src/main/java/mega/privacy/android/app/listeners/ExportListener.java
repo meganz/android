@@ -2,10 +2,14 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import android.content.Intent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -34,6 +38,7 @@ public class ExportListener extends BaseListener {
     private long messageId = MEGACHAT_INVALID_HANDLE;
     private long chatId = MEGACHAT_INVALID_HANDLE;
     private ArrayList<AndroidMegaChatMessage> messages;
+    private HashMap<Long, Long> msgIdNodeHandle = new HashMap<>();
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -58,6 +63,7 @@ public class ExportListener extends BaseListener {
         this.messageId = messageId;
         this.chatId = chatId;
         this.numberExport = 1;
+        this.pendingExport = numberExport;
     }
 
     /**
@@ -88,10 +94,15 @@ public class ExportListener extends BaseListener {
         this.shareIntent = shareIntent;
         this.messages = messages;
         this.chatId = chatId;
-
         this.numberExport = numberExport;
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
+
+        for(AndroidMegaChatMessage msg: messages){
+            long msgId = msg.getMessage().getMsgId();
+            long nodeHandle = msg.getMessage().getMegaNodeList().get(0).getHandle();
+            msgIdNodeHandle.put(nodeHandle, msgId);
+        }
     }
 
     /**
@@ -110,6 +121,21 @@ public class ExportListener extends BaseListener {
         this.numberExport = numberExport;
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
+    }
+
+    public void updateNodeHandle(long msgID, long newNodeHandle){
+       long currentNodeHandle = getKeyByValue(msgIdNodeHandle, msgID);
+       msgIdNodeHandle.remove(currentNodeHandle);
+       msgIdNodeHandle.put(newNodeHandle, msgID);
+    }
+
+    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -135,7 +161,10 @@ public class ExportListener extends BaseListener {
             return;
         }
 
-        if (request != null && request.getLink() != null) {
+        if(request == null)
+            return;
+
+        if (request.getLink() != null) {
             if (shareIntent == null)
                 return;
 
@@ -159,29 +188,24 @@ public class ExportListener extends BaseListener {
             }
 
             pendingExport--;
-
             if (pendingExport == 0 && numberError < numberExport) {
                 startShareIntent(context, shareIntent, exportedLinks.toString());
             }
-
             return;
         }
 
-        if (e.getErrorCode() == MegaError.API_OK && request.getLink() != null) {
-            if (shareIntent != null) {
-                startShareIntent(context, shareIntent, request.getLink());
-            }
-        } else {
-            logError("Error exporting node: " + e.getErrorString());
+        logError("Error exporting node: " + e.getErrorString());
 
-            ChatController chatC = new ChatController(context);
-            if(messages != null && !messages.isEmpty()){
-                logDebug("Several nodes to import to MEGA and export");
-                chatC.importNode(messageId, chatId, true);
-            }else{
-                logDebug("One node to import to MEGA and export");
-                chatC.importNode(messageId, chatId, true);
-            }
+        ChatController chatC = new ChatController(context);
+        if (messages != null && !messages.isEmpty()) {
+            messageId = msgIdNodeHandle.get(request.getNodeHandle());
+            logDebug("Several nodes to import to MEGA and export");
+            chatC.setExportListener(this);
+            chatC.importNode(messageId, chatId, true);
+        } else {
+            logDebug("One node to import to MEGA and export");
+            chatC.setExportListener(null);
+            chatC.importNode(messageId, chatId, true);
         }
     }
 }

@@ -262,7 +262,6 @@ public class MegaNodeUtil {
         shareNodeFromChat(context, node, MEGACHAT_INVALID_HANDLE, MEGACHAT_INVALID_HANDLE);
     }
 
-
     /**
      * Method for sharing a node from the chat room.
      *
@@ -286,13 +285,6 @@ public class MegaNodeUtil {
                     megaApi.exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND), messageId, chatId));
                 }
             }
-        }
-    }
-
-    public static void shareMegaChatMessage(Context context, ArrayList<MegaChatMessage> messagesSelected, long chatId){
-        ArrayList<AndroidMegaChatMessage> androidMessagesSelected = new ArrayList<AndroidMegaChatMessage>();
-        for(MegaChatMessage chatMessage : messagesSelected){
-
         }
     }
 

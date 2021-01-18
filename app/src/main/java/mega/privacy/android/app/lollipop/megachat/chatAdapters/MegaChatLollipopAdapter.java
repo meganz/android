@@ -7670,7 +7670,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
                 int currentPositionInMessages = currentPositionInAdapter -1;
                 messageArray.add(messages.get(currentPositionInMessages));
-                ((ChatActivityLollipop) context).forwardMessages(messageArray, false);
+                ((ChatActivityLollipop) context).forwardMessages(messageArray, false, null);
                 break;
             }
             case R.id.content_own_message_text:

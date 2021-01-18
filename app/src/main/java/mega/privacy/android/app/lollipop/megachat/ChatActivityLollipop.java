@@ -481,6 +481,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
     private boolean isImportOption;
+
+
+    private ExportListener exportListener;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
     private MegaNode myChatFilesFolder;
@@ -503,10 +506,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void handleStoredData() {
 
         if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
-            forwardMessages(preservedMessagesSelected, false);
+            forwardMessages(preservedMessagesSelected, false, null);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
-
+            setExportListener(exportListener);
             chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, isImportOption
                         ? MULTIPLE_IMPORT_CONTACT_MESSAGES
                         : MULTIPLE_FORWARD_MESSAGES);
@@ -523,6 +526,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         preservedMsgSelected = messagesSelected;
         preservedMsgToImport = messagesToImport;
         preservedMessagesSelected = null;
+    }
+
+    public void setExportListener(ExportListener exportListener) {
+        this.exportListener = exportListener;
     }
 
     /**
@@ -3119,27 +3126,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
 
-    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, boolean isImportOptionChosen){
+    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, boolean isImportOptionChosen, ExportListener exportListener){
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
 
         //Prevent trigger multiple forwarding messages screens in multiple clicks
-        if (isForwardingMessage) {
+        if (!isImportOptionChosen && isForwardingMessage) {
             logDebug("Forwarding message is on going");
             return;
         }
 
-        isImportOption = isImportOptionChosen;
+        this.isImportOption = isImportOptionChosen;
+        this.exportListener = exportListener;
         isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
+
         checkIfIsNeededToAskForMyChatFilesFolder();
     }
 
     public void proceedWithAction() {
         if (isForwardingMessage) {
             stopReproductions();
+            chatC.setExportListener(exportListener);
             chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat, isImportOption);
         } else {
             startUploadService();
@@ -4287,7 +4297,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 case R.id.chat_cab_menu_forward:
                     logDebug("Forward message");
-                    forwardMessages(messagesSelected, false);
+                    forwardMessages(messagesSelected, false, null);
                     break;
 
                 case R.id.chat_cab_menu_copy:
