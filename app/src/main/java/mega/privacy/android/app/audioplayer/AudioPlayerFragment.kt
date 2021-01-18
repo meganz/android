@@ -187,7 +187,7 @@ class AudioPlayerFragment : Fragment() {
 
         binding.playerView.showController()
 
-        binding.playerView.setControlDispatcher(CallAwareControlDispatcher())
+        binding.playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
 
         binding.playerView.setOnClickListener {
             if (toolbarVisible) {

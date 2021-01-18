@@ -157,7 +157,7 @@ class MiniAudioPlayerController(
 
         playerView.showController()
 
-        playerView.setControlDispatcher(CallAwareControlDispatcher())
+        playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
     }
 
     companion object {

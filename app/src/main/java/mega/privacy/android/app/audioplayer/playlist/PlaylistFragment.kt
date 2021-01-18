@@ -119,7 +119,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
 
         binding.playerView.showController()
 
-        binding.playerView.setControlDispatcher(CallAwareControlDispatcher())
+        binding.playerView.setControlDispatcher(CallAwareControlDispatcher(player.repeatMode))
     }
 
     override fun onItemClick(item: PlaylistItem) {

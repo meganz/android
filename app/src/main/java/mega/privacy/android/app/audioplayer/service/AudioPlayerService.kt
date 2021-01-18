@@ -225,7 +225,7 @@ class AudioPlayerService : LifecycleService(), LifecycleObserver {
             setUseChronometer(false)
 
             setPlayer(exoPlayer)
-            setControlDispatcher(CallAwareControlDispatcher())
+            setControlDispatcher(CallAwareControlDispatcher(exoPlayer.repeatMode))
         }
     }
 
