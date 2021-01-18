@@ -191,12 +191,7 @@ public class AvatarUtil {
 
         if (isList) {
             /*Shape list*/
-            int radius;
-            if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-                radius = defaultAvatar.getWidth() / 2;
-            } else {
-                radius = defaultAvatar.getHeight() / 2;
-            }
+            int radius = getRadius(defaultAvatar);
             c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, paintCircle);
         } else {
             /*Shape grid*/
@@ -385,5 +380,19 @@ public class AvatarUtil {
 
         canvas.drawCircle(bitmap.getWidth() / 2F, bitmap.getHeight() / 2F, radius, paint);
         return Pair.create(true, circleBitmap);
+    }
+
+    /**
+     * Method for getting the radius of a bitmap to correctly paint the radius of the border.
+     *
+     * @param bitmap The bitmap.
+     * @return The radius.
+     */
+    public static int getRadius(Bitmap bitmap) {
+        if (bitmap.getWidth() < bitmap.getHeight()) {
+            return bitmap.getWidth() / 2;
+        } else {
+            return bitmap.getHeight() / 2;
+        }
     }
 }

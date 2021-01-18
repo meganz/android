@@ -8,10 +8,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.nio.ByteBuffer;
-
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
-
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
@@ -39,7 +37,6 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
             if (!isLocal) {
                 this.surfaceView.setZOrderOnTop(false);
             }
-            this.surfaceView.setZOrderMediaOverlay(isLocal);
         }
 
         surfaceHolder = this.surfaceView.getHolder();
@@ -105,7 +102,5 @@ public class IndividualCallListener implements MegaChatVideoListenerInterface {
     public void setHeight(int height) {
         this.height = height;
     }
-
-
 }
 
