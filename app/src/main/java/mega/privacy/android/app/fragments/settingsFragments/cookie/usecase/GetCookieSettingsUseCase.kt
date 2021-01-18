@@ -73,7 +73,7 @@ class GetCookieSettingsUseCase @Inject constructor(
     /**
      * Check if the cookie dialog should be shown
      *
-     * @return Observable with a boolean flag
+     * @return Observable with the boolean flag
      */
     fun shouldShowDialog(): Single<Boolean> =
         get().map { it.isNullOrEmpty() }.onErrorReturn { true }

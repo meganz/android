@@ -16,7 +16,7 @@ class UpdateCookieSettingsUseCase @Inject constructor(
      * Save cookie settings to SDK
      *
      * @param cookies Set of cookies to be enabled
-     * @return Observable with the result
+     * @return Observable with the operation result
      */
     fun update(cookies: Set<CookieType>?): Completable =
         Completable.create { emitter ->
@@ -64,8 +64,8 @@ class UpdateCookieSettingsUseCase @Inject constructor(
                 this[CookieType.ESSENTIAL.value] = true // Essential cookies are always enabled
             }
 
-            cookies.forEach { setting ->
-                bitSet[setting.value] = true
+            cookies.forEach { cookie ->
+                bitSet[cookie.value] = true
             }
 
             val bitSetToDecimal = bitSet.toLongArray().first().toInt()
@@ -79,7 +79,7 @@ class UpdateCookieSettingsUseCase @Inject constructor(
     /**
      * Save cookie settings with all the cookies enabled
      *
-     * @return Observable with the result
+     * @return Observable with the operation result
      */
     fun acceptAll(): Completable =
         update(CookieType.values().toMutableSet())

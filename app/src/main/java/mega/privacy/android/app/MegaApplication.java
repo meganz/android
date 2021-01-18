@@ -133,7 +133,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Inject
 	DatabaseHandler dbH;
 	@Inject
-    GetCookieSettingsUseCase getCookieSettingsUseCase;
+	GetCookieSettingsUseCase getCookieSettingsUseCase;
 
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";

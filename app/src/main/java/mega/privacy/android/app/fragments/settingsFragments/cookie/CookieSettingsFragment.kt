@@ -52,7 +52,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     }
 
     private fun setupObservers() {
-        viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showConfiguration)
+        viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
             if (success) {
                 showConfirmationSnackbar()
@@ -79,12 +79,12 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         }
     }
 
-    private fun showConfiguration(settings: Set<CookieType>?) {
+    private fun showCookies(cookies: Set<CookieType>?) {
         essentialCookiesPreference.isChecked = true
-        preferenceCookiesPreference.isChecked = settings?.contains(PREFERENCE) == true
-        analyticsCookiesPreference.isChecked = settings?.contains(ANALYTICS) == true
-        advertisingCookiesPreference.isChecked = settings?.contains(ADVERTISEMENT) == true
-        thirdPartyCookiesPreference.isChecked = settings?.contains(THIRDPARTY) == true
+        preferenceCookiesPreference.isChecked = cookies?.contains(PREFERENCE) == true
+        analyticsCookiesPreference.isChecked = cookies?.contains(ANALYTICS) == true
+        advertisingCookiesPreference.isChecked = cookies?.contains(ADVERTISEMENT) == true
+        thirdPartyCookiesPreference.isChecked = cookies?.contains(THIRDPARTY) == true
 
         acceptCookiesPreference.isChecked = preferenceCookiesPreference.isChecked ||
                 analyticsCookiesPreference.isChecked ||
@@ -95,7 +95,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
 
-        val action: () -> Unit = when (preference?.key) {
+        val action = when (preference?.key) {
             acceptCookiesPreference.key -> { { viewModel.toggleCookies(enable) } }
             preferenceCookiesPreference.key -> { { viewModel.changeCookie(PREFERENCE, enable) } }
             analyticsCookiesPreference.key -> { { viewModel.changeCookie(ANALYTICS, enable) } }
@@ -113,11 +113,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         return false
     }
 
-    private fun showConfirmationDialog(action: () -> Unit) {
+    private fun showConfirmationDialog(positiveAction: () -> Unit) {
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.preference_cookies_confirmation_message)
             .setPositiveButton(android.R.string.yes) { _: DialogInterface, _: Int ->
-                action.invoke()
+                positiveAction.invoke()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()

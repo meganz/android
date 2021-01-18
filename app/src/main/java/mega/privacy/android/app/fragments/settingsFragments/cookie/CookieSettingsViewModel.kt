@@ -19,10 +19,6 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
 ) : BaseRxViewModel() {
 
-    companion object {
-        private const val TAG = "CookieSettingsViewModel"
-    }
-
     private val enabledCookies = MutableLiveData<MutableSet<CookieType>>()
     private val updateResult = MutableLiveData<Boolean>()
 
@@ -36,8 +32,8 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     /**
      * Change specific cookie state
      *
-     * @param cookie to be enabled/disabled
-     * @param enable flag to enable disable specified cookie
+     * @param cookie Cookie to be changed
+     * @param enable Flag to enable/disable specified cookie
      */
     fun changeCookie(cookie: CookieType, enable: Boolean) {
         if (enable) {
@@ -53,7 +49,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     /**
      * Change all cookies state at once
      *
-     * @param enable flag to enable disable all cookies
+     * @param enable Flag to enable/disable all cookies
      */
     fun toggleCookies(enable: Boolean) {
         if (enable) {
