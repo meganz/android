@@ -462,7 +462,7 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
                 binding.emptyGiphyView.visibility = GONE
                 binding.giphyListView.visibility = VISIBLE
             }
-            EMPTY_SEARCH or EMPTY_DOWN_SERVER -> {
+            else -> {
                 binding.emptyGiphyView.visibility = VISIBLE
                 binding.giphyListView.visibility = GONE
                 binding.emptyGiphyText.text =
