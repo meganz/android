@@ -15169,7 +15169,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		String textToShow = String.format(getString(R.string.section_contacts_with_notification), pendingRequest);
 		try {
 			if (enable) {
-				textToShow = textToShow.replace("[A]", "<font color=\'#ff333a\'>");
+				textToShow = textToShow.replace("[A]", "<font color=\'" + ColorUtils.getColorHexString(this, R.color.red_600_red_300) + "\'>");
 			}
 			else {
 				textToShow = textToShow.replace("[A]", "<font color=\'#ffcccc\'>");

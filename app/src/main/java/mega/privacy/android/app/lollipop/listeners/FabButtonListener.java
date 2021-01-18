@@ -2,9 +2,12 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.content.Intent;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;

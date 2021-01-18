@@ -143,7 +143,7 @@ public class MegaCompletedTransfersAdapter extends RecyclerView.Adapter<MegaComp
 
 		holder.iconDownloadUploadView.setImageResource(transfer.getType() == TYPE_DOWNLOAD ? R.drawable.ic_download_transfers : R.drawable.ic_upload_transfers);
 
-		holder.textViewCompleted.setTextColor(ContextCompat.getColor(context, R.color.file_list_second_row));
+		holder.textViewCompleted.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
         RelativeLayout.LayoutParams params1 =  (RelativeLayout.LayoutParams) holder.imageViewCompleted.getLayoutParams();
         params1.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
 

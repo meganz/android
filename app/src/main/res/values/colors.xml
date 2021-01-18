@@ -21,11 +21,11 @@
 <!--    <color name="navigation_drawer_background">#222222</color>-->
 <!--    <color name="color_navigation_drawer_selected">#1AFFFFFF</color>-->
 <!--    <color name="file_list_first_row">#000000</color>-->
-    <color name="file_list_second_row">#848484</color>
+<!--    <color name="file_list_second_row">#848484</color>-->
 <!--    <color name="file_list_selected_row">#1A000000</color>-->
 <!--    <color name="new_file_list_selected_row">#0A000000</color>-->
-    <color name="border_file_properties">#cccccc</color>
-    <color name="file_properties_text_available">#666666</color>
+<!--    <color name="border_file_properties">#cccccc</color>-->
+<!--    <color name="file_properties_text_available">#666666</color>-->
     <color name="grey_info_menu">#999999</color>
 <!--    <color name="grid_item_border">#d4d4d4</color>-->
 <!--    <color name="grid_item_separator">#e5e5e5</color>-->
