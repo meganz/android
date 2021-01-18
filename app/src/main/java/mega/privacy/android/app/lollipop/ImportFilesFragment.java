@@ -151,16 +151,16 @@ public class ImportFilesFragment extends BaseFragment {
     private void showMoreClick() {
         areItemsVisible = !areItemsVisible;
 
-        if (adapter != null) {
-            adapter.setItemsVisibility(areItemsVisible);
-        }
-
         if (areItemsVisible) {
             binding.showMoreText.setText(getString(R.string.general_show_less));
             binding.showMoreImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_expand));
         } else {
             binding.showMoreText.setText(getString(R.string.general_show_more));
             binding.showMoreImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_collapse_acc));
+        }
+
+        if (adapter != null) {
+            adapter.setItemsVisibility(areItemsVisible);
         }
     }
 
