@@ -9,7 +9,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_first"
-        style="@style/Widget.Mega.Button.Policy"
+        style="@style/Widget.Mega.Button.Preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:theme="@style/Theme.MaterialComponents.Bridge"
@@ -17,7 +17,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_second"
-        style="@style/Widget.Mega.Button.Policy"
+        style="@style/Widget.Mega.Button.Preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
