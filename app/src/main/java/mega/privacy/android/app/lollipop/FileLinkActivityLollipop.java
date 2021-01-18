@@ -46,7 +46,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import nz.mega.sdk.MegaApiAndroid;
@@ -660,11 +659,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				}
 			} else {
 				logDebug("setIntentToAudioVideoPlayer");
-				if (MimeTypeList.typeForName(document.getName()).isAudio()) {
-					mediaIntent = new Intent(this, AudioPlayerActivity.class);
-				} else {
-					mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-				}
+				mediaIntent = getMediaIntent(this, document.getName());
 				mediaIntent.putExtra("adapterType", FILE_LINK_ADAPTER);
 				mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 				mediaIntent.putExtra(EXTRA_SERIALIZE_STRING, serializeString);

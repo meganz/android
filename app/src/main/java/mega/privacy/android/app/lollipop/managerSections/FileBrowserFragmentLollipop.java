@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,12 +54,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -690,11 +687,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					opusFile = true;
 				}
 			} else {
-				if (MimeTypeList.typeForName(node.getName()).isAudio()) {
-					mediaIntent = new Intent(context, AudioPlayerActivity.class);
-				} else {
-					mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-				}
+				mediaIntent = getMediaIntent(context, node.getName());
 				internalIntent = true;
 			}
 			mediaIntent.putExtra("position", position);

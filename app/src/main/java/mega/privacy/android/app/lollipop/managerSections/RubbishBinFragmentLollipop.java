@@ -53,11 +53,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -771,11 +769,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					}
 					else {
 						internalIntent = true;
-						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
-							mediaIntent = new Intent(context, AudioPlayerActivity.class);
-						} else {
-							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-						}
+						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);
 					mediaIntent.putExtra("screenPosition", screenPosition);

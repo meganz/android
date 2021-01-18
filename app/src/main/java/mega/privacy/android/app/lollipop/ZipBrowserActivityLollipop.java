@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,7 +47,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import nz.mega.sdk.MegaApiJava;
@@ -469,11 +467,7 @@ public class ZipBrowserActivityLollipop extends PinActivityLollipop{
 			}
 			else {
 				internalIntent = true;
-				if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-					mediaIntent = new Intent(this, AudioPlayerActivity.class);
-				} else {
-					mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-				}
+				mediaIntent = getMediaIntent(this, currentFile.getName());
 			}
 
 			int index = currentNode.getName().lastIndexOf('/');

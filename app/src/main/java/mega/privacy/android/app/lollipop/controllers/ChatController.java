@@ -25,7 +25,6 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -1408,11 +1407,7 @@ public class ChatController {
                             }
                         } else {
                             internalIntent = true;
-                            if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                                mediaIntent = new Intent(context, AudioPlayerActivity.class);
-                            } else {
-                                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            }
+                            mediaIntent = getMediaIntent(context, tempNode.getName());
                         }
                         mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
                         mediaIntent.putExtra("HANDLE", tempNode.getHandle());

@@ -38,13 +38,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
-import androidx.core.content.FileProvider;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,12 +55,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SearchNodesTask;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -813,11 +804,9 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 					else {
 						internalIntent = true;
+						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
-							mediaIntent = new Intent(context, AudioPlayerActivity.class);
 							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
-						} else {
-							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
 						}
 					}
                     mediaIntent.putExtra("placeholder", placeholderCount);

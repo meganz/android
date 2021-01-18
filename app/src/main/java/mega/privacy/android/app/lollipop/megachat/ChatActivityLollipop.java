@@ -108,7 +108,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
@@ -4924,11 +4923,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                         else {
                                             logDebug("setIntentToAudioVideoPlayer");
-                                            if (MimeTypeList.typeForName(node.getName()).isAudio()) {
-                                                mediaIntent = new Intent(this, AudioPlayerActivity.class);
-                                            } else {
-                                                mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-                                            }
+                                            mediaIntent = getMediaIntent(this, node.getName());
                                             internalIntent=true;
                                         }
                                         logDebug("putExtra: screenPosition("+screenPosition+"), msgId("+m.getMessage().getMsgId()+"), chatId("+idChat+"), filename("+node.getName()+")");

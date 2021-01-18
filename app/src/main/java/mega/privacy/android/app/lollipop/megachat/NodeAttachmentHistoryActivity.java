@@ -48,11 +48,9 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -509,11 +507,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 							}
 							else {
 								logDebug("setIntentToAudioVideoPlayer");
-								if (MimeTypeList.typeForName(node.getName()).isAudio()) {
-									mediaIntent = new Intent(this, AudioPlayerActivity.class);
-								} else {
-									mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-								}
+								mediaIntent = getMediaIntent(this, node.getName());
 								internalIntent=true;
 							}
 

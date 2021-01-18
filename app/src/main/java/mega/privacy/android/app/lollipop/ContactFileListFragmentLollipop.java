@@ -45,7 +45,6 @@ import java.util.Stack;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -582,11 +581,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					}
 					else {
 						internalIntent = true;
-						if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
-							mediaIntent = new Intent(context, AudioPlayerActivity.class);
-						} else {
-							mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-						}
+						mediaIntent = getMediaIntent(context, contactNodes.get(position).getName());
 					}
 					mediaIntent.putExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL, contact.getEmail());
 					mediaIntent.putExtra("position", position);

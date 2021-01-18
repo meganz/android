@@ -18,7 +18,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.StatFs;
@@ -50,7 +49,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,7 +68,6 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -1559,11 +1556,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					}
 					else {
 						internalIntent = true;
-						if (MimeTypeList.typeForName(nodes.get(position).getName()).isAudio()) {
-							mediaIntent = new Intent(this, AudioPlayerActivity.class);
-						} else {
-							mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-						}
+						mediaIntent = getMediaIntent(this, nodes.get(position).getName());
 					}
 					mediaIntent.putExtra("orderGetChildren", orderGetChildren);
 					mediaIntent.putExtra("isFolderLink", true);

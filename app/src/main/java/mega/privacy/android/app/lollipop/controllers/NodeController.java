@@ -702,11 +702,7 @@ public class NodeController {
                             }
                         } else {
                             internalIntent = true;
-                            if (MimeTypeList.typeForName(tempNode.getName()).isAudio()) {
-                                mediaIntent = new Intent(context, AudioPlayerActivity.class);
-                            } else {
-                                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
-                            }
+                            mediaIntent = getMediaIntent(context, tempNode.getName());
                         }
                         mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
                         mediaIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_DOWNLOAD);

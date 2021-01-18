@@ -36,14 +36,12 @@ import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.RecentsItem;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.Scrollable;
 import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -59,6 +57,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
 
@@ -349,11 +348,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         if (isAudioOrVideo(node)) {
             if (isInternalIntent(node)) {
-                if (MimeTypeList.typeForName(node.getName()).isAudio()) {
-                    intent = new Intent(context, AudioPlayerActivity.class);
-                } else {
-                    intent = new Intent(context, AudioVideoPlayerLollipop.class);
-                }
+                intent = getMediaIntent(context, node.getName());
             } else {
                 intent = new Intent(Intent.ACTION_VIEW);
             }

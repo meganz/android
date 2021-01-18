@@ -42,7 +42,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
@@ -812,11 +811,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 								}
 							} else {
 								internalIntent = true;
-								if (MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
-									mediaIntent = new Intent(this, AudioPlayerActivity.class);
-								} else {
-									mediaIntent = new Intent(this, AudioVideoPlayerLollipop.class);
-								}
+								mediaIntent = getMediaIntent(this, currentFile.getName());
 							}
 
 							mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
