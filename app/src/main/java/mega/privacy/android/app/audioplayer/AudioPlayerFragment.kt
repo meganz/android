@@ -1,7 +1,6 @@
 package mega.privacy.android.app.audioplayer
 
 import android.animation.Animator
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -9,7 +8,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -17,6 +15,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -317,6 +316,12 @@ class AudioPlayerFragment : Fragment() {
             if (enabled) R.drawable.player_play_bg_on else R.drawable.player_play_bg_off
         )
 
+        bgPlayHint.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (enabled) R.color.teal_200 else R.color.white_60_opacity
+            )
+        )
         bgPlayHint.setText(
             if (enabled) R.string.background_play_hint else R.string.not_background_play_hint
         )
