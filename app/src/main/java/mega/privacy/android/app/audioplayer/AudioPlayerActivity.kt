@@ -8,11 +8,9 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
@@ -24,6 +22,7 @@ import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
@@ -49,10 +48,9 @@ class AudioPlayerActivity : BaseActivity() {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    private lateinit var binding: ActivityAudioPlayerBinding
     private val viewModel: AudioPlayerViewModel by viewModels()
 
-    private lateinit var rootLayout: FrameLayout
-    private lateinit var toolbar: Toolbar
     private lateinit var actionBar: ActionBar
     private lateinit var navController: NavController
 
@@ -103,10 +101,9 @@ class AudioPlayerActivity : BaseActivity() {
             return
         }
 
-        setContentView(R.layout.activity_audio_player)
+        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         changeStatusBarColor(this, window, R.color.black)
-
-        rootLayout = findViewById(R.id.root_layout)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -147,28 +144,19 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     private fun setupToolbar() {
-        toolbar = findViewById(R.id.toolbar)
-
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         actionBar = supportActionBar!!
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         actionBar.title = ""
 
-        toolbar.setNavigationOnClickListener {
-            handleNavigateUp()
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressed()
         }
     }
 
     override fun onBackPressed() {
-        handleNavigateUp()
-    }
-
-    /**
-     * Handle navigate up event (toolbar go back button, system back menu).
-     */
-    private fun handleNavigateUp() {
         if (!navController.navigateUp()) {
             playerService?.mainPlayerUIClosed()
             finish()
@@ -447,7 +435,7 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     /**
-     * Show alert dialog to confirm move a node to rubbish bin.
+     * Shows a confirmation warning before moves a node to rubbish bin.
      *
      * @param node node to be moved to rubbish bin
      */
@@ -477,11 +465,11 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     fun showSnackbar(type: Int, content: String, chatId: Long) {
-        showSnackbar(type, rootLayout, content, chatId)
+        showSnackbar(type, binding.rootLayout, content, chatId)
     }
 
     fun setToolbarTitle(title: String) {
-        toolbar.title = title
+        binding.toolbar.title = title
     }
 
     fun closeSearch() {
@@ -489,21 +477,21 @@ class AudioPlayerActivity : BaseActivity() {
     }
 
     fun hideToolbar() {
-        toolbar.animate()
-            .translationY(-toolbar.measuredHeight.toFloat())
+        binding.toolbar.animate()
+            .translationY(-binding.toolbar.measuredHeight.toFloat())
             .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
             .start()
     }
 
     fun showToolbar(animate: Boolean = true) {
         if (animate) {
-            toolbar.animate()
+            binding.toolbar.animate()
                 .translationY(0F)
                 .setDuration(AUDIO_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS)
                 .start()
         } else {
-            toolbar.animate().cancel()
-            toolbar.translationY = 0F
+            binding.toolbar.animate().cancel()
+            binding.toolbar.translationY = 0F
         }
     }
 }
