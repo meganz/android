@@ -454,10 +454,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
         else if (addedItems.contains(item)) {
             deleteItem(item);
-
-            if (context instanceof FileExplorerActivityLollipop && addedItems.size() == 0) {
-                ((FileExplorerActivityLollipop) context).hideTabs(false, CHAT_FRAGMENT);
-            }
         }
     }
 
@@ -622,6 +618,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                     ((ChatExplorerActivity)context).setToolbarSubtitle(null);
                 }
                 else if (context instanceof FileExplorerActivityLollipop){
+                    ((FileExplorerActivityLollipop) context).hideTabs(false, CHAT_FRAGMENT);
                     ((FileExplorerActivityLollipop)context).showFabButton(false);
                     ((FileExplorerActivityLollipop)context).setToolbarSubtitle(null);
                 }
@@ -875,6 +872,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            if (context instanceof FileExplorerActivityLollipop && !addedItems.isEmpty()) {
+                ((FileExplorerActivityLollipop) context).hideTabs(true, CHAT_FRAGMENT);
+            }
+
             setFinalViews();
         }
     }

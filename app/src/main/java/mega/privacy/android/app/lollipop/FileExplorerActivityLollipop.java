@@ -929,37 +929,46 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				isSearchExpanded = true;
+
 				if (isSearchMultiselect()) {
+					hideTabs(true, isCloudVisible() ? CLOUD_FRAGMENT : INCOMING_FRAGMENT);
 					gridListMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
-				}
-				else {
+				} else {
+					hideTabs(true, CHAT_FRAGMENT);
 					chatExplorer = getChatExplorerFragment();
+
 					if (chatExplorer != null && chatExplorer.isVisible()) {
 						chatExplorer.enableSearch(true);
 					}
 				}
+
 				return true;
 			}
 
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				isSearchExpanded = false;
+
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
+						hideTabs(false, CLOUD_FRAGMENT);
 						cDriveExplorer.closeSearch(collapsedByClick);
-					}
-					else if (isIncomingVisible()) {
+					} else if (isIncomingVisible()) {
+						hideTabs(false, INCOMING_FRAGMENT);
 						iSharesExplorer.closeSearch(collapsedByClick);
 					}
+
 					supportInvalidateOptionsMenu();
-				}
-				else {
+				} else {
+					hideTabs(false, CHAT_FRAGMENT);
 					chatExplorer = getChatExplorerFragment();
+
 					if (chatExplorer != null && chatExplorer.isVisible()) {
 						chatExplorer.enableSearch(false);
 					}
 				}
+
 				return true;
 			}
 		});
@@ -3488,6 +3497,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 	 * @param currentTab The current tab where the action happens.
 	 */
 	public void hideTabs(boolean hide, int currentTab) {
+		if (!hide && (queryAfterSearch != null || isSearchExpanded || pendingToOpenSearchView)) {
+			return;
+		}
+
 		switch (currentTab) {
 			case CLOUD_FRAGMENT:
 				MegaNode rootNode = megaApi.getRootNode();

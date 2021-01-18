@@ -175,13 +175,13 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			if (!((FileExplorerActivityLollipop) context).shouldReopenSearch()) {
+				((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 				((FileExplorerActivityLollipop) context).clearQuerySearch();
 				getNodes();
 				setNodes(nodes);
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 0);
 		}
 
