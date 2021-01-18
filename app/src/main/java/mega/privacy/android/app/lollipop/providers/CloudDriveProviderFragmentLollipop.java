@@ -45,6 +45,7 @@ import static mega.privacy.android.app.providers.FileProviderActivity.CLOUD_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class CloudDriveProviderFragmentLollipop extends Fragment{
@@ -348,6 +349,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		else {
 			((FileProviderActivity)context).activateButton(false);
 			if (nodes.get(position).isFolder()){
+				((FileProviderActivity) context).hideTabs(true, CLOUD_TAB);
 
 				MegaNode n = nodes.get(position);
 
@@ -393,12 +395,11 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 		if (parentNode != null){
-			
-			if(parentNode.getType()==MegaNode.TYPE_ROOT){
-				parentHandle=-1;
+			if (parentNode.getType() == MegaNode.TYPE_ROOT) {
+				parentHandle = INVALID_HANDLE;
+				((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
 				changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
-			}
-			else{
+			} else {
 				String path=parentNode.getName();	
 				String[] temp;
 				temp = path.split("/");

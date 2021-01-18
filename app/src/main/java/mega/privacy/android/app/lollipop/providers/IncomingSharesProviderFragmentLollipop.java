@@ -44,6 +44,7 @@ import static mega.privacy.android.app.providers.FileProviderActivity.INCOMING_T
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class IncomingSharesProviderFragmentLollipop extends Fragment{
@@ -351,6 +352,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 
 				deepBrowserTree = deepBrowserTree + 1;
 				if (context instanceof FileProviderActivity) {
+					((FileProviderActivity) context).hideTabs(true, INCOMING_TAB);
 					((FileProviderActivity) context).setIncomingDeepBrowserTree(deepBrowserTree);
 					logDebug("The browser tree change to: " + deepBrowserTree);
 				}
@@ -400,11 +402,14 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		}
 
 		if(deepBrowserTree==0){
-			parentHandle=-1;
+			parentHandle = INVALID_HANDLE;
+
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setIncParentHandle(parentHandle);
+				((FileProviderActivity) context).hideTabs(false, INCOMING_TAB);
 				logDebug("The parent handle change to: " + parentHandle);
 			}
+
 			changeActionBarTitle(getString(R.string.file_provider_title).toUpperCase());
 			findNodes();
 			

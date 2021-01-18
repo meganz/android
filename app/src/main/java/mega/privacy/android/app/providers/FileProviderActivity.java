@@ -1901,10 +1901,26 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	 * @param currentTab The current tab where the action happens.
 	 */
 	public void hideTabs(boolean hide, int currentTab) {
-		if ((currentTab == CLOUD_TAB && getCDriveProviderLol() != null)
-				|| (currentTab == INCOMING_TAB && getISharesProviderLol() != null)) {
-			viewPagerProvider.disableSwipe(hide);
-			tabLayoutProvider.setVisibility(hide ? View.GONE : View.VISIBLE);
+		switch (currentTab) {
+			case CLOUD_TAB:
+				MegaNode rootNode = megaApi.getRootNode();
+				long parentHandle = rootNode != null ? rootNode.getHandle() : INVALID_HANDLE;
+
+				if (getCDriveProviderLol() == null || (!hide && gParentHandle != parentHandle)) {
+					return;
+				}
+
+				break;
+
+			case INCOMING_TAB:
+				if (getISharesProviderLol() == null || !hide && incParentHandle != INVALID_HANDLE) {
+					return;
+				}
+
+				break;
 		}
+
+		viewPagerProvider.disableSwipe(hide);
+		tabLayoutProvider.setVisibility(hide ? View.GONE : View.VISIBLE);
 	}
 }

@@ -644,6 +644,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 
             setParentHandle(parentNode.getHandle());
+
+			if (parentNode.getType() == MegaNode.TYPE_ROOT) {
+				((FileExplorerActivityLollipop) context).hideTabs(false, CLOUD_FRAGMENT);
+			}
+
             ((FileExplorerActivityLollipop) context).changeTitle();
 
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
@@ -682,7 +687,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			adapter.setParentHandle(parentHandle);
 			((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
-			((FileExplorerActivityLollipop) context).hideTabs(false, CLOUD_FRAGMENT);
 
 			return 2;
 		}
