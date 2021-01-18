@@ -395,9 +395,11 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 		if (parentNode != null){
+			boolean parentIsRoot = false;
+
 			if (parentNode.getType() == MegaNode.TYPE_ROOT) {
 				parentHandle = INVALID_HANDLE;
-				((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
+				parentIsRoot = true;
 				changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
 			} else {
 				String path=parentNode.getName();	
@@ -427,6 +429,10 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			adapter.setParentHandle(parentHandle);
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setParentHandle(parentHandle);
+
+				if (parentIsRoot) {
+					((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
+				}
 			}
 			
 			return 2;

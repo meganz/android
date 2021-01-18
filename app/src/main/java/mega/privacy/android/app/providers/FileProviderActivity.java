@@ -1903,10 +1903,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void hideTabs(boolean hide, int currentTab) {
 		switch (currentTab) {
 			case CLOUD_TAB:
-				MegaNode rootNode = megaApi.getRootNode();
-				long parentHandle = rootNode != null ? rootNode.getHandle() : INVALID_HANDLE;
-
-				if (getCDriveProviderLol() == null || (!hide && gParentHandle != parentHandle)) {
+				if (getCDriveProviderLol() == null || (!hide && gParentHandle != INVALID_HANDLE)) {
 					return;
 				}
 
