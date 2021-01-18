@@ -1,23 +1,23 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
-import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import nz.mega.sdk.*
 import java.util.*
 import javax.inject.Inject
 
-class UpdateCookieSettingsUsecase @Inject constructor(
+class GetCookieSettingsUseCase @Inject constructor(
     private val megaApi: MegaApiAndroid
 ) {
 
-    fun update(cookies: Set<CookieType>?): Completable =
-        Completable.create { emitter ->
-            if (cookies.isNullOrEmpty()) {
-                emitter.onError(IllegalArgumentException("Cookies are null or empty"))
-                return@create
-            }
-
+    /**
+     * Get current cookie settings from SDK
+     *
+     * @return Observable with a set of enabled cookies
+     */
+    fun get(): Single<Set<CookieType>> =
+        Single.create { emitter ->
             val listener = object : MegaRequestListenerInterface {
                 override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
                     if (emitter.isDisposed) {
@@ -37,7 +37,16 @@ class UpdateCookieSettingsUsecase @Inject constructor(
                     error: MegaError
                 ) {
                     if (error.errorCode == MegaError.API_OK) {
-                        emitter.onComplete()
+                        val result = mutableSetOf<CookieType>()
+
+                        val bitSet = BitSet.valueOf(longArrayOf(request.numDetails.toLong()))
+                        for (i in 0..bitSet.length()) {
+                            if (bitSet[i]) {
+                                result.add(CookieType.valueOf(i))
+                            }
+                        }
+
+                        emitter.onSuccess(result)
                     } else {
                         emitter.onError(RuntimeException("${error.errorCode}: ${error.errorString}"))
                     }
@@ -53,22 +62,18 @@ class UpdateCookieSettingsUsecase @Inject constructor(
                 }
             }
 
-            val bitSet = BitSet(CookieType.values().size).apply {
-                this[CookieType.ESSENTIAL.value] = true // Essential cookies are always enabled
-            }
-
-            cookies.forEach { setting ->
-                bitSet[setting.value] = true
-            }
-
-            val bitSetToDecimal = bitSet.toLongArray().first().toInt()
-            megaApi.setCookieSettings(bitSetToDecimal, listener)
+            megaApi.getCookieSettings(listener)
 
             emitter.setDisposable(Disposable.fromAction {
                 megaApi.removeRequestListener(listener)
             })
         }
 
-    fun acceptAll(): Completable =
-        update(CookieType.values().toMutableSet())
+    /**
+     * Check if the cookie dialog should be shown
+     *
+     * @return Observable with a boolean flag
+     */
+    fun shouldShowDialog(): Single<Boolean> =
+        get().map { it.isNullOrEmpty() }.onErrorReturn { true }
 }

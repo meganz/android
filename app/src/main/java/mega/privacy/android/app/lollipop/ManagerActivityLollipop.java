@@ -163,8 +163,8 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUsecase;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUsecase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -348,10 +348,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
     @Inject
-	GetCookieSettingsUsecase getCookieSettingsUsecase;
+	GetCookieSettingsUseCase getCookieSettingsUseCase;
 
     @Inject
-	UpdateCookieSettingsUsecase updateCookieSettingsUsecase;
+	UpdateCookieSettingsUseCase updateCookieSettingsUseCase;
 
 	public int accountFragment;
 
@@ -3595,10 +3595,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.setCancelable(false)
 				.setView(R.layout.dialog_cookie_alert)
 				.setPositiveButton(R.string.dialog_cookie_alert_accept, (positiveDialog, which) ->
-						updateCookieSettingsUsecase.acceptAll()
+						updateCookieSettingsUseCase.acceptAll()
 								.subscribeOn(Schedulers.io())
 								.observeOn(AndroidSchedulers.mainThread())
-								.subscribe()
+								.subscribe(() -> { }, (error) -> {
+									logError(error.getMessage());
+								})
 				)
 				.setNegativeButton(R.string.dialog_cookie_alert_settings, (negativeDialog, which) ->
 						startActivity(new Intent(this, CookiePreferencesActivity.class))
@@ -4786,7 +4788,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		checkBeforeShowSMSVerificationDialog();
 
 		if (MegaApplication.isCookieBannerEnabled()) {
-			getCookieSettingsUsecase.shouldShowDialog()
+			getCookieSettingsUseCase.shouldShowDialog()
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
 					.subscribe((showDialog, throwable) -> {

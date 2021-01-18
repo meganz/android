@@ -43,7 +43,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUsecase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -133,7 +133,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	@Inject
 	DatabaseHandler dbH;
 	@Inject
-	GetCookieSettingsUsecase getCookieSettingsUsecase;
+    GetCookieSettingsUseCase getCookieSettingsUseCase;
 
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -970,8 +970,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
+	/**
+	 * Check current enabled cookies and set the corresponding flags to true/false
+	 */
 	public void checkEnabledCookies() {
-		getCookieSettingsUsecase.get()
+		getCookieSettingsUseCase.get()
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((cookies, throwable) -> {

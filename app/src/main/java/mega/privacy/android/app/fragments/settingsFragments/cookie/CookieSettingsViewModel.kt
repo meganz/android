@@ -9,14 +9,14 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUsecase
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUsecase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.notifyObserver
 
 class CookieSettingsViewModel @ViewModelInject constructor(
-    private val getCookieSettingsUsecase: GetCookieSettingsUsecase,
-    private val updateCookieSettingsUsecase: UpdateCookieSettingsUsecase
+    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
+    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
 ) : BaseRxViewModel() {
 
     companion object {
@@ -33,6 +33,12 @@ class CookieSettingsViewModel @ViewModelInject constructor(
         getCookieSettings()
     }
 
+    /**
+     * Change specific cookie state
+     *
+     * @param cookie to be enabled/disabled
+     * @param enable flag to enable disable specified cookie
+     */
     fun changeCookie(cookie: CookieType, enable: Boolean) {
         if (enable) {
             enabledCookies.value?.add(cookie)
@@ -44,6 +50,11 @@ class CookieSettingsViewModel @ViewModelInject constructor(
         updateCookieSettings()
     }
 
+    /**
+     * Change all cookies state at once
+     *
+     * @param enable flag to enable disable all cookies
+     */
     fun toggleCookies(enable: Boolean) {
         if (enable) {
             enabledCookies.value?.addAll(CookieType.values())
@@ -55,8 +66,11 @@ class CookieSettingsViewModel @ViewModelInject constructor(
         updateCookieSettings()
     }
 
+    /**
+     * Retrieve current cookie settings from SDK
+     */
     private fun getCookieSettings() {
-        getCookieSettingsUsecase.get()
+        getCookieSettingsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -71,8 +85,11 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Save cookie settings to SDK
+     */
     private fun updateCookieSettings() {
-        updateCookieSettingsUsecase.update(enabledCookies.value)
+        updateCookieSettingsUseCase.update(enabledCookies.value)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -87,6 +104,9 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Reset cookies to essentials ones
+     */
     private fun resetCookies() {
         enabledCookies.postValue(mutableSetOf(CookieType.ESSENTIAL))
     }
