@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -89,14 +90,21 @@ public class AvatarUtil {
     }
 
     private static String hasEmojiCompatAtFirst(String text) {
+        if (isTextEmpty(text)) {
+            return null;
+        }
+
         List<String> listEmojis = EmojiParser.extractEmojis(text);
+
         if (listEmojis != null && !listEmojis.isEmpty()) {
             String substring = text.substring(0, listEmojis.get(0).length());
             List<String> sublistEmojis = EmojiParser.extractEmojis(substring);
+
             if (sublistEmojis != null && !sublistEmojis.isEmpty()) {
                 return substring;
             }
         }
+
         return null;
     }
 
