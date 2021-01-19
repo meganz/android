@@ -260,6 +260,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		}
 
 		if (tL.isEmpty()) {
+			destroyActionMode();
 			setEmptyView(tL.size());
 			managerActivity.supportInvalidateOptionsMenu();
 		}
