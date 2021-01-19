@@ -384,7 +384,6 @@ public class MegaNodeUtil {
 
         /*Nodes are not downloaded*/
         boolean allExportedNodes = true;
-        int nodesExported = 0;
         StringBuilder links = new StringBuilder();
         for (MegaNode node : nodes) {
             if (!node.isExported()) {
@@ -392,7 +391,6 @@ public class MegaNodeUtil {
             } else {
                 links.append(node.getPublicLink())
                         .append("\n\n");
-                nodesExported ++;
             }
         }
 

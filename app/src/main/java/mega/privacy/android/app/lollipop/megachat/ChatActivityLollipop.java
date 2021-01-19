@@ -4677,7 +4677,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                                     importIcon.setVisible(false);
                                 } else {
-                                    menu.findItem(R.id.chat_cab_menu_share).setVisible(shouldSharingOptionBeShown(ChatActivityLollipop.this, selected));
+                                    menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
                                     importIcon.setVisible(true);
                                 }
