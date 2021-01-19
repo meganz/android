@@ -600,6 +600,21 @@ public class FileUtil {
     }
 
     /**
+     * Shares an uri.
+     *
+     * @param context current Context.
+     * @param name name of the uri.
+     * @param uri uri to share.
+     */
+    public static void shareUri(Context context, String name, Uri uri) {
+        Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+        shareIntent.setType(MimeTypeList.typeForName(name).getType() + "/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
+    }
+
+    /**
      * Share multiple files to other apps.
      *
      * credit: https://stackoverflow.com/a/15577579/3077508

@@ -30,8 +30,9 @@ import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
@@ -254,8 +255,13 @@ class AudioPlayerActivity : BaseActivity() {
             R.id.audio_player, R.id.track_info -> {
                 if (adapterType == OFFLINE_ADAPTER) {
                     toggleAllMenuItemsVisibility(false)
+
                     optionsMenu?.findItem(R.id.properties)?.isVisible =
                         currentFragment == R.id.audio_player
+
+                    optionsMenu?.findItem(R.id.share)?.isVisible =
+                        currentFragment == R.id.audio_player
+
                     return
                 }
 
@@ -282,6 +288,11 @@ class AudioPlayerActivity : BaseActivity() {
 
                 optionsMenu?.findItem(R.id.properties)?.isVisible =
                     currentFragment == R.id.audio_player
+
+                optionsMenu?.findItem(R.id.share)?.isVisible =
+                    currentFragment == R.id.audio_player && showShareOption(
+                        adapterType, adapterType == FOLDER_LINK_ADAPTER, node.handle
+                    )
 
                 optionsMenu?.findItem(R.id.send_to_chat)?.isVisible = adapterType != FROM_CHAT
 
@@ -349,6 +360,26 @@ class AudioPlayerActivity : BaseActivity() {
                 )
                 return true
             }
+            R.id.share -> {
+                when (adapterType) {
+                    OFFLINE_ADAPTER, ZIP_ADAPTER -> {
+                        val nodeName =
+                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
+                                ?: return false
+                        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri
+                            ?: return false
+
+                        shareUri(this, nodeName, uri)
+                    }
+                    FILE_LINK_ADAPTER -> {
+                        shareLink(this, launchIntent.getStringExtra(URL_FILE_LINK))
+                    }
+                    else -> {
+                        shareNode(this, megaApi.getNodeByHandle(service.viewModel.playingHandle))
+                    }
+                }
+                return true
+            }
             R.id.send_to_chat -> {
                 if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
                     showOverDiskQuotaPaywallWarning()
@@ -360,7 +391,7 @@ class AudioPlayerActivity : BaseActivity() {
                 return true
             }
             R.id.get_link -> {
-                if (MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(
+                if (showTakenDownNodeActionNotAvailableDialog(
                         megaApi.getNodeByHandle(playingHandle), this
                     )
                 ) {
@@ -373,7 +404,7 @@ class AudioPlayerActivity : BaseActivity() {
             }
             R.id.remove_link -> {
                 val node = megaApi.getNodeByHandle(playingHandle) ?: return true
-                if (MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
                     return true
                 }
 
