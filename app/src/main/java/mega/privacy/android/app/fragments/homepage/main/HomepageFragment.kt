@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
@@ -25,7 +24,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.zhpan.bannerview.BannerViewPager
-import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
@@ -37,8 +35,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
+import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.fragments.homepage.banner.BannerViewHolder
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
@@ -61,7 +59,7 @@ class HomepageFragment : Fragment() {
 
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
-    private lateinit var bannerViewPager: BannerViewPager<MegaBanner, BannerViewHolder>
+    private lateinit var bannerViewPager: BannerViewPager<MegaBanner>
 
     /** The fab button in normal state */
     private lateinit var fabMain: FloatingActionButton
@@ -167,7 +165,6 @@ class HomepageFragment : Fragment() {
             showOfflineMode()
         }
 
-        Log.i("Alex", "onResume")
         viewModel.getBanners()
     }
 
@@ -175,7 +172,6 @@ class HomepageFragment : Fragment() {
         super.onDestroyView()
 
         tabsChildren.clear()
-        Log.i("Alex", "onDestroyView")
         requireContext().unregisterReceiver(networkReceiver)
     }
 
@@ -343,11 +339,10 @@ class HomepageFragment : Fragment() {
     @Suppress("UNCHECKED_CAST")
     private fun setupBannerView() {
         bannerViewPager =
-            viewDataBinding.bannerView as BannerViewPager<MegaBanner, BannerViewHolder>
+            viewDataBinding.bannerView as BannerViewPager<MegaBanner>
         bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
             .setScrollDuration(800)
             .setAutoPlay(false)
-//            .setCanLoop(false)
             .setLifecycleRegistry(lifecycle)
             .setIndicatorStyle(IndicatorStyle.CIRCLE)
             .setIndicatorSliderGap(Util.dp2px(6f))
@@ -361,29 +356,7 @@ class HomepageFragment : Fragment() {
                 ContextCompat.getColor(requireContext(), R.color.white)
             )
             .setOnPageClickListener(null)
-            .setAdapter(object : BaseBannerAdapter<MegaBanner, BannerViewHolder>() {
-                override fun createViewHolder(
-                    parent: ViewGroup,
-                    itemView: View?,
-                    viewType: Int
-                ): BannerViewHolder {
-                    return BannerViewHolder(itemView!!)
-                }
-
-                override fun onBind(
-                    holder: BannerViewHolder?,
-                    data: MegaBanner?,
-                    position: Int,
-                    pageSize: Int
-                ) {
-                    holder?.setViewModel(viewModel)
-                    holder?.bindData(data, position, pageSize)
-                }
-
-                override fun getLayoutId(viewType: Int): Int {
-                    return R.layout.item_banner_view
-                }
-            })
+            .setAdapter(BannerAdapter(viewModel))
             .create()
 
         viewModel.bannerList.observe(viewLifecycleOwner) {

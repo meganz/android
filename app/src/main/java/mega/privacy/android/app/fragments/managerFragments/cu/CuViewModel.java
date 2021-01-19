@@ -387,6 +387,7 @@ class CuViewModel extends BaseRxViewModel {
         }
         mRealNodeCount = realNodes.size();
 
+        // Fetch thumbnails of nodes in computation thread, fetching each in 50ms interval
         add(Observable.fromIterable(nodesWithoutThumbnail)
                 .zipWith(Observable.interval(Constants.GET_THUMBNAIL_THROTTLE_MS, TimeUnit.MILLISECONDS),
                         (node, interval) -> node)

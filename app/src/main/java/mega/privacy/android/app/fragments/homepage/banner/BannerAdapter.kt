@@ -3,49 +3,51 @@ package mega.privacy.android.app.fragments.homepage.banner
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat.startActivity
 import com.facebook.drawee.view.SimpleDraweeView
+import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
-import mega.privacy.android.app.utils.Constants
 import nz.mega.sdk.MegaBanner
 
-class BannerViewHolder(itemView: View) : BaseViewHolder<MegaBanner>(itemView) {
-    private lateinit var viewModel: HomePageViewModel
+class BannerAdapter(private var viewModel: HomePageViewModel)
+    : BaseBannerAdapter<MegaBanner>() {
 
-    override fun bindData(data: MegaBanner?, position: Int, pageSize: Int) {
-        val background: SimpleDraweeView = findView(R.id.draweeView_background)
-        val title: TextView = findView(R.id.textView_title)
-        val description: TextView = findView(R.id.textView_description)
-        val image: SimpleDraweeView = findView(R.id.draweeView_image)
+    override fun bindData(
+        holder: BaseViewHolder<MegaBanner>,
+        data: MegaBanner?,
+        position: Int,
+        pageSize: Int
+    ) {
+        val background: SimpleDraweeView = holder.findViewById(R.id.draweeView_background)
+        val title: TextView = holder.findViewById(R.id.textView_title)
+        val description: TextView = holder.findViewById(R.id.textView_description)
+        val image: SimpleDraweeView = holder.findViewById(R.id.draweeView_image)
 
         background.setImageURI(data?.imageLocation.plus(data?.backgroundImage))
         image.setImageURI(data?.imageLocation.plus(data?.image))
         title.text = data?.title
         description.text = data?.description
 
-        (findView(R.id.imageView_dismiss) as ImageView).setOnClickListener {
+        (holder.findViewById(R.id.imageView_dismiss) as ImageView).setOnClickListener {
             data?.run {
                 viewModel.dismissBanner(data)
             }
         }
 
         data?.url?.let { link ->
-            itemView.setOnClickListener {
-                actOnActionLink(itemView.context, link)
+            holder.itemView.setOnClickListener {
+                actOnActionLink(it.context, link)
             }
         }
     }
 
-    fun setViewModel(viewModel: HomePageViewModel) {
-        this.viewModel = viewModel
+    override fun getLayoutId(viewType: Int): Int {
+        return R.layout.item_banner_view
     }
 
     private fun actOnActionLink(context: Context, link: String) {
