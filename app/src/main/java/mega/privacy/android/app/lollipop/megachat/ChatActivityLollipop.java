@@ -504,15 +504,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void handleStoredData() {
-
         if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
             forwardMessages(preservedMessagesSelected, false, null);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
             setExportListener(exportListener);
             chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, isImportOption
-                        ? MULTIPLE_IMPORT_CONTACT_MESSAGES
-                        : MULTIPLE_FORWARD_MESSAGES);
+                    ? MULTIPLE_IMPORT_CONTACT_MESSAGES
+                    : MULTIPLE_FORWARD_MESSAGES);
 
             isForwardingFromNC = false;
             preservedMsgSelected = null;
@@ -4673,11 +4672,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         else {
                             if (allNodeAttachments && isOnline(chatActivity)) {
                                 menu.findItem(R.id.chat_cab_menu_download).setVisible(true);
-                                menu.findItem(R.id.chat_cab_menu_share).setVisible(true);
                                 if (chatC.isInAnonymousMode()) {
                                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(false);
+                                    menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                                     importIcon.setVisible(false);
                                 } else {
+                                    menu.findItem(R.id.chat_cab_menu_share).setVisible(shouldSharingOptionBeShown(ChatActivityLollipop.this, selected));
                                     menu.findItem(R.id.chat_cab_menu_offline).setVisible(true);
                                     importIcon.setVisible(true);
                                 }

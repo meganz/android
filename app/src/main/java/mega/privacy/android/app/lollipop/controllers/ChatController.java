@@ -1578,7 +1578,6 @@ public class ChatController {
         showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, 0);
     }
 
-
     public void importNode(long idMessage, long idChat, boolean needShareNode) {
         logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
@@ -1653,6 +1652,9 @@ public class ChatController {
     public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat, boolean isImportOption){
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
 
+        if(androidMessagesSelected == null || androidMessagesSelected.isEmpty())
+            return;
+
         for(int i = 0; i<androidMessagesSelected.size(); i++){
             messagesSelected.add(androidMessagesSelected.get(i).getMessage());
         }
@@ -1662,15 +1664,14 @@ public class ChatController {
 
     public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat, boolean isImportOption){
         logDebug("Number of messages: " + messagesSelected.size() + ",Chat ID: " + idChat);
+
         ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
         long[] idMessages = new long[messagesSelected.size()];
         for(int i=0; i<messagesSelected.size();i++){
             idMessages[i] = messagesSelected.get(i).getMsgId();
-
             logDebug("Type of message: "+ messagesSelected.get(i).getType());
             if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                if(messagesSelected.get(i).getUserHandle()!=megaChatApi.getMyUserHandle()){
-                    //Node has to be imported
+                if (isImportOption || (messagesSelected.get(i).getUserHandle() != megaChatApi.getMyUserHandle())) {
                     messagesToImport.add(messagesSelected.get(i));
                 }
             }
@@ -1699,7 +1700,13 @@ public class ChatController {
     }
 
     public void proceedWithForward(MegaNode myChatFilesFolder, ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport, long idChat, int action) {
-        ChatImportToForwardListener listener = new ChatImportToForwardListener(action, messagesSelected, messagesToImport.size(), context, this, idChat, exportListener);
+        ChatImportToForwardListener listener;
+        if(action == MULTIPLE_IMPORT_CONTACT_MESSAGES){
+            listener = new ChatImportToForwardListener(action, messagesSelected, messagesToImport.size(), context, this, idChat, exportListener);
+        }else{
+            listener = new ChatImportToForwardListener(action, messagesSelected, messagesToImport.size(), context, this, idChat);
+        }
+
         int errors = 0;
 
         for(int j=0; j<messagesToImport.size();j++){

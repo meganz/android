@@ -2,21 +2,17 @@ package mega.privacy.android.app.listeners;
 
 import android.content.Context;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import android.content.Intent;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -123,12 +119,40 @@ public class ExportListener extends BaseListener {
         this.exportedLinks = exportedLinks;
     }
 
-    public void updateNodeHandle(long msgID, long newNodeHandle){
-       long currentNodeHandle = getKeyByValue(msgIdNodeHandle, msgID);
-       msgIdNodeHandle.remove(currentNodeHandle);
-       msgIdNodeHandle.put(newNodeHandle, msgID);
+    /**
+     * Method for updating the handle of the node associated with a message.
+     * This is necessary when a node is to be shared and it is necessary to import the node into the cloud and use that node to get a share link.
+     *
+     * @param msgID         Message ID.
+     * @param newNodeHandle node Handle of a node imported.
+     */
+    public void updateNodeHandle(long msgID, long newNodeHandle) {
+        boolean isFoundAndRemoved = getKeyByValueAndRemoveIt(msgIdNodeHandle, msgID);
+        if (isFoundAndRemoved) {
+            msgIdNodeHandle.put(newNodeHandle, msgID);
+        }
     }
 
+    public void errorImportingNodes(long msgId) {
+        long nodeHandle = getKeyByValue(msgIdNodeHandle, msgId);
+        numberError++;
+        pendingExport--;
+        if (pendingExport == 0) {
+            logError(numberExport + " errors exporting nodes");
+            showSnackbar(context, context.getResources()
+                    .getQuantityString(R.plurals.context_link_export_error, numberExport));
+        }
+    }
+
+    /**
+     * Method to get the key in Map with the value and remove this entry.
+     *
+     * @param map   The Map.
+     * @param value The value.
+     * @param <T>   First param of the Map.
+     * @param <E>   Second param of the Map.
+     * @return True, if it has been found and removed. False, if not.
+     */
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (Objects.equals(value, entry.getValue())) {
@@ -136,6 +160,25 @@ public class ExportListener extends BaseListener {
             }
         }
         return null;
+    }
+
+    /**
+     * Method to get the key in Map with the value and remove this entry.
+     *
+     * @param map   The Map.
+     * @param value The value.
+     * @param <T>   First param of the Map.
+     * @param <E>   Second param of the Map.
+     * @return True, if it has been found and removed. False, if not.
+     */
+    public static <T, E> boolean getKeyByValueAndRemoveIt(Map<T, E> map, E value) {
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                map.remove(entry.getKey());
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -161,12 +204,12 @@ public class ExportListener extends BaseListener {
             return;
         }
 
-        if(request == null)
+        if(request == null || shareIntent == null)
             return;
 
         if (request.getLink() != null) {
-            if (shareIntent == null)
-                return;
+
+            logDebug("The link is not null");
 
             if (e.getErrorCode() != API_OK) {
                 numberError++;
@@ -175,7 +218,7 @@ public class ExportListener extends BaseListener {
                         .append("\n\n");
             }
 
-            if (numberError != 0) {
+            if (numberError > 0) {
                 logError(numberError + " errors exporting nodes");
                 showSnackbar(context, context.getResources()
                         .getQuantityString(R.plurals.context_link_export_error, numberExport));
@@ -183,29 +226,32 @@ public class ExportListener extends BaseListener {
             }
 
             if (exportedLinks == null) {
+                logDebug("Start share one item");
                 startShareIntent(context, shareIntent, request.getLink());
                 return;
             }
 
             pendingExport--;
             if (pendingExport == 0 && numberError < numberExport) {
+                logDebug("Start share several items");
                 startShareIntent(context, shareIntent, exportedLinks.toString());
             }
+
             return;
         }
 
         logError("Error exporting node: " + e.getErrorString());
 
         ChatController chatC = new ChatController(context);
-        if (messages != null && !messages.isEmpty()) {
-            messageId = msgIdNodeHandle.get(request.getNodeHandle());
-            logDebug("Several nodes to import to MEGA and export");
-            chatC.setExportListener(this);
-            chatC.importNode(messageId, chatId, true);
-        } else {
-            logDebug("One node to import to MEGA and export");
+        if(messages == null || messages.isEmpty()){
+            logDebug("One node to import to MEGA and then share");
             chatC.setExportListener(null);
-            chatC.importNode(messageId, chatId, true);
+        }else{
+            messageId = msgIdNodeHandle.get(request.getNodeHandle());
+            logDebug("Several nodes to import to MEGA and then share");
+            chatC.setExportListener(this);
         }
+
+        chatC.importNode(messageId, chatId, true);
     }
 }

@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Bundle;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Gravity;
@@ -37,7 +35,6 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -274,11 +271,14 @@ public class MegaNodeUtil {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
             String path = getLocalFile(context, node.getName(), node.getSize());
             if (!isTextEmpty(path) && !node.isFolder()) {
+                logDebug("Node is downloaded, so share the file");
                 shareFile(context, new File(path));
             } else if (node.isExported()) {
+                logDebug("Node is exported, so share the public link");
                 startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
             } else {
                 MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+                logDebug("Node is not exported, so export Node");
                 if (messageId == MEGACHAT_INVALID_HANDLE || chatId == MEGACHAT_INVALID_HANDLE) {
                     megaApi.exportNode(node, new ExportListener(context, new Intent(android.content.Intent.ACTION_SEND)));
                 } else {
@@ -286,6 +286,41 @@ public class MegaNodeUtil {
                 }
             }
         }
+    }
+
+    /**
+     * Method to check if all nodes should be shared in the same way.
+     *
+     * @param context      The Context of the Activity.
+     * @param msgsSelected The list of messages selected.
+     * @return True, if all nodes are downloaded or if all nodes should be shared via a link. False, if not.
+     */
+    public static boolean shouldSharingOptionBeShown(Context context, List<AndroidMegaChatMessage> msgsSelected) {
+        int nodesDownloaded = 0;
+        ArrayList<MegaNode> listNodes = new ArrayList<>();
+
+        for (AndroidMegaChatMessage androidMessage : msgsSelected) {
+            MegaNodeList nodeList = androidMessage.getMessage().getMegaNodeList();
+            if (nodeList == null || nodeList.size() == 0) continue;
+
+            MegaNode node = nodeList.get(0);
+            if (node == null) continue;
+
+            listNodes.add(node);
+        }
+
+        if (listNodes.isEmpty())
+            return false;
+
+        for (MegaNode node : listNodes) {
+            String path = node.isFolder() ? null
+                    : getLocalFile(context, node.getName(), node.getSize());
+            if (!isTextEmpty(path)) {
+                nodesDownloaded++;
+            }
+        }
+
+        return nodesDownloaded == 0 || nodesDownloaded == listNodes.size();
     }
 
     public static void shareChatMessages(Context context, ArrayList<AndroidMegaChatMessage> messagesSelected, long chatId){
@@ -320,7 +355,6 @@ public class MegaNodeUtil {
                return;
 
             shareNodesFromChat(context, messagesSelected, listNodes, chatId );
-
         }
     }
 
@@ -337,55 +371,87 @@ public class MegaNodeUtil {
                     : getLocalFile(context, node.getName(), node.getSize());
             if (isTextEmpty(path)) {
                 allDownloadedFiles = false;
-                break;
             } else {
                 downloadedFiles.add(new File(path));
             }
         }
+
         if (allDownloadedFiles) {
+            logDebug("Nodes are downloaded, so share the files");
             shareFiles(context, downloadedFiles);
             return;
         }
 
-        int notExportedNodes = 0;
+        /*Nodes are not downloaded*/
+        boolean allExportedNodes = true;
+        int nodesExported = 0;
         StringBuilder links = new StringBuilder();
         for (MegaNode node : nodes) {
             if (!node.isExported()) {
-                notExportedNodes++;
+                allExportedNodes = false;
             } else {
                 links.append(node.getPublicLink())
                         .append("\n\n");
+                nodesExported ++;
             }
         }
-        if (notExportedNodes == 0) {
+
+        if (allExportedNodes) {
+            logDebug("Nodes are exported, so share the public links");
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
                     links.toString());
             return;
         }
 
+        int nodesNotExported = 0;
+        ArrayList<MegaNode> arrayNodesNotExported = new ArrayList<>();
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
+
         if(messagesSelected == null || chatId == MEGACHAT_INVALID_HANDLE){
-
-            ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
-                    new Intent(android.content.Intent.ACTION_SEND));
-
             for (MegaNode node : nodes) {
                 if (!node.isExported()) {
-                    megaApi.exportNode(node, exportListener);
+                    arrayNodesNotExported.add(node);
+                    nodesNotExported ++;
                 }
             }
+
+            if (nodesNotExported > 0) {
+                logDebug("Nodes are not exported, so export Nodes");
+                ExportListener exportListener = new ExportListener(context, nodesNotExported, links, new Intent(android.content.Intent.ACTION_SEND));
+
+                for (MegaNode nodeNotExported : arrayNodesNotExported) {
+                    logDebug("Node is not exported, so export Node");
+                    megaApi.exportNode(nodeNotExported, exportListener);
+                }
+
+                return;
+            }
         }else{
-            ExportListener exportListener = new ExportListener(context, notExportedNodes, links,
-                    new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
 
             for(AndroidMegaChatMessage androidMessage : messagesSelected){
                 MegaNodeList nodeList = androidMessage.getMessage().getMegaNodeList();
-                if(nodeList == null || nodeList.size() == 0) continue;
+                if(nodeList == null || nodeList.size() == 0)
+                    continue;
 
                 MegaNode node = nodeList.get(0);
-                if (node == null) continue;
+                if (node == null)
+                    continue;
 
-                megaApi.exportNode(node, exportListener);
+                if (!node.isExported()) {
+                    arrayNodesNotExported.add(node);
+                    nodesNotExported ++;
+                }
+            }
+
+            if (nodesNotExported > 0) {
+                ExportListener exportListener = new ExportListener(context, nodesNotExported, links,
+                        new Intent(android.content.Intent.ACTION_SEND), messagesSelected, chatId);
+
+                for (MegaNode nodeNotExported : arrayNodesNotExported) {
+                    megaApi.exportNode(nodeNotExported, exportListener);
+                }
+
+                return;
             }
         }
     }

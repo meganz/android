@@ -11,6 +11,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaError;
@@ -46,9 +47,9 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
         this.exportListener = exportListener;
     }
 
-    int counter = 0;
+    int counter;
     int error = 0;
-    int actionListener = -1;
+    int actionListener;
     String message;
     long chatId;
     ArrayList<MegaChatMessage> messagesSelected;
@@ -113,18 +114,25 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                     }else if(actionListener == MULTIPLE_IMPORT_CONTACT_MESSAGES){
                         if (error <= 0 && context instanceof ChatActivityLollipop &&
                                 messagesSelected.get(0).getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+
                             MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(request.getNodeHandle());
                             if (node == null) {
                                 logWarning("Node is NULL");
                                 return;
                             }
 
-                            long msgId = messagesSelected.get(0).getMsgId();
-                            if(exportListener != null){
+                            if (exportListener != null) {
+                                long msgId = messagesSelected.get(0).getMsgId();
                                 exportListener.updateNodeHandle(msgId, node.getHandle());
                                 MegaApplication.getInstance().getMegaApi().exportNode(node, exportListener);
-                            }else{
+                            } else {
                                 MegaNodeUtil.shareNode(context, node);
+                            }
+                        }else{
+                            if(exportListener == null) {
+                                Util.showSnackbar(context, "This node cannot be shared");
+                            }else{
+                                exportListener.errorImportingNodes(messagesSelected.get(0).getMsgId());
                             }
                         }
                     }
