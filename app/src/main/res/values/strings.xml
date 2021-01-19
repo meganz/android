@@ -129,8 +129,8 @@
     </plurals>
 
     <plurals name="general_num_shared_with">
-        <item context="Indicates how many contacts a folder it is shared with. Singular. Shared with Pepe" quantity="one">Shared with %1$s</item>
-        <item context="indicates how many contacts a folder it is shared with. Plural. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Shared with %1$s</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
     </plurals>
 
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s will be downloaded.</string>
@@ -1041,8 +1041,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
 
     <plurals name="general_num_request">
-        <item context="referring to a invitation request in the Contacts section. Singular. 1 request" quantity="one">1 request</item>
-        <item context="referring to a invitation request in the Contacts section. Plural. 5 requests" quantity="other">%1$d requests</item>
+        <item context="Referring to a invitation request in the Contacts section. Singular." quantity="one">1 request</item>
+        <item context="Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests" quantity="other">%1$d requests</item>
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1067,8 +1067,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. Singular. 1 item" quantity="one">1 item</item>
-        <item context="Plural of items which contains a folder. Plural. 2 items" quantity="other">%1$d items</item>
+        <item context="Singular of items which contains a folder. Singular." quantity="one">1 item</item>
+        <item context="Plural of items which contains a folder. Plural. e.g. 2 items" quantity="other">%1$d items</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
@@ -2403,7 +2403,7 @@
     <string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
     <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file">1 folder . 1 file</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. 1 folder . 7 files">1 folder . %1$d files</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder . 7 files">1 folder . %1$d files</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d file</item>
@@ -2416,8 +2416,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is 1 folder and 1 file. Singular of file. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
-        <item context="Indicates the content of a folder is 1 folder and 1 file. Plural of file. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
