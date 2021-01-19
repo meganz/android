@@ -1040,7 +1040,7 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
 
     <plurals name="general_num_request">
-        <item context="referring to a invitation request in the Contacts section. Singular. 1 request" quantity="one">%1$d request</item>
+        <item context="referring to a invitation request in the Contacts section. Singular. 1 request" quantity="one">1 request</item>
         <item context="referring to a invitation request in the Contacts section. Plural. 5 requests" quantity="other">%1$d requests</item>
     </plurals>
 
@@ -1066,7 +1066,7 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. Singular. 1 item" quantity="one">%1$d item</item>
+        <item context="Singular of items which contains a folder. Singular. 1 item" quantity="one">1 item</item>
         <item context="Plural of items which contains a folder. Plural. 2 items" quantity="other">%1$d items</item>
     </plurals>
 
@@ -2415,7 +2415,7 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is 1 folder and 1 file. Singular of file. 7 folders . 1 file" quantity="one">%1$d folders . %2$d file</item>
+        <item context="Indicates the content of a folder is 1 folder and 1 file. Singular of file. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
         <item context="Indicates the content of a folder is 1 folder and 1 file. Plural of file. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
     </plurals>
 
