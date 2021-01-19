@@ -3699,6 +3699,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		supportInvalidateOptionsMenu();
 		selectDrawerItemLollipop(drawerItem);
+
+		setStatusBarColor(this, android.R.color.transparent);
 	}
 
 	void deleteCurrentFragment () {
@@ -3728,6 +3730,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		supportInvalidateOptionsMenu();
 		hideFabButton();
 		showHideBottomNavigationView(true);
+
+		setStatusBarColor(this, R.color.teal_500_teal_400);
 	}
 
 	void actionOpenFolder (long handleIntent) {

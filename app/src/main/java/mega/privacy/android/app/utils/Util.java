@@ -32,6 +32,7 @@ import android.os.Build;
 import android.os.Handler;
 
 import android.provider.MediaStore;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
@@ -61,7 +62,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -1362,19 +1362,43 @@ public class Util {
     }
 
 	/**
-	 * Reset the color of the status bar to the Theme setting
-	 * @param window
+	 * Draw activity content under status bar.
+	 * @param activity the activity
+	 * @param drawUnderStatusBar whether draw under status bar
 	 */
-	public static void resetStatusBarColor(Context context, Window window) {
-		if (context == null || window == null) return;
+	public static void setDrawUnderStatusBar(Activity activity, boolean drawUnderStatusBar) {
+		Window window = activity.getWindow();
+		if (window == null) {
+			return;
+		}
 
-		TypedValue typedValue = new TypedValue();
-		context.getTheme().resolveAttribute(
-				android.R.attr.statusBarColor, typedValue, true);
+		if (drawUnderStatusBar) {
+			int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+			if (Util.isDarkMode(activity)) {
+				visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+			} else {
+				// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+				visibility |= 0x00002000 | 0x00000010;
+			}
+			window.getDecorView().setSystemUiVisibility(visibility);
+			window.setStatusBarColor(Color.TRANSPARENT);
+		} else {
+			ColorUtils.setStatusBarTextColor(activity);
+		}
+	}
 
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.setStatusBarColor(typedValue.data);
+	/**
+	 * Set status bar color.
+	 * @param activity the activity
+	 * @param color color of the status bar
+	 */
+	public static void setStatusBarColor(Activity activity, @ColorRes int color) {
+		Window window = activity.getWindow();
+		if (window == null) {
+			return;
+		}
+
+		window.setStatusBarColor(ContextCompat.getColor(activity, color));
 	}
 
 	public static int getStatusBarHeight() {

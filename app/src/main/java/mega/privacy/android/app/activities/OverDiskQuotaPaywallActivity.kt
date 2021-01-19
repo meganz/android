@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -25,7 +24,7 @@ import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
 import mega.privacy.android.app.utils.LogUtil.logInfo
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils.*
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
 import java.util.concurrent.TimeUnit
 
 class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
@@ -60,14 +59,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
 
-        window?.decorView?.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or if (Util.isDarkMode(this)) {
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            } else {
-                // View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                0x00002000 or 0x00000010
-            }
-        window?.statusBarColor = Color.TRANSPARENT
+        setDrawUnderStatusBar(this, true)
 
         scrollContentLayout = findViewById(R.id.scroll_content_layout)
 

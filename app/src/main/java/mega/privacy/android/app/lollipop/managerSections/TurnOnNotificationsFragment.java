@@ -3,9 +3,9 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +16,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -68,58 +69,45 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
         thirdText = (TextView) v.findViewById(R.id.third_text);
         fourthText = (TextView) v.findViewById(R.id.fourth_text);
 
-        String textToShow = String.format(getString(R.string.turn_on_notifications_first_step));
+        String textToShow = getString(R.string.turn_on_notifications_first_step);
         try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#ffffff\'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.white_black)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
         }
         catch (Exception e){}
-        Spanned result = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        firstText.setText(result);
+        firstText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        textToShow = String.format(getString(R.string.turn_on_notifications_second_step));
+        textToShow = getString(R.string.turn_on_notifications_second_step);
         try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#ffffff\'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.white_black)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
         }
         catch (Exception e){}
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        secondText.setText(result);
+        secondText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        textToShow = String.format(getString(R.string.turn_on_notifications_third_step));
+        textToShow = getString(R.string.turn_on_notifications_third_step);
         try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#ffffff\'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.white_black)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
         }
         catch (Exception e){}
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        thirdText.setText(result);
+        thirdText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        textToShow = String.format(getString(R.string.turn_on_notifications_fourth_step));
+        textToShow = getString(R.string.turn_on_notifications_fourth_step);
         try{
-            textToShow = textToShow.replace("[A]", "<font color=\'#ffffff\'>");
+            textToShow = textToShow.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.white_black)
+                    + "\'>");
             textToShow = textToShow.replace("[/A]", "</font>");
         }
         catch (Exception e){}
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-        fourthText.setText(result);
+        fourthText.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
         return v;
     }

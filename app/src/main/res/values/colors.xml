@@ -294,6 +294,7 @@
     <color name="grey_alpha_050">#80000000</color>
     <color name="grey_alpha_054">#89000000</color>
     <color name="grey_alpha_060">#99000000</color>
+    <color name="grey_alpha_070">#B3000000</color>
     <color name="grey_alpha_087">#DD000000</color>
 
     <color name="teal_200">#6DD2BF</color>
@@ -438,6 +439,15 @@
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/white_alpha_087</color>
 
+    <!-- Turn on notification title text color -->
+    <color name="white_grey_087">@color/white</color>
+
+    <!-- Turn on notification subtitle text color -->
+    <color name="grey_087_grey_070">@color/grey_alpha_087</color>
+
+    <!-- Turn on notification bullet text color -->
+    <color name="grey_900_grey_700">@color/grey_900</color>
+
     <!-- Same to textColorSecondary -->
     <color name="grey_054_white_054">@color/grey_alpha_054</color>
 
@@ -539,6 +549,9 @@
 
     <!-- Same to colorSecondary -->
     <color name="teal_300_teal_200">@color/teal_300</color>
+
+    <!-- Turn on notification screen background -->
+    <color name="teal_500_teal_400">@color/teal_500</color>
 
     <!-- "Contact" title in Notifications Screen -->
     <color name="jade_600_jade_300">@color/jade_600</color>

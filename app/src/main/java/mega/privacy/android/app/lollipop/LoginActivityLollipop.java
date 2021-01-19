@@ -277,7 +277,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, loginFragment);
                 ft.commitNowAllowingStateLoss();
 
-                setDrawUnderStatusBar(false);
+                setDrawUnderStatusBar(this, false);
                 break;
             }
             case CHOOSE_ACCOUNT_FRAGMENT: {
@@ -291,7 +291,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                setDrawUnderStatusBar(false);
+                setDrawUnderStatusBar(this, false);
                 break;
             }
             case CREATE_ACCOUNT_FRAGMENT: {
@@ -305,7 +305,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 ft.replace(R.id.fragment_container_login, createAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
-                setDrawUnderStatusBar(false);
+                setDrawUnderStatusBar(this, false);
                 break;
 
             }
@@ -323,7 +323,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, tourFragment).commitNowAllowingStateLoss();
 
-                setDrawUnderStatusBar(true);
+                setDrawUnderStatusBar(this, true);
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
@@ -341,7 +341,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 
-                setDrawUnderStatusBar(false);
+                setDrawUnderStatusBar(this, false);
                 break;
             }
         }
@@ -354,27 +354,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     @Override
     protected boolean shouldSetStatusBarTextColor() {
         return false;
-    }
-
-    private void setDrawUnderStatusBar(boolean drawUnderStatusBar) {
-        Window window = getWindow();
-        if (window == null) {
-            return;
-        }
-
-        if (drawUnderStatusBar) {
-            int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-            if (Util.isDarkMode(this)) {
-                visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-            } else {
-                // View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-                visibility |= 0x00002000 | 0x00000010;
-            }
-            window.getDecorView().setSystemUiVisibility(visibility);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        } else {
-            ColorUtils.setStatusBarTextColor(this);
-        }
     }
 
     public Intent getIntentReceived() {
@@ -711,7 +690,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         aB.setDisplayHomeAsUpEnabled(true);
 
         if (visibleFragment == LOGIN_FRAGMENT) {
-            setDrawUnderStatusBar(false);
+            setDrawUnderStatusBar(this, false);
         }
     }
 

@@ -41,6 +41,15 @@
     <!-- call in progress text color -->
     <color name="white_087_grey_087">@color/grey_alpha_087</color>
 
+    <!-- Turn on notification title text color -->
+    <color name="white_grey_087">@color/grey_alpha_087</color>
+
+    <!-- Turn on notification subtitle text color -->
+    <color name="grey_087_grey_070">@color/grey_alpha_070</color>
+
+    <!-- Turn on notification bullet text color -->
+    <color name="grey_900_grey_700">@color/grey_700</color>
+
     <color name="white_black">@color/black</color>
 
     <!-- Emoji keyboard background -->
@@ -157,6 +166,9 @@
 
     <!-- Same to colorSecondary -->
     <color name="teal_300_teal_200">@color/teal_200</color>
+
+    <!-- Turn on notification screen background -->
+    <color name="teal_500_teal_400">@color/teal_400</color>
 
     <!-- "Contact" title in Notifications Screen -->
     <color name="jade_600_jade_300">@color/jade_300</color>

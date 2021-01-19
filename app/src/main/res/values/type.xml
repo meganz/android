@@ -45,16 +45,20 @@
         <item name="android:textColor">@color/grey_012_white_012</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant4">
+        <item name="android:textColor">@color/grey_087_grey_070</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red">
         <item name="android:textColor">@color/red_600_red_300</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Red.18">
-        <item name="textSize">18sp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Red.20">
-        <item name="textSize">20sp</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Error">
@@ -113,13 +117,29 @@
 
     <!-- Medium, normal, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant2">
-        <item name="textSize">18sp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Medium, normal, 20sp, 0px, white - black 87% -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant3">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/white_grey_087</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, grey_900 - grey_700 -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant4">
+        <item name="android:textColor">@color/grey_900_grey_700</item>
+    </style>
+
+    <!-- Medium, normal, 16sp, 0px, white - black -->
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant5">
+        <item name="android:textColor">@color/white_black</item>
     </style>
 
     <!-- Bold, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Bold">
-        <item name="textSize">18sp</item>
-        <item name="textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <!--===============  Subtitle 2 =====================-->
