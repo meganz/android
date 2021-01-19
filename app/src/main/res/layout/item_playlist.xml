@@ -23,7 +23,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@{highlight ? @color/audio_player_main_bg : @color/audio_player_controller_bg }"
+        android:background="@{highlight ? @color/adapters_background : @color/navigation_drawer_background }"
         android:onClick="@{() -> itemOperation.onItemClick(item)}">
 
         <com.facebook.drawee.view.SimpleDraweeView

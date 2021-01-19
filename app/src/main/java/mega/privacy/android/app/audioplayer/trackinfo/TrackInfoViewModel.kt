@@ -244,7 +244,12 @@ class TrackInfoViewModel @ViewModelInject constructor(
         }
     }
 
-    fun toggleAvailableOffline(available: Boolean) {
+    /**
+     * Make a node available offline, or remove it from offline.
+     *
+     * @param available whether this node should be available offline
+     */
+    fun makeAvailableOffline(available: Boolean) {
         val args = trackInfoArgs ?: return
 
         add(

@@ -79,20 +79,21 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (offlineNodeSaver.handleActivityResult(requestCode, resultCode, data)
             || megaNodeSaver.handleActivityResult(requestCode, resultCode, data)
+            || resultCode != RESULT_OK || data == null
         ) {
             return
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK && data != null) {
-            handleSelectChatResult(data)
-        } else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK
-            && data != null
-        ) {
-            handleMoveResult(data)
-        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK
-            && data != null
-        ) {
-            handleCopyResult(data)
+        when (requestCode) {
+            REQUEST_CODE_SELECT_CHAT -> {
+                handleSelectChatResult(data)
+            }
+            REQUEST_CODE_SELECT_MOVE_FOLDER -> {
+                handleMoveResult(data)
+            }
+            REQUEST_CODE_SELECT_COPY_FOLDER -> {
+                handleCopyResult(data)
+            }
         }
     }
 

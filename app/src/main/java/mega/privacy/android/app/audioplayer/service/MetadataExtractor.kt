@@ -21,10 +21,13 @@ class MetadataExtractor(
         super.onTracksChanged(trackGroups, trackSelections)
 
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo ?: return
+
         for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
             val trackSelection = trackSelections[rendererIndex] ?: continue
+
             for (selectionIndex in 0 until trackSelection.length()) {
                 val metadata = trackSelection.getFormat(selectionIndex).metadata
+
                 if (metadata != null) {
                     extractMetadata(metadata)
                     return
@@ -39,8 +42,10 @@ class MetadataExtractor(
         var title: String? = null
         var artist: String? = null
         var album: String? = null
+
         for (i in 0 until metadata.length()) {
             val entry = metadata.get(i)
+
             if (entry is TextInformationFrame) {
                 when {
                     entry.id.startsWith(ID3_TITLE_PREFIX) -> {

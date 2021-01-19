@@ -16,7 +16,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:background="@{highlight ? @color/audio_player_main_bg : @color/audio_player_controller_bg }">
+        android:background="@{highlight ? @color/adapters_background : @color/navigation_drawer_background }">
 
         <TextView
             android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="72dp"
             android:text="@{name}"
-            android:textColor="@color/teal_300"
+            android:textColor="@color/ic_mic_unread_message"
             android:textSize="14sp"
             tools:text="Now Playing" />
     </FrameLayout>

@@ -55,9 +55,11 @@ public class ExposedShuffleOrder implements ShuffleOrder {
         this.shuffled = shuffled;
         this.random = random;
         this.indexInShuffled = new int[shuffled.length];
+
         for (int i = 0; i < shuffled.length; i++) {
             indexInShuffled[shuffled[i]] = i;
         }
+
         this.listener = listener;
 
         listener.onShuffleChanged(this);
@@ -94,22 +96,26 @@ public class ExposedShuffleOrder implements ShuffleOrder {
     public ShuffleOrder cloneAndInsert(int insertionIndex, int insertionCount) {
         int[] insertionPoints = new int[insertionCount];
         int[] insertionValues = new int[insertionCount];
+
         for (int i = 0; i < insertionCount; i++) {
             insertionPoints[i] = random.nextInt(shuffled.length + 1);
             int swapIndex = random.nextInt(i + 1);
             insertionValues[i] = insertionValues[swapIndex];
             insertionValues[swapIndex] = i + insertionIndex;
         }
+
         Arrays.sort(insertionPoints);
         int[] newShuffled = new int[shuffled.length + insertionCount];
         int indexInOldShuffled = 0;
         int indexInInsertionList = 0;
+
         for (int i = 0; i < shuffled.length + insertionCount; i++) {
             if (indexInInsertionList < insertionCount
                     && indexInOldShuffled == insertionPoints[indexInInsertionList]) {
                 newShuffled[i] = insertionValues[indexInInsertionList++];
             } else {
                 newShuffled[i] = shuffled[indexInOldShuffled++];
+
                 if (newShuffled[i] >= insertionIndex) {
                     newShuffled[i] += insertionCount;
                 }
@@ -123,6 +129,7 @@ public class ExposedShuffleOrder implements ShuffleOrder {
         int numberOfElementsToRemove = indexToExclusive - indexFrom;
         int[] newShuffled = new int[shuffled.length - numberOfElementsToRemove];
         int foundElementsCount = 0;
+
         for (int i = 0; i < shuffled.length; i++) {
             if (shuffled[i] >= indexFrom && shuffled[i] < indexToExclusive) {
                 foundElementsCount++;
@@ -131,6 +138,7 @@ public class ExposedShuffleOrder implements ShuffleOrder {
                         shuffled[i] >= indexFrom ? shuffled[i] - numberOfElementsToRemove : shuffled[i];
             }
         }
+
         return new ExposedShuffleOrder(newShuffled, new Random(random.nextLong()), listener);
     }
 
@@ -141,11 +149,13 @@ public class ExposedShuffleOrder implements ShuffleOrder {
 
     private static int[] createShuffledList(int length, Random random) {
         int[] shuffled = new int[length];
+
         for (int i = 0; i < length; i++) {
             int swapIndex = random.nextInt(i + 1);
             shuffled[i] = shuffled[swapIndex];
             shuffled[swapIndex] = i;
         }
+
         return shuffled;
     }
 

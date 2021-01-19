@@ -6187,6 +6187,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			miniAudioPlayerController.setShouldVisible(shouldVisible);
 			return miniAudioPlayerController.isVisible();
 		}
+
 		return false;
 	}
 

@@ -31,7 +31,7 @@ class TrackInfoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentAudioTrackInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -87,7 +87,7 @@ class TrackInfoFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.toggleAvailableOffline(isChecked)
+            viewModel.makeAvailableOffline(isChecked)
         }
 
         viewModel.loadTrackInfo(args)

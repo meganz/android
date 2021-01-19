@@ -495,7 +495,7 @@ class AudioPlayerActivity : BaseActivity() {
         viewModel.handleActivityResult(requestCode, resultCode, data)
     }
 
-    fun showSnackbar(type: Int, content: String, chatId: Long) {
+    fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.rootLayout, content, chatId)
     }
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/audio_player_main_bg">
+    tools:background="@color/adapters_background">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_toolbar"
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textColor="@color/white_60_opacity"
+        android:textColor="@color/text_tab_alpha"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textColor="@color/white_60_opacity"
+        android:textColor="@color/text_tab_alpha"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textColor="@color/teal_300"
+        android:textColor="@color/ic_mic_unread_message"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +89,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
-        android:background="@color/audio_player_controller_bg"
+        android:background="@color/navigation_drawer_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -172,7 +172,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textAllCaps="true"
-        android:textColor="@color/teal_300"
+        android:textColor="@color/ic_mic_unread_message"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="@id/divider"
         app:layout_constraintTop_toBottomOf="@id/location_title"

@@ -227,6 +227,40 @@ public class OfflineUtils {
         }
     }
 
+    /**
+     * Get folder name of an offline node, or `Offline` if it's in root offline folder.
+     *
+     * @param context Android context
+     * @param handle handle of the offline node
+     */
+    public static String getOfflineFolderName(Context context, long handle) {
+        DatabaseHandler dbHandler = DatabaseHandler.getDbHandler(context);
+
+        MegaOffline node = dbHandler.findByHandle(handle);
+        if (node == null) {
+            return "";
+        }
+
+        File file = getOfflineFile(context, node);
+        if (!file.exists()) {
+            return "";
+        }
+
+        File parentFile = file.getParentFile();
+        if (parentFile == null) {
+            return "";
+        }
+
+        File grandParentFile = parentFile.getParentFile();
+        if ((grandParentFile != null && OFFLINE_INBOX_DIR.equals(grandParentFile.getName()
+                + File.separator + parentFile.getName()))
+                || OFFLINE_DIR.equals(parentFile.getName())) {
+            return context.getString(R.string.section_saved_for_offline_new);
+        } else {
+            return parentFile.getName();
+        }
+    }
+
     public static File getOfflineFile(Context context, MegaOffline offlineNode) {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
         if (offlineNode.isFolder()) {

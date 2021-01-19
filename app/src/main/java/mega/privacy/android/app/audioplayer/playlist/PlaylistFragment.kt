@@ -53,7 +53,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentAudioPlaylistBinding.inflate(inflater, container, false)
         return binding.root
     }

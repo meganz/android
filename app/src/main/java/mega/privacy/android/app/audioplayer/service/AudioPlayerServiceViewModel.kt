@@ -1,6 +1,5 @@
 package mega.privacy.android.app.audioplayer.service
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -25,9 +24,7 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
-import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
+import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TextUtil
@@ -192,7 +189,9 @@ class AudioPlayerServiceViewModel(
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {
-                setupStreamingServer(if (type == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi)
+                setupStreamingServer(
+                    if (type == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi, context
+                )
             }
 
             compositeDisposable.add(
@@ -200,7 +199,7 @@ class AudioPlayerServiceViewModel(
                     .fromCallable(Callable {
                         when (type) {
                             OFFLINE_ADAPTER -> {
-                                playlistTitle = getOfflineFolderName(firstPlayHandle)
+                                playlistTitle = getOfflineFolderName(context, firstPlayHandle)
 
                                 buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                             }
@@ -453,33 +452,11 @@ class AudioPlayerServiceViewModel(
         }
     }
 
-    /**
-     * Setup SDK HTTP streaming server.
-     *
-     * @param api MegaApiAndroid instance to use
-     */
-    private fun setupStreamingServer(api: MegaApiAndroid) {
-        if (api.httpServerIsRunning() == 0) {
-            api.httpServerStart()
-
-            val memoryInfo = ActivityManager.MemoryInfo()
-            val activityManager =
-                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.getMemoryInfo(memoryInfo)
-
-            if (memoryInfo.totalMem > BUFFER_COMP) {
-                api.httpServerSetMaxBufferSize(MAX_BUFFER_32MB)
-            } else {
-                api.httpServerSetMaxBufferSize(MAX_BUFFER_16MB)
-            }
-        }
-    }
-
     private fun buildPlaylistFromOfflineNodes(intent: Intent, firstPlayHandle: Long) {
         val nodes = intent.getParcelableArrayListExtra<MegaOffline>(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
             ?: return
 
-        buildPlaylistFromNodes(
+        doBuildPlaylist(
             megaApi, nodes, firstPlayHandle,
             {
                 isFileAvailable(getOfflineFile(context, it))
@@ -499,25 +476,6 @@ class AudioPlayerServiceViewModel(
                 getThumbnailFile(context, it)
             }
         )
-    }
-
-    private fun getOfflineFolderName(handle: Long): String {
-        val node = dbHandler.findByHandle(handle) ?: return ""
-        val file = getOfflineFile(context, node)
-        if (!file.exists()) {
-            return ""
-        }
-
-        val parentName = file.parentFile?.name ?: return ""
-        val grandParentName = file.parentFile?.parentFile?.name
-        return when {
-            grandParentName != null
-                    && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR ->
-                context.getString(R.string.section_saved_for_offline_new)
-            parentName == OfflineUtils.OFFLINE_DIR ->
-                context.getString(R.string.section_saved_for_offline_new)
-            else -> parentName
-        }
     }
 
     private fun buildPlaylistFromHandles(intent: Intent, firstPlayHandle: Long) {
@@ -553,7 +511,7 @@ class AudioPlayerServiceViewModel(
     }
 
     private fun buildPlaylistFromFiles(files: List<File>, firstPlayHandle: Long) {
-        buildPlaylistFromNodes(
+        doBuildPlaylist(
             megaApi, files, firstPlayHandle,
             {
                 it.isFile && MimeTypeList.typeForName(it.name).isAudio
@@ -579,7 +537,7 @@ class AudioPlayerServiceViewModel(
         nodes: List<MegaNode>,
         firstPlayHandle: Long
     ) {
-        buildPlaylistFromNodes(
+        doBuildPlaylist(
             api, nodes, firstPlayHandle,
             {
                 MimeTypeList.typeForName(it.name).isAudio
@@ -622,7 +580,7 @@ class AudioPlayerServiceViewModel(
         )
     }
 
-    private fun <T> buildPlaylistFromNodes(
+    private fun <T> doBuildPlaylist(
         api: MegaApiAndroid,
         nodes: List<T>,
         firstPlayHandle: Long,

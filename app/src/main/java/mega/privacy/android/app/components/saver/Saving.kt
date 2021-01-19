@@ -9,6 +9,11 @@ abstract class Saving(
     var unsupportedFileName = ""
         protected set
 
+    /**
+     * Check if there is any unsupported file in this Saving.
+     *
+     * @param context Android context
+     */
     abstract fun hasUnsupportedFile(context: Context): Boolean
 
     companion object {

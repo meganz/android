@@ -83,7 +83,7 @@ class AudioPlayerFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -149,8 +149,7 @@ class AudioPlayerFragment : Fragment() {
                     MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
                         .setCancelable(false)
                         .setMessage(
-                            if (isOnline(requireContext()))
-                                R.string.unsupported_file_type
+                            if (isOnline(requireContext())) R.string.unsupported_file_type
                             else R.string.error_fail_to_open_file_no_network
                         )
                         .setPositiveButton(
@@ -319,7 +318,7 @@ class AudioPlayerFragment : Fragment() {
         bgPlayHint.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
-                if (enabled) R.color.teal_200 else R.color.white_60_opacity
+                if (enabled) R.color.teal_200 else R.color.text_tab_alpha
             )
         )
         bgPlayHint.setText(
