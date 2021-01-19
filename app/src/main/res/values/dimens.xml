@@ -99,5 +99,10 @@
     <dimen name="audio_player_playlist_controller_height">106dp</dimen>
     <dimen name="audio_player_mini_controller_height">64dp</dimen>
 
+    <dimen name="playlist_non_default_thumbnail_size">36dp</dimen>
+    <dimen name="playlist_non_default_thumbnail_margin_start">18dp</dimen>
+    <dimen name="playlist_default_thumbnail_size">48dp</dimen>
+    <dimen name="playlist_default_thumbnail_margin_start">12dp</dimen>
+
     <dimen name="bottom_navigation_view_height">56dp</dimen>
 </resources>

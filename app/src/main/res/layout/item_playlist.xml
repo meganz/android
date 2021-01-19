@@ -27,10 +27,10 @@
         android:onClick="@{() -> itemOperation.onItemClick(item)}">
 
         <com.facebook.drawee.view.SimpleDraweeView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="12dp"
             android:scaleType="fitCenter"
             app:apDefaultThumbnail="@{MimeTypeList.typeForName(item.nodeName).iconResourceId}"
             app:roundedCornerRadius="4dp"
