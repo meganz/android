@@ -7,7 +7,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.NumberPicker.OnValueChangeListener
+import android.widget.NumberPicker
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -29,7 +29,6 @@ import nz.mega.sdk.MegaChatRoom
 import java.util.*
 
 class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
-
     companion object {
         private const val OPTION_HOURS = 0
         private const val OPTION_DAYS = 1
@@ -64,18 +63,6 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             updateRetentionTimeUI(seconds)
         }
     }
-
-    private var onValueChangeListenerPickerNumber =
-        OnValueChangeListener { _, oldValue, newValue ->
-            updateTextPicker(oldValue, newValue)
-            updateOptionsAccordingly()
-        }
-
-    private var onValueChangeListenerPickerText =
-        OnValueChangeListener { textPicker, _, _ ->
-            updateNumberPicker(textPicker.value)
-            updateOptionsAccordingly()
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,9 +138,23 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             val seconds = chat!!.retentionTime
             updateRetentionTimeUI(seconds)
 
-            binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
-            binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
+            binding.numberPicker.setOnScrollListener(onScrollListenerPickerNumber)
+            binding.textPicker.setOnScrollListener(onScrollListenerPickerText)
             binding.pickerButton.setOnClickListener(this)
+        }
+    }
+
+    private var onScrollListenerPickerNumber = NumberPicker.OnScrollListener { view, scrollState ->
+        if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE) {
+            fillPickerText(view.value)
+            updateOptionsAccordingly()
+        }
+    }
+
+    private var onScrollListenerPickerText = NumberPicker.OnScrollListener { view, scrollState ->
+        if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE) {
+            updateNumberPicker(view.value)
+            updateOptionsAccordingly()
         }
     }
 
