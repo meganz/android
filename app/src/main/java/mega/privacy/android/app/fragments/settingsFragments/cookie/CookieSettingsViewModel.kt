@@ -11,7 +11,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
-import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
 
 class CookieSettingsViewModel @ViewModelInject constructor(
@@ -74,8 +74,8 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                     enabledCookies.postValue(configuration.toMutableSet())
                 },
                 onError = { error ->
+                    logError(error.stackTraceToString())
                     resetCookies()
-                    logDebug(error.stackTraceToString())
                 }
             )
             .addTo(composite)
@@ -93,7 +93,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                     updateResult.postValue(true)
                 },
                 onError = { error ->
-                    logDebug(error.stackTraceToString())
+                    logError(error.stackTraceToString())
                     updateResult.postValue(false)
                 }
             )

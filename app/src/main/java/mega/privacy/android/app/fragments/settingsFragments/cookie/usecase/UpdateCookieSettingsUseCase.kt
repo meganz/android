@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.app.utils.LogUtil.*
 import nz.mega.sdk.*
 import java.util.*
 import javax.inject.Inject
@@ -55,8 +56,7 @@ class UpdateCookieSettingsUseCase @Inject constructor(
                     request: MegaRequest,
                     error: MegaError
                 ) {
-                    megaApi.removeRequestListener(this)
-                    emitter.onError(error.toThrowable())
+                    logError(error.toThrowable().stackTraceToString())
                 }
             }
 
