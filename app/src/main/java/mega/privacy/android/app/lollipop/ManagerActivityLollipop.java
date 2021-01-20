@@ -224,6 +224,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
 import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -4796,7 +4797,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param psa the PSA to show
 	 */
     private void showPsa(Psa psa) {
-        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+        if (psa == null || drawerItem != DrawerItem.HOMEPAGE
+				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
+        	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
+        	adjustNavHostViewHeight(true);
             return;
         }
 
@@ -4809,6 +4813,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 
         psaViewHolder.bind(psa);
+		adjustNavHostViewHeight(true);
     }
 
     public void checkBeforeShowSMSVerificationDialog() {
@@ -5710,7 +5715,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
 
-    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
+		updatePsaViewVisibility();
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
@@ -5790,6 +5795,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (destinationId == R.id.homepageFragment) {
 				mHomepageScreen = HomepageScreen.HOMEPAGE;
+				updatePsaViewVisibility();
 				// Showing the bottom navigation view immediately because the initial dimension
 				// of Homepage bottom sheet is calculated based on it
 				showBNVImmediate();
@@ -5810,6 +5816,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 			} else if (destinationId == R.id.offline_file_info) {
 				mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+				updatePsaViewVisibility();
 				abL.setVisibility(View.GONE);
 				showHideBottomNavigationView(true);
 				return;
@@ -5817,6 +5824,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
 			supportInvalidateOptionsMenu();
@@ -8028,6 +8036,44 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
+    /**
+	 * Update the PSA view visibility. It should only visible in root homepage tab.
+	 */
+    private void updatePsaViewVisibility() {
+		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
+				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
+		adjustNavHostViewHeight(true);
+	}
+
+    /**
+	 * Adjust the height of NavHostView according to the visibility of the PSA view.
+	 * When the PSA view is visible, the FAB within homepage should be displayed above
+	 * the PSA view, limit the height of NavHostView is an easier way to do that.
+	 *
+	 * @param needPost in some cases, e.g. go back from transfer fragment, the BNV isn't visible
+	 *                 when we call this function, so we need post this function call to the
+	 *                 next draw cycle.
+	 */
+    private void adjustNavHostViewHeight(boolean needPost) {
+    	if (drawerItem != DrawerItem.HOMEPAGE) {
+    		return;
+		}
+
+    	if (psaViewHolder.visible()) {
+    		if (fragmentLayout.getMeasuredHeight() <= 0 || psaViewHolder.psaLayoutHeight() <= 0 || needPost) {
+    			handler.post(() -> adjustNavHostViewHeight(false));
+			} else {
+				LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+				params.height = fragmentLayout.getMeasuredHeight() - psaViewHolder.psaLayoutHeight();
+				mNavHostView.setLayoutParams(params);
+			}
+		} else {
+    		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+    		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+    		mNavHostView.setLayoutParams(params);
+		}
+	}
+
 	private void closeUpgradeAccountFragment() {
 		setFirstNavigationLevel(true);
 		displayedAccountType = -1;
@@ -8144,13 +8190,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.bottom_navigation_item_shared_items: {
 				if (drawerItem == DrawerItem.SHARED_ITEMS) {
-					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
-						parentHandleIncoming = -1;
+					if (getTabItemShares() == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE) {
+						parentHandleIncoming = INVALID_HANDLE;
 						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
-						parentHandleOutgoing = -1;
+					} else if (getTabItemShares() == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE){
+						parentHandleOutgoing = INVALID_HANDLE;
 						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					} else if (getTabItemShares() == LINKS_TAB && parentHandleLinks != INVALID_HANDLE) {
+						parentHandleLinks = INVALID_HANDLE;
+						refreshFragment(FragmentTag.LINKS.getTag());
 					}
+
 					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
@@ -8521,9 +8571,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
+		LinksUtil.showGetLinkActivity(this, handle);
 
 		refreshAfterMovingToRubbish();
 	}

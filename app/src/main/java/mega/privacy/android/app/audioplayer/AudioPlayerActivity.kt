@@ -25,12 +25,12 @@ import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
@@ -397,9 +397,7 @@ class AudioPlayerActivity : BaseActivity() {
                 ) {
                     return true
                 }
-                val intent = Intent(this, GetLinkActivityLollipop::class.java)
-                intent.putExtra(HANDLE, playingHandle)
-                startActivity(intent)
+                LinksUtil.showGetLinkActivity(this, playingHandle)
                 return true
             }
             R.id.remove_link -> {
