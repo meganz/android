@@ -81,8 +81,8 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     /**
      * Sets the initial state of a BottomSheet and its state.
      *
-     * @param heightHeader              height of the header
-     * @param addBottomSheetCallBack    true if it should add a BottomsheetCallback, false otherwise
+     * @param heightHeader           Height of the header.
+     * @param addBottomSheetCallBack True if it should add a BottomsheetCallback, false otherwise.
      */
     protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
@@ -153,43 +153,39 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     /**
      * Gets the initial height of a BottomSheet.
-     * It depends on the number of options visibles on it
-     * and on the display height and current orientation of the used device.
+     * It depends on the number of visible options on it, the display height
+     * and current orientation of the used device.
      * The maximum height will be a bit more than half of the screen.
      *
-     * @return  The initial height of a BottomSheet
+     * @return The initial height of a BottomSheet.
      */
     private int getPeekHeight() {
-        int numOptions = items_layout.getChildCount();
         int numVisibleOptions = 0;
         int heightChild = dp2px(viewType == DEFAULT_VIEW_TYPE ? HEIGHT_CHILD : HEIGHT_RADIO_GROUP_VIEW, outMetrics);
         int peekHeight = dp2px(heightHeader, outMetrics);
 
-        for (int i = 0; i < numOptions; i++) {
-            if (getItemsLayoutChildAt(i).getVisibility() == VISIBLE) {
+        for (int i = 0; i < items_layout.getChildCount(); i++) {
+            if (isChildVisibleAt(i)) {
                 numVisibleOptions++;
             }
         }
 
-        if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE) || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
-            return peekHeight + (heightChild * numOptions);
+        if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE)
+                || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
+            return peekHeight + (heightChild * numVisibleOptions);
         } else {
-            for (int i = 0; i < numOptions; i++) {
-                if (isChildVisibleAt(i) && peekHeight < halfHeightDisplay) {
+            for (int i = 1; i <= numVisibleOptions; i++) {
+                if (peekHeight < halfHeightDisplay) {
                     peekHeight += heightChild;
 
                     if (peekHeight >= halfHeightDisplay) {
-                        if (getItemsLayoutChildAt(i + 2) != null) {
-                            for (int j = i + 2; j < numOptions; j++) {
-                                if (isChildVisibleAt(j)) {
-                                    return peekHeight + (heightChild / 2);
-                                }
-                            }
-                        } else if (isChildVisibleAt(i + 1)) {
+                        int nextVisiblePosition = i + 1;
+
+                        if (nextVisiblePosition == numVisibleOptions) {
+                            return peekHeight + heightChild;
+                        } else {
                             return peekHeight + (heightChild / 2);
                         }
-
-                        return peekHeight + heightChild;
                     }
                 }
             }
@@ -199,22 +195,14 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     /**
-     * Gets a child view from "items_layout".
-     *
-     * @param index the index of the child to get
-     * @return The child view
-     */
-    private View getItemsLayoutChildAt(int index) {
-        return items_layout.getChildAt(index);
-    }
-
-    /**
      * Checks if a child view from "items_layout" exists and if it is visible.
      *
      * @param index the index of the child to check
      * @return True if the child view exists and if it is visible, false otherwise
      */
     private boolean isChildVisibleAt(int index) {
-        return getItemsLayoutChildAt(index) != null && getItemsLayoutChildAt(index).getVisibility() == VISIBLE;
+        View v = items_layout.getChildAt(index);
+
+        return v != null && v.getVisibility() == VISIBLE;
     }
 }
