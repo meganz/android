@@ -10,7 +10,7 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        aB.title = getString(R.string.dialog_cookie_alert_settings)
+        aB.title = getString(R.string.settings_about_cookie_settings).toUpperCase()
         replaceFragment(CookieSettingsFragment())
     }
 }

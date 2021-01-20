@@ -80,6 +80,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         }
     }
 
+    /**
+     * Show current cookies configuration by toggling each cookie switch.
+     *
+     * @param cookies   Set of enabled cookies
+     */
     private fun showCookies(cookies: Set<CookieType>?) {
         essentialCookiesPreference.isChecked = true
         preferenceCookiesPreference.isChecked = cookies?.contains(PREFERENCE) == true
@@ -93,6 +98,14 @@ class CookieSettingsFragment : SettingsBaseFragment() {
                 thirdPartyCookiesPreference.isChecked
     }
 
+    /**
+     * Called when a preference has been changed by the user. This is called before the state
+     * of the preference is about to be updated and before the state is persisted.
+     *
+     * @param preference The changed preference
+     * @param newValue   The new value of the preference
+     * @return {@code true} to update the state of the preference with the new value
+     */
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
 
@@ -114,6 +127,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         return false
     }
 
+    /**
+     * Show confirmation dialog to save cookie settings.
+     *
+     * @param positiveAction    Action to be invoked once the positive button is clicked
+     */
     private fun showConfirmationDialog(positiveAction: () -> Unit) {
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.preference_cookies_confirmation_message)
@@ -125,6 +143,9 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             .show()
     }
 
+    /**
+     * Show third party information dialog.
+     */
     private fun showThirdPartyInfoDialog() {
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
             .setView(R.layout.dialog_cookie_thirdparty)
@@ -133,6 +154,9 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             .show()
     }
 
+    /**
+     * Show confirmation Snackbar to acknowledge that settings has been saved.
+     */
     private fun showConfirmationSnackbar() {
         Snackbar.make(
             requireView(),
@@ -141,6 +165,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         ).show()
     }
 
+    /**
+     * Open browser screen to show an Uri
+     *
+     * @param uri   Uri to be shown on the browser
+     */
     private fun openBrowser(uri: Uri) {
         startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
             data = uri

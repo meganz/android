@@ -3595,7 +3595,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
 				.setCancelable(false)
 				.setView(R.layout.dialog_cookie_alert)
-				.setPositiveButton(R.string.dialog_cookie_alert_accept, (positiveDialog, which) ->
+				.setPositiveButton(R.string.dialog_cookie_action_accept, (positiveDialog, which) ->
 						updateCookieSettingsUseCase.acceptAll()
 								.subscribeOn(Schedulers.io())
 								.observeOn(AndroidSchedulers.mainThread())
@@ -3603,7 +3603,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 									logError(error.getMessage());
 								})
 				)
-				.setNegativeButton(R.string.dialog_cookie_alert_settings, (negativeDialog, which) ->
+				.setNegativeButton(R.string.settings_about_cookie_settings, (negativeDialog, which) ->
 						startActivity(new Intent(this, CookiePreferencesActivity.class))
 				)
 				.create();

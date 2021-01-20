@@ -104,6 +104,6 @@ class CookieSettingsViewModel @ViewModelInject constructor(
      * Reset cookies to essentials ones
      */
     private fun resetCookies() {
-        enabledCookies.postValue(mutableSetOf(CookieType.ESSENTIAL))
+        enabledCookies.value = mutableSetOf(CookieType.ESSENTIAL)
     }
 }

@@ -7,6 +7,16 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import mega.privacy.android.app.R
 
+/**
+ * A Preference that provides two configurable buttons.
+ *
+ * @param context      The Context this is associated with, through which it can access the
+ *                     current theme, resources, {@link SharedPreferences}, etc.
+ * @param attrs        The attributes of the XML tag that is inflating the preference
+ * @param defStyleAttr An attribute in the current theme that contains a reference to a style
+ *                     resource that supplies default values for the view. Can be 0 to not
+ *                     look for defaults.
+ */
 class TwoButtonsPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
@@ -36,11 +46,23 @@ class TwoButtonsPreference @JvmOverloads constructor(
         }
     }
 
+    /**
+     * Set first button configuration
+     *
+     * @param text      Text to be shown
+     * @param listener  Listener to be called when the button is clicked
+     */
     fun setButton1(text: String?, listener: (() -> Unit)?) {
         button1Text = text
         button1Listener = listener
     }
 
+    /**
+     * Set second button configuration
+     *
+     * @param text      Text to be shown
+     * @param listener  Listener to be called when the button is clicked
+     */
     fun setButton2(text: String?, listener: (() -> Unit)?) {
         button2Text = text
         button2Listener = listener

@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Google Advertising Cookies"
+        android:text="@string/dialog_cookie_thirdparty_subtitle1"
         android:textAppearance="?textAppearanceSubtitle2"
         android:textColor="@color/primary_text" />
 
@@ -25,7 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Category: Advertising Cookies"
+        android:text="@string/dialog_cookie_thirdparty_subtitle2"
         android:textAppearance="?textAppearanceBody2"
         android:textColor="@color/primary_text" />
 
