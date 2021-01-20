@@ -158,14 +158,14 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
         }
 
     private var onScrollListenerPickerNumber =
-        OnScrollListener { numberPicker, scrollState ->
+        OnScrollListener { _, scrollState ->
             if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                 updateOptionsAccordingly()
             }
         }
 
     private var onScrollListenerPickerText =
-        OnScrollListener { textPicker, scrollState ->
+        OnScrollListener { _, scrollState ->
             if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
                 updateOptionsAccordingly()
             }
