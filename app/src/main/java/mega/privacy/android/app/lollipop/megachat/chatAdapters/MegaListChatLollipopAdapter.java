@@ -1045,7 +1045,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			if (call != null && isStatusConnected(context, chat.getChatId())) {
 				int callStatus = call.getStatus();
 				((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
-				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 				((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
 
 				switch (callStatus) {
@@ -2025,7 +2025,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							else{
 								logDebug("Message NOt read");
 								Spannable myMessage = new SpannableString(lastMessageString);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
@@ -2037,7 +2037,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 							else{
 								logDebug("Message NOT read");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							}
 
 							((ViewHolderNormalChatList)holder).textViewContent.setText(lastMessageString);
@@ -2158,7 +2158,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							else{
 								logDebug("Message NOT read");
 								Spannable myMessage = new SpannableString(invalidMetaMessage);
-								myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+								myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 								CharSequence indexedText = TextUtils.concat(name, myMessage);
 								((ViewHolderNormalChatList)holder).textViewContent.setText(indexedText);
 							}
@@ -2170,7 +2170,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							}
 							else{
 								logDebug("Message NOT read");
-								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+								((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							}
 
 							((ViewHolderNormalChatList)holder).textViewContent.setText(invalidMetaMessage);
@@ -2217,7 +2217,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if (chat.getUnreadCount() == 0) {
 						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					} else {
-						myMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+						myMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, myMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 					}
 
 					((ViewHolderNormalChatList) holder).textViewContent.setText(TextUtils.concat(name, myMessage));
@@ -2225,7 +2225,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					if (chat.getUnreadCount() == 0) {
 						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 					} else {
-						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+						((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 					}
 
 					((ViewHolderNormalChatList) holder).textViewContent.setText(contactAttachmentMessage);
@@ -2312,8 +2312,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 						else{
 							logDebug("Message NOT read");
-							contactMessage.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.accentColor)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							contactMessage.setSpan(new ForegroundColorSpan(ColorUtils.getThemeColor(context, R.attr.colorSecondary)), 0, contactMessage.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							isRead = false;
 						}
 						CharSequence indexedText = TextUtils.concat(name, contactMessage);
@@ -2329,7 +2329,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 						else{
 							logDebug("Message NOT read");
-							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ContextCompat.getColor(context, R.color.accentColor));
+							((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 							setVoiceClipOrLocationLayout(((ViewHolderNormalChatList)holder).voiceClipOrLocationIc, ((ViewHolderNormalChatList)holder).voiceClipOrLocationText, R.drawable.ic_mic_on_small, false);
 						}
 

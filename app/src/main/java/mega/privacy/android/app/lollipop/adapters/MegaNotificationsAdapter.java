@@ -1190,7 +1190,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -1231,7 +1231,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -1273,7 +1273,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -1314,7 +1314,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 				holder.sectionIcon.setVisibility(View.GONE);
 				holder.titleIcon.setVisibility(View.GONE);
 
-				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+				holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
@@ -1386,7 +1386,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
                 holder.sectionIcon.setVisibility(View.GONE);
                 holder.titleIcon.setVisibility(View.GONE);
 
-                holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.tour_bar_red));
+                holder.sectionText.setTextColor(ContextCompat.getColor(context, R.color.red_600_red_300));
 
 				holder.titleText.setVisibility(View.VISIBLE);
 				holder.titleText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);

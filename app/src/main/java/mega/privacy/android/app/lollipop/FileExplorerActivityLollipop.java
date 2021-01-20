@@ -913,8 +913,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		searchView = (SearchView) searchMenuItem.getActionView();
 
 		SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-		searchAutoComplete.setTextColor(ContextCompat.getColor(this, R.color.black));
-		searchAutoComplete.setHintTextColor(ContextCompat.getColor(this, R.color.status_bar_login));
 		searchAutoComplete.setHint(getString(R.string.hint_action_search));
 		View v = searchView.findViewById(androidx.appcompat.R.id.search_plate);
 		v.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -2454,7 +2452,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2471,7 +2469,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileExplorerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -2765,7 +2763,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2782,7 +2780,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileExplorerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -3014,7 +3012,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
         error_layout.setVisibility(View.GONE);
 
         input.getBackground().mutate().clearColorFilter();
-        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+        input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -3031,7 +3029,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
                 if(error_layout.getVisibility() == View.VISIBLE){
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(FileExplorerActivityLollipop.this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(FileExplorerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
@@ -3070,8 +3068,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
             }
         });
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.context_rename) + " "	+ document.getName());
         builder.setPositiveButton(getString(R.string.context_rename),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {

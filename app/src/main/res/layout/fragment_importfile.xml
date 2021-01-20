@@ -86,50 +86,38 @@
             android:text="@string/choose_destionation"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
-        <RelativeLayout
+        <TextView
             android:id="@+id/cloud_drive_layout"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_below="@+id/choose_destination"
-            android:layout_marginStart="10dp">
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:gravity="start"
+            android:text="@string/section_cloud_drive" />
 
-            <TextView
-                style="?attr/borderlessButtonStyle"
-                android:layout_centerVertical="true"
-                android:gravity="start"
-                android:text="@string/section_cloud_drive" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
+        <TextView
             android:id="@+id/incoming_layout"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_below="@+id/cloud_drive_layout"
-            android:layout_marginStart="10dp">
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:gravity="start"
+            android:text="@string/title_incoming_shares_explorer" />
 
-            <TextView
-                style="?attr/borderlessButtonStyle"
-                android:layout_centerVertical="true"
-                android:gravity="start"
-                android:text="@string/title_incoming_shares_explorer" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
+        <TextView
             android:id="@+id/chat_layout"
+            style="?attr/borderlessButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_below="@+id/incoming_layout"
-            android:layout_marginStart="10dp">
-
-            <TextView
-                style="?attr/borderlessButtonStyle"
-                android:layout_centerVertical="true"
-                android:gravity="start"
-                android:text="@string/section_chat" />
-
-        </RelativeLayout>
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:gravity="start"
+            android:text="@string/section_chat" />
 
     </RelativeLayout>
 

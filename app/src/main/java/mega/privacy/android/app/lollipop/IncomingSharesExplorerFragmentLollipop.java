@@ -779,7 +779,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
         } else {
             boolean shouldShowButton = hasWritePermissions && show;
             optionButton.setEnabled(shouldShowButton);
-            optionButton.setTextColor(ContextCompat.getColor(context, shouldShowButton ? R.color.accentColor : R.color.invite_button_deactivated));
+            optionButton.setTextColor(ContextCompat.getColor(context, shouldShowButton ? R.color.teal_300_teal_200 : R.color.teal_300_038_teal_200_038));
 		}
 	}
 

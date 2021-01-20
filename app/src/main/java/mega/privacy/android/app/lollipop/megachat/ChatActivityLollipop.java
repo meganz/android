@@ -8925,7 +8925,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     break;
                 }
 
-                callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+                callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
                 if (!isAfterReconnecting(this, callInProgressLayout, callInProgressText)) {
                     updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                     break;
@@ -8951,7 +8951,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     private void tapToReturnLayout(MegaChatCall call, String text){
-        callInProgressLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.accentColor));
+        callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
         showCallInProgressLayout(text, false, call);
         callInProgressLayout.setOnClickListener(this);
     }

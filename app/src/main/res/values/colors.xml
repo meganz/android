@@ -70,56 +70,56 @@
 
 <!--    <color name="delimiterColor">#e6e6e6</color>-->
 <!--    <color name="contactSelected">#1A00BFA5</color>-->
-    <color name="accentColor">#FF00BFA5</color>
+<!--    <color name="accentColor">#FF00BFA5</color>-->
 <!--    <color name="accentColorTransparent">#5900BFA5</color>-->
 <!--    <color name="accentColorLight">#9900BFA5</color>-->
-    <color name="accentColorDark">#FF009884</color>
+<!--    <color name="accentColorDark">#FF009884</color>-->
 <!--    <color name="textGrey">#6d6f70</color>-->
 
 <!--    <color name="filePropertiesToolBar">#2284b1</color>-->
 
 <!--    <color name="tour_bar_grey">#dddddd</color>-->
-    <color name="tour_bar_red">#cc0000</color>
+<!--    <color name="tour_bar_red">#cc0000</color>-->
 
 <!--    <color name="small_letter_upgrade_account">#8a333333</color>-->
 
 <!--    <color name="chat_background">#08000000</color>-->
 <!--    <color name="message_background">#0f000000</color>-->
 
-    <color name="chat_sliding_panel_separator">#dcdcdcdc</color>
+<!--    <color name="chat_sliding_panel_separator">#dcdcdcdc</color>-->
 <!--    <color name="gradient_avatar_chat">#44000000</color>-->
 
-    <color name="status_connected">#13e03c</color>
+<!--    <color name="status_connected">#13e03c</color>-->
 <!--    <color name="status_busy">#eb4444</color>-->
 
 <!--    <color name="participants_layout">#f2f2f2</color>-->
-    <color name="status_invisible_layout">#bfbfbf</color>
+<!--    <color name="status_invisible_layout">#bfbfbf</color>-->
 
-    <color name="sliding_panel_separator">#dcdcdcdc</color>
+<!--    <color name="sliding_panel_separator">#dcdcdcdc</color>-->
 
-    <color name="fab_mask">#D96B6B6B</color>
+<!--    <color name="fab_mask">#D96B6B6B</color>-->
 
 <!--    <color name="copyright_text">#FF333333</color>-->
 
-    <color name="transparent_transparent_black">#35000000</color>
-    <color name="status_bar_login">#33000000</color>
-    <color name="less_transparent_white">#80FFFFFF</color>
+<!--    <color name="transparent_transparent_black">#35000000</color>-->
+<!--    <color name="status_bar_login">#33000000</color>-->
+<!--    <color name="less_transparent_white">#80FFFFFF</color>-->
 
-    <color name="grey_my_account_background">#FFF9F9F9</color>
-    <color name="grey_my_account_separator">#80FFFFFF</color>
+<!--    <color name="grey_my_account_background">#FFF9F9F9</color>-->
+<!--    <color name="grey_my_account_separator">#80FFFFFF</color>-->
 
-    <color name="grey_achievements_background">#E6FFFFFF</color>
-    <color name="grey_achievements_title">#FF777777</color>
+<!--    <color name="grey_achievements_background">#E6FFFFFF</color>-->
+<!--    <color name="grey_achievements_title">#FF777777</color>-->
 
-    <color name="grey_achievements_invite_friends">#FF666666</color>
-    <color name="grey_achievements_invite_friends_sub">#FF999999</color>
+<!--    <color name="grey_achievements_invite_friends">#FF666666</color>-->
+<!--    <color name="grey_achievements_invite_friends_sub">#FF999999</color>-->
 
-    <color name="blue_unlocked_rewards">#FF2BA6DE</color>
-    <color name="green_unlocked_rewards">#FF31B500</color>
+<!--    <color name="blue_unlocked_rewards">#FF2BA6DE</color>-->
+<!--    <color name="green_unlocked_rewards">#FF31B500</color>-->
 
-    <color name="grey_text_chip">#FF535353</color>
-    <color name="grey_background_chip">#FFE0E0E0</color>
-    <color name="invite_button_deactivated">#424F4F4F</color>
+<!--    <color name="grey_text_chip">#FF535353</color>-->
+<!--    <color name="grey_background_chip">#FFE0E0E0</color>-->
+<!--    <color name="invite_button_deactivated">#424F4F4F</color>-->
 
 <!--    <color name="very_transparent_black">#40000000</color>-->
 <!--    <color name="very_very_transparent_black">#10000000</color>-->
@@ -279,6 +279,7 @@
 
     <color name="grey_100_alpha_060">#99E0E0E0</color>
     <color name="grey_300_alpha_026">#429E9E9E</color>
+    <color name="grey_600_alpha_085">#D96C6C6C</color>
     <color name="grey_700_alpha_026">#424F4F4F</color>
 
     <color name="grey_alpha_003">#08000000</color>

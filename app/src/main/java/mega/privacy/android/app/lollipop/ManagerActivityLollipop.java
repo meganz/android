@@ -8317,7 +8317,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -8334,7 +8334,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});
@@ -9933,7 +9933,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 //		input.setId(EDIT_TEXT_ID);
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -9950,7 +9950,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if(error_layout_email.getVisibility() == View.VISIBLE){
 					error_layout_email.setVisibility(View.GONE);
 					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(managerActivity, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+					input.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(ManagerActivityLollipop.this, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
 				}
 			}
 		});

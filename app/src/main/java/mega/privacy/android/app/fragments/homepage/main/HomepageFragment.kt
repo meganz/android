@@ -15,13 +15,11 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -38,6 +36,7 @@ import mega.privacy.android.app.fragments.homepage.homepageVisibilityChange
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
@@ -559,10 +558,7 @@ class HomepageFragment : Fragment() {
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else ContextCompat.getColor(
-                requireContext(),
-                R.color.accentColor
-            )
+            if (isExpand) Color.WHITE else getThemeColor(requireContext(), R.attr.colorSecondary)
         )
 
         AnimatorSet().apply {

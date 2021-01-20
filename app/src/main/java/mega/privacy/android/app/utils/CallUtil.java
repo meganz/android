@@ -252,7 +252,7 @@ public class CallUtil {
         } else {
 
             callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
-            callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.accentColor));
+            callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 
             if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                 activateChrono(true, callInProgressChrono, call);

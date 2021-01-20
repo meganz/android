@@ -61,7 +61,7 @@
             android:textSize="14sp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/blue_unlocked_rewards" />
+            android:textColor="@color/dark_blue_500_200" />
 
         <TextView
             android:id="@+id/referral_bonus_transfer"
@@ -72,7 +72,7 @@
             android:maxLines="1"
             android:layout_marginLeft="12dp"
             android:layout_toRightOf="@id/referral_bonus_storage"
-            android:textColor="@color/green_unlocked_rewards" />
+            android:textColor="@color/green_500_green_400" />
 
     </RelativeLayout>
 

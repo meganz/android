@@ -55,14 +55,12 @@
 
 			<Button
 				android:id="@+id/cancel_text"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 style="?attr/borderlessButtonStyle"/>
 
 			<Button
 				android:id="@+id/action_text"
-                style="?attr/materialButtonStyle"
+				style="?attr/borderlessButtonStyle"
 				android:layout_marginEnd="19dp"/>
 		</LinearLayout>
 

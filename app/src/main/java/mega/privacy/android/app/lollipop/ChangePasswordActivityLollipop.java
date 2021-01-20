@@ -913,7 +913,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			fifthShape.setBackground(ContextCompat.getDrawable(this, R.drawable.shape_password));
 
 			passwdType.setText(getString(R.string.pass_medium));
-			passwdType.setTextColor(ContextCompat.getColor(this, R.color.green_unlocked_rewards));
+			passwdType.setTextColor(ContextCompat.getColor(this, R.color.green_500_green_400));
 
 			passwdAdvice.setText(getString(R.string.passwd_medium));
 
@@ -947,7 +947,7 @@ public class ChangePasswordActivityLollipop extends PinActivityLollipop implemen
 			fifthShape.setBackground(ContextCompat.getDrawable(this, R.drawable.passwd_strong));
 
 			passwdType.setText(getString(R.string.pass_strong));
-			passwdType.setTextColor(ContextCompat.getColor(this, R.color.blue_unlocked_rewards));
+			passwdType.setTextColor(ContextCompat.getColor(this, R.color.dark_blue_500_200));
 
 			passwdAdvice.setText(getString(R.string.passwd_strong));
 

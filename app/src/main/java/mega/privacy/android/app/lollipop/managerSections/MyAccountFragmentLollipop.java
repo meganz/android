@@ -938,7 +938,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		int w = bitMatrix.getWidth();
 		int h = bitMatrix.getHeight();
 		int[] pixels = new int[w * h];
-		int color = ContextCompat.getColor(context, R.color.grey_achievements_invite_friends_sub);
+		int color = ContextCompat.getColor(context, R.color.grey_400);
 		float resize = 12.2f;
 
 		Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);

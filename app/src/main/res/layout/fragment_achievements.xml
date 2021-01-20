@@ -343,7 +343,7 @@
                                         android:layout_below="@id/figure_unlocked_storage_text_base_quota"
                                         android:text="@string/unlocked_storage_title"
                                         android:textAllCaps="false"
-                                        android:textColor="@color/grey_achievements_title"
+                                        android:textColor="?android:attr/textColorSecondary"
                                         android:textSize="11dp" />
 
                                 </RelativeLayout>
@@ -369,7 +369,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_base_quota"
                                         android:text="@string/label_transfer_quota_achievements"
-                                        android:textColor="@color/grey_achievements_title"
+                                        android:textColor="?android:attr/textColorSecondary"
                                         android:textSize="11dp" />
 
                                 </RelativeLayout>
@@ -604,7 +604,7 @@
                                         android:layout_below="@id/figure_unlocked_storage_text_add_phone"
                                         android:text="@string/unlocked_storage_title"
                                         android:textAllCaps="false"
-                                        android:textColor="@color/grey_achievements_title"
+                                        android:textColor="?android:attr/textColorSecondary"
                                         android:textSize="11dp" />
                                 </RelativeLayout>
 
@@ -629,7 +629,7 @@
                                         android:layout_column="0"
                                         android:layout_below="@id/figure_unlocked_transfer_text_add_phone"
                                         android:text="@string/transfer_quota"
-                                        android:textColor="@color/grey_achievements_title"
+                                        android:textColor="?android:attr/textColorSecondary"
                                         android:textSize="11dp" />
                                 </RelativeLayout>
                             </LinearLayout>

@@ -49,9 +49,9 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
     TextView contentText;
     LinearLayoutManager mLayoutManager;
     RecyclerView recyclerView;
-    RelativeLayout cloudDriveButton;
-    RelativeLayout incomingButton;
-    RelativeLayout chatButton;
+    View cloudDriveButton;
+    View incomingButton;
+    View chatButton;
     RelativeLayout showMoreLayout;
     TextView showMoreText;
     ImageView showMoreIcon;
@@ -119,9 +119,9 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
-        cloudDriveButton = (RelativeLayout) v.findViewById(R.id.cloud_drive_layout);
+        cloudDriveButton = v.findViewById(R.id.cloud_drive_layout);
         cloudDriveButton.setOnClickListener(this);
-        incomingButton = (RelativeLayout) v.findViewById(R.id.incoming_layout);
+        incomingButton = v.findViewById(R.id.incoming_layout);
         incomingButton.setOnClickListener(this);
         ArrayList<MegaNode> inShares = megaApi.getInShares();
         if (inShares == null || inShares.size() <= 0) {
@@ -131,7 +131,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
             incomingButton.setVisibility(View.VISIBLE);
         }
 
-        chatButton = (RelativeLayout) v.findViewById(R.id.chat_layout);
+        chatButton = v.findViewById(R.id.chat_layout);
         chatButton.setOnClickListener(this);
         chatButton.setVisibility(View.VISIBLE);
 

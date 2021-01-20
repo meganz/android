@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
@@ -194,7 +196,7 @@ public class AchievementsActivity extends PinActivityLollipop {
     public void showInviteConfirmationDialog(String contentText){
         logDebug("showInviteConfirmationDialog");
 
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogLayout = inflater.inflate(R.layout.dialog_invite_friends_achievement, null);
         TextView content = dialogLayout.findViewById(R.id.invite_content);
