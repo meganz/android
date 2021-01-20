@@ -888,8 +888,8 @@
 
     <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">Pro Monat</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">pro Jahr</string>
@@ -1222,7 +1222,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Der Chatverlauf wurde gelöscht</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">An error has occured. The chat history has not been successfully cleared</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">An error has occurred. The chat history has not been successfully cleared</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Teilnehmer hinzufügen</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Teilnehmer entfernen</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Neue/Geänderte Dateien</string>
     <string name="chats_label" context="Label to reference a chats section">Chats</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No file activity to show in [/B][A]Recents[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No file activity to show in [/B][A]Recents[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s and %2$d more</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Images</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Videos</string>
@@ -2944,16 +2944,16 @@
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Lesezeichen hinzufügen</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Lesezeichen entfernen</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Markierung&#8230;</string>
     <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
     <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Rot</string>
     <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Gelb</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Grün</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blau</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Violett</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grau</string>
 </resources>

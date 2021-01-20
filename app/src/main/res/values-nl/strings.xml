@@ -886,10 +886,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Foto\'s</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Video\'s</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">Nieuwste datum</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oudste datum</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Grootste maat</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Kleinste maat</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per maand</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per jaar</string>
@@ -1222,7 +1222,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Gespreksgeschiedenis is gewist</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Er is een fout opgetreden. De chatgeschiedenis is niet succesvol gewist</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">Een fout heeft opgetreden. De chat geschiedenis is niet succesvol gewist</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Deelnemers toevoegen</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Deelnemer verwijderen</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Geen bestanden in uw[/B][A]Postvak[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Geen bestanden in uw [/B][A]Cloud Schijf[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Geen bestanden[/B][A]Offline[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Geen bestanden [/B][A]Offline[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Geen [/B][A]Contacten[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Geen[/A] [B]Gesprekken[/B]</string>
@@ -2323,7 +2323,7 @@
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Haal gesprekslink</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Beheer Gesprek Koppeling</string>
 
-    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Gecodeerde Sleutel Rotatie Inschakelen</string>
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Schakel Rotatie van Coderingssleutel in</string>
     <string name="private_chat" context="Title of the view to inform that a chat is private">Gecodeerde Sleutel Rotatie ingeschakeld</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek creëren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">Sleutel rotatie is uitgeschakeld voor gesprekken met meer dan 100 deelnemers.</string>
@@ -2357,7 +2357,7 @@
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Dit gesprek is niet langer beschikbaar</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Ongeldige Gesprekskoppeling</string>
 
-    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Gecodeerde Sleutel Rotatie</string>
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotatie van Coderingssleutel</string>
     <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek creëren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">Sleutel rotatie is iets veiliger, maar u kunt geen koppeling naar het gesprek creëren en nieuwe deelnemers kunnen geen berichten uit het verleden zien.</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recent</string>
     <string name="chats_label" context="Label to reference a chats section">Gesprekken</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Geen bestand activiteit weer te geven in [/B][A]Recent[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Geen bestandsactiviteit om weer te geven in [/B][A]Recentelijk[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s en %2$d meer</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d Afbeeldingen</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d Video\'s</string>
@@ -2829,11 +2829,11 @@
 
     <string name="reconnecting_message" context="Text shown in a call when it is trying to reconnect after lose the internet connection">Opnieuw verbinden</string>
     <string name="connected_message" context="Text shown when the Internet connection is retrieved and there is a call is in progress">U bent terug.</string>
-    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Slechte internet connectie</string>
+    <string name="poor_internet_connection_message" context="Text shown in a call when the own internet connection is of low quality">Slechte internetverbinding</string>
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">Opnemen&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Creëer een nieuw bestand</string>
-    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Permissie fout</string>
+    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Toestemming fout</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">U hebt niet de vereiste machtigingen om dit bestand terug te zetten. Om door te gaan, kunnen we een nieuw bestand maken met de teruggekeerde gegevens. Wilt u doorgaan?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Versie is met succes aangemaakt als een nieuw bestand.</string>
 
@@ -2899,7 +2899,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Uw telefoonnummer is succesvol verwijderd.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Uw telefoonnummer verwijdering is mislukt.</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Zoeken in MEGA</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Het account dat u probeert te herstellen is geblokeerd.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Uw account is geblokkeerd. Neem alstublieft contact op met support&#64;mega.nz</string>
@@ -2917,14 +2917,14 @@
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s\'s inloggegevens</string>
 
     <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
-    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documenten</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nieuw Gesprek</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">Geen foto\'s gevonden</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Geen documenten gevonden</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">Geen audio bestanden gevonden</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">Geen video\'s gevonden</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Zoek GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Geen [A]GIFs[/A] gevonden</string>
@@ -2942,18 +2942,18 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">U Heeft de maximale limiet van %d reacties bereikt.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Dit bericht heeft de maximale limiet van %d reacties bereikt.</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA heeft uw toestemming nodig om bestanden te delen.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favoriet</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Verwijder favoriet</string>
     <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Verwijder label</string>
     <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Rood</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Oranje</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Geel</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Groen</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blauw</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Paars</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grijs</string>
 </resources>

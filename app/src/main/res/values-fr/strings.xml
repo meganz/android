@@ -171,7 +171,7 @@
     <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
     -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s sera à téléchargé.</string>
-    <string name="alert_no_app" context="Alert text before download">Il n\'y a aucune appli pour ouvrir le fichier %s. Souhaitez-vous poursuivre le téléchargement ?</string>
+    <string name="alert_no_app" context="Alert text before download">Il n\'y a aucune appli pour ouvrir le fichier %s. Voulez-vous poursuivre le téléchargement ?</string>
     <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Ne plus afficher</string>
 
     <string name="confirm_cancel_login" context="Press back while login to cancel current login process.">Souhaitez-vous vraiment annuler le processus de connexion actuel ?</string>
@@ -594,7 +594,7 @@
         <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file" quantity="one">Traitement du fichier</item>
         <item context="Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files" quantity="other">Traitement des fichiers</item>
     </plurals>
-    <string name="error_temporary_unavaible" context="error message when downloading a file">La ressource n\'est temporairement pas disponible, veuillez réessayer ultérieurement.</string>
+    <string name="error_temporary_unavaible" context="error message when downloading a file">La ressource n\'est temporairement pas accessible, veuillez réessayer ultérieurement.</string>
     <string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Impossible d\'ouvrir le fichier sélectionné</string>
     <string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Décompression du fichier</string>
 
@@ -886,10 +886,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Photos</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Vidéos</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">Du plus récent</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Du plus ancien</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Du plus grand</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Du plus petit</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">par mois</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">par an</string>
@@ -1548,8 +1548,8 @@
     </plurals>
 
     <plurals name="download_service_failed">
-        <item context="Text of the notification shown when the download service has finished with any transfer error, Singular" quantity="one">%1$d n\'a pas été téléchargé</item>
-        <item context="Text of the notification shown when the download service has finished with any transfer error, Plural" quantity="other">%1$d n\'ont pas été téléchargés</item>
+        <item context="Text of the notification shown when the download service has finished with any transfer error, Singular" quantity="one">%1$d fichier n\'a pas été téléchargé</item>
+        <item context="Text of the notification shown when the download service has finished with any transfer error, Plural" quantity="other">%1$d fichiers n\'ont pas été téléchargés</item>
     </plurals>
 
     <plurals name="download_service_notification">
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Il n\'y a aucun fichier dans votre [/B][A]boîte de réception[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Il n\'y a aucun ficher [/B][A]dans votre disque nuagique[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Il n\'y a aucun fichier [/B][A]Hors ligne[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Il n\'y a aucun fichier [/B][A]Hors ligne[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Il n\'y a aucun [/B][A]contact[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Il n\'y a aucune[/A] [B]conversation[/B]</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Récents</string>
     <string name="chats_label" context="Label to reference a chats section">Conversations</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Il n\'y a aucune activité à afficher dans [/B][A]Récents[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Il n\'y a aucune activité à afficher dans [/B][A]Récents[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s et %2$d de plus</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d images</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d vidéos</string>
@@ -2789,7 +2789,7 @@
     <string name="expired_admin_business_text" context="Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode.">Un problème est survenu lors du traitement de votre paiement. MEGA sera en lecture seulement tant que ce problème n\'aura pas été corrigé dans un navigateur pour ordinateur.</string>
     <string name="expired_user_business_text" context="A message which is shown to sub-users of expired business accounts.">Votre compte est actuellement [B]désactivé[/B]. Vous ne pouvez que parcourir vos données.</string>
     <string name="camera_uploads_business_alert" context="Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data.">Bien que MEGA ne puisse pas accéder à vos données, l\'administrateur de votre compte d\'entreprise a la possibilité de contrôler et de visualiser les téléversements de l\'appareil photo dans votre compte utilisateur</string>
-    <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Un problème est survenu</string>
+    <string name="general_something_went_wrong_error" context="General label to alert user that somehting went wrong">Quelque chose a mal tourné</string>
     <string name="expired_user_business_text_2" context="A dialog message which is shown to sub-users of expired business accounts.">Contactez l\'administrateur de votre compte d\'entreprise pour résoudre la situation et activer votre compte.</string>
     <string name="business_account_clarification" context="The meaning of the double asterisk in the storage and transfer quota characteristics of the business accounts.">** Augmentera automatiquement, sans frais supplémentaires, pour une utilisation professionnelle justifiée.</string>
     <string name="storage_space_amount" context="Label to indicate amount of space. Placeholder %s is to include the amount of storage (including units). Please, keep [A] and [/A] is to format the string giving it a style, for instance bold style. Keep the ** at the end.">%s [A]d\'espace de stockage[/A] **</string>
@@ -2899,7 +2899,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Votre numéro de téléphone a été supprimé avec succès.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Échec de suppression de votre numéro de téléphone.</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Chercher dans MEGA</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Le compte que vous essayez de réinitialiser est bloqué.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Votre compte a été bloqué. Veuillez contacter support&#64;mega.nz</string>
@@ -2916,15 +2916,15 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Numéro d\'identification de %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Documents</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nouvelle conversation</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">Aucune photo n\'a été trouvée</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Aucun document n\'a été trouvé</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">Aucun fichier son n\'a été trouvé</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">Aucune vidéo n\'a été trouvée</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Chercher dans GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Aucun [A]GIF[/A] n\'a été trouvé</string>
@@ -2942,18 +2942,18 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Vous avez atteint la limite maximale de %d réactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA a besoin de votre autorisation afin de partager des fichiers.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favori</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Supprimer le favori</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Étiquette&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Supprimer l\'étiquette</string>
+    <string name="title_label" context="Title text to show label selector.">Étiquette</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">rouge</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">orange</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">jaune</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">verte</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">bleue</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">violette</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">grise</string>
 </resources>

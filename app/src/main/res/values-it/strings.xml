@@ -888,8 +888,8 @@
 
     <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mese</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">all\'anno</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Nessun file nel tuo[/B] [A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Nessun file nel tuo[/B] [A]Cloud Drive[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Nessun file[/B] [A]Offline[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Nessun file[/B] [A]salvato per l\'offline[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Nessun[/B] [A]contatto[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Nessuna[/A] [B]Conversazione[/B]</string>
@@ -2323,7 +2323,7 @@
     <string name="get_chat_link_option" context="Title of the option to generate a public chat link">Ottieni il link della chat</string>
     <string name="manage_chat_link_option" context="Title of the option to manage a public chat link">Gestisci il link della chat</string>
 
-    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Attiva la rotazione della chiave criptata</string>
+    <string name="make_chat_private_option" context="Title of the option to make a public chat private">Attiva la rotazione della chiave di criptazione</string>
     <string name="private_chat" context="Title of the view to inform that a chat is private">Rotazione della chiave di criptazione attivata</string>
     <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
     <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è disabilitata per le chat con più di 100 partecipanti.</string>
@@ -2357,7 +2357,7 @@
     <string name="invalid_chat_link" context="error message shown when a chat link is invalid">Questa conversazione non è più disponibile.</string>
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Link della chat non valido</string>
 
-    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotazione della chiave criptata</string>
+    <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotazione della chiave di criptazione</string>
     <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
 
     <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recenti</string>
     <string name="chats_label" context="Label to reference a chats section">Chat</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nessuna attività sui file da mostrare nelle[/B] [A]Attività recenti[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nessuna attività sui file da mostrare nelle[/B] [A]Attività recenti[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s e altri %2$d</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d immagini</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d video</string>
@@ -2833,7 +2833,7 @@
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">In registrazione&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">Crea un nuovo file</string>
-    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Errori di permessi</string>
+    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">Errori di permesso</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">Non hai i permessi requisiti per recuperare questo file. Per continuare. Possiamo creare un nuovo file con i dati recuperati. Vuoi procedere?</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">Da questa versione è stato creato un nuovo file con successo.</string>
 
@@ -2922,9 +2922,9 @@
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
 
     <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Nessun documento trovato</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">Nessun file audio trovato</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">Nessun video trovato</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Cerca su GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Nessuna [A]GIF[/A] trovata</string>
@@ -2944,16 +2944,16 @@
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Preferiti</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Rimuovi preferito</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Categoria&#8230;</string>
     <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="title_label" context="Title text to show label selector.">Etichetta</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Rosso</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Arancio</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Giallo</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Verde</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blu</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Viola</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grigio</string>
 </resources>

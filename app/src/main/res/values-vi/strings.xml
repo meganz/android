@@ -888,8 +888,8 @@
 
     <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">hàng tháng</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">hàng năm</string>
@@ -2922,9 +2922,9 @@
     <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
 
     <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Không có văn bản tài liệu nào</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">Không có tệp tin âm thanh nào</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">Không có video nào</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Tìm trong GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Không tìm thấy [A]ảnh GIF[/A] nào</string>
@@ -2944,16 +2944,16 @@
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Đánh dấu ưa thích</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Loại bỏ ưa thích</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Dán nhãn&#8230;</string>
     <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="title_label" context="Title text to show label selector.">Màu nhãn</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Màu đỏ</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Màu cam</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Màu vàng</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Màu lục</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Màu lam</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Màu tím</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Màu xám</string>
 </resources>

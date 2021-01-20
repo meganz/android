@@ -886,10 +886,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Fotos</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Videos</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">Más nuevo</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Más antiguo</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Más grande</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Más pequeño</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mes</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">al año</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No hay archivos en la [/B][A]bandeja de entrada[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No hay archivos en tu [/B][A]Nube[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No hay archivos [/B][A]sin conexión[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No hay archivos [/B][A]sin conexión[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]No hay [/B][A]contactos[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No hay[/A] [B]conversaciones[/B]</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recientes</string>
     <string name="chats_label" context="Label to reference a chats section">Chat</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No hay archivos [/B][A]Recientes[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]No hay archivos [/B][A]recientes[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s y %2$d más</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d imágenes</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d vídeos</string>
@@ -2899,7 +2899,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Tu número de teléfono se ha eliminado.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">No se ha podido eliminar el número de teléfono.</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Buscar en MEGA</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">La cuenta que intentas restablecer está bloqueada.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Tu cuenta ha sido bloqueada. Por favor contacta con support&#64;mega.nz</string>
@@ -2916,15 +2916,15 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenciales de %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
-    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Documentos</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documentos</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nuevo chat</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No se han encontrado fotos</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No se han encontrado documentos</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No se han encontrado audios</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No se han encontrado vídeos</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Buscar GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No se han encontrado [A]GIFs[/A]</string>
@@ -2942,18 +2942,18 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ha alcanzado el límite máximo de %d reacciones.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Este mensaje ha alcanzado el límite máximo de %d reacciones.</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA necesita tu permiso para compartir archivos.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favorito</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Eliminar favorito</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Etiqueta&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Eliminar etiqueta</string>
+    <string name="title_label" context="Title text to show label selector.">Etiqueta</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Rojo</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Naranja</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Amarillo</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Verde</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Azul</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Púrpura</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Gris</string>
 </resources>

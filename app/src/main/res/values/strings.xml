@@ -888,8 +888,8 @@
 
     <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
@@ -1222,7 +1222,7 @@
     -->
 
     <string name="clear_history_success" context="Message show when the history of a chat has been successfully deleted">Chat history has been cleared</string>
-    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">An error has occured. The chat history has not been successfully cleared</string>
+    <string name="clear_history_error" context="Message show when the history of a chat hasn’t been successfully deleted">An error has occurred. The chat history has not been successfully cleared</string>
 
     <string name="add_participants_menu_item" context="Menu item to add participants to a chat">Add participants</string>
     <string name="remove_participant_menu_item" context="Menu item to remove a participants from a chat">Remove participant</string>

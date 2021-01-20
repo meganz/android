@@ -886,10 +886,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Фотографии</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Видео</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">От новых к старым</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">От старых к новым</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">От больших к маленьким</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">От маленьких к большим</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">в месяц</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">в год</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Во [/B][A]«Входящих»[/A][B] нет файлов.[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]В [/B][A]облачном диске[/A][B] нет файлов.[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Нет файлов в [/B][A]«Оффлайн»[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Нет [A]локальных[/A] файлов[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Нет [/B][A]контактов[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Нет[/A] [B]разговоров[/B]</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Недавние</string>
     <string name="chats_label" context="Label to reference a chats section">Чаты</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Нет файловой активности для показа во [/B][A]«Входящих»[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Нет файловой активности для показа во [/B][A]«Входящих»[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s и ещё %2$d</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">Изображения (%d)</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">Видео (%d)</string>
@@ -2899,7 +2899,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Номер телефона успешно удалён.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">Не удалось удалить номер телефона.</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Поиск в MEGA</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">Учётная запись, к которой вы пытаетесь получить доступ, заблокирована.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Ваша учётная запись была заблокирована. Пожалуйста, свяжитесь с support&#64;mega.nz</string>
@@ -2916,15 +2916,15 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Учётные данные %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
-    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Документы</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Документы</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Новый чат</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">Фотографий не найдено</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Документы не найдены</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">Аудиофайлы не найдены</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">Видео не найдены</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Искать GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">[A]GIF-файлы[/A] не найдены</string>
@@ -2942,18 +2942,18 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Вы достигли максимального количества реакций: %d.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Достигнуто максимальное количество реакций на это сообщение: %d.</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA требуется ваше разрешение, чтобы делиться файлами.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Популярные</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Удалить популярные</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Метка&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Удалить метку</string>
+    <string name="title_label" context="Title text to show label selector.">Метка</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Красный</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Оранжевый</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Жёлтый</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Зелёный</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Синий</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Фиолетовый</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Серый</string>
 </resources>

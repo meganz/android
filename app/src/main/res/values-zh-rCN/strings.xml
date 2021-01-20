@@ -886,10 +886,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">照片</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">影片</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">最新日期</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">最早日期</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">最大尺寸</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">最小尺寸</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">每月</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">每年</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]无文件在您的 [/B][A]收件箱[/A][B]。[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]无文件在您的 [/B][A]云盘[/A][B]。[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]无文件 [/B][A]离线[/A][B]。[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]无文件[/B][A]离线[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]无[/B][A]联系人[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]无[/A] [B]对话[/B]</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">近期</string>
     <string name="chats_label" context="Label to reference a chats section">聊天</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B][A]最近[/A]无文件记录[/B][B]。[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[A]最近[/A][B]无文件记录[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s和%2$d及更多</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d个图片</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d个视频</string>
@@ -2833,7 +2833,7 @@
 
     <string name="recording_layout" context="Text is displayed while a voice clip is being recorded">正在录音&#8230;&#8230;</string>
     <string name="create_new_file_action" context="Text shown for the action create new file">创建新文档</string>
-    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">未获得授权</string>
+    <string name="permissions_error_label" context="Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions">权限错误</string>
     <string name="alert_not_enough_permissions_revert" context="Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share.">您没有还原文件所需的权限，您想使用已还原的数据创建一个新文件吗？</string>
     <string name="version_as_new_file_created" context="Text shown when the creation of a version as a new file was successful">版本已成功创建为新文件。</string>
 
@@ -2899,7 +2899,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">您的手机号已成功解除绑定。</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">您的手机号码移除失败。</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">在MEGA中搜索</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">您要重置的账号已被封锁。</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">您的账号已被锁定。请连系support&#64;mega.nz</string>
@@ -2916,15 +2916,15 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%s的凭证</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
-    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">文档</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">文档</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">新建聊天</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">无照片</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">无文档</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">无语音文件</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">无视频</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">搜索GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">无[A]GIFs[/A]动图</string>
@@ -2942,18 +2942,18 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已达到%d个态度的最大上限。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此消息已达到%d个态度的最大上限。</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA需要您的授权才能共享文件。</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">收藏</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">删除收藏</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">标签&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">删除标签</string>
+    <string name="title_label" context="Title text to show label selector.">标签</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">玫红</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">橘橙</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">金黄</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">草绿</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">天蓝</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">兰紫</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">银灰</string>
 </resources>

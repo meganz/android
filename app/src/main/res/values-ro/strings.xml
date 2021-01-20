@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android\n\nFor more info, please check our website:\nSee https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA oferă stocare în cloud criptată, controlată de utilizatori, și chat prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt MEGA permite confidențialitate totală și a fost disponibil prin browser începând cu 2016. Acesta a fost extins pe aplicația noastră mobilă, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință fișiere într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 50 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul Pro Lite: 4,99€ pe lună sau 49,99€ pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul Pro I: 9,99€ pe lună sau 99,99€ pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul Pro II: 19,99€ pe lună sau 199,99€ pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul Pro III: 29,99€ pe lună sau 299,99€ pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade de abonare succesive de aceeași durată și la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, clic pe pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru), iar apoi clic pe aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -> Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -> Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -> Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -> MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android\n\nPentru mai multe informații, te rugăm să consulți site-ul nostru web:\nVezi https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA, serviciul de stocare în cloud cu confidențialitate puternică mereu activă.</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Vizualizator PDF MEGA</string>
@@ -888,8 +888,8 @@
 
     <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
     <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">per lună</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per an</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Niciun fișier în [/B][A]Conținut media primit[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Niciun fișier în [/B][A]unitatea cloud[/A][B].[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Niciun fișier în [/B][A]Offline[/A][B].[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Niciun fișier [/B][A]offline[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Niciun [/B][A]contact[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Nicio[/A] [B]conversație[/B]</string>
@@ -2009,7 +2009,7 @@
 
     <string name="remember_pwd_dialog_title" context="Title of the dialog ‘Do you remember your password?’">Îți mai aduci aminte parola?</string>
     <string name="remember_pwd_dialog_text_logout" context="Text of the dialog ‘Recovery Key exported’ when the user wants logout">Ești pe cale să te deconectezi, te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
-    <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Te rugăm să îți testezi parola mai jos pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
+    <string name="remember_pwd_dialog_text" context="Text of the dialog ‘Do you remember your password?’">Te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
     <string name="general_do_not_show" context="Dialog option that permits user do not show it again">Nu afișa din nou</string>
     <string name="remember_pwd_dialog_button_test" context="Button of the dialog ‘Do you remember your password?’ that permits user test his password">Testează parola</string>
     <string name="test_pwd_title" context="Title of the activity that permits user test his password">Testează-ți parola</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recente</string>
     <string name="chats_label" context="Label to reference a chats section">Chaturi</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nicio activitate privind fișierele pentru a fi afișată în [/B][A]Recente[/A][B].[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nicio activitate privind fișierele pentru a fi afișată în [/B][A]Recente[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s și încă %2$d</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d imagini</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d videoclipuri</string>
@@ -2944,16 +2944,16 @@
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favorit</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Elimină de la favorite</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Etichetă&#8230;</string>
     <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="title_label" context="Title text to show label selector.">Etichetă</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">Roșu</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Portocaliu</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Galben</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">Verde</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Albastru</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Violet</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Gri</string>
 </resources>

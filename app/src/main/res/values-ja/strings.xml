@@ -886,10 +886,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">写真</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">動画</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by date newest first">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by date oldest first">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">最新の日付</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">最古の日付</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">最大サイズ</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">最小サイズ</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">月につき</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">年につき</string>
@@ -1881,7 +1881,7 @@
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B][/B][A]受信箱[/A]にファイルはありません[B]。[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B][/B][A]クラウドドライブ[/A]にファイルはありません[B]。[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B][/B][A]オフライン[/A]ファイルはありません[B]。[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]オフライン[/A]の[B]ファイルはありません[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B][/B][A]連絡先はありません[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[B]会話[/B]が[A]ありません[/A]</string>
@@ -2744,7 +2744,7 @@
     <string name="recents_label" context="Label to reference a recents section">最近</string>
     <string name="chats_label" context="Label to reference a chats section">チャット</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[A]最近[/A][B]で表示するファイルアクティビティはありません[/B][B]。[/B]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[A]最近[/A][B]で表示するファイルアクティビティはありません[/B]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">あと%1$s%2$d</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d個の画像</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d個の動画</string>
@@ -2899,7 +2899,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">お使いの電話番号が正常に削除されました。</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">電話番号を削除できませんでした。</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">MEGAで検索</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">リセットしようとしているアカウントは封鎖されています。</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">あなたのアカウントはブロックされています。support&#64;mega.nzへ連絡して下さい。</string>
@@ -2916,15 +2916,15 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">%sさんの資格情報</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
-    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">文書</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">ドキュメント</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">新しいチャット</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
-    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">No documents found</string>
-    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">No audio files found</string>
-    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">No videos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">写真が見つかりません</string>
+    <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">ドキュメントが見つかりません</string>
+    <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">音声ファイルが見つかりません</string>
+    <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">動画が見つかりません</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">GIPHYを検索</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">[A]GIF[/A]が見つかりません</string>
@@ -2942,18 +2942,18 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">反応の上限(%d)に達しました。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">このメッセージは、反応の上限（%d）に達しました。</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGAはファイルを共有するためにあなたの権限を必要とします。</string>
 
-    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Favourite</string>
-    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Remove favourite</string>
-    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Label&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
-    <string name="title_label" context="Title text to show label selector.">Label</string>
-    <string name="label_red" context="A user can mark a folder or file with red colour.">Red</string>
-    <string name="label_orange" context="A user can mark a folder or file with orange colour.">Orange</string>
-    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">Yellow</string>
-    <string name="label_green" context="A user can mark a folder or file with green colour.">Green</string>
-    <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
-    <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
-    <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+    <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">お気に入り</string>
+    <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">お気に入りを取り除く</string>
+    <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">色を選択&#8230;</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">ラベルを削除</string>
+    <string name="title_label" context="Title text to show label selector.">ラベル</string>
+    <string name="label_red" context="A user can mark a folder or file with red colour.">赤い</string>
+    <string name="label_orange" context="A user can mark a folder or file with orange colour.">オレンジ色の</string>
+    <string name="label_yellow" context="A user can mark a folder or file with yellow colour.">黄色の</string>
+    <string name="label_green" context="A user can mark a folder or file with green colour.">緑の</string>
+    <string name="label_blue" context="A user can mark a folder or file with blue colour.">青い</string>
+    <string name="label_purple" context="A user can mark a folder or file with purple colour.">紫の</string>
+    <string name="label_grey" context="A user can mark a folder or file with grey colour.">グレーの</string>
 </resources>
