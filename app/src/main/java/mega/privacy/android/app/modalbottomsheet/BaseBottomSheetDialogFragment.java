@@ -161,48 +161,48 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
      */
     private int getPeekHeight() {
         int numVisibleOptions = 0;
-        int heightChild = dp2px(viewType == DEFAULT_VIEW_TYPE ? HEIGHT_CHILD : HEIGHT_RADIO_GROUP_VIEW, outMetrics);
+        int heightChildPixels = viewType == DEFAULT_VIEW_TYPE ? HEIGHT_CHILD : HEIGHT_RADIO_GROUP_VIEW;
+        int heightChild = dp2px(heightChildPixels, outMetrics);
         int peekHeight = dp2px(heightHeader, outMetrics);
+        int heightSeparator = dp2px(1, outMetrics);
 
         for (int i = 0; i < items_layout.getChildCount(); i++) {
-            if (isChildVisibleAt(i)) {
-                numVisibleOptions++;
+            View v = items_layout.getChildAt(i);
+
+            if (v != null && v.getVisibility() == VISIBLE) {
+                int height = v.getLayoutParams().height;
+
+                if (height < 0 || height >= heightChildPixels) {
+                    //Is visible option
+                    numVisibleOptions++;
+                } else {
+                    //Is visible separator
+                    peekHeight += heightSeparator;
+                }
             }
         }
 
         if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE)
                 || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
             return peekHeight + (heightChild * numVisibleOptions);
-        } else {
-            for (int i = 1; i <= numVisibleOptions; i++) {
-                if (peekHeight < halfHeightDisplay) {
-                    peekHeight += heightChild;
+        }
 
-                    if (peekHeight >= halfHeightDisplay) {
-                        int nextVisiblePosition = i + 1;
+        for (int i = 1; i <= numVisibleOptions; i++) {
+            if (peekHeight < halfHeightDisplay) {
+                peekHeight += heightChild;
 
-                        if (nextVisiblePosition == numVisibleOptions) {
-                            return peekHeight + heightChild;
-                        } else {
-                            return peekHeight + (heightChild / 2);
-                        }
+                if (peekHeight >= halfHeightDisplay) {
+                    int nextVisiblePosition = i + 1;
+
+                    if (nextVisiblePosition == numVisibleOptions) {
+                        return peekHeight + heightChild;
+                    } else {
+                        return peekHeight + (heightChild / 2);
                     }
                 }
             }
         }
 
         return peekHeight;
-    }
-
-    /**
-     * Checks if a child view from "items_layout" exists and if it is visible.
-     *
-     * @param index the index of the child to check
-     * @return True if the child view exists and if it is visible, false otherwise
-     */
-    private boolean isChildVisibleAt(int index) {
-        View v = items_layout.getChildAt(index);
-
-        return v != null && v.getVisibility() == VISIBLE;
     }
 }
