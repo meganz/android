@@ -191,6 +191,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
+    private static final int INVALID_LAST_SEEN_ID = 0;
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
     public int position_imageDrag = -1;
@@ -5908,33 +5909,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (!bufferMessages.isEmpty()) {
             logDebug("Buffer size: " + bufferMessages.size());
             loadBufferMessages();
+            checkLastSeenId();
 
             if (lastSeenReceived && positionToScroll > 0 && positionToScroll < messages.size()) {
                 logDebug("Last message seen received");
                 //Find last message
-                int positionLastMessage = -1;
-                for (int i = messages.size() - 1; i >= 0; i--) {
-                    AndroidMegaChatMessage androidMessage = messages.get(i);
-
-                    if (!androidMessage.isUploading()) {
-                        MegaChatMessage msg = androidMessage.getMessage();
-                        if (msg.getMsgId() == lastIdMsgSeen) {
-                            positionLastMessage = i;
-                            break;
-                        }
-                    }
-                }
-
-                //Check if it has no my messages after
-                positionLastMessage = positionLastMessage + 1;
-                AndroidMegaChatMessage message = messages.get(positionLastMessage);
-
-                while (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
-                    lastIdMsgSeen = message.getMessage().getMsgId();
-                    positionLastMessage = positionLastMessage + 1;
-                    message = messages.get(positionLastMessage);
-                }
-
+                updateLocalLastSeenId();
                 scrollToMessage(isTurn ? -1 : lastIdMsgSeen);
             }
 
@@ -9527,5 +9507,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         errorReactionsDialog.show();
         errorReactionsDialogIsShown = true;
         typeErrorReaction = typeError;
+    }
+
+    /**
+     * Method for correctly updating the id of the last read message.
+     */
+    private void checkLastSeenId() {
+        if (lastIdMsgSeen == INVALID_LAST_SEEN_ID && messages != null && !messages.isEmpty() && messages.get(0) != null && messages.get(0).getMessage() != null) {
+            lastIdMsgSeen = messages.get(0).getMessage().getMsgId();
+            updateLocalLastSeenId();
+        }
+    }
+
+    /**
+     * Method that updates as read messages the own messages.
+     */
+    private void updateLocalLastSeenId() {
+        int positionLastMessage = -1;
+        for (int i = messages.size() - 1; i >= 0; i--) {
+            AndroidMegaChatMessage androidMessage = messages.get(i);
+            if (!androidMessage.isUploading()) {
+                MegaChatMessage msg = androidMessage.getMessage();
+                if (msg.getMsgId() == lastIdMsgSeen) {
+                    positionLastMessage = i;
+                    break;
+                }
+            }
+        }
+
+        positionLastMessage = positionLastMessage + 1;
+        AndroidMegaChatMessage message = messages.get(positionLastMessage);
+
+        while (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
+            lastIdMsgSeen = message.getMessage().getMsgId();
+            positionLastMessage = positionLastMessage + 1;
+            message = messages.get(positionLastMessage);
+        }
     }
 }
