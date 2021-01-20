@@ -10,6 +10,7 @@ import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import nz.mega.sdk.MegaBanner
@@ -57,7 +58,7 @@ class BannerAdapter(private var viewModel: HomePageViewModel)
                 context.startActivity(intent)
             }
             REFERRAL -> {
-                val openLinkIntent = Intent(context, OpenLinkActivity::class.java).apply {
+                val openLinkIntent = Intent(context, WebViewActivity::class.java).apply {
                     data = Uri.parse(link)
                 }
                 context.startActivity(openLinkIntent)
