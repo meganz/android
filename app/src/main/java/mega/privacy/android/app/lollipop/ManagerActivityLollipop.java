@@ -6878,6 +6878,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         setSearchDrawerItem();
         selectDrawerItemLollipop(drawerItem);
         resetActionBar(aB);
+
+        if (sFLol != null) {
+            sFLol.newSearchNodesTask();
+        }
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
