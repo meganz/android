@@ -7,7 +7,8 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.NumberPicker
+import android.widget.NumberPicker.OnValueChangeListener
+import android.widget.NumberPicker.OnScrollListener
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -139,24 +140,36 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             updateRetentionTimeUI(seconds)
 
             binding.numberPicker.setOnScrollListener(onScrollListenerPickerNumber)
+            binding.numberPicker.setOnValueChangedListener(onValueChangeListenerPickerNumber)
             binding.textPicker.setOnScrollListener(onScrollListenerPickerText)
+            binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
             binding.pickerButton.setOnClickListener(this)
         }
     }
 
-    private var onScrollListenerPickerNumber = NumberPicker.OnScrollListener { view, scrollState ->
-        if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE) {
-            fillPickerText(view.value)
-            updateOptionsAccordingly()
+    private var onValueChangeListenerPickerNumber =
+        OnValueChangeListener { _, oldValue, newValue ->
+            updateTextPicker(oldValue, newValue)
         }
-    }
 
-    private var onScrollListenerPickerText = NumberPicker.OnScrollListener { view, scrollState ->
-        if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE) {
-            updateNumberPicker(view.value)
-            updateOptionsAccordingly()
+    private var onValueChangeListenerPickerText =
+        OnValueChangeListener { textPicker, _, _ ->
+            updateNumberPicker(textPicker.value)
         }
-    }
+
+    private var onScrollListenerPickerNumber =
+        OnScrollListener { numberPicker, scrollState ->
+            if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
+                updateOptionsAccordingly()
+            }
+        }
+
+    private var onScrollListenerPickerText =
+        OnScrollListener { textPicker, scrollState ->
+            if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
+                updateOptionsAccordingly()
+            }
+        }
 
     /**
      * Method that controls and shows the initial UI of the picket elements.
@@ -170,6 +183,8 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
         binding.numberPicker.wrapSelectorWheel = true
         binding.textPicker.wrapSelectorWheel = true
+
+        binding.textPicker.minimumWidth = MAXIMUM_VALUE_TEXT_PICKER
         binding.numberPicker.minValue = MINIMUM_VALUE_NUMBER_PICKER
         binding.textPicker.minValue = MINIMUM_VALUE_TEXT_PICKER
         binding.textPicker.maxValue = MAXIMUM_VALUE_TEXT_PICKER
@@ -211,9 +226,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             ),
             StringResourcesUtils.getString(R.string.year_cc).toLowerCase(Locale.getDefault())
         )
-
         binding.textPicker.displayedValues = arrayString
-        binding.textPicker.minimumWidth = MAXIMUM_VALUE_TEXT_PICKER
     }
 
     /**
@@ -228,11 +241,13 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
             binding.textPicker.value = OPTION_HOURS
             binding.numberPicker.maxValue = MAXIMUM_VALUE_NUMBER_PICKER_HOURS
             binding.numberPicker.value = MINIMUM_VALUE_NUMBER_PICKER
+
         } else {
             binding.textPicker.value = textValue
             binding.numberPicker.maxValue = maximumValue
             binding.numberPicker.value = numberValue
         }
+
         fillPickerText(binding.numberPicker.value)
     }
 
@@ -306,6 +321,7 @@ class ManageChatHistoryActivity : PinActivityLollipop(), View.OnClickListener {
 
         if ((oldValue == 1 && newValue > 1) || (newValue == 1 && oldValue > 1)) {
             fillPickerText(newValue)
+            binding.textPicker.minimumWidth = MAXIMUM_VALUE_TEXT_PICKER
         }
     }
 
