@@ -10,7 +10,7 @@ import mega.privacy.android.app.R
 class TwoButtonsPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = android.R.attr.preferenceStyle
 ) : Preference(context, attrs, defStyleAttr) {
 
     private var button1Text: String? = null

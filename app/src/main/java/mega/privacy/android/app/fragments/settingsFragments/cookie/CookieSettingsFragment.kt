@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.components.ClickableSummarySwitchPreference
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
@@ -30,7 +31,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     private lateinit var preferenceCookiesPreference: SwitchPreferenceCompat
     private lateinit var analyticsCookiesPreference: SwitchPreferenceCompat
     private lateinit var advertisingCookiesPreference: SwitchPreferenceCompat
-    private lateinit var thirdPartyCookiesPreference: SwitchPreferenceCompat
+    private lateinit var thirdPartyCookiesPreference: ClickableSummarySwitchPreference
     private lateinit var policiesPreference: TwoButtonsPreference
 
     override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
@@ -67,9 +68,8 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         analyticsCookiesPreference.onPreferenceChangeListener = this
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
-        thirdPartyCookiesPreference.setOnPreferenceClickListener {
+        thirdPartyCookiesPreference.setOnSummaryClickListener {
             showThirdPartyInfoDialog()
-            true
         }
         policiesPreference.setButton1(getString(R.string.preference_cookies_policies_cookie)) {
             openBrowser("https://mega.nz/cookie".toUri())
@@ -86,9 +86,9 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         advertisingCookiesPreference.isChecked = cookies?.contains(ADVERTISEMENT) == true
         thirdPartyCookiesPreference.isChecked = cookies?.contains(THIRDPARTY) == true
 
-        acceptCookiesPreference.isChecked = preferenceCookiesPreference.isChecked ||
-                analyticsCookiesPreference.isChecked ||
-                advertisingCookiesPreference.isChecked ||
+        acceptCookiesPreference.isChecked = preferenceCookiesPreference.isChecked &&
+                analyticsCookiesPreference.isChecked &&
+                advertisingCookiesPreference.isChecked &&
                 thirdPartyCookiesPreference.isChecked
     }
 
