@@ -15,6 +15,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.ClickableSummarySwitchPreference
+import mega.privacy.android.app.components.StaticSwitchPreference
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
@@ -27,7 +28,7 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     private val viewModel by viewModels<CookieSettingsViewModel>()
 
     private lateinit var acceptCookiesPreference: SwitchPreferenceCompat
-    private lateinit var essentialCookiesPreference: SwitchPreferenceCompat
+    private lateinit var essentialCookiesPreference: StaticSwitchPreference
     private lateinit var preferenceCookiesPreference: SwitchPreferenceCompat
     private lateinit var analyticsCookiesPreference: SwitchPreferenceCompat
     private lateinit var advertisingCookiesPreference: SwitchPreferenceCompat
