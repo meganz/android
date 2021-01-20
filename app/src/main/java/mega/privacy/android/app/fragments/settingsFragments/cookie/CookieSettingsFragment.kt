@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -57,7 +55,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         viewModel.onEnabledCookies().observe(viewLifecycleOwner, ::showCookies)
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
             if (success) {
-                showConfirmationSnackbar()
                 (context?.applicationContext as MegaApplication?)?.checkEnabledCookies()
             }
         }
@@ -109,38 +106,15 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
 
-        val action = when (preference?.key) {
-            acceptCookiesPreference.key -> { { viewModel.toggleCookies(enable) } }
-            preferenceCookiesPreference.key -> { { viewModel.changeCookie(PREFERENCE, enable) } }
-            analyticsCookiesPreference.key -> { { viewModel.changeCookie(ANALYTICS, enable) } }
-            advertisingCookiesPreference.key -> { { viewModel.changeCookie(ADVERTISEMENT, enable) } }
-            thirdPartyCookiesPreference.key -> { { viewModel.changeCookie(THIRDPARTY, enable) } }
-            else -> { {} }
-        }
-
-        if (!enable) {
-            showConfirmationDialog(action)
-        } else {
-            action.invoke()
+        when (preference?.key) {
+            acceptCookiesPreference.key -> viewModel.toggleCookies(enable)
+            preferenceCookiesPreference.key -> viewModel.changeCookie(PREFERENCE, enable)
+            analyticsCookiesPreference.key -> viewModel.changeCookie(ANALYTICS, enable)
+            advertisingCookiesPreference.key -> viewModel.changeCookie(ADVERTISEMENT, enable)
+            thirdPartyCookiesPreference.key -> viewModel.changeCookie(THIRDPARTY, enable)
         }
 
         return false
-    }
-
-    /**
-     * Show confirmation dialog to save cookie settings.
-     *
-     * @param positiveAction    Action to be invoked once the positive button is clicked
-     */
-    private fun showConfirmationDialog(positiveAction: () -> Unit) {
-        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
-            .setMessage(R.string.preference_cookies_confirmation_message)
-            .setPositiveButton(android.R.string.yes) { _: DialogInterface, _: Int ->
-                positiveAction.invoke()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .create()
-            .show()
     }
 
     /**
@@ -152,17 +126,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
             .setPositiveButton(android.R.string.yes, null)
             .create()
             .show()
-    }
-
-    /**
-     * Show confirmation Snackbar to acknowledge that settings has been saved.
-     */
-    private fun showConfirmationSnackbar() {
-        Snackbar.make(
-            requireView(),
-            R.string.preference_cookies_confirmation_saved,
-            Snackbar.LENGTH_SHORT
-        ).show()
     }
 
     /**

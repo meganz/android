@@ -2984,14 +2984,11 @@
     <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
     <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
     <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
-    <string name="dialog_cookie_action_accept" context="Cookie dialog action button">Accept Cookies</string>
     <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
     <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
     <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
-    <string name="preference_cookies_confirmation_message" context="Preference screen dialog to save settings title">Are you sure you want to change Cookie Settings?</string>
-    <string name="preference_cookies_confirmation_saved" context="Preference screen confirmation banner title">Cookie Settings changes has been saved.</string>
     <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
     <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
     <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
