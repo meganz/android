@@ -16,9 +16,10 @@ import android.os.Build;
 import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
@@ -447,6 +447,9 @@ public class AccountController {
         MegaApplication app = MegaApplication.getInstance();
         app.getMyAccountInfo().clear();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
+
+        // Clear get banner success flag
+        LiveEventBus.get(EVENT_LOGOUT_CLEARED).post(null);
     }
 
     public static void removeFolder(Context context, File folder) {

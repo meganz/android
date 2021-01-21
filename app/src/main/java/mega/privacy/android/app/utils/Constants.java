@@ -722,4 +722,5 @@ public class Constants {
     public static final String EVENT_SCROLLING_CHANGE = "scrolling_change";
     public static final String EVENT_NOTIFICATION_COUNT_CHANGE = "notification_count_change";
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
+    public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
 }

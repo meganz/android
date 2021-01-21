@@ -31,12 +31,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_homepage.*
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
+import kotlinx.android.synthetic.main.user_reaction_item.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
@@ -46,6 +47,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -165,6 +167,8 @@ class HomepageFragment : Fragment() {
             showOfflineMode()
         }
 
+        // Retrieve the banners from the server again, for the banners are possibly varied
+        // while the app is on the background
         viewModel.getBanners()
     }
 
@@ -414,7 +418,8 @@ class HomepageFragment : Fragment() {
      * Set the initial height of the bottom sheet. The top is just below the banner view.
      */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver?.addOnPreDrawListener (object : ViewTreeObserver.OnPreDrawListener {
+        rootView.viewTreeObserver?.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
                 if (bannerViewPager.data.isNotEmpty()) {
                     bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom

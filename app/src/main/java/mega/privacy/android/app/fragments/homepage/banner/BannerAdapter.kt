@@ -8,7 +8,6 @@ import android.widget.TextView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.zhpan.bannerview.BaseBannerAdapter
 import com.zhpan.bannerview.BaseViewHolder
-import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
@@ -28,7 +27,6 @@ class BannerAdapter(private var viewModel: HomePageViewModel)
         val title: TextView = holder.findViewById(R.id.textView_title)
         val description: TextView = holder.findViewById(R.id.textView_description)
         val image: SimpleDraweeView = holder.findViewById(R.id.draweeView_image)
-
         background.setImageURI(data?.imageLocation.plus(data?.backgroundImage))
         image.setImageURI(data?.imageLocation.plus(data?.image))
         title.text = data?.title

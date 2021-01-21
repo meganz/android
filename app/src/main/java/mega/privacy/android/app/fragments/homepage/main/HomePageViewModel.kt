@@ -9,7 +9,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaError

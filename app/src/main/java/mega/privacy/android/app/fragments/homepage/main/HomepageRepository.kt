@@ -2,9 +2,15 @@ package mega.privacy.android.app.fragments.homepage.main
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import android.util.Pair
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.facebook.common.executors.UiThreadImmediateExecutorService
+import com.facebook.datasource.BaseDataSubscriber
+import com.facebook.datasource.DataSource
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.request.ImageRequest
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,6 +22,7 @@ import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.*
 import javax.inject.Inject
@@ -30,8 +37,24 @@ class HomepageRepository @Inject constructor(
 
     private val bannerList = MutableLiveData<MutableList<MegaBanner>?>()
 
+    /** The last time of getting banners */
     private var lastGetBannerTime = 0L
+
+    /** Time threshold of getting banners from the server again */
     private val getBannerThreshold = 6 * TimeUtils.HOUR
+
+    /** Whether the previous getting banners was successful or not */
+    private var getBannerSuccess = false
+
+    private val logoutObserver = Observer<Unit> {
+        getBannerSuccess = false
+        bannerList.value = null
+    }
+
+    init {
+        LiveEventBus.get(Constants.EVENT_LOGOUT_CLEARED, Unit::class.java)
+            .observeForever(logoutObserver)
+    }
 
     fun getBannerListLiveData(): MutableLiveData<MutableList<MegaBanner>?> {
         return bannerList
@@ -85,7 +108,7 @@ class HomepageRepository @Inject constructor(
      */
     suspend fun loadBannerList() {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastGetBannerTime < getBannerThreshold) {
+        if (currentTime - lastGetBannerTime < getBannerThreshold && getBannerSuccess) {
             bannerList.value?.let {
                 bannerList.value = it
             }
@@ -94,6 +117,7 @@ class HomepageRepository @Inject constructor(
         }
 
         lastGetBannerTime = currentTime
+        getBannerSuccess = false
 
         withContext(Dispatchers.IO) {
             megaApi.getBanners(object : BaseListener(MegaApplication.getInstance()) {
@@ -103,12 +127,50 @@ class HomepageRepository @Inject constructor(
                     e: MegaError
                 ) {
                     if (e.errorCode == MegaError.API_OK) {
-                        bannerList.value = MegaUtilsAndroid.bannersToArray(request.megaBannerList)
+                        MegaUtilsAndroid.bannersToArray(request.megaBannerList)?.also {
+                            prefetchBannerImages(it)
+                        }
                     } else if (e.errorCode == MegaError.API_ENOENT) {
                         bannerList.value = null
                     }
                 }
             })
+        }
+    }
+
+    /**
+     * Prefetch all the images of the banners by virtue of Fresco disk cache mechanism.
+     * Notify to display the banner view pager only if all images were successfully downloaded
+     *
+     * @param banners the list of MegaBanner
+     */
+    private fun prefetchBannerImages(banners: MutableList<MegaBanner>) {
+        val bannerImageUrls = mutableListOf<String>()
+
+        banners.forEach {
+            bannerImageUrls.add(it.imageLocation.plus(it.backgroundImage))
+            bannerImageUrls.add(it.imageLocation.plus(it.image))
+        }
+
+        var count = bannerImageUrls.size
+
+        bannerImageUrls.forEach {
+            val ds = Fresco.getImagePipeline()
+                .prefetchToDiskCache(ImageRequest.fromUri(it), null)
+            ds.subscribe(object : BaseDataSubscriber<Void>() {
+                override fun onNewResultImpl(dataSource: DataSource<Void>) {
+                    count--
+                    if (count == 0) {
+                        getBannerSuccess = true
+                        bannerList.value = banners
+                    }
+                }
+
+                override fun onFailureImpl(dataSource: DataSource<Void>) {
+                    logWarning("Get banner image failed")
+                }
+
+            }, UiThreadImmediateExecutorService.getInstance())
         }
     }
 
