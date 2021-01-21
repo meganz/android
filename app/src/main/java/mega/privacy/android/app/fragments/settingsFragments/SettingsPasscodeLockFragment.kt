@@ -33,9 +33,32 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_passcode)
         pinLockEnableSwitch = findPreference(SettingsConstants.KEY_PIN_LOCK_ENABLE)
-        pinLockEnableSwitch?.onPreferenceClickListener = this
+        pinLockEnableSwitch?.setOnPreferenceClickListener {
+            pinLock = !pinLock
+
+            if (pinLock) {
+                showPanelSetPinLock()
+            } else {
+                dbH.setPinLockEnabled(false)
+                dbH.setPinLockCode("")
+                preferenceScreen.removePreference(pinLockCode)
+            }
+            true
+        }
 
         pinLockCode = findPreference(SettingsConstants.KEY_PIN_LOCK_CODE)
+        pinLockCode?.apply {
+            setOnPreferenceClickListener {
+                resetPinLock()
+                true
+            }
+
+            onPreferenceChangeListener =
+                Preference.OnPreferenceChangeListener { _, newValue ->
+                    dbH.setPinLockCode(newValue.toString())
+                    true
+                }
+        }
         pinLockCode?.onPreferenceClickListener = this
         pinLockCode?.onPreferenceChangeListener = this
 
@@ -47,35 +70,6 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         } else {
             preferenceScreen.removePreference(pinLockCode)
         }
-    }
-
-    override fun onPreferenceClick(preference: Preference): Boolean {
-        when (preference.key) {
-            SettingsConstants.KEY_PIN_LOCK_ENABLE -> {
-                pinLock = !pinLock
-
-                if (pinLock) {
-                    showPanelSetPinLock()
-                } else {
-                    dbH.setPinLockEnabled(false)
-                    dbH.setPinLockCode("")
-                    preferenceScreen.removePreference(pinLockCode)
-                }
-            }
-
-            SettingsConstants.KEY_PIN_LOCK_CODE -> resetPinLock()
-        }
-        return true
-    }
-
-    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-        prefs = dbH.preferences
-
-        if (preference.key == SettingsConstants.KEY_PIN_LOCK_CODE) {
-            dbH.setPinLockCode(newValue.toString())
-        }
-
-        return true
     }
 
     /**
@@ -140,12 +134,13 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     override fun onResume() {
-        prefs = dbH.preferences
         updatePinLock()
         super.onResume()
     }
 
     private fun updatePinLock() {
+        prefs = dbH.preferences
+
         if (prefs == null || prefs.pinLockEnabled == null) {
             cancelSetPinLock()
         } else {
@@ -161,8 +156,6 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        prefs = dbH.preferences
-
         if (requestCode != Constants.SET_PIN) return
 
         if (resultCode == Activity.RESULT_OK) {
