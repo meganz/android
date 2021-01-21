@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_passcode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/Theme.Megaactionbar"
+        app:theme="@style/Theme.Megaactionbar"
+        app:titleTextAppearance="@style/ToolbarTitle" />
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:fontFamily="sans-serif"
+        android:text="@string/unlock_pin_title"
+        android:textColor="@color/primary_text"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_passcode" />
+
+    <mega.privacy.android.app.components.EditTextPIN
+        android:id="@+id/pass_first_input"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:imeOptions="actionNext"
+        android:inputType="numberPassword"
+        android:maxLength="1"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
+        android:theme="@style/ColorControlStyle"
+        app:layout_constraintEnd_toStartOf="@id/pass_second_input"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+    <mega.privacy.android.app.components.EditTextPIN
+        android:id="@+id/pass_second_input"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:imeOptions="actionNext"
+        android:inputType="numberPassword"
+        android:maxLength="1"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
+        android:theme="@style/ColorControlStyle"
+        app:layout_constraintEnd_toStartOf="@id/pass_third_input"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/pass_first_input"
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+    <mega.privacy.android.app.components.EditTextPIN
+        android:id="@+id/pass_third_input"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:imeOptions="actionNext"
+        android:inputType="numberPassword"
+        android:maxLength="1"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
+        android:theme="@style/ColorControlStyle"
+        app:layout_constraintEnd_toStartOf="@id/pass_fourth_input"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/pass_second_input"
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+    <mega.privacy.android.app.components.EditTextPIN
+        android:id="@+id/pass_fourth_input"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:imeOptions="actionDone"
+        android:inputType="numberPassword"
+        android:maxLength="1"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
+        android:theme="@style/ColorControlStyle"
+        app:layout_constraintEnd_toStartOf="@id/pass_fifth_input"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/pass_third_input"
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+    <mega.privacy.android.app.components.EditTextPIN
+        android:id="@+id/pass_fifth_input"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center_horizontal"
+        android:imeOptions="actionNext"
+        android:inputType="numberPassword"
+        android:maxLength="1"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
+        android:theme="@style/ColorControlStyle"
+        app:layout_constraintEnd_toStartOf="@id/pass_sixth_input"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/pass_fourth_input"
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+    <mega.privacy.android.app.components.EditTextPIN
+        android:id="@+id/pass_sixth_input"
+        android:layout_width="22dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:imeOptions="actionDone"
+        android:inputType="numberPassword"
+        android:maxLength="1"
+        android:textColor="@color/primary_text"
+        android:textSize="18sp"
+        android:theme="@style/ColorControlStyle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/pass_fifth_input"
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+    <EditText
+        android:id="@+id/password_input"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:importantForAutofill="no"
+        android:inputType="textPassword"
+        android:textColor="@color/primary_text"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        tools:ignore="LabelFor" />
+
+    <Button
+        android:id="@+id/passcode_options_button"
+        style="@style/TransparentBackgroundButtonWithoutBorder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:imeOptions="actionDone"
+        android:text="@string/settings_passcode_option"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -318,6 +318,13 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeActivity"
+            android:label="@string/settings_pin_lock"
+            android:windowSoftInputMode="adjustResize|stateVisible"
+            android:theme="@style/Theme.Megaactionbar">
+        </activity>
+
+        <activity
             android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
             android:label="@string/zip_browser_activity"
             android:configChanges="orientation|screenSize"

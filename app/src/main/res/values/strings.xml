@@ -677,6 +677,7 @@
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
     <string name="settings_pin_lock" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
 
@@ -780,7 +781,7 @@
         <item context="Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime." quantity="other">Wrong Passcode, please try again. You have %2d attempts left</item>
     </plurals>
     <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match</string>
-    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your Passcode</string>
+    <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your passcode</string>
     <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your Passcode</string>
     <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new Passcode</string>
     <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new Passcode</string>

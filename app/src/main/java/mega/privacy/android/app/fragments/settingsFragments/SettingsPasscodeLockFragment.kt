@@ -9,6 +9,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.settingsActivities.PasscodeActivity
+import mega.privacy.android.app.activities.settingsActivities.PasscodeActivity.Companion.ACTION_SET_PIN_LOCK
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.lollipop.PinLockActivityLollipop
 import mega.privacy.android.app.utils.Constants
@@ -37,7 +39,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             pinLock = !pinLock
 
             if (pinLock) {
-                showPanelSetPinLock()
+                intentToPinLock()
             } else {
                 dbH.setPinLockEnabled(false)
                 dbH.setPinLockCode("")
@@ -145,7 +147,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             cancelSetPinLock()
         } else {
             pinLock = java.lang.Boolean.parseBoolean(prefs.pinLockEnabled)
-            pinLockEnableSwitch!!.isChecked = pinLock
+            pinLockEnableSwitch?.isChecked = pinLock
             pinLockCodeTxt = prefs.pinLockCode
 
             if (pinLockCodeTxt == null) {
@@ -183,7 +185,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
     private fun cancelSetPinLock() {
         pinLock = false
-        pinLockEnableSwitch!!.isChecked = pinLock
+        pinLockEnableSwitch?.isChecked = pinLock
         dbH.setPinLockEnabled(false)
         dbH.setPinLockCode("")
     }
@@ -195,8 +197,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     private fun intentToPinLock() {
-        val intent = Intent(context, PinLockActivityLollipop::class.java)
-        intent.action = PinLockActivityLollipop.ACTION_SET_PIN_LOCK
+        val intent = Intent(context, PasscodeActivity::class.java)
+        intent.action = ACTION_SET_PIN_LOCK
         startActivityForResult(intent, Constants.SET_PIN)
     }
 }
