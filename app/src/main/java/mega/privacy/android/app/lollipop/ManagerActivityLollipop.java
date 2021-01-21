@@ -269,7 +269,6 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
-import static mega.privacy.android.app.MegaApplication.sNightMode;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -775,8 +774,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	int bottomNavigationCurrentItem = -1;
 	View chatBadge;
 	View callBadge;
-
-	FrameLayout themeSection;
 
 	private boolean connected;
 
@@ -2331,8 +2328,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		transfersSection.setOnClickListener(this);
         settingsSection = findViewById(R.id.settings_section);
         settingsSection.setOnClickListener(this);
-		themeSection = findViewById(R.id.theme_section);
-		themeSection.setOnClickListener(this);
         upgradeAccount = (Button) findViewById(R.id.upgrade_navigation_view);
         upgradeAccount.setOnClickListener(this);
 
@@ -10978,15 +10973,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				drawerItem = DrawerItem.SETTINGS;
 				checkIfShouldCloseSearchView(oldDrawerItem);
 				selectDrawerItemLollipop(drawerItem);
-				break;
-			}
-			case R.id.theme_section: {
-				if (sNightMode == AppCompatDelegate.MODE_NIGHT_NO) {
-					sNightMode = AppCompatDelegate.MODE_NIGHT_YES;
-				} else {
-					sNightMode = AppCompatDelegate.MODE_NIGHT_NO;
-				}
-				getDelegate().setDefaultNightMode(sNightMode);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {

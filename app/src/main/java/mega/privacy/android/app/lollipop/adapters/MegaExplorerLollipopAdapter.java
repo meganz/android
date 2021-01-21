@@ -257,7 +257,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                 holder.itemView.setOnClickListener(null);
             } else {
                 holder.imageView.setAlpha(1.0f);
-                holder.permissionsIcon.setAlpha(.35f);
                 holder.itemView.setOnClickListener(this);
             }
 

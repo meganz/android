@@ -69,6 +69,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.ColorThemeManager;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -205,8 +206,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private PowerManager.WakeLock wakeLock;
 	private CallListener callListener = new CallListener();
 	private GlobalChatListener globalChatListener = new GlobalChatListener(this);
-
-	public static int sNightMode = AppCompatDelegate.MODE_NIGHT_YES;
 
     @Override
 	public void networkAvailable() {
@@ -706,7 +705,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		super.onCreate();
 
-		AppCompatDelegate.setDefaultNightMode(sNightMode);
+        ColorThemeManager.INSTANCE.applyColorTheme(this);
 
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {

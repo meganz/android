@@ -705,6 +705,7 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     -->
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera uploads complete</string>
+    <string name="settings_appearance" context="settings of the Appearance section">Appearance</string>
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
@@ -1411,6 +1412,7 @@
     <string name="confirmation_delete_from_save_for_offline" context="Confirmation message before removing something from the Offline section.">Remove from Offline?</string>
 
     <string name="set_status_option_label" context="Label for the option of action menu to change the chat status">Set status</string>
+    <string name="set_color_theme_label" context="Label for the option of setting to change the color theme">Color theme</string>
     <string name="general_dismiss" context="Answer for confirmation dialog.">Dismiss</string>
     <string name="general_not_available" context="Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible).">Not available</string>
 
@@ -1434,6 +1436,12 @@
     <!--
     <string name="autoaway_disabled" context="Word to indicated the autoaway is disabled">Disabled</string>
     -->
+
+    <string-array name="settings_color_theme_label">
+        <item context="Option of color theme, light mode.">Light</item>
+        <item context="Option of color theme, dark mode.">Dark</item>
+        <item context="Option of color theme, follow the system setting.">System default</item>
+    </string-array>
 
     <string-array name="settings_status_entries">
         <item context="the options of what to upload in an array. Needed for the settings, the options of what to upload.">Online</item>

@@ -285,30 +285,6 @@
 
             </RelativeLayout>
 
-            <FrameLayout
-                android:id="@+id/theme_section"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/drawer_item_height">
-
-                <TextView
-                    android:id="@+id/theme_section_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="start|center_vertical"
-                    android:text="Switch theme"
-                    android:textAppearance="?attr/textAppearanceSubtitle2" />
-
-                <View
-                    android:id="@+id/theme_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_gravity="bottom"
-                    android:layout_marginTop="16dp"
-                    android:background="@color/grey_012_white_012" />
-
-            </FrameLayout>
-
             <Button
                 android:id="@+id/upgrade_navigation_view"
                 style="?attr/materialButtonStyle"

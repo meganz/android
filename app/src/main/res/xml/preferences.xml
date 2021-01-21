@@ -5,6 +5,23 @@
 	android:key="general_preference_screen">
 
 	<androidx.preference.PreferenceCategory
+		android:key="settings_appearance"
+		android:title="@string/settings_appearance"
+		app:allowDividerAbove="false"
+		app:allowDividerBelow="false">
+
+		<androidx.preference.ListPreference
+			android:key="settings_appearance_color_theme"
+			android:title="@string/set_color_theme_label"
+			android:entries="@array/settings_color_theme_label"
+			android:entryValues="@array/settings_color_theme_value"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+	</androidx.preference.PreferenceCategory>
+
+	<androidx.preference.PreferenceCategory
 		android:key="settings_features"
 		android:title="@string/settings_features"
 		app:allowDividerAbove="false"
