@@ -3,6 +3,7 @@ package mega.privacy.android.app.psa
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.notifyObserver
@@ -95,5 +96,11 @@ class PsaViewModel(
          * SDK to get PSA from server.
          */
         const val GET_PSA_MIN_INTERVAL_MS = 3600_000
+
+        @JvmStatic
+        fun clearPreference() {
+            MegaApplication.getInstance()
+                .getSharedPreferences(LAST_GET_PSA_SP, Context.MODE_PRIVATE).edit().clear().apply()
+        }
     }
 }

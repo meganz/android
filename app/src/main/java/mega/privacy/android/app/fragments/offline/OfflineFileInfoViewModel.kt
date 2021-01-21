@@ -13,8 +13,9 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.repo.MegaNodeRepo
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.OfflineUtils.*
+import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -63,7 +64,7 @@ class OfflineFileInfoViewModel @ViewModelInject constructor(
                 val file = getOfflineFile(context, node)
                 val totalSize = getSizeString(getTotalSize(file))
                 val contains = if (node.isFolder) {
-                    getFolderInfo(context.resources, file)
+                    getFileFolderInfo(file)
                 } else {
                     ""
                 }
