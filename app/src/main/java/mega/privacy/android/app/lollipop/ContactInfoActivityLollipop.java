@@ -115,6 +115,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.getDescription;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1058,40 +1059,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_sharing_folder), -1);
 			logWarning("Error sharing folder");
 		}
-	}
-
-
-	public String getDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders).toUpperCase(Locale.getDefault());
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFiles).toUpperCase(Locale.getDefault());
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders).toUpperCase(Locale.getDefault());
-			}
-			else{
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFiles).toUpperCase(Locale.getDefault());
-			}
-		}
-
-		return info;
 	}
 
 	public void setAvatar() {

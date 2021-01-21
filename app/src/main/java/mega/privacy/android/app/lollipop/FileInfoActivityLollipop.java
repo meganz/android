@@ -120,12 +120,14 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @SuppressLint("NewApi")
 public class FileInfoActivityLollipop extends PinActivityLollipop implements OnClickListener,
@@ -873,7 +875,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if(megaApi.hasVersions(node)){
                     versionsLayout.setVisibility(View.VISIBLE);
 
-                    String text = getResources().getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
+                    String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
                     versionsButton.setText(text);
                     versionsButton.setOnClickListener(this);
                     separatorVersions.setVisibility(View.VISIBLE);
@@ -1515,7 +1517,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 			if(megaApi.hasVersions(node)){
 				versionsLayout.setVisibility(View.VISIBLE);
-                String text = getResources().getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
+                String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
                 versionsButton.setText(text);
 				versionsButton.setOnClickListener(this);
 				separatorVersions.setVisibility(View.VISIBLE);
@@ -1533,7 +1535,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			contentTextView.setVisibility(View.VISIBLE);
 			contentTitleTextView.setVisibility(View.VISIBLE);
 
-			contentTextView.setText(getInfoFolder(node, this));
+			contentTextView.setText(getMegaNodeFolderInfo(node));
 
 			long sizeFile=megaApi.getSize(node);
 			sizeTextView.setText(getSizeString(sizeFile));
@@ -1641,7 +1643,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					sharedLayout.setVisibility(View.VISIBLE);
 					dividerSharedLayout.setVisibility(View.VISIBLE);
-					usersSharedWithTextButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+                    usersSharedWithTextButton.setText(getQuantityString(R.plurals.general_selection_num_contacts,
+                                    sl.size(), sl.size()));
 
 				}
 
@@ -1687,7 +1690,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         FrameLayout sharedContactLayout = (FrameLayout)findViewById(R.id.shared_contact_list_container);
         if (isShareContactExpanded) {
             if (sl != null) {
-                usersSharedWithTextButton.setText(sl.size() + " " + getResources().getQuantityString(R.plurals.general_num_users, sl.size()));
+                usersSharedWithTextButton.setText(getQuantityString(R.plurals.general_selection_num_contacts,
+                                sl.size(), sl.size()));
             }
             sharedContactLayout.setVisibility(View.GONE);
         } else {
@@ -2021,7 +2025,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 logDebug("Num versions: " + numVersions);
                 if(numVersions>0){
                     folderVersionsLayout.setVisibility(View.VISIBLE);
-                    String text = getResources().getQuantityString(R.plurals.number_of_versions_inside_folder, numVersions, numVersions);
+                    String text = getQuantityString(R.plurals.number_of_versions_inside_folder, numVersions, numVersions);
                     folderVersionsText.setText(text);
 
                     long currentVersions = info.getCurrentSize();
@@ -2088,11 +2092,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                 if (versionsRemoved+errorVersionRemove == versionsToRemove) {
                     if (versionsRemoved == versionsToRemove) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted), -1);
-                    }
-                    else {
+                    } else {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.version_history_deleted_erroneously)
-                                + "\n" + getResources().getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved, versionsRemoved)
-                                + "\n" + getResources().getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove, errorVersionRemove), -1);
+                                        + "\n" + getQuantityString(R.plurals.versions_deleted_succesfully, versionsRemoved, versionsRemoved)
+                                        + "\n" + getQuantityString(R.plurals.versions_not_deleted, errorVersionRemove, errorVersionRemove),
+                                MEGACHAT_INVALID_HANDLE);
                     }
                     versionsToRemove = 0;
                     versionsRemoved = 0;
@@ -2537,7 +2541,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			long sizeFile=megaApi.getSize(node);
 			sizeTextView.setText(getSizeString(sizeFile));
 
-			contentTextView.setText(getInfoFolder(node, this));
+			contentTextView.setText(getMegaNodeFolderInfo(node));
 			setIconResource();
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
@@ -2579,7 +2583,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				else{
 					sharedLayout.setVisibility(View.VISIBLE);
 					dividerSharedLayout.setVisibility(View.VISIBLE);
-                    usersSharedWithTextButton.setText((sl.size()) + " " + getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+                    usersSharedWithTextButton.setText(getQuantityString(R.plurals.general_selection_num_contacts,
+                                    sl.size(), sl.size()));
 				}
 			}
 		}
@@ -2605,7 +2610,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 		if(megaApi.hasVersions(node)){
 			versionsLayout.setVisibility(View.VISIBLE);
-            String text = getResources().getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
+            String text = getQuantityString(R.plurals.number_of_versions, megaApi.getNumVersions(node), megaApi.getNumVersions(node));
             versionsButton.setText(text);
 			versionsButton.setOnClickListener(this);
 			separatorVersions.setVisibility(View.VISIBLE);
@@ -3005,10 +3010,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             logDebug("Contacts selected: " + contacts.size());
         }
         
-        Resources res = getResources();
-        String format = "%d %s";
-        
-        actionMode.setTitle(String.format(format, contacts.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())));
+        actionMode.setTitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                        contacts.size(), contacts.size()));
         try {
             actionMode.invalidate();
         } catch (NullPointerException e) {

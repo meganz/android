@@ -41,6 +41,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -225,7 +226,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
-                nodeInfo.setText(getInfoFolder(node, context, megaApi));
+                nodeInfo.setText(getMegaNodeFolderInfo(node));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
@@ -606,7 +607,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                         if (sl != null) {
                             if (sl.size() != 0) {
-                                nodeInfo.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users, sl.size()));
+                                nodeInfo.setText(getQuantityString(R.plurals.general_num_shared_with,
+                                                sl.size(), sl.size()));
                             }
                         }
                     } else {

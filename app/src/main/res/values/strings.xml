@@ -124,52 +124,15 @@
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>
 
     <plurals name="general_num_files">
-        <item context="this is used for example when downloading 1 file or 2 files, Singular of file. 1 file" quantity="one">file</item>
-        <item context="this is used for example when downloading 1 file or 2 files, Plural of file. 2 files" quantity="other">files</item>
+        <item context="General file label. Singular of file. File" quantity="one">File</item>
+        <item context="General files label. Plural of file. Files" quantity="other">Files</item>
     </plurals>
 
-    <plurals name="general_num_contacts">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">contact</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">contacts</item>
+    <plurals name="general_num_shared_with">
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Shared with %1$s</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
     </plurals>
 
-    <plurals name="num_contacts_selected">
-        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d contact</item>
-        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
-    </plurals>
-
-    <plurals name="general_num_folders">
-        <item context="Singular of folder/directory. 1 folder" quantity="one">folder</item>
-        <item context="Plural of folder/directory. 2 folders" quantity="other">folders</item>
-    </plurals>
-
-    <plurals name="general_num_shared_folders">
-        <item context="Title of the incoming shared folders of a user in singular" quantity="one">shared folder</item>
-        <item context="Title of the incoming shared folders of a user in plural." quantity="other">shared folders</item>
-    </plurals>
-
-    <!--
-    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item context="Item menu option upon clicking on one or multiple files. Singular" quantity="one">download</item>
-        <item context="Item menu option upon clicking on one or multiple files. Plural" quantity="other">downloads</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_num_uploads">
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Singular" quantity="one">upload</item>
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Plural" quantity="other">uploads</item>
-    </plurals>
-    -->
-
-    <plurals name="general_num_users">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">contact</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">contacts</item>
-    </plurals>
-
-    <!--
-    <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
-    -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s will be downloaded.</string>
     <string name="alert_no_app" context="Alert text before download">There is no app to open the file %s. Do you want to continue with the download?</string>
     <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Do not show again</string>
@@ -375,6 +338,7 @@
     <string name="download_touch_to_show" context="Hint how to cancel the download">View transfers</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can’t download files greater than 4GB. Your download will probably fail</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">There isn’t any available app to execute this file on your device</string>
+    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There isn’t any available app to open this location on your device</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
@@ -1078,8 +1042,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d request replies successfully sent but %2$d were not sent.</string>
 
     <plurals name="general_num_request">
-        <item context="referring to a invitation request in the Contacts section" quantity="one">request</item>
-        <item context="referring to a invitation request in the Contacts section" quantity="other">requests</item>
+        <item context="Referring to a invitation request in the Contacts section. Singular." quantity="one">1 request</item>
+        <item context="Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests" quantity="other">%1$d requests</item>
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1104,8 +1068,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Please check your email and click the link to confirm your account.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. 1 item" quantity="one">item</item>
-        <item context="Plural of items which contains a folder. 2 items" quantity="other">items</item>
+        <item context="Singular of items which contains a folder. Singular." quantity="one">1 item</item>
+        <item context="Plural of items which contains a folder. Plural. e.g. 2 items" quantity="other">%1$d items</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">The associated user account has been terminated due to multiple violations of our Terms of Service.</string>
@@ -1136,27 +1100,6 @@
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
-    -->
-
-    <!--
-    <plurals name="general_minutes">
-        <item context="Singular of minutes. 1 minute" quantity="one">minute</item>
-        <item context="Plural of minutes. 2 minute" quantity="other">minutes</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_hours">
-        <item context="Singular of hours. 1 hour" quantity="one">hour</item>
-        <item context="Plural of hours. 2 hours" quantity="other">hours</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_seconds">
-        <item context="Singular of seconds. 1 second" quantity="one">second</item>
-        <item context="Plural of seconds. 2 second" quantity="other">seconds</item>
-    </plurals>
     -->
 
     <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">h</string>
@@ -2469,6 +2412,9 @@
     <string name="title_compress_video" context="notification title when compressing video">Compressing Videos %1$d/%2$d</string>
     <string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Invalid folder selected</string>
 
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file">1 folder . 1 file</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder . 7 files">1 folder . %1$d files</string>
+
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d file</item>
         <item context="on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files" quantity="other">%d files</item>
@@ -2477,6 +2423,11 @@
     <plurals name="num_folders_with_parameter">
         <item context="on the section notifications indicates the number of folder added to a shared folder, Singular of folder/directory. 1 folder" quantity="one">%d folder</item>
         <item context="on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders" quantity="other">%d folders</item>
+    </plurals>
+
+    <plurals name="num_folders_num_files">
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] added %2$s and %3$s[/B]</string>
@@ -2938,6 +2889,7 @@
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Search GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">No [A]GIFs[/A] found</string>
+    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">No available GIFs. Please try again later</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]End of[/A] results</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Resume transfers?</string>
