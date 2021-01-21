@@ -1605,7 +1605,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             app.setVideoStatus(callChat.getChatid(), isVideoOn);
         }
 
-        if(!videoFAB.isShown()) videoFAB.show();
+        if (microFAB.isShown() && !videoFAB.isShown()) videoFAB.show();
         updateVideoFABStatus();
 
         if (!chat.isGroup()) {

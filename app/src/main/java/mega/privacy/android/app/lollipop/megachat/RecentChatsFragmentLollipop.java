@@ -181,6 +181,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (!adapterList.isMultipleSelect()) {
             adapterList.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+            bannerContainer.setVisibility(View.GONE);
         }
     }
 
@@ -796,6 +797,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 adapterList.selectAll();
 
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+                bannerContainer.setVisibility(View.GONE);
             }
 
             new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
@@ -1720,6 +1722,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 ((ManagerActivityLollipop) context).showFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
                 checkScroll();
+            }
+
+            if(showInviteBanner()) {
+                bannerContainer.setVisibility(View.VISIBLE);
             }
         }
 

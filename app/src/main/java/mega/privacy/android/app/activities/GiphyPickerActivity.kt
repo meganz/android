@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Bundle
+import android.text.Spanned
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +23,9 @@ import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.databinding.ActivityGiphyBinding
 import mega.privacy.android.app.interfaces.GiphyEndPointsInterface
 import mega.privacy.android.app.interfaces.GiphyInterface
+import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_DOWN_SERVER
+import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
+import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
 import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
@@ -31,6 +35,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_PICK_GIF
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
 import retrofit2.Call
@@ -46,7 +51,7 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         private const val DEFAULT_LIMIT = 25
         private const val EMPTY_IMAGE_MARGIN_TOP_PORTRAIT = 152F
         private const val EMPTY_TEXT_MARGIN_TOP_PORTRAIT = 12F
-        private const val EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE= 20F
+        private const val EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE = 20F
         private const val EMPTY_TEXT_MARGIN_TOP_LANDSCAPE = 0
 
         const val GIF_DATA = "GIF_DATA"
@@ -72,6 +77,8 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
     private var currentQuery: String? = null
     private var queryOffset = 0
     private var isEndOfList = false
+
+    private lateinit var emptyText: Spanned
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,7 +120,7 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
 
         binding.giphyEndList.text = HtmlCompat.fromHtml(endOfList, HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.giphyEndList.visibility = GONE
-        binding.emptyGiphyText.text = HtmlCompat.fromHtml(emptyTextSearch, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        emptyText = HtmlCompat.fromHtml(emptyTextSearch, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         giphyService = GiphyService.buildService()
         requestTrendingData(false)
@@ -198,13 +205,16 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
             numColumns = NUM_COLUMNS_PORTRAIT
             widthScreen = outMetrics.widthPixels
 
-            paramsEmptyImage.topMargin = dp2px(EMPTY_IMAGE_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
-            paramsEmptyText.topMargin = dp2px(EMPTY_TEXT_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
+            paramsEmptyImage.topMargin =
+                dp2px(EMPTY_IMAGE_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
+            paramsEmptyText.topMargin =
+                dp2px(EMPTY_TEXT_MARGIN_TOP_PORTRAIT, resources.displayMetrics)
         } else if (screenOrientation == ORIENTATION_LANDSCAPE) {
             numColumns = NUM_COLUMNS_LANDSCAPE
             widthScreen = outMetrics.heightPixels
 
-            paramsEmptyImage.topMargin = dp2px(EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE, resources.displayMetrics)
+            paramsEmptyImage.topMargin =
+                dp2px(EMPTY_IMAGE_MARGIN_TOP_LANDSCAPE, resources.displayMetrics)
             paramsEmptyText.topMargin = EMPTY_TEXT_MARGIN_TOP_LANDSCAPE
         }
 
@@ -312,15 +322,26 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
                     }
                 } else {
                     logError("GiphyResponse failed.")
+                    checkIfShouldShowDownServerState()
                 }
             }
 
             override fun onFailure(call: Call<GiphyResponse>, t: Throwable) {
                 logError("GiphyResponse failed: " + t.message)
+                checkIfShouldShowDownServerState()
             }
         })
 
         previousRequest = call
+    }
+
+    /**
+     *Shows down server state if the response of server failed and there is no GIF in the adapter.
+     */
+    private fun checkIfShouldShowDownServerState() {
+        if (giphyAdapter == null || giphyAdapter?.itemCount == 0) {
+            setEmptyState(EMPTY_DOWN_SERVER)
+        }
     }
 
     /**
@@ -364,7 +385,12 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         searchView.maxWidth = Int.MAX_VALUE
 
         val line = searchView.findViewById(androidx.appcompat.R.id.search_plate) as View
-        line.setBackgroundColor(ContextCompat.getColor(applicationContext, android.R.color.transparent))
+        line.setBackgroundColor(
+            ContextCompat.getColor(
+                applicationContext,
+                android.R.color.transparent
+            )
+        )
 
         val searchAutoComplete =
             searchView.findViewById(androidx.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
@@ -421,13 +447,19 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         )
     }
 
-    override fun setEmptyState(emptyList: Boolean) {
-        if (emptyList) {
-            binding.emptyGiphyView.visibility = VISIBLE
-            binding.giphyListView.visibility = GONE
-        } else {
-            binding.emptyGiphyView.visibility = GONE
-            binding.giphyListView.visibility = VISIBLE
+    override fun setEmptyState(emptyState: Int) {
+        when (emptyState) {
+            NON_EMPTY -> {
+                binding.emptyGiphyView.visibility = GONE
+                binding.giphyListView.visibility = VISIBLE
+            }
+            else -> {
+                binding.emptyGiphyView.visibility = VISIBLE
+                binding.giphyListView.visibility = GONE
+                binding.emptyGiphyText.text =
+                    if (emptyState == EMPTY_SEARCH) emptyText
+                    else StringResourcesUtils.getString(R.string.server_down_giphy)
+            }
         }
     }
 
