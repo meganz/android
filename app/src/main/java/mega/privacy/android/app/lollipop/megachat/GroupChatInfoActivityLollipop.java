@@ -209,7 +209,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
             recyclerView = findViewById(R.id.chat_group_contact_properties_list);
-            recyclerView.addItemDecoration(new GroupParticipantsDividerItemDecoration(this, getOutMetrics()));
+            recyclerView.addItemDecoration(new GroupParticipantsDividerItemDecoration(this));
             recyclerView.setHasFixedSize(true);
             linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
@@ -1158,7 +1158,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case RECORD_AUDIO:
+            case REQUEST_RECORD_AUDIO:
             case REQUEST_CAMERA:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     controlCallPermissions();

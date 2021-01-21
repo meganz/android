@@ -13,6 +13,9 @@ import androidx.core.content.ContextCompat;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class PermissionUtils {
@@ -40,15 +43,22 @@ public class PermissionUtils {
             if(context == null) {
                 return;
             }
+
             Intent intent = new Intent();
             intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             Uri uri = Uri.fromParts("package", context.getPackageName(), null);
             intent.setData(uri);
+
             try {
                 context.startActivity(intent);
             } catch (Exception e) {
-                // in case few devices cannot hanle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
-                Util.showSnackbar(context, context.getString(R.string.on_permanently_denied));
+                if (context instanceof ManagerActivityLollipop) {
+                    // in case few devices cannot hanle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
+                    Util.showSnackbar(context, context.getString(R.string.on_permanently_denied));
+                } else {
+                    logError("Exception opening device settings", e);
+                }
             }
         };
     }

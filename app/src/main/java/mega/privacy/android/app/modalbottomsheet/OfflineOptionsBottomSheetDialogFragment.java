@@ -67,7 +67,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         LinearLayout optionShare = contentView.findViewById(R.id.option_share_layout);
 
         contentView.findViewById(R.id.option_delete_offline_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.available_offline_switch).setOnClickListener(this);
         optionOpenWith.setOnClickListener(this);
         optionShare.setOnClickListener(this);
 
@@ -95,33 +94,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             file = getOfflineFile(context, nodeOffline);
             if (!isFileAvailable(file)) return;
 
-            int folders = 0;
-            int files = 0;
             if (file.isDirectory()) {
-                File[] fList = file.listFiles();
-                if (fList != null) {
-                    for (File f : fList) {
-                        if (f.isDirectory()) {
-                            folders++;
-                        } else {
-                            files++;
-                        }
-                    }
-
-                    String info = "";
-                    if (folders > 0) {
-                        info = folders + " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
-                        if (files > 0) {
-                            info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
-                        }
-                    } else {
-                        info = files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
-                    }
-
-                    nodeInfo.setText(info);
-                } else {
-                    nodeInfo.setText(" ");
-                }
+                nodeInfo.setText(getFileFolderInfo(file));
             } else {
                 long nodeSize = file.length();
                 nodeInfo.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(file.lastModified() / 1000)));
@@ -156,9 +130,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
-            case R.id.available_offline_switch:
-                ((SwitchMaterial) contentView.findViewById(R.id.available_offline_switch))
-                        .setChecked(true);
                 if (context instanceof ManagerActivityLollipop) {
                     ((ManagerActivityLollipop) context)
                             .showConfirmationRemoveFromOffline(nodeOffline,

@@ -100,6 +100,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
@@ -109,6 +110,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.saver.OfflineNodeSaver;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
 import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
@@ -123,7 +125,7 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
@@ -160,6 +162,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -289,6 +292,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DraggableView draggableView;
     private ImageView ivShadow;
     private NodeController nC;
+    private OfflineNodeSaver offlineNodeSaver;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
@@ -1486,7 +1490,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void getImageView (int i, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
+        intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
         intent.putExtra("handle", handle);
@@ -1543,7 +1547,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         getImageView(i, handle);
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
         intent.putExtra("position", i);
-        intent.putExtra("actionType", SCROLL_TO_POSITION);
+        intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
         intent.putExtra("adapterType", adapterType);
         intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount);
@@ -2050,7 +2054,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
-                downloadMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
                 copyMenuItem.setVisible(false);
@@ -2448,7 +2452,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     break;
                 }
 
-                showGetLinkActivity();
+                showGetLinkActivity(this, handle);
                 break;
             }
             case R.id.full_video_viewer_remove_link: {
@@ -3095,13 +3099,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         removeLinkDialog.show();
     }
 
-    public void showGetLinkActivity(){
-        logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-        linkIntent.putExtra("handle", handle);
-        startActivity(linkIntent);
-    }
-
     public void showPropertiesActivity(){
         Intent i = new Intent(this, FileInfoActivityLollipop.class);
         if (isOffline){
@@ -3144,8 +3141,15 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void downloadFile() {
-
-        if (adapterType == FILE_LINK_ADAPTER){
+        if (adapterType == OFFLINE_ADAPTER) {
+            if (offlineNodeSaver == null) {
+                offlineNodeSaver = new OfflineNodeSaver(this, dbH);
+            }
+            offlineNodeSaver.save(Collections.singletonList(mediaOffList.get(currentWindowIndex)), false, (intent, code) -> {
+                startActivityForResult(intent, code);
+                return Unit.INSTANCE;
+            });
+        } else if (adapterType == FILE_LINK_ADAPTER) {
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -3232,6 +3236,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (intent == null) {
+            return;
+        }
+
+        if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
             return;
         }
 

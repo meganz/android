@@ -48,6 +48,7 @@ public class Constants {
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
     public static final int REQUEST_CODE_PICK_GIF = 1034;
+    public static final int REQUEST_CODE_SEND_LINK = 1035;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -76,6 +77,9 @@ public class Constants {
     public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
+    public static final String EXTRA_LINK = "EXTRA_LINK";
+    public static final String EXTRA_KEY = "EXTRA_KEY";
+    public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
@@ -120,9 +124,6 @@ public class Constants {
     public static final int CHOOSE_ACCOUNT_FRAGMENT = 6003;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
 
-    public static final int GET_LINK_FRAGMENT = 7000;
-    public static final int COPYRIGHT_FRAGMENT = 7001;
-
     public static final int ACHIEVEMENTS_FRAGMENT = 8000;
     public static final int BONUSES_FRAGMENT = 8001;
     public static final int INVITE_FRIENDS_FRAGMENT = 8002;
@@ -142,7 +143,7 @@ public class Constants {
     public static final int REQUEST_WRITE_STORAGE = 1;
     public static final int REQUEST_CAMERA = 2;
     public static final int REQUEST_READ_CONTACTS = 3;
-    public static final int RECORD_AUDIO = 4;
+    public static final int REQUEST_RECORD_AUDIO = 4;
     public static final int REQUEST_UPLOAD_CONTACT = 5;
     public static final int REQUEST_READ_STORAGE = 6;
 
@@ -475,6 +476,7 @@ public class Constants {
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
+    public static final int PERMISSIONS_TYPE = 4;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -537,6 +539,7 @@ public class Constants {
     public static final int INVALID_TYPE_PERMISSIONS = -1;
     public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
+    public static final int INVALID_VIEW_TYPE = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 

@@ -20,6 +20,7 @@ import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.OfflineUtils.*
@@ -407,8 +408,8 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    fun saveNodeToDevice(node: MegaOffline, activityStarter: (Intent, Int) -> Unit) {
-        nodeSaver.save(node, false, activityStarter)
+    fun saveNodeToDevice(nodes: List<MegaOffline>, activityStarter: (Intent, Int) -> Unit) {
+        nodeSaver.save(nodes, false, activityStarter)
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
@@ -512,7 +513,7 @@ class OfflineViewModel @ViewModelInject constructor(
         val file = getOfflineFile(context, node)
 
         return if (file.isDirectory) {
-            getFolderInfo(context.resources, file)
+            getFileFolderInfo(file)
         } else {
             String.format(
                 "%s . %s",

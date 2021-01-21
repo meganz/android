@@ -37,9 +37,11 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -609,6 +611,11 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
                 snackbar.show();
                 break;
+
+            case PERMISSIONS_TYPE:
+                snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
+                snackbar.show();
+                break;
         }
     }
 
@@ -937,5 +944,43 @@ public class BaseActivity extends AppCompatActivity {
 
     public AlertDialog getResumeTransfersWarning() {
         return resumeTransfersWarning;
+    }
+
+    /**
+     * Checks if should refresh session due to megaApi.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToSDK() {
+        if (megaApi == null || megaApi.getRootNode() == null) {
+            logWarning("Refresh session - sdk");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if should refresh session due to karere.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToKarere() {
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logWarning("Refresh session - karere");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void refreshSession() {
+        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

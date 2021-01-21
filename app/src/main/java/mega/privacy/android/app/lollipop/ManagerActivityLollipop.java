@@ -130,6 +130,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -150,6 +151,7 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
+import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -178,7 +180,7 @@ import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollip
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
@@ -220,6 +222,7 @@ import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -697,6 +700,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 //	private MenuItem pauseRestartTransfersItem;
 	private MenuItem createFolderMenuItem;
 	private MenuItem importLinkMenuItem;
+	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
 	private MenuItem thumbViewMenuItem;
@@ -885,7 +889,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                     return;
 				}
 
-				int actionType = intent.getIntExtra("actionType", -1);
+				int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if(actionType == UPDATE_GET_PRICING){
 					logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
@@ -1018,7 +1022,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			int actionType;
 
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if(actionType == GO_OFFLINE){
 				    //stop cu process
@@ -1086,7 +1090,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			ImageView imageDrag = null;
 
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 				position = intent.getIntExtra("position", -1);
 				placeholderCount = intent.getIntExtra("placeholder", 0);
 				adapterType = intent.getIntExtra("adapterType", 0);
@@ -1762,7 +1766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				break;
 			}
 
-			case RECORD_AUDIO:
+			case REQUEST_RECORD_AUDIO:
 				if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
@@ -2519,8 +2523,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
 					tFLol.setGetMoreQuotaViewVisibility();
-				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
-					completedTFLol.setGetMoreQuotaViewVisibility();
+				} else if (position == COMPLETED_TAB) {
+					if (isTransfersCompletedAdded()) {
+						completedTFLol.setGetMoreQuotaViewVisibility();
+					}
+
+					if (isTransfersInProgressAdded()) {
+						tFLol.checkSelectModeAfterChangeTab();
+					}
 				}
 			}
 
@@ -4752,12 +4762,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * @param psa the PSA to show
 	 */
     private void showPsa(Psa psa) {
-        if (psa == null || drawerItem != DrawerItem.CLOUD_DRIVE) {
+        if (psa == null || drawerItem != DrawerItem.HOMEPAGE
+				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
+        	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
+        	adjustNavHostViewHeight(true);
             return;
         }
 
         if (!TextUtils.isEmpty(psa.getUrl())) {
-            Intent intent = new Intent(this, WebViewActivityLollipop.class);
+            Intent intent = new Intent(this, WebViewActivity.class);
             intent.setData(Uri.parse(psa.getUrl()));
             startActivity(intent);
             psaViewModel.dismissPsa(psa.getId());
@@ -4765,6 +4778,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 
         psaViewHolder.bind(psa);
+		adjustNavHostViewHeight(true);
     }
 
     public void checkBeforeShowSMSVerificationDialog() {
@@ -5597,7 +5611,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && transfersWidget.getPendingTransfers() <= 0;
 
-		indexTransfers = MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
+		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+		indexTransfers = transfersManagement.thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
 		if (viewPagerTransfers != null) {
 			switch (indexTransfers) {
@@ -5609,6 +5624,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				default:
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					viewPagerTransfers.setCurrentItem(PENDING_TAB);
+
+					if (transfersManagement.shouldShowNetWorkWarning()) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+					}
+
 					break;
 			}
 
@@ -5666,7 +5686,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
 
-    	psaViewHolder.toggleVisible(drawerItem == DrawerItem.CLOUD_DRIVE);
+		updatePsaViewVisibility();
 
     	if (turnOnNotifications) {
 			fragmentContainer.setVisibility(View.VISIBLE);
@@ -5746,6 +5766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 			if (destinationId == R.id.homepageFragment) {
 				mHomepageScreen = HomepageScreen.HOMEPAGE;
+				updatePsaViewVisibility();
 				// Showing the bottom navigation view immediately because the initial dimension
 				// of Homepage bottom sheet is calculated based on it
 				showBNVImmediate();
@@ -5766,6 +5787,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.FULLSCREEN_OFFLINE;
 			} else if (destinationId == R.id.offline_file_info) {
 				mHomepageScreen = HomepageScreen.OFFLINE_FILE_INFO;
+				updatePsaViewVisibility();
 				abL.setVisibility(View.GONE);
 				showHideBottomNavigationView(true);
 				return;
@@ -5773,6 +5795,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
 			supportInvalidateOptionsMenu();
@@ -6568,6 +6591,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
 		importLinkMenuItem = menu.findItem(R.id.action_import_link);
+		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		thumbViewMenuItem = menu.findItem(R.id.action_grid);
@@ -6629,6 +6653,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
+					createFolderMenuItem.setVisible(true);
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
                         thumbViewMenuItem.setVisible(true);
                         setGridListIcon();
@@ -6787,7 +6812,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         } else {
                             pauseTransfersMenuIcon.setVisible(true);
                         }
+
 						cancelAllTransfersMenuItem.setVisible(true);
+					    enableSelectMenuItem.setVisible(true);
 					} else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersInProgressAdded() && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
 						retryTransfers.setVisible(thereAreFailedOrCancelledTransfers());
@@ -6850,6 +6877,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         setSearchDrawerItem();
         selectDrawerItemLollipop(drawerItem);
         resetActionBar(aB);
+
+        if (sFLol != null) {
+            sFLol.newSearchNodesTask();
+        }
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
@@ -7475,6 +7506,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				retryAllTransfers();
 				return true;
 
+			case R.id.action_enable_select:
+				if (isTransfersInProgressAdded()) {
+					tFLol.activateActionMode();
+				}
+				return true;
+
             default:{
 	            return super.onOptionsItemSelected(item);
             }
@@ -7960,6 +7997,44 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
     }
 
+    /**
+	 * Update the PSA view visibility. It should only visible in root homepage tab.
+	 */
+    private void updatePsaViewVisibility() {
+		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
+				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
+		adjustNavHostViewHeight(true);
+	}
+
+    /**
+	 * Adjust the height of NavHostView according to the visibility of the PSA view.
+	 * When the PSA view is visible, the FAB within homepage should be displayed above
+	 * the PSA view, limit the height of NavHostView is an easier way to do that.
+	 *
+	 * @param needPost in some cases, e.g. go back from transfer fragment, the BNV isn't visible
+	 *                 when we call this function, so we need post this function call to the
+	 *                 next draw cycle.
+	 */
+    private void adjustNavHostViewHeight(boolean needPost) {
+    	if (drawerItem != DrawerItem.HOMEPAGE) {
+    		return;
+		}
+
+    	if (psaViewHolder.visible()) {
+    		if (fragmentLayout.getMeasuredHeight() <= 0 || psaViewHolder.psaLayoutHeight() <= 0 || needPost) {
+    			handler.post(() -> adjustNavHostViewHeight(false));
+			} else {
+				LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+				params.height = fragmentLayout.getMeasuredHeight() - psaViewHolder.psaLayoutHeight();
+				mNavHostView.setLayoutParams(params);
+			}
+		} else {
+    		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
+    		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+    		mNavHostView.setLayoutParams(params);
+		}
+	}
+
 	private void closeUpgradeAccountFragment() {
 		setFirstNavigationLevel(true);
 		displayedAccountType = -1;
@@ -8076,13 +8151,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.bottom_navigation_item_shared_items: {
 				if (drawerItem == DrawerItem.SHARED_ITEMS) {
-					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
-						parentHandleIncoming = -1;
+					if (getTabItemShares() == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE) {
+						parentHandleIncoming = INVALID_HANDLE;
 						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
-						parentHandleOutgoing = -1;
+					} else if (getTabItemShares() == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE){
+						parentHandleOutgoing = INVALID_HANDLE;
 						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					} else if (getTabItemShares() == LINKS_TAB && parentHandleLinks != INVALID_HANDLE) {
+						parentHandleLinks = INVALID_HANDLE;
+						refreshFragment(FragmentTag.LINKS.getTag());
 					}
+
 					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
@@ -8453,9 +8532,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
+		LinksUtil.showGetLinkActivity(this, handle);
 
 		refreshAfterMovingToRubbish();
 	}
@@ -11058,7 +11135,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case R.id.lost_authentication_device: {
 				try {
 					String url = "https://mega.nz/recovery";
-					Intent openTermsIntent = new Intent(this, WebViewActivityLollipop.class);
+					Intent openTermsIntent = new Intent(this, WebViewActivity.class);
 					openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					openTermsIntent.setData(Uri.parse(url));
 					startActivity(openTermsIntent);
@@ -13664,7 +13741,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 		} else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
-			MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+			if (e.getErrorCode() == MegaError.API_OK){
+				MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+				transfersWidget.update();
+				supportInvalidateOptionsMenu();
+			} else {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
+			}
 		} else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			logDebug("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
@@ -13683,21 +13766,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 
-		}
-		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
-			logDebug("One MegaRequest.TYPE_CANCEL_TRANSFER");
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("REQUEST OK - wait for onTransferFinish()");
-				transfersWidget.update();
-				supportInvalidateOptionsMenu();
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-			}
-
-		}
-		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+		} else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			logDebug("requestFinish TYPE_KILL_SESSION"+MegaRequest.TYPE_KILL_SESSION);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Success kill sessions");
@@ -14378,8 +14447,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * Shows a warning to ensure if it is sure of remove all completed transfers.
 	 */
 	public void showConfirmationClearCompletedTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers))
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
 				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
 					dbH.emptyCompletedTransfers();
 
@@ -14388,32 +14457,41 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 					supportInvalidateOptionsMenu();
 				})
-				.setNegativeButton(R.string.general_cancel, null);
+				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
 		setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**
-	 * Shows a warning to ensure if it is sure of cancel a transfer.
-	 *
-	 * @param mT	the transfer to cancel
+	 * Shows a warning to ensure if it is sure of cancel selected transfers.
 	 */
-	public void showConfirmationCancelTransfer(final MegaTransfer mT) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.cancel_transfer_confirmation)
-				.setPositiveButton(R.string.general_cancel, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
+	public void showConfirmationCancelSelectedTransfers(List<MegaTransfer> selectedTransfers) {
+		if (selectedTransfers == null || selectedTransfers.isEmpty()) {
+			return;
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
+				.setPositiveButton(R.string.button_continue, (dialog, which) -> {
+					CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
+					cancelTransferListener.cancelTransfers(selectedTransfers);
+
+					if(isTransfersInProgressAdded()) {
+						tFLol.destroyActionMode();
+					}
+				})
 				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
-        setConfirmationTransfersDialogNotCancellableAndShow();
+		setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**
 	 * Shows a warning to ensure if it is sure of cancel all transfers.
 	 */
 	public void showConfirmationCancelAllTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
 				.setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
@@ -14540,14 +14618,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			logDebug("Update onTransferUpdate: " + transfer.getNodeHandle() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
 			lastTimeOnTransferUpdate = now;
 
-			if (!transfer.isFolderTransfer()){
-				if(transferCallback<transfer.getNotificationNumber()){
-					transferCallback = transfer.getNotificationNumber();
+			if (!transfer.isFolderTransfer() && transferCallback < transfer.getNotificationNumber()) {
+				transferCallback = transfer.getNotificationNumber();
 
-                    if (isTransfersInProgressAdded()){
-						tFLol.transferUpdate(transfer);
-					}
-
+				if (isTransfersInProgressAdded()) {
+					tFLol.transferUpdate(transfer);
 				}
 			}
 		}

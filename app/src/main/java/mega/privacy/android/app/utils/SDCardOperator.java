@@ -171,6 +171,23 @@ public class SDCardOperator {
     }
 
     /**
+     * Checks if the file already exists in targetPath.
+     *
+     * @param file       File to check.
+     * @param targetPath Path where the file is checked for.
+     */
+    public boolean fileExistsInTargetPath(File file, String targetPath) {
+        DocumentFile parent = getDocumentFileByPath(targetPath);
+        if (parent == null) {
+            return false;
+        }
+
+        DocumentFile destFile = parent.findFile(file.getName());
+
+        return destFile != null && destFile.length() == file.length();
+    }
+
+    /**
      * Moves a file from its location to targetPath.
      *
      * @param targetPath Path where the file has to be moved.
@@ -225,6 +242,14 @@ public class SDCardOperator {
     }
 
     private List<String> getSubFolders(String root, String parent) {
+        if (parent == null) {
+            throw new IllegalArgumentException("parent is null");
+        }
+
+        if (root == null) {
+            throw new IllegalArgumentException("root is null");
+        }
+
         if (parent.length() < root.length()) {
             throw new IllegalArgumentException("no subfolders!");
         }

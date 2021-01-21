@@ -95,7 +95,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             int actionType;
 
             if (intent != null){
-                actionType = intent.getIntExtra("actionType", -1);
+                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
                 if(actionType == UPDATE_GET_PRICING){
                     logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
@@ -321,7 +321,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, tourFragment).commit();
+                ft.replace(R.id.fragment_container_login, tourFragment).commitNowAllowingStateLoss();
                 break;
             }
             case CONFIRM_EMAIL_FRAGMENT: {
@@ -334,7 +334,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 }
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commit();
+                ft.replace(R.id.fragment_container_login, confirmEmailFragment).commitNowAllowingStateLoss();
+
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.executePendingTransactions();
 

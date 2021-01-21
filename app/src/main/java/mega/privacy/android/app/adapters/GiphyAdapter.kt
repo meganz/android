@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.viewHolders.GiphyViewHolder
 import mega.privacy.android.app.interfaces.GiphyInterface
+import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
+import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
 import mega.privacy.android.app.objects.Data
 
 class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: GiphyInterface) :
@@ -28,14 +30,14 @@ class GiphyAdapter(private var gifs: List<Data>?, private val giphyInterface: Gi
 
     fun setGifs(newGifs: ArrayList<Data>?) {
         gifs = newGifs
-        giphyInterface.setEmptyState(gifs?.isEmpty() ?: true)
+        giphyInterface.setEmptyState(if (gifs?.isEmpty() == true) EMPTY_SEARCH else NON_EMPTY)
         notifyDataSetChanged()
     }
 
     fun addGifs(newGifs: ArrayList<Data>?) {
         val oldLatestPosition = itemCount
         gifs = newGifs
-        giphyInterface.setEmptyState(gifs?.isEmpty() ?: true)
+        giphyInterface.setEmptyState(if (gifs?.isEmpty() == true) EMPTY_SEARCH else NON_EMPTY)
         notifyItemRangeInserted(oldLatestPosition, gifs?.size!!)
     }
 
