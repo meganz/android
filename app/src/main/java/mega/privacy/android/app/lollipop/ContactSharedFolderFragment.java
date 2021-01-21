@@ -77,7 +77,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             //set up list view
             listView = (RecyclerView)v.findViewById(R.id.contact_shared_folder_list_view);
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(context);
-            listView.addItemDecoration(new SimpleDividerItemDecoration(context,outMetrics));
+            listView.addItemDecoration(new SimpleDividerItemDecoration(context));
             listView.setLayoutManager(mLayoutManager);
             listView.setItemAnimator(new DefaultItemAnimator());
             
