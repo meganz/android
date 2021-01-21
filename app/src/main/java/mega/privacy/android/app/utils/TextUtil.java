@@ -90,7 +90,7 @@ public class TextUtil {
 
         return emptyString;
     }
-    
+
     /**
      * Gets the string to show as content of a folder.
      *
