@@ -13,16 +13,16 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.MegaNodeSaver
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.listeners.CreateChatListener.SEND_FILE
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaNodeUtilKt
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.util.*
 
@@ -40,9 +40,6 @@ class AudioPlayerViewModel @ViewModelInject constructor(
 
     private val _snackbarToShow = MutableLiveData<Triple<Int, String, Long>>()
     val snackbarToShow: LiveData<Triple<Int, String, Long>> = _snackbarToShow
-
-    private val _intentToLaunch = MutableLiveData<Intent>()
-    val intentToLaunch: LiveData<Intent> = _intentToLaunch
 
     private val _itemToRemove = MutableLiveData<Long>()
     val itemToRemove: LiveData<Long> = _itemToRemove
@@ -75,8 +72,16 @@ class AudioPlayerViewModel @ViewModelInject constructor(
      * @param requestCode requestCode of onActivityResult
      * @param resultCode resultCode of onActivityResult
      * @param data data of onActivityResult
+     * @param snackbarShower interface to show snackbar
+     * @param activityLauncher interface to start activity
      */
-    fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun handleActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower,
+        activityLauncher: ActivityLauncher
+    ) {
         if (offlineNodeSaver.handleActivityResult(requestCode, resultCode, data)
             || megaNodeSaver.handleActivityResult(requestCode, resultCode, data)
             || resultCode != RESULT_OK || data == null
@@ -89,10 +94,18 @@ class AudioPlayerViewModel @ViewModelInject constructor(
                 handleSelectChatResult(data)
             }
             REQUEST_CODE_SELECT_MOVE_FOLDER -> {
-                handleMoveResult(data)
+                val handles = MegaNodeUtilKt.handleSelectMoveFolderResult(
+                    requestCode, resultCode, data, snackbarShower
+                )
+
+                for (handle in handles) {
+                    _itemToRemove.value = handle
+                }
             }
             REQUEST_CODE_SELECT_COPY_FOLDER -> {
-                handleCopyResult(data)
+                MegaNodeUtilKt.handleSelectCopyFolderResult(
+                    requestCode, resultCode, data, snackbarShower, activityLauncher
+                )
             }
         }
     }
@@ -189,123 +202,6 @@ class AudioPlayerViewModel @ViewModelInject constructor(
                 megaChatApi.attachNode(handle, nodeHandles[0], megaChatRequestListener)
             }
         }
-    }
-
-    private fun handleMoveResult(intent: Intent) {
-        val moveHandles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
-        if (moveHandles == null || moveHandles.isEmpty()) {
-            return
-        }
-
-        val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
-        val parent = megaApi.getNodeByHandle(toHandle) ?: return
-
-        val listener = object : BaseListener(context) {
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                if (request.type == MegaRequest.TYPE_MOVE) {
-                    _snackbarToShow.value = Triple(
-                        SNACKBAR_TYPE,
-                        context.getString(
-                            if (e.errorCode == MegaError.API_OK) R.string.context_correctly_moved
-                            else R.string.context_no_moved
-                        ),
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-        }
-
-        for (handle in moveHandles) {
-            val node = megaApi.getNodeByHandle(handle)
-            if (node != null) {
-                _itemToRemove.value = handle
-                megaApi.moveNode(node, parent, listener)
-            }
-        }
-    }
-
-    private fun handleCopyResult(intent: Intent) {
-        val copyHandles = intent.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)
-        if (copyHandles == null || copyHandles.isEmpty()) {
-            return
-        }
-
-        val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
-        val parent = megaApi.getNodeByHandle(toHandle) ?: return
-
-        val listener = object : BaseListener(context) {
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                if (request.type == MegaRequest.TYPE_COPY) {
-                    when (e.errorCode) {
-                        MegaError.API_OK -> {
-                            _snackbarToShow.value = Triple(
-                                SNACKBAR_TYPE,
-                                context.getString(R.string.context_correctly_copied),
-                                MEGACHAT_INVALID_HANDLE
-                            )
-                        }
-                        MegaError.API_EOVERQUOTA -> {
-                            val toLaunch = Intent(context, ManagerActivityLollipop::class.java)
-                            toLaunch.action = ACTION_OVERQUOTA_STORAGE
-                            _intentToLaunch.value = toLaunch
-                        }
-                        MegaError.API_EGOINGOVERQUOTA -> {
-                            val toLaunch = Intent(context, ManagerActivityLollipop::class.java)
-                            toLaunch.action = ACTION_PRE_OVERQUOTA_STORAGE
-                            _intentToLaunch.value = toLaunch
-                        }
-                        else -> {
-                            _snackbarToShow.value = Triple(
-                                SNACKBAR_TYPE,
-                                context.getString(R.string.context_no_copied),
-                                MEGACHAT_INVALID_HANDLE
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        for (handle in copyHandles) {
-            val node = megaApi.getNodeByHandle(handle)
-            if (node != null) {
-                megaApi.copyNode(node, parent, listener)
-            }
-        }
-    }
-
-    fun renameNode(node: MegaNode, newName: String) {
-        megaApi.renameNode(node, newName, object : BaseListener(context) {
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                if (request.type == MegaRequest.TYPE_RENAME) {
-                    _snackbarToShow.value = Triple(
-                        SNACKBAR_TYPE,
-                        context.getString(
-                            if (e.errorCode == MegaError.API_OK) R.string.context_correctly_renamed
-                            else R.string.context_no_renamed
-                        ),
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-        })
-    }
-
-    fun moveNodeToRubbishBin(node: MegaNode) {
-        megaApi.moveNode(node, megaApi.rubbishNode, object : BaseListener(context) {
-            override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-                if (request.type == MegaRequest.TYPE_MOVE) {
-                    _snackbarToShow.value = Triple(
-                        SNACKBAR_TYPE,
-                        context.getString(
-                            if (e.errorCode == MegaError.API_OK) R.string.context_correctly_moved
-                            else R.string.context_no_moved
-                        ),
-                        MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-        })
     }
 
     override fun onCleared() {

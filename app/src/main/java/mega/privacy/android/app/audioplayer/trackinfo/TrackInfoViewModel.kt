@@ -16,14 +16,13 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.audioplayer.service.Metadata
 import mega.privacy.android.app.audioplayer.service.MetadataExtractor
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils.*
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
@@ -31,7 +30,9 @@ import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.notifyObserver
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
@@ -55,15 +56,9 @@ class TrackInfoViewModel @ViewModelInject constructor(
     private var trackInfoArgs: TrackInfoFragmentArgs? = null
     private var metadataOnlyPlayer: Player? = null
 
-    private val createThumbnailRequest = object : BaseListener(context) {
-        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-            if (e.errorCode == MegaError.API_OK) {
-                post {
-                    _nodeInfo.notifyObserver()
-                }
-            }
-        }
-    }
+    private val createThumbnailRequest = MegaRequestFinishListener({
+        _nodeInfo.notifyObserver()
+    })
 
     fun loadTrackInfo(args: TrackInfoFragmentArgs) {
         trackInfoArgs = args

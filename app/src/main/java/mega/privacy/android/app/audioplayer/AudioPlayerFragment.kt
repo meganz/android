@@ -149,7 +149,7 @@ class AudioPlayerFragment : Fragment() {
                     MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
                         .setCancelable(false)
                         .setMessage(
-                            if (isOnline(requireContext())) R.string.unsupported_file_type
+                            if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
                             else R.string.error_fail_to_open_file_no_network
                         )
                         .setPositiveButton(

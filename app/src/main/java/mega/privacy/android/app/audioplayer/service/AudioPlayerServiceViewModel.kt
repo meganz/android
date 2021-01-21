@@ -19,7 +19,7 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.playlist.PlaylistItem
-import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
@@ -30,8 +30,9 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.*
 import java.util.concurrent.Callable
@@ -60,17 +61,13 @@ class AudioPlayerServiceViewModel(
     private var repeatMode = preferences.getInt(KEY_REPEAT_MODE, Player.REPEAT_MODE_OFF)
 
     private val createThumbnailFinished = PublishSubject.create<Boolean>()
-    private val createThumbnailRequest = object : BaseListener(context) {
-        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-            if (e.errorCode == MegaError.API_OK) {
-                createThumbnailFinished.onNext(true)
+    private val createThumbnailRequest = MegaRequestFinishListener({
+        createThumbnailFinished.onNext(true)
 
-                if (request.nodeHandle == playingHandle) {
-                    postPlayingThumbnail()
-                }
-            }
+        if (it.nodeHandle == playingHandle) {
+            postPlayingThumbnail()
         }
-    }
+    })
 
     private val _playerSource = MutableLiveData<Triple<List<MediaItem>, Int, String?>>()
     val playerSource: LiveData<Triple<List<MediaItem>, Int, String?>> = _playerSource

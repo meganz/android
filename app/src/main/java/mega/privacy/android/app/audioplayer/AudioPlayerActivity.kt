@@ -24,6 +24,8 @@ import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -33,6 +35,7 @@ import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.*
+import mega.privacy.android.app.utils.MegaNodeUtilKt
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
@@ -43,7 +46,7 @@ import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AudioPlayerActivity : BaseActivity() {
+class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     @MegaApi
     @Inject
@@ -127,11 +130,6 @@ class AudioPlayerActivity : BaseActivity() {
 
         viewModel.snackbarToShow.observe(this) {
             showSnackbar(it.first, it.second, it.third)
-        }
-
-        viewModel.intentToLaunch.observe(this) {
-            startActivity(it)
-            stopPlayer()
         }
 
         viewModel.itemToRemove.observe(this) {
@@ -416,7 +414,7 @@ class AudioPlayerActivity : BaseActivity() {
                 AlertsAndWarnings.showRenameDialog(this, node.name, node.isFolder) {
                     playerService?.viewModel?.updateItemName(node.handle, it)
                     updateTrackInfoNodeNameIfNeeded(node.handle, it)
-                    viewModel.renameNode(node, it)
+                    MegaNodeUtilKt.renameNode(node, it, this)
                 }
                 return true
             }
@@ -482,7 +480,7 @@ class AudioPlayerActivity : BaseActivity() {
             .setMessage(R.string.confirmation_move_to_rubbish)
             .setPositiveButton(R.string.general_move) { _, _ ->
                 playerService?.viewModel?.removeItem(node.handle)
-                viewModel.moveNodeToRubbishBin(node)
+                MegaNodeUtilKt.moveNodeToRubbishBin(node, this)
             }
             .setNegativeButton(R.string.general_cancel, null)
             .show()
@@ -490,7 +488,7 @@ class AudioPlayerActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.handleActivityResult(requestCode, resultCode, data)
+        viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
     }
 
     fun showSnackbar(type: Int, content: String?, chatId: Long) {
@@ -522,5 +520,18 @@ class AudioPlayerActivity : BaseActivity() {
             binding.toolbar.animate().cancel()
             binding.toolbar.translationY = 0F
         }
+    }
+
+    override fun showSnackbar(content: String) {
+        showSnackbar(SNACKBAR_TYPE, content, MEGACHAT_INVALID_HANDLE)
+    }
+
+    override fun showSnackbarWithChat(content: String, chatId: Long) {
+        showSnackbar(MESSAGE_SNACKBAR_TYPE, content, chatId)
+    }
+
+    override fun launchActivity(intent: Intent) {
+        startActivity(intent)
+        stopPlayer()
     }
 }
