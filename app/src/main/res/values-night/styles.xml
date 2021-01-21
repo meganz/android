@@ -7,9 +7,7 @@
         <item name="backgroundTint">@color/white</item>
     </style>
 
-    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton">
-    </style>
+    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton" />
 
-    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
-    </style>
+    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton" />
 </resources>
