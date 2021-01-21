@@ -86,7 +86,7 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
@@ -113,12 +113,14 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -635,8 +637,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 						return false;
 					}
+
 					shareIt = false;
-			    	showGetLinkActivity(node.getHandle());
+			    	showGetLinkActivity(this, node.getHandle());
 					break;
 				}
 
@@ -1505,7 +1508,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void getImageView (int i, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
-		intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
+		intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
 		intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
 		intent.putExtra("handle", handle);
@@ -1561,7 +1564,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		getImageView(i, handle);
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
-		intent.putExtra("actionType", SCROLL_TO_POSITION);
+		intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
 		intent.putExtra("adapterType", adapterType);
 		intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount );
@@ -2024,13 +2027,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
 		    	.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 		}
-	}
-
-	public void showGetLinkActivity(long handle){
-		logDebug("Handle: " + handle);
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
 	}
 
 	public void setIsGetLink(boolean value){

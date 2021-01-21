@@ -98,7 +98,7 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
@@ -132,6 +132,7 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
@@ -1660,7 +1661,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     break;
                 }
 
-                showGetLinkActivity();
+                showGetLinkActivity(this, handle);
                 break;
             }
             case R.id.pdf_viewer_remove_link: {
@@ -2214,13 +2215,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         removeLinkDialog = builder.create();
         removeLinkDialog.show();
-    }
-
-    public void showGetLinkActivity(){
-        logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-        linkIntent.putExtra("handle", handle);
-        startActivity(linkIntent);
     }
 
     public void updateFile (){

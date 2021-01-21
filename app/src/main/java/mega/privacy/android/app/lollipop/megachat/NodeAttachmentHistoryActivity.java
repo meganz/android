@@ -252,7 +252,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			linearLayoutGrid.setVisibility(View.GONE);
 
 			listView = (RecyclerView) findViewById(R.id.node_history_list_view);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 			mLayoutManager = new LinearLayoutManager(this);
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			listView.setLayoutManager(mLayoutManager);
@@ -1411,7 +1411,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 				if(adapter==null){
 					adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
 					listView.setLayoutManager(mLayoutManager);
-					listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+					listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 					listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 						@Override
 						public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -1464,7 +1464,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			logDebug("Create adapter");
 			adapter = new NodeAttachmentHistoryAdapter(this, messages, listView, NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST);
 			listView.setLayoutManager(mLayoutManager);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

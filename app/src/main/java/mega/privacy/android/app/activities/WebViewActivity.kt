@@ -313,8 +313,8 @@ class WebViewActivity : BaseActivity() {
         val results: Array<Uri?>
 
         if (clipData == null && stringData == null && (pickedImage != null || pickedVideo != null)) {
-            val image = File(pickedImage?.removePrefix(FILE))
-            val video = File(pickedVideo?.removePrefix(FILE))
+            val image = if (pickedImage != null) File(pickedImage!!.removePrefix(FILE)) else null
+            val video = if (pickedVideo != null) File(pickedVideo!!.removePrefix(FILE)) else null
 
             val picked = if (isFileAvailable(image)) {
                 results = arrayOf(Uri.parse(pickedImage))

@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -58,6 +59,10 @@ public class AvatarUtil {
         }
 
         String resultTitle = EmojiUtilsShortcodes.emojify(text);
+        if (isTextEmpty(resultTitle)) {
+            return resultUnknown;
+        }
+
         List<EmojiRange> emojis = EmojiUtils.emojis(resultTitle);
 
         if (emojis != null && emojis.size() > 0 && emojis.get(0).start == 0) {
@@ -89,14 +94,21 @@ public class AvatarUtil {
     }
 
     private static String hasEmojiCompatAtFirst(String text) {
+        if (isTextEmpty(text)) {
+            return null;
+        }
+
         List<String> listEmojis = EmojiParser.extractEmojis(text);
+
         if (listEmojis != null && !listEmojis.isEmpty()) {
             String substring = text.substring(0, listEmojis.get(0).length());
             List<String> sublistEmojis = EmojiParser.extractEmojis(substring);
+
             if (sublistEmojis != null && !sublistEmojis.isEmpty()) {
                 return substring;
             }
         }
+
         return null;
     }
 
@@ -191,12 +203,7 @@ public class AvatarUtil {
 
         if (isList) {
             /*Shape list*/
-            int radius;
-            if (defaultAvatar.getWidth() < defaultAvatar.getHeight()) {
-                radius = defaultAvatar.getWidth() / 2;
-            } else {
-                radius = defaultAvatar.getHeight() / 2;
-            }
+            int radius = getRadius(defaultAvatar);
             c.drawCircle(defaultAvatar.getWidth() / 2, defaultAvatar.getHeight() / 2, radius, paintCircle);
         } else {
             /*Shape grid*/
@@ -385,5 +392,19 @@ public class AvatarUtil {
 
         canvas.drawCircle(bitmap.getWidth() / 2F, bitmap.getHeight() / 2F, radius, paint);
         return Pair.create(true, circleBitmap);
+    }
+
+    /**
+     * Method for getting the radius of a bitmap to correctly paint the radius of the border.
+     *
+     * @param bitmap The bitmap.
+     * @return The radius.
+     */
+    public static int getRadius(Bitmap bitmap) {
+        if (bitmap.getWidth() < bitmap.getHeight()) {
+            return bitmap.getWidth() / 2;
+        } else {
+            return bitmap.getHeight() / 2;
+        }
     }
 }

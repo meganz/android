@@ -13,6 +13,15 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
+
+import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.interfaces.GetLinkInterface;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaRequest;
+
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -35,6 +44,10 @@ public class ExportListener extends BaseListener {
     private long chatId = MEGACHAT_INVALID_HANDLE;
     private ArrayList<AndroidMegaChatMessage> messages;
     private HashMap<Long, Long> msgIdNodeHandle = new HashMap<>();
+
+    public ExportListener(Context context) {
+        super(context);
+    }
 
     /**
      * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
@@ -204,7 +217,7 @@ public class ExportListener extends BaseListener {
             return;
         }
 
-        if(request == null || shareIntent == null)
+        if(request == null)
             return;
 
         if (request.getLink() != null) {
@@ -227,12 +240,16 @@ public class ExportListener extends BaseListener {
 
             if (exportedLinks == null) {
                 logDebug("Start share one item");
-                startShareIntent(context, shareIntent, request.getLink());
+                if (shareIntent != null) {
+                    startShareIntent(context, shareIntent, request.getLink());
+                } else if (context instanceof GetLinkActivity) {
+                    ((GetLinkActivity) context).setLink();
+                }
                 return;
             }
 
             pendingExport--;
-            if (pendingExport == 0 && numberError < numberExport) {
+            if (shareIntent != null && pendingExport == 0 && numberError < numberExport) {
                 logDebug("Start share several items");
                 startShareIntent(context, shareIntent, exportedLinks.toString());
             }
@@ -241,6 +258,12 @@ public class ExportListener extends BaseListener {
         }
 
         logError("Error exporting node: " + e.getErrorString());
+
+        if (context instanceof GetLinkActivity
+                && e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
+            ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
+                    context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
+        }
 
         ChatController chatC = new ChatController(context);
         if(messages == null || messages.isEmpty()){

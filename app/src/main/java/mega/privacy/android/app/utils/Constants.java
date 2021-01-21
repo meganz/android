@@ -48,6 +48,7 @@ public class Constants {
     public static final int REQUEST_CODE_VERIFY_CODE = 1032;
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
     public static final int REQUEST_CODE_PICK_GIF = 1034;
+    public static final int REQUEST_CODE_SEND_LINK = 1035;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -76,6 +77,9 @@ public class Constants {
     public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
+    public static final String EXTRA_LINK = "EXTRA_LINK";
+    public static final String EXTRA_KEY = "EXTRA_KEY";
+    public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
@@ -120,9 +124,6 @@ public class Constants {
     public static final int CONFIRM_EMAIL_FRAGMENT = 6002;
     public static final int CHOOSE_ACCOUNT_FRAGMENT = 6003;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
-
-    public static final int GET_LINK_FRAGMENT = 7000;
-    public static final int COPYRIGHT_FRAGMENT = 7001;
 
     public static final int ACHIEVEMENTS_FRAGMENT = 8000;
     public static final int BONUSES_FRAGMENT = 8001;
