@@ -27,13 +27,12 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.px2dp;
+import static mega.privacy.android.app.utils.Util.dp2px;
 
 public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHolderReaction> implements View.OnClickListener, View.OnLongClickListener {
 
@@ -148,21 +147,13 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(holder.itemNumUsersReaction.getLayoutParams());
             params.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
             params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-            params.setMarginEnd(px2dp(8, outMetrics));
+            params.setMarginEnd(dp2px(8, outMetrics));
             params.addRule(RelativeLayout.END_OF, emoji == null ? R.id.item_emoji_reaction_text : R.id.item_emoji_reaction);
             holder.itemNumUsersReaction.setLayoutParams(params);
             holder.itemNumUsersReaction.setGravity(Gravity.CENTER_VERTICAL);
 
-            boolean ownReaction = false;
-            MegaHandleList handleList = megaChatApi.getReactionUsers(chatId, messageId, reaction);
-            for (int i = 0; i < handleList.size(); i++) {
-                if (handleList.get(i) == megaChatApi.getMyUserHandle()) {
-                    ownReaction = true;
-                    break;
-                }
-            }
-
-            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.mail_my_account));
+            boolean ownReaction = isMyOwnReaction(chatId, messageId, reaction);
+            holder.itemNumUsersReaction.setTextColor(ContextCompat.getColor(context, ownReaction ? R.color.accentColor : R.color.secondary_text));
             holder.itemReactionLayout.setBackground(ContextCompat.getDrawable(context, ownReaction ? R.drawable.own_reaction_added : R.drawable.contact_reaction_added));
         }else{
             holder.moreReactionsLayout.setVisibility(View.GONE);

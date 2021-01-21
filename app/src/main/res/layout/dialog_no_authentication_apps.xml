@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             android:fontFamily="roboto"
             android:text="@string/no_authentication_apps_title"/>
@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/secondary_text"
             android:textSize="16sp"
             android:fontFamily="roboto"
             android:text="@string/intent_not_available_2fa"
@@ -29,7 +29,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/secondary_text"
             android:textSize="16sp"
             android:fontFamily="roboto"
             android:text="@string/open_play_store_2fa"

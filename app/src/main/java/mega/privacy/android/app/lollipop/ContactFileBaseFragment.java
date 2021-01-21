@@ -3,6 +3,8 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -85,7 +87,7 @@ public class ContactFileBaseFragment extends RotatableFragment {
     }
     
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
         aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -106,50 +108,6 @@ public class ContactFileBaseFragment extends RotatableFragment {
     
     public String getUserEmail(){
         return this.userEmail;
-    }
-    
-    public String getDescription(ArrayList<MegaNode> nodes) {
-        int numFolders = 0;
-        int numFiles = 0;
-        
-        for (int i = 0; i < nodes.size(); i++) {
-            MegaNode c = nodes.get(i);
-            if (c.isFolder()) {
-                numFolders++;
-            } else {
-                numFiles++;
-            }
-        }
-        
-        String info;
-        if (numFolders > 0) {
-            info = numFolders
-                    + " "
-                    + getResources().getQuantityString(
-                    R.plurals.general_num_folders, numFolders);
-            if (numFiles > 0) {
-                info = info
-                        + ", "
-                        + numFiles
-                        + " "
-                        + getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-        } else {
-            if (numFiles == 0) {
-                info = numFiles
-                        + " "
-                        + getResources().getQuantityString(
-                        R.plurals.general_num_folders, numFolders);
-            } else {
-                info = numFiles
-                        + " "
-                        + getResources().getQuantityString(
-                        R.plurals.general_num_files, numFiles);
-            }
-        }
-        
-        return info;
     }
 
     @Override

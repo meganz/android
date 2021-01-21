@@ -70,7 +70,7 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
                    if(context instanceof ManagerActivityLollipop){
                        Intent intent = new Intent(context, ChatActivityLollipop.class);
                        intent.setAction(ACTION_CHAT_SHOW_MESSAGES);
-                       intent.putExtra("CHAT_ID", request.getChatHandle());
+                       intent.putExtra(CHAT_ID, request.getChatHandle());
                        intent.putExtra("PUBLIC_LINK", e.getErrorCode());
                        intent.putExtra(CHAT_LINK_EXTRA, request.getText());
                        context.startActivity(intent);

@@ -58,7 +58,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 rounded:emojiSize="14sp" />
 
@@ -70,7 +70,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="@color/mail_my_account"
+                android:textColor="@color/secondary_text"
                 android:textSize="14sp"
                 rounded:emojiSize="12sp" />
 
@@ -124,7 +124,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_view_contacts"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -155,7 +155,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_info_info_file"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -194,7 +194,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/context_send_message"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -214,7 +214,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_add_contact_chat_item"
-                    android:tint="@color/mail_my_account"
+                    android:tint="@color/secondary_text"
                     android:visibility="visible" />
 
                 <TextView
@@ -225,7 +225,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/contact_invite"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp" />
             </LinearLayout>
 

@@ -46,7 +46,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="16dp"
                 android:textSize="16dp"
-                android:textColor="@color/mail_my_account"/>
+                android:textColor="@color/secondary_text"/>
         </RelativeLayout>
         
         <RelativeLayout
@@ -147,7 +147,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="16dp"
                 android:textSize="16dp"
-                android:textColor="@color/mail_my_account"/>
+                android:textColor="@color/secondary_text"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -182,7 +182,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="16dp"
                     android:textSize="14dp"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="@color/secondary_text"/>
 
                 <TextView
                     android:id="@+id/text_view_from"
@@ -241,7 +241,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="16dp"
                     android:textSize="14dp"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="@color/secondary_text"/>
 
                 <TextView
                     android:id="@+id/text_view_to"

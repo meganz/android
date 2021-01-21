@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
+import androidx.core.text.HtmlCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -451,10 +453,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		} catch (Exception e) {
 			logWarning("Exception formatting text, ", e);
 		}
-		emptyTextView.setText(getSpannedHtmlText(textToShow));
+		emptyTextView.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		listView = findViewById(R.id.file_storage_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, getOutMetrics()));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -598,6 +600,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		//for below N or above P, open SAF
 		if (intent == null) {
 			intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 		}
 
 		startActivityForResult(intent, REQUEST_CODE_TREE);
@@ -698,7 +701,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void setFiles(File path) {
 		logDebug("setFiles");
 		List<FileDocument> documents = new ArrayList<FileDocument>();
-		if (!path.canRead()) {
+
+		if (path == null || !path.canRead()) {
 			showErrorAlertDialog(getString(R.string.error_io_problem),
 					true, this);
 			return;
@@ -706,16 +710,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		File[] files = path.listFiles();
 
-		if(files != null)
-		{
+		if (files != null) {
 			logDebug("Number of files: " + files.length);
+
 			for (File file : files) {
 				FileDocument document = new FileDocument(file);
 				if (document.isHidden()) {
 					continue;
 				}
+
 				documents.add(document);
 			}
+
 			Collections.sort(documents, new CustomComparator());
 		}
 
@@ -741,24 +747,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				files++;
 			}
 		}
-		
-		Resources res = this.getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}
-		actionMode.setTitle(title);
+
+		actionMode.setTitle(getFolderInfo(folders, files));
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -1286,6 +1277,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
+            ContentResolver contentResolver = getContentResolver();
+			contentResolver.takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 			DocumentFile pickedDir = DocumentFile.fromTreeUri(this, treeUri);
 			if (pickedDir == null || !pickedDir.canWrite()) {
 				logWarning("PickedDir null or cannot write.");

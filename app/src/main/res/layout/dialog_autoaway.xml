@@ -16,7 +16,7 @@
         android:inputType="number"
         android:imeOptions="actionDone"
         android:singleLine="true"
-        android:textColor="@color/name_my_account"
+        android:textColor="@color/primary_text"
         android:theme="@style/ColorControlStyle"/>
 
     <LinearLayout

@@ -17,7 +17,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:textSize="20sp"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:text="@string/general_something_went_wrong_error"
             android:fontFamily="sans-serif-light"
             android:textStyle="bold"/>

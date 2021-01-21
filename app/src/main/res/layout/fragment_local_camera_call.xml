@@ -1,24 +1,66 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="80dp"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:layout_width="88dp"
     android:layout_height="120dp"
+    android:layout_gravity="top|right"
     android:background="@null">
 
-    <SurfaceView
-        android:id="@+id/surface_local_video"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:id="@+id/video_layout"
+        android:layout_width="80dp"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:background="@android:color/transparent" />
+        android:layout_alignParentTop="true">
 
-    <ImageView
-        android:id="@+id/micro_surface_view"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_alignTop="@id/surface_local_video"
-        android:layout_alignRight="@id/surface_local_video"
-        android:layout_marginTop="12dp"
+    <SurfaceView
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/avatar_layout"
+        android:layout_marginTop="9dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:id="@+id/avatar_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/avatar_image"
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:scaleType="fitCenter"
+                rounded:border_color="@color/border_avatar_call"
+                rounded:border_width="3dp"
+                rounded:corner_radius="60dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mute_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/video_layout"
+        android:layout_alignTop="@id/video_layout"
         android:layout_marginRight="4dp"
-        android:background="@null"
-        android:src="@drawable/ic_mic_off_ind_call" />
+        android:layout_marginTop="12dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/mute_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@null"
+            android:src="@drawable/ic_own_mic_off"/>
+    </RelativeLayout>
 
 </RelativeLayout>

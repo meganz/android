@@ -63,7 +63,7 @@ abstract class CuViewHolder extends RecyclerView.ViewHolder {
         if (node.getThumbnail() != null) {
             thumbnail.setImageURI(Uri.fromFile(node.getThumbnail()));
         } else {
-            thumbnail.setImageResource(R.drawable.ic_image_thumbnail);
+            thumbnail.setActualImageResource(R.drawable.ic_image_thumbnail);
         }
 
         thumbnail.getHierarchy()

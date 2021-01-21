@@ -8,6 +8,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.text.HtmlCompat;
+
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -40,9 +42,9 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
         LinearLayout.LayoutParams expiredLayoutParams = (LinearLayout.LayoutParams) expiredImageLayout.getLayoutParams();
 
         if (isScreenInPortrait(this)) {
-            expiredLayoutParams.height = px2dp(IMAGE_HEIGHT_PORTRAIT, getOutMetrics());
+            expiredLayoutParams.height = dp2px(IMAGE_HEIGHT_PORTRAIT, getOutMetrics());
         } else {
-            expiredLayoutParams.height = px2dp(IMAGE_HEIGHT_LANDSCAPE, getOutMetrics());
+            expiredLayoutParams.height = dp2px(IMAGE_HEIGHT_LANDSCAPE, getOutMetrics());
         }
 
         expiredImageLayout.setLayoutParams(expiredLayoutParams);
@@ -80,7 +82,7 @@ public class BusinessExpiredAlertActivity extends PinActivityLollipop implements
             } catch (Exception e) {
                 logWarning("Exception formatting string", e);
             }
-            expiredText.setText(getSpannedHtmlText(expiredString));
+            expiredText.setText(HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY));
             expiredSubtext.setVisibility(View.VISIBLE);
             getWindow().setStatusBarColor(getResources().getColor(R.color.expired_business_user_statusbar));
         }

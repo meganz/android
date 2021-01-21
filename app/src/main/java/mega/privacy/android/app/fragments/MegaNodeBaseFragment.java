@@ -5,8 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -248,7 +251,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
         if (context instanceof ManagerActivityLollipop) {
@@ -747,7 +750,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     }
 
     private void setRecyclerView() {
-        recyclerView.setPadding(0, 0, 0, px2dp(MARGIN_BOTTOM_LIST, outMetrics));
+        recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -785,7 +788,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             logWarning("Exception formatting text", e);
         }
 
-        emptyTextViewFirst.setText(getSpannedHtmlText(text));
+        emptyTextViewFirst.setText(HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY));
         checkEmptyView();
     }
 

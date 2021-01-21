@@ -11,6 +11,7 @@ import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+
 import android.text.Html;
 import android.text.Spanned;
 
@@ -24,6 +25,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -41,7 +43,6 @@ import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-import mega.privacy.android.app.lollipop.megachat.ChatItemPreferences;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
@@ -50,6 +51,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
@@ -60,8 +62,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -73,10 +74,12 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -341,55 +344,34 @@ public class ChatController {
         }
     }
 
-    public void muteChats(ArrayList<MegaChatListItem> chats){
-        for(int i=0; i<chats.size();i++){
-            muteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
-        }
-    }
+    /**
+     * Method to silence notifications for all chats or for a specific chat.
+     *
+     * @param option     The selected mute option.
+     */
+    public void muteChat(String option) {
+        if (context instanceof ChatNotificationsPreferencesActivity)
+            return;
 
-    public void muteChat(long chatHandle){
-        logDebug("Chat handle: " + chatHandle);
-        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if(chatPrefs==null){
+        switch (option) {
+            case NOTIFICATIONS_ENABLED:
+                showSnackbar(context, context.getString(R.string.success_unmuting_a_chat));
+                break;
 
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(false), "");
-            dbH.setChatItemPreferences(chatPrefs);
+            case NOTIFICATIONS_DISABLED:
+                showSnackbar(context, context.getString(R.string.notifications_are_already_muted));
+                break;
 
-        }
-        else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(false));
-            dbH.setNotificationEnabledChatItem(Boolean.toString(false), Long.toString(chatHandle));
-        }
-    }
+            case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
+            case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
+                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+                break;
 
-    public void muteChat(MegaChatListItem chat){
-        logDebug("Chat ID:" + chat.getChatId());
-        muteChat(chat.getChatId());
-    }
-
-    public void unmuteChats(ArrayList<MegaChatListItem> chats){
-        for(int i=0; i<chats.size();i++){
-            unmuteChat(chats.get(i));
-            ((ManagerActivityLollipop)context).showMuteIcon(chats.get(i));
-        }
-    }
-
-    public void unmuteChat(MegaChatListItem chat){
-        logDebug("Chat ID: " + chat.getChatId());
-        unmuteChat(chat.getChatId());
-    }
-
-    public void unmuteChat(long chatHandle){
-        logDebug("Chant handle: " + chatHandle);
-        ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(chatHandle));
-        if(chatPrefs==null){
-            chatPrefs = new ChatItemPreferences(Long.toString(chatHandle), Boolean.toString(true), "");
-            dbH.setChatItemPreferences(chatPrefs);
-        }
-        else{
-            chatPrefs.setNotificationsEnabled(Boolean.toString(true));
-            dbH.setNotificationEnabledChatItem(Boolean.toString(true), Long.toString(chatHandle));
+            default:
+                String text = getMutedPeriodString(option);
+                if (!isTextEmpty(text)) {
+                    showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
+                }
         }
     }
 
@@ -1567,7 +1549,7 @@ public class ChatController {
 
                         if (isVoiceClip(nodeList.get(0).getName())) {
                             service.putExtra(DownloadService.EXTRA_OPEN_FILE, false);
-                            service.putExtra(EXTRA_TRANSFER_TYPE, EXTRA_VOICE_CLIP);
+                            service.putExtra(EXTRA_TRANSFER_TYPE, APP_DATA_VOICE_CLIP);
                         } else if (context instanceof AudioVideoPlayerLollipop || context instanceof PdfViewerActivityLollipop || context instanceof ChatFullScreenImageViewer) {
                             service.putExtra("fromMV", true);
                         }
@@ -1847,6 +1829,9 @@ public class ChatController {
         long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
         long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
         long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
+        String extraLink = intent.getStringExtra(EXTRA_LINK);
+        String extraKey = intent.getStringExtra(EXTRA_KEY);
+        String extraPassword = intent.getStringExtra(EXTRA_PASSWORD);
 
         if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
             if (contactHandles != null && contactHandles.length > 0) {
@@ -1873,11 +1858,13 @@ public class ChatController {
                 boolean createChats = false;
 
                 if (nodeHandles != null) {
-                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES, -1);
+                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES);
                     createChats = true;
                 } else if (userHandles != null) {
-                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS, -1);
+                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS);
                     createChats = true;
+                } else if (!isTextEmpty(extraLink)) {
+                    listener = new CreateChatListener(chats, users, extraLink, extraKey, extraPassword, context, CreateChatListener.SEND_LINK);
                 } else {
                     logWarning("Error on sending to chat");
                 }
@@ -1899,11 +1886,63 @@ public class ChatController {
                 } else if (userHandles != null) {
                     logDebug("Send " + userHandles.length + " contacts");
                     sendContactsToChats(chatHandles, userHandles);
+                } else if (!isTextEmpty(extraLink)) {
+                    sendLinkToChats(context, chatHandles, extraLink, extraKey, extraPassword);
                 } else {
                     logWarning("Error on sending to chat");
                 }
             }
         }
+    }
+
+    /**
+     * Shares a link to chats. The link can be received along with its decryption key or with it.
+     * There are several possibilities to share a link:
+     * - Link along with decryption key:
+     *      * Without password protection. Here key and password params should be null.
+     *      * With password protection. Here key param should be null and password param:
+     *              + Can contain the password protection.
+     *              + Be null if only the protected link is shared.
+     * - Link without decryption key. Here password param should be always null and key param:
+     *      * Can contain the decryption key.
+     *      * Be null if only the link is shared.
+     *
+     * @param context      Current context.
+     * @param chatHandles List of chat identifiers to which the link has to be shared.
+     * @param link        Link to share.
+     * @param key         Decryption key of the link to share. It can be null.
+     * @param password    Password protection of the link to share. It can be null.
+     */
+    public static void sendLinkToChats(Context context, long[] chatHandles, String link, String key, String password) {
+        MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null) {
+            logError("MegaChatApi is null");
+            return;
+        }
+
+        for (Long chatId : chatHandles) {
+            megaChatApi.sendMessage(chatId, link);
+
+            if (!isTextEmpty(key)) {
+                megaChatApi.sendMessage(chatId, key);
+            } else if (!isTextEmpty(password)) {
+                megaChatApi.sendMessage(chatId, password);
+            }
+        }
+
+        String message;
+
+        if (!isTextEmpty(key)) {
+            message = context.getString(R.string.link_and_key_sent);
+        } else if (!isTextEmpty(password)) {
+            message = context.getString(R.string.link_and_password_sent);
+        } else {
+            message = context.getString(R.string.link_sent);
+        }
+
+        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, message, chatHandles.length == 1
+                ? chatHandles[0]
+                : MEGACHAT_INVALID_HANDLE);
     }
 
     public void sendContactsToChats(long[] chatHandles, long[] userHandles) {

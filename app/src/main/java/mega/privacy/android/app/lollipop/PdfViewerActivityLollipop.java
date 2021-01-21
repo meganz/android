@@ -24,7 +24,6 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -70,12 +69,17 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -83,19 +87,22 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.saver.OfflineNodeSaver;
+import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -125,13 +132,18 @@ import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EX
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.MegaNodeUtil.NodeTakenDownAlertHandler.showTakenDownAlert;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class PdfViewerActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener, OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface, MegaTransferListenerInterface{
+
+    private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
+            = new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
 
     int[] screenPosition;
     int mLeftDelta;
@@ -210,6 +222,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private String pathNavigation;
 
     NodeController nC;
+    private OfflineNodeSaver offlineNodeSaver;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
@@ -249,6 +262,14 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
     };
+
+    public static void addDraggingThumbnailCallback(Class<?> clazz, DraggingThumbnailCallback cb) {
+        DRAGGING_THUMBNAIL_CALLBACKS.put(clazz, cb);
+    }
+
+    public static void removeDraggingThumbnailCallback(Class<?> clazz) {
+        DRAGGING_THUMBNAIL_CALLBACKS.remove(clazz);
+    }
 
     @Override
     public void onCreate (Bundle savedInstanceState){
@@ -294,7 +315,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
         fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
-//        handle = intent.getLongExtra("HANDLE", -1);
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
@@ -345,6 +365,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
         }
+
+        if (dbH == null){
+            dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+        }
+
         if (!isOffLine && type != ZIP_ADAPTER) {
             app = (MegaApplication) getApplication();
             megaApi = app.getMegaApi();
@@ -373,10 +398,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             logDebug("Add transfer listener");
             megaApi.addTransferListener(this);
             megaApi.addGlobalListener(this);
-
-            if (dbH == null){
-                dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-            }
 
             if (uri.toString().contains("http://")) {
                 if (dbH != null && dbH.getCredentials() != null) {
@@ -415,22 +436,30 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                         megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
                     }
                 }
+
                 if (savedInstanceState != null && ! isFolderLink) {
                     MegaNode node = null;
+
                     if (fromChat) {
                         node = nodeChat;
-                    }
-                    else if (type == FILE_LINK_ADAPTER) {
+                    } else if (type == FILE_LINK_ADAPTER) {
                         node = currentDocument;
-                    }
-                    else {
+                    } else {
                         node = megaApi.getNodeByHandle(handle);
                     }
-                    if (node != null){
-                        uri = Uri.parse(megaApi.httpServerGetLocalLink(node));
+
+                    String url = null;
+
+                    if (node != null) {
+                        url = megaApi.httpServerGetLocalLink(node);
+
+                        if (url != null) {
+                            uri = Uri.parse(url);
+                        }
                     }
-                    else {
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming), -1);
+
+                    if (node == null || url == null || uri == null) {
+                        showSnackbar(SNACKBAR_TYPE, getString(R.string.error_streaming), MEGACHAT_INVALID_HANDLE);
                     }
                 }
             }
@@ -643,8 +672,18 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         else if (type == FILE_BROWSER_ADAPTER){
             FileBrowserFragmentLollipop.imageDrag.getLocationOnScreen(location);
         }
-        else if (type == OFFLINE_ADAPTER){
-            OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+        else if (type == OFFLINE_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
+        } else if (type == DOCUMENTS_BROWSE_ADAPTER || type == DOCUMENTS_SEARCH_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(DocumentsFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
         }
         else if (type == ZIP_ADAPTER) {
             ZipBrowserActivityLollipop.imageDrag.getLocationOnScreen(location);
@@ -947,7 +986,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         protected void onPostExecute(InputStream inputStream) {
             logDebug("onPostExecute");
             try {
-                pdfView.fromStream(inputStream)
+                pdfView.fromStream(inputStream, String.valueOf(handle))
                         .defaultPage(currentPage-1)
                         .onPageChange(PdfViewerActivityLollipop.this)
                         .enableAnnotationRendering(true)
@@ -1005,7 +1044,20 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
     public void download(){
 
-        if (type == FILE_LINK_ADAPTER){
+        if (type == OFFLINE_ADAPTER) {
+            MegaOffline node = dbH.findByHandle(handle);
+            if (node == null) {
+                return;
+            }
+
+            if (offlineNodeSaver == null) {
+                offlineNodeSaver = new OfflineNodeSaver(this, dbH);
+            }
+            offlineNodeSaver.save(Collections.singletonList(node), false, (intent, code) -> {
+                startActivityForResult(intent, code);
+                return Unit.INSTANCE;
+            });
+        } else if (type == FILE_LINK_ADAPTER) {
             if (nC == null) {
                 nC = new NodeController(this);
             }
@@ -1253,7 +1305,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 getlinkMenuItem.setVisible(false);
                 removelinkMenuItem.setVisible(false);
                 propertiesMenuItem.setVisible(true);
-                downloadMenuItem.setVisible(false);
+                downloadMenuItem.setVisible(true);
                 renameMenuItem.setVisible(false);
                 moveMenuItem.setVisible(false);
                 copyMenuItem.setVisible(false);
@@ -1609,7 +1661,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     break;
                 }
 
-                showGetLinkActivity();
+                showGetLinkActivity(this, handle);
                 break;
             }
             case R.id.pdf_viewer_remove_link: {
@@ -2165,13 +2217,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         removeLinkDialog.show();
     }
 
-    public void showGetLinkActivity(){
-        logDebug("showGetLinkActivity");
-        Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-        linkIntent.putExtra("handle", handle);
-        startActivity(linkIntent);
-    }
-
     public void updateFile (){
         MegaNode file = null;
         if (pdfFileName != null && handle != -1 ) {
@@ -2241,6 +2286,10 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("onActivityResult: " + requestCode + "____" + resultCode);
         if (intent == null) {
+            return;
+        }
+
+        if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
             return;
         }
 
@@ -2534,7 +2583,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     window.setStatusBarColor(ContextCompat.getColor(this, R.color.lollipop_dark_primary_color));
 
                 }
-                DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
                 gSession = megaApi.dumpSession();
                 MegaUser myUser = megaApi.getMyUser();

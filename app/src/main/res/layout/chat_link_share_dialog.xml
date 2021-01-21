@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/image"
@@ -15,131 +15,82 @@
             android:layout_height="80dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
-            android:src="@drawable/il_chat_link"/>
+            android:src="@drawable/il_chat_link" />
 
         <mega.privacy.android.app.components.twemoji.EmojiTextView
             android:id="@+id/group_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/image"
-            android:textSize="20sp"
-            app:emojiSize="20sp"
-            android:textColor="@color/name_my_account"
             android:layout_centerHorizontal="true"
-            android:gravity="center"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginLeft="24dp"/>
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:textColor="@color/primary_text"
+            android:textSize="20sp"
+            app:emojiSize="20sp" />
 
         <TextView
             android:id="@+id/chat_link_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/group_name_text"
-            android:textSize="16sp"
-            android:textColor="@color/name_my_account"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginLeft="24dp"
+            android:layout_marginEnd="24dp"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:ellipsize="end"/>
+            android:textColor="@color/primary_text"
+            android:textSize="16sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_below="@+id/chat_link_text"
-            android:background="@color/accentColor"
-            android:layout_marginRight="24dp"
-            android:layout_marginLeft="24dp"/>
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/accentColor" />
 
         <TextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/chat_link_text"
-            android:textSize="14sp"
-            android:textColor="@color/mail_my_account"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="24dp"
             android:text="@string/copy_link_explanation"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"/>
+            android:textColor="@color/secondary_text"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/copy_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TransparentBackgroundButtonWithoutBorder"
             android:layout_below="@+id/description"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:layout_gravity="right"
-            android:gravity="right|center_vertical"
-            android:layout_marginTop="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
             android:text="@string/context_copy"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="18dp"
-            android:paddingLeft="8dp"
-            style="@style/ButtonStyle"/>
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/share_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/TransparentBackgroundButtonWithoutBorder"
             android:layout_below="@+id/copy_button"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:layout_gravity="right"
-            android:gravity="right|center_vertical"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
             android:text="@string/general_share"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="18dp"
-            android:paddingLeft="8dp"
-            style="@style/ButtonStyle"/>
-
-        <Button
-            android:id="@+id/delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/share_button"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:layout_gravity="right"
-            android:gravity="right|center_vertical"
-            android:layout_marginTop="12dp"
-            android:text="@string/context_delete"
-            android:textColor="@color/dark_primary_color"
-            android:textSize="14sp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="18dp"
-            android:paddingLeft="8dp"
-            style="@style/ButtonStyle"/>
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/dismiss_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/delete_button"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:layout_gravity="right"
-            android:gravity="right|center_vertical"
+            style="@style/TransparentBackgroundButtonWithoutBorder"
+            android:layout_below="@+id/share_button"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="12dp"
-            android:text="@string/general_dismiss"
-            android:textColor="@color/accentColor"
-            android:textSize="14sp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingRight="18dp"
-            android:paddingLeft="8dp"
             android:layout_marginBottom="14dp"
-            style="@style/ButtonStyle"/>
+            android:text="@string/general_dismiss"
+            android:textSize="14sp" />
 
     </RelativeLayout>
 

@@ -29,5 +29,4 @@
             android:choiceMode="multipleChoice" />
 
     </RelativeLayout>
-
 </LinearLayout>

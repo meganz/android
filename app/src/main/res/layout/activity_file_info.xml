@@ -87,7 +87,7 @@
                     android:layout_gravity="left|bottom"
                     android:layout_marginLeft="72dp"
                     android:layout_marginBottom="15dp"
-                    android:textColor="@color/mail_my_account"/>
+                    android:textColor="@color/secondary_text"/>
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"

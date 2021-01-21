@@ -42,7 +42,6 @@
         android:title="@string/general_clear"
         MEGA:showAsAction="never" />
 
-
     <item
         android:id="@+id/cab_menu_archive_chat"
         android:orderInCategory="125"
@@ -53,6 +52,18 @@
         android:id="@+id/cab_menu_leave_chat"
         android:orderInCategory="125"
         android:title="@string/general_leave"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_mute_chat"
+        android:orderInCategory="130"
+        android:title="@string/general_mute"
+        MEGA:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_unmute_chat"
+        android:orderInCategory="130"
+        android:title="@string/general_unmute"
         MEGA:showAsAction="never" />
 
 </menu>

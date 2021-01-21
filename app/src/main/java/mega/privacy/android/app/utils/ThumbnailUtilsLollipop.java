@@ -40,7 +40,6 @@ import java.util.HashMap;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ThumbnailCache;
-import mega.privacy.android.app.lollipop.adapters.MediaRecentsAdapter;
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.FileStorageLollipopAdapter.ViewHolderFileStorage;
@@ -277,20 +276,6 @@ public class ThumbnailUtilsLollipop {
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.setImageBitmap(
 								getRoundedBitmap(context, bitmap, THUMB_ROUND_PIXEL));
 						((NodeAttachmentHistoryAdapter.ViewHolderBrowserList)holder).imageView.startAnimation(fadeInAnimation);
-					}
-				}
-				else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
-					RecentsAdapter.ViewHolderBucket viewHolderBucket = (RecentsAdapter.ViewHolderBucket) holder;
-					if (viewHolderBucket.getDocument() == handle) {
-						viewHolderBucket.setImageThumbnail(bitmap);
-						viewHolderBucket.getImageThumbnail().startAnimation(fadeInAnimation);
-					}
-				}
-				else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
-					MediaRecentsAdapter.ViewHolderMediaBucket viewHolderMediaBucket = (MediaRecentsAdapter.ViewHolderMediaBucket) holder;
-					if (viewHolderMediaBucket.getDocument() == handle) {
-						viewHolderMediaBucket.setImage(bitmap);
-						viewHolderMediaBucket.getThumbnail().startAnimation(fadeInAnimation);
 					}
 				}
 				else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
@@ -1051,7 +1036,6 @@ public class ThumbnailUtilsLollipop {
 
 				onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
 			} else if (holder instanceof RecentsAdapter.ViewHolderBucket
-					|| holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket
 					|| holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
 				onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
 			}
@@ -1110,12 +1094,6 @@ public class ThumbnailUtilsLollipop {
 		}
 		else if(holder instanceof VersionsFileAdapter.ViewHolderVersion){
 			((VersionsFileAdapter.ViewHolderVersion)holder).imageView.setImageBitmap(bitmap);
-		}
-		else if (holder instanceof RecentsAdapter.ViewHolderBucket) {
-			((RecentsAdapter.ViewHolderBucket) holder).setImageThumbnail(bitmap);
-		}
-		else if (holder instanceof MediaRecentsAdapter.ViewHolderMediaBucket) {
-			((MediaRecentsAdapter.ViewHolderMediaBucket) holder).setImage(bitmap);
 		}
 		else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
 			((MultipleBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);

@@ -20,7 +20,6 @@ import android.os.Handler;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 import androidx.appcompat.app.ActionBar;
@@ -60,6 +59,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -72,8 +72,12 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.saver.OfflineNodeSaver;
+import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -81,9 +85,8 @@ import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
@@ -110,13 +113,14 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
-import static mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
@@ -156,6 +160,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	NodeController nC;
+	private OfflineNodeSaver offlineNodeSaver;
 	boolean isFileLink;
 
 	private MegaFullScreenImageAdapterLollipop adapterMega;
@@ -332,8 +337,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			propertiesIcon.setVisible(false);
 			menu.findItem(R.id.full_image_viewer_properties).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-			downloadIcon.setVisible(false);
-			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			downloadIcon.setVisible(true);
+			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 			renameIcon.setVisible(false);
 			moveIcon.setVisible(false);
@@ -453,7 +458,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 		}
-		else if (adapterType == RECENTS_ADAPTER) {
+		else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
 			getlinkIcon.setVisible(false);
 			removelinkIcon.setVisible(false);
@@ -480,6 +485,21 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		else {
 			node = megaApi.getNodeByHandle(imageHandles.get(positionG));
+			if (node == null) {
+				getlinkIcon.setVisible(false);
+				removelinkIcon.setVisible(false);
+				shareIcon.setVisible(false);
+				propertiesIcon.setVisible(false);
+				downloadIcon.setVisible(false);
+				renameIcon.setVisible(false);
+				moveIcon.setVisible(false);
+				copyIcon.setVisible(false);
+				moveToTrashIcon.setVisible(false);
+				removeIcon.setVisible(false);
+				chatIcon.setVisible(false);
+
+				return super.onCreateOptionsMenu(menu);
+			}
 
 			downloadIcon.setVisible(true);
 			menu.findItem(R.id.full_image_viewer_download).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -617,8 +637,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
 						return false;
 					}
+
 					shareIt = false;
-			    	showGetLinkActivity(node.getHandle());
+			    	showGetLinkActivity(this, node.getHandle());
 					break;
 				}
 
@@ -752,7 +773,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					}
 					boolean fromIncoming = false;
 
-					if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) {
+					if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 						fromIncoming = nC.nodeComesFromIncoming(node);
 					}
 					if (adapterType == INCOMING_SHARES_ADAPTER || fromIncoming) {
@@ -768,9 +789,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			case R.id.full_image_viewer_download: {
 
-				if (adapterType == OFFLINE_ADAPTER){
+				if (adapterType == OFFLINE_ADAPTER) {
+					if (offlineNodeSaver == null) {
+						offlineNodeSaver = new OfflineNodeSaver(this, dbH);
+					}
+					offlineNodeSaver.save(Collections.singletonList(mOffListImages.get(positionG)), false, (intent, code) -> {
+						startActivityForResult(intent, code);
+						return Unit.INSTANCE;
+					});
 					break;
-
 				}else if (adapterType == ZIP_ADAPTER){
 					break;
 
@@ -882,7 +909,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				adapterType == INCOMING_SHARES_ADAPTER|| adapterType == OUTGOING_SHARES_ADAPTER ||
 				adapterType == SEARCH_ADAPTER || adapterType == FILE_BROWSER_ADAPTER ||
 				adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER ||
-				adapterType == LINKS_ADAPTER) {
+				adapterType == LINKS_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
+				|| adapterType == PHOTOS_SEARCH_ADAPTER ) {
             // only for the first time
             if(savedInstanceState == null) {
                 positionG -= placeholderCount;
@@ -952,7 +980,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 		if (adapterType == OFFLINE_ADAPTER){
 			//OFFLINE
-			mOffList = intent.getParcelableArrayListExtra(ARRAY_OFFLINE);
+			mOffList = intent.getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE);
 			logDebug ("mOffList.size() = " + mOffList.size());
 
 			for(int i=0; i<mOffList.size();i++){
@@ -1070,7 +1098,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		else if(adapterType == SEARCH_ADAPTER){
 			ArrayList<String> handles = intent.getStringArrayListExtra(ARRAY_SEARCH);
 			getImageHandles(getSearchedNodes(handles), savedInstanceState);
-		}else if(adapterType == SEARCH_BY_ADAPTER){
+		}else if(adapterType == SEARCH_BY_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER){
 			handlesNodesSearched = intent.getLongArrayExtra("handlesNodesSearch");
 
 			ArrayList<MegaNode> nodes = new ArrayList<>();
@@ -1079,7 +1107,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 			getImageHandles(nodes,savedInstanceState);
 		}
-		else if (adapterType == RECENTS_ADAPTER) {
+		else if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			long handle = intent.getLongExtra(HANDLE, -1);
 			if (handle == -1) finish();
 
@@ -1105,6 +1133,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
+		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
+			// TODO: use constants
+			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
@@ -1145,7 +1176,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		viewPager.setCurrentItem(positionG);
 		viewPager.addOnPageChangeListener(this);
 
-		if (savedInstanceState == null && adapterMega!= null){
+		if (savedInstanceState == null) {
 			ViewTreeObserver observer = viewPager.getViewTreeObserver();
 			observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				@Override
@@ -1251,8 +1282,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		else if (adapterType == OFFLINE_ADAPTER) {
-			if (OfflineFragmentLollipop.imageDrag != null){
-				OfflineFragmentLollipop.imageDrag.setVisibility(visibility);
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+			if (callback != null) {
+				callback.setVisibility(visibility);
 			}
 		}
 		else if (adapterType == ZIP_ADAPTER) {
@@ -1265,7 +1298,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
 			RecentsFragment.imageDrag.setVisibility(visibility);
-		}
+		} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(PhotosFragment.class);
+			if (callback != null) {
+				callback.setVisibility(visibility);
+			}
+		} else if(adapterType == RECENTS_BUCKET_ADAPTER ) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.setVisibility(visibility);
+            }
+        }
 	}
 
 	void getLocationOnScreen(int[] location){
@@ -1317,9 +1362,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				callback.getLocationOnScreen(location);
 			}
 		}
-		else if (adapterType == OFFLINE_ADAPTER){
-			if (OfflineFragmentLollipop.imageDrag != null){
-				OfflineFragmentLollipop.imageDrag.getLocationOnScreen(location);
+		else if (adapterType == OFFLINE_ADAPTER) {
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(OfflineFragment.class);
+			if (callback != null) {
+				callback.getLocationOnScreen(location);
 			}
 		}
 		else if (adapterType == ZIP_ADAPTER) {
@@ -1332,7 +1379,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		} else if (adapterType == RECENTS_ADAPTER && RecentsFragment.imageDrag != null) {
 			RecentsFragment.imageDrag.getLocationOnScreen(location);
-		}
+		} else if (adapterType == PHOTOS_BROWSE_ADAPTER || adapterType == PHOTOS_SEARCH_ADAPTER) {
+			DraggingThumbnailCallback callback
+					= DRAGGING_THUMBNAIL_CALLBACKS.get(PhotosFragment.class);
+			if (callback != null) {
+				callback.getLocationOnScreen(location);
+			}
+		} else if(adapterType == RECENTS_BUCKET_ADAPTER) {
+            DraggingThumbnailCallback callback
+                    = DRAGGING_THUMBNAIL_CALLBACKS.get(RecentsBucketFragment.class);
+            if (callback != null) {
+                callback.getLocationOnScreen(location);
+            }
+        }
 	}
 
 	public void runEnterAnimation() {
@@ -1391,16 +1450,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
             for (int i=0; i<mOffList.size(); i++){
 				logDebug("Name: " + name + " mOfflist name: " + mOffList.get(i).getName());
                 if (mOffList.get(i).getName().equals(name)){
-                    getImageView(i, -1);
+                    getImageView(i, Long.parseLong(mOffList.get(i).getHandle()));
                     break;
                 }
             }
-        }
-        else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-	    	Long handle = adapterMega.getImageHandle(positionG);
-			getImageView(0, handle);
-		}
-		else if (adapterType == SEARCH_ADAPTER){
+		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
+				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
+				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			getImageView(0, handle);
 		}
@@ -1452,7 +1508,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void getImageView (int i, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
-		intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
+		intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
 		intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
 		intent.putExtra("handle", handle);
@@ -1467,16 +1523,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
             for (int i=0; i<mOffList.size(); i++){
 				logDebug("Name: " + name + " mOfflist name: " + mOffList.get(i).getName());
                 if (mOffList.get(i).getName().equals(name)){
-                    scrollToPosition(i, -1);
+                    scrollToPosition(i, Long.parseLong(mOffList.get(i).getHandle()));
                     break;
                 }
             }
-        }
-		else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER){
-			Long handle = adapterMega.getImageHandle(positionG);
-			scrollToPosition(0, handle);
-		}
-		else if (adapterType == SEARCH_ADAPTER){
+		} else if (adapterType == PHOTO_SYNC_ADAPTER || adapterType == SEARCH_BY_ADAPTER
+				|| adapterType == SEARCH_ADAPTER || adapterType == PHOTOS_BROWSE_ADAPTER
+				|| adapterType == PHOTOS_SEARCH_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 			Long handle = adapterMega.getImageHandle(positionG);
 			scrollToPosition(0, handle);
 		}
@@ -1511,7 +1564,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		getImageView(i, handle);
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
-		intent.putExtra("actionType", SCROLL_TO_POSITION);
+		intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
 		intent.putExtra("adapterType", adapterType);
 		intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount );
@@ -1591,7 +1644,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		super.onSaveInstanceState(savedInstanceState);
 		if (getIntent() != null) {
 			getIntent().putExtra("position", positionG);
-			if (adapterType == RECENTS_ADAPTER) {
+			if (adapterType == RECENTS_ADAPTER || adapterType == RECENTS_BUCKET_ADAPTER) {
 				getIntent().putExtra(HANDLE, imageHandles.get(positionG));
 			}
 		}
@@ -1976,13 +2029,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 
-	public void showGetLinkActivity(long handle){
-		logDebug("Handle: " + handle);
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
-	}
-
 	public void setIsGetLink(boolean value){
 		logDebug("Value: " + value);
 
@@ -2181,6 +2227,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		logDebug("onActivityResult");
 
 		if (intent == null) {
+			return;
+		}
+
+		if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 

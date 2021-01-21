@@ -1154,12 +1154,12 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 			if (megaApi.getInboxNode().getHandle()==((ManagerActivityLollipop) context).getParentHandleInbox()||((ManagerActivityLollipop) context).getParentHandleInbox()==-1) {
 
-				contentText.setText(getInfoFolder(inboxNode, context));
+				contentText.setText(getMegaNodeFolderInfo(inboxNode));
 			} else {
 				MegaNode parentNode = megaApi.getNodeByHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 
 				if(parentNode!=null){
-					contentText.setText(getInfoFolder(parentNode, context));
+					contentText.setText(getMegaNodeFolderInfo(parentNode));
 				}
 			}
 		}

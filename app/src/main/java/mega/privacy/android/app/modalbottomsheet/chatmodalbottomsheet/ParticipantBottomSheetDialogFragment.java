@@ -105,11 +105,11 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout separatorLeave = contentView.findViewById(R.id.separator_leave);
 
         if (isScreenInPortrait(context)) {
-            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
         } else {
-            titleNameContactChatPanel.setMaxWidthEmojis(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(px2dp(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
         }
 
         setContactStatus(getUserStatus(participantHandle), stateIcon);
@@ -153,7 +153,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             String fullName = chatC.getParticipantFullName(participantHandle);
             titleNameContactChatPanel.setText(fullName);
             String email = chatC.getParticipantEmail(participantHandle);
-            titleMailContactChatPanel.setText(email);
 
             int permission = selectedChat.getPeerPrivilegeByHandle(participantHandle);
 
@@ -173,10 +172,14 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionStartCall.setVisibility(View.VISIBLE);
                 optionStartCall.setOnClickListener(participatingInACall() ? null : this);
                 optionInvite.setVisibility(View.GONE);
+
+                titleMailContactChatPanel.setText(email);
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
                 optionInvite.setVisibility(View.VISIBLE);
+
+                titleMailContactChatPanel.setVisibility(View.GONE);
             }
 
             optionEditProfileChat.setVisibility(View.GONE);

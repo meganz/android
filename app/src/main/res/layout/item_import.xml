@@ -18,7 +18,7 @@
         android:layout_toRightOf="@+id/thumbnail_file"
         android:layout_toLeftOf="@+id/edit_icon_layout"
         android:textSize="16sp"
-        android:textColor="@color/name_my_account"
+        android:textColor="@color/primary_text"
         android:gravity="left|center_vertical"
         android:fontFamily="roboto"
         android:layout_centerVertical="true"

@@ -10,29 +10,27 @@ import mega.privacy.android.app.lollipop.megachat.calls.MegaSurfaceRendererGroup
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatVideoListenerInterface;
 
+import static mega.privacy.android.app.utils.CallUtil.isItMe;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 
 public class GroupCallListener implements MegaChatVideoListenerInterface {
 
-    Context context;
-    int width;
-    int height;
-    Bitmap bitmap;
-    TextureView myTexture = null;
-    boolean isLocal;
-    MegaSurfaceRendererGroup localRenderer = null;
+    private int width;
+    private int height;
+    private Bitmap bitmap;
+    private TextureView myTexture;
+    private boolean isLocal;
+    private MegaSurfaceRendererGroup localRenderer;
 
-    public GroupCallListener(Context context, TextureView myTexture, long peerid, long clientid, boolean isLocal) {
+    public GroupCallListener(TextureView myTexture, long peerid, long clientid, long chatId, int numParticipants) {
         logDebug("GroupCallListener");
-        this.context = context;
         this.width = 0;
         this.height = 0;
         this.myTexture = myTexture;
-        this.isLocal = isLocal;
+        this.isLocal = isItMe(chatId, peerid, clientid);
         this.localRenderer = new MegaSurfaceRendererGroup(myTexture, peerid, clientid);
     }
-
 
     @Override
     public void onChatVideoData(MegaChatApiJava api, long chatid, int width, int height, byte[] byteBuffer) {
@@ -89,6 +87,14 @@ public class GroupCallListener implements MegaChatVideoListenerInterface {
 
     public int getHeight() {
         return height;
+    }
+
+    public Bitmap getLastFrame(int width, int height) {
+        if (myTexture != null) {
+            return myTexture.getBitmap(width, height);
+        }
+
+        return null;
     }
 }
 

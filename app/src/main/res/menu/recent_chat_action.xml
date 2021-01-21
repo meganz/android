@@ -3,6 +3,20 @@
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
 
     <item
+        android:id="@+id/cab_menu_mute"
+        android:orderInCategory="90"
+        android:title="@string/general_mute"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_mute_white"/>
+
+    <item
+        android:id="@+id/cab_menu_unmute"
+        android:orderInCategory="90"
+        android:title="@string/general_unmute"
+        MEGA:showAsAction="always"
+        android:icon="@drawable/ic_unmute_white"/>
+
+    <item
         android:id="@+id/cab_menu_archive"
         android:orderInCategory="100"
         android:title="@string/tab_archive_chat"
@@ -15,20 +29,6 @@
         android:title="@string/general_unarchive"
         MEGA:showAsAction="always"
         android:icon="@drawable/ic_w_unarchive"/>
-
-    <item
-        android:id="@+id/cab_menu_mute"
-        android:orderInCategory="100"
-        android:title="@string/general_mute"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_mute_white"/>
-
-    <item
-        android:id="@+id/cab_menu_unmute"
-        android:orderInCategory="100"
-        android:title="@string/general_unmute"
-        MEGA:showAsAction="always"
-        android:icon="@drawable/ic_unmute_white"/>
 
     <item
         android:id="@+id/cab_menu_delete"

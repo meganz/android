@@ -133,11 +133,11 @@ function downloadCheckAndUnpack()
         local CURRENTSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
         if [ "${SHA1}" != "${CURRENTSHA1}" ]; then
             echo "* Invalid hash. Redownloading..."
-            wget -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+            wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
         fi
     else
         echo "* Downloading '${FILENAME}' ..."
-        wget -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
     fi
 
     local NEWSHA1=`sha1sum ${FILENAME} | cut -d " " -f 1`
