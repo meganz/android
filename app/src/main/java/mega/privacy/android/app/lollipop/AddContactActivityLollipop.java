@@ -1716,7 +1716,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.section_contacts));
-            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
         else if(contactType == CONTACT_TYPE_DEVICE) {
             typeContactLayout.setVisibility(View.VISIBLE);
@@ -1726,7 +1726,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.contacts_phone));
-            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
         else {
             typeContactLayout.setVisibility(View.VISIBLE);
@@ -1734,7 +1734,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 scanQRButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(stickyLayoutManager);
-            recyclerViewList.addItemDecoration(new HeaderItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new HeaderItemDecoration(this));
             showHeader(false);
         }
 
@@ -1788,7 +1788,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         newGroupRecyclerView.setItemAnimator(new DefaultItemAnimator());
         newGrouplinearLayoutManager = new LinearLayoutManager(this);
         newGroupRecyclerView.setLayoutManager(newGrouplinearLayoutManager);
-        newGroupRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+        newGroupRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         //Get MEGA contacts and phone contacts: first name, last name and email
         if (savedInstanceState != null) {

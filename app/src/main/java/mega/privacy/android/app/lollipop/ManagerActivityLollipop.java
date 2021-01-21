@@ -137,7 +137,6 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -158,6 +157,7 @@ import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
+import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
@@ -186,7 +186,7 @@ import mega.privacy.android.app.lollipop.managerSections.MyStorageFragmentLollip
 import mega.privacy.android.app.lollipop.managerSections.NotificationsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ReceivedRequestsFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLollipop;
@@ -706,6 +706,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 //	private MenuItem pauseRestartTransfersItem;
 	private MenuItem createFolderMenuItem;
 	private MenuItem importLinkMenuItem;
+	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
 	private MenuItem thumbViewMenuItem;
@@ -894,7 +895,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
                     return;
 				}
 
-				int actionType = intent.getIntExtra("actionType", -1);
+				int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if(actionType == UPDATE_GET_PRICING){
 					logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
@@ -1027,7 +1028,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			int actionType;
 
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if(actionType == GO_OFFLINE){
 				    //stop cu process
@@ -1095,7 +1096,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			ImageView imageDrag = null;
 
 			if (intent != null){
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 				position = intent.getIntExtra("position", -1);
 				placeholderCount = intent.getIntExtra("placeholder", 0);
 				adapterType = intent.getIntExtra("adapterType", 0);
@@ -2538,8 +2539,14 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 				if (position == PENDING_TAB && isTransfersInProgressAdded()) {
 					tFLol.setGetMoreQuotaViewVisibility();
-				} else if (position == COMPLETED_TAB && isTransfersCompletedAdded()) {
-					completedTFLol.setGetMoreQuotaViewVisibility();
+				} else if (position == COMPLETED_TAB) {
+					if (isTransfersCompletedAdded()) {
+						completedTFLol.setGetMoreQuotaViewVisibility();
+					}
+
+					if (isTransfersInProgressAdded()) {
+						tFLol.checkSelectModeAfterChangeTab();
+					}
 				}
 			}
 
@@ -5630,7 +5637,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && transfersWidget.getPendingTransfers() <= 0;
 
-		indexTransfers = MegaApplication.getTransfersManagement().thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
+		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+		indexTransfers = transfersManagement.thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
 		if (viewPagerTransfers != null) {
 			switch (indexTransfers) {
@@ -5642,6 +5650,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				default:
 					refreshFragment(FragmentTag.TRANSFERS.getTag());
 					viewPagerTransfers.setCurrentItem(PENDING_TAB);
+
+					if (transfersManagement.shouldShowNetWorkWarning()) {
+						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+					}
+
 					break;
 			}
 
@@ -6604,6 +6617,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
 		importLinkMenuItem = menu.findItem(R.id.action_import_link);
+		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		thumbViewMenuItem = menu.findItem(R.id.action_grid);
@@ -6665,6 +6679,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					addMenuItem.setVisible(true);
 					takePicture.setVisible(true);
 
+					createFolderMenuItem.setVisible(true);
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
                         thumbViewMenuItem.setVisible(true);
                         setGridListIcon();
@@ -6823,7 +6838,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
                         } else {
                             pauseTransfersMenuIcon.setVisible(true);
                         }
+
 						cancelAllTransfersMenuItem.setVisible(true);
+					    enableSelectMenuItem.setVisible(true);
 					} else if (getTabItemTransfers() == COMPLETED_TAB && isTransfersInProgressAdded() && completedTFLol.isAnyTransferCompleted()) {
 						clearCompletedTransfers.setVisible(true);
 						retryTransfers.setVisible(thereAreFailedOrCancelledTransfers());
@@ -6886,6 +6903,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
         setSearchDrawerItem();
         selectDrawerItemLollipop(drawerItem);
         resetActionBar(aB);
+
+        if (sFLol != null) {
+            sFLol.newSearchNodesTask();
+        }
     }
 
     private void setFullscreenOfflineFragmentSearchQuery(String searchQuery) {
@@ -7509,6 +7530,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 			case R.id.action_menu_retry_transfers:
 				retryAllTransfers();
+				return true;
+
+			case R.id.action_enable_select:
+				if (isTransfersInProgressAdded()) {
+					tFLol.activateActionMode();
+				}
 				return true;
 
             default:{
@@ -13258,7 +13285,13 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 		} else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
-			MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+			if (e.getErrorCode() == MegaError.API_OK){
+				MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+				transfersWidget.update();
+				supportInvalidateOptionsMenu();
+			} else {
+				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
+			}
 		} else if(request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			logDebug("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
@@ -13277,21 +13310,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
 			}
 
-		}
-		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
-			logDebug("One MegaRequest.TYPE_CANCEL_TRANSFER");
-
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("REQUEST OK - wait for onTransferFinish()");
-				transfersWidget.update();
-				supportInvalidateOptionsMenu();
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
-			}
-
-		}
-		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+		} else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			logDebug("requestFinish TYPE_KILL_SESSION"+MegaRequest.TYPE_KILL_SESSION);
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Success kill sessions");
@@ -13943,8 +13962,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	 * Shows a warning to ensure if it is sure of remove all completed transfers.
 	 */
 	public void showConfirmationClearCompletedTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(getResources().getString(R.string.confirmation_to_clear_completed_transfers))
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
 				.setPositiveButton(R.string.general_clear, (dialog, which) -> {
 					dbH.emptyCompletedTransfers();
 
@@ -13953,32 +13972,41 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 					supportInvalidateOptionsMenu();
 				})
-				.setNegativeButton(R.string.general_cancel, null);
+				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
 		setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**
-	 * Shows a warning to ensure if it is sure of cancel a transfer.
-	 *
-	 * @param mT	the transfer to cancel
+	 * Shows a warning to ensure if it is sure of cancel selected transfers.
 	 */
-	public void showConfirmationCancelTransfer(final MegaTransfer mT) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage(R.string.cancel_transfer_confirmation)
-				.setPositiveButton(R.string.general_cancel, (dialog, which) -> megaApi.cancelTransfer(mT, managerActivity))
+	public void showConfirmationCancelSelectedTransfers(List<MegaTransfer> selectedTransfers) {
+		if (selectedTransfers == null || selectedTransfers.isEmpty()) {
+			return;
+		}
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
+		builder.setMessage(getResources().getQuantityString(R.plurals.cancel_selected_transfers, selectedTransfers.size()))
+				.setPositiveButton(R.string.button_continue, (dialog, which) -> {
+					CancelTransferListener cancelTransferListener = new CancelTransferListener(managerActivity);
+					cancelTransferListener.cancelTransfers(selectedTransfers);
+
+					if(isTransfersInProgressAdded()) {
+						tFLol.destroyActionMode();
+					}
+				})
 				.setNegativeButton(R.string.general_dismiss, null);
 
 		confirmationTransfersDialog = builder.create();
-        setConfirmationTransfersDialogNotCancellableAndShow();
+		setConfirmationTransfersDialogNotCancellableAndShow();
 	}
 
 	/**
 	 * Shows a warning to ensure if it is sure of cancel all transfers.
 	 */
 	public void showConfirmationCancelAllTransfers() {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.ConfirmationWarning);
 		builder.setMessage(getResources().getString(R.string.cancel_all_transfer_confirmation))
 				.setPositiveButton(R.string.cancel_all_action, (dialog, which) -> {
 					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, managerActivity);
@@ -14105,14 +14133,11 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			logDebug("Update onTransferUpdate: " + transfer.getNodeHandle() + " - " + transfer.getTag()+ " - "+ transfer.getNotificationNumber());
 			lastTimeOnTransferUpdate = now;
 
-			if (!transfer.isFolderTransfer()){
-				if(transferCallback<transfer.getNotificationNumber()){
-					transferCallback = transfer.getNotificationNumber();
+			if (!transfer.isFolderTransfer() && transferCallback < transfer.getNotificationNumber()) {
+				transferCallback = transfer.getNotificationNumber();
 
-                    if (isTransfersInProgressAdded()){
-						tFLol.transferUpdate(transfer);
-					}
-
+				if (isTransfersInProgressAdded()) {
+					tFLol.transferUpdate(transfer);
 				}
 			}
 		}

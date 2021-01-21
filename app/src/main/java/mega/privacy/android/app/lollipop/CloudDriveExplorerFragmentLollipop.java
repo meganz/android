@@ -51,7 +51,6 @@ import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -308,7 +307,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		if (((FileExplorerActivityLollipop) context).isList()) {
 			recyclerView = v.findViewById(R.id.file_list_view_browser);
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 		}

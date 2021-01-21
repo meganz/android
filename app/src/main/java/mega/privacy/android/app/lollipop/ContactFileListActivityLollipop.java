@@ -332,7 +332,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			if (intent != null) {
 				position = intent.getIntExtra("position", -1);
 				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if (position != -1) {
 					if (adapterType == CONTACT_FILE_ADAPTER) {

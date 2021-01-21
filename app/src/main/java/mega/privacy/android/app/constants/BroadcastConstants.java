@@ -82,9 +82,10 @@ public class BroadcastConstants {
     public static final String CACHE_SIZE = "CACHE_SIZE";
     public static final String OFFLINE_SIZE = "OFFLINE_SIZE";
     public static final String COMPLETED_TRANSFER = "COMPLETED_TRANSFER";
+    public static final String ACTION_TYPE = "ACTION_TYPE";
+    public static final int INVALID_ACTION = -1;
     public static final String SECONDARY_FOLDER = "SECONDARY_FOLDER";
     public static final String PRIMARY_HANDLE = "PRIMARY_HANDLE";
-    public static final String ACTION_TYPE = "actionType";
     public static final String DAYS_COUNT = "DAYS_COUNT";
 
 }
