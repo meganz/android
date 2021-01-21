@@ -118,7 +118,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.4_347";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.5_349";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
@@ -212,7 +212,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-		intent.putExtra("actionType", GO_ONLINE);
+		intent.putExtra(ACTION_TYPE, GO_ONLINE);
 		sendBroadcast(intent);
 	}
 
@@ -220,7 +220,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void networkUnavailable() {
 		logDebug("Net unavailable: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-		intent.putExtra("actionType", GO_OFFLINE);
+		intent.putExtra(ACTION_TYPE, GO_OFFLINE);
 		sendBroadcast(intent);
 	}
 
@@ -391,7 +391,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_GET_PRICING);
+					intent.putExtra(ACTION_TYPE, UPDATE_GET_PRICING);
 					sendBroadcast(intent);
 				}
 				else{
@@ -411,7 +411,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_PAYMENT_METHODS);
+					intent.putExtra(ACTION_TYPE, UPDATE_PAYMENT_METHODS);
 					sendBroadcast(intent);
 				}
 			}
@@ -423,7 +423,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_CREDIT_CARD_SUBSCRIPTION);
+					intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION);
 					sendBroadcast(intent);
 				}
 			}
@@ -476,7 +476,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private void sendBroadcastUpdateAccountDetails() {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
+		intent.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS);
 		sendBroadcast(intent);
 	}
 
@@ -1615,6 +1615,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             }
             logDebug("Creating RTC Audio Manager");
 			removeRTCAudioManagerRingIn();
+			this.isSpeakerOn = isSpeakerOn;
 			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
 			startProximitySensor();
         }

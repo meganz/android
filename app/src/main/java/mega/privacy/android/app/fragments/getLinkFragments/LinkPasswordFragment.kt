@@ -126,9 +126,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     confirmClick()
                     true
-                }
-
-                false
+                } else false
             }
         }
 

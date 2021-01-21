@@ -1670,6 +1670,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * @param visible   true if visible, false otherwise
      */
     private void setGroupalSubtitleToolbarVisibility(boolean visible) {
+        if (subtitleCall.getVisibility() == View.VISIBLE) {
+            visible = false;
+        }
+
         groupalSubtitleToolbar.setVisibility(visible ? View.VISIBLE : View.GONE);
 
         if (visible) {
@@ -5148,10 +5152,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                     }
                                 }
-                                if (url == null) return;
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                startActivity(browserIntent);
 
+                                if (url == null) return;
+
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+                                if (isIntentAvailable(this, browserIntent)) {
+                                    startActivity(browserIntent);
+                                } else {
+                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available_location), MEGACHAT_INVALID_HANDLE);
+                                }
                             } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL ){
                                 logDebug("TYPE_NORMAL");
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
@@ -9176,7 +9186,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void startConnection() {
         logDebug("Broadcast to ManagerActivity");
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra("actionType", START_RECONNECTION);
+        intent.putExtra(ACTION_TYPE, START_RECONNECTION);
         sendBroadcast(intent);
     }
 
