@@ -221,6 +221,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
 import mega.privacy.android.app.psa.PsaViewModelFactory;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
+import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -8146,13 +8147,17 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.bottom_navigation_item_shared_items: {
 				if (drawerItem == DrawerItem.SHARED_ITEMS) {
-					if (getTabItemShares() == 0 && parentHandleIncoming != -1) {
-						parentHandleIncoming = -1;
+					if (getTabItemShares() == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE) {
+						parentHandleIncoming = INVALID_HANDLE;
 						refreshFragment(FragmentTag.INCOMING_SHARES.getTag());
-					} else if (getTabItemShares() == 1 && parentHandleOutgoing != -1){
-						parentHandleOutgoing = -1;
+					} else if (getTabItemShares() == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE){
+						parentHandleOutgoing = INVALID_HANDLE;
 						refreshFragment(FragmentTag.OUTGOING_SHARES.getTag());
+					} else if (getTabItemShares() == LINKS_TAB && parentHandleLinks != INVALID_HANDLE) {
+						parentHandleLinks = INVALID_HANDLE;
+						refreshFragment(FragmentTag.LINKS.getTag());
 					}
+
 					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
@@ -8523,9 +8528,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			return;
 		}
 
-		Intent linkIntent = new Intent(this, GetLinkActivityLollipop.class);
-		linkIntent.putExtra("handle", handle);
-		startActivity(linkIntent);
+		LinksUtil.showGetLinkActivity(this, handle);
 
 		refreshAfterMovingToRubbish();
 	}

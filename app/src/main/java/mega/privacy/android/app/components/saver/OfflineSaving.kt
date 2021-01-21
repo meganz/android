@@ -26,7 +26,7 @@ class OfflineSaving(
                 !MegaApiUtils.isIntentAvailable(context, checkIntent)
             } catch (e: Exception) {
                 LogUtil.logWarning("isIntentAvailable error", e)
-                true
+                return true
             }
         }
 
