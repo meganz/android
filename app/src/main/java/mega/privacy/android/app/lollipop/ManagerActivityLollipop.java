@@ -137,6 +137,7 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -563,7 +564,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	//Tabs in Transfers
 	private TabLayout tabLayoutTransfers;
 	private TransfersPageAdapter mTabsAdapterTransfers;
-	private ViewPager viewPagerTransfers;
+	private CustomViewPager viewPagerTransfers;
 
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
@@ -5817,6 +5818,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 				tabLayoutContacts.setVisibility(visibility);
 				viewPagerContacts.disableSwipe(hide);
+				break;
+
+			case TRANSFERS:
+				if (currentTab == PENDING_TAB && !isTransfersInProgressAdded()) {
+					return;
+				}
+
+				tabLayoutTransfers.setVisibility(visibility);
+				viewPagerTransfers.disableSwipe(hide);
 				break;
 		}
 	}
