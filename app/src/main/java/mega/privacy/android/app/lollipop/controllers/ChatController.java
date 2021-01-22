@@ -604,13 +604,19 @@ public class ChatController {
 
                 }else if(message.getType() == MegaChatMessage.TYPE_CONTAINS_META){
                     MegaChatContainsMeta meta = message.getContainsMeta();
-                    if(meta!=null && meta.getType()==MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW){
-                       String text = meta.getRichPreview().getText();
-                       builder.append(text);
-                       return builder.toString();
-                    }else{
-                       return "";
+                    if (meta != null) {
+                        if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW) {
+                            String text = meta.getRichPreview().getText();
+                            builder.append(text);
+                            return builder.toString();
+                        } else if (isGeolocation(message)) {
+                            String text = message.getContainsMeta().getTextMessage();
+                            builder.append(text);
+                            return builder.toString();
+                        }
                     }
+
+                    return "";
                 }else if(message.getType() == MegaChatMessage.TYPE_CALL_STARTED){
                     String textToShow = context.getResources().getString(R.string.call_started_messages);
                     builder.append(textToShow);
@@ -1734,7 +1740,6 @@ public class ChatController {
             showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
         }
     }
-
 
     public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected, long idChat){
         logDebug("Number of messages: " + messagesSelected.size() + ", Chat ID: " + idChat);

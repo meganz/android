@@ -190,7 +190,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             optionSelect.setVisibility(View.VISIBLE);
 
-            if (typeMessage == MegaChatMessage.TYPE_NORMAL ||
+            if (typeMessage == MegaChatMessage.TYPE_NORMAL || isGeolocation(megaChatMessage) ||
                     (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
                             megaChatMessage.getContainsMeta() != null &&
                             (megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW ||
@@ -390,7 +390,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     return;
                 }
 
-                shareNodeFromChat(context, node, messageId, chatId);
+                shareNode(context, node, messageId, chatId);
                 break;
 
             case R.id.select_layout:

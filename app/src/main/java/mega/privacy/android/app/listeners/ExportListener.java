@@ -144,7 +144,7 @@ public class ExportListener extends BaseListener {
     }
 
     /**
-     * Method to display a snackbar when all nodes have not been imported correctly.
+     * Method to display a Snackbar when all nodes have not been imported correctly.
      */
     public void errorImportingNodes() {
         numberError++;

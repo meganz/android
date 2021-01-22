@@ -21,10 +21,18 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 public class ChatImportToForwardListener implements MegaRequestListenerInterface {
 
     Context context;
+    private int counter;
+    private int error = 0;
+    private final int actionListener;
+    private final long chatId;
+    private final ArrayList<MegaChatMessage> messagesSelected;
+    private final ChatController chatC;
+    private ExportListener exportListener;
 
     public ChatImportToForwardListener(int action, ArrayList<MegaChatMessage> messagesSelected, int counter, Context context, ChatController chatC, long chatId) {
         super();
@@ -47,19 +55,9 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
         this.exportListener = exportListener;
     }
 
-    int counter;
-    int error = 0;
-    int actionListener;
-    String message;
-    long chatId;
-    ArrayList<MegaChatMessage> messagesSelected;
-    ChatController chatC;
-    ExportListener exportListener;
-
     @Override
     public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -98,7 +96,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                     if(actionListener==MULTIPLE_FORWARD_MESSAGES){
                         //Many files shared with one contacts
                         if(error>0){
-                            message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
+                            String message = context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error);
                             if(context instanceof ChatActivityLollipop){
                                 ((ChatActivityLollipop) context).removeProgressDialog();
                                 ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, message, -1);
@@ -122,16 +120,15 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                             }
 
                             if (exportListener != null) {
-                                long msgId = messagesSelected.get(0).getMsgId();
-                                exportListener.updateNodeHandle(msgId, node.getHandle());
+                                exportListener.updateNodeHandle(messagesSelected.get(0).getMsgId(), node.getHandle());
                                 MegaApplication.getInstance().getMegaApi().exportNode(node, exportListener);
                             } else {
                                 MegaNodeUtil.shareNode(context, node);
                             }
-                        }else{
-                            if(exportListener == null) {
-                                Util.showSnackbar(context, "This node cannot be shared");
-                            }else{
+                        } else {
+                            if (exportListener == null) {
+                                showSnackbar(context, context.getResources().getQuantityString(R.plurals.error_forwarding_messages, error));
+                            } else {
                                 exportListener.errorImportingNodes();
                             }
                         }
