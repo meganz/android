@@ -1420,7 +1420,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                         .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
                                 (dialog, which) -> finish())
                         .show();
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                logError("Exception trying to show A/V player error dialog", e);
+            }
         }
 
         numErrors = 0;
