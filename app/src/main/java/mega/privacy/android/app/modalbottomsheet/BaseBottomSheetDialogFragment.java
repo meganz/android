@@ -16,6 +16,9 @@ import androidx.annotation.Nullable;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -27,13 +30,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
-    private static final int DEFAULT_VIEW_TYPE = 0;
-    private static final int RADIO_GROUP_VIEW_TYPE = 1;
-
-    private static final int HEIGHT_RADIO_GROUP_VIEW = 56;
-    private static final int HEIGHT_CHILD = 50;
+    protected static final int HEIGHT_HEADER_RADIO_GROUP = 56;
     protected static final int HEIGHT_HEADER_LARGE = 81;
     protected static final int HEIGHT_HEADER_LOW = 48;
+    protected static final int HEIGHT_SEPARATOR = 1;
+
+    protected static final String TYPE_OPTION = "TYPE_OPTION";
+    protected static final String TYPE_SEPARATOR = "TYPE_SEPARATOR";
 
     protected Context context;
     protected MegaApplication app;
@@ -46,7 +49,6 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private int heightHeader;
     protected BottomSheetBehavior mBehavior;
 
-    private int viewType = DEFAULT_VIEW_TYPE;
     protected View contentView;
     protected LinearLayout mainLinearLayout;
     protected LinearLayout items_layout;
@@ -82,19 +84,14 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
      * Sets the initial state of a BottomSheet and its state.
      *
      * @param heightHeader           Height of the header.
-     * @param addBottomSheetCallBack True if it should add a BottomsheetCallback, false otherwise.
+     * @param addBottomSheetCallBack True if it should add a BottomSheetCallback, false otherwise.
      */
     protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
 
-        int peekHeight = getPeekHeight();
-        if (peekHeight < halfHeightDisplay) {
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } else {
-            mBehavior.setPeekHeight(peekHeight);
-            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
+        mBehavior.setPeekHeight(getPeekHeight());
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         if (addBottomSheetCallBack) {
             addBottomSheetCallBack();
@@ -103,11 +100,9 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     /**
      * Sets the initial state of a BottomSheet composed by a RadioGroup and its state.
-     *
      */
     protected void setRadioGroupViewBottomSheetBehaviour() {
-        viewType = RADIO_GROUP_VIEW_TYPE;
-        setBottomSheetBehavior(HEIGHT_RADIO_GROUP_VIEW, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_RADIO_GROUP, false);
     }
 
     /**
@@ -161,45 +156,51 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
      */
     private int getPeekHeight() {
         int numVisibleOptions = 0;
-        int heightChildPixels = viewType == DEFAULT_VIEW_TYPE ? HEIGHT_CHILD : HEIGHT_RADIO_GROUP_VIEW;
-        int heightChild = dp2px(heightChildPixels, outMetrics);
+        int childHeight = 0;
+        Map<Integer, String> visibleItems = new HashMap<>();
         int peekHeight = dp2px(heightHeader, outMetrics);
-        int heightSeparator = dp2px(1, outMetrics);
+        int heightSeparator = dp2px(HEIGHT_SEPARATOR, outMetrics);
 
         for (int i = 0; i < items_layout.getChildCount(); i++) {
             View v = items_layout.getChildAt(i);
 
             if (v != null && v.getVisibility() == VISIBLE) {
                 int height = v.getLayoutParams().height;
+                childHeight += height;
 
-                if (height < 0 || height >= heightChildPixels) {
+                if (height == heightSeparator) {
+                    //Is separator
+                    visibleItems.put(i, TYPE_SEPARATOR);
+                } else {
                     //Is visible option
                     numVisibleOptions++;
-                } else {
-                    //Is visible separator
-                    peekHeight += heightSeparator;
+                    visibleItems.put(i, TYPE_OPTION);
                 }
             }
         }
 
         if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE)
                 || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
-            return peekHeight + (heightChild * numVisibleOptions);
+            return peekHeight + childHeight;
         }
 
-        for (int i = 1; i <= numVisibleOptions; i++) {
-            if (peekHeight < halfHeightDisplay) {
-                peekHeight += heightChild;
+        int countVisibleOptions = 0;
 
-                if (peekHeight >= halfHeightDisplay) {
-                    int nextVisiblePosition = i + 1;
+        for (Map.Entry<Integer, String> visibleItem : visibleItems.entrySet()) {
+            String visibleItemType = visibleItem.getValue();
+            int visibleItemPosition = visibleItem.getKey();
+            int heightVisiblePosition = items_layout.getChildAt(visibleItemPosition).getLayoutParams().height;
 
-                    if (nextVisiblePosition == numVisibleOptions) {
-                        return peekHeight + heightChild;
-                    } else {
-                        return peekHeight + (heightChild / 2);
-                    }
-                }
+            if (visibleItemType.equals(TYPE_OPTION)) {
+                countVisibleOptions++;
+            }
+
+            if (peekHeight < halfHeightDisplay
+                    || visibleItemType.equals(TYPE_SEPARATOR)
+                    || countVisibleOptions == numVisibleOptions) {
+                peekHeight += heightVisiblePosition;
+            } else {
+                return peekHeight + (heightVisiblePosition / 2);
             }
         }
 
