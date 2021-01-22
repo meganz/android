@@ -129,14 +129,14 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                         if(folderSubHandle==null){
                             richLinkMessage.setNode(rootNode);
-                            String content = getInfoFolder(rootNode, context, megaApiFolder);
+                            String content = getMegaNodeFolderInfo(rootNode);
                             richLinkMessage.setFolderContent(content);
                         }
                         else{
                             MegaNode pN = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(folderSubHandle));
                             richLinkMessage.setNode(pN);
                             if(pN.isFolder()){
-                                String content = getInfoFolder(pN, context, megaApiFolder);
+                                String content = getMegaNodeFolderInfo(pN);
                                 richLinkMessage.setFolderContent(content);
                             }
                         }

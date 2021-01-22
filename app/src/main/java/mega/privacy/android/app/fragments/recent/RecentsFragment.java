@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop.managerSections;
+package mega.privacy.android.app.fragments.recent;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,7 +42,6 @@ import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.Scrollable;
-import mega.privacy.android.app.fragments.recent.SelectedBucketViewModel;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -83,6 +83,16 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     private FastScroller fastScroller;
 
     private SelectedBucketViewModel selectedBucketModel;
+
+    private final Observer<Boolean> nodeChangeObserver = forceUpdate -> {
+        if (forceUpdate) {
+            buckets = megaApi.getRecentActions();
+            reloadItems(buckets);
+            refreshRecentsActions();
+            setVisibleContacts();
+            setRecentsView();
+        }
+    };
 
     @Override
     public void onStart() {
@@ -165,15 +175,15 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        EventNotifierKt.getNodesChange().observeForever(o -> {
-            if (o) {
-                ArrayList<MegaRecentActionBucket> buckets = megaApi.getRecentActions();
-                reloadItems(buckets);
-                refreshRecentsActions();
-                setVisibleContacts();
-            }
-        });
+        EventNotifierKt.getNodesChange().observeForever(nodeChangeObserver);
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        EventNotifierKt.getNodesChange().removeObserver(nodeChangeObserver);
     }
 
     public SelectedBucketViewModel getSelectedBucketModel() {
@@ -186,7 +196,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         adapter = new RecentsAdapter(context, this, recentsItems);
         listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
+        listView.addItemDecoration(new HeaderItemDecoration(context));
         setVisibleContacts();
     }
 
