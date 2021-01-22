@@ -14,6 +14,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import java.lang.StringBuilder
 import java.util.*
 
 class PasscodeActivity : BaseActivity() {
@@ -25,6 +27,10 @@ class PasscodeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
+
+    private var secondRound = false
+    private val sbFirst = StringBuilder()
+    private val sbSecond = StringBuilder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +50,8 @@ class PasscodeActivity : BaseActivity() {
 
     private fun initPasscodeScreen() {
         val prefs = dbH.preferences
-        passcodeType = if (prefs != null) prefs.pinLockType else PIN_4
+        passcodeType =
+            if (prefs != null && !isTextEmpty(prefs.pinLockType)) prefs.pinLockType else PIN_4
 
         if (passcodeType == PIN_ALPHANUMERIC) {
             binding.passFirstInput.visibility = GONE
@@ -160,10 +167,12 @@ class PasscodeActivity : BaseActivity() {
                     }
 
                     override fun afterTextChanged(editable: Editable) {
-                        if (editable.toString()
-                                .isNotEmpty() && binding.passFifthInput.visibility == VISIBLE
-                        ) {
-                            binding.passFourthInput.requestFocus()
+                        if (editable.toString().isNotEmpty()) {
+                            if (passcodeType == PIN_4) {
+                                confirmPasscode()
+                            } else {
+                                binding.passFifthInput.requestFocus()
+                            }
                         }
                     }
                 })
@@ -225,7 +234,7 @@ class PasscodeActivity : BaseActivity() {
 
                         override fun afterTextChanged(editable: Editable) {
                             if (editable.toString().isNotEmpty()) {
-
+                                confirmPasscode()
                             }
                         }
                     })
@@ -234,6 +243,60 @@ class PasscodeActivity : BaseActivity() {
 
             binding.passwordInput.visibility = GONE
         }
+    }
+
+    private fun confirmPasscode() {
+        if (!isPassCodeComplete()) {
+            return
+        }
+
+        when (passcodeType) {
+            PIN_4 -> {
+                if (secondRound) {
+
+                } else {
+
+                }
+            }
+            PIN_6 -> {
+                if (secondRound) {
+
+                } else {
+
+                }
+            }
+            PIN_ALPHANUMERIC -> {
+                if (secondRound) {
+
+                } else {
+
+                }
+            }
+        }
+    }
+
+    private fun isPassCodeComplete(): Boolean {
+        when (passcodeType) {
+            PIN_4 -> {
+                return binding.passFirstInput.length() == 1
+                        && binding.passSecondInput.length() == 1
+                        && binding.passThirdInput.length() == 1
+                        && binding.passFourthInput.length() == 1
+            }
+            PIN_6 -> {
+                return binding.passFirstInput.length() == 1
+                        && binding.passSecondInput.length() == 1
+                        && binding.passThirdInput.length() == 1
+                        && binding.passFourthInput.length() == 1
+                        && binding.passFifthInput.length() == 1
+                        && binding.passSixthInput.length() == 1
+            }
+            PIN_ALPHANUMERIC -> {
+                return binding.passwordInput.text.isNotEmpty()
+            }
+        }
+
+        return false
     }
 
     override fun onBackPressed() {
