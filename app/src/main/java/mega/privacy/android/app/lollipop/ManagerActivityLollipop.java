@@ -96,12 +96,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
 import java.io.File;
@@ -155,8 +149,10 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
@@ -167,7 +163,6 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
@@ -193,7 +188,6 @@ import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipo
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -204,6 +198,10 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.middlelayer.iab.BillingManager;
+import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
@@ -221,12 +219,13 @@ import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaViewModel;
 import mega.privacy.android.app.psa.PsaViewModelFactory;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
+import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
@@ -264,35 +263,37 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingUpdatesListener {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -457,7 +458,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
-	private List<SkuDetails> mSkuDetailsList;
+	private List<MegaSku> mSkuDetailsList;
 
     public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -1426,61 +1427,49 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     public void launchPayment(String productId) {
         //start purchase/subscription flow
-        SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-        Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
+        MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
+        MegaPurchase purchase = app.getMyAccountInfo().getActiveSubscription();
         String oldSku = purchase == null ? null : purchase.getSku();
-        String token = purchase == null ? null : purchase.getPurchaseToken();
+        String token = purchase == null ? null : purchase.getToken();
         if (mBillingManager != null) {
             mBillingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
         }
     }
 
-	private void getInventory() {
-		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
-			@Override
-			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-				if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-					logWarning("Failed to get SkuDetails, error code is " + billingResult.getResponseCode());
-				}
-				if (skuDetailsList != null && skuDetailsList.size() > 0) {
-					mSkuDetailsList = skuDetailsList;
-					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+	private MegaSku getSkuDetails(List<MegaSku> list, String key) {
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
 
-					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-					if (upAFL != null) {
-						upAFL.setPricingInfo();
-					}
-				}
+		for (MegaSku details : list) {
+			if (details.getSku().equals(key)) {
+				return details;
 			}
-		};
-
-		List<String> inAppSkus = new ArrayList<>();
-		inAppSkus.add(SKU_PRO_I_MONTH);
-		inAppSkus.add(SKU_PRO_I_YEAR);
-		inAppSkus.add(SKU_PRO_II_MONTH);
-		inAppSkus.add(SKU_PRO_II_YEAR);
-		inAppSkus.add(SKU_PRO_III_MONTH);
-		inAppSkus.add(SKU_PRO_III_YEAR);
-		inAppSkus.add(SKU_PRO_LITE_MONTH);
-		inAppSkus.add(SKU_PRO_LITE_YEAR);
-
-		//we only support subscription for google pay
-		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
+		}
+		return null;
 	}
 
     public void initGooglePlayPayments() {
-        mBillingManager = new BillingManager(this, this);
+        mBillingManager = new BillingManagerImpl(this, this);
     }
 
 	@Override
-	public void onBillingClientSetupFinished() {
-		logInfo("Google play billing client setup finished");
-		getInventory();
-	}
+    public void onBillingClientSetupFinished() {
+        logInfo("Billing client setup finished");
+        mBillingManager.getInventory(skuList -> {
+            mSkuDetailsList = skuList;
+            app.getMyAccountInfo().setAvailableSkus(skuList);
+
+            upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+            if (upAFL != null) {
+                upAFL.setPricingInfo();
+            }
+        });
+    }
 
 	@Override
-	public void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases) {
-		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
+	public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+		if (isFailed || purchases == null) {
 			logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
 			return;
 		}
@@ -1490,16 +1479,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	@Override
-	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
-        if (resultCode == BillingClient.BillingResponseCode.OK) {
+	public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (!isFailed) {
             String message;
             if (purchases != null && !purchases.isEmpty()) {
-                Purchase purchase = purchases.get(0);
+                MegaPurchase purchase = purchases.get(0);
                 //payment may take time to process, we will not give privilege until it has been fully processed
                 String sku = purchase.getSku();
                 String subscriptionType = getSubscriptionType(this, sku);
                 String subscriptionRenewalType = getSubscriptionRenewalType(this, sku);
-                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                if (mBillingManager.isPurchased(purchase)) {
                     //payment has been processed
                     updateAccountInfo(purchases);
                     logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
@@ -1523,12 +1512,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 	}
 
-	private void updateAccountInfo(List<Purchase> purchases) {
+	private void updateAccountInfo(List<MegaPurchase> purchases) {
 		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
 		int highest = -1;
 		int temp = -1;
-		Purchase max = null;
-		for (Purchase purchase : purchases) {
+		MegaPurchase max = null;
+		for (MegaPurchase purchase : purchases) {
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -1556,7 +1545,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         if(max != null ){
             logDebug("Set current max subscription: " + max);
-            myAccountInfo.setActiveGooglePlaySubscription(max);
+            myAccountInfo.setActiveSubscription(max);
+        } else {
+            myAccountInfo.setActiveSubscription(null);
         }
 
 		myAccountInfo.setLevelInventory(highest);
@@ -1586,12 +1577,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
-		Purchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
+		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveSubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
 			return;
 		}
 
-		String json = highestGooglePlaySubscription.getOriginalJson();
+		String json = highestGooglePlaySubscription.getReceipt();
 		logDebug("ORIGINAL JSON:" + json); //Print JSON in logs to help debug possible payments issues
 
 		MegaAttributes attributes = dbH.getAttributes();
@@ -1599,9 +1590,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
 			if (lastPublicHandle == INVALID_HANDLE) {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, this);
+				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, this);
 			} else {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle,
+				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
 						attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
 			}
 		}
@@ -2809,17 +2800,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			dbH.setInvalidateSdkCache(false);
-
-			String token = FirebaseInstanceId.getInstance().getToken();
-			if (token != null) {
-				logDebug("FCM TOKEN: " + token);
-				megaApi.registerPushNotifications(DEVICE_ANDROID, token, this);
-//				Log.d("TOKEN___", token);
-
-//				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
-			}
-
-
+            MegaMessageService.getToken(this);
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
@@ -11103,40 +11084,27 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					sectionClicked = true;
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					checkIfShouldCloseSearchView(oldDrawerItem);
-					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
 			}
 			case R.id.inbox_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.INBOX;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.CONTACTS;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.NOTIFICATIONS;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.offline_section: {
 				sectionClicked = true;
-				isFirstTimeCam();
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				drawerLayout.closeDrawer(Gravity.LEFT);
 				openFullscreenOfflineFragment(getPathNavigationOffline());
-				setTabsVisibility();
 				break;
 			}
 			case R.id.transfers_section:
@@ -11147,8 +11115,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case R.id.settings_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.SETTINGS;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
@@ -11158,8 +11124,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.lost_authentication_device: {
@@ -11879,6 +11843,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                 fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);
+            }
+        }
+		// for HMS purchase only
+        else if (requestCode == REQ_CODE_BUY) {
+            if (resultCode == Activity.RESULT_OK) {
+                int purchaseResult = mBillingManager.getPurchaseResult(intent);
+                if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
+                    mBillingManager.updatePurchase();
+                } else {
+                    logWarning("Purchase failed, error code: " + purchaseResult);
+                }
+            } else {
+                logWarning("cancel subscribe");
             }
         }
 		else{

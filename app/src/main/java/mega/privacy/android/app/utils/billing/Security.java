@@ -28,6 +28,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.SIGNATURE_ALGORITHM;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 /**
@@ -38,26 +39,24 @@ public class Security {
     private static final String TAG = "IABUtil/Security";
 
     private static final String KEY_FACTORY_ALGORITHM = "RSA";
-    private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
     /**
      * Verifies that the data was signed with the given signature, and returns the verified
      * purchase.
-     * @param base64PublicKey the base64-encoded public key to use for verifying.
      * @param signedData the signed JSON string (signed, not encrypted)
      * @param signature the signature for the data, signed with the private key
+     * @param publicKey Public key.
      * @throws IOException if encoding algorithm is not supported or key specification
      * is invalid
      */
-    public static boolean verifyPurchase(String base64PublicKey, String signedData,
-            String signature) throws IOException {
-        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(base64PublicKey)
+    public static boolean verifyPurchase(String signedData, String signature, String publicKey) throws IOException {
+        if (TextUtils.isEmpty(signedData) || TextUtils.isEmpty(publicKey)
                 || TextUtils.isEmpty(signature)) {
             logWarning("Purchase verification failed: missing data.");
             return false;
         }
 
-        PublicKey key = generatePublicKey(base64PublicKey);
+        PublicKey key = generatePublicKey(publicKey);
         return verify(key, signedData, signature);
     }
 
