@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaChatSession;
 import jp.wasabeef.blurry.Blurry;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.widget.RelativeLayout.TRUE;
+import static mega.privacy.android.app.utils.AvatarUtil.getRadius;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -221,8 +222,8 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             height = maxScreenWidth / 2;
             width = numPeersOnCall == CHECK_PARTICIPANTS_UI && position == numPeersOnCall - 1 ? maxScreenWidth : maxScreenWidth / 2;
         } else {
-            height = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
-            width = px2dp(SIZE_VIDEO_PARTICIPANTS, outMetrics);
+            height = dp2px(SIZE_VIDEO_PARTICIPANTS, outMetrics);
+            width = dp2px(SIZE_VIDEO_PARTICIPANTS, outMetrics);
         }
 
         ViewGroup.LayoutParams lp = holder.rlGeneral.getLayoutParams();
@@ -361,7 +362,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
 
         int numPeersOnCall = peers.size();
-        int size = px2dp(numPeersOnCall <= MAX_PARTICIPANTS_GRID ? SIZE_BIG_AVATAR : SIZE_SMALL_AVATAR, outMetrics);
+        int size = dp2px(numPeersOnCall <= MAX_PARTICIPANTS_GRID ? SIZE_BIG_AVATAR : SIZE_SMALL_AVATAR, outMetrics);
 
         if (numPeersOnCall == 2 && isItMe(chatId, peer.getPeerId(), peer.getClientId())) {
 
@@ -424,12 +425,14 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
 
         /*Avatar*/
-        Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
-
-        holder.avatarImage.setImageBitmap(defaultBitmap);
         Bitmap bitmap = getImageAvatarCall(chatRoom, peer.getPeerId());
-        if (bitmap != null) {
+        if(bitmap != null){
             holder.avatarImage.setImageBitmap(bitmap);
+            holder.avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
+        }else{
+            Bitmap defaultBitmap = getDefaultAvatarCall(context, chatRoom, peer.getPeerId());
+            holder.avatarImage.setImageBitmap(defaultBitmap);
+            holder.avatarImage.setCornerRadius(dp2px(getRadius(defaultBitmap), outMetrics));
         }
 
         displayAvatar(position, holder, peer);
@@ -521,11 +524,11 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
         int size;
         int margin;
         if (peers.size() <= MAX_PARTICIPANTS_GRID) {
-            size = px2dp(24, outMetrics);
-            margin = px2dp(15, outMetrics);
+            size = dp2px(24, outMetrics);
+            margin = dp2px(15, outMetrics);
         } else {
-            size = px2dp(20, outMetrics);
-            margin = px2dp(7, outMetrics);
+            size = dp2px(20, outMetrics);
+            margin = dp2px(7, outMetrics);
         }
 
         paramsQuality.height = size;
@@ -592,6 +595,7 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
                     ViewHolderGroupCall holder = getHolder(position);
                     if (holder != null) {
                         holder.avatarImage.setImageBitmap(avatar);
+                        holder.avatarImage.setCornerRadius(dp2px(getRadius(avatar), outMetrics));
                     } else {
                         notifyItemChanged(position);
                     }
@@ -614,16 +618,16 @@ public class GroupCallAdapter extends RecyclerView.Adapter<GroupCallAdapter.View
             return;
 
         boolean smallIcon = !(peers.size() <= MAX_PARTICIPANTS_GRID);
-        int iconRightMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
-        int iconTopMargin = px2dp(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
+        int iconRightMargin = dp2px(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
+        int iconTopMargin = dp2px(smallIcon ? MARGIN_MUTE_ICON_SMALL : MARGIN_MUTE_ICON_LARGE, outMetrics);
 
         if (!smallIcon && ((ChatCallActivity) context).isActionBarShowing() && peers.size() == 2 && position == 0) {
             iconTopMargin += getActionBarHeight(context);
         }
 
         RelativeLayout.LayoutParams paramsImage = new RelativeLayout.LayoutParams(holder.muteIcon.getLayoutParams());
-        paramsImage.height = px2dp(SIZE_MUTE_ICON_LARGE, outMetrics);
-        paramsImage.width = px2dp(SIZE_MUTE_ICON_LARGE, outMetrics);
+        paramsImage.height = dp2px(SIZE_MUTE_ICON_LARGE, outMetrics);
+        paramsImage.width = dp2px(SIZE_MUTE_ICON_LARGE, outMetrics);
         holder.muteIcon.setLayoutParams(paramsImage);
 
         RelativeLayout.LayoutParams paramsMicroSurface = new RelativeLayout.LayoutParams(holder.muteIconLayout.getLayoutParams());

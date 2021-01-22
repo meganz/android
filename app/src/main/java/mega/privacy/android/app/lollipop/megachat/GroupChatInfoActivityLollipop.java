@@ -9,7 +9,9 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
 import android.graphics.Bitmap;
+
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -38,6 +40,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.MegaApplication;
@@ -46,13 +49,13 @@ import mega.privacy.android.app.components.GroupParticipantsDividerItemDecoratio
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
+import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
-import mega.privacy.android.app.lollipop.listeners.MultipleGroupChatRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaParticipantsChatLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ManageChatLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment;
@@ -206,7 +209,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             aB.setTitle(getString(R.string.group_chat_info_label).toUpperCase());
 
             recyclerView = findViewById(R.id.chat_group_contact_properties_list);
-            recyclerView.addItemDecoration(new GroupParticipantsDividerItemDecoration(this, getOutMetrics()));
+            recyclerView.addItemDecoration(new GroupParticipantsDividerItemDecoration(this));
             recyclerView.setHasFixedSize(true);
             linearLayoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(linearLayoutManager);
@@ -575,33 +578,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         logDebug("Result Code: " + resultCode);
+
+        if (intent == null) {
+            logWarning("Intent is null");
+            return;
+        }
+
         if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == RESULT_OK) {
             logDebug("Participants successfully added");
-            if (intent == null) {
-                logWarning("Return.....");
-                return;
-            }
 
-            final ArrayList<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
-            MultipleGroupChatRequestListener multipleListener = null;
-
+            final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
-
-                if (contactsData.size() == 1) {
-                    MegaUser user = megaApi.getContact(contactsData.get(0));
-                    if (user != null) {
-                        megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, this);
-                    }
-                } else {
-                    logDebug("Add multiple participants " + contactsData.size());
-                    multipleListener = new MultipleGroupChatRequestListener(this);
-                    for (int i = 0; i < contactsData.size(); i++) {
-                        MegaUser user = megaApi.getContact(contactsData.get(i));
-                        if (user != null) {
-                            megaChatApi.inviteToChat(chatHandle, user.getHandle(), MegaChatPeerList.PRIV_STANDARD, multipleListener);
-                        }
-                    }
-                }
+                new InviteToChatRoomListener(this).inviteToChat(chatHandle, contactsData);
             }
         } else {
             logError("Error adding participants");
@@ -639,7 +627,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         input.setSelectAllOnFocus(true);
         input.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        input.setEmojiSize(px2dp(EMOJI_SIZE, getOutMetrics()));
+        input.setEmojiSize(dp2px(EMOJI_SIZE, getOutMetrics()));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
 
@@ -822,27 +810,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
             } else {
                 logError("Error clearing history: " + e.getErrorString());
                 showSnackbar(getString(R.string.clear_history_error));
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_INVITE_TO_CHATROOM) {
-            logDebug("Invite to chatroom request finish!!!");
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Ok. Invited");
-                showSnackbar(getString(R.string.add_participant_success));
-
-                if (request.getChatHandle() == chatHandle) {
-                    logDebug("Changes in my chat");
-                    chat = megaChatApi.getChatRoom(chatHandle);
-                    logDebug("Peers after onChatListItemUpdate: " + chat.getPeerCount());
-                    updateParticipants();
-                } else {
-                    logWarning("Changes NOT interested in");
-                }
-            } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
-                logError("Error inviting ARGS: " + e.getErrorString());
-                showSnackbar(getString(R.string.add_participant_error_already_exists));
-            } else {
-                logError("Error inviting: " + e.getErrorString() + " " + e.getErrorCode());
-                showSnackbar(getString(R.string.add_participant_error));
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             logDebug("Create chat request finish!!!");
@@ -1191,7 +1158,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case RECORD_AUDIO:
+            case REQUEST_RECORD_AUDIO:
             case REQUEST_CAMERA:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     controlCallPermissions();

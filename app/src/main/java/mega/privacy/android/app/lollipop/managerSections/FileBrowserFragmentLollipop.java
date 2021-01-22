@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Environment;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -656,7 +655,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
     }
     
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
 		logDebug("onAttach");
         
         super.onAttach(context);

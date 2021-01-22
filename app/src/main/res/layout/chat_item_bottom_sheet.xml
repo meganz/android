@@ -46,7 +46,7 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:maxLines="1"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 rounded:emojiSize="14sp"/>
 
@@ -65,7 +65,7 @@
                 android:id="@+id/chat_list_chat_mail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/mail_my_account"
+                android:textColor="@color/secondary_text"
                 android:gravity="center_vertical"
                 android:layout_below="@+id/chat_list_chat_name_text"
                 android:textSize="14sp"
@@ -119,7 +119,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -158,7 +158,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/title_properties_chat_clear"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -189,7 +189,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_mute"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -219,7 +219,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/archive_chat_option"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 

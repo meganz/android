@@ -15,6 +15,8 @@ import android.os.Looper;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -77,7 +79,6 @@ import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -181,6 +182,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (!adapterList.isMultipleSelect()) {
             adapterList.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+            bannerContainer.setVisibility(View.GONE);
         }
     }
 
@@ -305,7 +307,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         bannerDivider.setVisibility(View.GONE);
-                        appBarLayout.setElevation(px2dp(4, outMetrics));
+                        appBarLayout.setElevation(dp2px(4, outMetrics));
                     } else {
                         bannerDivider.setVisibility(View.VISIBLE);
                         appBarLayout.setElevation(0);
@@ -817,6 +819,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 adapterList.selectAll();
 
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+                bannerContainer.setVisibility(View.GONE);
             }
 
             new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
@@ -855,7 +858,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
     }
@@ -1586,7 +1589,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
             boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
             if (!hasRecordAudioPermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
+                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
                 return false;
             }
 
@@ -1609,7 +1612,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
                 break;
             }
-            case RECORD_AUDIO: {
+            case REQUEST_RECORD_AUDIO: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");
@@ -1747,6 +1750,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 checkScroll();
             } else if (context instanceof ArchivedChatsActivity) {
                 ((ArchivedChatsActivity) context).changeStatusBarColor(0);
+            }
+
+            if(showInviteBanner()) {
+                bannerContainer.setVisibility(View.VISIBLE);
             }
         }
 

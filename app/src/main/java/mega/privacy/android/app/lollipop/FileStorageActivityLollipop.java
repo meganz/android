@@ -456,7 +456,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		emptyTextView.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		listView = findViewById(R.id.file_storage_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, getOutMetrics()));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -701,7 +701,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private void setFiles(File path) {
 		logDebug("setFiles");
 		List<FileDocument> documents = new ArrayList<FileDocument>();
-		if (!path.canRead()) {
+
+		if (path == null || !path.canRead()) {
 			showErrorAlertDialog(getString(R.string.error_io_problem),
 					true, this);
 			return;
@@ -709,16 +710,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		File[] files = path.listFiles();
 
-		if(files != null)
-		{
+		if (files != null) {
 			logDebug("Number of files: " + files.length);
+
 			for (File file : files) {
 				FileDocument document = new FileDocument(file);
 				if (document.isHidden()) {
 					continue;
 				}
+
 				documents.add(document);
 			}
+
 			Collections.sort(documents, new CustomComparator());
 		}
 
@@ -744,24 +747,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				files++;
 			}
 		}
-		
-		Resources res = this.getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}
-		actionMode.setTitle(title);
+
+		actionMode.setTitle(getFolderInfo(folders, files));
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {

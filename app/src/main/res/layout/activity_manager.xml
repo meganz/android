@@ -6,22 +6,21 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:background="@color/white"
-        android:layout_width="match_parent"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:background="@color/white">
 
         <LinearLayout
             android:id="@+id/fragment_layout"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="56dp">
+            android:layout_marginBottom="56dp"
+            android:orientation="vertical">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar_layout"
@@ -47,38 +46,31 @@
                         app:theme="@style/Theme.Megaactionbar"
                         tools:context=".ManagerActivityLollipop"/>
 
-                        <com.google.android.material.tabs.TabLayout
-                            android:id="@+id/sliding_tabs_cloud"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            style="@style/MyCustomTabLayout"/>
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_contacts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        style="@style/MyCustomTabLayout"/>
 
-                        <com.google.android.material.tabs.TabLayout
-                            android:id="@+id/sliding_tabs_contacts"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            style="@style/MyCustomTabLayout"/>
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_shares"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/MyCustomTabLayout"/>
 
-                        <com.google.android.material.tabs.TabLayout
-                            android:id="@+id/sliding_tabs_shares"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            style="@style/MyCustomTabLayout"/>
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_my_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/MyCustomTabLayout"/>
 
-                        <com.google.android.material.tabs.TabLayout
-                            android:id="@+id/sliding_tabs_my_account"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            style="@style/MyCustomTabLayout"/>
-
-                        <com.google.android.material.tabs.TabLayout
-                            android:id="@+id/sliding_tabs_transfers"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            style="@style/MyCustomTabLayout"/>
-                    </com.google.android.material.appbar.AppBarLayout>
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/sliding_tabs_transfers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/MyCustomTabLayout"/>
+                </com.google.android.material.appbar.AppBarLayout>
 
                 <include layout="@layout/item_call_in_progress_layout"
                     android:layout_width="match_parent"
@@ -87,12 +79,6 @@
                     android:layout_alignParentTop="true" />
 
             </com.google.android.material.appbar.AppBarLayout>
-
-            <mega.privacy.android.app.components.CustomViewPager
-                android:id="@+id/cloud_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/contact_tabs_pager"
@@ -118,13 +104,20 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <FrameLayout
+            <fragment
+                android:id="@+id/nav_host_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/homepage" />
+
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/app_bar_layout"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
         </LinearLayout>
 
         <RelativeLayout
@@ -144,13 +137,14 @@
                 android:id="@+id/floating_button"
                 android:layout_width="@dimen/fab_button_diameter"
                 android:layout_height="@dimen/fab_button_diameter"
+                android:layout_above="@id/psa_layout"
+                android:layout_alignParentEnd="true"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="16dp"
+                android:elevation="@dimen/elevation_low"
                 android:src="@drawable/ic_add_white"
                 android:stateListAnimator="@anim/button_elevation"
-                android:tint="@android:color/white"
-                android:layout_above="@id/psa_layout"
-                android:layout_alignParentRight="true"/>
+                android:tint="@android:color/white" />
 
             <include
                 android:id="@+id/psa_layout"
@@ -166,83 +160,83 @@
                 android:id="@+id/bottom_navigation_view"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:background="@color/dark_primary_color"
                 android:layout_alignParentBottom="true"
+                android:background="@color/dark_primary_color"
                 app:itemIconTint="@drawable/bottom_navigation_item_tint"
                 app:itemTextColor="@drawable/bottom_navigation_item_tint"
-                app:menu="@menu/bottom_navigation_items"/>
+                app:menu="@menu/bottom_navigation_items" />
 
         </RelativeLayout>
 
         <include
+            layout="@layout/layout_get_pro_account"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
             android:elevation="@dimen/elevation_high"
-            layout="@layout/layout_get_pro_account"
             android:visibility="gone" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/fab_collection_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fab_collection_layout"
         android:background="@color/transparent_white"
+        android:fitsSystemWindows="true"
         android:gravity="bottom|end"
-        android:visibility="gone"
-        android:fitsSystemWindows="true">
+        android:visibility="gone">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/third_fab_chat"
-                android:layout_width="@dimen/fab_button_diameter"
-                android:layout_height="@dimen/fab_button_diameter"
-                android:layout_marginBottom="200dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginRight="16dp"
-                android:visibility="invisible"
-                app:backgroundTint="@color/orange"
-                app:elevation="6dp"
-                app:pressedTranslationZ="12dp"
-                android:src="@drawable/ic_add_white" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/third_fab_chat"
+            android:layout_width="@dimen/fab_button_diameter"
+            android:layout_height="@dimen/fab_button_diameter"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="200dp"
+            android:src="@drawable/ic_add_white"
+            android:visibility="invisible"
+            app:backgroundTint="@color/orange"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/second_fab_chat"
-                android:layout_width="@dimen/fab_button_diameter"
-                android:layout_height="@dimen/fab_button_diameter"
-                android:layout_marginBottom="140dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginRight="16dp"
-                android:visibility="invisible"
-                app:backgroundTint="@color/orange"
-                app:elevation="6dp"
-                app:pressedTranslationZ="12dp"
-                android:src="@drawable/ic_add_white" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/second_fab_chat"
+            android:layout_width="@dimen/fab_button_diameter"
+            android:layout_height="@dimen/fab_button_diameter"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="140dp"
+            android:src="@drawable/ic_add_white"
+            android:visibility="invisible"
+            app:backgroundTint="@color/orange"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/first_fab_chat"
-                android:layout_width="@dimen/fab_button_diameter"
-                android:layout_height="@dimen/fab_button_diameter"
-                android:layout_marginBottom="80dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginRight="16dp"
-                android:visibility="invisible"
-                app:elevation="6dp"
-                app:backgroundTint="@color/accentColor"
-                app:pressedTranslationZ="12dp"
-                android:tint="@color/white"
-                android:src="@drawable/ic_chat"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/first_fab_chat"
+            android:layout_width="@dimen/fab_button_diameter"
+            android:layout_height="@dimen/fab_button_diameter"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="80dp"
+            android:src="@drawable/ic_add_white"
+            android:tint="@color/white"
+            android:visibility="invisible"
+            app:backgroundTint="@color/accentColor"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/main_fab_chat"
-                android:layout_width="@dimen/fab_button_diameter"
-                android:layout_height="@dimen/fab_button_diameter"
-                android:layout_gravity="bottom|end"
-                app:elevation="6dp"
-                app:backgroundTint="@color/accentColor"
-                app:pressedTranslationZ="12dp"
-                android:layout_margin="16dp"
-                android:src="@drawable/ic_add_white" />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/main_fab_chat"
+            android:layout_width="@dimen/fab_button_diameter"
+            android:layout_height="@dimen/fab_button_diameter"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white"
+            app:backgroundTint="@color/accentColor"
+            app:elevation="6dp"
+            app:pressedTranslationZ="12dp" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -27,7 +27,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
             android:gravity="center"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="20sp"
             app:emojiSize="20sp" />
 
@@ -41,7 +41,7 @@
             android:layout_marginEnd="24dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="16sp" />
 
         <View
@@ -61,7 +61,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="24dp"
             android:text="@string/copy_link_explanation"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/secondary_text"
             android:textSize="14sp" />
 
         <Button

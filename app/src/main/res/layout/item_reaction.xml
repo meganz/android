@@ -47,7 +47,7 @@
             android:lines="1"
             android:layout_toEndOf="@id/item_emoji_reaction"
             android:layout_marginEnd="8dp"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/secondary_text"
             android:textSize="14sp"/>
     </RelativeLayout>
 

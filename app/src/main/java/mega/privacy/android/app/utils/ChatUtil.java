@@ -58,6 +58,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -70,10 +71,11 @@ import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatUtil {
     private static final int MIN_WIDTH = 44;
@@ -375,7 +377,7 @@ public class ChatUtil {
             return 0;
         }
 
-        int initSize = px2dp(MIN_WIDTH, outMetrics);
+        int initSize = dp2px(MIN_WIDTH, outMetrics);
         for (String reaction : listReactions) {
             int numUsers = MegaApplication.getInstance().getMegaChatApi().getMessageReactionCount(receivedChatId, receivedMessageId, reaction);
             if (numUsers > 0) {
@@ -385,7 +387,7 @@ public class ChatUtil {
                 paint.setTextSize(TEXT_SIZE);
                 int newWidth = (int) paint.measureText(text);
                 int sizeText = isScreenInPortrait(MegaApplication.getInstance().getBaseContext()) ? newWidth + 1 : newWidth + 4;
-                int possibleNewSize = px2dp(MIN_WIDTH, outMetrics) + px2dp(sizeText, outMetrics);
+                int possibleNewSize = dp2px(MIN_WIDTH, outMetrics) + dp2px(sizeText, outMetrics);
                 if (possibleNewSize > initSize) {
                     initSize = possibleNewSize;
                 }
@@ -943,5 +945,33 @@ public class ChatUtil {
             default:
                 return null;
         }
+    }
+
+    /**
+     * Gets the right message to show in case MegaChatContainsMeta type is CONTAINS_META_INVALID.
+     *
+     * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
+     * @return String to show for invalid meta message.
+     */
+    public static String getInvalidMetaMessage(MegaChatMessage message) {
+        String invalidMetaMessage = getString(R.string.error_meta_message_invalid);
+
+        if (message == null) {
+            return invalidMetaMessage;
+        }
+
+        String contentMessage = message.getContent();
+        if (!isTextEmpty(contentMessage)) {
+            return contentMessage;
+        }
+
+        MegaChatContainsMeta meta = message.getContainsMeta();
+
+        String metaTextMessage = meta != null ? meta.getTextMessage() : null;
+        if (!isTextEmpty(metaTextMessage)) {
+            return metaTextMessage;
+        }
+
+        return invalidMetaMessage;
     }
 }

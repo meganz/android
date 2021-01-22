@@ -24,6 +24,6 @@
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/mail_my_account"/>
+        android:textColor="@color/secondary_text"/>
 
 </LinearLayout>

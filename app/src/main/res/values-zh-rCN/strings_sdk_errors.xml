@@ -16,7 +16,7 @@
     <string name="api_eaccess" context="Label to show that an error related with an denied access occurs during a SDK operation.">进入遭拒</string>
     <string name="api_eexist" context="Label to show that an error related with an existent resource occurs during a SDK operation.">已存在</string>
     <string name="api_eincomplete" context="Label to show that an error related with an Incomplete SDK operation.">未完成</string>
-    <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">无效金钥/解密错误</string>
+    <string name="api_ekey" context="Label to show that an error related with the decryption process of a node occurs during a SDK operation.">密钥无效/解密错误</string>
     <string name="api_esid" context="Label to show that an error related with a bad session ID occurs during a SDK operation.">恶意session ID</string>
     <string name="api_eblocked_ec_import_ec_download" context="Error shown when download a file that has violated ToS/AUP.">由于违反ToS服务条款或AUP可接受的使用政策而无法访问</string>
     <string name="api_eblocked" context="Label to show that an error related with a blocked account occurs during a SDK operation.">封锁</string>

@@ -19,14 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/label_transfer_over_quota"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/content_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/secondary_text"
             android:textSize="14sp" />
 
         <LinearLayout

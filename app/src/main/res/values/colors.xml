@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="free_account">#2BB200</color>
+    <color name="lite_account">#FFA500</color>
+    <color name="pro_account">#F0373A</color>
+    <color name="business_account">#2BA6DE</color>
+
 	<color name="pressed_mega">#CCcc0000</color>
     <color name="text_tab_alpha">#99ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
@@ -49,15 +54,11 @@
     
     <color name="green_free_account">#31B404</color>
 
-    <color name="black_12_alpha">#1F000000</color>
-
     <color name="transparent_white">#CCFFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="black_87_opacity">#DE000000</color>
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
-    <color name="upgrade_orange">#ffa500</color>
     <color name="upgrade_grey">#8d8d8d</color>
     <color name="filter_icon">#8d8d94</color>
     <color name="upgrade_white">#b9ffffff</color>
@@ -65,8 +66,8 @@
     <color name="ic_mic_read_message">#9e9e9e</color>
     <color name="ic_mic_unread_message">#00bfa5</color>
 
-    <color name="name_my_account">#de000000</color>
-    <color name="mail_my_account">#8a000000</color>
+    <color name="primary_text">#de000000</color>
+    <color name="secondary_text">#8a000000</color>
     <color name="forgot_pass_text">#91000000</color>
         
     <color name="tab_pressed">#ee0008</color>
@@ -102,6 +103,8 @@
     <color name="status_invisible_layout">#bfbfbf</color>
 
     <color name="sliding_panel_separator">#dcdcdcdc</color>
+
+    <color name="fab_mask">#D96B6B6B</color>
 
     <color name="login_warning">#FFFF333A</color>
     <color name="login_title">#FFD90007</color>
@@ -184,8 +187,6 @@
     <color name="yellow_notif_shares">#FFFFA500</color>
     <color name="green_notif_contacts">#FF00897B</color>
 
-    <color name="free_account">#2bb200</color>
-
     <!-- DIALOGS -->
     <color name="dialog_title">#FF333333</color>
     <color name="dialog_text">#FF666666</color>
@@ -206,6 +207,7 @@
     <color name="expired_business_user">#44BCE6</color>
     <color name="business_color">#2BA6DE</color>
 
+    <color name="black_12_alpha">#1F000000</color>
     <color name="black_40_alpha">#66000000</color>
     <color name="black_54_alpha">#89000000</color>
 
@@ -221,9 +223,28 @@
     <color name="giphy_loading_background">#ECECEC</color>
 
     <color name="border_avatar_call">#4DFFFFFF</color>
-
-    <color name="over_quota_yellow">#FFFFB42B</color>
+    
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
+    <color name="error_color">#C70000</color>
+
+    <color name="pressed_color">#E7E7E7</color>
+
+    <color name="homepage_background">#EEF2F1</color>
+
+    <color name="homepage_title">#dd000000</color>
+    <color name="homepage_content">#89000000</color>
+    <color name="homepage_fab_label_text_color">#ff373737</color>
+
     <color name="black_bottom_sheets_icon_tint">#8F000000</color>
+
+    <!-- NODE LABELS -->
+    <color name="label_red">#FF625D</color>
+    <color name="label_orange">#F9A646</color>
+    <color name="label_yellow">#F4CE4A</color>
+    <color name="label_green">#6DCB50</color>
+    <color name="label_blue">#4BB8F3</color>
+    <color name="label_purple">#D088E1</color>
+    <color name="label_grey">#A4A4A7</color>
+
 </resources>

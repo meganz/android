@@ -58,6 +58,7 @@
 
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <meta-data
             android:name="fontProviderRequests"
             android:value="Noto Color Emoji Compat" />
@@ -70,7 +71,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.WebViewActivityLollipop"
+            android:name="mega.privacy.android.app.activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop" />
@@ -302,7 +303,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:name="mega.privacy.android.app.activities.GetLinkActivity"
             android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu"
             android:theme="@style/Theme.Megaactionbar.Secondary">
@@ -367,6 +368,11 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
+        <activity
+            android:name=".activities.OfflineFileInfoActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar.InfoScreens"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"
@@ -445,6 +451,7 @@
             android:name="mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
+
             android:label="@string/app_name">
         </activity>
 	    <activity android:name=".SMSVerificationActivity"
@@ -568,23 +575,6 @@
         </service>
 
         <service
-            android:name=".fcm.MegaFirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
-
-        <service
-            android:name=".fcm.MegaFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
-
-        <!-- Used for Google Play Store Campaign Measurement-->
-        <service
-            android:name="com.google.android.gms.analytics.CampaignTrackingService" />
-        <service
             android:name=".jobservices.CameraUploadsService"
             android:exported="false" />
 	    <service
@@ -646,18 +636,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-
-        <!--
-               The API key for Google Maps-based APIs is defined as a string resource.
-               (See the file "res/values/google_maps_api.xml").
-               Note that the API key is linked to the encryption key used to sign the APK.
-               You need a different API key for each encryption key, including the release key that is used to
-               sign the APK for publishing.
-               You can define the keys for the debug and release targets in src/debug/ and src/release/.
-          -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
 
         <activity
             android:name=".lollipop.megachat.MapsActivity"

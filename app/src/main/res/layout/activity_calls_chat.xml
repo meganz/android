@@ -13,6 +13,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/transparent"
         android:fitsSystemWindows="true">
 
         <RelativeLayout
@@ -74,7 +75,7 @@
                     android:id="@+id/rl_big_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:background="@android:color/transparent"
                     android:visibility="gone">
 
@@ -101,7 +102,6 @@
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
                     android:background="@android:color/transparent">
 
                     <FrameLayout
@@ -150,7 +150,7 @@
                             android:id="@+id/subtitle_toolbar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginEnd="8dp"
                             android:textColor="@color/white"
                             android:textSize="14sp" />
 
@@ -158,7 +158,7 @@
                             android:id="@+id/simple_chronometer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginEnd="8dp"
                             android:textColor="@color/white"
                             android:textSize="14sp"
                             android:visibility="gone" />
@@ -175,7 +175,7 @@
                                 android:id="@+id/participants_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginRight="4dp"
+                                android:layout_marginEnd="4dp"
                                 android:textColor="@color/white"
                                 android:textSize="14sp" />
 
@@ -184,7 +184,8 @@
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
                                 android:layout_gravity="center_vertical"
-                                android:src="@drawable/ic_videocam_white" />
+                                android:src="@drawable/ic_videocam_white"
+                                tools:ignore="ContentDescription"/>
 
                         </LinearLayout>
                     </LinearLayout>
@@ -246,7 +247,7 @@
                             android:background="@null"
                             android:gravity="start"
                             android:ellipsize="end"
-                            android:fontFamily="roboto"
+                            android:fontFamily="sans-serif"
                             android:maxLines="1"
                             android:text="@string/call_on_hold"
                             android:textAlignment="gravity"
@@ -261,7 +262,7 @@
                             android:background="@null"
                             android:gravity="start"
                             android:ellipsize="end"
-                            android:fontFamily="roboto"
+                            android:fontFamily="sans-serif"
                             android:maxLines="1"
                             android:text="@string/call_on_hold"
                             android:textAlignment="gravity"
@@ -293,7 +294,7 @@
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:ellipsize="end"
-                        android:fontFamily="roboto"
+                        android:fontFamily="sans-serif"
                         android:gravity="center"
                         android:maxLines="1"
                         android:text="@string/muted_own_micro"
@@ -314,9 +315,9 @@
                 android:background="@drawable/gradient_shape_callschat"
                 android:gravity="center_vertical|center_horizontal"
                 android:minHeight="36dp"
-                android:paddingLeft="16dp"
+                android:paddingStart="16dp"
                 android:paddingTop="10dp"
-                android:paddingRight="16dp"
+                android:paddingEnd="16dp"
                 android:paddingBottom="10dp"
                 android:visibility="visible">
 
@@ -331,7 +332,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
-                        android:fontFamily="roboto"
+                        android:fontFamily="sans-serif"
                         android:gravity="center"
                         android:maxWidth="250dp"
                         android:maxLines="3"
@@ -367,7 +368,7 @@
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:ellipsize="end"
-                        android:fontFamily="roboto"
+                        android:fontFamily="sans-serif"
                         android:gravity="center"
                         android:maxLines="1"
                         android:text="@string/call_on_hold"
@@ -404,9 +405,9 @@
                     android:id="@+id/small_camera_parent"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:layout_marginTop="60dp"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginEnd="5dp"
                     android:layout_marginBottom="110dp"
                     android:background="@android:color/transparent">
 
@@ -416,7 +417,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
-                        android:layout_marginRight="20dp"
+                        android:layout_marginEnd="20dp"
                         android:layout_marginBottom="10dp"
                         android:background="@android:color/transparent"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
@@ -450,7 +451,8 @@
                     app:borderWidth="0dp"
                     app:elevation="0dp"
                     app:fabSize="normal"
-                    app:pressedTranslationZ="12dp" />
+                    app:pressedTranslationZ="12dp"
+                    tools:ignore="ContentDescription"/>
 
             </LinearLayout>
 
@@ -485,14 +487,15 @@
                         app:borderWidth="0dp"
                         app:elevation="0dp"
                         app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        app:pressedTranslationZ="12dp"
+                        tools:ignore="ContentDescription"/>
                 </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
-                    android:layout_marginRight="36dp">
+                    android:layout_marginEnd="36dp">
 
                     <!-- SPEAKER -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -509,7 +512,8 @@
                         app:borderWidth="0dp"
                         app:elevation="0dp"
                         app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        app:pressedTranslationZ="12dp"
+                        tools:ignore="ContentDescription"/>
 
                     <!-- ANSWER -->
                     <RelativeLayout
@@ -533,7 +537,8 @@
                             app:borderWidth="0dp"
                             app:elevation="0dp"
                             app:fabSize="normal"
-                            app:pressedTranslationZ="12dp" />
+                            app:pressedTranslationZ="12dp"
+                            tools:ignore="ContentDescription"/>
 
                         <LinearLayout
                             android:id="@+id/linear_arrow_call"
@@ -549,46 +554,43 @@
                                 android:id="@+id/first_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
                                 android:layout_marginTop="10dp"
-                                android:src="@drawable/ic_expand" />
+                                android:src="@drawable/ic_expand"
+                                tools:ignore="ContentDescription"/>
 
                             <ImageView
                                 android:id="@+id/second_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
                                 android:layout_marginTop="10dp"
-                                android:src="@drawable/ic_expand" />
+                                android:src="@drawable/ic_expand"
+                                tools:ignore="ContentDescription"/>
 
                             <ImageView
                                 android:id="@+id/third_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
                                 android:layout_marginTop="10dp"
-                                android:src="@drawable/ic_expand" />
+                                android:src="@drawable/ic_expand"
+                                tools:ignore="ContentDescription"/>
 
                             <ImageView
                                 android:id="@+id/four_arrow_call"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
                                 android:layout_marginTop="10dp"
-                                android:src="@drawable/ic_expand" />
+                                android:src="@drawable/ic_expand"
+                                tools:ignore="ContentDescription"/>
                         </LinearLayout>
-
                     </RelativeLayout>
-
                 </FrameLayout>
-
 
                 <RelativeLayout
                     android:id="@+id/relative_video_fab"
                     android:layout_width="54dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|center_horizontal"
-                    android:layout_marginRight="36dp"
+                    android:layout_marginEnd="36dp"
                     android:background="@android:color/transparent"
                     android:gravity="bottom|center_horizontal">
 
@@ -608,7 +610,8 @@
                         app:borderWidth="0dp"
                         app:elevation="0dp"
                         app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        app:pressedTranslationZ="12dp"
+                        tools:ignore="ContentDescription"/>
 
                     <LinearLayout
                         android:id="@+id/linear_arrow_video"
@@ -624,37 +627,37 @@
                             android:id="@+id/first_arrow_video"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"
                             android:background="@null"
-                            android:src="@drawable/ic_expand" />
+                            android:src="@drawable/ic_expand"
+                            tools:ignore="ContentDescription"/>
 
                         <ImageView
                             android:id="@+id/second_arrow_video"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"
                             android:background="@null"
-                            android:src="@drawable/ic_expand" />
+                            android:src="@drawable/ic_expand"
+                            tools:ignore="ContentDescription"/>
 
                         <ImageView
                             android:id="@+id/third_arrow_video"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"
                             android:background="@null"
-                            android:src="@drawable/ic_expand" />
+                            android:src="@drawable/ic_expand"
+                            tools:ignore="ContentDescription"/>
 
                         <ImageView
                             android:id="@+id/four_arrow_video"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerInParent="true"
                             android:layout_marginTop="10dp"
                             android:background="@null"
-                            android:src="@drawable/ic_expand" />
+                            android:src="@drawable/ic_expand"
+                            tools:ignore="ContentDescription"/>
                     </LinearLayout>
                 </RelativeLayout>
 
@@ -679,7 +682,8 @@
                         android:alpha="1"
                         app:elevation="0dp"
                         app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        app:pressedTranslationZ="12dp"
+                        tools:ignore="ContentDescription"/>
 
                     <!-- REJECT -->
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -695,7 +699,8 @@
                         android:alpha="1"
                         app:elevation="0dp"
                         app:fabSize="normal"
-                        app:pressedTranslationZ="12dp" />
+                        app:pressedTranslationZ="12dp"
+                        tools:ignore="ContentDescription"/>
                 </FrameLayout>
 
             </LinearLayout>

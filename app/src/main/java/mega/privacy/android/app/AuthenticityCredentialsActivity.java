@@ -130,7 +130,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         if (!isPortrait) {
             RelativeLayout contactCredentialsLayout = findViewById(R.id.contact_credentials_layout);
             RelativeLayout.LayoutParams contactCredentialsLayoutParams = (RelativeLayout.LayoutParams) contactCredentialsLayout.getLayoutParams();
-            contactCredentialsLayoutParams.topMargin = px2dp(MARGIN_TOP_NAME, getOutMetrics());
+            contactCredentialsLayoutParams.topMargin = dp2px(MARGIN_TOP_NAME, getOutMetrics());
             contactCredentialsLayout.setLayoutParams(contactCredentialsLayoutParams);
         }
 
@@ -156,8 +156,8 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
         } else {
             TableLayout contactCredentialsTable = findViewById(R.id.contact_credentials);
             RelativeLayout.LayoutParams tabParams = (RelativeLayout.LayoutParams) contactCredentialsTable.getLayoutParams();
-            tabParams.topMargin = px2dp(MARGIN_TOP_CONTACT_CREDENTIALS, getOutMetrics());
-            tabParams.rightMargin = px2dp(MARGIN_RIGHT_CONTACT_CREDENTIALS, getOutMetrics());
+            tabParams.topMargin = dp2px(MARGIN_TOP_CONTACT_CREDENTIALS, getOutMetrics());
+            tabParams.rightMargin = dp2px(MARGIN_RIGHT_CONTACT_CREDENTIALS, getOutMetrics());
             contactCredentialsTable.setLayoutParams(tabParams);
 
             contactCredentials10 = findViewById(R.id.contact_credentials_0_5);
@@ -183,9 +183,9 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
             megaApi.getUserCredentials(contact, new GetAttrUserListener(this));
         }
 
-        int marginTopBottomButtonAndMyCredentials = px2dp(MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS, getOutMetrics());
-        int marginLeftExplanationAndMyCredentials = px2dp(MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
-        int marginRightExplanationAndMyCredentials = px2dp(MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
+        int marginTopBottomButtonAndMyCredentials = dp2px(MARGIN_TOP_BOTTOM_BUTTON_AND_MY_CREDENTIALS, getOutMetrics());
+        int marginLeftExplanationAndMyCredentials = dp2px(MARGIN_LEFT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
+        int marginRightExplanationAndMyCredentials = dp2px(MARGIN_RIGHT_EXPLANATION_AND_MY_CREDENTIALS, getOutMetrics());
 
         credentialsButton = findViewById(R.id.credentials_button);
         updateButtonText();
@@ -197,7 +197,7 @@ public class AuthenticityCredentialsActivity extends PinActivityLollipop {
 
             TextView explanation = findViewById(R.id.credentials_explanation);
             RelativeLayout.LayoutParams explanationParams = (RelativeLayout.LayoutParams) explanation.getLayoutParams();
-            explanationParams.topMargin = px2dp(MARGIN_TOP_EXPLANATION, getOutMetrics());
+            explanationParams.topMargin = dp2px(MARGIN_TOP_EXPLANATION, getOutMetrics());
             explanationParams.leftMargin = marginLeftExplanationAndMyCredentials;
             explanationParams.rightMargin = marginRightExplanationAndMyCredentials;
             explanation.setLayoutParams(explanationParams);

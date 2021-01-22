@@ -29,7 +29,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:textSize="22sp"
-            android:textColor="@color/name_my_account"
+            android:textColor="@color/primary_text"
             android:text="@string/expired_business_title"/>
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:textSize="15sp"
-            android:textColor="@color/mail_my_account" />
+            android:textColor="@color/secondary_text" />
 
         <TextView
             android:id="@+id/expired_subtext"
@@ -54,7 +54,7 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:textSize="15sp"
-            android:textColor="@color/mail_my_account"
+            android:textColor="@color/secondary_text"
             android:text="@string/expired_user_business_text_2"/>
 
 

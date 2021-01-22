@@ -49,7 +49,7 @@
                 android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/button_copy_link"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 app:drawableStartCompat="@drawable/ic_copy_grey" />
 
@@ -60,7 +60,7 @@
                 android:drawablePadding="35dp"
                 android:gravity="center_vertical"
                 android:text="@string/context_get_link"
-                android:textColor="@color/name_my_account"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 app:drawableStartCompat="@drawable/ic_social_share_white"
                 app:drawableTint="@color/black_bottom_sheets_icon_tint" />

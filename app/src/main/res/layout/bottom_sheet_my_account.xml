@@ -46,7 +46,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/choose_qr_option_panel"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -83,7 +83,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/choose_photo_avatar_panel"
                     android:layout_marginLeft="18dp"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 
@@ -113,7 +113,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/take_photo_avatar_panel"
-                    android:textColor="@color/name_my_account"
+                    android:textColor="@color/primary_text"
                     android:textSize="16sp"/>
             </LinearLayout>
 

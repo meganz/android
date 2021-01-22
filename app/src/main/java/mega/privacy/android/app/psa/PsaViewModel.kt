@@ -16,14 +16,13 @@ import nz.mega.sdk.MegaRequest
  * The ViewModel for PSA logic.
  */
 class PsaViewModel(
-    private val megaApi: MegaApiAndroid
+    private val megaApi: MegaApiAndroid,
+    private val context: Context,
 ) : BaseRxViewModel() {
     /**
      * SharedPreferences to store values.
      */
-    private val preference = getApplication<MegaApplication>().getSharedPreferences(
-        LAST_GET_PSA_SP, Context.MODE_PRIVATE
-    )
+    private val preference = context.getSharedPreferences(LAST_GET_PSA_SP, Context.MODE_PRIVATE)
     /**
      * The timestamp in milliseconds that the last time when we call SDK to get PSA from server.
      */
@@ -51,7 +50,7 @@ class PsaViewModel(
             return
         }
 
-        megaApi.getPSAWithUrl(object : BaseListener(getApplication()) {
+        megaApi.getPSAWithUrl(object : BaseListener(context) {
             override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
                 super.onRequestFinish(api, request, e)
 
@@ -97,5 +96,11 @@ class PsaViewModel(
          * SDK to get PSA from server.
          */
         const val GET_PSA_MIN_INTERVAL_MS = 3600_000
+
+        @JvmStatic
+        fun clearPreference() {
+            MegaApplication.getInstance()
+                .getSharedPreferences(LAST_GET_PSA_SP, Context.MODE_PRIVATE).edit().clear().apply()
+        }
     }
 }

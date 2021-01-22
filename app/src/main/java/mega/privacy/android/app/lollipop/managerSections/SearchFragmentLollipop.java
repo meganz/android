@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -35,6 +37,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -528,8 +537,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
             }
         }
 
-        String folderStr = context.getResources().getQuantityString(R.plurals.general_num_folders,folderCount);
-        String fileStr = context.getResources().getQuantityString(R.plurals.general_num_files,fileCount);
         if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -702,7 +709,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	}
 
 	@Override
-	public void onAttach(Context context) {
+	public void onAttach(@NonNull Context context) {
 		logDebug("onAttach");
 		super.onAttach(context);
 		this.context = context;
@@ -734,7 +741,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			logDebug("nodes.size(): "+nodes.size());
 			((ManagerActivityLollipop) context).setTextSubmitted();
 
-			// If nothing is input, then click a folder in search view, redirect to CD.
+			// If search text is empty and try to open a folder in search fragment.
 			if (!((ManagerActivityLollipop) context).isValidSearchQuery() && nodes.get(position).isFolder()) {
 				((ManagerActivityLollipop) context).closeSearchView();
 				((ManagerActivityLollipop) context).openSearchFolder(nodes.get(position));

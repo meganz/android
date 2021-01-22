@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background_button_white"
-    android:paddingBottom="20dp">
+    android:paddingBottom="20dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <View
         android:layout_width="match_parent"
@@ -29,7 +31,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:textColor="@color/black_87_opacity"
+        android:textColor="@color/primary_text"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/image"
