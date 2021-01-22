@@ -3,11 +3,6 @@
     <!--Top level DayNight theme to be used in AndroidManifest.xml-->
     <style name="Theme.Mega" parent="Base.Theme.Mega" />
 
-    <style name="Theme.Mega.Swipe">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
-
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Base.Theme.Mega" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!--Material color attributes (light theme) -->
@@ -46,16 +41,13 @@
         <!--        <item name="colorOnError"></item>-->
         <!--        <item name="colorOnBackground"></item>-->
 
-        <!-- The color appliindicatorColored to icons/controls in their normal state -->
+        <!-- The color applied to icons/controls in their normal state -->
         <!-- e.g. The overflow menu item (3 dotes) automatically use this color
              so is the BadgeDrawerArrowDrawable's arrow color.
              Other action bar menu icons tint (activity_manager menu xml), etc. -->
         <item name="colorControlNormal">@color/grey_alpha_087</item>
         <!-- You can also set colorControlActivated
-        colorControlHighlighindicatorColort & colorSwitchThumbNormal. -->
-
-        <!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-        <!--        <item name="android:windowTranslucentStatus">false</item>-->
+        colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">?attr/colorPrimary</item>
@@ -64,13 +56,9 @@
         <!-- we need this to tint the overflow icon (3 dots) -->
         <item name="actionBarTheme">@style/Widget.Mega.ActionBar</item>
 
-        <!-- Action bar only used in Action mode (overlap the tool bar), thus only need to set action mode style -->
-        <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
-
         <item name="preferenceTheme">@style/PreferenceStyle</item>
         <item name="bottomSheetDialogTheme">@style/Theme.Mega.BottomSheetDialogTheme</item>
 
-        <!--        <item name="android:fitsSystemWindows">true</item>-->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
 
@@ -90,11 +78,6 @@
           child view TextInputEditText to have the correct underline color -->
         <item name="textInputStyle">@style/Widget.Mega.TextInputLayout</item>
 
-        <!-- This Material style has a min width and height for enlarging the clickable area of checkbox.
-             It uses textColorSecondary as colorControlNormal that complies with Invision design.
-              Default is Widget.MaterialComponents.CompoundButton.CheckBox-->
-        <!--        <item name="checkboxStyle"></item>-->
-
         <!-- Progress indicator -->
         <item name="indicatorColor">?attr/colorSecondary</item>
         <item name="trackColor">@color/grey_alpha_012</item>
@@ -106,18 +89,13 @@
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
 
         <!-- Theme for ListPreference in settings, colorControlNormal controls radio button's tint color -->
-        <item name="alertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog.ListPreference
-        </item>
+        <item name="alertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog.ListPreference</item>
 
         <!-- Switch -->
         <item name="switchStyle">@style/Widget.Mega.Switch</item>
 
         <item name="checkedTextViewStyle">@style/Widget.Mega.CheckedTextView</item>
 
-        <!--        <item name="textAppearanceHeadline1">@style/TextAppearance.Mega.Headline1</item>-->
-        <!--<item name="textAppearanceHeadline2">@style/TextAppearance.MyTheme.Headline2</item>-->
-        <!--<item name="textAppearanceHeadline3">@style/TextAppearance.MyTheme.Headline3</item>-->
-        <!--<item name="textAppearanceHeadline4">@style/TextAppearance.MyTheme.Headline4</item>-->
         <item name="textAppearanceHeadline5">@style/TextAppearance.Mega.Headline5</item>
         <!-- In material design, typically for the title of the action bar -->
         <item name="textAppearanceHeadline6">@style/TextAppearance.Mega.Headline6</item>
@@ -133,6 +111,10 @@
         <item name="textAppearanceButton">@style/TextAppearance.Mega.Button</item>
         <!-- In material design, TextInputLayout hint,error,helper text, BNV item text, etc. -->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
-        <!--<item name="textAppearanceOverline">@style/TextAppearance.MyTheme.Overline</item>-->
+    </style>
+
+    <style name="Theme.Mega.Swipe">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 </resources>
