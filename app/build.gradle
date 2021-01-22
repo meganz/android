@@ -151,11 +151,11 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'jp.wasabeef:blurry:2.1.0'
     implementation 'com.android.billingclient:billing:3.0.1'
+    implementation 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.1'
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
-    implementation 'com.github.meganz:AndroidDocumentScanner:develop-SNAPSHOT'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
 
