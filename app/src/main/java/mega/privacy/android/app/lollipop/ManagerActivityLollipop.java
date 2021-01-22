@@ -668,6 +668,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
 
+	private DrawerItem drawerItemBeforeOpenFullscreenOffline = null;
 	private OfflineFragment fullscreenOfflineFragment;
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
@@ -6124,6 +6125,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
 		if (fragment == fullscreenOfflineFragment) {
+			if (drawerItemBeforeOpenFullscreenOffline != null) {
+				if (drawerItem != drawerItemBeforeOpenFullscreenOffline) {
+					selectDrawerItemLollipop(drawerItemBeforeOpenFullscreenOffline);
+				}
+				drawerItemBeforeOpenFullscreenOffline = null;
+			}
+
 			setPathNavigationOffline("/");
 			fullscreenOfflineFragment = null;
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
@@ -11112,6 +11120,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.offline_section: {
 				sectionClicked = true;
+				drawerItemBeforeOpenFullscreenOffline = drawerItem;
 				openFullscreenOfflineFragment(getPathNavigationOffline());
 				break;
 			}
