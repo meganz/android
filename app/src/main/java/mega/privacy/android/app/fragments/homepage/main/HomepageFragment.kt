@@ -63,10 +63,12 @@ class HomepageFragment : Fragment() {
 
     private var pendingExpandBottomSheet = false
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it && pendingExpandBottomSheet) {
-            pendingExpandBottomSheet = false
-            post {
-                fullyExpandBottomSheet(true)
+        if (it) {
+            if (pendingExpandBottomSheet) {
+                pendingExpandBottomSheet = false
+                post { fullyExpandBottomSheet(true) }
+            } else {
+                post { setBottomSheetHeight() }
             }
         }
     }
@@ -200,9 +202,7 @@ class HomepageFragment : Fragment() {
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
-        val layoutParams = bottomSheetRoot.layoutParams
-        layoutParams.height = rootView.height - searchInputView.bottom
-        bottomSheetRoot.layoutParams = layoutParams
+        setBottomSheetHeight(true)
     }
 
     private fun fullyCollapseBottomSheet() {
@@ -328,13 +328,7 @@ class HomepageFragment : Fragment() {
             val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                val layoutParams = bottomSheet.layoutParams
-                val maxHeight = rootView.height - searchInputView.bottom
-
-                if (bottomSheet.height > maxHeight) {
-                    layoutParams.height = maxHeight
-                    bottomSheet.layoutParams = layoutParams
-                }
+                setBottomSheetHeight()
 
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     tabLayout.setBackgroundResource(R.drawable.bg_cardview_white)
@@ -362,6 +356,17 @@ class HomepageFragment : Fragment() {
                 bottomSheet.elevation = maxElevation - res * maxElevation
             }
         })
+    }
+
+    private fun setBottomSheetHeight(forceMaxHeight: Boolean = false) {
+        val bottomSheet = viewDataBinding.homepageBottomSheet.root
+        val maxHeight = rootView.measuredHeight - searchInputView.bottom
+
+        if (bottomSheet.measuredHeight > maxHeight || forceMaxHeight) {
+            val layoutParams = bottomSheet.layoutParams
+            layoutParams.height = maxHeight
+            bottomSheet.layoutParams = layoutParams
+        }
     }
 
     private fun changeTabElevation(withElevation: Boolean) {
