@@ -99,13 +99,6 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     }
 
     /**
-     * Sets the initial state of a BottomSheet composed by a RadioGroup and its state.
-     */
-    protected void setRadioGroupViewBottomSheetBehaviour() {
-        setBottomSheetBehavior(HEIGHT_HEADER_RADIO_GROUP, false);
-    }
-
-    /**
      * Hides the BottomSheet.
      */
     protected void setStateBottomSheetBehaviorHidden() {
