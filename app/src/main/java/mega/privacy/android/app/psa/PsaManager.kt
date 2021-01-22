@@ -32,12 +32,12 @@ object PsaManager : LifecycleObserver {
     /**
      * LiveData for PSA, mutable, used to emit value.
      */
-    private val _psa = MutableLiveData<Psa?>()
+    private val mutablePsa = MutableLiveData<Psa?>()
 
     /**
      * LiveData for PSA, not mutable, only used to observe value.
      */
-    val psa: LiveData<Psa?> = _psa
+    val psa: LiveData<Psa?> = mutablePsa
 
     /**
      * Start checking PSA periodically.
@@ -76,7 +76,7 @@ object PsaManager : LifecycleObserver {
                         super.onRequestFinish(api, request, e)
 
                         if (e.errorCode == MegaError.API_OK) {
-                            _psa.value = Psa(
+                            mutablePsa.value = Psa(
                                 request.number.toInt(), request.name, request.text, request.file,
                                 request.password, request.link, request.email
                             )
@@ -103,9 +103,9 @@ object PsaManager : LifecycleObserver {
      * value.
      */
     fun displayPendingPsa() {
-        val value = _psa.value
+        val value = mutablePsa.value
         if (value != null) {
-            _psa.postValue(value)
+            mutablePsa.postValue(value)
         }
     }
 
@@ -116,7 +116,7 @@ object PsaManager : LifecycleObserver {
      */
     fun dismissPsa(id: Int) {
         megaApi.setPSA(id)
-        _psa.value = null
+        mutablePsa.value = null
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)

@@ -119,7 +119,7 @@ public class BaseActivity extends AppCompatActivity {
 
     private FrameLayout psaWebBrowserContainer;
     private PsaWebBrowser psaWebBrowser;
-    private Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +192,11 @@ public class BaseActivity extends AppCompatActivity {
      * @param psa the psa to display
      */
     private void launchPsaWebBrowser(Psa psa) {
+        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
+        if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
+            return;
+        }
+
         if (psaWebBrowserContainer == null) {
             psaWebBrowserContainer = new FrameLayout(this);
             psaWebBrowserContainer.setId(R.id.psa_web_browser_container);
@@ -201,11 +206,6 @@ public class BaseActivity extends AppCompatActivity {
             contentView.addView(psaWebBrowserContainer,
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT));
-        }
-
-        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
-        if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
-            return;
         }
 
         Bundle args = new Bundle();

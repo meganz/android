@@ -1,5 +1,6 @@
 package mega.privacy.android.app.psa
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -29,11 +30,12 @@ class PsaWebBrowser : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPsaWebBrowserBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    @SuppressLint("SetJavaScriptEnabled", "HardwareIds")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
