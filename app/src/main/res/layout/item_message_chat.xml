@@ -430,8 +430,7 @@
                 <!--forward rich links-->
                 <ImageView
                     android:id="@+id/forward_own_rich_links"
-                    style="@style/ForwardIcon"
-                    android:layout_marginEnd="8dp"
+                    style="@style/MessageForwardIconStyleEnd"
                     android:layout_toStartOf="@+id/url_own_message_layout" />
                 <!--End Rich links-->
 
@@ -670,8 +669,7 @@
                     <!--forward icon location message-->
                     <ImageView
                         android:id="@+id/forward_own_location"
-                        style="@style/ForwardIcon"
-                        android:layout_marginEnd="8dp"
+                        style="@style/MessageForwardIconStyleEnd"
                         android:layout_toStartOf="@+id/own_main_item_location_rl" />
 
                 </RelativeLayout>
@@ -813,8 +811,7 @@
                     <!--forward icon with preview portrait-->
                     <ImageView
                         android:id="@+id/forward_own_preview_portrait"
-                        style="@style/ForwardIcon"
-                        android:layout_marginEnd="8dp"
+                        style="@style/MessageForwardIconStyleEnd"
                         android:layout_toStartOf="@+id/preview_frame_portrait_rl" />
 
                 </RelativeLayout>
@@ -956,8 +953,7 @@
                     <!--forward icon with preview landscape-->
                     <ImageView
                         android:id="@+id/forward_own_preview_landscape"
-                        style="@style/ForwardIcon"
-                        android:layout_marginEnd="8dp"
+                        style="@style/MessageForwardIconStyleEnd"
                         android:layout_toStartOf="@+id/preview_frame_landscape_rl" />
 
                 </RelativeLayout>
@@ -1030,8 +1026,7 @@
                 <!--forward file-->
                 <ImageView
                     android:id="@+id/forward_own_file"
-                    style="@style/ForwardIcon"
-                    android:layout_marginEnd="8dp"
+                    style="@style/MessageForwardIconStyleEnd"
                     android:layout_toStartOf="@+id/content_own_message_file_layout" />
                 <!--End RelativeLayout file-->
 
@@ -1125,8 +1120,7 @@
                 <!--forward contact-->
                 <ImageView
                     android:id="@+id/forward_own_contact"
-                    style="@style/ForwardIcon"
-                    android:layout_marginEnd="8dp"
+                    style="@style/MessageForwardIconStyleEnd"
                     android:layout_toStartOf="@+id/content_own_message_contact_layout" />
 
             </RelativeLayout>
@@ -1491,8 +1485,7 @@
                 <!--forward rich links-->
                 <ImageView
                     android:id="@+id/forward_contact_rich_links"
-                    style="@style/ForwardIcon"
-                    android:layout_marginStart="8dp"
+                    style="@style/MessageForwardIconStyleStart"
                     android:layout_toEndOf="@+id/url_contact_message_layout" />
 
                 <!--Received a voice clip-->
@@ -1652,8 +1645,7 @@
                     <!--forward icon location message-->
                     <ImageView
                         android:id="@+id/forward_contact_location"
-                        style="@style/ForwardIcon"
-                        android:layout_marginStart="8dp"
+                        style="@style/MessageForwardIconStyleStart"
                         android:layout_toEndOf="@+id/contact_main_item_location" />
                 </RelativeLayout>
                 <!-- End location-->
@@ -1743,8 +1735,7 @@
                     <!--forward preview portrait-->
                     <ImageView
                         android:id="@+id/forward_contact_preview_portrait"
-                        style="@style/ForwardIcon"
-                        android:layout_marginStart="8dp"
+                        style="@style/MessageForwardIconStyleStart"
                         android:layout_toEndOf="@+id/content_contact_message_portrait" />
 
                     <!-- contact elements landscape -->
@@ -1824,8 +1815,7 @@
                     <!--forward preview landscape-->
                     <ImageView
                         android:id="@+id/forward_contact_preview_landscape"
-                        style="@style/ForwardIcon"
-                        android:layout_marginStart="8dp"
+                        style="@style/MessageForwardIconStyleStart"
                         android:layout_toEndOf="@+id/content_contact_message_landscape" />
 
                     <!--End contact elements landscape-->
@@ -1887,8 +1877,7 @@
                     <!--forward file-->
                     <ImageView
                         android:id="@+id/forward_contact_file"
-                        style="@style/ForwardIcon"
-                        android:layout_marginStart="8dp"
+                        style="@style/MessageForwardIconStyleStart"
                         android:layout_toEndOf="@+id/content_contact_message_file" />
 
                 </RelativeLayout>
@@ -1972,8 +1961,7 @@
                 <!--forward contact-->
                 <ImageView
                     android:id="@+id/forward_contact_contact"
-                    style="@style/ForwardIcon"
-                    android:layout_marginStart="8dp"
+                    style="@style/MessageForwardIconStyleStart"
                     android:layout_toEndOf="@+id/content_contact_message_contact_layout" />
 
                 <!--End RelativeLayout contact-->

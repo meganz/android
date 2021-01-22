@@ -480,9 +480,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean isAskingForMyChatFiles;
     // The flag to indicate whether forwarding message is on going
     private boolean isForwardingMessage = false;
-    private boolean isImportOption;
-
-
+    private int typeImport = IMPORT_ONLY_OPTION;
     private ExportListener exportListener;
     private BottomSheetDialogFragment bottomSheetDialogFragment;
 
@@ -505,11 +503,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     public void handleStoredData() {
         if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
-            forwardMessages(preservedMessagesSelected, false, null);
+            forwardMessages(preservedMessagesSelected, FORWARD_ONLY_OPTION, null);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
             setExportListener(exportListener);
-            chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, isImportOption
+            chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, typeImport == IMPORT_TO_SHARE_OPTION
                     ? MULTIPLE_IMPORT_CONTACT_MESSAGES
                     : MULTIPLE_FORWARD_MESSAGES);
 
@@ -3128,20 +3126,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-
-    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, boolean isImportOptionChosen, ExportListener exportListener){
+    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, int typeImport, ExportListener exportListener){
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
 
         //Prevent trigger multiple forwarding messages screens in multiple clicks
-        if (!isImportOptionChosen && isForwardingMessage) {
+        if (typeImport != IMPORT_TO_SHARE_OPTION && isForwardingMessage) {
             logDebug("Forwarding message is on going");
             return;
         }
 
-        this.isImportOption = isImportOptionChosen;
+        this.typeImport = typeImport;
         this.exportListener = exportListener;
         isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
@@ -3153,7 +3150,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (isForwardingMessage) {
             stopReproductions();
             chatC.setExportListener(exportListener);
-            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat, isImportOption);
+            chatC.prepareAndroidMessagesToForward(preservedMessagesSelected, idChat, typeImport);
         } else {
             startUploadService();
         }
@@ -4278,7 +4275,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     } else {
                         ArrayList<String> contactEmails = new ArrayList<>();
                         for (AndroidMegaChatMessage message : messagesSelected) {
-                            contactEmails.add(message.getMessage().getUserEmail(messagesSelected.indexOf(message)));
+                            contactEmails.add(message.getMessage().getUserEmail(0));
                         }
                         cC.inviteMultipleContacts(contactEmails);
                     }
@@ -4300,7 +4297,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 case R.id.chat_cab_menu_forward:
                     logDebug("Forward message");
-                    forwardMessages(messagesSelected, false, null);
+                    forwardMessages(messagesSelected, FORWARD_ONLY_OPTION, null);
                     break;
 
                 case R.id.chat_cab_menu_copy:
@@ -4339,7 +4336,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 case R.id.chat_cab_menu_import:
                     finishMultiselectionMode();
-                    chatC.importNodesFromAndroidMessages(messagesSelected, false);
+                    chatC.importNodesFromAndroidMessages(messagesSelected, IMPORT_ONLY_OPTION);
                     break;
 
                 case R.id.chat_cab_menu_offline:
@@ -4528,7 +4525,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                     return false;
                                 }
                             }
-
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
@@ -4637,7 +4633,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                                     allNodeNonContacts = false;
                                 } else {
-                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(i));
+                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
                                     if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                         allNodeNonContacts = false;
                                     }
@@ -4648,7 +4644,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                 if (selected.get(i).getMessage().getType() != MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                                     allNodeContacts = false;
                                 } else {
-                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(i));
+                                    MegaUser contact = megaApi.getContact(selected.get(i).getMessage().getUserEmail(0));
 
                                     if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                         long userHandle = selected.get(i).getMessage().getUserHandle(i);

@@ -189,31 +189,16 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             }
 
             optionSelect.setVisibility(View.VISIBLE);
-            if(typeMessage == MegaChatMessage.TYPE_NORMAL){
+
+            if (typeMessage == MegaChatMessage.TYPE_NORMAL ||
+                    (typeMessage == MegaChatMessage.TYPE_CONTAINS_META &&
+                            megaChatMessage.getContainsMeta() != null &&
+                            (megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW ||
+                                    megaChatMessage.getContainsMeta().getType() == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW))) {
                 optionCopy.setVisibility(View.VISIBLE);
-
-            }else if(typeMessage == MegaChatMessage.TYPE_CONTAINS_META){
-                    MegaChatContainsMeta meta = megaChatMessage.getContainsMeta();
-                    if(meta != null){
-                        int type = meta.getType();
-                        if(type != MegaChatContainsMeta.CONTAINS_META_INVALID){
-                            if(type == MegaChatContainsMeta.CONTAINS_META_RICH_PREVIEW || type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION){
-                                optionCopy.setVisibility(View.VISIBLE);
-                            }else{
-                                optionCopy.setVisibility(View.GONE);
-                            }
-                        }else{
-                            optionCopy.setVisibility(View.GONE);
-
-                        }
-                    }else{
-                        optionCopy.setVisibility(View.GONE);
-
-                    }
-            }else{
+            } else {
                 optionCopy.setVisibility(View.GONE);
             }
-
 
             if (((chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RM || chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_RO) && !chatRoom.isPreview())) {
                 optionForward.setVisibility(View.GONE);
@@ -385,7 +370,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.forward_layout:
-                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, false, null);
+                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, FORWARD_ONLY_OPTION, null);
                 break;
 
             case R.id.edit_layout:
@@ -477,6 +462,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
+
                 chatC.prepareForChatDownload(nodeList);
                 break;
 
@@ -485,7 +471,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     logWarning("The selected node is NULL");
                     return;
                 }
-                chatC.importNode(messageId, chatId, false);
+
+                chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
                 break;
 
             case R.id.file_properties_switch:

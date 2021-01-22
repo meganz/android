@@ -1067,7 +1067,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	public void forwardMessages(ArrayList<MegaChatMessage> messagesSelected){
 		logDebug("forwardMessages");
-		chatC.prepareMessagesToForward(messagesSelected, chatId, false);
+		chatC.prepareMessagesToForward(messagesSelected, chatId, FORWARD_ONLY_OPTION);
 	}
 
 	@Override

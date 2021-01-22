@@ -203,10 +203,9 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:alpha="0.54"
                         android:src="@drawable/ic_social_share_white"
                         android:visibility="visible"
-                        app:tint="@color/black" />
+                        app:tint="@color/secondary_text" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -339,8 +338,8 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:alpha="0.54"
                         android:src="@drawable/ic_send_message_modal"
+                        app:tint="@color/secondary_text"
                         android:visibility="visible" />
 
                     <TextView
@@ -367,7 +366,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
-                        android:src="@drawable/ic_add_contact_chat_item"
+                        android:src="@drawable/ic_add_contact_chat"
                         app:tint="@color/secondary_text"
                         android:visibility="visible" />
 

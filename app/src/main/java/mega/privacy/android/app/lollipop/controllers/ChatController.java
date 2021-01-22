@@ -90,10 +90,6 @@ public class ChatController {
     private DatabaseHandler dbH;
     private ExportListener exportListener;
 
-    public void setExportListener(ExportListener exportListener) {
-        this.exportListener = exportListener;
-    }
-
     public ChatController(Context context){
         logDebug("ChatController created");
         this.context = context;
@@ -1580,14 +1576,14 @@ public class ChatController {
         showSnackBarWhenDownloading(context, numberOfNodesPending, numberOfNodesAlreadyDownloaded, 0);
     }
 
-    public void importNode(long idMessage, long idChat, boolean needShareNode) {
+    public void importNode(long idMessage, long idChat, int typeImport) {
         logDebug("Message ID: " + idMessage + ", Chat ID: " + idChat);
         ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
         MegaChatMessage m = getMegaChatMessage(context, megaChatApi, idChat, idMessage);
         if(m!=null){
             AndroidMegaChatMessage aMessage = new AndroidMegaChatMessage(m);
             messages.add(aMessage);
-            importNodesFromAndroidMessages(messages, needShareNode);
+            importNodesFromAndroidMessages(messages, typeImport);
         }
         else{
             logWarning("Message cannot be recovered - null");
@@ -1604,7 +1600,6 @@ public class ChatController {
         for (int i = 0; i < messages.size(); i++) {
             longArray[i] = messages.get(i).getMsgId();
         }
-
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
         if(context instanceof  NodeAttachmentHistoryActivity){
@@ -1612,7 +1607,7 @@ public class ChatController {
         }
     }
 
-    public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, boolean needShareNode){
+    public void importNodesFromAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, int typeImport){
         logDebug("importNodesFromAndroidMessages");
         Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
         intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
@@ -1625,10 +1620,9 @@ public class ChatController {
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray);
 
         if(context instanceof  ChatActivityLollipop){
-
-            if(needShareNode){
-                ((ChatActivityLollipop) context).forwardMessages(messages, needShareNode, exportListener);
-            }else{
+            if (typeImport == IMPORT_TO_SHARE_OPTION) {
+                ((ChatActivityLollipop) context).forwardMessages(messages, typeImport, exportListener);
+            } else {
                 ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
             }
         }
@@ -1644,14 +1638,14 @@ public class ChatController {
 
         if(m!=null){
             messagesSelected.add(m);
-            prepareMessagesToForward(messagesSelected, idChat, false);
+            prepareMessagesToForward(messagesSelected, idChat, FORWARD_ONLY_OPTION);
         }
         else{
             logError("Message null");
         }
     }
 
-    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat, boolean isImportOption){
+    public void prepareAndroidMessagesToForward(ArrayList<AndroidMegaChatMessage> androidMessagesSelected, long idChat, int typeImport){
         ArrayList<MegaChatMessage> messagesSelected = new ArrayList<>();
 
         if(androidMessagesSelected == null || androidMessagesSelected.isEmpty())
@@ -1661,10 +1655,10 @@ public class ChatController {
             messagesSelected.add(androidMessagesSelected.get(i).getMessage());
         }
 
-        prepareMessagesToForward(messagesSelected, idChat, isImportOption);
+        prepareMessagesToForward(messagesSelected, idChat, typeImport);
     }
 
-    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat, boolean isImportOption){
+    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat, int typeForward){
         logDebug("Number of messages: " + messagesSelected.size() + ",Chat ID: " + idChat);
 
         ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
@@ -1673,14 +1667,14 @@ public class ChatController {
             idMessages[i] = messagesSelected.get(i).getMsgId();
             logDebug("Type of message: "+ messagesSelected.get(i).getType());
             if((messagesSelected.get(i).getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT)||(messagesSelected.get(i).getType()==MegaChatMessage.TYPE_VOICE_CLIP)){
-                if (isImportOption || (messagesSelected.get(i).getUserHandle() != megaChatApi.getMyUserHandle())) {
+                if (typeForward == IMPORT_TO_SHARE_OPTION || (messagesSelected.get(i).getUserHandle() != megaChatApi.getMyUserHandle())) {
                     messagesToImport.add(messagesSelected.get(i));
                 }
             }
         }
 
         if(messagesToImport.isEmpty()){
-            if(!isImportOption) {
+            if(typeForward != IMPORT_TO_SHARE_OPTION) {
                 forwardMessages(messagesSelected, idChat);
             }
         }
@@ -2113,5 +2107,9 @@ public class ChatController {
         }
 
         return email;
+    }
+
+    public void setExportListener(ExportListener exportListener) {
+        this.exportListener = exportListener;
     }
 }

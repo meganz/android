@@ -132,7 +132,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                             if(exportListener == null) {
                                 Util.showSnackbar(context, "This node cannot be shared");
                             }else{
-                                exportListener.errorImportingNodes(messagesSelected.get(0).getMsgId());
+                                exportListener.errorImportingNodes();
                             }
                         }
                     }
