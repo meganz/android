@@ -586,6 +586,7 @@
 								android:id="@+id/upgrade_business_title_text"
 								android:layout_width="wrap_content"
 								android:layout_height="wrap_content"
+								android:gravity="center_horizontal"
 								android:textColor="@color/business_color"
 								android:text="@string/business_label"
 								android:layout_below="@+id/image_business"

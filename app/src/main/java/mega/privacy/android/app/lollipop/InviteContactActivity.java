@@ -77,6 +77,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class InviteContactActivity extends PinActivityLollipop implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
@@ -225,7 +226,7 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         recyclerViewList.setHasFixedSize(true);
         recyclerViewList.setItemAnimator(new DefaultItemAnimator());
         recyclerViewList.setLayoutManager(linearLayoutManager);
-        recyclerViewList.addItemDecoration(new ContactsDividerDecoration(this, outMetrics));
+        recyclerViewList.addItemDecoration(new ContactsDividerDecoration(this));
         invitationContactsAdapter = new InvitationContactsAdapter(this, filteredContacts, this, megaApi);
         recyclerViewList.setAdapter(invitationContactsAdapter);
         containerContacts = findViewById(R.id.container_list_contacts);
@@ -416,7 +417,8 @@ public class InviteContactActivity extends PinActivityLollipop implements Contac
         logDebug("setTitleAB");
         if (aB != null) {
             if (addedContacts.size() > 0) {
-                aB.setSubtitle(getResources().getQuantityString(R.plurals.num_contacts_selected, addedContacts.size(), addedContacts.size()));
+                aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                                addedContacts.size(), addedContacts.size()));
             } else {
                 aB.setSubtitle(null);
             }

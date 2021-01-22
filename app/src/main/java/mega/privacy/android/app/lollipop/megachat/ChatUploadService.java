@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -58,6 +59,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
@@ -1004,6 +1006,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					transfersCount--;
 					totalUploadsCompleted++;
 				}
+
+				addCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
 				mapProgressTransfers.put(transfer.getTag(), transfer);
 				launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
@@ -1127,7 +1131,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								} catch (Exception e) {
 								}
 							}
-						}else if(isVoiceClip(transfer.getPath())){
+						}else if(isVoiceClip(transfer.getAppData())){
 							logDebug("Is voice clip");
 							attachVoiceClips(transfer);
 						}
