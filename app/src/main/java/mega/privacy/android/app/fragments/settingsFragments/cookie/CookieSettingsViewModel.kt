@@ -97,7 +97,6 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                     updateResult.postValue(false)
                 }
             )
-            .addTo(composite)
     }
 
     /**
