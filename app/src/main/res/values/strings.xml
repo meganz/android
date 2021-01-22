@@ -2941,7 +2941,7 @@
     <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
-    <string name="progress_size_indicator" context="Indicator of the progress in a download/upload. Please, don't remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB">%1$d%% of %2$s</string>
+
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
     <string name="action_retake" context="Action text to retake current scan picture">Retake</string>
     <string name="title_crop" context="Screen title for cropping current scan">Crop</string>
