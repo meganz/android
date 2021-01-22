@@ -1,30 +1,46 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.CountDownTimer;
+import android.os.Build;
 import android.os.Handler;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.SDCardUtils.checkSDCardCompletedTransfers;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+
 import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
 import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
 
 public class TransfersManagement {
     private static final long INVALID_VALUE = -1;
     private static final int WAIT_TIME_TO_SHOW_WARNING = 60000;
+    private static final  int WAIT_TIME_TO_SHOW_NETWORK_WARNING = 30000;
     private static final int WAIT_TIME_TO_RESTART_SERVICES = 5000;
+
+    private CountDownTimer networkTimer;
 
     private long transferOverQuotaTimestamp;
     private boolean hasNotToBeShowDueToTransferOverQuota;
@@ -34,8 +50,9 @@ public class TransfersManagement {
     private boolean transferOverQuotaNotificationShown;
     private boolean isTransferOverQuotaBannerShown;
     private boolean resumeTransfersWarningHasAlreadyBeenShown;
+    private boolean shouldShowNetworkWarning;
 
-    private ArrayList<String> pausedTransfers = new ArrayList<>();
+    private final ArrayList<String> pausedTransfers = new ArrayList<>();
 
     public TransfersManagement() {
         resetTransferOverQuotaTimestamp();
@@ -173,7 +190,8 @@ public class TransfersManagement {
      * @param transferType  the transfer type.
      */
     public static void launchTransferUpdateIntent(int transferType) {
-        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE).putExtra(TRANSFER_TYPE, transferType));
+        MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE)
+                .putExtra(TRANSFER_TYPE, transferType));
     }
 
     /**
@@ -189,6 +207,42 @@ public class TransfersManagement {
         completedTransfer.setId(id);
         app.sendBroadcast(new Intent(BROADCAST_ACTION_TRANSFER_FINISH)
                 .putExtra(COMPLETED_TRANSFER, completedTransfer));
+    }
+
+    /**
+     * Starts a CountDownTimer after show warnings related to no internet connection.
+     * If the timer finishes, launches a Broadcast to update the widget.
+     */
+    public void startNetworkTimer() {
+        networkTimer = new CountDownTimer(WAIT_TIME_TO_SHOW_NETWORK_WARNING,
+                WAIT_TIME_TO_SHOW_NETWORK_WARNING) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                if (isOnline(MegaApplication.getInstance())) {
+                    return;
+                }
+
+                setShouldShowNetworkWarning(true);
+                launchTransferUpdateIntent(NO_TYPE);
+            }
+        };
+
+        networkTimer.start();
+    }
+
+    /**
+     * Cancels the CountDownTimer to show warnings related to no internet connection.
+     */
+    public void resetNetworkTimer() {
+        if (networkTimer != null) {
+            networkTimer.cancel();
+            setShouldShowNetworkWarning(false);
+            launchTransferUpdateIntent(NO_TYPE);
+        }
     }
 
     /**
@@ -249,6 +303,43 @@ public class TransfersManagement {
     }
 
     /**
+     * Creates the initial notification when a service starts.
+     *
+     * @param notificationChannelId   Identifier of the notification channel.
+     * @param notificationChannelName Name of the notification channel.
+     * @param mNotificationManager    NotificationManager to create the notification.
+     * @param mBuilder                Builder to create the notification.
+     * @return The initial notification created.
+     */
+    public static Notification createInitialServiceNotification(String notificationChannelId,
+                                                                String notificationChannelName,
+                                                                NotificationManager mNotificationManager,
+                                                                NotificationCompat.Builder mBuilderCompat,
+                                                                Notification.Builder mBuilder) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setShowBadge(true);
+            channel.setSound(null, null);
+            mNotificationManager.createNotificationChannel(channel);
+
+            mBuilderCompat
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setContentTitle(getString(R.string.download_preparing_files))
+                    .setAutoCancel(true);
+
+            return mBuilderCompat.build();
+        } else {
+            mBuilder.setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
+                    .setContentTitle(getString(R.string.download_preparing_files))
+                    .setAutoCancel(true);
+
+            return mBuilder.build();
+        }
+    }
+
+    /**
      * Checks if the transfer over quota has occurred at this moment
      * or it occurred in other past moment.
      *
@@ -300,5 +391,13 @@ public class TransfersManagement {
 
     public boolean isResumeTransfersWarningHasAlreadyBeenShown() {
         return resumeTransfersWarningHasAlreadyBeenShown;
+    }
+
+    public void setShouldShowNetworkWarning(boolean shouldShowNetworkWarning) {
+        this.shouldShowNetworkWarning = shouldShowNetworkWarning;
+    }
+
+    public boolean shouldShowNetWorkWarning() {
+        return shouldShowNetworkWarning;
     }
 }

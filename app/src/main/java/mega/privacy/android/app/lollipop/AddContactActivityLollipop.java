@@ -108,6 +108,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -1637,7 +1638,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         typeContactLayout.setVisibility(View.GONE);
         typeContactEditText = (EditText) findViewById(R.id.type_mail_edit_text);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, px2dp(40, outMetrics));
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp2px(40, outMetrics));
             typeContactLayout.setLayoutParams(params1);
         }
         editTextBackground = typeContactEditText.getBackground().mutate().getConstantState().newDrawable();
@@ -1715,7 +1716,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.section_contacts));
-            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
         else if(contactType == CONTACT_TYPE_DEVICE) {
             typeContactLayout.setVisibility(View.VISIBLE);
@@ -1725,7 +1726,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.contacts_phone));
-            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
         else {
             typeContactLayout.setVisibility(View.VISIBLE);
@@ -1733,7 +1734,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 scanQRButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(stickyLayoutManager);
-            recyclerViewList.addItemDecoration(new HeaderItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new HeaderItemDecoration(this));
             showHeader(false);
         }
 
@@ -1762,10 +1763,10 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayout.LayoutParams params1 = (LinearLayout.LayoutParams) emptySubTextView.getLayoutParams();
-            params1.setMargins(px2dp(34, outMetrics), 0, px2dp(34, outMetrics), 0);
+            params1.setMargins(dp2px(34, outMetrics), 0, dp2px(34, outMetrics), 0);
             emptyTextView.setLayoutParams(params1);
             LinearLayout.LayoutParams params2 = (LinearLayout.LayoutParams) emptyInviteButton.getLayoutParams();
-            params2.setMargins(0, px2dp(5, outMetrics), 0, px2dp(32, outMetrics));
+            params2.setMargins(0, dp2px(5, outMetrics), 0, dp2px(32, outMetrics));
             emptyInviteButton.setLayoutParams(params2);
         }
 
@@ -1787,7 +1788,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         newGroupRecyclerView.setItemAnimator(new DefaultItemAnimator());
         newGrouplinearLayoutManager = new LinearLayoutManager(this);
         newGroupRecyclerView.setLayoutManager(newGrouplinearLayoutManager);
-        newGroupRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+        newGroupRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         //Get MEGA contacts and phone contacts: first name, last name and email
         if (savedInstanceState != null) {
@@ -1988,7 +1989,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else if (contactType == CONTACT_TYPE_DEVICE){
                 aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
                 if (addedContactsPhone.size() > 0){
-                    aB.setSubtitle(addedContactsPhone.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsPhone.size()));
+                    aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                                    addedContactsPhone.size(), addedContactsPhone.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -1997,7 +1999,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else {
                 aB.setTitle(getString(R.string.share_with).toUpperCase());
                 if (addedContactsShare.size() > 0){
-                    aB.setSubtitle(addedContactsShare.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsShare.size()));
+                    aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                                    addedContactsShare.size(), addedContactsShare.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -2010,7 +2013,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         logDebug("setError");
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(px2dp(18, outMetrics), px2dp(-10, outMetrics), px2dp(18, outMetrics), 0);
+            params.setMargins(dp2px(18, outMetrics), dp2px(-10, outMetrics), dp2px(18, outMetrics), 0);
             typeContactEditText.setLayoutParams(params);
         }
         mailError.setVisibility(View.VISIBLE);
@@ -2027,7 +2030,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         }
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(px2dp(18, outMetrics), px2dp(0, outMetrics), px2dp(18, outMetrics), 0);
+            params.setMargins(dp2px(18, outMetrics), dp2px(0, outMetrics), dp2px(18, outMetrics), 0);
             typeContactEditText.setLayoutParams(params);
         }
         typeContactEditText.setBackground(editTextBackground);
@@ -2809,7 +2812,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     case DialogInterface.BUTTON_POSITIVE: {
                         addMEGAFilteredContact(contact);
                         addedContactsMEGA.remove(contact);
-                        newGroupHeaderList.setText(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
+                        newGroupHeaderList.setText(getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
                         adapterMEGA.setContacts(addedContactsMEGA);
                         adapterMEGAContacts.setContacts(addedContactsMEGA);
 
@@ -3228,7 +3231,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         createMyContact();
 
         addedContactsMEGA.add(myContact);
-        newGroupHeaderList.setText(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
+        newGroupHeaderList.setText(getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
 
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(false);

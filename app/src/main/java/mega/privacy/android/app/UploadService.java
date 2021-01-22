@@ -167,6 +167,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		mBuilderCompat = new NotificationCompat.Builder(UploadService.this, null);
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+		startForeground();
+
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -183,6 +185,34 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         };
         registerReceiver(pauseBroadcastReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 	}
+
+    private void startForeground() {
+        if (megaApi.getNumPendingUploads() <= 0) {
+            return;
+        }
+
+        try {
+            startForeground(notificationIdForFileUpload,
+                    createInitialServiceNotification(notificationChannelIdForFileUpload,
+                            notificationChannelNameForFileUpload,
+                            mNotificationManager,
+                            new NotificationCompat.Builder(UploadService.this, notificationChannelIdForFileUpload),
+                            mBuilder));
+
+            isForeground = true;
+        } catch (Exception e) {
+            logWarning("Error starting foreground.", e);
+            isForeground = false;
+        }
+    }
+
+    private void stopForeground() {
+        isForeground = false;
+        stopForeground(true);
+        mNotificationManager.cancel(notificationIdForFileUpload);
+        mNotificationManager.cancel(notificationIdForFolderUpload);
+        stopSelf();
+    }
 
 	@Override
 	public void onDestroy(){
@@ -247,6 +277,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 case ACTION_RESTART_SERVICE:
                     MegaTransferData transferData = megaApi.getTransferData(null);
                     if (transferData == null) {
+                        stopForeground();
                         return;
                     }
 
@@ -270,6 +301,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                     totalFolderUploads = mapProgressFolderTransfers.size();
                     totalFileUploads = mapProgressFileTransfers.size();
                     uploadCount = currentUpload = transfersCount = totalFileUploads + totalFolderUploads;
+
+                    if (transfersCount == 0) {
+                        stopForeground();
+                    } else if (totalFileUploads == 0) {
+                        isForeground = false;
+                        stopForeground(true);
+                        mNotificationManager.cancel(notificationIdForFileUpload);
+                    }
+
                     launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
                     break;
             }
@@ -353,11 +393,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private void cancel() {
 		logDebug("cancel");
 		canceled = true;
-		isForeground = false;
-		stopForeground(true);
-		mNotificationManager.cancel(notificationIdForFileUpload);
-		mNotificationManager.cancel(notificationIdForFolderUpload);
-		stopSelf();
+		stopForeground();
 	}
 
 	@Override
@@ -399,11 +435,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         resetUploadNumbers();
 
 		logDebug("Stopping service!");
-        isForeground = false;
-        stopForeground(true);
-        mNotificationManager.cancel(notificationIdForFileUpload);
-        mNotificationManager.cancel(notificationIdForFolderUpload);
-        stopSelf();
+        stopForeground();
 		logDebug("After stopSelf");
 
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {

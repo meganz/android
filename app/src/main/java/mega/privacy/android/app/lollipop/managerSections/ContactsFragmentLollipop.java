@@ -873,7 +873,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			recyclerView.setHasFixedSize(true);
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);

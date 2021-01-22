@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static mega.privacy.android.app.utils.AvatarUtil.getRadius;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -103,8 +104,14 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
         chatRoom = megaChatApi.getChatRoom(chatId);
 
         Bitmap bitmap = getImageAvatarCall(chatRoom, peerid);
-        avatarImage.setImageBitmap(bitmap != null ? bitmap :
-                getDefaultAvatarCall(context, chatRoom, peerid));
+        if(bitmap != null){
+            avatarImage.setImageBitmap(bitmap);
+            avatarImage.setCornerRadius(dp2px(getRadius(bitmap), outMetrics));
+        }else{
+            Bitmap defaultAvatar = getDefaultAvatarCall(context, chatRoom, peerid);
+            avatarImage.setImageBitmap(defaultAvatar);
+            avatarImage.setCornerRadius(dp2px(getRadius(defaultAvatar), outMetrics));
+        }
     }
 
     /**
@@ -271,7 +278,7 @@ public class FragmentPeerSelected extends BaseFragment implements View.OnClickLi
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             paramsMicroSurface.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 
-            paramsMicroSurface.setMargins(0, px2dp(16, outMetrics), px2dp(16, outMetrics), 0);
+            paramsMicroSurface.setMargins(0, dp2px(16, outMetrics), dp2px(16, outMetrics), 0);
             muteLayout.setLayoutParams(paramsMicroSurface);
             muteLayout.setVisibility(View.VISIBLE);
             return;

@@ -180,9 +180,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.avatarImageView = v.findViewById(R.id.chat_group_properties_thumbnail);
                 holderHeader.infoTitleChatText = v.findViewById(R.id.chat_group_contact_properties_info_title);
                 if (isScreenInPortrait(groupChatInfoActivity)) {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
+                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_PORT, outMetrics));
                 } else {
-                    holderHeader.infoTitleChatText.setMaxWidthEmojis(px2dp(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
+                    holderHeader.infoTitleChatText.setMaxWidthEmojis(dp2px(MAX_WIDTH_CHAT_TITLE_LAND, outMetrics));
                 }
 
                 holderHeader.editImageView = v.findViewById(R.id.chat_group_contact_properties_edit_icon);

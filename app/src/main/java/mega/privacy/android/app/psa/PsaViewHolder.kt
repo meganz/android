@@ -6,7 +6,7 @@ import android.text.TextUtils
 import android.view.View
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PsaLayoutBinding
-import mega.privacy.android.app.lollipop.WebViewActivityLollipop
+import mega.privacy.android.app.activities.WebViewActivity
 
 /**
  * The view holder for normal PSA view, implementing the display logic of PSA.
@@ -38,7 +38,7 @@ class PsaViewHolder(
             binding.leftButton.text = psa.positiveText
             binding.leftButton.setOnClickListener {
                 val context = binding.root.context
-                val intent = Intent(context, WebViewActivityLollipop::class.java)
+                val intent = Intent(context, WebViewActivity::class.java)
                 intent.data = Uri.parse(psa.positiveLink)
                 context.startActivity(intent)
                 dismissPsa(psa.id)
@@ -62,13 +62,30 @@ class PsaViewHolder(
     }
 
     /**
+     * Check if the PSA view is visible.
+     *
+     * @return if the PSA view is visible
+     */
+    fun visible() = binding.root.visibility == View.VISIBLE
+
+    /**
+     * Get height of the PSA view.
+     *
+     * @return height of the PSA view
+     */
+    fun psaLayoutHeight() = binding.root.measuredHeight
+
+    /**
      * Hide PSA view and dismiss it in server.
      *
      * @param id the id of the PSA
      */
     private fun dismissPsa(id: Int) {
-        psaManager.dismissPsa(id)
+        // ManagerActivity will check visibility of PSA view when dismiss PSA
+        // (receive null Psa event), so we need change visibility before calling
+        // ViewModel.
         binding.root.visibility = View.GONE
+        psaManager.dismissPsa(id)
         bound = false
     }
 }

@@ -66,7 +66,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.WebViewActivityLollipop"
+            android:name="mega.privacy.android.app.activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop" />
@@ -298,7 +298,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.GetLinkActivityLollipop"
+            android:name="mega.privacy.android.app.activities.GetLinkActivity"
             android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu"
             android:theme="@style/Theme.Megaactionbar.Secondary">
@@ -363,6 +363,11 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Megaactionbar.InfoScreens">
         </activity>
+        <activity
+            android:name=".activities.OfflineFileInfoActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Megaactionbar.InfoScreens"
+            android:configChanges="orientation|screenSize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.VersionsFileActivity"

@@ -196,8 +196,8 @@ public class CreditCardFragmentLollipop extends Fragment implements MegaRequestL
 
 		packageIcon = (ImageView) v.findViewById(R.id.pro_image_cc);
 
-		packageIcon.getLayoutParams().width = px2dp((100*scaleW), outMetrics);
-		packageIcon.getLayoutParams().height = px2dp((100*scaleW), outMetrics);
+		packageIcon.getLayoutParams().width = dp2px((100*scaleW), outMetrics);
+		packageIcon.getLayoutParams().height = dp2px((100*scaleW), outMetrics);
 
 		packageName = (TextView) v.findViewById(R.id.pro_title_cc);
 		pricingFrom = (TextView) v.findViewById(R.id.pricing_from_cc);

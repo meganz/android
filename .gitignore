@@ -23,6 +23,7 @@
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+.idea/navEditor.xml
 
 # Gradle:
 .idea/gradle.xml
@@ -31,7 +32,6 @@
 .idea/misc.xml
 .idea/vcs.xml
 .idea/compiler.xml
-.idea/navEditor.xml
 .gradle
 
 #Captures

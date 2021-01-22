@@ -43,9 +43,11 @@ import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -679,12 +681,12 @@ public class BaseActivity extends AppCompatActivity {
 
         if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
             final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
+            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
             snackbarLayout.setLayoutParams(params);
         }
         else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
             final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(px2dp(8, outMetrics),0, px2dp(8, outMetrics), px2dp(8, outMetrics));
+            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
             snackbarLayout.setLayoutParams(params);
         }
 
@@ -709,6 +711,11 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
                 snackbar.show();
                 break;
+
+            case PERMISSIONS_TYPE:
+                snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
+                snackbar.show();
+                break;
         }
     }
 
@@ -725,7 +732,7 @@ public class BaseActivity extends AppCompatActivity {
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
+        params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);
@@ -1037,5 +1044,43 @@ public class BaseActivity extends AppCompatActivity {
 
     public AlertDialog getResumeTransfersWarning() {
         return resumeTransfersWarning;
+    }
+
+    /**
+     * Checks if should refresh session due to megaApi.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToSDK() {
+        if (megaApi == null || megaApi.getRootNode() == null) {
+            logWarning("Refresh session - sdk");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if should refresh session due to karere.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToKarere() {
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logWarning("Refresh session - karere");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void refreshSession() {
+        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }
