@@ -8,13 +8,6 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
-    <!-- For dropdown menu in AudioViewPlayerActivity, fix to dark mode -->
-    <style name="ThemeOverlay.AppCompat.DayNight.Dark" parent="ThemeOverlay.AppCompat">
-        <item name="colorSurface">@color/grey_900</item>
-        <item name="android:textColorPrimary">@color/white_alpha_087</item>
-        <item name="checkboxStyle">@style/Widget.AppCompat.CompoundButton.CheckBox</item>
-    </style>
-
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Base.Theme.Mega" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!--Material color attributes (light theme) -->

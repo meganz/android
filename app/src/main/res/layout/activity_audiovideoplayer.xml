@@ -40,6 +40,8 @@
 				android:layout_height="wrap_content"
 				android:minHeight="?attr/actionBarSize"
 				android:background="@color/grey_alpha_050"
+                app:popupTheme="@style/ThemeOverlay.MaterialComponents.MenuDark"
+                app:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
 				android:fitsSystemWindows="true" />
 
 			<ProgressBar
@@ -53,8 +55,6 @@
 				android:layout_marginTop="30dp" />
 
 		</RelativeLayout>
-
-
 
 		<FrameLayout
 			android:id="@+id/fragment_container"
