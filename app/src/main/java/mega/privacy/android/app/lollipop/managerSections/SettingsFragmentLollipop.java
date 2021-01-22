@@ -387,7 +387,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     }
 
     public void goToCategoryStorage() {
-        scrollToPreference(storageCategory);
+        scrollToPreference(fileManagementPrefence);
+        onPreferenceClick(fileManagementPrefence);
     }
 
     public void goToCategoryQR() {
