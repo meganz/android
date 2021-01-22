@@ -223,9 +223,10 @@
     <color name="giphy_loading_background">#ECECEC</color>
 
     <color name="border_avatar_call">#4DFFFFFF</color>
-
-    <color name="over_quota_yellow">#FFFFB42B</color>
+    
     <color name="background_own_reaction_added">#0F00BFA5</color>
+
+    <color name="error_color">#C70000</color>
 
     <color name="pressed_color">#E7E7E7</color>
 

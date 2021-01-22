@@ -806,7 +806,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             position = -1;
         }
         positionDividerItemDecoration = new PositionDividerItemDecoration(context, outMetrics, position);
-        simpleDividerItemDecoration = new SimpleDividerItemDecoration(context, outMetrics);
+        simpleDividerItemDecoration = new SimpleDividerItemDecoration(context);
         listView.addItemDecoration(positionDividerItemDecoration);
         listView.setAdapter(adapterList);
 

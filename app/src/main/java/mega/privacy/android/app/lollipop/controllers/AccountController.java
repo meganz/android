@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.psa.PsaViewModel;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
@@ -440,6 +441,8 @@ public class AccountController {
 
         // clean time stamps preference settings after logout
         clearCUBackUp();
+
+        PsaViewModel.clearPreference();
 
         new LastShowSMSDialogTimeChecker(context).reset();
         AudioPlayerService.stopAudioPlayer(context);

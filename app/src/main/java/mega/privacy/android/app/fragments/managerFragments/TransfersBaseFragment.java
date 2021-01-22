@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
+import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 
-public class TransfersBaseFragment extends BaseFragment {
+public class TransfersBaseFragment extends RotatableFragment {
 
     protected ImageView emptyImage;
     protected TextView emptyText;
@@ -33,7 +34,7 @@ public class TransfersBaseFragment extends BaseFragment {
         View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 
         listView = v.findViewById(R.id.transfers_list_view);
-        listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+        listView.addItemDecoration(new SimpleDividerItemDecoration(context));
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
@@ -95,5 +96,30 @@ public class TransfersBaseFragment extends BaseFragment {
         if (getMoreQuotaView != null) {
             getMoreQuotaView.setVisibility(isOnTransferOverQuota() ? View.VISIBLE : View.GONE);
         }
+    }
+
+    @Override
+    protected RotatableAdapter getAdapter() {
+        return null;
+    }
+
+    @Override
+    public void activateActionMode() {
+
+    }
+
+    @Override
+    public void multipleItemClick(int position) {
+
+    }
+
+    @Override
+    public void reselectUnHandledSingleItem(int position) {
+
+    }
+
+    @Override
+    protected void updateActionModeTitle() {
+
     }
 }

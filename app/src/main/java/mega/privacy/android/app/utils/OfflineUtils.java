@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.StatFs;
 
 import android.util.Base64;
@@ -278,55 +277,6 @@ public class OfflineUtils {
         File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
         String thumbName = Base64.encodeToString(handle.getBytes(), Base64.DEFAULT);
         return new File(thumbDir, thumbName + JPG_EXTENSION);
-    }
-
-    public static String getFolderInfo(Resources res, File file) {
-        File[] files = file.listFiles();
-        if (files == null) {
-            return " ";
-        }
-
-        int folderNum = 0;
-        int fileNum = 0;
-        for (File f : files) {
-            if (f.isDirectory()) {
-                folderNum++;
-            } else {
-                fileNum++;
-            }
-        }
-
-        if (folderNum > 0 && fileNum > 0) {
-            return folderNum + " "
-                    + res.getQuantityString(R.plurals.general_num_folders, folderNum)
-                    + ", " + fileNum + " "
-                    + res.getQuantityString(R.plurals.general_num_files, fileNum);
-        } else if (folderNum > 0) {
-            return folderNum + " " + res.getQuantityString(R.plurals.general_num_folders,
-                    folderNum);
-        } else {
-            return fileNum + " " + res.getQuantityString(R.plurals.general_num_files, fileNum);
-        }
-    }
-
-    public static long getTotalSize(File file) {
-        if (file.isFile()) {
-            return file.length();
-        }
-        File[] files = file.listFiles();
-        if (files == null) {
-            return 0;
-        }
-
-        long totalSize = 0;
-        for (File child : files) {
-            if (child.isFile()) {
-                totalSize += child.length();
-            } else {
-                totalSize += getTotalSize(child);
-            }
-        }
-        return totalSize;
     }
 
     private static String getOfflinePath(String path, MegaOffline offlineNode) {
