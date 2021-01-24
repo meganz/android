@@ -124,6 +124,7 @@ import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
@@ -295,10 +296,7 @@ public class Util {
 			count =  list.length;
 		}
 
-		Context context = MegaApplication.getInstance().getApplicationContext();
-		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
-
-		return numChilden;
+		return getQuantityString(R.plurals.general_num_items, count, count);
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {

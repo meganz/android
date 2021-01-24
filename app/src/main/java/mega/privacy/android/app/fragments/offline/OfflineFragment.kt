@@ -259,7 +259,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (args.rootFolderOnly) {
             binding.offlineBrowserList.addItemDecoration(
-                SimpleDividerItemDecoration(requireContext(), resources.displayMetrics)
+                SimpleDividerItemDecoration(requireContext())
             )
         } else {
             listDivider = PositionDividerItemDecoration(requireContext(), resources.displayMetrics)

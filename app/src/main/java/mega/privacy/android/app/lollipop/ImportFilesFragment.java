@@ -27,7 +27,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -116,7 +115,6 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
 
         contentText = (TextView) v.findViewById(R.id.content_text);
         recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
         cloudDriveButton = v.findViewById(R.id.cloud_drive_layout);

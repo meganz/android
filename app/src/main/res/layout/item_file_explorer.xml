@@ -16,7 +16,7 @@
         android:id="@+id/scroll_view_filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
+        android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_toEndOf="@id/file_explorer_thumbnail"
         android:overScrollMode="never"

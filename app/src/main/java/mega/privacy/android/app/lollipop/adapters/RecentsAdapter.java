@@ -1,11 +1,9 @@
 package mega.privacy.android.app.lollipop.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.drawable.Drawable;
@@ -17,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,9 +28,9 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -45,7 +42,6 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHolderBucket> implements View.OnClickListener, SectionTitleProvider {

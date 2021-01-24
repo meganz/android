@@ -23,7 +23,7 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static nz.mega.sdk.MegaTransfer.*;
 
 public class TransferWidget {
-    private static final int NO_TYPE = -1;
+    static final int NO_TYPE = -1;
 
     private Context context;
     private MegaApiAndroid megaApi;
@@ -87,10 +87,13 @@ public class TransferWidget {
             }
         }
 
-        if (getPendingTransfers() > 0) {
+        TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
+
+        if (getPendingTransfers() > 0 && !transfersManagement.shouldShowNetWorkWarning()) {
             setProgress(getProgress(), transferType);
             updateState();
-        } else if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
+        } else if (transfersManagement.shouldShowNetWorkWarning()
+                || transfersManagement.thereAreFailedTransfers()) {
             setFailedTransfers();
         } else {
             hide();
@@ -167,6 +170,11 @@ public class TransferWidget {
     private void setFailedTransfers() {
         if (isOnTransferOverQuota()) return;
 
+        if (transfersWidget.getVisibility() != VISIBLE) {
+            transfersWidget.setVisibility(VISIBLE);
+        }
+
+        setProgress(getProgress(), NO_TYPE);
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_warning_progress_bar));
         updateStatus(getDrawable(R.drawable.ic_transfers_error));
     }

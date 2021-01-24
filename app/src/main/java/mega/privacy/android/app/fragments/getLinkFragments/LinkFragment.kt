@@ -23,7 +23,7 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.MegaApiUtils.getInfoFolder
+import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap
@@ -77,7 +77,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         setThumbnail()
         binding.nodeName.text = node.name
         binding.nodeInfo.text =
-            if (node.isFolder) getInfoFolder(node, context)
+            if (node.isFolder) getMegaNodeFolderInfo(node)
             else getSizeString(node.size)
 
         binding.learnMoreTextButton.setOnClickListener {

@@ -471,7 +471,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 			if (intent != null) {
 				position = intent.getIntExtra("position", -1);
 				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if (position != -1) {
 					if (adapterType == CONTACT_FILE_ADAPTER) {
@@ -678,36 +678,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop impleme
 		logDebug("onNewIntent");
 		super.onNewIntent(intent);
 		setIntent(intent);
-	}
-
-	public String getDescription(ArrayList<MegaNode> nodes) {
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i = 0; i < nodes.size(); i++) {
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()) {
-				numFolders++;
-			} else {
-				numFiles++;
-			}
-		}
-
-		String info = "";
-		if (numFolders > 0) {
-			info = numFolders + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0) {
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		} else {
-			if (numFiles == 0) {
-				info = numFiles + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			} else {
-				info = numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-
-		return info;
 	}
 
 	@Override

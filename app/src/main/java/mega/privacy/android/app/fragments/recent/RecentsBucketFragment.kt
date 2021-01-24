@@ -102,7 +102,7 @@ class RecentsBucketFragment : BaseFragment() {
                 val linearLayoutManager = LinearLayoutManager(activity)
 
                 listView.layoutManager = linearLayoutManager
-                listView.addItemDecoration(SimpleDividerItemDecoration(activity, outMetrics))
+                listView.addItemDecoration(SimpleDividerItemDecoration(activity))
             }
 
             listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {

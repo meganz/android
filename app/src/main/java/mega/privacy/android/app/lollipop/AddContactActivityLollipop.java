@@ -110,6 +110,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -1707,7 +1708,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.section_contacts));
-            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
         else if(contactType == CONTACT_TYPE_DEVICE) {
             typeContactLayout.setVisibility(View.VISIBLE);
@@ -1717,7 +1718,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             recyclerViewList.setLayoutManager(linearLayoutManager);
             showHeader(true);
             textHeader.setText(getString(R.string.contacts_phone));
-            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new SimpleDividerItemDecoration(this));
         }
         else {
             typeContactLayout.setVisibility(View.VISIBLE);
@@ -1725,7 +1726,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                 scanQRButton.setVisibility(View.VISIBLE);
             }
             recyclerViewList.setLayoutManager(stickyLayoutManager);
-            recyclerViewList.addItemDecoration(new HeaderItemDecoration(this, outMetrics));
+            recyclerViewList.addItemDecoration(new HeaderItemDecoration(this));
             showHeader(false);
         }
 
@@ -1778,7 +1779,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         newGroupRecyclerView.setItemAnimator(new DefaultItemAnimator());
         newGrouplinearLayoutManager = new LinearLayoutManager(this);
         newGroupRecyclerView.setLayoutManager(newGrouplinearLayoutManager);
-        newGroupRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+        newGroupRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         //Get MEGA contacts and phone contacts: first name, last name and email
         if (savedInstanceState != null) {
@@ -1979,7 +1980,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else if (contactType == CONTACT_TYPE_DEVICE){
                 aB.setTitle(getString(R.string.invite_contacts).toUpperCase());
                 if (addedContactsPhone.size() > 0){
-                    aB.setSubtitle(addedContactsPhone.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsPhone.size()));
+                    aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                                    addedContactsPhone.size(), addedContactsPhone.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -1988,7 +1990,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             else {
                 aB.setTitle(getString(R.string.share_with).toUpperCase());
                 if (addedContactsShare.size() > 0){
-                    aB.setSubtitle(addedContactsShare.size() + " " + getResources().getQuantityString(R.plurals.general_num_contacts, addedContactsShare.size()));
+                    aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                                    addedContactsShare.size(), addedContactsShare.size()));
                 }
                 else {
                     aB.setSubtitle(null);
@@ -2812,7 +2815,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
                     case DialogInterface.BUTTON_POSITIVE: {
                         addMEGAFilteredContact(contact);
                         addedContactsMEGA.remove(contact);
-                        newGroupHeaderList.setText(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
+                        newGroupHeaderList.setText(getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
                         adapterMEGA.setContacts(addedContactsMEGA);
                         adapterMEGAContacts.setContacts(addedContactsMEGA);
 
@@ -3231,7 +3234,7 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
         createMyContact();
 
         addedContactsMEGA.add(myContact);
-        newGroupHeaderList.setText(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
+        newGroupHeaderList.setText(getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
 
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(false);

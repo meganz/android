@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/transfers_list_item_layout"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
     android:layout_marginEnd="13dp"
     android:descendantFocusability="blocksDescendants">
@@ -52,28 +52,28 @@
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
 
-    <ImageButton
-        android:id="@+id/transfers_list_option_remove"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="16dp"
-        android:background="@null"
-        android:src="@drawable/ic_close_grey"
-        app:tint="?android:attr/textColorSecondary" />
+	<ImageButton
+		android:id="@+id/transfers_list_option_reorder"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentEnd="true"
+		android:layout_centerVertical="true"
+		android:layout_marginEnd="16dp"
+		android:background="@null"
+		android:src="@drawable/ic_reorder"
+		app:tint="?android:attr/textColorSecondary" />
 
-    <ImageView
-        android:id="@+id/transfers_list_option_pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="24dp"
-        android:layout_toStartOf="@id/transfers_list_option_remove"
-        android:background="@null"
-        android:src="@drawable/ic_pause"
-        app:tint="?android:attr/textColorSecondary" />
+	<ImageView
+		android:id="@+id/transfers_list_option_pause"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+		android:layout_marginStart="16dp"
+		android:layout_marginEnd="24dp"
+		android:layout_toStartOf="@id/transfers_list_option_reorder"
+		android:background="@null"
+		android:src="@drawable/ic_pause"
+		app:tint="?android:attr/textColorSecondary" />
 
     <TextView
         android:id="@+id/transfers_progress_text"

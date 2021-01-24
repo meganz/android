@@ -89,7 +89,7 @@ import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLoll
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentLollipop;
-import mega.privacy.android.app.lollipop.managerSections.RecentsFragment;
+import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -117,6 +117,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -1521,7 +1522,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void getImageView (int i, long handle) {
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
-		intent.putExtra("actionType", UPDATE_IMAGE_DRAG);
+		intent.putExtra(ACTION_TYPE, UPDATE_IMAGE_DRAG);
 		intent.putExtra("adapterType", adapterType);
         intent.putExtra("placeholder",placeholderCount);
 		intent.putExtra("handle", handle);
@@ -1577,7 +1578,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		getImageView(i, handle);
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION);
 		intent.putExtra("position", i);
-		intent.putExtra("actionType", SCROLL_TO_POSITION);
+		intent.putExtra(ACTION_TYPE, SCROLL_TO_POSITION);
 		intent.putExtra("adapterType", adapterType);
 		intent.putExtra("handle", handle);
         intent.putExtra("placeholder",placeholderCount );

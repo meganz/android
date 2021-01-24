@@ -69,6 +69,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.getProgressDialog;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -386,7 +387,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView = (RecyclerView) findViewById(R.id.file_contact_list_view_browser);
 			listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			listView.setClipToPadding(false);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());
@@ -636,10 +637,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			logDebug("Contacts selected: " + contacts.size());
 		}
 
-		Resources res = getResources();
-		String format = "%d %s";
-	
-		actionMode.setTitle(String.format(format, contacts.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())));
+		actionMode.setTitle(getQuantityString(R.plurals.general_selection_num_contacts,
+						contacts.size(), contacts.size()));
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -729,7 +728,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				showOverDiskQuotaPaywallWarning();
 				return;
 			}
-			showSnackbar(getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
+			showSnackbar(getQuantityString(R.plurals.upload_began, infos.size(), infos.size()));
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());

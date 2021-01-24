@@ -30,7 +30,7 @@
     <string name="api_egoingoverquota" context="Label shown when current account does not have enough quota to complete the operation">Không đủ băng thông</string>
     <string name="api_emfarequired" context="Label to show that an error of Multi-factor authentication required occurs during a SDK operation.">Cần sử dụng Xác Minh 2-Bước.</string>
     <string name="api_emasteronly" context="Label to show that an error of Access denied for users occurs during a SDK operation.">Truy cập bị từ chối cho tất cả thành viên dưới hạng admin</string>
-    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Tài khoản doanh nghiệp của quý khách đã hết hạn</string>
+    <string name="api_ebusinesspastdue" context="A dialog title shown to users when their business account is expired.">Tài khoản doanh nghiệp đã hết hạn</string>
     <string name="payment_ecard" context="Label to show that an error of Credit card rejected occurs during a SDK operation.">Thẻ bị từ chối</string>
     <string name="payment_ebilling" context="Label to show that an error of Billing failed occurs during a SDK operation.">Thanh toán thất bại</string>
     <string name="payment_efraud" context="Label to show that an error of Rejected by fraud protection occurs during a SDK operation.">Bị từ chối bởi phòng chống gian lận</string>

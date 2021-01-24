@@ -170,7 +170,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         preventListItemBlink()
         elevateToolbarWhenScrolling()
 
-        itemDecoration = SimpleDividerItemDecoration(context, outMetrics)
+        itemDecoration = SimpleDividerItemDecoration(context)
         if (viewModel.searchMode) listView.addItemDecoration(itemDecoration)
 
         listView.clipToPadding = false

@@ -171,6 +171,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
                 fileCount++;
             }
         }
+
         if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
             int spanCount = 2;
             if (recyclerView instanceof NewGridRecyclerView) {
@@ -973,7 +974,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 				folders++;
 			}
 		}
-		
+
 		String title;
 		int sum=files+folders;
 

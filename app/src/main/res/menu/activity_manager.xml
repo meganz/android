@@ -143,13 +143,21 @@
         android:visible="false"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_select"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="110"
-        android:title="@string/action_select_all"
-        android:visible="false"
-        app:showAsAction="never" />
+	<item
+		android:id="@+id/action_enable_select"
+		android:orderInCategory="110"
+		android:title="@string/general_select"
+		android:icon="@drawable/ic_action_bar_null"
+		app:showAsAction="never"
+		android:visible="false"/>
+
+	<item
+		android:id="@+id/action_select"
+		android:icon="@drawable/ic_action_bar_null"
+		android:orderInCategory="110"
+		android:title="@string/action_select_all"
+		android:visible="false"
+		app:showAsAction="never" />
 
     <item
         android:id="@+id/action_unselect"

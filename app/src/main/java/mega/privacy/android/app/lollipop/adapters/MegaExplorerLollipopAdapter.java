@@ -57,6 +57,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public static int MAX_WIDTH_FILENAME_LAND=500;
 	public static int MAX_WIDTH_FILENAME_PORT=235;
 
+	private static final int MARGIN_LEFT_WITHOUT_THUMBNAIL = 12;
+    private static final int MARGIN_LEFT_WITH_THUMBNAIL = 18;
+
 	Context context;
 	MegaApiAndroid megaApi;
 	MegaPreferences prefs;
@@ -247,7 +250,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         holder.textViewFileName.setText(node.getName());
 
         if (node.isFolder()){
-            setImageParams(holder.imageView, 48, 0);
+            setImageParams(holder.imageView, 48, MARGIN_LEFT_WITHOUT_THUMBNAIL);
             holder.itemView.setOnLongClickListener(null);
 
             if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
@@ -261,7 +264,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             }
 
             holder.permissionsIcon.setVisibility(View.GONE);
-            holder.textViewFileSize.setText(getInfoFolder(node, context));
+            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
             if(node.isInShare()){
@@ -308,7 +311,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             long nodeSize = node.getSize();
             holder.textViewFileSize.setText(String.format("%s . %s", getSizeString(nodeSize), formatLongDateTime(node.getModificationTime())));
             holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-            setImageParams(holder.imageView, 48, 0);
+            setImageParams(holder.imageView, 48, MARGIN_LEFT_WITHOUT_THUMBNAIL);
 
             if(selectFile){
                 holder.imageView.setAlpha(1.0f);
@@ -347,7 +350,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             }
 
             if (thumb != null) {
-                setImageParams(holder.imageView, 36, 6);
+                setImageParams(holder.imageView, 36, MARGIN_LEFT_WITH_THUMBNAIL);
                 holder.imageView.setImageBitmap(
                         ThumbnailUtilsLollipop.getRoundedBitmap(context, thumb, THUMB_ROUND_PIXEL));
             }
