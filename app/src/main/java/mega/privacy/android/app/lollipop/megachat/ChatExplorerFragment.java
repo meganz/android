@@ -290,12 +290,12 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         if (context instanceof FileExplorerActivityLollipop) {
             if (addLayoutVisible) {
-                addLayout.setElevation(canScroll ? px2dp(4, outMetrics) : 0);
+                addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
             }
             ((FileExplorerActivityLollipop) context).changeActionBarElevation(
                     canScroll && !addLayoutVisible, FileExplorerActivityLollipop.CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
-            addLayout.setElevation(canScroll ? px2dp(4, outMetrics) : 0);
+            addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
         }
     }
 

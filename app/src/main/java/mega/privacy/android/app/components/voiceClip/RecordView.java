@@ -190,7 +190,7 @@ public class RecordView extends RelativeLayout {
         countHide = 0;
         imageArrow.setVisibility(VISIBLE);
         imageLock.setVisibility(VISIBLE);
-        createAnimation(px2dp(175, outMetrics), duration);
+        createAnimation(dp2px(175, outMetrics), duration);
 
     }
 
@@ -399,7 +399,7 @@ public class RecordView extends RelativeLayout {
         RelativeLayout.LayoutParams paramsSlide = (RelativeLayout.LayoutParams) slideToCancelLayout.getLayoutParams();
         paramsSlide.addRule(RelativeLayout.RIGHT_OF, R.id.chrono_voice_clip);
         paramsSlide.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        paramsSlide.setMargins(px2dp(20, outMetrics), 0, 0, 0);
+        paramsSlide.setMargins(dp2px(20, outMetrics), 0, 0, 0);
         slideToCancelLayout.setLayoutParams(paramsSlide);
         slideToCancelLayout.setShimmerColor(Color.WHITE);
     }

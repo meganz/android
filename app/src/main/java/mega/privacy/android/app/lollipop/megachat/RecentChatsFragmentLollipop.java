@@ -79,7 +79,6 @@ import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -307,7 +306,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     ((ManagerActivityLollipop) context).changeActionBarElevation(false);
                     if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
                         bannerDivider.setVisibility(View.GONE);
-                        appBarLayout.setElevation(px2dp(4, outMetrics));
+                        appBarLayout.setElevation(dp2px(4, outMetrics));
                     } else {
                         bannerDivider.setVisibility(View.VISIBLE);
                         appBarLayout.setElevation(0);
@@ -1588,7 +1587,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
             boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
             if (!hasRecordAudioPermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, RECORD_AUDIO);
+                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
                 return false;
             }
 
@@ -1611,7 +1610,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
                 break;
             }
-            case RECORD_AUDIO: {
+            case REQUEST_RECORD_AUDIO: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (checkPermissionsCall()) {
                         logDebug("RECORD_AUDIO -> returnTheCall");

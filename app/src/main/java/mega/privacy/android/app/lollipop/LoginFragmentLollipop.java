@@ -57,6 +57,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
@@ -1536,7 +1537,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 logDebug("Click on button_forgot_pass");
                 try {
                     String url = "https://mega.nz/recovery";
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
@@ -1596,7 +1597,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.lost_authentication_device: {
                 try {
                     String url = "https://mega.nz/recovery";
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
@@ -1738,7 +1739,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 firstRequestUpdate = false;
             }
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
             if (request.getTotalBytes() > 0){
                 double progressValue = 100.0 * request.getTransferredBytes() / request.getTotalBytes();
                 if ((progressValue > 99) || (progressValue < 0)){
@@ -1936,7 +1937,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 //			loginProgressBar.setVisibility(View.GONE);
             loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
-            loginFetchNodesProgressBar.getLayoutParams().width = px2dp((250*scaleW), outMetrics);
+            loginFetchNodesProgressBar.getLayoutParams().width = dp2px((250*scaleW), outMetrics);
             loginFetchNodesProgressBar.setProgress(0);
             LoginActivityLollipop.isFetchingNodes = true;
             disableLoginButton();

@@ -638,7 +638,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(px2dp(margin, outMetrics), px2dp(margin, outMetrics), px2dp(margin, outMetrics), 0);
+        params.setMargins(dp2px(margin, outMetrics), dp2px(margin, outMetrics), dp2px(margin, outMetrics), 0);
 
         queueSizeInput = new EditText(context);
         queueSizeInput.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -665,7 +665,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         });
 
         params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(px2dp(margin + 5, outMetrics), px2dp(0, outMetrics), px2dp(margin, outMetrics), 0);
+        params.setMargins(dp2px(margin + 5, outMetrics), dp2px(0, outMetrics), dp2px(margin, outMetrics), 0);
         final TextView text = new TextView(context);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         text.setText(getString(R.string.settings_compression_queue_subtitle,

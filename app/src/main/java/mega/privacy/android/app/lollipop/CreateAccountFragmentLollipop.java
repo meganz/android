@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputLayout;
@@ -12,7 +11,6 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.AppCompatEditText;
 import android.text.Editable;
 import android.text.Html;
-import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -37,6 +35,7 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -448,7 +447,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
 //				startActivity(browserIntent);
                 try {
                     String url = "https://mega.nz/terms";
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(url));
                     startActivity(openTermsIntent);
@@ -463,7 +462,7 @@ public class CreateAccountFragmentLollipop extends Fragment implements View.OnCl
             case R.id.top:
                 logDebug("Show terms of password");
                 try {
-                    Intent openTermsIntent = new Intent(context, WebViewActivityLollipop.class);
+                    Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     openTermsIntent.setData(Uri.parse(URL_E2EE));
                     startActivity(openTermsIntent);

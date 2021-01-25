@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -579,12 +580,12 @@ public class BaseActivity extends AppCompatActivity {
 
         if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
             final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
+            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
             snackbarLayout.setLayoutParams(params);
         }
         else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
             final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(px2dp(8, outMetrics),0, px2dp(8, outMetrics), px2dp(8, outMetrics));
+            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
             snackbarLayout.setLayoutParams(params);
         }
 
@@ -609,6 +610,11 @@ public class BaseActivity extends AppCompatActivity {
                 snackbar.setAction(R.string.general_unmute, new SnackbarNavigateOption(view.getContext(), MUTE_NOTIFICATIONS_SNACKBAR_TYPE));
                 snackbar.show();
                 break;
+
+            case PERMISSIONS_TYPE:
+                snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
+                snackbar.show();
+                break;
         }
     }
 
@@ -625,7 +631,7 @@ public class BaseActivity extends AppCompatActivity {
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_snackbar));
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-        params.setMargins(px2dp(8, outMetrics),0,px2dp(8, outMetrics), px2dp(8, outMetrics));
+        params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
         snackbarLayout.setLayoutParams(params);
         TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarTextView.setMaxLines(5);

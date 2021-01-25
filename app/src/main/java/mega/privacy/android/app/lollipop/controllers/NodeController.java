@@ -599,7 +599,7 @@ public class NodeController {
         }
     }
 
-    private void askForPermissions () {
+    public void askForPermissions() {
         if(context instanceof ManagerActivityLollipop){
             ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
         }
@@ -1374,10 +1374,6 @@ public class NodeController {
         if (parentNode != null) {
             logDebug("Parent to check: " + parentNode.getName());
             checkParentDeletion(parentNode);
-        }
-
-        if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).updateOfflineView(null);
         }
     }
 

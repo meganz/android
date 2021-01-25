@@ -2343,7 +2343,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(),db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2368,7 +2368,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(),db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2393,7 +2393,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         MegaOffline checkInsert = null;
-        checkInsert=findByHandle(offline.getHandle(), db);
+        checkInsert = findByHandle(offline.getHandle());
 
         if(checkInsert==null){
         	String nullColumnHack = null;
@@ -2485,121 +2485,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return false;
 	}
 
-	public MegaOffline findByHandle(long handle){
-        logDebug("findByHandle: " + handle);
-
-		MegaOffline offline = null;
-
-		//Get the foreign key of the node
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(String.valueOf(handle)) + "'";
-
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				int _id = -1;
-				int _parent = -1;
-				String _handle = null;
-				String _path = null;
-				String _name = null;
-				String _type = null;
-				int _incoming = 0;
-				String _handleIncoming = null;
-
-				_id = Integer.parseInt(cursor.getString(0));
-				_handle = decrypt(cursor.getString(1));
-				_path = decrypt(cursor.getString(2));
-				_name = decrypt(cursor.getString(3));
-				_parent = cursor.getInt(4);
-				_type = decrypt(cursor.getString(5));
-				_incoming = cursor.getInt(6);
-				_handleIncoming = decrypt(cursor.getString(7));
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
-				cursor.close();
-				return offline;
-			}
-		}
-		cursor.close();
-		return null;
+	public MegaOffline findByHandle(long handle) {
+        return findByHandle(String.valueOf(handle));
 	}
 
-	public MegaOffline findByHandle(String handle){
-
-		MegaOffline offline = null;
+	public MegaOffline findByHandle(String handle) {
 		//Get the foreign key of the node
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(handle) + "'";
-
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '"
+				+ encrypt(handle) + "'";
 		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor != null) {
+			if (cursor.moveToFirst()) {
+				int id = Integer.parseInt(cursor.getString(0));
+				String nodeHandle = decrypt(cursor.getString(1));
+				String path = decrypt(cursor.getString(2));
+				String name = decrypt(cursor.getString(3));
+				int parent = cursor.getInt(4);
+				String type = decrypt(cursor.getString(5));
+				int incoming = cursor.getInt(6);
+				String handleIncoming = decrypt(cursor.getString(7));
 
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				int _id = -1;
-				int _parent = -1;
-				String _handle = null;
-				String _path = null;
-				String _name = null;
-				String _type = null;
-				int _incoming = 0;
-				String _handleIncoming = null;
-
-				_id = Integer.parseInt(cursor.getString(0));
-				_handle = decrypt(cursor.getString(1));
-				_path = decrypt(cursor.getString(2));
-				_name = decrypt(cursor.getString(3));
-				_parent = cursor.getInt(4);
-				_type = decrypt(cursor.getString(5));
-				_incoming = cursor.getInt(6);
-				_handleIncoming = decrypt(cursor.getString(7));
-
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
 				cursor.close();
-				return offline;
+				return new MegaOffline(id,nodeHandle, path, name, parent, type,  incoming,
+						handleIncoming);
 			}
+			cursor.close();
 		}
-		cursor.close();
 		return null;
-
-	}
-
-	public MegaOffline findByHandle(String handle, SQLiteDatabase db){
-
-		MegaOffline offline = null;
-		//Get the foreign key of the node
-		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(handle) + "'";
-
-		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		if (!cursor.equals(null)){
-			if (cursor.moveToFirst()){
-
-				int _id = -1;
-				int _parent = -1;
-				String _handle = null;
-				String _path = null;
-				String _name = null;
-				String _type = null;
-				int _incoming = 0;
-				String _handleIncoming = null;
-
-				_id = Integer.parseInt(cursor.getString(0));
-				_handle = decrypt(cursor.getString(1));
-				_path = decrypt(cursor.getString(2));
-				_name = decrypt(cursor.getString(3));
-				_parent = cursor.getInt(4);
-				_type = decrypt(cursor.getString(5));
-				_incoming = cursor.getInt(6);
-				_handleIncoming = decrypt(cursor.getString(7));
-
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
-				cursor.close();
-				return offline;
-			}
-		}
-		cursor.close();
-		return null;
-
 	}
 
 	public ArrayList<MegaOffline> findByParentId(int parentId){

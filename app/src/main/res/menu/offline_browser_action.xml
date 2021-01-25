@@ -2,6 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <item
+      android:id="@+id/cab_menu_download"
+      android:icon="@drawable/ic_download_white"
+      android:orderInCategory="70"
+      android:title="@string/general_save_to_device"
+      app:showAsAction="always" />
+
+  <item
       android:id="@+id/cab_menu_share_out"
       android:icon="@drawable/ic_social_share_white"
       android:orderInCategory="80"

@@ -22,6 +22,8 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
+import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -138,8 +140,7 @@ class CuActionModeCallback implements ActionMode.Callback {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.cloud_storage_action, menu);
         ((ManagerActivityLollipop) mContext).showHideBottomNavigationView(true);
-        Util.changeStatusBarColor(mContext, ((ManagerActivityLollipop) mContext).getWindow(),
-                R.color.accentColorDark);
+        ((ManagerActivityLollipop) mContext).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
         ((ManagerActivityLollipop) mContext).setDrawerLockMode(true);
         mFragment.checkScroll();
         return true;
@@ -150,8 +151,7 @@ class CuActionModeCallback implements ActionMode.Callback {
         logDebug("onDestroyActionMode");
         mViewModel.clearSelection();
         ((ManagerActivityLollipop) mContext).showHideBottomNavigationView(false);
-        Util.changeStatusBarColor(mContext, ((ManagerActivityLollipop) mContext).getWindow(),
-                R.color.black);
+        ((ManagerActivityLollipop) mContext).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
         mFragment.checkScroll();
         ((ManagerActivityLollipop) mContext).setDrawerLockMode(false);
     }

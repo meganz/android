@@ -54,6 +54,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
@@ -335,12 +336,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 
 		MegaPreferences prefs = getPreferences(context);
-		if(prefs.getPreferredSortCloud()!=null){
-			order = Integer.parseInt(prefs.getPreferredSortCloud());
-		}
-		else{
-			order = megaApi.ORDER_DEFAULT_ASC;
-		}
+		order = prefs != null && prefs.getPreferredSortCloud() != null
+				? Integer.parseInt(prefs.getPreferredSortCloud())
+				: MegaApiJava.ORDER_DEFAULT_ASC;
 
 		getNodes();
 		setParentHandle(parentHandle);

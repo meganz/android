@@ -44,12 +44,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
+import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.OfflineFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
@@ -1651,8 +1651,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if(!transfer.isFolderTransfer()){
 							errorCount++;
 						}
-						File file = new File(transfer.getPath());
-						file.delete();
+
+						if (!isTextEmpty(transfer.getPath())) {
+							File file = new File(transfer.getPath());
+							file.delete();
+						}
 					}
 				}
 			}
@@ -1849,36 +1852,42 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				MegaApplication.setLoggingIn(isLoggingIn);
 //				finish();
 			}
-		}
-		else{
+		} else {
 			logDebug("Public node received");
+
 			if (e.getErrorCode() != MegaError.API_OK) {
 				logError("Public node error");
 				return;
 			}
-			else {
-				MegaNode node = request.getPublicMegaNode();
 
-				if (node != null) {
-					if (currentDir.isDirectory()) {
-						currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
-					} else {
-						currentFile = currentDir;
-					}
+			MegaNode node = request.getPublicMegaNode();
+			if (node == null) {
+				logError("Public node is null");
+				return;
+			}
 
-					String appData = getSDCardAppData(intent);
+			if (currentDir == null) {
+				logError("currentDir is null");
+				return;
+			}
 
-                    logDebug("Public node download launched");
-					if(!wl.isHeld()) wl.acquire();
-					if(!lock.isHeld()) lock.acquire();
-					if (currentDir.isDirectory()){
-						logDebug("To downloadPublic(dir)");
-						if (!isTextEmpty(appData)) {
-							megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
-						} else {
-							megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
-						}
-					}
+			if (currentDir.isDirectory()) {
+				currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName(), currentDir.getAbsolutePath() + SEPARATOR));
+			} else {
+				currentFile = currentDir;
+			}
+
+			String appData = getSDCardAppData(intent);
+
+			logDebug("Public node download launched");
+			if (!wl.isHeld()) wl.acquire();
+			if (!lock.isHeld()) lock.acquire();
+			if (currentDir.isDirectory()) {
+				logDebug("To downloadPublic(dir)");
+				if (!isTextEmpty(appData)) {
+					megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
+				} else {
+					megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
 				}
 			}
 		}
@@ -1934,7 +1943,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	private void refreshOfflineFragment(){
-		sendBroadcast(new Intent(OfflineFragmentLollipop.REFRESH_OFFLINE_FILE_LIST));
+		sendBroadcast(new Intent(OfflineFragment.REFRESH_OFFLINE_FILE_LIST));
 	}
 
 	private void refreshSettingsFragment() {
