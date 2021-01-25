@@ -627,17 +627,29 @@
         <item name="android:button">@drawable/selector_label</item>
     </style>
 
-    <style name="PinPassCodeStyle">
+    <style name="PinPasscodeStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:layout_marginEnd">16dp</item>
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:imeOptions">actionNext</item>
+        <item name="android:imeOptions">actionNext|flagNoFullscreen</item>
         <item name="android:inputType">numberPassword</item>
         <item name="android:maxLength">1</item>
         <item name="textColor">@color/primary_text</item>
         <item name="textSize">20sp</item>
         <item name="theme">@style/ColorControlStyle</item>
     </style>
+
+    <style name="WarningPasscodeStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:layout_marginStart">40dp</item>
+        <item name="android:layout_marginEnd">40dp</item>
+        <item name="textColor">@color/error_color</item>
+        <item name="textSize">13sp</item>
+    </style>
+
 </resources>

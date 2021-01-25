@@ -90,8 +90,9 @@ public class SettingsConstants {
     public static final String KEY_AUTO_PLAY_SWITCH = "auto_play_switch";
 
     /* PassCode Lock settings */
-    public static final String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
-    public static final String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
+    public static final String KEY_PASSCODE_ENABLE = "settings_passcode_enable";
+    public static final String KEY_RESET_PASSCODE = "settings_change_passcode";
+    public static final String KEY_REQUIRE_PASSCODE = "settings_require_passcode";
 
     /* Advance settings  */
     public static final String KEY_HTTPS_ONLY = "settings_use_https_only";

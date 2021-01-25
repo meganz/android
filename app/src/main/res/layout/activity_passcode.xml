@@ -33,7 +33,7 @@
 
     <mega.privacy.android.app.components.EditTextPIN
         android:id="@+id/pass_first_input"
-        style="@style/PinPassCodeStyle"
+        style="@style/PinPasscodeStyle"
         app:layout_constraintEnd_toStartOf="@id/pass_second_input"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
 
     <mega.privacy.android.app.components.EditTextPIN
         android:id="@+id/pass_second_input"
-        style="@style/PinPassCodeStyle"
+        style="@style/PinPasscodeStyle"
         app:layout_constraintEnd_toStartOf="@id/pass_third_input"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/pass_first_input"
@@ -49,7 +49,7 @@
 
     <mega.privacy.android.app.components.EditTextPIN
         android:id="@+id/pass_third_input"
-        style="@style/PinPassCodeStyle"
+        style="@style/PinPasscodeStyle"
         app:layout_constraintEnd_toStartOf="@id/pass_fourth_input"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/pass_second_input"
@@ -57,7 +57,7 @@
 
     <mega.privacy.android.app.components.EditTextPIN
         android:id="@+id/pass_fourth_input"
-        style="@style/PinPassCodeStyle"
+        style="@style/PinPasscodeStyle"
         app:layout_constraintEnd_toStartOf="@id/pass_fifth_input"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/pass_third_input"
@@ -65,7 +65,7 @@
 
     <mega.privacy.android.app.components.EditTextPIN
         android:id="@+id/pass_fifth_input"
-        style="@style/PinPassCodeStyle"
+        style="@style/PinPasscodeStyle"
         app:layout_constraintEnd_toStartOf="@id/pass_sixth_input"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/pass_fourth_input"
@@ -73,7 +73,7 @@
 
     <mega.privacy.android.app.components.EditTextPIN
         android:id="@+id/pass_sixth_input"
-        style="@style/PinPassCodeStyle"
+        style="@style/PinPasscodeStyle"
         android:layout_marginEnd="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -85,7 +85,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:imeOptions="actionDone"
+        android:imeOptions="actionDone|flagNoFullscreen"
         android:importantForAutofill="no"
         android:inputType="textPassword"
         android:textColor="@color/primary_text"
@@ -94,6 +94,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_text"
         tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/do_not_match_warning"
+        style="@style/WarningPasscodeStyle"
+        android:text="@string/pin_lock_not_match"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password_input" />
 
     <Button
         android:id="@+id/passcode_options_button"

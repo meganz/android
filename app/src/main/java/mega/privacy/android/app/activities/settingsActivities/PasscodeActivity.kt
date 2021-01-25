@@ -7,19 +7,19 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
-import android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
+import android.view.inputmethod.EditorInfo.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.PinUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.dp2px
-import java.lang.StringBuilder
 import java.util.*
 
 class PasscodeActivity : BaseActivity() {
@@ -65,6 +65,8 @@ class PasscodeActivity : BaseActivity() {
 
         updateViewOrientation()
 
+        binding.doNotMatchWarning.visibility = GONE
+
         if (passcodeType == PIN_ALPHANUMERIC) {
             binding.passFirstInput.visibility = GONE
             binding.passSecondInput.visibility = GONE
@@ -79,7 +81,7 @@ class PasscodeActivity : BaseActivity() {
 
                 setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == IME_ACTION_DONE) {
-                        confirmPasscode()
+                        checkPasscode()
                         true
                     } else false
 
@@ -191,7 +193,7 @@ class PasscodeActivity : BaseActivity() {
                     override fun afterTextChanged(editable: Editable) {
                         if (editable.toString().isNotEmpty()) {
                             if (passcodeType == PIN_4) {
-                                confirmPasscode()
+                                checkPasscode()
                             } else {
                                 binding.passFifthInput.requestFocus()
                             }
@@ -203,14 +205,14 @@ class PasscodeActivity : BaseActivity() {
             val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
 
             if (passcodeType == PIN_4) {
-                binding.passFirstInput.imeOptions = IME_ACTION_DONE
+                binding.passFourthInput.imeOptions = IME_ACTION_DONE and IME_FLAG_NO_FULLSCREEN
 
                 params.marginEnd = 0
 
                 binding.passFifthInput.visibility = GONE
                 binding.passSixthInput.visibility = GONE
             } else {
-                binding.passFirstInput.imeOptions = IME_ACTION_NEXT
+                binding.passFourthInput.imeOptions = IME_ACTION_NEXT and IME_FLAG_NO_FULLSCREEN
 
                 params.marginEnd = dp2px(16F, resources.displayMetrics)
 
@@ -262,7 +264,7 @@ class PasscodeActivity : BaseActivity() {
 
                         override fun afterTextChanged(editable: Editable) {
                             if (editable.toString().isNotEmpty()) {
-                                confirmPasscode()
+                                checkPasscode()
                             }
                         }
                     })
@@ -305,33 +307,80 @@ class PasscodeActivity : BaseActivity() {
         binding.passcodeOptionsButton.layoutParams = params
     }
 
-    private fun confirmPasscode() {
+    private fun checkPasscode() {
         if (!isPassCodeComplete()) {
             return
         }
 
-        when (passcodeType) {
-            PIN_4 -> {
-                if (secondRound) {
+        if (secondRound) {
+            when (passcodeType) {
+                PIN_4 -> {
+                    sbSecond.apply {
+                        append(binding.passFirstInput.text)
+                        append(binding.passSecondInput.text)
+                        append(binding.passThirdInput.text)
+                        append(binding.passFourthInput.text)
+                    }
+                }
+                PIN_6 -> {
+                    sbSecond.apply {
+                        append(binding.passFirstInput.text)
 
-                } else {
-
+                        append(binding.passSecondInput.text)
+                        append(binding.passThirdInput.text)
+                        append(binding.passFourthInput.text)
+                        append(binding.passFifthInput.text)
+                        append(binding.passSixthInput.text)
+                    }
+                }
+                PIN_ALPHANUMERIC -> {
+                    sbSecond.append(binding.passwordInput.text)
                 }
             }
-            PIN_6 -> {
-                if (secondRound) {
 
-                } else {
-
+            confirmPasscode()
+        } else {
+            when (passcodeType) {
+                PIN_4 -> {
+                    sbFirst.apply {
+                        append(binding.passFirstInput.text)
+                        append(binding.passSecondInput.text)
+                        append(binding.passThirdInput.text)
+                        append(binding.passFourthInput.text)
+                    }
+                }
+                PIN_6 -> {
+                    sbFirst.apply {
+                        append(binding.passFirstInput.text)
+                        append(binding.passSecondInput.text)
+                        append(binding.passThirdInput.text)
+                        append(binding.passFourthInput.text)
+                        append(binding.passFifthInput.text)
+                        append(binding.passSixthInput.text)
+                    }
+                }
+                PIN_ALPHANUMERIC -> {
+                    sbFirst.append(binding.passwordInput.text)
                 }
             }
-            PIN_ALPHANUMERIC -> {
-                if (secondRound) {
 
-                } else {
+            secondRound = true
+            clearTypedPasscode(false)
+            binding.passcodeOptionsButton.visibility = GONE
+        }
+    }
 
-                }
-            }
+    private fun confirmPasscode() {
+        if (sbFirst.toString() == sbSecond.toString()) {
+            dbH.setPinLockCode(sbFirst.toString())
+            dbH.setPinLockType(passcodeType)
+            dbH.setPinLockEnabled(true)
+            PinUtil.update()
+            setResult(RESULT_OK)
+            finish()
+        } else {
+            clearTypedPasscode(true)
+            binding.doNotMatchWarning.visibility = VISIBLE
         }
     }
 
@@ -359,6 +408,28 @@ class PasscodeActivity : BaseActivity() {
         return false
     }
 
+    private fun clearTypedPasscode(reset: Boolean) {
+        binding.passFirstInput.text.clear()
+        binding.passSecondInput.text.clear()
+        binding.passThirdInput.text.clear()
+        binding.passFourthInput.text.clear()
+        binding.passFifthInput.text.clear()
+        binding.passSixthInput.text.clear()
+
+        binding.passwordInput.text.clear()
+
+        binding.titleText.text = StringResourcesUtils.getString(
+            if (reset) R.string.unlock_pin_title
+            else R.string.unlock_pin_title_2
+        )
+
+        if (passcodeType == PIN_ALPHANUMERIC) {
+            binding.passwordInput.requestFocus()
+        } else {
+            binding.passFirstInput.requestFocus()
+        }
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
@@ -378,5 +449,10 @@ class PasscodeActivity : BaseActivity() {
             onBackPressed()
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        MegaApplication.setShowPinScreen(isFinishing)
+        super.onDestroy()
     }
 }
