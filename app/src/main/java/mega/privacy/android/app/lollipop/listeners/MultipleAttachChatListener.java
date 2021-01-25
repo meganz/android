@@ -97,19 +97,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                     ((FullScreenImageViewerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             }
-            else if (context instanceof AudioVideoPlayerLollipop) {
-                if(success>0){
-                    if(chatId==-1){
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
-                    }
-                    else{
-                        ((AudioVideoPlayerLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
-                    }
-                }
-                else{
-                    ((AudioVideoPlayerLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
-                }
-            }
             else if (context instanceof PdfViewerActivityLollipop) {
                 if(success>0){
                     if(chatId==-1){

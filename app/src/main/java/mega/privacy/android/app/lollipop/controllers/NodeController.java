@@ -207,15 +207,6 @@ public class NodeController {
         checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
     }
 
-    public void checkIfHandlesAreMineAndSelectChatsToSendNodes(ArrayList<Long> handles) {
-        ArrayList<MegaNode> nodes = new ArrayList<>();
-        for (long handle : handles) {
-            nodes.add(megaApi.getNodeByHandle(handle));
-        }
-
-        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
-    }
-
     public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
         logDebug("checkIfNodesAreMineAndSelectChatsToSendNodes");
 
@@ -297,9 +288,6 @@ public class NodeController {
         }
         else if (context instanceof PdfViewerActivityLollipop){
             ((PdfViewerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
-        else if (context instanceof AudioVideoPlayerLollipop){
-            ((AudioVideoPlayerLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
         else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);

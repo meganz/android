@@ -5,7 +5,6 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -90,6 +89,9 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,6 +111,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
+import mega.privacy.android.app.components.attacher.NodeAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.components.saver.OfflineNodeSaver;
@@ -118,9 +121,9 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.AudioFocusListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
@@ -134,14 +137,8 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -159,7 +156,6 @@ import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -172,14 +168,15 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 /**
  * Note: this class is only used to play video, audio will be played by
  * {@link mega.privacy.android.app.audioplayer.AudioPlayerActivity}.
  */
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
-        MegaChatRequestListenerInterface, MegaTransferListenerInterface, DraggableView.DraggableListener {
+        MegaTransferListenerInterface, DraggableView.DraggableListener,
+        SnackbarShower {
 
     public static final String PLAY_WHEN_READY = "PLAY_WHEN_READY";
 
@@ -213,8 +210,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH = null;
     private MegaPreferences prefs = null;
-
-    private AlertDialog alertDialogTransferOverquota;
 
     private Handler handler;
     private Runnable runnableActionStatusBar = new Runnable() {
@@ -257,9 +252,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private RelativeLayout audioContainer;
     private long handle = -1;
-    private int countChat = 0;
-    private int successSent = 0;
-    private int errorSent = 0;
     private boolean transferOverquota = false;
 
     private boolean video = false;
@@ -296,9 +288,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DraggableView draggableView;
     private ImageView ivShadow;
     private NodeController nC;
-    private OfflineNodeSaver offlineNodeSaver;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
+
+    private OfflineNodeSaver offlineNodeSaver;
+    private final NodeAttacher nodeAttacher = new NodeAttacher(this);
 
     private boolean fromShared = false;
     private int typeExport = -1;
@@ -870,6 +864,16 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         exoPlayerName.setLayoutParams(paramsName);
         controlsButtonsLayout.setLayoutParams(paramsControlButtons);
         audioContainer.setLayoutParams(paramsAudioContainer);
+    }
+
+    @Override
+    public void showSnackbar(@NotNull String content) {
+        showSnackbar(SNACKBAR_TYPE, containerAudioVideoPlayer, content, MEGACHAT_INVALID_HANDLE);
+    }
+
+    @Override
+    public void showSnackbarWithChat(@Nullable String content, long chatId) {
+        showSnackbar(MESSAGE_SNACKBAR_TYPE, containerAudioVideoPlayer, content, chatId);
     }
 
     class GetMediaFilesTask extends AsyncTask<Void, Void, Void> {
@@ -1930,7 +1934,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_audiovideoplayer, menu);
 
-        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
@@ -2404,24 +2407,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
             case R.id.full_video_viewer_chat:{
                 logDebug("Chat option");
-
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning();
-                    break;
-                }
-
-                long[] longArray = new long[1];
-                longArray[0] = handle;
-
-                if(nC ==null){
-                    nC = new NodeController(this, isFolderLink);
-                }
-
-                MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-                if (attachNode != null) {
-                    nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-                }
-
+                nodeAttacher.attachNode(handle);
                 break;
             }
             case R.id.full_video_viewer_share: {
@@ -3243,53 +3229,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             return;
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-            long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-            long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
-            long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-
-            if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
-                if (contactHandles != null && contactHandles.length > 0) {
-                    ArrayList<MegaChatRoom> chats = new ArrayList<>();
-                    ArrayList<MegaUser> users = new ArrayList<>();
-
-                    for (int i=0; i<contactHandles.length; i++) {
-                        MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
-                        if (user != null) {
-                            users.add(user);
-                        }
-                    }
-
-                    if (chatHandles != null) {
-                        for (int i = 0; i < chatHandles.length; i++) {
-                            MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
-                            if (chatRoom != null) {
-                                chats.add(chatRoom);
-                            }
-                        }
-                    }
-
-                    if(nodeHandles!=null){
-                        CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
-                        for (MegaUser user : users) {
-                            MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                            megaChatApi.createChat(false, peers, listener);
-                        }
-                    }
-                    else{
-                        logWarning("Error on sending to chat");
-                    }
-                }
-                else {
-                    countChat = chatHandles.length;
-                    for (int i = 0; i < chatHandles.length; i++) {
-                        megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
-                    }
-                }
-            }
+        if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
+            return;
         }
-        else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+
+        if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
             if (adapterType == FILE_LINK_ADAPTER){
@@ -3610,55 +3554,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                 }
             }
         }
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish");
-        if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
-
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                logDebug("File sent correctly");
-                successSent++;
-
-            }
-            else{
-                logWarning("File NOT sent: "+e.getErrorCode()+"___"+e.getErrorString());
-                errorSent++;
-            }
-
-            if(countChat==errorSent+successSent){
-                if(successSent==countChat){
-                    if(countChat==1){
-                        showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
-                    }
-                    else{
-                        showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
-                    }
-                }
-                else if(errorSent==countChat){
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
-                }
-                else{
-                    showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
     }
 
     public void showSnackbar(int type, String s, long idChat){

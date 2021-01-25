@@ -35,6 +35,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
+import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -64,7 +67,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
@@ -1082,5 +1085,15 @@ public class BaseActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void launchActivity(@NotNull Intent intent) {
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode);
     }
 }

@@ -81,9 +81,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
 
         when (requestCode) {
             REQUEST_CODE_SELECT_CHAT -> {
-                nodeAttacher?.handleSelectChatActivityResult(
-                    requestCode, resultCode, data, snackbarShower
-                )
+                nodeAttacher?.handleActivityResult(requestCode, resultCode, data, snackbarShower)
             }
             REQUEST_CODE_SELECT_MOVE_FOLDER -> {
                 val handles = MegaNodeUtilKt.handleSelectMoveFolderResult(

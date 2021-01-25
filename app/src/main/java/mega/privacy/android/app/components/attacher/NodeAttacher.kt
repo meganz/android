@@ -60,7 +60,7 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
         }
     }
 
-    fun handleSelectChatActivityResult(
+    fun handleActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
