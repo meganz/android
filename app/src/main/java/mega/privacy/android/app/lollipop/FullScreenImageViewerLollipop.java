@@ -49,6 +49,9 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +73,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
+import mega.privacy.android.app.components.attacher.NodeAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.components.saver.OfflineNodeSaver;
@@ -78,10 +82,10 @@ import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.managerSections.FileBrowserFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.InboxFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.IncomingSharesFragmentLollipop;
@@ -94,12 +98,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatPeerList;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
-import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -126,8 +124,10 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaChatRequestListenerInterface, DraggableView.DraggableListener{
+public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener,
+		SnackbarShower {
 
 	private static final Map<Class<?>, DraggingThumbnailCallback> DRAGGING_THUMBNAIL_CALLBACKS
 			= new HashMap<>(DraggingThumbnailCallback.DRAGGING_THUMBNAIL_CALLBACKS_SIZE);
@@ -158,6 +158,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	int positionToRemove = -1;
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
+
+	private final NodeAttacher nodeAttacher = new NodeAttacher(this);
 
 	NodeController nC;
 	private OfflineNodeSaver offlineNodeSaver;
@@ -199,10 +201,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
     int adapterType = 0;
     long[] handlesNodesSearched;
-
-	int countChat = 0;
-	int errorSent = 0;
-	int successSent = 0;
 
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -646,33 +644,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 
 			case R.id.full_image_viewer_chat:{
-				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-					showOverDiskQuotaPaywallWarning();
-					break;
-				}
-
-//				node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-
-//				ArrayList<Long> handleList = new ArrayList<Long>();
-//				handleList.add(node.getHandle());
-//
-//				long[] longArray = new long[handleList.size()];
-//				for (int i=0; i<handleList.size(); i++){
-//					longArray[i] = handleList.get(i);
-//				}
-
-				long[] longArray = new long[1];
-				longArray[0] = imageHandles.get(positionG);
-
-				if(nC ==null){
-					nC = new NodeController(this, isFolderLink);
-				}
-
-				MegaNode attachNode = megaApi.getNodeByHandle(longArray[0]);
-				if (attachNode != null) {
-					nC.checkIfNodeIsMineAndSelectChatsToSendNode(attachNode);
-				}
-
+				nodeAttacher.attachNode(imageHandles.get(positionG));
 				break;
 			}
 
@@ -2226,6 +2198,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("onActivityResult");
 
+		if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
+			return;
+		}
+
 		if (intent == null) {
 			return;
 		}
@@ -2355,53 +2331,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					catch (Exception ex) {}
 				}
 			}
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-			long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-			long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
-			long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-
-			if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
-				if (contactHandles != null && contactHandles.length > 0) {
-					ArrayList<MegaChatRoom> chats = new ArrayList<>();
-					ArrayList<MegaUser> users = new ArrayList<>();
-
-					for (int i=0; i<contactHandles.length; i++) {
-						MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandles[i]));
-						if (user != null) {
-							users.add(user);
-						}
-					}
-
-					if (chatHandles != null) {
-						for (int i = 0; i < chatHandles.length; i++) {
-							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandles[i]);
-							if (chatRoom != null) {
-								chats.add(chatRoom);
-							}
-						}
-					}
-
-					if(nodeHandles!=null){
-						CreateChatListener listener = new CreateChatListener(chats, users, nodeHandles[0], this, CreateChatListener.SEND_FILE);
-						for (MegaUser user : users) {
-							MegaChatPeerList peers = MegaChatPeerList.createInstance();
-							peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-							megaChatApi.createChat(false, peers, listener);
-						}
-					}
-					else{
-						logWarning("Error on sending to chat");
-					}
-				}
-				else {
-					countChat = chatHandles.length;
-					for (int i = 0; i < chatHandles.length; i++) {
-						megaChatApi.attachNode(chatHandles[i], nodeHandles[0], this);
-					}
-				}
-			}
-
 		}
 	}
 
@@ -2634,52 +2563,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {}
 
-
-	@Override
-	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		logDebug("onRequestFinish");
-		if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
-
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("File sent correctly");
-				successSent++;
-			}else{
-				logWarning("File NOT sent: " + e.getErrorCode() + "___" + e.getErrorString());
-				errorSent++;
-			}
-
-			if(countChat==errorSent+successSent){
-				if(successSent==countChat){
-					if(countChat==1){
-						showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), request.getChatHandle());
-					}
-					else{
-						showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.sent_as_message), -1);
-					}
-				}
-				else if(errorSent==countChat){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_attaching_node_from_cloud), -1);
-				}
-				else{
-					showSnackbar(MESSAGE_SNACKBAR_TYPE, getString(R.string.error_sent_as_message), -1);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {}
-
 	@Override
 	public void onViewPositionChanged(float fractionScreen) {
 		ivShadow.setAlpha(1 - fractionScreen);
@@ -2771,5 +2654,15 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	public MegaNode getCurrentDocument() {
 		return currentDocument;
+	}
+
+	@Override
+	public void showSnackbar(@NotNull String content) {
+		showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
+	}
+
+	@Override
+	public void showSnackbarWithChat(@Nullable String content, long chatId) {
+		showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
 	}
 }

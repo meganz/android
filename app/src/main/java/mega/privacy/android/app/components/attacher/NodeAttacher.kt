@@ -104,8 +104,13 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
         data: Intent?,
         snackbarShower: SnackbarShower
     ): Boolean {
-        if (requestCode != REQUEST_CODE_SELECT_CHAT || resultCode != RESULT_OK || data == null) {
+        if (requestCode != REQUEST_CODE_SELECT_CHAT) {
             return false
+        }
+
+        if (resultCode != RESULT_OK || data == null) {
+            attaching = false
+            return true
         }
 
         val nodeHandles = data.getLongArrayExtra(NODE_HANDLES)
