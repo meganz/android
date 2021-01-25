@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities.settingsActivities
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,6 +9,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -15,6 +18,7 @@ import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util.dp2px
 import java.lang.StringBuilder
 import java.util.*
 
@@ -23,7 +27,11 @@ class PasscodeActivity : BaseActivity() {
     companion object {
         const val ACTION_SET_PIN_LOCK = "ACTION_SET"
         const val ACTION_RESET_PIN_LOCK = "ACTION_RESET"
+
+        const val MAX_ATTEMPTS = 10
     }
+
+    private var screenOrientation = 0
 
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
@@ -34,6 +42,8 @@ class PasscodeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        screenOrientation = resources.configuration.orientation
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.lollipop_dark_primary_color)
 
@@ -53,6 +63,8 @@ class PasscodeActivity : BaseActivity() {
         passcodeType =
             if (prefs != null && !isTextEmpty(prefs.pinLockType)) prefs.pinLockType else PIN_4
 
+        updateViewOrientation()
+
         if (passcodeType == PIN_ALPHANUMERIC) {
             binding.passFirstInput.visibility = GONE
             binding.passSecondInput.visibility = GONE
@@ -61,8 +73,18 @@ class PasscodeActivity : BaseActivity() {
             binding.passFifthInput.visibility = GONE
             binding.passSixthInput.visibility = GONE
 
-            binding.passwordInput.visibility = VISIBLE
-            binding.passFirstInput.requestFocus()
+            binding.passwordInput.apply {
+                visibility = VISIBLE
+                requestFocus()
+
+                setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == IME_ACTION_DONE) {
+                        confirmPasscode()
+                        true
+                    } else false
+
+                }
+            }
         } else {
             binding.passFirstInput.apply {
                 visibility = VISIBLE
@@ -178,13 +200,19 @@ class PasscodeActivity : BaseActivity() {
                 })
             }
 
+            val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
+
             if (passcodeType == PIN_4) {
                 binding.passFirstInput.imeOptions = IME_ACTION_DONE
+
+                params.marginEnd = 0
 
                 binding.passFifthInput.visibility = GONE
                 binding.passSixthInput.visibility = GONE
             } else {
                 binding.passFirstInput.imeOptions = IME_ACTION_NEXT
+
+                params.marginEnd = dp2px(16F, resources.displayMetrics)
 
                 binding.passFifthInput.apply {
                     visibility = VISIBLE
@@ -241,8 +269,40 @@ class PasscodeActivity : BaseActivity() {
                 }
             }
 
+            binding.passFourthInput.layoutParams = params
+
             binding.passwordInput.visibility = GONE
         }
+    }
+
+    private fun updateViewOrientation() {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(binding.passcodeParentView)
+        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.BOTTOM)
+        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.END)
+        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.START)
+        constraintSet.clear(binding.passcodeOptionsButton.id, ConstraintSet.TOP)
+        constraintSet.applyTo(binding.passcodeParentView)
+
+        val params = binding.passcodeOptionsButton.layoutParams as ConstraintLayout.LayoutParams
+
+        params.apply {
+            if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) {
+                bottomToBottom = binding.passcodeParentView.id
+                endToEnd = binding.passcodeParentView.id
+                startToStart = binding.passcodeParentView.id
+
+                topMargin = 0
+                bottomMargin = dp2px(40F, resources.displayMetrics)
+            } else {
+                endToEnd = binding.passcodeParentView.id
+                topToBottom = binding.titleText.id
+                topMargin = dp2px(20F, resources.displayMetrics)
+                bottomMargin = 0
+            }
+        }
+
+        binding.passcodeOptionsButton.layoutParams = params
     }
 
     private fun confirmPasscode() {
@@ -297,6 +357,15 @@ class PasscodeActivity : BaseActivity() {
         }
 
         return false
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == screenOrientation) return
+
+        screenOrientation = newConfig.orientation
+        updateViewOrientation()
     }
 
     override fun onBackPressed() {
