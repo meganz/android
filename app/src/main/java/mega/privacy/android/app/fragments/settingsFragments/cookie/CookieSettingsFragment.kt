@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
@@ -56,7 +57,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         viewModel.onUpdateResult().observe(viewLifecycleOwner) { success ->
             if (success) {
                 (context?.applicationContext as MegaApplication?)?.checkEnabledCookies()
+            } else if (isVisible) {
+                Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_LONG).show()
             }
+
+            enableSwitches()
         }
     }
 
@@ -82,12 +87,12 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      *
      * @param cookies   Set of enabled cookies
      */
-    private fun showCookies(cookies: Set<CookieType>?) {
+    private fun showCookies(cookies: Set<CookieType>) {
         essentialCookiesPreference.isChecked = true
-        preferenceCookiesPreference.isChecked = cookies?.contains(PREFERENCE) == true
-        analyticsCookiesPreference.isChecked = cookies?.contains(ANALYTICS) == true
-        advertisingCookiesPreference.isChecked = cookies?.contains(ADVERTISEMENT) == true
-        thirdPartyCookiesPreference.isChecked = cookies?.contains(THIRDPARTY) == true
+        preferenceCookiesPreference.isChecked = cookies.contains(PREFERENCE) == true
+        analyticsCookiesPreference.isChecked = cookies.contains(ANALYTICS) == true
+        advertisingCookiesPreference.isChecked = cookies.contains(ADVERTISEMENT) == true
+        thirdPartyCookiesPreference.isChecked = cookies.contains(THIRDPARTY) == true
 
         acceptCookiesPreference.isChecked = preferenceCookiesPreference.isChecked &&
                 analyticsCookiesPreference.isChecked &&
@@ -105,6 +110,8 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      */
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         val enable = newValue as? Boolean ?: false
+        preference?.shouldDisableView = true
+        preference?.isEnabled = false
 
         when (preference?.key) {
             acceptCookiesPreference.key -> viewModel.toggleCookies(enable)
@@ -118,7 +125,23 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Show third party information dialog.
+     * Enable all cookie switches
+     */
+    private fun enableSwitches() {
+        preferenceCookiesPreference.shouldDisableView = false
+        analyticsCookiesPreference.shouldDisableView = false
+        advertisingCookiesPreference.shouldDisableView = false
+        thirdPartyCookiesPreference.shouldDisableView = false
+        acceptCookiesPreference.shouldDisableView = false
+        preferenceCookiesPreference.isEnabled = true
+        analyticsCookiesPreference.isEnabled = true
+        advertisingCookiesPreference.isEnabled = true
+        thirdPartyCookiesPreference.isEnabled = true
+        acceptCookiesPreference.isEnabled = true
+    }
+
+    /**
+     * Show third party cookie information dialog.
      */
     private fun showThirdPartyInfoDialog() {
         MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)

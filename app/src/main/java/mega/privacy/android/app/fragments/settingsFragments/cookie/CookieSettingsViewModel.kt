@@ -19,7 +19,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
     private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
 ) : BaseRxViewModel() {
 
-    private val enabledCookies = MutableLiveData<MutableSet<CookieType>>()
+    private val enabledCookies = MutableLiveData(mutableSetOf(CookieType.ESSENTIAL))
     private val updateResult = MutableLiveData<Boolean>()
 
     fun onEnabledCookies(): LiveData<MutableSet<CookieType>> = enabledCookies
@@ -71,10 +71,12 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { configuration ->
-                    enabledCookies.postValue(configuration.toMutableSet())
+                    enabledCookies.value = configuration.toMutableSet()
+                    updateResult.value = true
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
+                    updateResult.value = false
                     resetCookies()
                 }
             )
@@ -85,18 +87,21 @@ class CookieSettingsViewModel @ViewModelInject constructor(
      * Save cookie settings to SDK
      */
     private fun updateCookieSettings() {
+        composite.clear()
+
         updateCookieSettingsUseCase.update(enabledCookies.value)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    updateResult.postValue(true)
+                    updateResult.value = true
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
-                    updateResult.postValue(false)
+                    updateResult.value = false
+                    getCookieSettings()
                 }
-            )
+            ).addTo(composite)
     }
 
     /**
