@@ -115,6 +115,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
 
     implementation "androidx.navigation:navigation-runtime-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -165,8 +167,6 @@ dependencies {
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
-
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
 
     implementation "com.facebook.fresco:fresco:$frescoVersion"
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
