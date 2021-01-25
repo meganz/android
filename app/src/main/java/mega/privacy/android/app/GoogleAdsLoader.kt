@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.ViewGroup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -15,6 +14,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.admanager.AdManagerAdView
 import mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TextUtil
 
 /**
@@ -65,7 +65,7 @@ class GoogleAdsLoader(
             }
 
             val adWidth = (adWidthPixels / density).toInt()
-            return AdSize.getCurrentOrientationBannerAdSizeWithWidth(
+            return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
                 MegaApplication.getInstance(),
                 adWidth
             )
@@ -77,31 +77,27 @@ class GoogleAdsLoader(
      * @param adSize the size of the banner view
      */
     private fun loadBanner(adSize: AdSize) {
-        Log.i("Alex", "loadBanner, unitId=$adUnitId")
         adView?.adUnitId = adUnitId
         adView?.setAdSizes(adSize)
-        Log.i("Alex", "adSize$adSize")
         // Create an ad request.
         val adRequest = AdManagerAdRequest.Builder().build()
 
         // Start loading the ad in the background.
         adView?.loadAd(adRequest)
-        Log.i("Alex", "loadAd end")
     }
 
     private fun setUpBanner() {
-        Log.i("Alex", "setupbanner begin")
         if (!isContainerSet) return
-        Log.i("Alex", "setupbanner begin2")
+
         // If the user is not an Ad user any more, remove the Ad view if any and then return
         if (!AdUnitSource.isAdsUser()) {
             adViewContainer.removeAllViews()
             return
         }
-        Log.i("Alex", "setupbanner begin3")
+
         // Don't move forward until the loadImmediate flag is set to true by callbacks (e.g. queryCallback)
         if (!loadImmediate) return
-        Log.i("Alex", "setupbanner begin4")
+
         // Get the ad unit Id by the slot id, fetch it from the server
         // if had never been fetched or outdated
         val adUnitId = AdUnitSource.getAdUnitBySlot(slotId)
@@ -109,25 +105,23 @@ class GoogleAdsLoader(
             AdUnitSource.fetchAdUnits()
             return
         }
-        Log.i("Alex", "setupbanner begin5")
+
         // Return if the unit id is invalid or the same Ad had been loaded
         if (TextUtil.isTextEmpty(adUnitId)
             || (adViewContainer.childCount != 0 && showedAdUnitId == adUnitId)
         ) return
         this.adUnitId = adUnitId
 
-        Log.i("Alex", "new PublisherAdView")
         adViewContainer.removeAllViews()
         adView = AdManagerAdView(MegaApplication.getInstance())
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
-                Log.i("Alex", "Ad has been loaded")
                 showedAdUnitId = this@GoogleAdsLoader.adUnitId
             }
 
-            override fun onAdFailedToLoad(p0: LoadAdError?) {
-                super.onAdFailedToLoad(p0)
-                Log.i("Alex", "Ad failed to load:${p0?.cause},${p0?.message}")
+            override fun onAdFailedToLoad(error: LoadAdError?) {
+                super.onAdFailedToLoad(error)
+                logWarning("Ads failed to load:$error")
             }
         }
         adViewContainer.addView(adView)
@@ -142,7 +136,6 @@ class GoogleAdsLoader(
     }
 
     override fun onCreate(owner: LifecycleOwner) {
-        Log.i("Alex", "onCreate")
         // Register a broadcast receiver for the changing of the user account
         // Re-fetch the ad unit ids and Ad user status if account changed (e.g. a free user
         // has just upgraded to pro user, then should not show Ads)
@@ -153,7 +146,6 @@ class GoogleAdsLoader(
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        Log.i("Alex", "onStart")
         // The Ad loader is interested in the update of the ad units
         // and the status change of the user
         AdUnitSource.addFetchCallback(this)
@@ -164,16 +156,12 @@ class GoogleAdsLoader(
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        Log.i("Alex", "onStop")
         AdUnitSource.removeFetchCallback(this)
-//        AdUnitSource.setQueryCallback(null)
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        Log.i("Alex", "onDestroy")
         adView?.destroy()
 
-//        AdUnitSource.removeFetchCallback(this)
         AdUnitSource.setQueryShowOrNotCallback(null)
         context.unregisterReceiver(updateAccountDetailsReceiver)
     }
@@ -183,7 +171,6 @@ class GoogleAdsLoader(
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        Log.i("Alex", "onResume")
         adView?.resume()
     }
 
@@ -212,7 +199,6 @@ class GoogleAdsLoader(
      * @param handle the public handle of the link
      */
     fun queryShowOrNotByHandle(handle: Long) {
-        Log.i("Alex", "query handle:$handle")
         AdUnitSource.setQueryShowOrNotCallback(this)
         AdUnitSource.queryShowOrNotByHandle(handle)
     }
@@ -227,7 +213,6 @@ class GoogleAdsLoader(
     /** The account update receiver, for re-fetching the Ad units and user status */
     private val updateAccountDetailsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.i("Alex", "receive update account detail")
             AdUnitSource.fetchAdUnits()
         }
     }

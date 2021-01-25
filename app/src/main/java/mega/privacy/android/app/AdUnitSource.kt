@@ -1,11 +1,11 @@
 package mega.privacy.android.app
 
-import android.util.Log
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError.*
+import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaError.API_OK
 
 /**
  * Provide interfaces for fetching/querying Ad unit ids and user status
@@ -106,11 +106,9 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
     fun fetchAdUnits() {
         // Return immediately if the fetch is already in progress
         if (fetching) {
-            Log.i("Alex", "fetching in progress, return")
             return
         }
 
-        Log.i("Alex", "Start to fetch")
         fetching = true
 
         // Android ad slot ids for each screen has the form of "and1", "and2", and so forth
@@ -157,24 +155,15 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
             MegaRequest.TYPE_FETCH_GOOGLE_ADS -> {
                 fetching = false
                 lastFetchTime = System.currentTimeMillis()
-                Log.i("Alex", "onRequestFinish:$e")
                 when (e.errorCode) {
                     API_OK -> {
                         copyAdUnitsMap(request.megaStringMap)
-//                        adUnitMap = MegaStringMap.createInstance()
-//                        adUnitMap!!.set("and0", "/30497360/adaptive_banner_test_iu/backfill")
-//                        adUnitMap!!.set("and1", "/30497360/adaptive_banner_test_iu/backfill")
-//                        adUnitMap!!.set("and2", "/30497360/adaptive_banner_test_iu/backfill")
-//                        adUnitMap!!.set("and3", "/30497360/adaptive_banner_test_iu/backfill")
-//                        adUnitMap!!.set("and4", "/30497360/adaptive_banner_test_iu/backfill")
-//                        adUnitMap!!.set("and5", "/30497360/adaptive_banner_test_iu/backfill")
 
                         if (adUnitMap.isEmpty()) return
                         callBackForFetch()
                     }
                     // -9 for the user is a non-Ad user (here SDK returns -9 for API -9)
                     API_ENOENT -> {
-                        Log.i("Alex", "not ads user")
                         adUnitMap.clear()
                         isAdsUser = false
                         callBackForFetch()
@@ -190,7 +179,6 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
                     val result = request.numDetails
                     handleQueryCache[request.nodeHandle] = result
                     queryShowOrNotCallback?.queryShowOrNotDone(result)
-                    Log.i("Alex", "showAdOrNot:${result}")
                 }
             }
         }
