@@ -3,12 +3,8 @@ package mega.privacy.android.app.lollipop.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
@@ -82,19 +78,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                 }
                 else{
                     ((ContactInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
-                }
-            }
-            else if (context instanceof PdfViewerActivityLollipop) {
-                if(success>0){
-                    if(chatId==-1){
-                        ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
-                    }
-                    else{
-                        ((PdfViewerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
-                    }
-                }
-                else{
-                    ((PdfViewerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
             } else if (context instanceof ChatActivityLollipop) {
                 if (success > 0) {

@@ -283,9 +283,6 @@ public class NodeController {
         if(context instanceof ManagerActivityLollipop){
             ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
-        else if (context instanceof PdfViewerActivityLollipop){
-            ((PdfViewerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
     }
 
     public boolean nodeComesFromIncoming (MegaNode node) {
