@@ -768,7 +768,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     @Override
     public void onDestroyView() {
-        Log.i("Alex", "destoryView");
         super.onDestroyView();
         mBinding = null;
     }
