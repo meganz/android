@@ -2,11 +2,7 @@ package mega.privacy.android.app.lollipop.listeners;
 
 import android.content.Context;
 
-import java.util.ArrayList;
-
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
@@ -23,7 +19,6 @@ import nz.mega.sdk.MegaError;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 //Listener for  multi attach
 public class MultipleAttachChatListener implements MegaChatRequestListenerInterface {
@@ -146,15 +141,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
 
                 } else {
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
-                }
-            } else if (context instanceof AudioPlayerActivity) {
-                if (success > 0) {
-                    ((AudioPlayerActivity) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null,
-                            chatId);
-                } else {
-                    ((AudioPlayerActivity) context).showSnackbar(SNACKBAR_TYPE,
-                            context.getString(R.string.files_send_to_chat_error),
-                            MEGACHAT_INVALID_HANDLE);
                 }
             }
         }

@@ -28,7 +28,6 @@ import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -238,7 +237,7 @@ public class NodeController {
         copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
     }
 
-    public void checkIfNodesAreMine(ArrayList<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
+    public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {
         MegaNode currentNode;
 
         for (int i=0; i<nodes.size(); i++) {
@@ -304,9 +303,6 @@ public class NodeController {
         }
         else if (context instanceof FileInfoActivityLollipop) {
             ((FileInfoActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
-        else if (context instanceof AudioPlayerActivity) {
-            ((AudioPlayerActivity) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
     }
 

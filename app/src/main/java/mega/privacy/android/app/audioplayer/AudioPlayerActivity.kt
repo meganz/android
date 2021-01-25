@@ -27,7 +27,6 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants.*
@@ -127,10 +126,6 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
         bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
         serviceBound = true
-
-        viewModel.snackbarToShow.observe(this) {
-            showSnackbar(it.first, it.second, it.third)
-        }
 
         viewModel.itemToRemove.observe(this) {
             playerService?.viewModel?.removeItem(it)
@@ -379,13 +374,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 return true
             }
             R.id.send_to_chat -> {
-                if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning()
-                    return true
-                }
-
-                val node = megaApi.getNodeByHandle(playingHandle) ?: return true
-                NodeController(this, isFolderLink).checkIfNodeIsMineAndSelectChatsToSendNode(node)
+                viewModel.attachNodeToChats(playingHandle, this)
                 return true
             }
             R.id.get_link -> {
@@ -526,12 +515,16 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         showSnackbar(SNACKBAR_TYPE, content, MEGACHAT_INVALID_HANDLE)
     }
 
-    override fun showSnackbarWithChat(content: String, chatId: Long) {
+    override fun showSnackbarWithChat(content: String?, chatId: Long) {
         showSnackbar(MESSAGE_SNACKBAR_TYPE, content, chatId)
     }
 
     override fun launchActivity(intent: Intent) {
         startActivity(intent)
         stopPlayer()
+    }
+
+    override fun launchActivityForResult(intent: Intent, requestCode: Int) {
+        startActivityForResult(intent, requestCode)
     }
 }

@@ -1864,6 +1864,7 @@ public class ChatController {
                     createChats = true;
                 } else if (!isTextEmpty(extraLink)) {
                     listener = new CreateChatListener(chats, users, extraLink, extraKey, extraPassword, context, CreateChatListener.SEND_LINK);
+                    createChats = true;
                 } else {
                     logWarning("Error on sending to chat");
                 }

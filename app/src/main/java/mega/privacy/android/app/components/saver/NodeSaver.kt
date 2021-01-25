@@ -44,7 +44,7 @@ import nz.mega.sdk.MegaApiJava
 import java.util.concurrent.Callable
 
 /**
- * A class that encapsulate all the procedure of saving a node into device,
+ * A class that encapsulate all the procedure of saving nodes into device,
  * including choose save to internal storage or external sdcard,
  * choose save path, check download size, check other apps that could open this file, etc,
  * the final step that really download the node into a file is handled in sub-classes,
@@ -53,7 +53,7 @@ import java.util.concurrent.Callable
  * The initiation API of save should also be added by sub-classes, because it's usually
  * related with the final download step.
  *
- * It simplifies code in activity/fragment where a node need to be saved.
+ * It simplifies code in activity/fragment where nodes need to be saved.
  */
 abstract class NodeSaver(
     protected val context: Context,
