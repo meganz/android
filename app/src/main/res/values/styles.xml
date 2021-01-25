@@ -636,20 +636,47 @@
         <item name="android:imeOptions">actionNext|flagNoFullscreen</item>
         <item name="android:inputType">numberPassword</item>
         <item name="android:maxLength">1</item>
-        <item name="textColor">@color/primary_text</item>
-        <item name="textSize">20sp</item>
-        <item name="theme">@style/ColorControlStyle</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:theme">@style/ColorControlStyle</item>
     </style>
 
     <style name="WarningPasscodeStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_marginBottom">16dp</item>
         <item name="android:layout_marginStart">40dp</item>
         <item name="android:layout_marginEnd">40dp</item>
-        <item name="textColor">@color/error_color</item>
-        <item name="textSize">13sp</item>
+        <item name="android:textColor">@color/error_color</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="OnlyTextBottomSheetHeaderStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:layout_marginBottom">12dp</item>m>
+        <item name="android:textColor">@color/black_54_alpha</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="OnlyTextBottomSheetOptionStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">55dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="SeparatorBottomSheetStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:background">@color/sliding_panel_separator</item>
     </style>
 
 </resources>

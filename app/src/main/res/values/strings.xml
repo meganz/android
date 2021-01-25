@@ -892,9 +892,9 @@
     -->
 
     <string name="pin_lock_type" context="Title to choose the type of Passcode">Passcode Type</string>
-    <string name="four_pin_lock" context="Passcode with 4 digits">4 digit Passcode</string>
-    <string name="six_pin_lock" context="Passcode with 6 digits">6 digit Passcode</string>
-    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric Passcode</string>
+    <string name="four_pin_lock" context="Passcode with 4 digits">4 Digits</string>
+    <string name="six_pin_lock" context="Passcode with 6 digits">6 Digits</string>
+    <string name="AN_pin_lock" context="Passcode alphanumeric">Alphanumeric</string>
 
     <string name="settings_enable_logs" context="Confirmation message when enabling logs in the app">Logs are now enabled</string>
     <string name="settings_disable_logs" context="Confirmation message when disabling logs in the app">Logs are now disabled</string>

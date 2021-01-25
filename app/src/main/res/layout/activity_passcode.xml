@@ -98,10 +98,11 @@
     <TextView
         android:id="@+id/do_not_match_warning"
         style="@style/WarningPasscodeStyle"
+        android:layout_marginTop="82dp"
         android:text="@string/pin_lock_not_match"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/password_input" />
+        app:layout_constraintTop_toBottomOf="@id/title_text" />
 
     <Button
         android:id="@+id/passcode_options_button"

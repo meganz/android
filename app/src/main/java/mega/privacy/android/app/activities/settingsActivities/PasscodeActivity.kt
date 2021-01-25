@@ -16,6 +16,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.PinUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
+import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -40,6 +42,9 @@ class PasscodeActivity : BaseActivity() {
     private val sbFirst = StringBuilder()
     private val sbSecond = StringBuilder()
 
+    private var passcodeOptionsBottomSheetDialogFragment: PasscodeOptionsBottomSheetDialogFragment? =
+        null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,14 +60,18 @@ class PasscodeActivity : BaseActivity() {
         supportActionBar?.title =
             StringResourcesUtils.getString(R.string.settings_pin_lock).toUpperCase(Locale.ROOT)
 
-        initPasscodeScreen()
-    }
-
-    private fun initPasscodeScreen() {
         val prefs = dbH.preferences
         passcodeType =
             if (prefs != null && !isTextEmpty(prefs.pinLockType)) prefs.pinLockType else PIN_4
 
+        initPasscodeScreen()
+
+        binding.passcodeOptionsButton.setOnClickListener {
+            showPasscodeOptions()
+        }
+    }
+
+    private fun initPasscodeScreen() {
         updateViewOrientation()
 
         binding.doNotMatchWarning.visibility = GONE
@@ -365,7 +374,7 @@ class PasscodeActivity : BaseActivity() {
             }
 
             secondRound = true
-            clearTypedPasscode(false)
+            clearTypedPasscode(true)
             binding.passcodeOptionsButton.visibility = GONE
         }
     }
@@ -380,6 +389,7 @@ class PasscodeActivity : BaseActivity() {
             finish()
         } else {
             clearTypedPasscode(true)
+            sbSecond.clear()
             binding.doNotMatchWarning.visibility = VISIBLE
         }
     }
@@ -408,7 +418,7 @@ class PasscodeActivity : BaseActivity() {
         return false
     }
 
-    private fun clearTypedPasscode(reset: Boolean) {
+    private fun clearTypedPasscode(reEnter: Boolean) {
         binding.passFirstInput.text.clear()
         binding.passSecondInput.text.clear()
         binding.passThirdInput.text.clear()
@@ -419,8 +429,8 @@ class PasscodeActivity : BaseActivity() {
         binding.passwordInput.text.clear()
 
         binding.titleText.text = StringResourcesUtils.getString(
-            if (reset) R.string.unlock_pin_title
-            else R.string.unlock_pin_title_2
+            if (reEnter) R.string.unlock_pin_title_2
+            else R.string.unlock_pin_title
         )
 
         if (passcodeType == PIN_ALPHANUMERIC) {
@@ -428,6 +438,23 @@ class PasscodeActivity : BaseActivity() {
         } else {
             binding.passFirstInput.requestFocus()
         }
+    }
+
+    private fun showPasscodeOptions() {
+        if (isBottomSheetDialogShown(passcodeOptionsBottomSheetDialogFragment)) return
+
+        passcodeOptionsBottomSheetDialogFragment =
+            PasscodeOptionsBottomSheetDialogFragment(passcodeType)
+        passcodeOptionsBottomSheetDialogFragment?.show(
+            supportFragmentManager,
+            passcodeOptionsBottomSheetDialogFragment?.tag
+        )
+    }
+
+    fun setPasscodeType(passcodeType: String) {
+        this.passcodeType = passcodeType
+        initPasscodeScreen()
+        clearTypedPasscode(false)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
