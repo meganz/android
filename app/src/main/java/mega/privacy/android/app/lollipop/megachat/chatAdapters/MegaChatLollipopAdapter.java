@@ -1818,7 +1818,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         String contentUnreadText = context.getResources().getQuantityString(R.plurals.number_unread_messages, (int) unreadMessages, numberString);
         ((ViewHolderMessageChat) holder).newMessagesText.setText(contentUnreadText);
         ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.VISIBLE);
-        ((ChatActivityLollipop) context).setNewVisibility(true);
         ((ChatActivityLollipop) context).setPositionNewMessagesLayout(position);
     }
 
@@ -6738,14 +6737,12 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void addMessage(ArrayList<AndroidMegaChatMessage> messages, int position) {
         this.messages = messages;
-
         notifyItemInserted(position);
         notifyRangeChanged(position);
     }
 
     public void removeMessage(int position, ArrayList<AndroidMegaChatMessage> messages) {
         this.messages = messages;
-
         notifyItemRemoved(position);
         notifyRangeChanged(position);
     }

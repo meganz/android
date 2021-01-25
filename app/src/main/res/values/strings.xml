@@ -1971,7 +1971,6 @@
     <string name="option_save_on_filesystem" context="Option that permits user save on File System">Save on File System</string>
     <string name="message_copied_to_clipboard" context="Message shown when something has been copied to clipboard">Copied to clipboard</string>
 
-    <string name="message_jump_latest" context="text of the label to show that you have messages unread in the chat conversation">Jump to latest</string>
     <string name="message_new_messages" context="text of the label to show that you have new messages in the chat conversation">New messages</string>
 
     <string name="notification_subtitle_incoming" context="Title of the notification shown on the action bar when there is a incoming call">Incoming call</string>

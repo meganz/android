@@ -207,6 +207,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private static final String OPENING_AND_JOINING_ACTION = "OPENING_AND_JOINING_ACTION";
     private static final String ERROR_REACTION_DIALOG = "ERROR_REACTION_DIALOG";
     private static final String TYPE_ERROR_REACTION = "TYPE_ERROR_REACTION";
+    private static final String NUM_MSGS_RECEIVED_AND_UNREAD = "NUM_MSGS_RECEIVED_AND_UNREAD";
 
     private final static int NUMBER_MESSAGES_TO_LOAD = 32;
     private final static int MAX_NUMBER_MESSAGES_TO_LOAD_NOT_SEEN = 256;
@@ -261,15 +262,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int SIXTH_RANGE = 6;
     private final static int WIDTH_BAR = 8;
 
-    private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
-    private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
-
     private int currentRecordButtonState;
     private String mOutputFilePath;
     private int keyboardHeight;
     private int marginBottomDeactivated;
     private int marginBottomActivated;
-    private boolean newVisibility;
     private boolean getMoreHistory;
     private int minutesLastGreen = INVALID_VALUE;
     private boolean isLoadingHistory;
@@ -428,11 +425,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private ArrayList<MessageVoiceClip> messagesPlaying = new ArrayList<>();
     private ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
 
-    RelativeLayout messageJumpLayout;
-    TextView messageJumpText;
-    boolean isHideJump = false;
-    int typeMessageJump = 0;
-    boolean visibilityMessageJump=false;
+    private FrameLayout unreadMsgsLayout;
+    private TextView unreadBadgeText;
+    private ArrayList<Long> msgsReceived = new ArrayList<>();
+
     boolean isTurn = false;
     Handler handler;
 
@@ -490,6 +486,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private AudioFocusRequest request;
     private AudioManager mAudioManager;
     private AudioFocusListener audioFocusListener;
+
+    private int lastVisibleItemPosition = INVALID_POSITION;
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -917,9 +915,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         joiningLeavingLayout = findViewById(R.id.joining_leaving_layout_chat_layout);
         joiningLeavingText = findViewById(R.id.joining_leaving_text_chat_layout);
 
-        messageJumpLayout = findViewById(R.id.message_jump_layout);
-        messageJumpText = findViewById(R.id.message_jump_text);
-        messageJumpLayout.setVisibility(View.GONE);
+        unreadMsgsLayout = findViewById(R.id.new_messages_icon);
+        unreadMsgsLayout.setVisibility(View.GONE);
+        unreadBadgeText = findViewById(R.id.badge_text);
+
         writingLayout = findViewById(R.id.writing_linear_layout_chat);
 
         rLKeyboardTwemojiButton = findViewById(R.id.rl_keyboard_twemoji_chat);
@@ -971,7 +970,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         enableButton(rLPickFileStorageButton, pickFileStorageButton);
         enableButton(rlGifButton, gifButton);
 
-        messageJumpLayout.setOnClickListener(this);
+        unreadMsgsLayout.setOnClickListener(this);
 
         fragmentContainerFileStorage = findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout = findViewById(R.id.relative_layout_file_storage);
@@ -1170,8 +1169,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             placeRecordButton(RECORD_BUTTON_DEACTIVATED);
         });
 
-        messageJumpLayout.setOnClickListener(this);
-
         listView = findViewById(R.id.messages_chat_list_view);
         listView.setClipToPadding(false);
 
@@ -1185,38 +1182,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                // Get the first visible item
+                int currentLastVisibleItemPosition = mLayoutManager.findLastVisibleItemPosition();
 
-                if(!messages.isEmpty()){
-                    int lastPosition = messages.size()-1;
-                    AndroidMegaChatMessage msg = messages.get(lastPosition);
+                if (lastVisibleItemPosition == INVALID_POSITION) {
+                    lastVisibleItemPosition = currentLastVisibleItemPosition;
+                }
 
-                    while (!msg.isUploading() && msg.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL) {
-                        lastPosition--;
-                        msg = messages.get(lastPosition);
-                    }
-                    if (lastPosition == (messages.size() - 1)) {
-                        //Scroll to end
-                        if ((messages.size() - 1) == (mLayoutManager.findLastVisibleItemPosition() - 1)) {
-                            hideMessageJump();
-                        } else if ((messages.size() - 1) > (mLayoutManager.findLastVisibleItemPosition() - 1)) {
-                            if (newVisibility) {
-                                showJumpMessage();
-                            }
-                        }
-                    } else {
-                        lastPosition++;
-                        if (lastPosition == (mLayoutManager.findLastVisibleItemPosition() - 1)) {
-                            hideMessageJump();
-                        } else if (lastPosition != (mLayoutManager.findLastVisibleItemPosition() - 1)) {
-                            if (newVisibility) {
-                                showJumpMessage();
-                            }
-                        }
-                    }
-
-
+                if (!messages.isEmpty() && currentLastVisibleItemPosition < messages.size() - 1) {
+                    showScrollToLastMsgButton();
+                } else {
+                    hideScrollToLastMsgButton();
                 }
 
                 if (stateHistory != MegaChatApi.SOURCE_NONE) {
@@ -1319,29 +1300,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                         selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
                         logDebug("Handle of the message: " + selectedMessageId);
                         selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
-                        isHideJump = savedInstanceState.getBoolean("isHideJump",false);
-                        typeMessageJump = savedInstanceState.getInt("typeMessageJump",-1);
-                        visibilityMessageJump = savedInstanceState.getBoolean("visibilityMessageJump",false);
                         mOutputFilePath = savedInstanceState.getString("mOutputFilePath");
                         isShareLinkDialogDismissed = savedInstanceState.getBoolean("isShareLinkDialogDismissed", false);
                         isLocationDialogShown = savedInstanceState.getBoolean("isLocationDialogShown", false);
                         isJoinCallDialogShown = savedInstanceState.getBoolean(JOIN_CALL_DIALOG, false);
                         recoveredSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_ITEMS);
-
-                        if(visibilityMessageJump){
-                            if(typeMessageJump == TYPE_MESSAGE_NEW_MESSAGE){
-                                messageJumpText.setText(getResources().getString(R.string.message_new_messages));
-                                messageJumpLayout.setVisibility(View.VISIBLE);
-                            }else if(typeMessageJump == TYPE_MESSAGE_JUMP_TO_LEAST){
-                                messageJumpText.setText(getResources().getString(R.string.message_jump_latest));
-                                messageJumpLayout.setVisibility(View.VISIBLE);
-                            }
-                        }
-
                         lastIdMsgSeen = savedInstanceState.getLong(LAST_MESSAGE_SEEN, MEGACHAT_INVALID_HANDLE);
                         isTurn = lastIdMsgSeen != MEGACHAT_INVALID_HANDLE;
 
                         generalUnreadCount = savedInstanceState.getLong(GENERAL_UNREAD_COUNT, 0);
+
+                        long[] longArray = savedInstanceState.getLongArray(NUM_MSGS_RECEIVED_AND_UNREAD);
+                        if (longArray != null && longArray.length > 0) {
+                            for (int i = 0; i < longArray.length; i++) {
+                                msgsReceived.add(longArray[i]);
+                            }
+                        }
 
                         boolean isPlaying = savedInstanceState.getBoolean(PLAYING, false);
                         if (isPlaying) {
@@ -3803,7 +3777,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 showGroupInfoActivity();
                 break;
 
-            case R.id.message_jump_layout:
+            case R.id.new_messages_icon:
                 goToEnd();
                 break;
 
@@ -4018,7 +3992,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         lastIdMsgSeen = MEGACHAT_INVALID_HANDLE;
         generalUnreadCount = 0;
         lastSeenReceived = true;
-        newVisibility = false;
 
         if(adapter!=null){
             adapter.notifyItemChanged(position);
@@ -5933,7 +5906,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     positionLastMessage = positionLastMessage + 1;
                     message = messages.get(positionLastMessage);
                 }
-
                 scrollToMessage(isTurn ? -1 : lastIdMsgSeen);
             }
 
@@ -5958,7 +5930,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onMessageReceived(MegaChatApiJava api, MegaChatMessage msg) {
-
         logDebug("CHAT CONNECTION STATE: " + api.getChatConnectionState(idChat));
         logDebug("STATUS: " + msg.getStatus());
         logDebug("TEMP ID: " + msg.getTempId());
@@ -6019,6 +5990,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
 
+        if(!msgsReceived.contains(msg.getMsgId())){
+            msgsReceived.add(msg.getMsgId());
+        }
+
         if(setAsRead){
             markAsSeen(msg);
         }
@@ -6037,7 +6012,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         appendMessagePosition(androidMsg);
 
         if(mLayoutManager.findLastCompletelyVisibleItemPosition()==messages.size()-1){
-            logDebug("Do scroll to end");
             mLayoutManager.scrollToPosition(messages.size());
         }
         else{
@@ -6046,16 +6020,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     mLayoutManager.scrollToPosition(messages.size());
                 }
             }
-            logDebug("DONT scroll to end");
-            if(typeMessageJump !=  TYPE_MESSAGE_NEW_MESSAGE){
-                messageJumpText.setText(getResources().getString(R.string.message_new_messages));
-                typeMessageJump = TYPE_MESSAGE_NEW_MESSAGE;
-            }
-
-            if(messageJumpLayout.getVisibility() != View.VISIBLE){
-                messageJumpText.setText(getResources().getString(R.string.message_new_messages));
-                messageJumpLayout.setVisibility(View.VISIBLE);
-            }
+            showScrollToLastMsgButton();
         }
 
         checkMegaLink(msg);
@@ -6093,6 +6058,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 adapter.stopPlaying(msg.getMsgId());
             }
             deleteMessage(msg, false);
+            if(msgsReceived.contains(msg.getMsgId())){
+                msgsReceived.remove(msg.getMsgId());
+                if(unreadMsgsLayout.getVisibility() == View.VISIBLE){
+                    showScrollToLastMsgButton();
+                }
+            }
             return;
         }
         AndroidMegaChatMessage androidMsg = new AndroidMegaChatMessage(msg);
@@ -7477,7 +7448,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if(e.getErrorCode()==MegaChatError.ERROR_OK){
                 logDebug("Ok. Clear history done");
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
-                hideMessageJump();
+                hideScrollToLastMsgButton();
             }else{
                 logError("Error clearing history: " + e.getErrorString());
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
@@ -8089,24 +8060,21 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onSaveInstanceState(Bundle outState){
-        logDebug("onSaveInstance");
         super.onSaveInstanceState(outState);
-        outState.putLong("idChat", idChat);
+        outState.putLong(CHAT_ID, idChat);
         outState.putLong("selectedMessageId", selectedMessageId);
         outState.putInt("selectedPosition", selectedPosition);
-        outState.putInt("typeMessageJump",typeMessageJump);
-
-        if(messageJumpLayout.getVisibility() == View.VISIBLE){
-            visibilityMessageJump = true;
-        }else{
-            visibilityMessageJump = false;
-        }
-        outState.putBoolean("visibilityMessageJump",visibilityMessageJump);
         outState.putLong(LAST_MESSAGE_SEEN, lastIdMsgSeen);
         outState.putLong(GENERAL_UNREAD_COUNT, generalUnreadCount);
-        outState.putBoolean("isHideJump",isHideJump);
         outState.putString("mOutputFilePath",mOutputFilePath);
         outState.putBoolean("isShareLinkDialogDismissed", isShareLinkDialogDismissed);
+        if(msgsReceived != null && !msgsReceived.isEmpty()){
+            long[] longArray = new long[msgsReceived.size()];
+            for (int i = 0; i < msgsReceived.size(); i++)
+                longArray[i] = msgsReceived.get(i);
+
+            outState.putLongArray(NUM_MSGS_RECEIVED_AND_UNREAD, longArray);
+        }
 
         if(adapter == null)
             return;
@@ -8365,7 +8333,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             }
 
                             generalUnreadCount = unreadCount;
-
                             scrollToMessage(lastIdMsgSeen);
                         }
                     }
@@ -8684,14 +8651,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         chatAlertDialog.show();
-    }
-
-    public void showJumpMessage(){
-        if((!isHideJump)&&(typeMessageJump!=TYPE_MESSAGE_NEW_MESSAGE)){
-            typeMessageJump = TYPE_MESSAGE_JUMP_TO_LEAST;
-            messageJumpText.setText(getResources().getString(R.string.message_jump_latest));
-            messageJumpLayout.setVisibility(View.VISIBLE);
-        }
     }
 
     private void showCallInProgressLayout(String text, boolean shouldChronoShown, MegaChatCall call) {
@@ -9040,28 +8999,41 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
             }
         }
-        hideMessageJump();
     }
 
-    public void setNewVisibility(boolean vis){
-        newVisibility = vis;
+    /**
+     * Method to hide the button to scroll to the last message in a chatroom.
+     */
+    private void hideScrollToLastMsgButton() {
+        msgsReceived.clear();
+        if (unreadMsgsLayout.getVisibility() != View.VISIBLE)
+            return;
+
+        unreadMsgsLayout.animate()
+                .alpha(0.0f)
+                .setDuration(500)
+                .withEndAction(() -> {
+                    unreadMsgsLayout.setVisibility(View.GONE);
+                    unreadMsgsLayout.setAlpha(1.0f);
+                })
+                .start();
     }
 
-    public void hideMessageJump(){
-        isHideJump = true;
-        visibilityMessageJump=false;
-        if(messageJumpLayout.getVisibility() == View.VISIBLE){
-            messageJumpLayout.animate()
-                        .alpha(0.0f)
-                        .setDuration(1000)
-                        .withEndAction(new Runnable() {
-                            @Override public void run() {
-                                messageJumpLayout.setVisibility(View.GONE);
-                                messageJumpLayout.setAlpha(1.0f);
-                            }
-                        })
-                        .start();
+    /**
+     * Method of showing the button to scroll to the last message in a chat room.
+     */
+    private void showScrollToLastMsgButton() {
+        if (msgsReceived != null && msgsReceived.size() > 0) {
+            unreadBadgeText.setText(msgsReceived.size() + "");
+            unreadBadgeText.setVisibility(View.VISIBLE);
+        } else {
+            unreadBadgeText.setVisibility(View.GONE);
         }
+
+        if (unreadMsgsLayout.getVisibility() == View.VISIBLE)
+            return;
+
+        unreadMsgsLayout.setVisibility(View.VISIBLE);
     }
 
     public MegaApiAndroid getLocalMegaApiFolder() {
