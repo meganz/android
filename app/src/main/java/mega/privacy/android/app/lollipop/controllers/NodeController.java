@@ -47,7 +47,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
-import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
@@ -198,34 +197,6 @@ public class NodeController {
                 megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, (ManagerActivityLollipop) context);
             }
         }
-    }
-
-    public void checkIfNodeIsMineAndSelectChatsToSendNode(MegaNode node) {
-        logDebug("checkIfNodeIsMineAndSelectChatsToSendNode");
-        ArrayList<MegaNode> nodes = new ArrayList<>();
-        nodes.add(node);
-        checkIfNodesAreMineAndSelectChatsToSendNodes(nodes);
-    }
-
-    public void checkIfNodesAreMineAndSelectChatsToSendNodes(ArrayList<MegaNode> nodes) {
-        logDebug("checkIfNodesAreMineAndSelectChatsToSendNodes");
-
-        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
-        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
-
-        if (nodes == null) {
-            return;
-        }
-
-        checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
-
-        if (notOwnerNodes.size() == 0) {
-            selectChatsToSendNodes(ownerNodes);
-            return;
-        }
-
-        CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context);
-        copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
     }
 
     public void checkIfNodesAreMine(List<MegaNode> nodes, ArrayList<MegaNode> ownerNodes, ArrayList<MegaNode> notOwnerNodes) {

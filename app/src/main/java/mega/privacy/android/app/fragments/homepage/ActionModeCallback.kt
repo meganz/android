@@ -61,9 +61,7 @@ class ActionModeCallback constructor(
             }
             R.id.cab_menu_send_to_chat -> {
                 LogUtil.logDebug("Send files to chat")
-                NodeController(mainActivity).checkIfNodesAreMineAndSelectChatsToSendNodes(
-                    ArrayList(selectedNodes)
-                )
+                mainActivity.attachNodesToChats(selectedNodes)
             }
             R.id.cab_menu_trash -> {
                 mainActivity.askConfirmationMoveToRubbish(

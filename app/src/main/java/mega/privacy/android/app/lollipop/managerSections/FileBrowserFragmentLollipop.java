@@ -71,14 +71,12 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class FileBrowserFragmentLollipop extends RotatableFragment{
 
@@ -278,13 +276,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				}
 				case R.id.cab_menu_send_to_chat:{
 					logDebug("Send files to chat");
-					if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-						showOverDiskQuotaPaywallWarning();
-						break;
-					}
-					ArrayList<MegaNode> nodesSelected = adapter.getArrayListSelectedNodes();
-					NodeController nC = new NodeController(context);
-					nC.checkIfNodesAreMineAndSelectChatsToSendNodes(nodesSelected);
+					((ManagerActivityLollipop) context).attachNodesToChats(adapter.getArrayListSelectedNodes());
 					clearSelections();
 					hideMultipleSelect();
 					break;

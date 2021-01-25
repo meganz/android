@@ -98,6 +98,9 @@ import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -135,6 +138,7 @@ import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.attacher.NodeAttacher;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -151,6 +155,7 @@ import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -166,7 +171,6 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.managerSections.CentiliFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.CompletedTransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
@@ -292,7 +296,8 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingUpdatesListener {
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingUpdatesListener,
+		SnackbarShower {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -371,6 +376,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	NodeController nC;
 	ContactController cC;
 	AccountController aC;
+
+	private final NodeAttacher nodeAttacher = new NodeAttacher(this);
 
 	long[] searchDate = null;
 
@@ -8228,6 +8235,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	showSnackbar(type, fragmentContainer, s, idChat);
 	}
 
+	@Override
+	public void showSnackbar(@NotNull String content) {
+		showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
+	}
+
+	@Override
+	public void showSnackbarWithChat(@Nullable String content, long chatId) {
+		showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+	}
+
 	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
         logDebug("askConfirmationNoAppInstaledBeforeDownload");
 
@@ -10352,6 +10369,24 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.show();
 	}
 
+	/**
+	 * Attach node to chats, only used by NodeOptionsBottomSheetDialogFragment.
+	 *
+	 * @param node node to attach
+	 */
+	public void attachNodeToChats(MegaNode node) {
+		nodeAttacher.attachNode(node);
+	}
+
+	/**
+	 * Attach nodes to chats, used by ActionMode of manager fragments.
+	 *
+	 * @param nodes nodes to attach
+	 */
+	public void attachNodesToChats(List<MegaNode> nodes) {
+		nodeAttacher.attachNodes(nodes);
+	}
+
 	public void showConfirmationRemovePublicLink (final MegaNode n){
 		logDebug("showConfirmationRemovePublicLink");
 
@@ -11346,6 +11381,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
+		if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
+			return;
+		}
+
 		if (resultCode == RESULT_FIRST_USER){
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_destination_folder), -1);
 			return;
@@ -11399,11 +11438,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				logWarning("resultCode for CHOOSE_PICTURE_PROFILE_CODE: " + resultCode);
 			}
 		}
-		else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-			logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
-
-			new ChatController(this).checkIntentToShareSomething(intent);
-		}
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -11452,48 +11486,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cFLol.clearSelectionsNoAnimations();
 			}
 
-			ArrayList<String> selectedContacts = intent.getStringArrayListExtra(SELECTED_CONTACTS);
-			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
-
-			//Send file to contacts
-			//Check if all contacts have a chat created
-
-			ArrayList<MegaChatRoom> chats = null;
-			ArrayList<MegaUser> usersNoChat = null;
-
-			for(int i=0; i<selectedContacts.size(); i++){
-
-				MegaUser contact = megaApi.getContact(selectedContacts.get(i));
-
-				MegaChatRoom chatRoom = megaChatApi.getChatRoomByUser(contact.getHandle());
-				if(chatRoom!=null){
-					if(chats==null){
-						chats = new ArrayList<MegaChatRoom>();
-					}
-					chats.add(chatRoom);
-
-				}
-				else{
-					if(usersNoChat==null){
-						usersNoChat = new ArrayList<MegaUser>();
-					}
-					usersNoChat.add(contact);
-				}
-			}
-
-			if(usersNoChat==null || usersNoChat.isEmpty()){
-				new ChatController(this).checkIfNodesAreMineAndAttachNodes(fileHandles, getChatHandles(chats, null));
-			}
-			else{
-				//Create first the chats
-				CreateChatListener listener = new CreateChatListener(chats, usersNoChat, fileHandles, this, CreateChatListener.SEND_FILES, -1);
-
-				for(int i=0; i<usersNoChat.size(); i++){
-					MegaChatPeerList peers = MegaChatPeerList.createInstance();
-					peers.addPeer(usersNoChat.get(i).getHandle(), MegaChatPeerList.PRIV_STANDARD);
-					megaChatApi.createChat(false, peers, listener);
-				}
-			}
+			nodeAttacher.handleSelectFileResult(requestCode, resultCode, intent, this);
 		}
 		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK) {
 			if (intent == null) {
@@ -11916,26 +11909,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		return chatHandles;
-	}
-
-	public void sendFilesToChats(ArrayList<MegaChatRoom> chats, long[] _chatHandles, long[] nodeHandles) {
-		long[] chatHandles = getChatHandles(chats, _chatHandles);
-
-		int countChat = chatHandles.length;
-		int counter = chatHandles.length * nodeHandles.length;
-		long chatId = -1;
-
-		if (countChat == 1) {
-			chatId = chatHandles[0];
-		}
-
-		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, counter);
-
-		for (int i = 0; i < chatHandles.length; i++) {
-			for (int j = 0; j < nodeHandles.length; j++) {
-				megaChatApi.attachNode(chatHandles[i], nodeHandles[j], listener);
-			}
-		}
 	}
 
 	public void startOneToOneChat(MegaUser user){

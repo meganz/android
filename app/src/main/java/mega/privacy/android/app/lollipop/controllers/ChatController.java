@@ -1802,9 +1802,6 @@ public class ChatController {
             if (context instanceof ContactInfoActivityLollipop) {
                 ((ContactInfoActivityLollipop) context).sendFilesToChat(handles, idChats[0]);
                 return;
-            } else if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).sendFilesToChats(null, idChats, handles);
-                return;
             } else if (context instanceof ChatActivityLollipop) {
                 MultipleAttachChatListener listener = new MultipleAttachChatListener(context, idChats[0], handles.length);
                 for (long fileHandle : handles) {

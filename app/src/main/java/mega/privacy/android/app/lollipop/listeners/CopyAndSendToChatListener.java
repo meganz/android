@@ -9,7 +9,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.MyChatFilesExisitListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -105,9 +104,7 @@ public class CopyAndSendToChatListener implements MegaRequestListenerInterface, 
             if (e.getErrorCode() == MegaError.API_OK) {
                 nodesCopied.add(megaApi.getNodeByHandle(request.getNodeHandle()));
                 if (counter == 0) {
-                    if (idChats != null && idChats.length > 0 && context instanceof ManagerActivityLollipop) {
-                        ((ManagerActivityLollipop) context).sendFilesToChats(null, idChats, getNodeHandles());
-                    } else if (idChat == -1) {
+                    if (idChat == -1) {
                         NodeController nC = new NodeController(context);
                         nC.selectChatsToSendNodes(nodesCopied);
                     } else if (context instanceof ChatActivityLollipop) {

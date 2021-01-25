@@ -13,7 +13,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import java.util.*
+
 
 /**
  * A class that encapsulate all the procedure of send nodes to chats,
@@ -119,14 +119,85 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
             return true
         }
 
-        val chatHandles = data.getLongArrayExtra(SELECTED_CHATS)
+        val chatIds = data.getLongArrayExtra(SELECTED_CHATS)
         val contactHandles = data.getLongArrayExtra(SELECTED_USERS)
 
+        val contactEmails = ArrayList<String>()
         if (contactHandles != null && contactHandles.isNotEmpty()) {
+            for (handle in contactHandles) {
+                contactEmails.add(MegaApiAndroid.userHandleToBase64(handle))
+            }
+        }
+
+        doHandleActivityResult(nodeHandles, chatIds, contactEmails, snackbarShower)
+
+        return true
+    }
+
+    /**
+     * Handle activity result of REQUEST_CODE_SELECT_FILE.
+     *
+     * @param requestCode requestCode of onActivityResult
+     * @param resultCode resultCode of onActivityResult
+     * @param data data of onActivityResult
+     * @param snackbarShower interface to show snackbar
+     */
+    fun handleSelectFileResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower
+    ) {
+        if (requestCode != REQUEST_CODE_SELECT_FILE || resultCode != RESULT_OK || data == null) {
+            return
+        }
+
+        val nodeHandles = data.getLongArrayExtra(NODE_HANDLES)
+        if (nodeHandles == null || nodeHandles.isEmpty()) {
+            return
+        }
+
+        val contactEmails = data.getStringArrayListExtra(SELECTED_CONTACTS) ?: ArrayList<String>()
+        val contactsWithChatRoom = ArrayList<String>()
+        val chatIds = ArrayList<Long>()
+
+        for (email in contactEmails) {
+            val contact = megaApi.getContact(email)
+            val chatRoom = megaChatApi.getChatRoomByUser(contact.handle)
+            if (chatRoom != null) {
+                chatIds.add(chatRoom.chatId)
+                contactsWithChatRoom.add(email)
+            }
+        }
+
+        val chatIdsArray = if (chatIds.isEmpty()) {
+            null
+        } else {
+            val array = LongArray(chatIds.size)
+
+            for (i in chatIds.indices) {
+                array[i] = chatIds[i]
+            }
+
+            array
+        }
+
+        doHandleActivityResult(
+            nodeHandles, chatIdsArray, contactEmails - contactsWithChatRoom, snackbarShower
+        )
+    }
+
+    private fun doHandleActivityResult(
+        nodeHandles: LongArray,
+        chatIds: LongArray?,
+        contactEmails: List<String>,
+        snackbarShower: SnackbarShower
+    ) {
+        if (contactEmails.isNotEmpty()) {
             val users = ArrayList<MegaUser>()
 
-            for (handle in contactHandles) {
-                val user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(handle))
+            for (email in contactEmails) {
+                val user = megaApi.getContact(email)
 
                 if (user != null) {
                     users.add(user)
@@ -135,8 +206,8 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
 
             val listener = CreateChatsListener(users.size) { successChats, failureCount ->
                 if (failureCount == 0) {
-                    val chatIds = if (chatHandles != null && chatHandles.isNotEmpty()) {
-                        chatHandles.toList() + successChats
+                    val chatIds = if (chatIds != null && chatIds.isNotEmpty()) {
+                        chatIds.toList() + successChats
                     } else {
                         successChats
                     }
@@ -153,11 +224,11 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
                 peers.addPeer(user.handle, MegaChatPeerList.PRIV_STANDARD)
                 megaChatApi.createChat(false, peers, listener)
             }
-        } else if (chatHandles != null && chatHandles.isNotEmpty()) {
-            attachNodesToChats(nodeHandles, chatHandles.toList(), snackbarShower)
+        } else if (chatIds != null && chatIds.isNotEmpty()) {
+            attachNodesToChats(nodeHandles, chatIds.toList(), snackbarShower)
+        } else {
+            attaching = false
         }
-
-        return true
     }
 
     private fun selectChatsToAttach(nodes: List<MegaNode>) {

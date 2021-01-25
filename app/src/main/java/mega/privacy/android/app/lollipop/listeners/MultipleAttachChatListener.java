@@ -4,7 +4,6 @@ import android.content.Context;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaChatApiJava;
@@ -59,20 +58,7 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
         if(counter==0){
             int success = max_items - error;
 
-            if(context instanceof ManagerActivityLollipop){
-                if(success>0){
-                    if(chatId==-1){
-                        ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
-                    }
-                    else{
-                        ((ManagerActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
-                    }
-                }
-                else{
-                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
-                }
-            }
-            else if(context instanceof ContactInfoActivityLollipop){
+            if(context instanceof ContactInfoActivityLollipop){
                 if(success>0){
                    ((ContactInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
                 }

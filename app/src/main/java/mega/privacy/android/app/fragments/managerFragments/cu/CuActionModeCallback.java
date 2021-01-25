@@ -8,29 +8,23 @@ import androidx.appcompat.view.ActionMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
 import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.mutateIconSecondary;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 class CuActionModeCallback implements ActionMode.Callback {
-
-    private final MegaApplication app;
 
     private final Context mContext;
     private final CameraUploadsFragment mFragment;
@@ -39,8 +33,6 @@ class CuActionModeCallback implements ActionMode.Callback {
 
     CuActionModeCallback(Context context, CameraUploadsFragment fragment,
             CuViewModel viewModel, MegaApiAndroid megaApi) {
-
-        app = MegaApplication.getInstance();
 
         mContext = context;
         mFragment = fragment;
@@ -96,13 +88,8 @@ class CuActionModeCallback implements ActionMode.Callback {
                 break;
             case R.id.cab_menu_send_to_chat:
                 logDebug("Send files to chat");
-                if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning();
-                    break;
-                }
+                ((ManagerActivityLollipop) mContext).attachNodesToChats(documents);
                 mViewModel.clearSelection();
-                new NodeController(mContext).checkIfNodesAreMineAndSelectChatsToSendNodes(
-                        (ArrayList<MegaNode>) documents);
                 break;
             case R.id.cab_menu_trash:
                 mViewModel.clearSelection();
