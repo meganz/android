@@ -111,7 +111,7 @@ class TrackInfoFragment : Fragment() {
                 intent.putExtra(INTENT_EXTRA_KEY_FRAGMENT_HANDLE, location.fragmentHandle)
 
                 if (location.parentHandle != INVALID_HANDLE) {
-                    intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, location.parentHandle)
+                    intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, location.parentHandle)
                 }
             }
 
