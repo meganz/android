@@ -12,6 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomePageViewModel
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
+import mega.privacy.android.app.utils.LinksUtil
 import nz.mega.sdk.MegaBanner
 
 class BannerAdapter(private var viewModel: HomePageViewModel)
@@ -56,10 +57,7 @@ class BannerAdapter(private var viewModel: HomePageViewModel)
                 context.startActivity(intent)
             }
             REFERRAL -> {
-                val openLinkIntent = Intent(context, WebViewActivity::class.java).apply {
-                    data = Uri.parse(link)
-                }
-                context.startActivity(openLinkIntent)
+                LinksUtil.requiresTransferSession(context, REFERRAL)
             }
         }
     }
