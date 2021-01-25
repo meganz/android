@@ -144,6 +144,10 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		initAdsLoader();
 	}
 
+	/**
+	 * Init the Ads Loader and associate it with tht Ad Slot
+	 * Add it as the fragment lifecycle observer
+	 */
 	private void initAdsLoader() {
 		mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
 		getLifecycle().addObserver(mAdsLoader);

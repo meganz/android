@@ -472,6 +472,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		logDebug("After onCreate called super");
 	}
 
+	/**
+	 * Init the Ads Loader and associate it with tht Ad Slot
+	 * Add it as the fragment lifecycle observer
+	 */
 	private void initAdsLoader() {
 		mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
 		getLifecycle().addObserver(mAdsLoader);

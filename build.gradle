@@ -74,4 +74,5 @@ ext {
     rxAndroidVersion = '3.0.0'
     ankoVersion = '0.10.8'
     frescoVersion = '2.3.0'
+    playServicesAdsVersion = '19.7.0'
 }

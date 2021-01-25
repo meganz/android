@@ -12,22 +12,26 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest
-import com.google.android.gms.ads.doubleclick.PublisherAdView
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.gms.ads.admanager.AdManagerAdView
 import mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.TextUtil
 
 /**
- * Load Google advertisement banners to the Activity/Fragment.https://github.com/meganz/android2/pull/1549
- * Act as a LifecycleObserver to pause/resume/destroy the PublisherAdView in time
+ * Load Google advertisement adaptive banners to an Activity/Fragment.
+ * Create a GoogleAdsLoader and associate it with a Ads Slot ID(predefined by Mega API)
+ * Then set the Ads view container to this Ads loader
+ * Act as a Activity/Fragment LifecycleObserver to pause/resume/destroy the AdManagerAdView in time
+ * https://developers.google.com/ad-manager/mobile-ads-sdk/android/banner/adaptive
+ * https://github.com/googleads/googleads-mobile-android-examples/tree/master/kotlin/admanager/AdaptiveBannerExample
  */
 class GoogleAdsLoader(
     private val context: Context,
     // The ad slot id, e.g. "and1", "and2"
     private val slotId: String,
-    // Load the Ad immediately if true, false indicates some conditions need to be checked regarding
-    // whether load the ad or not, e.g. Public Handle of link file/folder
+    // Load the Ad immediately if true, false indicates some conditions need to be checked in advance
+    // regarding whether should load the ad or not, e.g. Public Handle of link file/folder
+    // see queryShowOrNotByHandle()
     private var loadImmediate: Boolean = true
 ) : DefaultLifecycleObserver, AdUnitSource.FetchCallback, AdUnitSource.QueryShowOrNotCallback {
 
@@ -40,7 +44,7 @@ class GoogleAdsLoader(
     private var initialLayoutComplete = false
 
     // The Ad banner view
-    private var adView: PublisherAdView? = null
+    private var adView: AdManagerAdView? = null
 
     // The unit Id of the Ad going to be loaded
     private var adUnitId = AdUnitSource.INVALID_UNIT_ID
@@ -78,7 +82,7 @@ class GoogleAdsLoader(
         adView?.setAdSizes(adSize)
         Log.i("Alex", "adSize$adSize")
         // Create an ad request.
-        val adRequest = PublisherAdRequest.Builder().build()
+        val adRequest = AdManagerAdRequest.Builder().build()
 
         // Start loading the ad in the background.
         adView?.loadAd(adRequest)
@@ -114,7 +118,7 @@ class GoogleAdsLoader(
 
         Log.i("Alex", "new PublisherAdView")
         adViewContainer.removeAllViews()
-        adView = PublisherAdView(MegaApplication.getInstance())
+        adView = AdManagerAdView(MegaApplication.getInstance())
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 Log.i("Alex", "Ad has been loaded")

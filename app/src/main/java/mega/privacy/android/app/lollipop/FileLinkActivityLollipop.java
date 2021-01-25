@@ -247,6 +247,11 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		initAdsLoader();
 	}
 
+	/**
+	 * Init the Ads Loader and associate it with tht Ad Slot
+	 * Add it as the fragment lifecycle observer
+	 * Set the Ads view container to the Ads Loader
+	 */
 	private void initAdsLoader() {
 		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
 		getLifecycle().addObserver(mAdsLoader);

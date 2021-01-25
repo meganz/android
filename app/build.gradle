@@ -178,12 +178,12 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
-    implementation 'com.google.android.gms:play-services-ads:19.4.0'
+    implementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    implementation 'android.arch.lifecycle:common-java8:2.2.0'
+    implementation "android.arch.lifecycle:common-java8:$lifecycleVersion"
 
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'

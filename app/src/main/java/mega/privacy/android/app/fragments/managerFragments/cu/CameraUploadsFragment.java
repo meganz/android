@@ -370,6 +370,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         initAdsLoader();
     }
 
+    /**
+     * Init the Ads Loader and associate it with tht Ad Slot
+     * Add it as the fragment lifecycle observer
+     */
     private void initAdsLoader() {
         mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
         getLifecycle().addObserver(mAdsLoader);
@@ -442,6 +446,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setDraggingThumbnailCallback();
     }
 
+    /**
+     * Set the Ads view container to the Ads Loader
+     */
     private void setupGoogleAds() {
         mAdsLoader.setAdViewContainer(mBinding.adViewContainer,
                 mManagerActivity.getOutMetrics());
