@@ -16,7 +16,7 @@ import mega.privacy.android.app.utils.Util
  */
 class PsaViewHolder(
     psaLayout: View,
-    private val viewModel: PsaViewModel
+    private val psaManager: PsaManager
 ) {
     private val binding = PsaLayoutBinding.bind(psaLayout)
     private var bound = false
@@ -97,7 +97,7 @@ class PsaViewHolder(
         // (receive null Psa event), so we need change visibility before calling
         // ViewModel.
         binding.root.visibility = View.GONE
-        viewModel.dismissPsa(id)
+        psaManager.dismissPsa(id)
         bound = false
     }
 }
