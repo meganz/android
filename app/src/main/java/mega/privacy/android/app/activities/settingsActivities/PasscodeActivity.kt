@@ -214,14 +214,14 @@ class PasscodeActivity : BaseActivity() {
             val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
 
             if (passcodeType == PIN_4) {
-                binding.passFourthInput.imeOptions = IME_ACTION_DONE and IME_FLAG_NO_FULLSCREEN
+                binding.passFourthInput.imeOptions = IME_ACTION_DONE or IME_FLAG_NO_FULLSCREEN
 
                 params.marginEnd = 0
 
                 binding.passFifthInput.visibility = GONE
                 binding.passSixthInput.visibility = GONE
             } else {
-                binding.passFourthInput.imeOptions = IME_ACTION_NEXT and IME_FLAG_NO_FULLSCREEN
+                binding.passFourthInput.imeOptions = IME_ACTION_NEXT or IME_FLAG_NO_FULLSCREEN
 
                 params.marginEnd = dp2px(16F, resources.displayMetrics)
 

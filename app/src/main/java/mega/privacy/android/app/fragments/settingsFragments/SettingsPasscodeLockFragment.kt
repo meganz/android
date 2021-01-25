@@ -28,7 +28,10 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeSwitch?.setOnPreferenceClickListener {
             if (pinLock) {
                 disablePasscode()
-            } else intentToPinLock(false)
+            } else {
+                passcodeSwitch?.isChecked = false
+                intentToPinLock(false)
+            }
 
             true
         }
