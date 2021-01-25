@@ -17,26 +17,53 @@ import java.util.*
 
 /**
  * A class that encapsulate all the procedure of send nodes to chats,
- * include checking over disk quota, copying nodes if they are not owned yet.
+ * include avoiding trigger select chat screen while still attaching,
+ * checking over disk quota, copying nodes if they are not owned yet.
  *
  * It simplifies code in activity/fragment where nodes need to be sent to chats.
+ *
+ * @param activityLauncher interface to start activity
  */
 class NodeAttacher(private val activityLauncher: ActivityLauncher) {
     private val app = MegaApplication.getInstance()
     private val megaApi = app.megaApi
     private val megaChatApi = app.megaChatApi
 
+    /**
+     * Record if an attach is ongoing.
+     */
+    private var attaching = false
+
+    /**
+     * Attach a node to chats.
+     *
+     * @param handle handle of the node
+     */
     fun attachNode(handle: Long) {
         val node = megaApi.getNodeByHandle(handle) ?: return
 
         attachNodes(listOf(node))
     }
 
+    /**
+     * Attach a node to chats.
+     *
+     * @param node node to attach
+     */
     fun attachNode(node: MegaNode) {
         attachNodes(listOf(node))
     }
 
+    /**
+     * Attach nodes to chats.
+     *
+     * @param nodes nodes to attach
+     */
     fun attachNodes(nodes: List<MegaNode>) {
+        if (attaching) {
+            return
+        }
+
         if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
             return
@@ -45,6 +72,8 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
         val ownerNodes = ArrayList<MegaNode>()
         val notOwnerNodes = ArrayList<MegaNode>()
         NodeController(app).checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes)
+
+        attaching = true
 
         if (notOwnerNodes.isEmpty()) {
             selectChatsToAttach(ownerNodes)
@@ -56,10 +85,19 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
                 selectChatsToAttach(ownerNodes + successNodes)
             } else {
                 // TODO?
+                attaching = false
             }
         }
     }
 
+    /**
+     * Handle activity result launched by NodeAttacher.
+     *
+     * @param requestCode requestCode of onActivityResult
+     * @param resultCode resultCode of onActivityResult
+     * @param data data of onActivityResult
+     * @param snackbarShower interface to show snackbar
+     */
     fun handleActivityResult(
         requestCode: Int,
         resultCode: Int,
@@ -72,7 +110,8 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
 
         val nodeHandles = data.getLongArrayExtra(NODE_HANDLES)
         if (nodeHandles == null || nodeHandles.isEmpty()) {
-            return false
+            attaching = false
+            return true
         }
 
         val chatHandles = data.getLongArrayExtra(SELECTED_CHATS)
@@ -100,6 +139,7 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
                     attachNodesToChats(nodeHandles, chatIds, snackbarShower)
                 } else {
                     // TODO?
+                    attaching = false
                 }
             }
 
@@ -137,7 +177,9 @@ class NodeAttacher(private val activityLauncher: ActivityLauncher) {
             handles.size * chatIds.size,
             if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE,
             snackbarShower
-        )
+        ) {
+            attaching = false
+        }
 
         for (chatId in chatIds) {
             for (handle in handles) {

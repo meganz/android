@@ -12,7 +12,8 @@ import nz.mega.sdk.MegaError.API_OK
 class AttachNodesListener(
     private val totalCount: Int,
     private val snackbarChatId: Long,
-    private val snackbarShower: SnackbarShower
+    private val snackbarShower: SnackbarShower,
+    private val onFinish: () -> Unit
 ) : ChatBaseListener(MegaApplication.getInstance()) {
 
     private var successCount = 0
@@ -33,6 +34,8 @@ class AttachNodesListener(
                 } else {
                     snackbarShower.showSnackbar(context.getString(R.string.files_send_to_chat_error))
                 }
+
+                onFinish()
             }
         }
     }

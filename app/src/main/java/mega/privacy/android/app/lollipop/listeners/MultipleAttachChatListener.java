@@ -109,19 +109,6 @@ public class MultipleAttachChatListener implements MegaChatRequestListenerInterf
                 else{
                     ((PdfViewerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
                 }
-            }
-            else if (context instanceof FileInfoActivityLollipop) {
-                if(success>0){
-                    if(chatId==-1){
-                        ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, -1);
-                    }
-                    else{
-                        ((FileInfoActivityLollipop) context).showSnackbar(MESSAGE_SNACKBAR_TYPE, null, chatId);
-                    }
-                }
-                else{
-                    ((FileInfoActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.files_send_to_chat_error), -1);
-                }
             } else if (context instanceof ChatActivityLollipop) {
                 if (success > 0) {
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getQuantityString(R.plurals.files_send_to_chat_success, success, success), -1);

@@ -57,7 +57,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Handle activity result launched by NodeSaver.
+     * Handle activity result.
      *
      * @param requestCode requestCode of onActivityResult
      * @param resultCode resultCode of onActivityResult

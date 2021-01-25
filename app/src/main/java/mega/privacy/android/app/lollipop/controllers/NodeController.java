@@ -289,9 +289,6 @@ public class NodeController {
         else if (context instanceof PdfViewerActivityLollipop){
             ((PdfViewerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
         }
-        else if (context instanceof FileInfoActivityLollipop) {
-            ((FileInfoActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
     }
 
     public boolean nodeComesFromIncoming (MegaNode node) {
