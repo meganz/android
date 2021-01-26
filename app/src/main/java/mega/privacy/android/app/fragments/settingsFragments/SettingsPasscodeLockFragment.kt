@@ -45,7 +45,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
             onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { _, newValue ->
-                    dbH.setPasscodeLockCode(newValue.toString())
+                    dbH.passcodeLockCode = newValue.toString()
                     true
                 }
         }
@@ -79,8 +79,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeSwitch?.isChecked = false
         preferenceScreen.removePreference(resetPasscode)
         preferenceScreen.removePreference(requirePasscode)
-        dbH.setPasscodeLockEnabled(false)
-        dbH.setPasscodeLockCode("")
+        dbH.isPasscodeLockEnabled = false
+        dbH.passcodeLockCode = ""
     }
 
     private fun intentToPasscodeLock(reset: Boolean) {

@@ -364,9 +364,9 @@ class PasscodeLockActivity : BaseActivity() {
 
     private fun confirmPasscode() {
         if (sbFirst.toString() == sbSecond.toString()) {
-            dbH.setPasscodeLockCode(sbFirst.toString())
-            dbH.setPasscodeLockType(passcodeType)
-            dbH.setPasscodeLockEnabled(true)
+            dbH.passcodeLockCode = sbFirst.toString()
+            dbH.passcodeLockType = passcodeType
+            dbH.isPasscodeLockEnabled = true
             PinUtil.update()
             setResult(RESULT_OK)
             finish()
