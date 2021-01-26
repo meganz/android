@@ -8,6 +8,7 @@ import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ public class LinksUtil {
             if (start != -1) {
                 String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
                 if (!isTextEmpty(path)) {
+                    Log.i("Alex", "requiresTransferSession");
                     MegaApplication.getInstance().getMegaApi().getSessionTransferURL(path, new SessionTransferURLListener(context));
                     return true;
                 }

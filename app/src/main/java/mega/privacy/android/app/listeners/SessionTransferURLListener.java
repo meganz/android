@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import mega.privacy.android.app.OpenLinkActivity;
 import nz.mega.sdk.MegaApiJava;
@@ -31,6 +32,7 @@ public class SessionTransferURLListener extends BaseListener {
                     if (context instanceof OpenLinkActivity) {
                         ((OpenLinkActivity) context).openWebLink(link);
                     } else {
+                        Log.i("Alex", "transferred url" + uri);
                         context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     }
                     return;

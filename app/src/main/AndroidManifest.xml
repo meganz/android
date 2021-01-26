@@ -510,6 +510,12 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity"
+            android:label="@string/settings_about_cookie_settings"
+            android:theme="@style/PreferencesScreen"
+            android:launchMode="singleTop" />
+
+        <activity
             android:name="mega.privacy.android.app.WeakAccountProtectionAlertActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Megaactionbar"
