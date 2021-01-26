@@ -388,6 +388,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private EmojiEditText textChat;
     private ImageButton sendIcon;
+    private RelativeLayout expandCollapseInputTextIcon;
     RelativeLayout messagesContainerLayout;
 
     RelativeLayout observersLayout;
@@ -781,7 +782,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        logDebug("onCreate");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
@@ -882,6 +882,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat = findViewById(R.id.input_text_chat);
         textChat.setVisibility(View.VISIBLE);
         textChat.setEnabled(true);
+
+        expandCollapseInputTextIcon = findViewById(R.id.expand_input_text_rl);
+        expandCollapseInputTextIcon.setOnClickListener(this);
+        expandCollapseInputTextIcon.setVisibility(View.GONE);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
         emptyTextView = findViewById(R.id.empty_text_chat_recent);
@@ -1019,8 +1023,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
                 if (s != null && !s.toString().trim().isEmpty()) {
                     showSendIcon();
+                    controlExpanableInputText(textChat.getLineCount());
                 } else {
                     refreshTextInput();
                 }
@@ -1386,6 +1392,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 editingMessage = !isTextEmpty(editedMsgId);
                 messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
                 textChat.setText(written);
+                textChat.post(() -> {
+                    controlExpanableInputText(textChat.getLineCount());
+                });
                 showSendIcon();
                 return;
             }
@@ -1393,6 +1402,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             chatPrefs = new ChatItemPreferences(Long.toString(idChat), "");
             dbH.setChatItemPreferences(chatPrefs);
         }
+
         refreshTextInput();
     }
 
@@ -1426,6 +1436,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 title = getString(R.string.type_message_hint_with_default_title, getTitleChat(chatRoom));
             }
             textChat.setHint(transformEmojis(title, textChat.getTextSize()));
+            controlExpanableInputText(1);
         }
     }
 
@@ -3459,13 +3470,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(isEmpty){
             textChat.setMaxLines(1);
         }else {
-
             int maxLines;
             if (textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()) {
                 maxLines = textChat.getLineCount() + 1;
             } else {
                 maxLines = MAX_LINES_INPUT_TEXT;
             }
+
             textChat.setEllipsize(null);
             textChat.setMaxLines(maxLines);
         }
@@ -3688,6 +3699,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     sendMessage(text);
                 }
                 textChat.setText("", TextView.BufferType.EDITABLE);
+                controlExpanableInputText(1);
                 break;
 
             case R.id.emoji_rl:
@@ -4104,6 +4116,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else {
             textChat.setText(messageToEdit.getContent());
             textChat.setSelection(textChat.getText().length());
+            textChat.post(() -> {
+                controlExpanableInputText(textChat.getLineCount());
+            });
+            setSizeInputText(false);
         }
     }
 
@@ -7744,6 +7760,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onDestroy() {
         logDebug("onDestroy()");
+
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null){
@@ -8242,7 +8259,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
    @Override
     public void onResume(){
         logDebug("onResume");
-        super.onResume();
+       super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
         if(idChat!=-1 && chatRoom!=null) {
 
@@ -8422,6 +8439,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     @Override
     protected void onPause(){
         super.onPause();
+
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
 
@@ -9058,6 +9076,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             storageDir.mkdir();
         }
         return new File(storageDir, imageFileName + ".jpg");
+    }
+
+    private void controlExpanableInputText(int linesCount) {
+        expandCollapseInputTextIcon.setVisibility(linesCount > 3 ? View.VISIBLE : View.GONE);
     }
 
     /**

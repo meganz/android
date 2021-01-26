@@ -43,9 +43,12 @@
                     android:layout_width="208dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="8dp"
                     android:layout_marginEnd="14dp"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical|start"
+                    android:background="@android:color/transparent"
                     android:inputType="textMultiLine|textCapSentences"
                     android:maxLines="5"
                     android:minHeight="38dp"
@@ -70,39 +73,39 @@
                         app:tint="@color/unread_msgs_badge"/>
                 </RelativeLayout>
             </RelativeLayout>
+
         <RelativeLayout
+            android:id="@+id/expand_input_text_rl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/write_msg_rl"
+            android:layout_toEndOf="@id/write_msg_rl">
+
+            <ImageButton
+                android:id="@+id/expand_input_text_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@null"
+                android:src="@drawable/ic_expand_text_input"
+                android:visibility="visible" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/record_and_send_rl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/write_msg_rl"
             android:layout_toEndOf="@id/write_msg_rl"
             android:paddingBottom="9dp">
-            <RelativeLayout
-                android:id="@+id/expand_input_text_rl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/record_and_send_rl">
-                <ImageButton
-                    android:id="@+id/expand_input_text_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:src="@drawable/ic_expand_text_input"
-                    android:visibility="visible" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/record_and_send_rl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <ImageButton
-                    android:id="@+id/record_and_send_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:src="@drawable/ic_send_black"
-                    android:visibility="visible"
-                    app:tint="@color/accentColor" />
-            </RelativeLayout>
 
+            <ImageButton
+                android:id="@+id/record_and_send_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@null"
+                android:src="@drawable/ic_send_black"
+                android:visibility="visible"
+                app:tint="@color/accentColor" />
         </RelativeLayout>
     </RelativeLayout>
 </RelativeLayout>
