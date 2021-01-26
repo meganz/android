@@ -383,6 +383,7 @@ class PasscodeLockActivity : BaseActivity() {
             resetAttempts()
             finish()
         } else {
+            sbFirst.clear()
             incrementAttempts()
             clearTypedPasscode(false)
             showAttemptsError()
