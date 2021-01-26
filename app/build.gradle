@@ -19,8 +19,8 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 349
-        versionName "3.8.5 (349)"
+        versionCode 350
+        versionName "3.8.5 (350)"
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
