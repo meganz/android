@@ -676,7 +676,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_pin_lock" context="Settings of the Passcode">Passcode lock</string>
     <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
@@ -785,8 +785,8 @@
     <string name="pin_lock_not_match" context="Error message when not typing the Passcode correctly (two times)">Passcodes don’t match. Try again.</string>
     <string name="unlock_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your passcode</string>
     <string name="unlock_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your passcode</string>
-    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new Passcode</string>
-    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new Passcode</string>
+    <string name="reset_pin_title" context="Title of the screen to unlock screen with Passcode">Enter your new passcode</string>
+    <string name="reset_pin_title_2" context="Title of the screen to unlock screen with Passcode in second round">Re-Enter your new passcode</string>
     <string name="incorrect_pin_activity" context="Text of the screen after 10 attemps with a wrong Passcode" formatted="false">All your local data will be deleted and you will be logged out in %1d seconds</string>
 
     <string name="settings_about" context="Caption of a title, in the context of “About MEGA” or “About us”">About</string>

@@ -24,7 +24,7 @@ import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.dp2px
 import java.util.*
 
-class PasscodeActivity : BaseActivity() {
+class PasscodeLockActivity : BaseActivity() {
 
     companion object {
         const val ACTION_SET_PIN_LOCK = "ACTION_SET"
@@ -37,6 +37,7 @@ class PasscodeActivity : BaseActivity() {
 
     private val attempts = 0
     private var mode = UNLOCK_MODE
+    private var setOrUnlockMode = true
 
     private var screenOrientation = 0
 
@@ -58,6 +59,8 @@ class PasscodeActivity : BaseActivity() {
             ACTION_RESET_PIN_LOCK -> RESET_MODE
             else -> UNLOCK_MODE
         }
+
+        setOrUnlockMode = mode == SET_MODE || mode == UNLOCK_MODE
 
         screenOrientation = resources.configuration.orientation
 
@@ -84,6 +87,11 @@ class PasscodeActivity : BaseActivity() {
 
     private fun initPasscodeScreen() {
         updateViewOrientation()
+
+        binding.titleText.text = StringResourcesUtils.getString(
+            if (setOrUnlockMode) R.string.unlock_pin_title
+            else R.string.reset_pin_title
+        )
 
         binding.doNotMatchWarning.visibility = GONE
 
@@ -148,7 +156,11 @@ class PasscodeActivity : BaseActivity() {
                 addTextChangedListener(object : CustomTextWatcher() {
                     override fun afterTextChanged(editable: Editable?) {
                         if (editable.toString().isNotEmpty()) {
-                            binding.passFifthInput.requestFocus()
+                            if (passcodeType == PIN_4) {
+                                checkPasscode()
+                            } else {
+                                binding.passFifthInput.requestFocus()
+                            }
                         }
                     }
                 })
@@ -340,7 +352,9 @@ class PasscodeActivity : BaseActivity() {
         binding.passwordInput.text.clear()
 
         binding.titleText.text = StringResourcesUtils.getString(
-            if (reEnter) R.string.unlock_pin_title_2
+            if (reEnter && setOrUnlockMode) R.string.unlock_pin_title_2
+            else if (reEnter) R.string.reset_pin_title_2
+            else if (setOrUnlockMode) R.string.reset_pin_title
             else R.string.unlock_pin_title
         )
 

@@ -318,7 +318,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeActivity"
+            android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity"
             android:label="@string/settings_pin_lock"
             android:windowSoftInputMode="adjustResize|stateVisible"
             android:configChanges="orientation|screenSize"

@@ -6,9 +6,9 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.settingsActivities.PasscodeActivity
-import mega.privacy.android.app.activities.settingsActivities.PasscodeActivity.Companion.ACTION_RESET_PIN_LOCK
-import mega.privacy.android.app.activities.settingsActivities.PasscodeActivity.Companion.ACTION_SET_PIN_LOCK
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PIN_LOCK
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PIN_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
@@ -84,7 +84,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     private fun intentToPinLock(reset: Boolean) {
-        val intent = Intent(context, PasscodeActivity::class.java)
+        val intent = Intent(context, PasscodeLockActivity::class.java)
         intent.action = if (reset) ACTION_RESET_PIN_LOCK else ACTION_SET_PIN_LOCK
         startActivityForResult(intent, Constants.SET_PIN)
     }
