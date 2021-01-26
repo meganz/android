@@ -14,7 +14,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.ClickableSummarySwitchPreference
-import mega.privacy.android.app.components.StaticSwitchPreference
 import mega.privacy.android.app.components.TwoButtonsPreference
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
@@ -27,7 +26,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
     private val viewModel by viewModels<CookieSettingsViewModel>()
 
     private lateinit var acceptCookiesPreference: SwitchPreferenceCompat
-    private lateinit var essentialCookiesPreference: StaticSwitchPreference
     private lateinit var preferenceCookiesPreference: SwitchPreferenceCompat
     private lateinit var analyticsCookiesPreference: SwitchPreferenceCompat
     private lateinit var advertisingCookiesPreference: SwitchPreferenceCompat
@@ -38,7 +36,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         addPreferencesFromResource(R.xml.preferences_cookie)
 
         acceptCookiesPreference = findPreference(KEY_COOKIE_ACCEPT)!!
-        essentialCookiesPreference = findPreference(KEY_COOKIE_ESSENTIAL)!!
         preferenceCookiesPreference = findPreference(KEY_COOKIE_PREFERENCE)!!
         analyticsCookiesPreference = findPreference(KEY_COOKIE_ANALYTICS)!!
         advertisingCookiesPreference = findPreference(KEY_COOKIE_ADVERTISING)!!
@@ -88,7 +85,6 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      * @param cookies   Set of enabled cookies
      */
     private fun showCookies(cookies: Set<CookieType>) {
-        essentialCookiesPreference.isChecked = true
         preferenceCookiesPreference.isChecked = cookies.contains(PREFERENCE) == true
         analyticsCookiesPreference.isChecked = cookies.contains(ANALYTICS) == true
         advertisingCookiesPreference.isChecked = cookies.contains(ADVERTISEMENT) == true

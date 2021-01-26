@@ -2963,5 +2963,6 @@
     <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
 
 </resources>
