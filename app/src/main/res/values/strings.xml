@@ -676,7 +676,7 @@
     <string name="settings_features" context="settings of the Features section">Features</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">Storage</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">Passcode lock</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">Passcode lock</string>
     <string name="settings_passcode_option" context="Setting to allow the user to select the preferred passcode type">Passcode options</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
@@ -770,13 +770,13 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change passcode</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Require passcode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
 
-    <plurals name="pin_lock_alert_attempts">
+    <plurals name="passcode_lock_alert_attempts">
         <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 failed passcode attempt</item>
         <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
     </plurals>

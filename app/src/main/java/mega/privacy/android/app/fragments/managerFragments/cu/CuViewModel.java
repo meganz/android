@@ -265,8 +265,8 @@ class CuViewModel extends BaseRxViewModel {
 
                     mDbHandler.setStorageDownloadLocation(
                             defaultDownloadLocation.getAbsolutePath());
-                    mDbHandler.setPinLockEnabled(false);
-                    mDbHandler.setPinLockCode("");
+                    mDbHandler.setPasscodeLockEnabled(false);
+                    mDbHandler.setPasscodeLockCode("");
 
                     ArrayList<MegaNode> nodeLinks = mMegaApi.getPublicLinks();
                     if (nodeLinks == null || nodeLinks.size() == 0) {

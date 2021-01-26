@@ -7,8 +7,8 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PIN_LOCK
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PIN_LOCK
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PASSCODE_LOCK
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PASSCODE_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
@@ -20,17 +20,17 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private var resetPasscode: Preference? = null
     private var requirePasscode: Preference? = null
 
-    private var pinLock = false
+    private var passcodeLock = false
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_passcode)
         passcodeSwitch = findPreference(KEY_PASSCODE_ENABLE)
         passcodeSwitch?.setOnPreferenceClickListener {
-            if (pinLock) {
+            if (passcodeLock) {
                 disablePasscode()
             } else {
                 passcodeSwitch?.isChecked = false
-                intentToPinLock(false)
+                intentToPasscodeLock(false)
             }
 
             true
@@ -39,13 +39,13 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         resetPasscode = findPreference(KEY_RESET_PASSCODE)
         resetPasscode?.apply {
             setOnPreferenceClickListener {
-                intentToPinLock(true)
+                intentToPasscodeLock(true)
                 true
             }
 
             onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { _, newValue ->
-                    dbH.setPinLockCode(newValue.toString())
+                    dbH.setPasscodeLockCode(newValue.toString())
                     true
                 }
         }
@@ -58,8 +58,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
         prefs = dbH.preferences
 
-        if (prefs == null || prefs.pinLockEnabled == null
-            || !prefs.pinLockEnabled.toBoolean() || isTextEmpty(prefs.pinLockCode)
+        if (prefs == null || prefs.passcodeLockEnabled == null
+            || !prefs.passcodeLockEnabled.toBoolean() || isTextEmpty(prefs.passcodeLockCode)
         ) {
             disablePasscode()
         } else {
@@ -68,24 +68,24 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     private fun enablePasscode() {
-        pinLock = true
+        passcodeLock = true
         passcodeSwitch?.isChecked = true
         preferenceScreen.addPreference(resetPasscode)
         preferenceScreen.addPreference(requirePasscode)
     }
 
     private fun disablePasscode() {
-        pinLock = false
+        passcodeLock = false
         passcodeSwitch?.isChecked = false
         preferenceScreen.removePreference(resetPasscode)
         preferenceScreen.removePreference(requirePasscode)
-        dbH.setPinLockEnabled(false)
-        dbH.setPinLockCode("")
+        dbH.setPasscodeLockEnabled(false)
+        dbH.setPasscodeLockCode("")
     }
 
-    private fun intentToPinLock(reset: Boolean) {
+    private fun intentToPasscodeLock(reset: Boolean) {
         val intent = Intent(context, PasscodeLockActivity::class.java)
-        intent.action = if (reset) ACTION_RESET_PIN_LOCK else ACTION_SET_PIN_LOCK
+        intent.action = if (reset) ACTION_RESET_PASSCODE_LOCK else ACTION_SET_PASSCODE_LOCK
         startActivityForResult(intent, Constants.SET_PIN)
     }
 

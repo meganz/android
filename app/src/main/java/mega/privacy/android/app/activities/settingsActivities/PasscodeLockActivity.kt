@@ -30,8 +30,8 @@ import java.util.*
 class PasscodeLockActivity : BaseActivity() {
 
     companion object {
-        const val ACTION_SET_PIN_LOCK = "ACTION_SET"
-        const val ACTION_RESET_PIN_LOCK = "ACTION_RESET"
+        const val ACTION_SET_PASSCODE_LOCK = "ACTION_SET"
+        const val ACTION_RESET_PASSCODE_LOCK = "ACTION_RESET"
         const val MAX_ATTEMPTS = 10
         const val MIN_ATTEMPTS_TO_SHOW_WARNING = 5
         const val UNLOCK_MODE = 0
@@ -59,8 +59,8 @@ class PasscodeLockActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         mode = when (intent.action) {
-            ACTION_SET_PIN_LOCK -> SET_MODE
-            ACTION_RESET_PIN_LOCK -> RESET_MODE
+            ACTION_SET_PASSCODE_LOCK -> SET_MODE
+            ACTION_RESET_PASSCODE_LOCK -> RESET_MODE
             else -> UNLOCK_MODE
         }
 
@@ -69,7 +69,7 @@ class PasscodeLockActivity : BaseActivity() {
         val prefs = dbH.preferences
 
         passcodeType =
-            if (prefs != null && !isTextEmpty(prefs.pinLockType)) prefs.pinLockType else PIN_4
+            if (prefs != null && !isTextEmpty(prefs.passcodeLockType)) prefs.passcodeLockType else PIN_4
 
         screenOrientation = resources.configuration.orientation
 
@@ -81,7 +81,7 @@ class PasscodeLockActivity : BaseActivity() {
         setSupportActionBar(binding.toolbarPasscode)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title =
-            StringResourcesUtils.getString(R.string.settings_pin_lock).toUpperCase(Locale.ROOT)
+            StringResourcesUtils.getString(R.string.settings_passcode_lock).toUpperCase(Locale.ROOT)
 
         initPasscodeScreen()
         setListeners()
@@ -364,9 +364,9 @@ class PasscodeLockActivity : BaseActivity() {
 
     private fun confirmPasscode() {
         if (sbFirst.toString() == sbSecond.toString()) {
-            dbH.setPinLockCode(sbFirst.toString())
-            dbH.setPinLockType(passcodeType)
-            dbH.setPinLockEnabled(true)
+            dbH.setPasscodeLockCode(sbFirst.toString())
+            dbH.setPasscodeLockType(passcodeType)
+            dbH.setPasscodeLockEnabled(true)
             PinUtil.update()
             setResult(RESULT_OK)
             finish()
@@ -378,7 +378,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     private fun confirmUnlockPasscode() {
-        if (sbFirst.toString() == dbH.preferences.pinLockCode) {
+        if (sbFirst.toString() == dbH.preferences.passcodeLockCode) {
             PinUtil.update()
             resetAttempts()
             finish()
@@ -394,7 +394,7 @@ class PasscodeLockActivity : BaseActivity() {
         binding.failedAttemptsText.apply {
             visibility = VISIBLE
             text = StringResourcesUtils.getQuantityString(
-                R.plurals.pin_lock_alert_attempts,
+                R.plurals.passcode_lock_alert_attempts,
                 attempts,
                 attempts
             )

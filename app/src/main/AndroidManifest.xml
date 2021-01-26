@@ -312,7 +312,7 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity"
-            android:label="@string/settings_pin_lock"
+            android:label="@string/settings_passcode_lock"
             android:windowSoftInputMode="adjustResize|stateVisible"
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Megaactionbar">
@@ -499,7 +499,7 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity"
-            android:label="@string/settings_pin_lock_switch"
+            android:label="@string/settings_passcode_lock_switch"
             android:theme="@style/PreferencesScreen"
             android:launchMode="singleTop">
         </activity>

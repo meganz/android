@@ -707,7 +707,7 @@
     <string name="settings_features" context="settings of the Features section">기능</string>
 
     <string name="settings_storage" context="label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’.">저장소</string>
-    <string name="settings_pin_lock" context="Settings of the Passcode">암호 잠금</string>
+    <string name="settings_passcode_lock" context="Settings of the Passcode">암호 잠금</string>
 	<string name="settings_camera_upload_charging_helper_label" context="Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
 	<string name="settings_camera_upload_include_gps_helper_label" context="Helper text to explain the things to note if enable the feature of including GPS info">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
 
@@ -800,7 +800,7 @@
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">사진과 동영상</string>
 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">설정되지 않음</string>
-    <string name="settings_pin_lock_switch" context="Settings of the Passcode">암호 잠금</string>
+    <string name="settings_passcode_lock_switch" context="Settings of the Passcode">암호 잠금</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">암호 변경</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">입력</string>

@@ -6,7 +6,7 @@
     <androidx.preference.SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="settings_passcode_enable"
-        android:title="@string/settings_pin_lock_switch"
+        android:title="@string/settings_passcode_lock_switch"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />

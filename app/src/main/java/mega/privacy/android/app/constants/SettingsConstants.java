@@ -9,7 +9,7 @@ public class SettingsConstants {
     public static final String KEY_STORAGE_FILE_MANAGEMENT = "settings_storage_file_management";
     public static final String CATEGORY_SECURITY = "settings_security";
     public static final String KEY_RECOVERY_KEY = "settings_recovery_key";
-    public static final String KEY_PIN_LOCK = "settings_pin_lock";
+    public static final String KEY_PASSCODE_LOCK = "settings_passcode_lock";
     public static final String KEY_CHANGE_PASSWORD = "settings_change_password";
     public static final String KEY_2FA = "settings_2fa_activated";
     public static final String KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept";

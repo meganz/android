@@ -13,8 +13,8 @@ public class MegaPreferences{
 	String camSyncFileUpload = "";
 	String camSyncTimeStamp = "";
 	String camVideoSyncTimeStamp = "";
-	String pinLockEnabled = "";
-	String pinLockCode = "";
+	String passcodeLockEnabled = "";
+	String passcodeLockCode = "";
 	String storageAskAlways = "";
 	String storageDownloadLocation = "";
 	String lastFolderUpload = "";
@@ -30,7 +30,7 @@ public class MegaPreferences{
 	String preferredViewListCameraUploads = "";
 	String uriExternalSDCard = "";
 	String cameraFolderExternalSDCard = "";	
-	String pinLockType = "";
+	String passcodeLockType = "";
 	String preferredSortCloud = "";
 	String preferredSortContacts = "";
 	private String preferredSortCameraUpload;
@@ -56,9 +56,9 @@ public class MegaPreferences{
 
 
 
-	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
+	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode, String storageAskAlways,
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
-			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String pinLockType, String preferredSortCloud, String preferredSortContacts,
+			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String passcodeLockType, String preferredSortCloud, String preferredSortContacts,
 			String preferredSortOthers, String firstTimeChat, String smallGridCamera, String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,
                     String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,String showInviteBanner, String preferredSortCameraUpload, String sdCardUri){
 		this.firstTime = firstTime;
@@ -68,8 +68,8 @@ public class MegaPreferences{
 		this.camSyncLocalPath = camSyncLocalPath;
 		this.camSyncFileUpload = camSyncFileUpload;
 		this.camSyncTimeStamp = camSyncTimeStamp;
-		this.pinLockEnabled = pinLockEnabled;
-		this.pinLockCode = pinLockCode;
+		this.passcodeLockEnabled = passcodeLockEnabled;
+		this.passcodeLockCode = passcodeLockCode;
 		this.storageAskAlways = storageAskAlways;
 		this.storageDownloadLocation = storageDownloadLocation;
 		this.camSyncCharging = camSyncCharging;
@@ -85,7 +85,7 @@ public class MegaPreferences{
 		this.preferredViewListCameraUploads = preferredViewListCameraUploads;
 		this.uriExternalSDCard = uriExternalSDCard;
 		this.cameraFolderExternalSDCard = cameraFolderExternalSDCard;
-		this.pinLockType = pinLockType;
+		this.passcodeLockType = passcodeLockType;
 		this.preferredSortCloud = preferredSortCloud;
 		this.preferredSortContacts = preferredSortContacts;
 		this.preferredSortOthers = preferredSortOthers;
@@ -175,20 +175,20 @@ public class MegaPreferences{
 		this.camSyncTimeStamp = camSyncTimeStamp;
 	}
 	
-	public String getPinLockEnabled(){
-		return pinLockEnabled;
+	public String getPasscodeLockEnabled(){
+		return passcodeLockEnabled;
 	}
 	
-	public void setPinLockEnabled(String pinLockEnabled){
-		this.pinLockEnabled = pinLockEnabled;
+	public void setPasscodeLockEnabled(String passcodeLockEnabled){
+		this.passcodeLockEnabled = passcodeLockEnabled;
 	}
 	
-	public String getPinLockCode(){
-		return pinLockCode;
+	public String getPasscodeLockCode(){
+		return passcodeLockCode;
 	}
 	
-	public void setPinLockCode(String pinLockCode){
-		this.pinLockCode = pinLockCode;
+	public void setPasscodeLockCode(String passcodeLockCode){
+		this.passcodeLockCode = passcodeLockCode;
 	}
 	
 	public String getStorageAskAlways(){
@@ -322,12 +322,12 @@ public class MegaPreferences{
 		this.cameraFolderExternalSDCard = cameraFolderExternalSDCard;
 	}
 
-	public String getPinLockType() {
-		return pinLockType;
+	public String getPasscodeLockType() {
+		return passcodeLockType;
 	}
 
-	public void setPinLockType(String pinLockType) {
-		this.pinLockType = pinLockType;
+	public void setPasscodeLockType(String passcodeLockType) {
+		this.passcodeLockType = passcodeLockType;
 	}
 
 
