@@ -9541,7 +9541,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         while (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
             lastIdMsgSeen = message.getMessage().getMsgId();
             positionLastMessage = positionLastMessage + 1;
-            message = messages.get(positionLastMessage);
+            if (positionLastMessage < messages.size()) {
+                message = messages.get(positionLastMessage);
+            } else {
+                break;
+            }
         }
     }
 }
