@@ -9520,15 +9520,15 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     /**
-     * Method that updates as read messages the own messages.
+     * Method to find the appropriate position of unread messages. Taking into account the last received message that is read and the messages sent by me.
      */
     private void updateLocalLastSeenId() {
         int positionLastMessage = -1;
         for (int i = messages.size() - 1; i >= 0; i--) {
             AndroidMegaChatMessage androidMessage = messages.get(i);
-            if (!androidMessage.isUploading()) {
+            if (androidMessage != null && !androidMessage.isUploading()) {
                 MegaChatMessage msg = androidMessage.getMessage();
-                if (msg.getMsgId() == lastIdMsgSeen) {
+                if (msg != null && msg.getMsgId() == lastIdMsgSeen) {
                     positionLastMessage = i;
                     break;
                 }
