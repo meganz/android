@@ -3,7 +3,6 @@ package mega.privacy.android.app.activities.settingsActivities
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -15,6 +14,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.PinUtil
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.CustomTextWatcher
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
@@ -29,9 +29,14 @@ class PasscodeActivity : BaseActivity() {
     companion object {
         const val ACTION_SET_PIN_LOCK = "ACTION_SET"
         const val ACTION_RESET_PIN_LOCK = "ACTION_RESET"
-
         const val MAX_ATTEMPTS = 10
+        const val UNLOCK_MODE = 0
+        const val SET_MODE = 1
+        const val RESET_MODE = 2
     }
+
+    private val attempts = 0
+    private var mode = UNLOCK_MODE
 
     private var screenOrientation = 0
 
@@ -47,6 +52,12 @@ class PasscodeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mode = when (intent.action) {
+            ACTION_SET_PIN_LOCK -> SET_MODE
+            ACTION_RESET_PIN_LOCK -> RESET_MODE
+            else -> UNLOCK_MODE
+        }
 
         screenOrientation = resources.configuration.orientation
 
@@ -100,24 +111,8 @@ class PasscodeActivity : BaseActivity() {
             binding.passFirstInput.apply {
                 visibility = VISIBLE
                 requestFocus()
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence,
-                        i: Int,
-                        i1: Int,
-                        i2: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                    }
-
-                    override fun afterTextChanged(editable: Editable) {
+                addTextChangedListener(object : CustomTextWatcher() {
+                    override fun afterTextChanged(editable: Editable?) {
                         if (editable.toString().isNotEmpty()) {
                             binding.passSecondInput.requestFocus()
                         }
@@ -127,24 +122,8 @@ class PasscodeActivity : BaseActivity() {
 
             binding.passSecondInput.apply {
                 visibility = VISIBLE
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence,
-                        i: Int,
-                        i1: Int,
-                        i2: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                    }
-
-                    override fun afterTextChanged(editable: Editable) {
+                addTextChangedListener(object : CustomTextWatcher() {
+                    override fun afterTextChanged(editable: Editable?) {
                         if (editable.toString().isNotEmpty()) {
                             binding.passThirdInput.requestFocus()
                         }
@@ -155,24 +134,8 @@ class PasscodeActivity : BaseActivity() {
 
             binding.passThirdInput.apply {
                 visibility = VISIBLE
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence,
-                        i: Int,
-                        i1: Int,
-                        i2: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                    }
-
-                    override fun afterTextChanged(editable: Editable) {
+                addTextChangedListener(object : CustomTextWatcher() {
+                    override fun afterTextChanged(editable: Editable?) {
                         if (editable.toString().isNotEmpty()) {
                             binding.passFourthInput.requestFocus()
                         }
@@ -182,30 +145,10 @@ class PasscodeActivity : BaseActivity() {
 
             binding.passFourthInput.apply {
                 visibility = VISIBLE
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence,
-                        i: Int,
-                        i1: Int,
-                        i2: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                    }
-
-                    override fun afterTextChanged(editable: Editable) {
+                addTextChangedListener(object : CustomTextWatcher() {
+                    override fun afterTextChanged(editable: Editable?) {
                         if (editable.toString().isNotEmpty()) {
-                            if (passcodeType == PIN_4) {
-                                checkPasscode()
-                            } else {
-                                binding.passFifthInput.requestFocus()
-                            }
+                            binding.passFifthInput.requestFocus()
                         }
                     }
                 })
@@ -227,24 +170,8 @@ class PasscodeActivity : BaseActivity() {
 
                 binding.passFifthInput.apply {
                     visibility = VISIBLE
-                    addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            charSequence: CharSequence,
-                            i: Int,
-                            i1: Int,
-                            i2: Int
-                        ) {
-                        }
-
-                        override fun onTextChanged(
-                            s: CharSequence,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                        ) {
-                        }
-
-                        override fun afterTextChanged(editable: Editable) {
+                    addTextChangedListener(object : CustomTextWatcher() {
+                        override fun afterTextChanged(editable: Editable?) {
                             if (editable.toString().isNotEmpty()) {
                                 binding.passSixthInput.requestFocus()
                             }
@@ -254,24 +181,8 @@ class PasscodeActivity : BaseActivity() {
 
                 binding.passSixthInput.apply {
                     visibility = VISIBLE
-                    addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            charSequence: CharSequence,
-                            i: Int,
-                            i1: Int,
-                            i2: Int
-                        ) {
-                        }
-
-                        override fun onTextChanged(
-                            s: CharSequence,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                        ) {
-                        }
-
-                        override fun afterTextChanged(editable: Editable) {
+                    addTextChangedListener(object : CustomTextWatcher() {
+                        override fun afterTextChanged(editable: Editable?) {
                             if (editable.toString().isNotEmpty()) {
                                 checkPasscode()
                             }
