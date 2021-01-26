@@ -243,7 +243,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int PADDING_BUBBLE = 25;
     private final static int CORNER_RADIUS_BUBBLE = 30;
     private final static int MAX_WIDTH_BUBBLE = 350;
-    private final static int MARGIN_BUTTON_DEACTIVATED = 48;
+    private final static int MARGIN_BUTTON_DEACTIVATED = 20;
     private final static int MARGIN_BUTTON_ACTIVATED = 24;
     private final static int MARGIN_BOTTOM = 80;
     private final static int DURATION_BUBBLE = 4000;
@@ -347,7 +347,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private CoordinatorLayout fragmentContainer;
     private RelativeLayout writingContainerLayout;
-    private RelativeLayout writingLayout;
+    private RelativeLayout inputTextLayout;
+
 
     private RelativeLayout joinChatLinkLayout;
     private Button joinButton;
@@ -386,7 +387,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean startVideo = false;
 
     private EmojiEditText textChat;
-    ImageButton sendIcon;
+    private ImageButton sendIcon;
     RelativeLayout messagesContainerLayout;
 
     RelativeLayout observersLayout;
@@ -435,8 +436,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private AlertDialog locationDialog;
     private boolean isLocationDialogShown = false;
     private boolean isJoinCallDialogShown = false;
-    private RelativeLayout inputTextLayout;
-    private LinearLayout separatorOptions;
 
     /*Voice clips*/
     private String outputFileVoiceNotes = null;
@@ -880,7 +879,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         participantsLayout = tB.findViewById(R.id.ll_participants);
         participantsText = tB.findViewById(R.id.participants_text);
 
-        textChat = findViewById(R.id.edit_text_chat);
+        textChat = findViewById(R.id.input_text_chat);
         textChat.setVisibility(View.VISIBLE);
         textChat.setEnabled(true);
 
@@ -890,8 +889,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
-        inputTextLayout = findViewById(R.id.write_layout);
-        separatorOptions = findViewById(R.id.separator_layout_options);
+        inputTextLayout = findViewById(R.id.write_and_options_layout);
 
         titleToolbar.setText("");
         individualSubtitleToobar.setText("");
@@ -919,15 +917,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         unreadMsgsLayout.setVisibility(View.GONE);
         unreadBadgeText = findViewById(R.id.badge_text);
 
-        writingLayout = findViewById(R.id.writing_linear_layout_chat);
-
-        rLKeyboardTwemojiButton = findViewById(R.id.rl_keyboard_twemoji_chat);
+        rLKeyboardTwemojiButton = findViewById(R.id.emoji_rl);
         rLMediaButton = findViewById(R.id.rl_media_icon_chat);
         rLPickFileStorageButton = findViewById(R.id.rl_pick_file_storage_icon_chat);
         rLPickAttachButton = findViewById(R.id.rl_attach_icon_chat);
         rlGifButton = findViewById(R.id.rl_gif_chat);
 
-        keyboardTwemojiButton = findViewById(R.id.keyboard_twemoji_chat);
+        keyboardTwemojiButton = findViewById(R.id.emoji_icon);
         mediaButton = findViewById(R.id.media_icon_chat);
         pickFileStorageButton = findViewById(R.id.pick_file_storage_icon_chat);
         pickAttachButton = findViewById(R.id.pick_attach_chat);
@@ -979,7 +975,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         chatRelativeLayout  = findViewById(R.id.relative_chat_layout);
 
-        sendIcon = findViewById(R.id.send_message_icon_chat);
+        sendIcon = findViewById(R.id.record_and_send_icon);
         sendIcon.setOnClickListener(this);
         sendIcon.setEnabled(true);
 
@@ -1023,7 +1019,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 if (s != null && !s.toString().trim().isEmpty()) {
                     showSendIcon();
                 } else {
@@ -1252,7 +1247,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void hideInputText(){
         inputTextLayout.setVisibility(View.GONE);
-        separatorOptions.setVisibility(View.VISIBLE);
         voiceClipLayout.setVisibility(View.GONE);
        if(emojiKeyboard!=null)
         emojiKeyboard.hideKeyboardFromFileStorage();
@@ -1264,9 +1258,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void showInputText(){
         inputTextLayout.setVisibility(View.VISIBLE);
-        separatorOptions.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.VISIBLE);
-
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
@@ -3467,6 +3459,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(isEmpty){
             textChat.setMaxLines(1);
         }else {
+
             int maxLines;
             if (textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()) {
                 maxLines = textChat.getLineCount() + 1;
@@ -3684,8 +3677,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
 
-            case R.id.send_message_icon_chat:
-                writingLayout.setClickable(false);
+            case R.id.record_and_send_icon:
                 String text = textChat.getText().toString();
                 if(text.trim().isEmpty()) break;
                 if (editingMessage) {
@@ -3698,8 +3690,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 textChat.setText("", TextView.BufferType.EDITABLE);
                 break;
 
-            case R.id.keyboard_twemoji_chat:
-            case R.id.rl_keyboard_twemoji_chat:
+            case R.id.emoji_rl:
+            case R.id.emoji_icon:
                 logDebug("keyboard_icon_chat");
                 hideFileStorage();
                 if(emojiKeyboard==null) break;

@@ -169,7 +169,7 @@
                 android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -217,60 +217,11 @@
                         </LinearLayout>
                     </RelativeLayout>
 
-
-                    <RelativeLayout
-                        android:id="@+id/write_layout"
+                    <include
+                        layout="@layout/input_text_chat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:gravity="bottom">
-
-                        <LinearLayout
-                            android:id="@+id/separator_edit_text"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_alignTop="@id/writing_linear_layout_chat"
-                            android:background="@color/black_12_alpha"
-                            android:orientation="horizontal"
-                            android:visibility="visible" />
-
-                        <RelativeLayout
-                            android:id="@+id/writing_linear_layout_chat"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:gravity="center_vertical"
-                            android:visibility="visible">
-
-                            <ImageButton
-                                android:id="@+id/send_message_icon_chat"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_alignParentEnd="true"
-                                android:layout_marginEnd="8dp"
-                                android:background="@null"
-                                android:src="@drawable/ic_send_black"
-                                app:tint="@color/accentColor"
-                                android:visibility="visible" />
-
-                            <mega.privacy.android.app.components.twemoji.EmojiEditText
-                                android:id="@+id/edit_text_chat"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:minHeight="48dp"
-                                android:layout_centerVertical="true"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginEnd="58dp"
-                                android:background="@android:color/transparent"
-                                android:gravity="center_vertical|start"
-                                android:inputType="textMultiLine|textCapSentences"
-                                android:maxLines="5"
-                                android:textColor="@color/black"
-                                android:textSize="14sp"
-                                app:emojiSize="18sp"/>
-
-                        </RelativeLayout>
-                    </RelativeLayout>
+                        android:gravity="bottom" />
 
                     <LinearLayout
                         android:id="@+id/separator_layout_options"
@@ -288,7 +239,8 @@
                         android:layout_height="48dp"
                         android:background="@color/white"
                         android:orientation="horizontal"
-                        android:baselineAligned="false">
+                        android:baselineAligned="false"
+                        android:visibility="gone">
 
                         <RelativeLayout
                             android:id="@+id/rl_keyboard_twemoji_chat"

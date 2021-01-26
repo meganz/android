@@ -248,5 +248,5 @@
     <color name="label_grey">#A4A4A7</color>
 
     <color name="unread_msgs_badge">#4F4F4F</color>
-
+    <color name="background_input_text_chat_layout">#07000000</color>
 </resources>
