@@ -775,7 +775,12 @@
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Require passcode</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
-    <string name="pin_lock_alert_attempts" context="Error message when not typing the Passcode code correctly. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts">%1$d failed passcode attempts</string>
+
+    <plurals name="pin_lock_alert_attempts">
+        <item context="Error message when not typing the Passcode code correctly. Singular." quantity="one">1 failed passcode attempt</item>
+        <item context="Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts" quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
+
     <string name="pin_lock_alert" context="Error message when not typing the Passcode code correctly">You will be logged out and your offline files will be deleted after 10 further failed attempts</string>
     <string name="pin_lock_incorrect" context="error message when not typing the Passcode code correctly">Incorrect code</string>
     <plurals name="pin_lock_incorrect_alert">

@@ -227,6 +227,7 @@
     <color name="background_own_reaction_added">#0F00BFA5</color>
 
     <color name="error_color">#C70000</color>
+    <color name="failed_attempts">#F30C14</color>
 
     <color name="pressed_color">#E7E7E7</color>
 

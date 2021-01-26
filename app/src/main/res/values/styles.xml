@@ -405,9 +405,10 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="AccentBorderBackgroundButton" parent="ButtonStyle">
+    <style name="AccentBorderBackgroundButton" parent="ButtonStyleWithoutBorder">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:textColor">@color/accentColor</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:background">@drawable/background_button_border_accent</item>
     </style>
     
@@ -632,6 +633,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:gravity">center_horizontal</item>
         <item name="android:imeOptions">actionNext|flagNoFullscreen</item>
         <item name="android:inputType">numberPassword</item>
@@ -645,8 +647,11 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginBottom">16dp</item>
-        <item name="android:layout_marginStart">40dp</item>
-        <item name="android:layout_marginEnd">40dp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:paddingStart">40dp</item>
+        <item name="android:paddingEnd">40dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:gravity">center</item>
         <item name="android:textColor">@color/error_color</item>
         <item name="android:textSize">13sp</item>
     </style>

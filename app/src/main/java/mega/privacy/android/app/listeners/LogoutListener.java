@@ -6,6 +6,7 @@ import android.content.Intent;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import nz.mega.sdk.MegaApiJava;
@@ -37,6 +38,8 @@ public class LogoutListener extends BaseListener {
 
             if (context instanceof WeakAccountProtectionAlertActivity) {
                 ((WeakAccountProtectionAlertActivity) context).finish();
+            } else if (context instanceof PasscodeLockActivity) {
+                ((PasscodeLockActivity) context).finish();
             }
         } else {
             showSnackbar(context, SNACKBAR_TYPE, context.getString(R.string.general_error), -1);

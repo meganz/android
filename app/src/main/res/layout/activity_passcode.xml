@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/passcode_parent_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_passcode"
@@ -13,107 +13,155 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/Theme.Megaactionbar"
         app:theme="@style/Theme.Megaactionbar"
         app:titleTextAppearance="@style/ToolbarTitle" />
 
-    <TextView
-        android:id="@+id/title_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:fontFamily="sans-serif"
-        android:text="@string/unlock_pin_title"
-        android:textColor="@color/primary_text"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_passcode" />
+    <ScrollView
+        android:id="@+id/passcode_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <mega.privacy.android.app.components.EditTextPIN
-        android:id="@+id/pass_first_input"
-        style="@style/PinPasscodeStyle"
-        app:layout_constraintEnd_toStartOf="@id/pass_second_input"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/passcode_parent_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white">
 
-    <mega.privacy.android.app.components.EditTextPIN
-        android:id="@+id/pass_second_input"
-        style="@style/PinPasscodeStyle"
-        app:layout_constraintEnd_toStartOf="@id/pass_third_input"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/pass_first_input"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+            <TextView
+                android:id="@+id/title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/unlock_pin_title"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <mega.privacy.android.app.components.EditTextPIN
-        android:id="@+id/pass_third_input"
-        style="@style/PinPasscodeStyle"
-        app:layout_constraintEnd_toStartOf="@id/pass_fourth_input"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/pass_second_input"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+            <mega.privacy.android.app.components.EditTextPIN
+                android:id="@+id/pass_first_input"
+                style="@style/PinPasscodeStyle"
+                app:layout_constraintEnd_toStartOf="@id/pass_second_input"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
-    <mega.privacy.android.app.components.EditTextPIN
-        android:id="@+id/pass_fourth_input"
-        style="@style/PinPasscodeStyle"
-        app:layout_constraintEnd_toStartOf="@id/pass_fifth_input"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/pass_third_input"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+            <mega.privacy.android.app.components.EditTextPIN
+                android:id="@+id/pass_second_input"
+                style="@style/PinPasscodeStyle"
+                app:layout_constraintEnd_toStartOf="@id/pass_third_input"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/pass_first_input"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
-    <mega.privacy.android.app.components.EditTextPIN
-        android:id="@+id/pass_fifth_input"
-        style="@style/PinPasscodeStyle"
-        app:layout_constraintEnd_toStartOf="@id/pass_sixth_input"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/pass_fourth_input"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+            <mega.privacy.android.app.components.EditTextPIN
+                android:id="@+id/pass_third_input"
+                style="@style/PinPasscodeStyle"
+                app:layout_constraintEnd_toStartOf="@id/pass_fourth_input"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/pass_second_input"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
-    <mega.privacy.android.app.components.EditTextPIN
-        android:id="@+id/pass_sixth_input"
-        style="@style/PinPasscodeStyle"
-        android:layout_marginEnd="0dp"
-        android:imeOptions="actionDone|flagNoFullscreen"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/pass_fifth_input"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+            <mega.privacy.android.app.components.EditTextPIN
+                android:id="@+id/pass_fourth_input"
+                style="@style/PinPasscodeStyle"
+                app:layout_constraintEnd_toStartOf="@id/pass_fifth_input"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/pass_third_input"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
-    <EditText
-        android:id="@+id/password_input"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:imeOptions="actionDone|flagNoFullscreen"
-        android:importantForAutofill="no"
-        android:inputType="textPassword"
-        android:textColor="@color/primary_text"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_text"
-        tools:ignore="LabelFor" />
+            <mega.privacy.android.app.components.EditTextPIN
+                android:id="@+id/pass_fifth_input"
+                style="@style/PinPasscodeStyle"
+                app:layout_constraintEnd_toStartOf="@id/pass_sixth_input"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/pass_fourth_input"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
-    <TextView
-        android:id="@+id/do_not_match_warning"
-        style="@style/WarningPasscodeStyle"
-        android:layout_marginTop="82dp"
-        android:text="@string/pin_lock_not_match"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_text" />
+            <mega.privacy.android.app.components.EditTextPIN
+                android:id="@+id/pass_sixth_input"
+                style="@style/PinPasscodeStyle"
+                android:layout_marginEnd="0dp"
+                android:imeOptions="actionDone|flagNoFullscreen"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@id/pass_fifth_input"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
 
-    <Button
-        android:id="@+id/passcode_options_button"
-        style="@style/TransparentBackgroundButtonWithoutBorder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:text="@string/settings_passcode_option"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            <EditText
+                android:id="@+id/password_input"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif"
+                android:imeOptions="actionDone|flagNoFullscreen"
+                android:importantForAutofill="no"
+                android:inputType="textPassword"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_text"
+                tools:ignore="LabelFor" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/do_not_match_warning"
+                style="@style/WarningPasscodeStyle"
+                android:layout_marginTop="82dp"
+                android:text="@string/pin_lock_not_match"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+            <TextView
+                android:id="@+id/failed_attempts_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="88dp"
+                android:background="@drawable/background_passcode_attempts"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+            <TextView
+                android:id="@+id/failed_attempts_error_text"
+                style="@style/WarningPasscodeStyle"
+                android:layout_marginTop="16dp"
+                android:text="@string/pin_lock_alert"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text" />
+
+            <Button
+                android:id="@+id/logout_button"
+                style="@style/AccentBorderBackgroundButton"
+                android:layout_marginTop="30dp"
+                android:text="@string/action_logout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/failed_attempts_error_text" />
+
+            <Button
+                android:id="@+id/passcode_options_button"
+                style="@style/TransparentBackgroundButtonWithoutBorder"
+                android:layout_marginBottom="40dp"
+                android:text="@string/settings_passcode_option"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -1,6 +1,6 @@
 package mega.privacy.android.app;
 
-import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -56,7 +56,7 @@ public class PinUtil {
 	// Display lock screen
 	public static void showLock(Context context) {
 		logDebug("showLock");
-		Intent intent = new Intent(context, PinLockActivityLollipop.class);
+		Intent intent = new Intent(context, PasscodeLockActivity.class);
 		context.startActivity(intent);
 	}
 	

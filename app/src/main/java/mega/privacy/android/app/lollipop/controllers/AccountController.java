@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
 
@@ -29,7 +28,6 @@ import java.io.IOException;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
@@ -37,7 +35,6 @@ import mega.privacy.android.app.jobservices.SyncRecord;
 import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
@@ -468,19 +465,13 @@ public class AccountController {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
 
-        if (context instanceof ManagerActivityLollipop){
-            megaApi.logout((ManagerActivityLollipop)context);
-        }
-        else if (context instanceof OpenLinkActivity){
-            megaApi.logout((OpenLinkActivity)context);
-        }
-        else if (context instanceof PinLockActivityLollipop){
-            megaApi.logout((PinLockActivityLollipop)context);
-        }
-        else if (context instanceof TestPasswordActivity){
-            megaApi.logout(((TestPasswordActivity)context));
-        }
-        else{
+        if (context instanceof ManagerActivityLollipop) {
+            megaApi.logout((ManagerActivityLollipop) context);
+        } else if (context instanceof OpenLinkActivity) {
+            megaApi.logout((OpenLinkActivity) context);
+        } else if (context instanceof TestPasswordActivity) {
+            megaApi.logout(((TestPasswordActivity) context));
+        } else {
             megaApi.logout(new LogoutListener(context));
         }
 
