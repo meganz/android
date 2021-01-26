@@ -133,7 +133,7 @@
             <LinearLayout
                 android:id="@+id/option_properties_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
