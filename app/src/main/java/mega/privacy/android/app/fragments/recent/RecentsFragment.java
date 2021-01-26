@@ -196,7 +196,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
 
         adapter = new RecentsAdapter(context, this, recentsItems);
         listView.setAdapter(adapter);
-        listView.addItemDecoration(new HeaderItemDecoration(context, outMetrics));
+        listView.addItemDecoration(new HeaderItemDecoration(context));
         setVisibleContacts();
     }
 

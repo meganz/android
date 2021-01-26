@@ -221,7 +221,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 		listView = (RecyclerView) findViewById(R.id.contact_attachment_chat_view_browser);
 		listView.setClipToPadding(false);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());

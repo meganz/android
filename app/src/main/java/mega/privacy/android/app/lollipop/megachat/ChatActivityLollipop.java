@@ -67,8 +67,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.iid.FirebaseInstanceId;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -124,6 +122,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
@@ -750,7 +749,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(position<messages.size()) {
             AndroidMegaChatMessage androidM = messages.get(position);
             StringBuilder messageToShow = new StringBuilder("");
-            String token = FirebaseInstanceId.getInstance().getToken();
+            String token = PushMessageHanlder.getToken();
             if(token!=null){
                 messageToShow.append("FCM TOKEN: " +token);
             }
@@ -1659,6 +1658,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * @param visible   true if visible, false otherwise
      */
     private void setGroupalSubtitleToolbarVisibility(boolean visible) {
+        if (subtitleCall.getVisibility() == View.VISIBLE) {
+            visible = false;
+        }
+
         groupalSubtitleToolbar.setVisibility(visible ? View.VISIBLE : View.GONE);
 
         if (visible) {
@@ -5169,10 +5172,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                                         }
                                     }
                                 }
-                                if (url == null) return;
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                startActivity(browserIntent);
 
+                                if (url == null) return;
+
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+                                if (isIntentAvailable(this, browserIntent)) {
+                                    startActivity(browserIntent);
+                                } else {
+                                    showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available_location), MEGACHAT_INVALID_HANDLE);
+                                }
                             } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL ){
                                 logDebug("TYPE_NORMAL");
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
@@ -9160,7 +9169,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void startConnection() {
         logDebug("Broadcast to ManagerActivity");
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-        intent.putExtra("actionType", START_RECONNECTION);
+        intent.putExtra(ACTION_TYPE, START_RECONNECTION);
         sendBroadcast(intent);
     }
 

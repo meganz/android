@@ -140,6 +140,14 @@
 		android:visible="false"/>
 
 	<item
+		android:id="@+id/action_enable_select"
+		android:orderInCategory="110"
+		android:title="@string/general_select"
+		android:icon="@drawable/ic_action_bar_null"
+		MEGA:showAsAction="never"
+		android:visible="false"/>
+
+	<item
 		android:id="@+id/action_select"
 		android:orderInCategory="110"
 		android:title="@string/action_select_all"
