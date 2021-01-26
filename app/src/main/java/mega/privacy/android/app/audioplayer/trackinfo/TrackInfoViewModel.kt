@@ -11,7 +11,6 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
-import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.audioplayer.service.Metadata
 import mega.privacy.android.app.audioplayer.service.MetadataExtractor
@@ -21,7 +20,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.getNodeLocationInfo
 import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
@@ -31,8 +30,6 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
@@ -133,21 +130,14 @@ class TrackInfoViewModel @ViewModelInject constructor(
     private fun to2DigitsStr(value: Long) = if (value < 10) "0$value" else "$value"
 
     private fun loadNodeInfo(args: TrackInfoFragmentArgs) {
+        val location =
+            getNodeLocationInfo(args.adapterType, args.fromIncomingShare, args.handle) ?: return
+
         if (args.adapterType == OFFLINE_ADAPTER) {
             val node = dbHandler.findByHandle(args.handle) ?: return
             val file = getOfflineFile(context, node)
             if (!file.exists()) {
                 return
-            }
-
-            val parentName = file.parentFile?.name ?: return
-            val grandParentName = file.parentFile?.parentFile?.name
-            val location = when {
-                grandParentName != null
-                        && grandParentName + File.separator + parentName == OFFLINE_INBOX_DIR ->
-                    context.getString(R.string.section_saved_for_offline_new)
-                parentName == OFFLINE_DIR -> context.getString(R.string.section_saved_for_offline_new)
-                else -> parentName + " (" + context.getString(R.string.section_saved_for_offline_new) + ")"
             }
 
             val thumbnail = getThumbnailFile(context, node)
@@ -156,45 +146,12 @@ class TrackInfoViewModel @ViewModelInject constructor(
             _nodeInfo.postValue(
                 NodeInfo(
                     thumbnail, true, getSizeString(file.length()),
-                    LocationInfo(location, offlineParentPath = node.path),
-                    formatLongDateTime(file.lastModified() / 1000),
+                    location, formatLongDateTime(file.lastModified() / 1000),
                     formatLongDateTime(file.lastModified() / 1000)
                 )
             )
         } else {
             val node = megaApi.getNodeByHandle(args.handle) ?: return
-
-            val parent = megaApi.getParentNode(node)
-            val topAncestor = getRootParentNode(node)
-
-            val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
-                    || topAncestor.handle == megaApi.rubbishNode.handle
-                    || topAncestor.handle == megaApi.inboxNode.handle
-
-            val location = when {
-                args.fromIncomingShare -> {
-                    if (parent != null) {
-                        parent.name + " (" + context.getString(R.string.tab_incoming_shares) + ")"
-                    } else {
-                        context.getString(R.string.tab_incoming_shares)
-                    }
-                }
-                parent == null -> context.getString(R.string.tab_incoming_shares)
-                inCloudDrive -> {
-                    if (topAncestor.handle == parent.handle) {
-                        getTranslatedNameForParentNode(topAncestor)
-                    } else {
-                        parent.name + " (" + getTranslatedNameForParentNode(topAncestor) + ")"
-                    }
-                }
-                else -> parent.name + " (" + context.getString(R.string.tab_incoming_shares) + ")"
-            }
-
-            val fragmentHandle = when {
-                args.fromIncomingShare || parent == null -> MegaApiJava.INVALID_HANDLE
-                inCloudDrive -> topAncestor.handle
-                else -> MegaApiJava.INVALID_HANDLE
-            }
 
             val thumbnail = File(getThumbFolder(context), node.base64Handle.plus(JPG_EXTENSION))
             createThumbnailIfNotExists(thumbnail, args.handle)
@@ -202,12 +159,8 @@ class TrackInfoViewModel @ViewModelInject constructor(
             _nodeInfo.postValue(
                 NodeInfo(
                     thumbnail, availableOffline(context, node), getSizeString(node.size),
-                    LocationInfo(
-                        location,
-                        parentHandle = parent?.handle ?: MegaApiJava.INVALID_HANDLE,
-                        fragmentHandle = fragmentHandle
-                    ),
-                    formatLongDateTime(node.creationTime), formatLongDateTime(node.modificationTime)
+                    location, formatLongDateTime(node.creationTime),
+                    formatLongDateTime(node.modificationTime)
                 )
             )
         }
@@ -217,15 +170,6 @@ class TrackInfoViewModel @ViewModelInject constructor(
         if (!thumbnail.exists() && isOnline(context)) {
             val node = megaApi.getNodeByHandle(handle) ?: return
             megaApi.getThumbnail(node, thumbnail.absolutePath, createThumbnailRequest)
-        }
-    }
-
-    private fun getTranslatedNameForParentNode(parent: MegaNode): String {
-        return when (parent.handle) {
-            megaApi.rootNode.handle -> context.getString(R.string.section_cloud_drive)
-            megaApi.rubbishNode.handle -> context.getString(R.string.section_rubbish_bin)
-            megaApi.inboxNode.handle -> context.getString(R.string.section_inbox)
-            else -> parent.name
         }
     }
 

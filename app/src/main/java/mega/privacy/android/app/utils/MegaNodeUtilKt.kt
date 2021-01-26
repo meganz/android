@@ -1,16 +1,23 @@
 package mega.privacy.android.app.utils
 
+import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
+import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CopyNodeListener
 import mega.privacy.android.app.listeners.MoveNodeListener
 import mega.privacy.android.app.listeners.RenameNodeListener
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import java.io.File
 import java.util.*
 
 class MegaNodeUtilKt {
@@ -135,5 +142,140 @@ class MegaNodeUtilKt {
             megaApi.renameNode(node, newName, RenameNodeListener(snackbarShower, megaApp))
         }
 
+        /**
+         * Get location info of a node.
+         *
+         * @param adapterType node source adapter type
+         * @param fromIncomingShare is from incoming share
+         * @param handle node handle
+         *
+         * @return location info
+         */
+        @JvmStatic
+        fun getNodeLocationInfo(
+            adapterType: Int,
+            fromIncomingShare: Boolean,
+            handle: Long
+        ): LocationInfo? {
+            val app = MegaApplication.getInstance()
+            val dbHandler = DatabaseHandler.getDbHandler(app)
+            val megaApi = app.megaApi
+
+            if (adapterType == OFFLINE_ADAPTER) {
+                val node = dbHandler.findByHandle(handle) ?: return null
+                val file = OfflineUtils.getOfflineFile(app, node)
+                if (!file.exists()) {
+                    return null
+                }
+
+                val parentName = file.parentFile?.name ?: return null
+                val grandParentName = file.parentFile?.parentFile?.name
+                val location = when {
+                    grandParentName != null
+                            && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR -> {
+                        app.getString(R.string.section_saved_for_offline_new)
+                    }
+                    parentName == OfflineUtils.OFFLINE_DIR -> {
+                        app.getString(R.string.section_saved_for_offline_new)
+                    }
+                    else -> {
+                        parentName + " (" + app.getString(R.string.section_saved_for_offline_new) + ")"
+                    }
+                }
+
+                return LocationInfo(location, offlineParentPath = node.path)
+            } else {
+                val node = megaApi.getNodeByHandle(handle) ?: return null
+
+                val parent = megaApi.getParentNode(node)
+                val topAncestor = MegaNodeUtil.getRootParentNode(node)
+
+                val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
+                        || topAncestor.handle == megaApi.rubbishNode.handle
+                        || topAncestor.handle == megaApi.inboxNode.handle
+
+                val location = when {
+                    fromIncomingShare -> {
+                        if (parent != null) {
+                            parent.name + " (" + app.getString(R.string.tab_incoming_shares) + ")"
+                        } else {
+                            app.getString(R.string.tab_incoming_shares)
+                        }
+                    }
+                    parent == null -> {
+                        app.getString(R.string.tab_incoming_shares)
+                    }
+                    inCloudDrive -> {
+                        if (topAncestor.handle == parent.handle) {
+                            getTranslatedNameForParentNode(megaApi, app, topAncestor)
+                        } else {
+                            parent.name + " (" +
+                                    getTranslatedNameForParentNode(megaApi, app, topAncestor) + ")"
+                        }
+                    }
+                    else -> {
+                        parent.name + " (" + app.getString(R.string.tab_incoming_shares) + ")"
+                    }
+                }
+
+                val fragmentHandle = when {
+                    fromIncomingShare || parent == null -> INVALID_HANDLE
+                    inCloudDrive -> topAncestor.handle
+                    else -> INVALID_HANDLE
+                }
+
+                return LocationInfo(
+                    location,
+                    parentHandle = parent?.handle ?: INVALID_HANDLE,
+                    fragmentHandle = fragmentHandle
+                )
+            }
+        }
+
+        /**
+         * Handle click event of the location text.
+         *
+         * @param activity current activity
+         * @param adapterType node source adapter type
+         * @param location location info
+         */
+        @JvmStatic
+        fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
+            val intent = Intent(activity, ManagerActivityLollipop::class.java)
+
+            intent.action = ACTION_OPEN_FOLDER
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            intent.putExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, true)
+
+            if (adapterType == OFFLINE_ADAPTER) {
+                intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_ADAPTER, true)
+
+                if (location.offlineParentPath != null) {
+                    intent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, location.offlineParentPath)
+                }
+            } else {
+                intent.putExtra(INTENT_EXTRA_KEY_FRAGMENT_HANDLE, location.fragmentHandle)
+
+                if (location.parentHandle != INVALID_HANDLE) {
+                    intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, location.parentHandle)
+                }
+            }
+
+            activity.startActivity(intent)
+            activity.finish()
+        }
+
+        private fun getTranslatedNameForParentNode(
+            megaApi: MegaApiAndroid,
+            context: Context,
+            parent: MegaNode
+        ): String {
+            return when (parent.handle) {
+                megaApi.rootNode.handle -> context.getString(R.string.section_cloud_drive)
+                megaApi.rubbishNode.handle -> context.getString(R.string.section_rubbish_bin)
+                megaApi.inboxNode.handle -> context.getString(R.string.section_inbox)
+                else -> parent.name
+            }
+        }
     }
 }

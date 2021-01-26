@@ -1,9 +1,9 @@
-package mega.privacy.android.app.audioplayer.trackinfo
+package mega.privacy.android.app.utils
 
 import nz.mega.sdk.MegaApiJava
 
 /**
- * This class hold UI info for an audio node.
+ * This class hold location info of a node.
  *
  * @property location the human readable location of this node
  * @property offlineParentPath parent path, only used for offline adapter
