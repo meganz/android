@@ -138,7 +138,7 @@ import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.attacher.NodeAttacher;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -377,7 +377,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	ContactController cC;
 	AccountController aC;
 
-	private final NodeAttacher nodeAttacher = new NodeAttacher(this);
+	private final MegaAttacher nodeAttacher = new MegaAttacher(this);
 
 	long[] searchDate = null;
 
@@ -11486,7 +11486,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				cFLol.clearSelectionsNoAnimations();
 			}
 
-			nodeAttacher.handleSelectFileResult(requestCode, resultCode, intent, this);
+			nodeAttacher.handleSelectFileResult(intent, this);
 		}
 		else if(requestCode == ACTION_SEARCH_BY_DATE && resultCode == RESULT_OK) {
 			if (intent == null) {

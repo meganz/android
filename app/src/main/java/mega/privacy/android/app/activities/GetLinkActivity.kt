@@ -11,13 +11,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.fragments.getLinkFragments.CopyrightFragment
 import mega.privacy.android.app.fragments.getLinkFragments.DecryptionKeyFragment
 import mega.privacy.android.app.fragments.getLinkFragments.LinkFragment
 import mega.privacy.android.app.fragments.getLinkFragments.LinkPasswordFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
-import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil.getKeyLink
@@ -28,7 +29,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.*
 
-class GetLinkActivity : BaseActivity(), GetLinkInterface {
+class GetLinkActivity : BaseActivity(), GetLinkInterface, SnackbarShower {
     companion object {
         const val GET_LINK_FRAGMENT = 0
         const val COPYRIGHT_FRAGMENT = 1
@@ -396,7 +397,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
             }
         }
 
-        ChatController(this).checkIntentToShareSomething(data)
+        MegaAttacher(this).handleActivityResult(REQUEST_CODE_SELECT_CHAT, RESULT_OK, data, this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -455,5 +456,13 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface {
         } else {
             finish()
         }
+    }
+
+    override fun showSnackbar(content: String) {
+        showSnackbar(SNACKBAR_TYPE, content, MEGACHAT_INVALID_HANDLE)
+    }
+
+    override fun showSnackbarWithChat(content: String?, chatId: Long) {
+        showSnackbar(MESSAGE_SNACKBAR_TYPE, content, chatId)
     }
 }

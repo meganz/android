@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.components.attacher.NodeAttacher
+import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.MegaNodeSaver
 import mega.privacy.android.app.components.saver.OfflineNodeSaver
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -27,7 +27,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     private val _itemToRemove = MutableLiveData<Long>()
     val itemToRemove: LiveData<Long> = _itemToRemove
 
-    private var nodeAttacher: NodeAttacher? = null
+    private var nodeAttacher: MegaAttacher? = null
 
     /**
      * Save an offline node to device.
@@ -52,7 +52,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
     }
 
     fun attachNodeToChats(handle: Long, activityLauncher: ActivityLauncher) {
-        nodeAttacher = NodeAttacher(activityLauncher)
+        nodeAttacher = MegaAttacher(activityLauncher)
         nodeAttacher?.attachNode(handle)
     }
 

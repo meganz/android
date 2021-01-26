@@ -111,7 +111,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.attacher.NodeAttacher;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.components.saver.OfflineNodeSaver;
@@ -292,7 +292,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DisplayMetrics outMetrics;
 
     private OfflineNodeSaver offlineNodeSaver;
-    private final NodeAttacher nodeAttacher = new NodeAttacher(this);
+    private final MegaAttacher nodeAttacher = new MegaAttacher(this);
 
     private boolean fromShared = false;
     private int typeExport = -1;

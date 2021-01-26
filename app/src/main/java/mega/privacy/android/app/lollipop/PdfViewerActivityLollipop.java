@@ -90,7 +90,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
-import mega.privacy.android.app.components.attacher.NodeAttacher;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.OfflineNodeSaver;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
@@ -221,7 +221,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private String path;
     private String pathNavigation;
 
-    private final NodeAttacher nodeAttacher = new NodeAttacher(this);
+    private final MegaAttacher nodeAttacher = new MegaAttacher(this);
 
     NodeController nC;
     private OfflineNodeSaver offlineNodeSaver;

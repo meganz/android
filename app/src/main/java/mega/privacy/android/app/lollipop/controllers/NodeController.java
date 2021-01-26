@@ -238,24 +238,6 @@ public class NodeController {
         return null;
     }
 
-    public void selectChatsToSendNodes(ArrayList<MegaNode> nodes){
-        logDebug("selectChatsToSendNodes");
-
-        int size = nodes.size();
-        long[] longArray = new long[size];
-
-        for(int i=0;i<nodes.size();i++){
-            longArray[i] = nodes.get(i).getHandle();
-        }
-
-        Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra(NODE_HANDLES, longArray);
-
-        if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
-    }
-
     public boolean nodeComesFromIncoming (MegaNode node) {
         MegaNode parent = getParent(node);
 

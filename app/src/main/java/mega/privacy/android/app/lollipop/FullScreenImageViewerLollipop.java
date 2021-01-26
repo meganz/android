@@ -73,7 +73,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
-import mega.privacy.android.app.components.attacher.NodeAttacher;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
 import mega.privacy.android.app.components.saver.OfflineNodeSaver;
@@ -159,7 +159,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	int positionToRemove = -1;
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
-	private final NodeAttacher nodeAttacher = new NodeAttacher(this);
+	private final MegaAttacher nodeAttacher = new MegaAttacher(this);
 
 	NodeController nC;
 	private OfflineNodeSaver offlineNodeSaver;

@@ -53,11 +53,13 @@ import android.widget.TextView;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
@@ -68,14 +70,15 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -130,7 +133,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
-public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface {
+public class ContactInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener, MegaGlobalListenerInterface,
+		SnackbarShower {
 
 	private static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
 	private ChatController chatC;
@@ -199,6 +203,8 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	private MarqueeTextView secondLineTextToolbar;
 	private State stateToolbar = State.IDLE;
+
+	private final MegaAttacher megaAttacher = new MegaAttacher(this);
 
 	RelativeLayout clearChatLayout;
 	View dividerClearChatLayout;
@@ -1407,6 +1413,10 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 		logDebug("resultCode: " + resultCode);
 
+		if (megaAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
+			return;
+		}
+
 		if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 
 			if (!isOnline(this)) {
@@ -1445,27 +1455,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			long fileHandles[] = intent.getLongArrayExtra(NODE_HANDLES);
-
-			if (fileHandles == null) {
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
-				return;
-			}
-
-			MegaChatRoom chatRoomToSend = megaChatApi.getChatRoomByUser(user.getHandle());
-			if(chatRoomToSend!=null){
-				chatC.checkIfNodesAreMineAndAttachNodes(fileHandles, chatRoomToSend.getChatId());
-			}
-			else{
-				//Create first the chat
-				ArrayList<MegaChatRoom> chats = new ArrayList<>();
-				ArrayList<MegaUser> usersNoChat = new ArrayList<>();
-				usersNoChat.add(user);
-				CreateChatListener listener = new CreateChatListener(chats, usersNoChat, fileHandles, this, CreateChatListener.SEND_FILES, -1);
-				MegaChatPeerList peers = MegaChatPeerList.createInstance();
-				peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-				megaChatApi.createChat(false, peers, listener);
-			}
+			megaAttacher.handleSelectFileResult(intent, user, this);
 		}
         else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
@@ -1485,14 +1475,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
             boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
 
             nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
-        } else if (requestCode == REQUEST_CODE_SELECT_CHAT && resultCode == RESULT_OK){
-            logDebug("Attach nodes to chats: REQUEST_CODE_SELECT_CHAT");
-
-            long userHandle[] = {user.getHandle()};
-            intent.putExtra(USER_HANDLES, userHandle);
-
-            chatC.checkIntentToShareSomething(intent);
-		} else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER	&& resultCode == RESULT_OK) {
             if (!isOnline(this)) {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -1536,13 +1519,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
         }
 
 		super.onActivityResult(requestCode, resultCode, intent);
-	}
-
-	public void sendFilesToChat(long[] fileHandles, long chatId) {
-		MultipleAttachChatListener listener = new MultipleAttachChatListener(this, chatId, fileHandles.length);
-		for (long fileHandle : fileHandles) {
-			megaChatApi.attachNode(chatId, fileHandle, listener);
-		}
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){
@@ -2500,5 +2476,15 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
+	}
+
+	@Override
+	public void showSnackbar(@NotNull String content) {
+		showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
+	}
+
+	@Override
+	public void showSnackbarWithChat(@Nullable String content, long chatId) {
+		showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
 	}
 }

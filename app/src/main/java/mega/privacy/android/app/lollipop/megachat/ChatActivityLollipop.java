@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -67,6 +68,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -84,11 +88,11 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.NpaLinearLayoutManager;
+import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -99,7 +103,9 @@ import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -107,6 +113,7 @@ import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -187,7 +194,8 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>,
+        SnackbarShower, AttachNodeToChatListener {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
 
@@ -324,6 +332,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public int showRichLinkWarning = RICH_WARNING_TRUE;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
+
+    private final MegaAttacher nodeAttacher = new MegaAttacher(this);
 
     ChatController chatC;
     boolean scrollingUp = false;
@@ -3177,15 +3187,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
-            if (intent == null) {
-                logWarning("Return.....");
-                return;
-            }
-
-            long handles[] = intent.getLongArrayExtra(NODE_HANDLES);
-            logDebug("Number of files to send: " + handles.length);
-
-            chatC.checkIfNodesAreMineAndAttachNodes(handles, idChat);
+            nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
         }
         else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
             if (intent == null) {
@@ -3923,8 +3925,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     public void attachFromCloud(){
         logDebug("attachFromCloud");
         if(megaApi!=null && megaApi.getRootNode()!=null){
-            ChatController chatC = new ChatController(this);
-            chatC.pickFileToSend();
+            Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+            intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
+            startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
         }
         else{
             logWarning("Online but not megaApi");
@@ -9530,5 +9533,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         errorReactionsDialog.show();
         errorReactionsDialogIsShown = true;
         typeErrorReaction = typeError;
+    }
+
+    @Override
+    public void showSnackbar(@NotNull String content) {
+        showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
+    }
+
+    @Override
+    public void showSnackbarWithChat(@Nullable String content, long chatId) {
+        showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+    }
+
+    @Override
+    public void onSendSuccess(@NotNull AndroidMegaChatMessage message) {
+        sendMessageToUI(message);
     }
 }

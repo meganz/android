@@ -35,9 +35,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.ChatImportToForwardListener;
-import mega.privacy.android.app.lollipop.listeners.CopyAndSendToChatListener;
-import mega.privacy.android.app.listeners.CreateChatListener;
-import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -51,13 +48,10 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
-import nz.mega.sdk.MegaChatPeerList;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaUser;
@@ -78,7 +72,6 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -1001,13 +994,6 @@ public class ChatController {
         }
     }
 
-    public void pickFileToSend(){
-        logDebug("pickFileToSend");
-        Intent intent = new Intent(context, FileExplorerActivityLollipop.class);
-        intent.setAction(FileExplorerActivityLollipop.ACTION_MULTISELECT_FILE);
-        ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
-    }
-
     public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chatRoom){
         logDebug("Save for offline multiple messages");
         for(int i=0; i<messages.size();i++){
@@ -1764,225 +1750,6 @@ public class ChatController {
         }
 
         return false;
-    }
-
-    public void checkIfNodesAreMineAndAttachNodes(long[] handles, long idChat) {
-        long[] idChats = new long[1];
-        idChats[0] = idChat;
-        checkIfNodesAreMineAndAttachNodes(handles, idChats);
-    }
-
-    public void checkIfNodesAreMineAndAttachNodes(long[] handles, long[] idChats) {
-        if (handles == null) {
-            return;
-        }
-
-        MegaNode currentNode;
-        ArrayList<MegaNode> nodes = new ArrayList<>();
-        ArrayList<MegaNode> ownerNodes = new ArrayList<>();
-        ArrayList<MegaNode> notOwnerNodes = new ArrayList<>();
-        NodeController nC = new NodeController(context);
-
-
-        for (int i=0; i<handles.length; i++) {
-            currentNode = megaApi.getNodeByHandle(handles[i]);
-            if (currentNode != null) {
-                nodes.add(currentNode);
-            }
-        }
-
-        nC.checkIfNodesAreMine(nodes, ownerNodes, notOwnerNodes);
-
-        if (notOwnerNodes.size() == 0) {
-            //Copy the ownerNodes handles to use them in case they are not the original ones stored on handles list
-            for (int i=0; i< ownerNodes.size(); i++) {
-                handles[i] = ownerNodes.get(i).getHandle();
-            }
-
-            if (context instanceof ContactInfoActivityLollipop) {
-                ((ContactInfoActivityLollipop) context).sendFilesToChat(handles, idChats[0]);
-                return;
-            } else if (context instanceof ChatActivityLollipop) {
-                MultipleAttachChatListener listener = new MultipleAttachChatListener(context, idChats[0], handles.length);
-                for (long fileHandle : handles) {
-                    megaChatApi.attachNode(idChats[0], fileHandle, listener);
-                }
-                return;
-            }
-        }
-
-        if (context instanceof ContactInfoActivityLollipop || context instanceof ChatActivityLollipop) {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats[0]);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
-        } else if (context instanceof ManagerActivityLollipop) {
-            CopyAndSendToChatListener copyAndSendToChatListener = new CopyAndSendToChatListener(context, idChats);
-            copyAndSendToChatListener.copyNodes(notOwnerNodes, ownerNodes);
-        }
-    }
-
-    public void checkIntentToShareSomething(Intent intent) {
-        long[] chatHandles = intent.getLongArrayExtra(SELECTED_CHATS);
-        long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
-        long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
-        long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
-        String extraLink = intent.getStringExtra(EXTRA_LINK);
-        String extraKey = intent.getStringExtra(EXTRA_KEY);
-        String extraPassword = intent.getStringExtra(EXTRA_PASSWORD);
-
-        if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
-            if (contactHandles != null && contactHandles.length > 0) {
-                ArrayList<MegaChatRoom> chats = new ArrayList<>();
-                ArrayList<MegaUser> users = new ArrayList<>();
-
-                for (long contactHandle : contactHandles) {
-                    MegaUser user = megaApi.getContact(MegaApiAndroid.userHandleToBase64(contactHandle));
-                    if (user != null) {
-                        users.add(user);
-                    }
-                }
-
-                if (chatHandles != null) {
-                    for (long chatHandle : chatHandles) {
-                        MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatHandle);
-                        if (chatRoom != null) {
-                            chats.add(chatRoom);
-                        }
-                    }
-                }
-
-                CreateChatListener listener = null;
-                boolean createChats = false;
-
-                if (nodeHandles != null) {
-                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES);
-                    createChats = true;
-                } else if (userHandles != null) {
-                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS);
-                    createChats = true;
-                } else if (!isTextEmpty(extraLink)) {
-                    listener = new CreateChatListener(chats, users, extraLink, extraKey, extraPassword, context, CreateChatListener.SEND_LINK);
-                    createChats = true;
-                } else {
-                    logWarning("Error on sending to chat");
-                }
-
-                if (createChats) {
-                    for (MegaUser user : users) {
-                        MegaChatPeerList peers = MegaChatPeerList.createInstance();
-                        peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-                        megaChatApi.createChat(false, peers, listener);
-                    }
-                }
-            } else {
-                int countChat = chatHandles.length;
-                logDebug("Selected: " + countChat + " chats to send");
-
-                if (nodeHandles != null) {
-                    logDebug("Send " + nodeHandles.length + " nodes");
-                    checkIfNodesAreMineAndAttachNodes(nodeHandles, chatHandles);
-                } else if (userHandles != null) {
-                    logDebug("Send " + userHandles.length + " contacts");
-                    sendContactsToChats(chatHandles, userHandles);
-                } else if (!isTextEmpty(extraLink)) {
-                    sendLinkToChats(context, chatHandles, extraLink, extraKey, extraPassword);
-                } else {
-                    logWarning("Error on sending to chat");
-                }
-            }
-        }
-    }
-
-    /**
-     * Shares a link to chats. The link can be received along with its decryption key or with it.
-     * There are several possibilities to share a link:
-     * - Link along with decryption key:
-     *      * Without password protection. Here key and password params should be null.
-     *      * With password protection. Here key param should be null and password param:
-     *              + Can contain the password protection.
-     *              + Be null if only the protected link is shared.
-     * - Link without decryption key. Here password param should be always null and key param:
-     *      * Can contain the decryption key.
-     *      * Be null if only the link is shared.
-     *
-     * @param context      Current context.
-     * @param chatHandles List of chat identifiers to which the link has to be shared.
-     * @param link        Link to share.
-     * @param key         Decryption key of the link to share. It can be null.
-     * @param password    Password protection of the link to share. It can be null.
-     */
-    public static void sendLinkToChats(Context context, long[] chatHandles, String link, String key, String password) {
-        MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (megaChatApi == null) {
-            logError("MegaChatApi is null");
-            return;
-        }
-
-        for (Long chatId : chatHandles) {
-            megaChatApi.sendMessage(chatId, link);
-
-            if (!isTextEmpty(key)) {
-                megaChatApi.sendMessage(chatId, key);
-            } else if (!isTextEmpty(password)) {
-                megaChatApi.sendMessage(chatId, password);
-            }
-        }
-
-        String message;
-
-        if (!isTextEmpty(key)) {
-            message = context.getString(R.string.link_and_key_sent);
-        } else if (!isTextEmpty(password)) {
-            message = context.getString(R.string.link_and_password_sent);
-        } else {
-            message = context.getString(R.string.link_sent);
-        }
-
-        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, message, chatHandles.length == 1
-                ? chatHandles[0]
-                : MEGACHAT_INVALID_HANDLE);
-    }
-
-    public void sendContactsToChats(long[] chatHandles, long[] userHandles) {
-        MegaHandleList handleList = MegaHandleList.createInstance();
-
-        for (long userHandle : userHandles) {
-            handleList.addMegaHandle(userHandle);
-        }
-
-        for (long chatHandle : chatHandles) {
-            megaChatApi.attachContacts(chatHandle, handleList);
-        }
-
-        if (chatHandles.length == 1) {
-            showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, chatHandles[0]);
-        } else {
-            showSnackbar(context, MESSAGE_SNACKBAR_TYPE, null, INVALID_HANDLE);
-        }
-    }
-
-    /**
-     * Method for send a file into one or more chats
-     *
-     * @param context Context of the Activity where the file has to be sent
-     * @param chats Chats where the file has to be sent
-     * @param fileHandle Handle of the file that has to be sent
-     */
-    public static void sendFileToChatsFromContacts(Context context, ArrayList<MegaChatRoom> chats, long fileHandle){
-        logDebug("sendFileToChatsFromContacts");
-
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MultipleAttachChatListener listener;
-
-        if(chats.size()==1){
-            listener = new MultipleAttachChatListener(context, chats.get(0).getChatId(), chats.size());
-            megaChatApi.attachNode(chats.get(0).getChatId(), fileHandle, listener);
-        }
-        else{
-            listener = new MultipleAttachChatListener(context, -1, chats.size());
-            for(int i=0;i<chats.size();i++){
-                megaChatApi.attachNode(chats.get(i).getChatId(), fileHandle, listener);
-            }
-        }
     }
 
     /**
