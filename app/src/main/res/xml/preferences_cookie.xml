@@ -10,13 +10,13 @@
         app:iconSpaceReserved="false"
         app:shouldDisableView="false" />
 
-    <mega.privacy.android.app.components.StaticSwitchPreference
+    <Preference
         android:key="settings_cookie_essential"
         android:summary="@string/preference_cookies_essential_summary"
         android:title="@string/preference_cookies_essential_title"
+        android:widgetLayout="@layout/preference_widget_always_on"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
-        app:defaultValue="true"
         app:iconSpaceReserved="false"
         app:shouldDisableView="false" />
 

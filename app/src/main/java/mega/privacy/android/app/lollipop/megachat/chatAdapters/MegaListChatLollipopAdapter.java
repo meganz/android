@@ -1223,7 +1223,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
+					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
 
 					if(isTextEmpty(fullNameTitle)){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1491,7 +1491,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("Participant privilege change!");
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
+					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
 
 					if(isTextEmpty(fullNameTitle)){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
