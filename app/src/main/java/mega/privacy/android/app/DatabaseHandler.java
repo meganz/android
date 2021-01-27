@@ -346,7 +346,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"			//43
 				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"				//44
 				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 		//45
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " INTEGER" + ")";	//46
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT" + ")";		//46
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -877,9 +877,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 59) {
-			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " INTEGER;");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
-					+ " = '" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID) + "';");
+					+ " = '" + encrypt("" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
 		}
 	}
 
@@ -1531,7 +1531,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
-		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, prefs.getPasscodeLockRequireTime());
+		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
 
         db.insert(TABLE_PREFERENCES, null, values);
 	}
@@ -1598,7 +1598,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String closeInviteBanner = decrypt(cursor.getString(39));
 			String preferredSortCameraUpload = decrypt(cursor.getString(40));
 			String sdCardUri = decrypt(cursor.getString(41));
-			String passcodeLockRequireTime = cursor.getString(46);
+			String passcodeLockRequireTime = decrypt(cursor.getString(46));
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, passcodeLockEnabled,
 					passcodeLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
@@ -3457,7 +3457,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param requiredTime The time required before ask for the passcode.
 	 */
 	public void setPasscodeRequiredTime(int requiredTime) {
-		setIntValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, requiredTime);
+		setStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, requiredTime + "");
 	}
 
 	/**
@@ -3466,7 +3466,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @return The time required before ask for the passcode.
 	 */
 	public int getPasscodeRequiredTime() {
-		return getIntValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID);
+		return Integer.parseInt(getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID + ""));
 	}
 
 	public void setStorageAskAlways(boolean storageAskAlways) {

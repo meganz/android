@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -10,10 +11,14 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -25,7 +30,7 @@ class PasscodeUtil @Inject constructor(
 
     companion object {
         const val REQUIRE_PASSCODE_INVALID = -1
-        const val REQUIRE_PASSCODE_IMMEDIATE = 0
+        const val REQUIRE_PASSCODE_IMMEDIATE = 500
         const val REQUIRE_PASSCODE_AFTER_5S = 5 * 1000
         const val REQUIRE_PASSCODE_AFTER_10S = 10 * 1000
         const val REQUIRE_PASSCODE_AFTER_30S = 30 * 1000
@@ -219,20 +224,70 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
+    fun enablePasscode(passcodeType: String, passcode: String) {
+        updatePasscode(true, passcodeType, passcode, REQUIRE_PASSCODE_AFTER_30S)
+        update()
+    }
+
     fun disablePasscode() {
+        updatePasscode(false, "", "", REQUIRE_PASSCODE_INVALID)
+    }
+
+    private fun updatePasscode(enable: Boolean, type: String, passcode: String, requiredTime: Int) {
         val prefs = dbH.preferences
 
         if (prefs != null) {
-            prefs.passcodeLockEnabled = false.toString()
-            prefs.passcodeLockType = ""
-            prefs.passcodeLockCode = ""
-            prefs.passcodeLockRequireTime = REQUIRE_PASSCODE_INVALID
+            prefs.passcodeLockEnabled = enable.toString()
+            prefs.passcodeLockType = type
+            prefs.passcodeLockCode = passcode
+            prefs.passcodeLockRequireTime = requiredTime.toString()
             dbH.preferences = prefs
         } else {
-            dbH.isPasscodeLockEnabled = false
-            dbH.passcodeLockType = ""
-            dbH.passcodeLockCode = ""
-            dbH.passcodeRequiredTime = REQUIRE_PASSCODE_INVALID
+            dbH.isPasscodeLockEnabled = enable
+            dbH.passcodeLockType = type
+            dbH.passcodeLockCode = passcode
+            dbH.passcodeRequiredTime = requiredTime
         }
+    }
+
+    private fun shouldLock(): Boolean {
+        val prefs = dbH.preferences
+
+        return if (prefs != null
+            && !isTextEmpty(prefs.passcodeLockEnabled)
+            && prefs.passcodeLockEnabled.toBoolean()
+            && !isTextEmpty(prefs.passcodeLockCode)
+            && prefs.passcodeLockRequireTime.toInt() != REQUIRE_PASSCODE_INVALID
+        ) {
+            val currentTime = System.currentTimeMillis()
+            val lastPaused = MegaApplication.getPasscodeManagement().lastPause
+
+            logDebug("Time: $currentTime lastPause: $lastPaused")
+
+            currentTime - lastPaused > prefs.passcodeLockRequireTime.toInt()
+        } else false
+    }
+
+    fun resume() {
+        if (shouldLock()) {
+            MegaApplication.getPasscodeManagement().lastLocked = context
+            showLockScreen()
+        } else {
+            MegaApplication.getPasscodeManagement().lastLocked = null
+        }
+    }
+
+    fun pause() {
+        if (MegaApplication.getPasscodeManagement().lastLocked != context) {
+            update()
+        }
+    }
+
+    fun update() {
+        MegaApplication.getPasscodeManagement().lastPause = System.currentTimeMillis()
+    }
+
+    private fun showLockScreen() {
+        context.startActivity(Intent(context, PasscodeLockActivity::class.java))
     }
 }

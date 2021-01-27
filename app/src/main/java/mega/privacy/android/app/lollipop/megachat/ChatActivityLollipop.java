@@ -2887,7 +2887,7 @@ public class ChatActivityLollipop extends PasscodeActivityLollipop implements Me
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_RING_IN) {
                 logDebug("The call in this chat is Ring in");
                 addChecksForACall(chatRoom.getChatId(), false);
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intent = new Intent(this, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, idChat);
@@ -3089,7 +3089,7 @@ public class ChatActivityLollipop extends PasscodeActivityLollipop implements Me
 
     public void disablePinScreen(){
         logDebug("disablePinScreen");
-        MegaApplication.setShowPinScreen(false);
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
     }
 
     public void showProgressForwarding(){
@@ -8289,7 +8289,7 @@ public class ChatActivityLollipop extends PasscodeActivityLollipop implements Me
 
             setNodeAttachmentVisible();
 
-            MegaApplication.setShowPinScreen(true);
+            MegaApplication.getPasscodeManagement().setShowPasscodeScreen(true);
             MegaApplication.setOpenChatId(idChat);
             supportInvalidateOptionsMenu();
 
@@ -9460,7 +9460,7 @@ public class ChatActivityLollipop extends PasscodeActivityLollipop implements Me
      * Method for opening the Call Activity.
      */
     private void openCall(){
-        MegaApplication.setShowPinScreen(false);
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         Intent i = new Intent(this, ChatCallActivity.class);
         i.putExtra(CHAT_ID, idChat);
         i.setAction(SECOND_CALL);

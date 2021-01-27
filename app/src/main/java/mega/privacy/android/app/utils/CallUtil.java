@@ -171,7 +171,7 @@ public class CallUtil {
         for(Long chatIdCall:currentCalls){
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
             if(call != null){
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());
@@ -195,7 +195,7 @@ public class CallUtil {
         for(Long chatIdCall:currentCalls){
             if(chatIdCall == chatId){
                 MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());

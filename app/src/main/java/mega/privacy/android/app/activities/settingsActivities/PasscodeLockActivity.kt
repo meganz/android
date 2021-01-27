@@ -13,7 +13,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.PinUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomTextWatcher
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -22,7 +21,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_30S
+import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
@@ -46,6 +45,7 @@ class PasscodeLockActivity : BaseActivity() {
 
     private var screenOrientation = 0
 
+    private lateinit var passcodeUtil: PasscodeUtil
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
 
@@ -58,6 +58,8 @@ class PasscodeLockActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        passcodeUtil = PasscodeUtil(this, dbH)
 
         mode = when (intent.action) {
             ACTION_SET_PASSCODE_LOCK -> SET_MODE
@@ -365,11 +367,7 @@ class PasscodeLockActivity : BaseActivity() {
 
     private fun confirmPasscode() {
         if (sbFirst.toString() == sbSecond.toString()) {
-            dbH.isPasscodeLockEnabled = true
-            dbH.passcodeLockType = passcodeType
-            dbH.passcodeLockCode = sbFirst.toString()
-            dbH.passcodeRequiredTime = REQUIRE_PASSCODE_AFTER_30S
-            PinUtil.update()
+            passcodeUtil.enablePasscode(passcodeType, sbFirst.toString())
             setResult(RESULT_OK)
             finish()
         } else {
@@ -381,7 +379,7 @@ class PasscodeLockActivity : BaseActivity() {
 
     private fun confirmUnlockPasscode() {
         if (sbFirst.toString() == dbH.preferences.passcodeLockCode) {
-            PinUtil.update()
+            passcodeUtil.update()
             resetAttempts()
             finish()
         } else {
@@ -497,7 +495,7 @@ class PasscodeLockActivity : BaseActivity() {
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
                 UNLOCK_MODE -> moveTaskToBack(true)
-                RESET_MODE -> MegaApplication.setShowPinScreen(false)
+                RESET_MODE -> MegaApplication.getPasscodeManagement().showPasscodeScreen = false
                 else -> finish()
             }
         } else {
@@ -516,7 +514,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        MegaApplication.setShowPinScreen(isFinishing)
+        MegaApplication.getPasscodeManagement().showPasscodeScreen = isFinishing
         super.onDestroy()
     }
 

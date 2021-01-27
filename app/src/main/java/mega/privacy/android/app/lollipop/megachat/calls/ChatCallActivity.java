@@ -658,7 +658,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.onCreate(savedInstanceState);
         cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
-        app.setShowPinScreen(true);
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(true);
         chatC = new ChatController(this);
         statusBarHeight = getStatusBarHeight();
 
@@ -1758,7 +1758,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         sendSignalPresence();
 
         MegaApplication.setSpeakerStatus(chatCallOnHold.getChatId(), false);
-        MegaApplication.setShowPinScreen(false);
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
         intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentOpenCall.putExtra(CHAT_ID, chatCallOnHold.getChatId());
@@ -1780,7 +1780,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (callChat.getChatid() != anotherChatId) {
                 logDebug("Returning to another call");
                 MegaApplication.setSpeakerStatus(anotherChatId, false);
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
                 intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentOpenCall.putExtra(CHAT_ID, anotherChatId);
@@ -2737,7 +2737,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }else{
             for(Long chatId:calls) {
                 MegaApplication.setSpeakerStatus(chatId, false);
-                MegaApplication.setShowPinScreen(false);
+                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
                 Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
                 intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentOpenCall.putExtra(CHAT_ID, chatId);

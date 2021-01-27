@@ -428,12 +428,12 @@ public class MegaPreferences{
         this.removeGPS = removeGPS;
     }
 
-	public int getPasscodeLockRequireTime() {
-		return Integer.parseInt(passcodeLockRequireTime);
+	public String getPasscodeLockRequireTime() {
+		return passcodeLockRequireTime;
 	}
 
-	public void setPasscodeLockRequireTime(int passcodeLockRequireTime) {
-		this.passcodeLockRequireTime = String.valueOf(passcodeLockRequireTime);
+	public void setPasscodeLockRequireTime(String passcodeLockRequireTime) {
+		this.passcodeLockRequireTime = passcodeLockRequireTime;
 	}
 
     @Override
