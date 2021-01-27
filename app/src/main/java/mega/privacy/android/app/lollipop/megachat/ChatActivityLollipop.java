@@ -4418,7 +4418,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     logDebug("Chat with permissions or preview");
                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
-
                     if (selected.size() == 1) {
                         if(hasMessagesRemoved(selected.get(0).getMessage()) || selected.get(0).isUploading()) {
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -4518,17 +4517,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                             int type = selected.get(0).getMessage().getType();
 
                             if(messageSelected.getUserHandle()==myUserHandle){
-
-                                if(messageSelected.isEditable()){
-                                    logDebug("Message EDITABLE");
-                                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(true);
-                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(true);
-                                }
-                                else{
-                                    logDebug("Message NOT EDITABLE");
-                                    menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                                }
+                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(messageSelected.isEditable());
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(messageSelected.isDeletable());
 
                                 if (!isOnline(chatActivity) || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
