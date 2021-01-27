@@ -273,7 +273,9 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public void onClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
-        if (holder == null || holder.getAdapterPosition() < 0 || !shouldReactionBeClicked(megaChatApi.getChatRoom(chatId)))
+        if (holder == null || holder.getAdapterPosition() < 0 ||
+                !shouldReactionBeClicked(megaChatApi.getChatRoom(chatId)) ||
+                ((ChatActivityLollipop) context).isMultiselectOn())
             return;
 
         switch (v.getId()) {
@@ -293,7 +295,8 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
     @Override
     public boolean onLongClick(View v) {
         ViewHolderReaction holder = (ViewHolderReaction) v.getTag();
-        if (holder == null || !chatRoom.isGroup())
+        if (holder == null || !chatRoom.isGroup() ||
+                ((ChatActivityLollipop) context).isMultiselectOn())
             return true;
 
         int currentPosition = holder.getAdapterPosition();

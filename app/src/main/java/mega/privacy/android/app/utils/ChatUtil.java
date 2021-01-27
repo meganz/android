@@ -65,6 +65,7 @@ import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
@@ -986,5 +987,22 @@ public class ChatUtil {
         }
 
         return invalidMetaMessage;
+    }
+
+    /**
+     * Method to know if a message is an image.
+     *
+     * @param message The android msg.
+     * @return True, if it's image. False, if not.
+     */
+    public static boolean isMsgImage(AndroidMegaChatMessage message) {
+        if (message != null && message.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+            MegaNodeList list = message.getMessage().getMegaNodeList();
+            if (list.size() == 1) {
+                return MimeTypeList.typeForName(list.get(0).getName()).isImage();
+            }
+        }
+
+        return false;
     }
 }

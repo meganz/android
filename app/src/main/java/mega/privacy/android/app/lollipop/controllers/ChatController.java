@@ -1155,7 +1155,7 @@ public class ChatController {
         checkSizeBeforeDownload(path, nodeList);
     }
 
-    public void prepareForChatDownload(ArrayList<MegaNodeList> list){
+    public void prepareForChatDownload(ArrayList<MegaNodeList> list, boolean downloadToGallery){
         logDebug("prepareForChatDownload");
         ArrayList<MegaNode> nodeList =  new ArrayList<>();
         MegaNodeList megaNodeList;
@@ -1165,19 +1165,19 @@ public class ChatController {
                 nodeList.add(megaNodeList.get(j));
             }
         }
-        prepareForDownloadVersions(nodeList);
+        prepareForDownloadVersions(nodeList, downloadToGallery);
     }
 
     public void prepareForChatDownload(MegaNodeList list){
         ArrayList<MegaNode> nodeList = MegaApiJava.nodeListToArray(list);
-        prepareForDownloadVersions(nodeList);
+        prepareForDownloadVersions(nodeList, false);
     }
 
     public void prepareForChatDownload(MegaNode node){
         logDebug("Node: " + node.getHandle());
         ArrayList<MegaNode> nodeList = new ArrayList<>();
         nodeList.add(node);
-        prepareForDownloadVersions(nodeList);
+        prepareForDownloadVersions(nodeList, false);
     }
 
     private ArrayList<String> serializeNodes(ArrayList<MegaNode> nodeList) {
@@ -1206,7 +1206,7 @@ public class ChatController {
         }
     }
 
-    private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList){
+    private void prepareForDownloadVersions(final ArrayList<MegaNode> nodeList, boolean downloadToGallery){
         logDebug("Node list size: " + nodeList.size() + " files to download");
         long size = 0;
         for (int i = 0; i < nodeList.size(); i++) {
@@ -1218,7 +1218,7 @@ public class ChatController {
             dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
         }
 
-        String downloadLocationDefaultPath = getDownloadLocation();
+        String downloadLocationDefaultPath = downloadToGallery ? getCameraFolder().getAbsolutePath() : getDownloadLocation();
 
         if(!nodeList.isEmpty() && isVoiceClip(nodeList.get(0).getName())){
             File vcFile = buildVoiceClipFile(context, nodeList.get(0).getName());
@@ -1318,7 +1318,6 @@ public class ChatController {
 
     public void download(String parentPath, ArrayList<MegaNode> nodeList){
         logDebug("download()");
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
             if (!hasStoragePermission) {
