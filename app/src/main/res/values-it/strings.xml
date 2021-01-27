@@ -124,52 +124,15 @@
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Errore durante la chiusura delle sessioni aperte</string>
 
     <plurals name="general_num_files">
-        <item context="this is used for example when downloading 1 file or 2 files, Singular of file. 1 file" quantity="one">file</item>
-        <item context="this is used for example when downloading 1 file or 2 files, Plural of file. 2 files" quantity="other">file</item>
+        <item context="General file label. Singular of file. File" quantity="one">File</item>
+        <item context="General label for files" quantity="other">File</item>
     </plurals>
 
-    <plurals name="general_num_contacts">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">contatto</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">contatti</item>
+    <plurals name="general_num_shared_with">
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Shared with %1$s</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
     </plurals>
 
-    <plurals name="num_contacts_selected">
-        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d contatto</item>
-        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contatti</item>
-    </plurals>
-
-    <plurals name="general_num_folders">
-        <item context="Singular of folder/directory. 1 folder" quantity="one">cartella</item>
-        <item context="Plural of folder/directory. 2 folders" quantity="other">cartelle</item>
-    </plurals>
-
-    <plurals name="general_num_shared_folders">
-        <item context="Title of the incoming shared folders of a user in singular" quantity="one">Cartella condivisa</item>
-        <item context="Title of the incoming shared folders of a user in plural." quantity="other">Cartelle condivise</item>
-    </plurals>
-
-    <!--
-    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item context="Item menu option upon clicking on one or multiple files. Singular" quantity="one">download</item>
-        <item context="Item menu option upon clicking on one or multiple files. Plural" quantity="other">downloads</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_num_uploads">
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Singular" quantity="one">upload</item>
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Plural" quantity="other">uploads</item>
-    </plurals>
-    -->
-
-    <plurals name="general_num_users">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">contatto</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">contatti</item>
-    </plurals>
-
-    <!--
-    <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
-    -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s verrà scaricato.</string>
     <string name="alert_no_app" context="Alert text before download">Non hai applicazioni che possano aprire il file %s Continuare lo stesso il download?</string>
     <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Non mostrare più</string>
@@ -243,6 +206,11 @@
     <string name="cancel_transfer_confirmation">Annullare questo trasferimento?</string>
     <string name="cancel_all_transfer_confirmation">Annullare tutti i trasferimenti?</string>
     <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Annulla tutto</string>
+
+    <plurals name="cancel_selected_transfers">
+        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">The selected transfer will be cancelled.</item>
+        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">The selected transfers will be cancelled.</item>
+    </plurals>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
     <string name="section_recents" context="Label to reference a recents section">Recenti</string>
@@ -375,6 +343,7 @@
     <string name="download_touch_to_show" context="Hint how to cancel the download">Vedi trasferimenti</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">La maggior parte dei dispositivi non possono scaricare file più grandi di 4GB. Il tuo download probabilmente fallirà</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Non c\'è nessuna applicazione disponibile per eseguire il file sul tuo dispositivo</string>
+    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There isn’t any available app to open this location on your device</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Condividi foto usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Condividi link</string>
@@ -886,10 +855,10 @@
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">Foto</string>
     <string name="sortby_type_video_first" context="sort option, sort media files by videos first">Video</string>
 
-    <string name="sort_by_newest_date" context="sort files by date newest first">Newest date</string>
-    <string name="sort_by_oldest_date" context="sort files by date oldest first">Oldest date</string>
-    <string name="sort_by_largest_size" context="sort files by largest size">Largest size</string>
-    <string name="sort_by_smallest_size" context="sort files by smallest size">Smallest size</string>
+    <string name="sort_by_newest_date" context="sort files by date newest first">Data più recente</string>
+    <string name="sort_by_oldest_date" context="sort files by date oldest first">Data meno recente</string>
+    <string name="sort_by_largest_size" context="sort files by largest size">Grandezza più grande</string>
+    <string name="sort_by_smallest_size" context="sort files by smallest size">Grandezza più piccola</string>
 
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mese</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">all\'anno</string>
@@ -1135,27 +1104,6 @@
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
-    -->
-
-    <!--
-    <plurals name="general_minutes">
-        <item context="Singular of minutes. 1 minute" quantity="one">minute</item>
-        <item context="Plural of minutes. 2 minute" quantity="other">minutes</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_hours">
-        <item context="Singular of hours. 1 hour" quantity="one">hour</item>
-        <item context="Plural of hours. 2 hours" quantity="other">hours</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_seconds">
-        <item context="Singular of seconds. 1 second" quantity="one">second</item>
-        <item context="Plural of seconds. 2 second" quantity="other">seconds</item>
-    </plurals>
     -->
 
     <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">h</string>
@@ -1847,7 +1795,7 @@
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Il QRcode non è stato resettato a causa di un errore. Per favore, riprova.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Il QRcode non è stato eliminato a causa di un errore. Per favore, riprova.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invito spedito</string>
-    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">L\'utente %s è stato invitato e apparirà nella tua lista dei contatti una volta accettato l\'invito.</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">L\'utente %s è stato invitato e apparirà nella tua lista dei contatti una volta accettato l\'invito.</string>
     <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">Gli utenti sono stati invitati e appariranno nell\'elenco dei contatti una volta accettati gli inviti.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Un errore è stato riscontrato durante la condivisione del file QR. Forse il file non esiste. Per favore, riprova più tardi.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Un errore è stato riscontrato durante il caricamento del file QR. Forse il file non esiste. Per favore, riprova più tardi.</string>
@@ -2439,6 +2387,7 @@
     <string name="button_continue" context="dialog option continue in alert dialog">Continua</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (abbonamento)</string>
+    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (abbonamento)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Operatore mobile[/A] (una volta sola)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Operatore mobile[/A] (una volta sola)</string>
@@ -2459,6 +2408,9 @@
 	<string name="title_compress_video" context="notification title when compressing video">Compressione di video %1$d su %2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Cartella non valida selezionata</string>
 
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file">1 folder . 1 file</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder . 7 files">1 folder . %1$d files</string>
+
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d file</item>
         <item context="on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files" quantity="other">%d files</item>
@@ -2467,6 +2419,11 @@
     <plurals name="num_folders_with_parameter">
         <item context="on the section notifications indicates the number of folder added to a shared folder, Singular of folder/directory. 1 folder" quantity="one">%d cartella</item>
         <item context="on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders" quantity="other">%d cartelle</item>
+    </plurals>
+
+    <plurals name="num_folders_num_files">
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A] [B]ha aggiunto %2$s e %3$s[/B]</string>
@@ -2899,7 +2856,7 @@
     <string name="remove_phone_number_success" context="Text show in a snackbar when phone has successfully reset.">Il tuo numero di telefono è stato rimosso con successo.</string>
     <string name="remove_phone_number_fail" context="Text show in a snackbar when reset phone number failed.">La rimozione del tuo numero di telefono è fallita.</string>
 
-    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Search in MEGA</string>
+    <string name="search_hint" context="Text hint shown in the global search box which sits on the top of the Homepage screen">Cerca su MEGA</string>
 
     <string name="error_reset_account_blocked" context="Alert shown when a user tries to reset an account wich is bloqued.">L\'account che stai cercando di ripristinare è bloccato.</string>
     <string name="error_account_blocked" context="Error message when trying to login and the account is blocked">Il tuo account è stato bloccato. Si prega di contattare support&#64;mega.nz</string>
@@ -2916,18 +2873,19 @@
 
     <string name="label_contact_credentials" context="“Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials">Credenziali di %s</string>
 
-    <string name="category_documents" context="The label under the button of opening all-documents screen">Docs</string>
-    <string name="section_documents" context="The label under the button of opening all-documents screen">Documents</string>
+    <string name="category_documents" context="The label under the button of opening all-documents screen">Documenti</string>
+    <string name="section_documents" context="The label under the button of opening all-documents screen">Documenti</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">New Chat</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">Nuova chat</string>
 
-    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">No photos found</string>
+    <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">Nessuna foto trovata</string>
     <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">Nessun documento trovato</string>
     <string name="homepage_empty_hint_audio" context="Text that indicates that there’s no audio to show">Nessun file audio trovato</string>
     <string name="homepage_empty_hint_video" context="Text that indicates that there’s no video to show">Nessun video trovato</string>
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Cerca su GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Nessuna [A]GIF[/A] trovata</string>
+    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">No available GIFs. Please try again later</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]Fine dei[/A] risultati</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Riprendere i trasferimenti?</string>
@@ -2942,12 +2900,39 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Hai raggiunto il limite massimo di %d reazioni.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Questo messaggio ha raggiunto il limite massimo di %d reazioni.</string>
 
-    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA needs your permission in order to share files.</string>
+    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
+
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer ‘video.mp4’ failed.">The priority change of the transfer ’%1$s’ failed.</string>
+
+    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Send decryption key separately</string>
+    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Export link and decryption key separately.</string>
+    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Learn more</string>
+    <string name="key_label" context="Label key referring to a link decryption key">Key</string>
+    <string name="button_share_key" context="Button which action is share the decryption key of a link">Share key</string>
+    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">Copy key</string>
+    <string name="button_copy_password" context="Button which action is copy the password of a link">Copy password</string>
+    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">Link copied to the clipboard.</string>
+    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">Key copied to the clipboard.</string>
+    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">Password copied to the clipboard.</string>
+    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">Link successfully sent.</string>
+    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and key successfully sent.</string>
+    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and password successfully sent.</string>
+    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Upgrade to Pro</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="reset_password_label" context="Reset password label">Reset password</string>
+    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Share the key for this link?</string>
+    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Share the password for this link?</string>
+    <string name="button_share_password" context="Button which action is share the password of a link">Share password</string>
+    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Link: %1$s\n\nKey: %2$s</string>
+    <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">Link: %1$s\n\nPassword: %2$s</string>
+
+    <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA ha bisogno del tuo permesso per poter condividere questi file.</string>
 
     <string name="file_properties_favourite" context="Context menu item. Allows user to add file/folder to favourites">Preferiti</string>
     <string name="file_properties_unfavourite" context="Context menu item. Allows user to delete file/folder from favourites">Rimuovi preferito</string>
     <string name="file_properties_label" context="Context menu item. Allows to mark file/folder with own color label">Categoria&#8230;</string>
-    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Remove label</string>
+    <string name="action_remove_label" context="Information text to let’s the user know that they can remove a colour from a folder or file that was already marked.">Rimuovi etichetta</string>
     <string name="title_label" context="Title text to show label selector.">Etichetta</string>
     <string name="label_red" context="A user can mark a folder or file with red colour.">Rosso</string>
     <string name="label_orange" context="A user can mark a folder or file with orange colour.">Arancio</string>
@@ -2956,4 +2941,27 @@
     <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blu</string>
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Viola</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grigio</string>
+
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
+    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
+    <string name="preference_cookies_performance_title" context="Preference screen item title">Performance and Analytics Cookies</string>
+    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
+    <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertising Cookies</string>
+    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
+    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Third Party Cookies</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
+    <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
+    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
 </resources>

@@ -124,52 +124,15 @@
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">关闭已打开的会话时出错</string>
 
     <plurals name="general_num_files">
-        <item context="this is used for example when downloading 1 file or 2 files, Singular of file. 1 file" quantity="one">文件</item>
-        <item context="this is used for example when downloading 1 file or 2 files, Plural of file. 2 files" quantity="other">文件</item>
+        <item context="General file label. Singular of file. File" quantity="one">文件</item>
+        <item context="General label for files" quantity="other">文件</item>
     </plurals>
 
-    <plurals name="general_num_contacts">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">联系人</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">联系人</item>
+    <plurals name="general_num_shared_with">
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Shared with %1$s</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
     </plurals>
 
-    <plurals name="num_contacts_selected">
-        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d个联系人</item>
-        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d个联系人</item>
-    </plurals>
-
-    <plurals name="general_num_folders">
-        <item context="Singular of folder/directory. 1 folder" quantity="one">文件夹</item>
-        <item context="Plural of folder/directory. 2 folders" quantity="other">文件夹</item>
-    </plurals>
-
-    <plurals name="general_num_shared_folders">
-        <item context="Title of the incoming shared folders of a user in singular" quantity="one">共享文件夹</item>
-        <item context="Title of the incoming shared folders of a user in plural." quantity="other">共享文件夹</item>
-    </plurals>
-
-    <!--
-    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item context="Item menu option upon clicking on one or multiple files. Singular" quantity="one">download</item>
-        <item context="Item menu option upon clicking on one or multiple files. Plural" quantity="other">downloads</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_num_uploads">
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Singular" quantity="one">upload</item>
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Plural" quantity="other">uploads</item>
-    </plurals>
-    -->
-
-    <plurals name="general_num_users">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">联系人</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">联系人</item>
-    </plurals>
-
-    <!--
-    <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
-    -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">即将下载%s</string>
     <string name="alert_no_app" context="Alert text before download">没有可以打开%s的应用程序。你要继续下载吗？</string>
     <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">不再显示</string>
@@ -243,6 +206,11 @@
     <string name="cancel_transfer_confirmation">您确定要取消传输吗？</string>
     <string name="cancel_all_transfer_confirmation">您确定要取消所有传输吗？</string>
     <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">全部取消</string>
+
+    <plurals name="cancel_selected_transfers">
+        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">The selected transfer will be cancelled.</item>
+        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">The selected transfers will be cancelled.</item>
+    </plurals>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">云盘</string>
     <string name="section_recents" context="Label to reference a recents section">近期</string>
@@ -375,6 +343,7 @@
     <string name="download_touch_to_show" context="Hint how to cancel the download">查看传输</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">大多数设备无法下载超过4GB 的文件。您的下载可能会失败。</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">您的设备上没有可用的应用程序执行此文件</string>
+    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There isn’t any available app to open this location on your device</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">图片分享自</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">分享链接</string>
@@ -1137,27 +1106,6 @@
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
     -->
 
-    <!--
-    <plurals name="general_minutes">
-        <item context="Singular of minutes. 1 minute" quantity="one">minute</item>
-        <item context="Plural of minutes. 2 minute" quantity="other">minutes</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_hours">
-        <item context="Singular of hours. 1 hour" quantity="one">hour</item>
-        <item context="Plural of hours. 2 hours" quantity="other">hours</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_seconds">
-        <item context="Singular of seconds. 1 second" quantity="one">second</item>
-        <item context="Plural of seconds. 2 second" quantity="other">seconds</item>
-    </plurals>
-    -->
-
     <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">小时</string>
     <string name="initial_minute" context="Initial of the word minute to show the duration of a video or audio call">分钟</string>
     <string name="initial_second" context="Initial of the word second to show the duration of a video or audio call">秒</string>
@@ -1847,7 +1795,7 @@
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">重置二维码时出错。请重试。</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">删除二维码时出错。请重试。</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">邀请已发送</string>
-    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">已发送邀请给%s，邀请获得接受后将添加至联系人列表。</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">已发送邀请给%s，邀请获得接受后将添加至联系人列表。</string>
     <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">该用户已被邀请。该邀请被接受后，他将会出现在您的联系人列表中。</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">分享二维码文件时出错，可能由于该文件不存在。请稍后再试。</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">上传二维码文件时出错，可能该文件不存在。请稍后再试。</string>
@@ -2439,6 +2387,7 @@
     <string name="button_continue" context="dialog option continue in alert dialog">继续</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] （订阅）</string>
+    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]信用卡[/A] （订阅）</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]手机运营商[/A] （一次性）</string>
@@ -2459,6 +2408,9 @@
 	<string name="title_compress_video" context="notification title when compressing video">正在压缩视频 %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">选择的文件夹无效</string>
 
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file">1 folder . 1 file</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder . 7 files">1 folder . %1$d files</string>
+
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d 个文件</item>
         <item context="on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files" quantity="other">%d 个文件</item>
@@ -2467,6 +2419,11 @@
     <plurals name="num_folders_with_parameter">
         <item context="on the section notifications indicates the number of folder added to a shared folder, Singular of folder/directory. 1 folder" quantity="one">%d 个文件夹</item>
         <item context="on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders" quantity="other">%d 个文件夹</item>
+    </plurals>
+
+    <plurals name="num_folders_num_files">
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B]添加了%2$s和%3$s[/B]</string>
@@ -2928,6 +2885,7 @@
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">搜索GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">无[A]GIFs[/A]动图</string>
+    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">No available GIFs. Please try again later</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">这是搜索结果的[A]结尾[/A]</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">恢复传输？</string>
@@ -2941,6 +2899,33 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">已为聊天消息关闭特别信息</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">您已达到%d个态度的最大上限。</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此消息已达到%d个态度的最大上限。</string>
+
+    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
+
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer ‘video.mp4’ failed.">The priority change of the transfer ’%1$s’ failed.</string>
+
+    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Send decryption key separately</string>
+    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Export link and decryption key separately.</string>
+    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Learn more</string>
+    <string name="key_label" context="Label key referring to a link decryption key">Key</string>
+    <string name="button_share_key" context="Button which action is share the decryption key of a link">Share key</string>
+    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">Copy key</string>
+    <string name="button_copy_password" context="Button which action is copy the password of a link">Copy password</string>
+    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">Link copied to the clipboard.</string>
+    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">Key copied to the clipboard.</string>
+    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">Password copied to the clipboard.</string>
+    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">Link successfully sent.</string>
+    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and key successfully sent.</string>
+    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and password successfully sent.</string>
+    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Upgrade to Pro</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="reset_password_label" context="Reset password label">Reset password</string>
+    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Share the key for this link?</string>
+    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Share the password for this link?</string>
+    <string name="button_share_password" context="Button which action is share the password of a link">Share password</string>
+    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Link: %1$s\n\nKey: %2$s</string>
+    <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">Link: %1$s\n\nPassword: %2$s</string>
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA需要您的授权才能共享文件。</string>
 
@@ -2956,4 +2941,27 @@
     <string name="label_blue" context="A user can mark a folder or file with blue colour.">天蓝</string>
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">兰紫</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">银灰</string>
+
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
+    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
+    <string name="preference_cookies_performance_title" context="Preference screen item title">Performance and Analytics Cookies</string>
+    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
+    <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertising Cookies</string>
+    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
+    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Third Party Cookies</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
+    <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
+    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
 </resources>

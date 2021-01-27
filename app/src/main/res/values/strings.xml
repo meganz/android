@@ -2902,7 +2902,7 @@
 
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
 
-    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don't remove the place holder, it's to set the name of the transfer. Example: The priority change of the transfer 'video.mp4' failed.">The priority change of the transfer \'%1$s\' failed.</string>
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer ‘video.mp4’ failed.">The priority change of the transfer ’%1$s’ failed.</string>
 
     <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Send decryption key separately</string>
     <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Export link and decryption key separately.</string>
