@@ -35,7 +35,7 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
-import mega.privacy.android.app.utils.ColorThemeManager;
+import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -85,8 +85,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         colorThemeListPreference = findPreference(KEY_APPEARNCE_COLOR_THEME);
         colorThemeListPreference.setOnPreferenceChangeListener(this);
-        colorThemeListPreference.setValue(Integer.toString(ColorThemeManager.INSTANCE.getColorTheme(context)));
-        colorThemeListPreference.setSummary(colorThemeListPreference.getEntry());
 
         cameraUploadsPreference = findPreference(KEY_FEATURES_CAMERA_UPLOAD);
         cameraUploadsPreference.setOnPreferenceClickListener(this);
@@ -225,9 +223,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case KEY_APPEARNCE_COLOR_THEME:
-                ColorThemeManager.INSTANCE.setAndApplyColorTheme(context, Integer.parseInt(newValue.toString()));
-                colorThemeListPreference.setValue(newValue.toString());
-                colorThemeListPreference.setSummary(colorThemeListPreference.getEntry());
+                ThemeHelper.INSTANCE.applyTheme((String) newValue);
                 break;
         }
         return true;

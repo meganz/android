@@ -13,8 +13,11 @@
 		<androidx.preference.ListPreference
 			android:key="settings_appearance_color_theme"
 			android:title="@string/set_color_theme_label"
-			android:entries="@array/settings_color_theme_label"
-			android:entryValues="@array/settings_color_theme_value"
+			app:defaultValue="default"
+			android:defaultValue="default"
+			app:entries="@array/theme_list_array"
+			app:entryValues="@array/theme_entry_array"
+			app:useSimpleSummaryProvider="true"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />

@@ -9,23 +9,11 @@
 		<item>1001</item>
 		<item>1002</item>
 	</string-array>
-	
+
 	<string-array name="settings_camera_upload_file_upload_values">
 		<item>1001</item>
 		<item>1002</item>
 		<item>1003</item>
-	</string-array>
-
-    <!--
-        Defined in AppCompatDelegate
-        MODE_NIGHT_NO = 1
-        MODE_NIGHT_YES = 2
-        MODE_NIGHT_FOLLOW_SYSTEM = -1
-    -->
-	<string-array name="settings_color_theme_value">
-		<item>1</item>
-		<item>2</item>
-		<item>-1</item>
 	</string-array>
 
 	<string-array name="settings_chat_status_values">
@@ -43,5 +31,17 @@
 	<string-array name="settings_video_upload_quality_values">
 		<item>0</item>
 		<item>1</item>
+	</string-array>
+	
+	<string-array name="theme_list_array">
+		<item>@string/theme_light</item>
+		<item>@string/theme_dark</item>
+		<item>@string/theme_battery_saver</item>
+	</string-array>
+
+	<string-array name="theme_entry_array">
+		<item>light</item>
+		<item>dark</item>
+		<item>default</item>
 	</string-array>
 </resources>

@@ -25,7 +25,6 @@ import android.os.PowerManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
@@ -74,7 +73,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.utils.ColorThemeManager;
+import mega.privacy.android.app.utils.ThemeHelper;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -715,7 +714,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		super.onCreate();
 
-        ColorThemeManager.INSTANCE.applyColorTheme(this);
+		ThemeHelper.INSTANCE.initTheme(this);
 
 		// Setup handler for uncaught exceptions.
 		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
