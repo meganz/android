@@ -24,13 +24,14 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.objects.SDTransfer;
+import mega.privacy.android.app.utils.PasscodeUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.PinUtil.REQUIRE_PASSCODE_IMMEDIATE;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_INVALID;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -344,7 +345,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"			//43
 				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"				//44
 				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 		//45
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT" + ")";		//46
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " INTEGER" + ")";	//46
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -875,9 +876,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 59) {
-			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
-					+ " = '" + encrypt(isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE + "" : "") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " INTEGER;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME+ " = '"
+					+ encrypt(String.valueOf(isPasscodeLockEnabled(db) ? PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
 		}
 	}
 
@@ -3461,7 +3462,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @return The time required before ask for the passcode.
 	 */
 	public int getPasscodeRequiredTime() {
-		return getIntValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_IMMEDIATE);
+		return getIntValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID);
 	}
 
 	public void setStorageAskAlways(boolean storageAskAlways) {

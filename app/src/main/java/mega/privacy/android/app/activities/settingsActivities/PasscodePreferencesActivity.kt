@@ -8,15 +8,12 @@ import java.util.*
 
 class PasscodePreferencesActivity : PreferencesBaseActivity() {
 
-    private lateinit var sttPasscodeLockFragment: SettingsPasscodeLockFragment
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         aB?.title = StringResourcesUtils.getString(R.string.settings_passcode_lock_switch)
             .toUpperCase(Locale.getDefault())
 
-        sttPasscodeLockFragment = SettingsPasscodeLockFragment()
-        replaceFragment(sttPasscodeLockFragment)
+        replaceFragment(SettingsPasscodeLockFragment())
     }
 }

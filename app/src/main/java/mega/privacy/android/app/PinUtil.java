@@ -9,14 +9,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 public class PinUtil {
-	public static final int REQUIRE_PASSCODE_IMMEDIATE = 0;
-	public static final int REQUIRE_PASSCODE_AFTER_5S = 5 * 1000;
-	public static final int REQUIRE_PASSCODE_AFTER_10S = 10 * 1000;
-	public static final int REQUIRE_PASSCODE_AFTER_30S = 30 * 1000;
-	public static final int REQUIRE_PASSCODE_AFTER_1M = 60 * 1000;
-	public static final int REQUIRE_PASSCODE_AFTER_2M = 60 * 2 * 1000;
-	public static final int REQUIRE_PASSCODE_AFTER_5M = 60 * 5 * 1000;
-
     static DatabaseHandler dbH = null;
     static MegaPreferences prefs = null;
 
@@ -29,7 +21,7 @@ public class PinUtil {
         dbH = DatabaseHandler.getDbHandler(context);
         prefs = dbH.getPreferences();
 
-        if (shouldLock(context)) {
+        if (shouldLock()) {
             lastLocked = context;
             logDebug("lastLocked " + context);
             showLock(context);
@@ -40,7 +32,7 @@ public class PinUtil {
     }
 
     // Check is app should lock
-    private static boolean shouldLock(Context context) {
+    private static boolean shouldLock() {
         if (prefs != null && prefs.getPasscodeLockEnabled() != null
                 && Boolean.parseBoolean(prefs.getPasscodeLockEnabled())
                 && !isTextEmpty(prefs.getPasscodeLockCode())) {

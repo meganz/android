@@ -22,6 +22,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_30S
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.*
@@ -364,9 +365,10 @@ class PasscodeLockActivity : BaseActivity() {
 
     private fun confirmPasscode() {
         if (sbFirst.toString() == sbSecond.toString()) {
-            dbH.passcodeLockCode = sbFirst.toString()
-            dbH.passcodeLockType = passcodeType
             dbH.isPasscodeLockEnabled = true
+            dbH.passcodeLockType = passcodeType
+            dbH.passcodeLockCode = sbFirst.toString()
+            dbH.passcodeRequiredTime = REQUIRE_PASSCODE_AFTER_30S
             PinUtil.update()
             setResult(RESULT_OK)
             finish()

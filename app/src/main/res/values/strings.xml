@@ -773,6 +773,7 @@
     <string name="settings_passcode_lock_switch" context="Settings of the Passcode">Passcode Lock</string>
     <string name="settings_change_passcode" context="Settings option to change Passcode.">Change passcode</string>
     <string name="settings_require_passcode" context="Settings option to set the timer to ask for passcode.">Require passcode</string>
+    <string name="action_immediately" context="Option available to choose in some context to make an action immediately.">Immediately</string>
 
     <string name="pin_lock_enter" context="Button after the Passcode code input field">Enter</string>
 

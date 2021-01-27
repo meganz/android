@@ -1,14 +1,12 @@
 package mega.privacy.android.app.lollipop;
 
 import android.os.Bundle;
-import android.os.Handler;
 
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinUtil;
 
 import static mega.privacy.android.app.utils.JobUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 

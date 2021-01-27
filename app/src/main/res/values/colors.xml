@@ -248,4 +248,6 @@
     <color name="label_purple">#D088E1</color>
     <color name="label_grey">#A4A4A7</color>
 
+    <color name="accentColorDisabled">#6100BFA5</color>
+
 </resources>

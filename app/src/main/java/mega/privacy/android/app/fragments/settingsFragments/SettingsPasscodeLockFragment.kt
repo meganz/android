@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.settingsFragments
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import mega.privacy.android.app.R
@@ -12,9 +13,14 @@ import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivi
 import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.PasscodeUtil
+import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 
 class SettingsPasscodeLockFragment : SettingsBaseFragment() {
+
+    private lateinit var passcodeUtil: PasscodeUtil
+    private lateinit var requirePasscodeDialog: AlertDialog
 
     private var passcodeSwitch: SwitchPreferenceCompat? = null
     private var resetPasscode: Preference? = null
@@ -23,6 +29,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private var passcodeLock = false
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        passcodeUtil = PasscodeUtil(context, dbH)
+
         addPreferencesFromResource(R.xml.preferences_passcode)
         passcodeSwitch = findPreference(KEY_PASSCODE_ENABLE)
         passcodeSwitch?.setOnPreferenceClickListener {
@@ -37,22 +45,14 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         }
 
         resetPasscode = findPreference(KEY_RESET_PASSCODE)
-        resetPasscode?.apply {
-            setOnPreferenceClickListener {
-                intentToPasscodeLock(true)
-                true
-            }
-
-            onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener { _, newValue ->
-                    dbH.passcodeLockCode = newValue.toString()
-                    true
-                }
+        resetPasscode?.setOnPreferenceClickListener {
+            intentToPasscodeLock(true)
+            true
         }
 
         requirePasscode = findPreference(KEY_REQUIRE_PASSCODE)
         requirePasscode?.setOnPreferenceClickListener {
-
+            requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog()
             true
         }
 
@@ -72,6 +72,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeSwitch?.isChecked = true
         preferenceScreen.addPreference(resetPasscode)
         preferenceScreen.addPreference(requirePasscode)
+        requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText()
     }
 
     private fun disablePasscode() {
@@ -80,7 +81,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         preferenceScreen.removePreference(resetPasscode)
         preferenceScreen.removePreference(requirePasscode)
         dbH.isPasscodeLockEnabled = false
+        dbH.passcodeLockType = ""
         dbH.passcodeLockCode = ""
+        dbH.passcodeRequiredTime = REQUIRE_PASSCODE_INVALID
     }
 
     private fun intentToPasscodeLock(reset: Boolean) {
@@ -97,5 +100,13 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         } else {
             LogUtil.logWarning("Set PIN ERROR")
         }
+    }
+
+    override fun onDestroy() {
+        if (this::requirePasscodeDialog.isInitialized && requirePasscodeDialog.isShowing) {
+            requirePasscodeDialog.dismiss()
+        }
+
+        super.onDestroy()
     }
 }

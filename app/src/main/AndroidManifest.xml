@@ -501,6 +501,7 @@
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity"
             android:label="@string/settings_passcode_lock_switch"
             android:theme="@style/PreferencesScreen"
+            android:configChanges="orientation|screenSize"
             android:launchMode="singleTop">
         </activity>
 
