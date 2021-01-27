@@ -1795,7 +1795,7 @@
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">QR code not reset due to an error. Please try again.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">QR code not deleted due to an error. Please try again.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invite sent</string>
-    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">The user %s has been invited and will appear in your contact list once accepted.</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">The user %s has been invited and will appear in your contact list once accepted.</string>
     <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">The users have been invited and will appear in your contact list once accepted.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">An error occurred while trying to share the QR file. Perhaps the file does not exist. Please try again later.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">An error occurred while trying to upload the QR file. Perhaps the file does not exist. Please try again later.</string>
@@ -2904,8 +2904,8 @@
 
     <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don't remove the place holder, it's to set the name of the transfer. Example: The priority change of the transfer 'video.mp4' failed.">The priority change of the transfer \'%1$s\' failed.</string>
 
-    <string name="option_send_decrypted_key_separately" context="Title option to send separated the link and decrypted key">Send decrypted key separately</string>
-    <string name="explanation_send_decrypted_key_separately" context="Explanation option to send separated the link and decrypted key">Export link and decrypted key separately.</string>
+    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Send decryption key separately</string>
+    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Export link and decryption key separately.</string>
     <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Learn more</string>
     <string name="key_label" context="Label key referring to a link decryption key">Key</string>
     <string name="button_share_key" context="Button which action is share the decryption key of a link">Share key</string>
@@ -2918,8 +2918,8 @@
     <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and key successfully sent.</string>
     <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and password successfully sent.</string>
     <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Upgrade to Pro</string>
-    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">Mega Pro users have exclusive access to additional link safety features making your account even more secure.</string>
-    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file.A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
     <string name="reset_password_label" context="Reset password label">Reset password</string>
     <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Share the key for this link?</string>
     <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Share the password for this link?</string>
@@ -2964,5 +2964,4 @@
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
-
 </resources>
