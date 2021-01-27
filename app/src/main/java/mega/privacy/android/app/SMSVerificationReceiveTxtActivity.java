@@ -35,7 +35,7 @@ import java.util.TimerTask;
 
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiJava;
@@ -47,7 +47,7 @@ import static mega.privacy.android.app.SMSVerificationActivity.*;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class SMSVerificationReceiveTxtActivity extends PinActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
+public class SMSVerificationReceiveTxtActivity extends PasscodeActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
 
     private Toolbar toolbar;
     private ActionBar actionBar;

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -62,7 +61,7 @@ import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class ZipBrowserActivityLollipop extends PinActivityLollipop{
+public class ZipBrowserActivityLollipop extends PasscodeActivityLollipop {
 	public static ImageView imageDrag;
 	int[] screenPosition;
 

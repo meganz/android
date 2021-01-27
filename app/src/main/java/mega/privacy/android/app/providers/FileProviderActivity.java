@@ -97,7 +97,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 
 @SuppressLint("NewApi") 
-public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class FileProviderActivity extends PasscodeFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
 	public static final int INVALID_TAB = -1;
 	public static final int CLOUD_TAB = 0;

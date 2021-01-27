@@ -15,14 +15,13 @@ import android.widget.TextView;
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener;
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
-import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class WeakAccountProtectionAlertActivity extends PinActivityLollipop implements View.OnClickListener {
+public class WeakAccountProtectionAlertActivity extends PasscodeActivityLollipop implements View.OnClickListener {
 
     private static final String IS_INFO_DIALOG_SHOWN = "IS_INFO_DIALOG_SHOWN";
     private static final String IS_ACCOUNT_BLOCKED = "IS_ACCOUNT_BLOCKED";

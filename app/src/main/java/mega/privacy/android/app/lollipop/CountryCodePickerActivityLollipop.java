@@ -32,7 +32,7 @@ import mega.privacy.android.app.utils.Util;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class CountryCodePickerActivityLollipop extends PinActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
+public class CountryCodePickerActivityLollipop extends PasscodeActivityLollipop implements CountryListAdapter.CountrySelectedCallback {
     private final String SAVED_QUERY_STRING = "SAVED_QUERY_STRING";
     private static List<Country> countries;
 

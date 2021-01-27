@@ -55,7 +55,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 @SuppressLint("NewApi")
-public class ChangePasswordActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
+public class ChangePasswordActivityLollipop extends PasscodeActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
 	
 	ChangePasswordActivityLollipop changePasswordActivity = this;
 

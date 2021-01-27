@@ -3,7 +3,7 @@ package mega.privacy.android.app.providers;
 import androidx.appcompat.app.AppCompatActivity;
 import mega.privacy.android.app.PinUtil;
 
-public class PinFileProviderActivity extends AppCompatActivity {
+public class PasscodeFileProviderActivity extends AppCompatActivity {
 	
 	@Override
 	protected void onPause() {

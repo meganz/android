@@ -40,7 +40,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
+public class TestPasswordActivity extends PasscodeActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
 
     private LinearLayout passwordReminderLayout;
     private ImageView passwordReminderCloseButton;

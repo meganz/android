@@ -42,7 +42,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
-public class PhoneContactsActivityLollipop extends PinActivityLollipop implements PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
+public class PhoneContactsActivityLollipop extends PasscodeActivityLollipop implements PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
 
 	ActionBar aB;
 	Toolbar tB;

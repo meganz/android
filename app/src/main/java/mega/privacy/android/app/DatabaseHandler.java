@@ -31,6 +31,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
 import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_INVALID;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -877,8 +878,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		if (oldVersion <= 59) {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " INTEGER;");
-			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME+ " = '"
-					+ encrypt(String.valueOf(isPasscodeLockEnabled(db) ? PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
+					+ " = '" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID) + "';");
 		}
 	}
 
@@ -1530,6 +1531,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
+		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, prefs.getPasscodeLockRequireTime());
+
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 
@@ -1595,12 +1598,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String closeInviteBanner = decrypt(cursor.getString(39));
 			String preferredSortCameraUpload = decrypt(cursor.getString(40));
 			String sdCardUri = decrypt(cursor.getString(41));
+			String passcodeLockRequireTime = cursor.getString(46);
 
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, passcodeLockEnabled,
 					passcodeLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 					passcodeLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera,uploadVideoQuality,conversionOnCharging,chargingOnSize,shouldClearCameraSyncRecords,camVideoSyncTimeStamp,
-                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner,preferredSortCameraUpload,sdCardUri);
+                    secVideoSyncTimeStamp,isAutoPlayEnabled,removeGPS,closeInviteBanner,preferredSortCameraUpload,sdCardUri, passcodeLockRequireTime);
 		}
 		cursor.close();
 

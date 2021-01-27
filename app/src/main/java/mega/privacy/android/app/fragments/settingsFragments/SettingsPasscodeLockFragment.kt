@@ -53,6 +53,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         requirePasscode = findPreference(KEY_REQUIRE_PASSCODE)
         requirePasscode?.setOnPreferenceClickListener {
             requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog()
+            requirePasscodeDialog.setOnDismissListener {
+                requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
+            }
             true
         }
 
@@ -72,7 +75,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeSwitch?.isChecked = true
         preferenceScreen.addPreference(resetPasscode)
         preferenceScreen.addPreference(requirePasscode)
-        requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText()
+        requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
     }
 
     private fun disablePasscode() {
@@ -80,10 +83,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeSwitch?.isChecked = false
         preferenceScreen.removePreference(resetPasscode)
         preferenceScreen.removePreference(requirePasscode)
-        dbH.isPasscodeLockEnabled = false
-        dbH.passcodeLockType = ""
-        dbH.passcodeLockCode = ""
-        dbH.passcodeRequiredTime = REQUIRE_PASSCODE_INVALID
+        passcodeUtil.disablePasscode()
     }
 
     private fun intentToPasscodeLock(reset: Boolean) {

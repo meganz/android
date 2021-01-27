@@ -141,6 +141,7 @@ class PasscodeUtil @Inject constructor(
 
         val requirePasscodeDialog = dialogBuilder.create()
         requirePasscodeDialog.show()
+
         enableOrDisableDialogButton(
             false,
             requirePasscodeDialog.getButton(AlertDialog.BUTTON_POSITIVE)
@@ -184,8 +185,7 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
-    fun getRequiredPasscodeText(): String {
-        val requiredTime = dbH.passcodeRequiredTime
+    fun getRequiredPasscodeText(requiredTime: Int): String {
         val requiredTimeValue = getPasscodeRequireTimeValue(requiredTime)
 
         return when (requiredTime) {
@@ -198,7 +198,7 @@ class PasscodeUtil @Inject constructor(
             )
             REQUIRE_PASSCODE_AFTER_1M, REQUIRE_PASSCODE_AFTER_2M, REQUIRE_PASSCODE_AFTER_5M -> removeFormatPlaceholder(
                 getQuantityString(
-                    R.plurals.plural_call_ended_messages_seconds,
+                    R.plurals.plural_call_ended_messages_minutes,
                     requiredTimeValue,
                     requiredTimeValue
                 )
@@ -216,6 +216,23 @@ class PasscodeUtil @Inject constructor(
             REQUIRE_PASSCODE_AFTER_2M -> TWO_MINUTES
             REQUIRE_PASSCODE_AFTER_5M -> FIVE_SECONDS_OR_MINUTES
             else -> REQUIRE_PASSCODE_IMMEDIATE
+        }
+    }
+
+    fun disablePasscode() {
+        val prefs = dbH.preferences
+
+        if (prefs != null) {
+            prefs.passcodeLockEnabled = false.toString()
+            prefs.passcodeLockType = ""
+            prefs.passcodeLockCode = ""
+            prefs.passcodeLockRequireTime = REQUIRE_PASSCODE_INVALID
+            dbH.preferences = prefs
+        } else {
+            dbH.isPasscodeLockEnabled = false
+            dbH.passcodeLockType = ""
+            dbH.passcodeLockCode = ""
+            dbH.passcodeRequiredTime = REQUIRE_PASSCODE_INVALID
         }
     }
 }

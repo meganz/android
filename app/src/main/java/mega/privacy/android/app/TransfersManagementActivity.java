@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
 import mega.privacy.android.app.components.transferWidget.TransferWidget;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -18,7 +18,7 @@ import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFER
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
-public class TransfersManagementActivity extends PinActivityLollipop {
+public class TransfersManagementActivity extends PasscodeActivityLollipop {
 
     protected TransferWidget transfersWidget;
 
