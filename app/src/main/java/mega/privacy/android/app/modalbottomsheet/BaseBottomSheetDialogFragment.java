@@ -16,6 +16,9 @@ import androidx.annotation.Nullable;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -27,13 +30,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
-    private static final int DEFAULT_VIEW_TYPE = 0;
-    private static final int RADIO_GROUP_VIEW_TYPE = 1;
-
-    private static final int HEIGHT_RADIO_GROUP_VIEW = 56;
-    private static final int HEIGHT_CHILD = 50;
+    protected static final int HEIGHT_HEADER_RADIO_GROUP = 56;
     protected static final int HEIGHT_HEADER_LARGE = 81;
     protected static final int HEIGHT_HEADER_LOW = 48;
+    protected static final int HEIGHT_SEPARATOR = 1;
+
+    protected static final String TYPE_OPTION = "TYPE_OPTION";
+    protected static final String TYPE_SEPARATOR = "TYPE_SEPARATOR";
 
     protected Context context;
     protected MegaApplication app;
@@ -46,7 +49,6 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     private int heightHeader;
     protected BottomSheetBehavior mBehavior;
 
-    private int viewType = DEFAULT_VIEW_TYPE;
     protected View contentView;
     protected LinearLayout mainLinearLayout;
     protected LinearLayout items_layout;
@@ -81,33 +83,19 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
     /**
      * Sets the initial state of a BottomSheet and its state.
      *
-     * @param heightHeader              height of the header
-     * @param addBottomSheetCallBack    true if it should add a BottomsheetCallback, false otherwise
+     * @param heightHeader           Height of the header.
+     * @param addBottomSheetCallBack True if it should add a BottomSheetCallback, false otherwise.
      */
     protected void setBottomSheetBehavior(int heightHeader, boolean addBottomSheetCallBack) {
         this.heightHeader = heightHeader;
         mBehavior = BottomSheetBehavior.from((View) contentView.getParent());
 
-        int peekHeight = getPeekHeight();
-        if (peekHeight < halfHeightDisplay) {
-            mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        } else {
-            mBehavior.setPeekHeight(peekHeight);
-            mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }
+        mBehavior.setPeekHeight(getPeekHeight());
+        mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         if (addBottomSheetCallBack) {
             addBottomSheetCallBack();
         }
-    }
-
-    /**
-     * Sets the initial state of a BottomSheet composed by a RadioGroup and its state.
-     *
-     */
-    protected void setRadioGroupViewBottomSheetBehaviour() {
-        viewType = RADIO_GROUP_VIEW_TYPE;
-        setBottomSheetBehavior(HEIGHT_RADIO_GROUP_VIEW, false);
     }
 
     /**
@@ -153,68 +141,62 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
 
     /**
      * Gets the initial height of a BottomSheet.
-     * It depends on the number of options visibles on it
-     * and on the display height and current orientation of the used device.
+     * It depends on the number of visible options on it, the display height
+     * and current orientation of the used device.
      * The maximum height will be a bit more than half of the screen.
      *
-     * @return  The initial height of a BottomSheet
+     * @return The initial height of a BottomSheet.
      */
     private int getPeekHeight() {
-        int numOptions = items_layout.getChildCount();
         int numVisibleOptions = 0;
-        int heightChild = dp2px(viewType == DEFAULT_VIEW_TYPE ? HEIGHT_CHILD : HEIGHT_RADIO_GROUP_VIEW, outMetrics);
+        int childHeight = 0;
+        Map<Integer, String> visibleItems = new HashMap<>();
         int peekHeight = dp2px(heightHeader, outMetrics);
+        int heightSeparator = dp2px(HEIGHT_SEPARATOR, outMetrics);
 
-        for (int i = 0; i < numOptions; i++) {
-            if (getItemsLayoutChildAt(i).getVisibility() == VISIBLE) {
-                numVisibleOptions++;
-            }
-        }
+        for (int i = 0; i < items_layout.getChildCount(); i++) {
+            View v = items_layout.getChildAt(i);
 
-        if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE) || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
-            return peekHeight + (heightChild * numOptions);
-        } else {
-            for (int i = 0; i < numOptions; i++) {
-                if (isChildVisibleAt(i) && peekHeight < halfHeightDisplay) {
-                    peekHeight += heightChild;
+            if (v != null && v.getVisibility() == VISIBLE) {
+                int height = v.getLayoutParams().height;
+                childHeight += height;
 
-                    if (peekHeight >= halfHeightDisplay) {
-                        if (getItemsLayoutChildAt(i + 2) != null) {
-                            for (int j = i + 2; j < numOptions; j++) {
-                                if (isChildVisibleAt(j)) {
-                                    return peekHeight + (heightChild / 2);
-                                }
-                            }
-                        } else if (isChildVisibleAt(i + 1)) {
-                            return peekHeight + (heightChild / 2);
-                        }
-
-                        return peekHeight + heightChild;
-                    }
+                if (height == heightSeparator) {
+                    //Is separator
+                    visibleItems.put(i, TYPE_SEPARATOR);
+                } else {
+                    //Is visible option
+                    numVisibleOptions++;
+                    visibleItems.put(i, TYPE_OPTION);
                 }
             }
         }
 
+        if ((numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE)
+                || (numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW)) {
+            return peekHeight + childHeight;
+        }
+
+        int countVisibleOptions = 0;
+
+        for (Map.Entry<Integer, String> visibleItem : visibleItems.entrySet()) {
+            String visibleItemType = visibleItem.getValue();
+            int visibleItemPosition = visibleItem.getKey();
+            int heightVisiblePosition = items_layout.getChildAt(visibleItemPosition).getLayoutParams().height;
+
+            if (visibleItemType.equals(TYPE_OPTION)) {
+                countVisibleOptions++;
+            }
+
+            if (peekHeight < halfHeightDisplay
+                    || visibleItemType.equals(TYPE_SEPARATOR)
+                    || countVisibleOptions == numVisibleOptions) {
+                peekHeight += heightVisiblePosition;
+            } else {
+                return peekHeight + (heightVisiblePosition / 2);
+            }
+        }
+
         return peekHeight;
-    }
-
-    /**
-     * Gets a child view from "items_layout".
-     *
-     * @param index the index of the child to get
-     * @return The child view
-     */
-    private View getItemsLayoutChildAt(int index) {
-        return items_layout.getChildAt(index);
-    }
-
-    /**
-     * Checks if a child view from "items_layout" exists and if it is visible.
-     *
-     * @param index the index of the child to check
-     * @return True if the child view exists and if it is visible, false otherwise
-     */
-    private boolean isChildVisibleAt(int index) {
-        return getItemsLayoutChildAt(index) != null && getItemsLayoutChildAt(index).getVisibility() == VISIBLE;
     }
 }
