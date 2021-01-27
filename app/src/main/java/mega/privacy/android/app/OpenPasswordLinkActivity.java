@@ -12,7 +12,7 @@ import mega.privacy.android.app.listeners.PasswordLinkListener;
 import mega.privacy.android.app.lollipop.DecryptAlertDialog;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import nz.mega.sdk.MegaError;
 
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK;
@@ -24,7 +24,7 @@ import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 
-public class OpenPasswordLinkActivity extends PasscodeActivityLollipop
+public class OpenPasswordLinkActivity extends PasscodeActivity
 		implements DecryptAlertDialog.DecryptDialogListener {
 	private static final String TAG_DECRYPT = "decrypt";
 

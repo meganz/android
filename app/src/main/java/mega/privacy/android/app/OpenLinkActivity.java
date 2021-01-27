@@ -15,7 +15,7 @@ import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -31,7 +31,7 @@ import static mega.privacy.android.app.utils.LinksUtil.requiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class OpenLinkActivity extends PasscodeActivityLollipop implements MegaRequestListenerInterface, View.OnClickListener {
+public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener {
 
 	private DatabaseHandler dbH = null;
 

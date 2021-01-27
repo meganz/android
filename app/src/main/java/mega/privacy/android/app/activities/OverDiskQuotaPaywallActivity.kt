@@ -18,14 +18,13 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.TimeUtils.*
 import java.util.concurrent.TimeUnit
 
-class OverDiskQuotaPaywallActivity : PasscodeActivityLollipop(), View.OnClickListener{
+class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
 
     private var timer: CountDownTimer? = null
 

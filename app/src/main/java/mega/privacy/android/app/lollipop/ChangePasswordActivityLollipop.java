@@ -40,6 +40,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import nz.mega.sdk.MegaApiAndroid;
@@ -55,7 +56,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 
 @SuppressLint("NewApi")
-public class ChangePasswordActivityLollipop extends PasscodeActivityLollipop implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
+public class ChangePasswordActivityLollipop extends PasscodeActivity implements OnClickListener, MegaRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener{
 	
 	ChangePasswordActivityLollipop changePasswordActivity = this;
 

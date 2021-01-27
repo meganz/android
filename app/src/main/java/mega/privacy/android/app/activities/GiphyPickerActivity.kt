@@ -26,7 +26,6 @@ import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_DOWN_SERVER
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop
 import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
@@ -41,7 +40,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GiphyPickerActivity : PasscodeActivityLollipop(), GiphyInterface {
+class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
     companion object {
         private const val NUM_COLUMNS_PORTRAIT = 2

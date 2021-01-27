@@ -59,13 +59,13 @@ import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 @SuppressLint("MissingPermission")
-public class MapsActivity extends PasscodeActivityLollipop implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
+public class MapsActivity extends PasscodeActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback, GoogleMap.OnMyLocationClickListener, GoogleMap.OnMyLocationButtonClickListener, View.OnClickListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener, LocationListener {
 
     public static final String SNAPSHOT = "snapshot";
     public static final String LATITUDE = "latitude";

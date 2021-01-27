@@ -669,7 +669,7 @@
             android:theme="@style/Theme.Megaactionbar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="mega.privacy.android.app.lollipop.PasscodeActivityLollipop" />
+                android:value="mega.privacy.android.app.activities.PasscodeActivity" />
         </activity>
 
         <activity

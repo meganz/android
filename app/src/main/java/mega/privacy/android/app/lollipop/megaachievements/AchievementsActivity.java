@@ -25,7 +25,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.lollipop.InviteContactActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -34,7 +34,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class AchievementsActivity extends PasscodeActivityLollipop {
+public class AchievementsActivity extends PasscodeActivity {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
     static final int INVALID_TYPE = -1;
 

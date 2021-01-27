@@ -47,6 +47,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import nz.mega.sdk.MegaApiJava;
@@ -61,7 +62,7 @@ import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class ZipBrowserActivityLollipop extends PasscodeActivityLollipop {
+public class ZipBrowserActivityLollipop extends PasscodeActivity {
 	public static ImageView imageDrag;
 	int[] screenPosition;
 

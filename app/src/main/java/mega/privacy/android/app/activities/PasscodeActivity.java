@@ -1,4 +1,4 @@
-package mega.privacy.android.app.lollipop;
+package mega.privacy.android.app.activities;
 
 import android.os.Bundle;
 
@@ -10,7 +10,7 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 
-public class PasscodeActivityLollipop extends BaseActivity {
+public class PasscodeActivity extends BaseActivity {
 
 	private PasscodeUtil passcodeUtil;
     private static long lastStart;
@@ -40,7 +40,7 @@ public class PasscodeActivityLollipop extends BaseActivity {
 		//if leave the APP then get back, should trigger camera upload.
         if(System.currentTimeMillis() - lastStart > 1000) {
 			if (megaApi.getRootNode() != null && !MegaApplication.isLoggingIn()){
-				startCameraUploadServiceIgnoreAttr(PasscodeActivityLollipop.this);
+				startCameraUploadServiceIgnoreAttr(PasscodeActivity.this);
 			}
         }
 	}

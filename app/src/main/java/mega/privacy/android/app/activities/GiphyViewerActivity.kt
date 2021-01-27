@@ -7,14 +7,13 @@ import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.databinding.ActivityGiphyViewerBinding
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.utils.Constants.ACTION_PREVIEW_GIPHY
 import mega.privacy.android.app.utils.FrescoUtils.loadGif
 import mega.privacy.android.app.utils.GiphyUtil.Companion.getOriginalGiphySrc
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 
-class GiphyViewerActivity : PasscodeActivityLollipop() {
+class GiphyViewerActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityGiphyViewerBinding
 

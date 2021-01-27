@@ -10,11 +10,11 @@ import android.widget.FrameLayout;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment;
-import mega.privacy.android.app.lollipop.PasscodeActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 
 import static mega.privacy.android.app.utils.Util.*;
 
-public class PreferencesBaseActivity extends PasscodeActivityLollipop {
+public class PreferencesBaseActivity extends PasscodeActivity {
 
     protected FrameLayout fragmentContainer;
     protected Toolbar tB;

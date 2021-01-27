@@ -34,6 +34,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -59,7 +60,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaShare.*;
 
-public class VersionsFileActivity extends PasscodeActivityLollipop implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
+public class VersionsFileActivity extends PasscodeActivity implements MegaRequestListenerInterface, OnClickListener, MegaGlobalListenerInterface {
 	private static final String IS_CHECKING_REVERT_VERSION = "IS_CHECKING_REVERT_VERSION";
 	private static final String SELECTED_NODE_HANDLE = "SELECTED_NODE_HANDLE";
 	private static final String SELECTED_POSITION =  "SELECTED_POSITION";

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.PhoneContactsLollipopAdapter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -42,7 +43,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 
-public class PhoneContactsActivityLollipop extends PasscodeActivityLollipop implements PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
+public class PhoneContactsActivityLollipop extends PasscodeActivity implements PhoneContactsLollipopAdapter.OnItemCheckClickListener, MegaRequestListenerInterface {
 
 	ActionBar aB;
 	Toolbar tB;
