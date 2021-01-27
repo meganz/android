@@ -15,7 +15,7 @@ import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.utils.LinksUtil
 import nz.mega.sdk.MegaBanner
 
-class BannerAdapter(private var viewModel: HomePageViewModel)
+class BannerAdapter(private val viewModel: HomePageViewModel)
     : BaseBannerAdapter<MegaBanner>() {
 
     override fun bindData(

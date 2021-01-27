@@ -24,11 +24,11 @@ import kotlin.collections.LinkedHashMap
  * Data fetcher for fetching typed files
  */
 class TypedNodesFetcher(
-    private var context: Context,
-    private var megaApi: MegaApiAndroid,
-    private var type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
-    private var order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private var selectedNodesMap: LinkedHashMap<Any, NodeItem>
+    private val context: Context,
+    private val megaApi: MegaApiAndroid,
+    private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
+    private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
+    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 

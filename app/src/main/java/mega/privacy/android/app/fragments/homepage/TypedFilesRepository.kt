@@ -12,8 +12,8 @@ import javax.inject.Singleton
 
 @Singleton
 class TypedFilesRepository @Inject constructor(
-    @ApplicationContext private var context: Context,
-    private var megaApi: MegaApiAndroid
+    @ApplicationContext private val context: Context,
+    private val megaApi: MegaApiAndroid
 ) {
     /** Live Data to notify the query result*/
     var fileNodeItems: LiveData<List<NodeItem>> = MutableLiveData()
