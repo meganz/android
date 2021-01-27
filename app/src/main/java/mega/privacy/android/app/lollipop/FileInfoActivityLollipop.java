@@ -60,9 +60,6 @@ import android.widget.Toast;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -366,13 +363,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     }
 
     @Override
-    public void showSnackbar(@NotNull String content) {
-        showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
-    }
-
-    @Override
-    public void showSnackbarWithChat(@Nullable String content, long chatId) {
-        showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+    public void showSnackbar(int type, String content, long chatId) {
+        showSnackbar(type, fragmentContainer, content, chatId);
     }
 
     private class ActionBarCallBack implements ActionMode.Callback {
@@ -2655,10 +2647,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         }
 
         super.onBackPressed();
-	}
-
-	public void showSnackbar(int type, String s, long idChat){
-	    showSnackbar(type, fragmentContainer, s, idChat);
 	}
 
     public void openAdvancedDevices(long handleToDownload, boolean highPriority) {

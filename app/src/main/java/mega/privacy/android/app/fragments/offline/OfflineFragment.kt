@@ -36,6 +36,9 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.PermissionRequester
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
@@ -772,9 +775,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     fun saveNodeToDevice(node: MegaOffline) {
-        viewModel.saveNodeToDevice(listOf(node)) { intent, code ->
-            startActivityForResult(intent, code)
-        }
+        viewModel.saveNodeToDevice(
+            listOf(node),
+            requireActivity() as ActivityLauncher,
+            requireActivity() as PermissionRequester,
+            requireActivity() as SnackbarShower
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -858,9 +864,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
-                viewModel.saveNodeToDevice(viewModel.getSelectedNodes()) { intent, code ->
-                    startActivityForResult(intent, code)
-                }
+                viewModel.saveNodeToDevice(
+                    viewModel.getSelectedNodes(),
+                    requireActivity() as ActivityLauncher,
+                    requireActivity() as PermissionRequester,
+                    requireActivity() as SnackbarShower
+                )
                 viewModel.clearSelection()
             }
             R.id.cab_menu_share_out -> {

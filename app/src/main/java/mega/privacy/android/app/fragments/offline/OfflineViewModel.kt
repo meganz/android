@@ -16,14 +16,18 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.components.saver.OfflineNodeSaver
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.fragments.homepage.Event
+import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.PermissionRequester
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.OfflineUtils.*
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -39,7 +43,7 @@ import java.util.concurrent.TimeUnit.SECONDS
 class OfflineViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context,
     private val repo: MegaNodeRepo,
-    private val nodeSaver: OfflineNodeSaver
+    private val nodeSaver: NodeSaver
 ) : BaseRxViewModel() {
 
     private var order = ORDER_DEFAULT_ASC
@@ -408,8 +412,13 @@ class OfflineViewModel @ViewModelInject constructor(
         }
     }
 
-    fun saveNodeToDevice(nodes: List<MegaOffline>, activityStarter: (Intent, Int) -> Unit) {
-        nodeSaver.save(nodes, false, activityStarter)
+    fun saveNodeToDevice(
+        nodes: List<MegaOffline>,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower
+    ) {
+        nodeSaver.saveOfflineNodes(nodes, activityLauncher, permissionRequester, snackbarShower)
     }
 
     fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {

@@ -90,10 +90,6 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface, SnackbarShower {
         showFragment(visibleFragment)
     }
 
-    fun showSnackbar(snackbarType: Int, message: String?, chatId: Long) {
-        showSnackbar(snackbarType, binding.getLinkCoordinatorLayout, message, chatId)
-    }
-
     override fun showFragment(visibleFragment: Int) {
         this.visibleFragment = visibleFragment
 
@@ -458,11 +454,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface, SnackbarShower {
         }
     }
 
-    override fun showSnackbar(content: String) {
-        showSnackbar(SNACKBAR_TYPE, content, MEGACHAT_INVALID_HANDLE)
-    }
-
-    override fun showSnackbarWithChat(content: String?, chatId: Long) {
-        showSnackbar(MESSAGE_SNACKBAR_TYPE, content, chatId)
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        showSnackbar(type, binding.getLinkCoordinatorLayout, content, chatId)
     }
 }

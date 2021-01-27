@@ -5,9 +5,7 @@ import android.content.Intent
 import android.text.TextUtils
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.interfaces.ActivityLauncher
-import mega.privacy.android.app.interfaces.AttachNodeToChatListener
-import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.listeners.AttachNodesListener
 import mega.privacy.android.app.listeners.CreateChatsListener
 import mega.privacy.android.app.lollipop.controllers.NodeController

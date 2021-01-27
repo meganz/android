@@ -334,13 +334,9 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         when (item.itemId) {
             R.id.save_to_device -> {
                 if (adapterType == OFFLINE_ADAPTER) {
-                    viewModel.saveOfflineNode(playingHandle) { intent, code ->
-                        startActivityForResult(intent, code)
-                    }
+                    viewModel.saveOfflineNode(playingHandle, this, this, this)
                 } else {
-                    viewModel.saveMegaNode(playingHandle, isFolderLink) { intent, code ->
-                        startActivityForResult(intent, code)
-                    }
+                    viewModel.saveMegaNode(playingHandle, isFolderLink, this, this, this)
                 }
                 return true
             }
@@ -480,10 +476,6 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
     }
 
-    fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        showSnackbar(type, binding.rootLayout, content, chatId)
-    }
-
     fun setToolbarTitle(title: String) {
         binding.toolbar.title = title
     }
@@ -511,12 +503,8 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         }
     }
 
-    override fun showSnackbar(content: String) {
-        showSnackbar(SNACKBAR_TYPE, content, MEGACHAT_INVALID_HANDLE)
-    }
-
-    override fun showSnackbarWithChat(content: String?, chatId: Long) {
-        showSnackbar(MESSAGE_SNACKBAR_TYPE, content, chatId)
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        showSnackbar(type, binding.rootLayout, content, chatId)
     }
 
     override fun launchActivity(intent: Intent) {

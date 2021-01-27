@@ -69,7 +69,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -7394,10 +7393,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     }
 
-    public void showSnackbar(int type, String s, long idChat){
-        showSnackbar(type, fragmentContainer, s, idChat);
-    }
-
     public void removeProgressDialog(){
         if (statusDialog != null) {
             try {
@@ -9536,13 +9531,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     @Override
-    public void showSnackbar(@NotNull String content) {
-        showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
-    }
-
-    @Override
-    public void showSnackbarWithChat(@Nullable String content, long chatId) {
-        showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+    public void showSnackbar(int type, String content, long chatId) {
+        showSnackbar(type, fragmentContainer, content, chatId);
     }
 
     @Override

@@ -98,9 +98,6 @@ import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -158,7 +155,6 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragm
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
@@ -8231,18 +8227,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		return true;
 	}
 
-	public void showSnackbar(int type, String s, long idChat){
-    	showSnackbar(type, fragmentContainer, s, idChat);
-	}
-
 	@Override
-	public void showSnackbar(@NotNull String content) {
-		showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
-	}
-
-	@Override
-	public void showSnackbarWithChat(@Nullable String content, long chatId) {
-		showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+	public void showSnackbar(int type, String content, long chatId) {
+    	showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
 	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){

@@ -49,9 +49,6 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,7 +59,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
@@ -76,7 +72,7 @@ import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
-import mega.privacy.android.app.components.saver.OfflineNodeSaver;
+import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -124,7 +120,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener,
 		SnackbarShower {
@@ -160,9 +155,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	private final MegaAttacher nodeAttacher = new MegaAttacher(this);
+	private NodeSaver nodeSaver;
 
 	NodeController nC;
-	private OfflineNodeSaver offlineNodeSaver;
 	boolean isFileLink;
 
 	private MegaFullScreenImageAdapterLollipop adapterMega;
@@ -760,49 +755,26 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 			case R.id.full_image_viewer_download: {
-
-				if (adapterType == OFFLINE_ADAPTER) {
-					if (offlineNodeSaver == null) {
-						offlineNodeSaver = new OfflineNodeSaver(this, dbH);
-					}
-					offlineNodeSaver.save(Collections.singletonList(mOffListImages.get(positionG)), false, (intent, code) -> {
-						startActivityForResult(intent, code);
-						return Unit.INSTANCE;
-					});
-					break;
-				}else if (adapterType == ZIP_ADAPTER){
-					break;
-
-				}else if (adapterType == FILE_LINK_ADAPTER){
-					logDebug("Click download");
-					if (nC == null) {
-						nC = new NodeController(this);
-					}
-					nC.downloadFileLink(currentDocument, url);
-					break;
-				}else{
-					node = megaApi.getNodeByHandle(imageHandles.get(positionG));
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-						boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-						if (!hasStoragePermission) {
-							ActivityCompat.requestPermissions(this,
-									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-									REQUEST_WRITE_STORAGE);
-
-							handleListM.add(node.getHandle());
-
-							break;
-						}
-					}
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(node.getHandle());
-					if(nC==null){
-						nC = new NodeController(this, isFolderLink);
-					}
-					nC.prepareForDownload(handleList, false);
-
-					break;
+				if (nodeSaver == null) {
+					nodeSaver = new NodeSaver(this, megaApi, dbH);
 				}
+
+				switch (adapterType) {
+					case OFFLINE_ADAPTER:
+						nodeSaver.saveOfflineNode(mOffListImages.get(positionG), this, this, this);
+						break;
+					case ZIP_ADAPTER:
+						// don't have this option
+						break;
+					case FILE_LINK_ADAPTER:
+						nodeSaver.saveNode(currentDocument, this, this, this, false, false, true, false);
+						break;
+					default:
+						nodeSaver.saveNode(node, this, this, this, false, isFolderLink, true, false);
+						break;
+				}
+
+				break;
 			}
 			case R.id.full_image_viewer_rename: {
 				showRenameDialog();
@@ -1589,25 +1561,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-        	case REQUEST_WRITE_STORAGE:{
-		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (hasStoragePermission) {
-					if(nC==null){
-						nC = new NodeController(this, isFolderLink);
-					}
-					if (adapterType == FILE_LINK_ADAPTER) {
-						if (nC == null) {
-							nC = new NodeController(this);
-						}
-						nC.downloadFileLink(currentDocument, url);
-					}else{
-						nC.prepareForDownload(handleListM, false);
-					}
-				}
-	        	break;
-	        }
-        }
+
+		if (nodeSaver != null) {
+			nodeSaver.handleRequestPermissionsResult(requestCode);
+		}
     }
 
 	@Override
@@ -2206,33 +2163,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			logDebug("Local folder selected");
-            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            if(adapterType == FILE_LINK_ADAPTER){
-				if (nC == null) {
-					nC = new NodeController(this);
-				}
-				nC.downloadTo(currentDocument, parentPath, url);
-			}
-			else{
-				String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-				long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-				long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-				boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
-
-				if(nC==null){
-					nC = new NodeController(this, isFolderLink);
-				}
-				nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
-			}
-        }
-		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
-
+		if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 				if (!hasStoragePermission) {
@@ -2336,10 +2271,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
-
-	public void showSnackbar(int type, String s, long idChat){
-		showSnackbar(type, fragmentContainer, s, idChat);
-	}
 
 	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
         logDebug("askSizeConfirmationBeforeDownload");
@@ -2657,12 +2588,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	}
 
 	@Override
-	public void showSnackbar(@NotNull String content) {
-		showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
-	}
-
-	@Override
-	public void showSnackbarWithChat(@Nullable String content, long chatId) {
-		showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+	public void showSnackbar(int type, String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 }

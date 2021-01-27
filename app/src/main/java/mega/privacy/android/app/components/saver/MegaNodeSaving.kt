@@ -2,17 +2,29 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.*
+import mega.privacy.android.app.DownloadService.*
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest
+import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaNode
+import java.io.File
+import java.util.*
 
 class MegaNodeSaving(
     totalSize: Long,
-    highPriority: Boolean,
-    val isFolderLink: Boolean,
-    val nodes: List<MegaNode>,
-) : Saving(totalSize, highPriority) {
+    private val highPriority: Boolean,
+    private val isFolderLink: Boolean,
+    private val nodes: List<MegaNode>,
+    private val fromMediaViewer: Boolean,
+    private val fromChat: Boolean,
+) : Saving(totalSize) {
 
     override fun hasUnsupportedFile(context: Context): Boolean {
         for (node in nodes) {
@@ -35,5 +47,121 @@ class MegaNodeSaving(
         }
 
         return false
+    }
+
+    override fun doDownload(
+        parentPath: String,
+        externalSDCard: Boolean,
+        sdCardOperator: SDCardOperator?,
+        snackbarShower: SnackbarShower,
+    ) {
+        val app = MegaApplication.getInstance()
+        val megaApi = app.megaApi
+        val dbHandler = DatabaseHandler.getDbHandler(app)
+
+        var numberOfNodesAlreadyDownloaded = 0
+        var numberOfNodesPending = 0
+        var emptyFolders = 0
+
+        for (node in nodes) {
+            val dlFiles = HashMap<MegaNode, String>()
+            val targets = HashMap<Long, String>()
+
+            if (node.type == MegaNode.TYPE_FOLDER) {
+                if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
+                    sdCardOperator.buildFileStructure(targets, parentPath, megaApi, node)
+                    getDlList(megaApi, dlFiles, node, File(sdCardOperator.downloadRoot, node.name))
+                } else {
+                    getDlList(megaApi, dlFiles, node, File(parentPath, node.name))
+                }
+            } else {
+                if (sdCardOperator != null && sdCardOperator.isSDCardDownload) {
+                    targets[node.handle] = parentPath
+                    dlFiles[node] = sdCardOperator.downloadRoot
+                } else {
+                    dlFiles[node] = parentPath
+                }
+            }
+
+            if (dlFiles.isEmpty()) {
+                emptyFolders++
+            }
+
+            for (document in dlFiles.keys) {
+                val path = dlFiles[document]
+                val targetPath = targets[document.handle]
+                if (TextUtil.isTextEmpty(path)) {
+                    continue
+                }
+
+                val destDir = File(path!!)
+                val destFile = if (destDir.isDirectory) {
+                    File(
+                        destDir,
+                        megaApi.escapeFsIncompatible(
+                            document.name, destDir.absolutePath + Constants.SEPARATOR
+                        )
+                    )
+                } else {
+                    destDir
+                }
+
+                if (isFileAvailable(destFile)
+                    && document.size == destFile.length()
+                    && isFileDownloadedLatest(destFile, document)
+                ) {
+                    numberOfNodesAlreadyDownloaded++
+                } else {
+                    numberOfNodesPending++
+
+                    val intent = Intent(app, DownloadService::class.java)
+
+                    if (fromChat) {
+                        intent.putExtra(EXTRA_SERIALIZE_STRING, document.serialize())
+                    } else {
+                        intent.putExtra(EXTRA_HASH, document.handle)
+                    }
+
+                    if (sdCardOperator!!.isSDCardDownload) {
+                        NodeController.getDownloadToSDCardIntent(
+                            intent, path, targetPath, dbHandler.sdCardUri
+                        )
+                    } else {
+                        intent.putExtra(EXTRA_PATH, path)
+                    }
+
+                    intent.putExtra(EXTRA_SIZE, document.size)
+
+                    if (highPriority) {
+                        intent.putExtra(HIGH_PRIORITY_TRANSFER, true)
+                    }
+
+                    if (fromMediaViewer) {
+                        intent.putExtra(EXTRA_FROM_MV, true)
+                    }
+
+                    intent.putExtra(EXTRA_FOLDER_LINK, isFolderLink)
+
+                    app.startService(intent)
+                }
+            }
+        }
+
+        val message = if (numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0) {
+            getQuantityString(R.plurals.empty_folders, emptyFolders)
+        } else if (numberOfNodesAlreadyDownloaded == 0) {
+            getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending)
+        } else if (numberOfNodesPending > 0) {
+            getQuantityString(
+                R.plurals.file_pending_download, numberOfNodesPending, numberOfNodesPending
+            )
+        } else {
+            getQuantityString(
+                R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded,
+                numberOfNodesAlreadyDownloaded
+            )
+        }
+
+        snackbarShower.showSnackbar(message)
     }
 }

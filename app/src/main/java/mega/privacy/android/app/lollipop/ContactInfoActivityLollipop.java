@@ -53,9 +53,6 @@ import android.widget.TextView;
 
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1860,10 +1857,6 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 	}
 
-	public void showSnackbar(int type, String s, long idChat){
-		showSnackbar(type, fragmentContainer, s, idChat);
-	}
-	
 	private void sharedFolderClicked(){
         RelativeLayout sharedFolderLayout = (RelativeLayout)findViewById(R.id.shared_folder_list_container);
 		if(isShareFolderExpanded){
@@ -2479,12 +2472,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public void showSnackbar(@NotNull String content) {
-		showSnackbar(SNACKBAR_TYPE, fragmentContainer, content, MEGACHAT_INVALID_HANDLE);
-	}
-
-	@Override
-	public void showSnackbarWithChat(@Nullable String content, long chatId) {
-		showSnackbar(MESSAGE_SNACKBAR_TYPE, fragmentContainer, content, chatId);
+	public void showSnackbar(int type, String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 }

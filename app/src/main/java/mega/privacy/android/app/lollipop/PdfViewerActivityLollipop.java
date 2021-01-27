@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -8,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -22,7 +20,6 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -61,9 +58,6 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -72,14 +66,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
@@ -91,7 +83,7 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
-import mega.privacy.android.app.components.saver.OfflineNodeSaver;
+import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
@@ -222,9 +214,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private String pathNavigation;
 
     private final MegaAttacher nodeAttacher = new MegaAttacher(this);
+    private NodeSaver nodeSaver;
 
     NodeController nC;
-    private OfflineNodeSaver offlineNodeSaver;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
@@ -963,13 +955,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     @Override
-    public void showSnackbar(@NotNull String content) {
-        showSnackbar(SNACKBAR_TYPE, pdfviewerContainer, content, MEGACHAT_INVALID_HANDLE);
-    }
-
-    @Override
-    public void showSnackbarWithChat(@Nullable String content, long chatId) {
-        showSnackbar(MESSAGE_SNACKBAR_TYPE, pdfviewerContainer, content, chatId);
+    public void showSnackbar(int type, String content, long chatId) {
+        showSnackbar(type, pdfviewerContainer, content, chatId);
     }
 
     class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
@@ -1054,99 +1041,31 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
     }
 
-    public void download(){
+    public void download() {
+        if (nodeSaver == null) {
+            nodeSaver = new NodeSaver(this, megaApi, dbH);
+        }
 
         if (type == OFFLINE_ADAPTER) {
             MegaOffline node = dbH.findByHandle(handle);
-            if (node == null) {
-                return;
+            if (node != null) {
+                nodeSaver.saveOfflineNode(node, this, this, this);
             }
-
-            if (offlineNodeSaver == null) {
-                offlineNodeSaver = new OfflineNodeSaver(this, dbH);
-            }
-            offlineNodeSaver.save(Collections.singletonList(node), false, (intent, code) -> {
-                startActivityForResult(intent, code);
-                return Unit.INSTANCE;
-            });
         } else if (type == FILE_LINK_ADAPTER) {
-            if (nC == null) {
-                nC = new NodeController(this);
-            }
-            nC.downloadFileLink(currentDocument, uri.toString());
-        }
-        else if (fromChat){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-                    handleListM.add(nodeChat.getHandle());
-                    return;
-                }
-            }
-            if (chatC == null){
-                chatC = new ChatController(this);
-            }
-            if (nodeChat != null){
-                chatC.prepareForChatDownload(nodeChat);
-            }
-        }
-        else {
-            MegaNode node = megaApi.getNodeByHandle(handle);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (!hasStoragePermission) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            REQUEST_WRITE_STORAGE);
-
-                    handleListM.add(node.getHandle());
-                    return;
-                }
-            }
-
-            ArrayList<Long> handleList = new ArrayList<Long>();
-            handleList.add(node.getHandle());
-
-            if(nC==null){
-                nC = new NodeController(this, isFolderLink);
-            }
-            nC.prepareForDownload(handleList, false);
+            nodeSaver.saveNode(currentDocument, this, this, this, false, false, true, false);
+        } else if (fromChat) {
+            nodeSaver.saveNode(nodeChat, this, this, this, true, false, true, true);
+        } else {
+            nodeSaver.saveHandle(handle, this, this, this, false, isFolderLink, true, false);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-            case REQUEST_WRITE_STORAGE:{
-                boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                if (hasStoragePermission) {
-                    if (type == FILE_LINK_ADAPTER) {
-                        if(nC==null){
-                            nC = new NodeController(this, isFolderLink);
-                        }
-                        nC.downloadFileLink(currentDocument, uri.toString());
-                    }
-                    else if (fromChat) {
-                        if (chatC == null){
-                            chatC = new ChatController(this);
-                        }
-                        if (nodeChat != null){
-                            chatC.prepareForChatDownload(nodeChat);
-                        }
-                    }
-                    else{
-                        if(nC==null){
-                            nC = new NodeController(this, isFolderLink);
-                        }
-                        nC.prepareForDownload(handleListM, false);
-                    }
-                }
-                break;
-            }
+
+        if (nodeSaver != null) {
+            nodeSaver.handleRequestPermissionsResult(requestCode);
         }
     }
 
@@ -2289,7 +2208,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             return;
         }
 
-        if (offlineNodeSaver != null && offlineNodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
             return;
         }
 
@@ -2297,32 +2216,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             return;
         }
 
-        if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-            logDebug("Local folder selected");
-            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-            if (type == FILE_LINK_ADAPTER){
-                if (nC == null) {
-                    nC = new NodeController(this);
-                }
-                nC.downloadTo(currentDocument, parentPath, uri.toString());
-            }
-            else if (type == FROM_CHAT) {
-                chatC.prepareForDownload(intent, parentPath);
-            }
-            else {
-                String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-                long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-                long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-                logDebug("URL: " + url + "___SIZE: " + size);
-
-                if(nC==null){
-                    nC = new NodeController(this, isFolderLink);
-                }
-                nC.checkSizeBeforeDownload(parentPath,url, size, hashes, false);
-            }
-        }
-        else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
-
+        if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
             if(!isOnline(this)){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
@@ -2776,10 +2670,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     @Override
     public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer) {
         return false;
-    }
-
-    public void showSnackbar(int type, String s, long idChat){
-        showSnackbar(type, pdfviewerContainer, s, idChat);
     }
 
     public void openAdvancedDevices (long handleToDownload, boolean highPriority){

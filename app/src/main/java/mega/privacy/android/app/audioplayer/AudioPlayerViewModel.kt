@@ -8,9 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.components.saver.MegaNodeSaver
-import mega.privacy.android.app.components.saver.OfflineNodeSaver
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaNodeUtilKt
@@ -19,8 +19,7 @@ import mega.privacy.android.app.utils.MegaNodeUtilKt
  * ViewModel for main audio player UI logic.
  */
 class AudioPlayerViewModel @ViewModelInject constructor(
-    private val offlineNodeSaver: OfflineNodeSaver,
-    private val megaNodeSaver: MegaNodeSaver,
+    private val nodeSaver: NodeSaver,
     private val dbHandler: DatabaseHandler,
 ) : BaseRxViewModel() {
 
@@ -33,11 +32,18 @@ class AudioPlayerViewModel @ViewModelInject constructor(
      * Save an offline node to device.
      *
      * @param handle node handle
-     * @param activityStarter function to start activity
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
      */
-    fun saveOfflineNode(handle: Long, activityStarter: (Intent, Int) -> Unit) {
+    fun saveOfflineNode(
+        handle: Long,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower
+    ) {
         val node = dbHandler.findByHandle(handle) ?: return
-        offlineNodeSaver.save(listOf(node), false, activityStarter)
+        nodeSaver.saveOfflineNode(node, activityLauncher, permissionRequester, snackbarShower)
     }
 
     /**
@@ -45,10 +51,21 @@ class AudioPlayerViewModel @ViewModelInject constructor(
      *
      * @param handle node handle
      * @param isFolderLink if this node is a folder link node
-     * @param activityStarter function to start activity
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
      */
-    fun saveMegaNode(handle: Long, isFolderLink: Boolean, activityStarter: (Intent, Int) -> Unit) {
-        megaNodeSaver.save(listOf(handle), false, isFolderLink, activityStarter)
+    fun saveMegaNode(
+        handle: Long,
+        isFolderLink: Boolean,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower
+    ) {
+        nodeSaver.saveHandle(
+            handle, activityLauncher, permissionRequester, snackbarShower,
+            isFolderLink = isFolderLink, fromMediaViewer = true
+        )
     }
 
     fun attachNodeToChats(handle: Long, activityLauncher: ActivityLauncher) {
@@ -72,8 +89,7 @@ class AudioPlayerViewModel @ViewModelInject constructor(
         snackbarShower: SnackbarShower,
         activityLauncher: ActivityLauncher
     ) {
-        if (offlineNodeSaver.handleActivityResult(requestCode, resultCode, data)
-            || megaNodeSaver.handleActivityResult(requestCode, resultCode, data)
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, data)
             || resultCode != RESULT_OK || data == null
         ) {
             return
@@ -102,7 +118,6 @@ class AudioPlayerViewModel @ViewModelInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        offlineNodeSaver.destroy()
-        megaNodeSaver.destroy()
+        nodeSaver.destroy()
     }
 }

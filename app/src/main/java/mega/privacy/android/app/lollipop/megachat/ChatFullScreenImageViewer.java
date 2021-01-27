@@ -37,6 +37,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,8 +54,9 @@ import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DraggableView;
 import mega.privacy.android.app.components.dragger.ExitViewAnimator;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
@@ -84,7 +87,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener {
+public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, DraggableView.DraggableListener,
+		SnackbarShower {
 	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	int[] screenPosition;
@@ -144,6 +148,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	boolean isDeleteDialogShow = false;
 
 	ChatController chatC;
+
+	private NodeSaver nodeSaver;
 
 	@Override
 	public void onDestroy(){
@@ -236,15 +242,9 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		switch(requestCode){
-			case REQUEST_WRITE_STORAGE:{
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (hasStoragePermission) {
-					MegaNode node = messages.get(positionG).getMegaNodeList().get(0);
-					chatC.prepareForChatDownload(node);
-				}
-				break;
-			}
+
+		if (nodeSaver != null) {
+			nodeSaver.handleRequestPermissionsResult(requestCode);
 		}
 	}
 
@@ -259,19 +259,13 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 			case R.id.chat_full_image_viewer_download: {
 				logDebug("Download option");
-				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions(this,
-								new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-						handleListM.add(node.getHandle());
-						break;
-					}
-				}
-				chatC.prepareForChatDownload(node);
 
+				if (nodeSaver == null) {
+					nodeSaver = new NodeSaver(this, megaApi, dbH);
+				}
+
+				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
+				nodeSaver.saveNode(node, this, this, this, true, false, true, true);
 				break;
 			}
 
@@ -799,11 +793,12 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		if (intent == null) {
 			return;
 		}
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			logDebug("Local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			chatC.prepareForDownload(intent, parentPath);
-		} else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+
+		if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+			return;
+		}
+
+		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			logDebug("REQUEST_CODE_SELECT_IMPORT_FOLDER OK");
 
 			if(!isOnline(this)||megaApi==null) {
@@ -1127,5 +1122,10 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				}
 			}, 300);
 		}
+	}
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 }

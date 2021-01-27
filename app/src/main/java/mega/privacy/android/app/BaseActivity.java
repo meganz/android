@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
@@ -38,6 +39,7 @@ import android.widget.TextView;
 import org.jetbrains.annotations.NotNull;
 
 import mega.privacy.android.app.interfaces.ActivityLauncher;
+import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -67,7 +69,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class BaseActivity extends AppCompatActivity implements ActivityLauncher {
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
@@ -1095,5 +1097,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher 
     @Override
     public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
         startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void askPermissions(@NotNull String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
     }
 }

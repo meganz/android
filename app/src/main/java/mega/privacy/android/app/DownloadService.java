@@ -99,6 +99,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_TARGET_URI = "target_uri";
 	public static final String EXTRA_PATH = "SAVE_PATH";
 	public static final String EXTRA_FOLDER_LINK = "FOLDER_LINK";
+	public static final String EXTRA_FROM_MV = "fromMV";
 	public static final String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
@@ -343,7 +344,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
         }
 
         boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
-        boolean fromMV = intent.getBooleanExtra("fromMV", false);
+        boolean fromMV = intent.getBooleanExtra(EXTRA_FROM_MV, false);
 		logDebug("fromMV: " + fromMV);
 
 		megaApi = app.getMegaApi();

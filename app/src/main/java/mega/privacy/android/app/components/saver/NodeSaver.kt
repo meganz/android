@@ -5,10 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
-import android.os.Handler
-import android.os.Looper
 import android.os.StatFs
 import android.text.TextUtils
 import android.widget.CheckBox
@@ -17,6 +13,7 @@ import android.widget.LinearLayout.LayoutParams
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.qualifiers.ActivityContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -24,24 +21,31 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
+import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_LOCAL_FOLDER
-import mega.privacy.android.app.utils.Constants.REQUEST_CODE_TREE
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaNode
 import java.util.concurrent.Callable
+import javax.inject.Inject
 
 /**
  * A class that encapsulate all the procedure of saving nodes into device,
@@ -55,14 +59,196 @@ import java.util.concurrent.Callable
  *
  * It simplifies code in activity/fragment where nodes need to be saved.
  */
-abstract class NodeSaver(
-    protected val context: Context,
-    protected val dbHandler: DatabaseHandler,
+class NodeSaver @Inject constructor(
+    @ActivityContext private val context: Context,
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val dbHandler: DatabaseHandler,
 ) {
     private val compositeDisposable = CompositeDisposable()
-    private val uiHandler = Handler(Looper.getMainLooper())
-    protected var saving = Saving.NOTHING
-    private var activityStarter: (Intent, Int) -> Unit = { _, _ -> }
+
+    private var saving = Saving.NOTHING
+    private var activityLauncher = ActivityLauncher.IDLE
+    private var permissionRequester = PermissionRequester.IDLE
+    private var snackbarShower = SnackbarShower.IDLE
+
+    /**
+     * Save an offline node into device.
+     *
+     * @param node the offline node to save
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
+     */
+    fun saveOfflineNode(
+        node: MegaOffline,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower
+    ) {
+        saveOfflineNodes(listOf(node), activityLauncher, permissionRequester, snackbarShower)
+    }
+
+    /**
+     * Save offline nodes into device.
+     *
+     * @param nodes the offline nodes to save
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
+     */
+    fun saveOfflineNodes(
+        nodes: List<MegaOffline>,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower
+    ) {
+        this.activityLauncher = activityLauncher
+        this.permissionRequester = permissionRequester
+        this.snackbarShower = snackbarShower
+
+        save {
+            var totalSize = 0L
+            for (node in nodes) {
+                totalSize += FileUtil.getTotalSize(OfflineUtils.getOfflineFile(context, node))
+            }
+            OfflineSaving(totalSize, nodes)
+        }
+    }
+
+    /**
+     * Save a MegaNode into device.
+     *
+     * @param handle the handle of node to save
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param fromChat whether this download is from chat
+     */
+    fun saveHandle(
+        handle: Long,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        fromChat: Boolean = false
+    ) {
+        saveHandles(
+            listOf(handle), activityLauncher, permissionRequester, snackbarShower,
+            highPriority, isFolderLink, fromMediaViewer, fromChat
+        )
+    }
+
+    /**
+     * Save a list of MegaNode into device.
+     *
+     * @param handles the handle list of nodes to save
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param fromChat whether this download is from chat
+     */
+    fun saveHandles(
+        handles: List<Long>,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        fromChat: Boolean = false
+    ) {
+        this.activityLauncher = activityLauncher
+        this.permissionRequester = permissionRequester
+        this.snackbarShower = snackbarShower
+
+        save {
+            val nodes = ArrayList<MegaNode>()
+            var totalSize = 0L
+
+            for (handle in handles) {
+                val node = megaApi.getNodeByHandle(handle)
+                if (node != null) {
+                    nodes.add(node)
+                    totalSize += node.size
+                }
+            }
+
+            MegaNodeSaving(totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, fromChat)
+        }
+    }
+
+    /**
+     * Save a MegaNode into device.
+     *
+     * @param node node to save
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param fromChat whether this download is from chat
+     */
+    fun saveNode(
+        node: MegaNode,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        fromChat: Boolean = false
+    ) {
+        saveNodes(
+            listOf(node), activityLauncher, permissionRequester, snackbarShower,
+            highPriority, isFolderLink, fromMediaViewer, fromChat
+        )
+    }
+
+    /**
+     * Save a list of MegaNode into device.
+     *
+     * @param nodes nodes to save
+     * @param activityLauncher interface to start activity
+     * @param permissionRequester interface to request permission
+     * @param snackbarShower interface to show snackbar
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param fromChat whether this download is from chat
+     */
+    fun saveNodes(
+        nodes: List<MegaNode>,
+        activityLauncher: ActivityLauncher,
+        permissionRequester: PermissionRequester,
+        snackbarShower: SnackbarShower,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        fromChat: Boolean = false
+    ) {
+        this.activityLauncher = activityLauncher
+        this.permissionRequester = permissionRequester
+        this.snackbarShower = snackbarShower
+
+        save {
+            var totalSize = 0L
+
+            for (node in nodes) {
+                totalSize += node.size
+            }
+
+            MegaNodeSaving(totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, fromChat)
+        }
+    }
 
     /**
      * Handle activity result from FileStorageActivityLollipop launched by requestLocalFolder,
@@ -103,11 +289,15 @@ abstract class NodeSaver(
         } else if (requestCode == REQUEST_CODE_TREE) {
             if (intent == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
-                if (resultCode != Activity.RESULT_OK) {
-                    showSnackbar(context, context.getString(R.string.download_requires_permission))
+
+                val message = if (resultCode != Activity.RESULT_OK) {
+                    context.getString(R.string.download_requires_permission)
                 } else {
-                    showSnackbar(context, context.getString(R.string.no_external_SD_card_detected))
+                    context.getString(R.string.no_external_SD_card_detected)
                 }
+
+                snackbarShower.showSnackbar(message)
+
                 return false
             }
 
@@ -142,37 +332,65 @@ abstract class NodeSaver(
     }
 
     /**
-     * Initiate the saving.
+     * Handle request permission result, and take actions according to the state and result.
      *
-     * @param activityStarter a high-order function to launch activity when needed
-     * @param savingProducer a high-order function to produce internal state needed for later use
+     * It should be called in onRequestPermissionsResult (but this doesn't mean NodeSaver should be
+     * owned by an activity).
+     *
+     * @param requestCode the requestCode from onRequestPermissionsResult
+     * @return whether NodeSaver handles this result, if this method return false,
+     * activity should handle the result by other code.
      */
-    protected fun save(activityStarter: (Intent, Int) -> Unit, savingProducer: () -> Saving?) {
-        if (lackPermission()) {
-            return
+    fun handleRequestPermissionsResult(requestCode: Int): Boolean {
+        if (requestCode != REQUEST_WRITE_STORAGE) {
+            return false;
         }
 
+        if (hasWriteExternalStoragePermission()) {
+            add(Completable
+                .fromCallable { doSave() }
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver save")))
+        }
+
+        return true
+    }
+
+    /**
+     * Initiate the saving.
+     *
+     * @param savingProducer a high-order function to produce internal state needed for later use
+     */
+    private fun save(savingProducer: () -> Saving?) {
         add(
             Completable
                 .fromCallable(Callable {
                     val saving = savingProducer() ?: return@Callable
                     this.saving = saving
-                    this.activityStarter = activityStarter
-                    val downloadLocationDefaultPath = getDownloadLocation()
 
-                    if (askMe(context)) {
-                        requestLocalFolder(null, activityStarter)
-                    } else {
-                        checkSizeBeforeDownload(downloadLocationDefaultPath)
+                    if (lackPermission()) {
+                        return@Callable
                     }
+
+                    doSave()
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver save"))
         )
     }
 
+    private fun doSave() {
+        val downloadLocationDefaultPath = getDownloadLocation()
+
+        if (Util.askMe(context)) {
+            requestLocalFolder(null, activityLauncher)
+        } else {
+            checkSizeBeforeDownload(downloadLocationDefaultPath)
+        }
+    }
+
     private fun requestLocalFolder(
-        prompt: String?, activityStarter: (Intent, Int) -> Unit
+        prompt: String?, activityLauncher: ActivityLauncher
     ) {
         val intent = Intent(PICK_FOLDER.action)
         intent.putExtra(EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select))
@@ -183,7 +401,7 @@ abstract class NodeSaver(
             intent.putExtra(EXTRA_PROMPT, prompt)
         }
 
-        activityStarter(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
+        activityLauncher.launchActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
     }
 
     private fun checkSizeBeforeDownload(parentPath: String) {
@@ -196,7 +414,7 @@ abstract class NodeSaver(
         logDebug("availableFreeSpace: $availableFreeSpace, totalSize: ${saving.totalSize}")
 
         if (availableFreeSpace < saving.totalSize) {
-            runOnUiThread { showNotEnoughSpaceSnackbar(context) }
+            post { snackbarShower.showNotEnoughSpaceSnackbar() }
             logWarning("Not enough space")
             return
         }
@@ -209,7 +427,7 @@ abstract class NodeSaver(
         }
 
         showConfirmationDialog(
-            context.getString(R.string.alert_larger_file, getSizeString(saving.totalSize))
+            context.getString(R.string.alert_larger_file, Util.getSizeString(saving.totalSize))
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
@@ -266,30 +484,21 @@ abstract class NodeSaver(
         if (sdCardOperator == null) {
             requestLocalFolder(
                 context.getString(R.string.no_external_SD_card_detected),
-                activityStarter
+                activityLauncher
             )
             return
         }
 
-        doDownload(parentPath, SDCardOperator.isSDCardPath(parentPath), sdCardOperator)
+        saving.doDownload(
+            parentPath,
+            SDCardOperator.isSDCardPath(parentPath),
+            sdCardOperator,
+            snackbarShower
+        )
     }
 
-    /**
-     * The final step to download a node into a file.
-     *
-     * @param parentPath the parent path where the file should be inside
-     * @param externalSDCard whether it's download into external sdcard
-     * @param sdCardOperator SDCardOperator used when download to external sdcard,
-     * will be null if download to internal storage
-     */
-    abstract fun doDownload(
-        parentPath: String,
-        externalSDCard: Boolean,
-        sdCardOperator: SDCardOperator?
-    )
-
     private fun showConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
-        runOnUiThread { doShowConfirmationDialog(message, onConfirmed) }
+        post { doShowConfirmationDialog(message, onConfirmed) }
     }
 
     private fun doShowConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
@@ -297,9 +506,9 @@ abstract class NodeSaver(
         confirmationLayout.orientation = LinearLayout.VERTICAL
         val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         params.setMargins(
-            scaleWidthPx(20, context.resources.displayMetrics),
-            scaleHeightPx(10, context.resources.displayMetrics),
-            scaleWidthPx(17, context.resources.displayMetrics),
+            Util.scaleWidthPx(20, context.resources.displayMetrics),
+            Util.scaleHeightPx(10, context.resources.displayMetrics),
+            Util.scaleWidthPx(17, context.resources.displayMetrics),
             0
         )
 
@@ -321,18 +530,21 @@ abstract class NodeSaver(
             .show()
     }
 
+    private fun hasWriteExternalStoragePermission(): Boolean =
+        ContextCompat.checkSelfPermission(context, permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED
+
     private fun lackPermission(): Boolean {
-        if (VERSION.SDK_INT >= VERSION_CODES.M && ContextCompat.checkSelfPermission(
-                context, permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            NodeController(context).askForPermissions()
+        if (!hasWriteExternalStoragePermission()) {
+            permissionRequester.askPermissions(
+                arrayOf(permission.WRITE_EXTERNAL_STORAGE), REQUEST_WRITE_STORAGE
+            )
             return true
         }
         return false
     }
 
-    protected fun add(disposable: Disposable) {
+    private fun add(disposable: Disposable) {
         compositeDisposable.add(disposable)
     }
 
@@ -342,14 +554,6 @@ abstract class NodeSaver(
      */
     fun destroy() {
         compositeDisposable.dispose()
-    }
-
-    protected fun runOnUiThread(task: () -> Unit) {
-        uiHandler.post(task)
-    }
-
-    private fun runOnUiThreadDelayed(delayMs: Long, task: () -> Unit) {
-        uiHandler.postDelayed(task, delayMs)
     }
 
     companion object {
