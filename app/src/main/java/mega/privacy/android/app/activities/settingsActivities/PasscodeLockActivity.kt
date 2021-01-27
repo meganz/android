@@ -308,9 +308,9 @@ class PasscodeLockActivity : BaseActivity() {
             if (screenOrientation == ORIENTATION_PORTRAIT) {
                 endToEnd = binding.passcodeParentView.id
                 startToStart = binding.passcodeParentView.id
-                topToBottom = binding.failedAttemptsErrorText.id
+                topToBottom = binding.failedAttemptsText.id
 
-                topMargin = dp2px(30F, resources.displayMetrics)
+                topMargin = dp2px(92F, resources.displayMetrics)
                 marginEnd = 0
             } else {
                 endToEnd = binding.passcodeParentView.id
@@ -408,6 +408,10 @@ class PasscodeLockActivity : BaseActivity() {
             }
             attempts >= MIN_ATTEMPTS_TO_SHOW_WARNING -> {
                 binding.failedAttemptsErrorText.visibility = VISIBLE
+                binding.logoutButton.visibility = VISIBLE
+            }
+            attempts > 0 -> {
+                binding.failedAttemptsErrorText.visibility = GONE
                 binding.logoutButton.visibility = VISIBLE
             }
             else -> {

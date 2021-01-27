@@ -145,11 +145,11 @@
             <Button
                 android:id="@+id/logout_button"
                 style="@style/AccentBorderBackgroundButton"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="92dp"
                 android:text="@string/action_logout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/failed_attempts_error_text" />
+                app:layout_constraintTop_toBottomOf="@id/failed_attempts_text" />
 
             <Button
                 android:id="@+id/passcode_options_button"
