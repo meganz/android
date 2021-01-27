@@ -100,6 +100,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -154,7 +155,6 @@ import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
@@ -2129,7 +2129,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
-			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
+			getter.getMegaContacts(megaApi, TimeUtils.WEEK);
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -2211,7 +2211,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		logDebug("Preferred View List: " + isList);
 
-		EventNotifierKt.notifyListGridChange(isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -2252,7 +2252,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		handler = new Handler();
 
@@ -5772,8 +5772,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-    	EventNotifierKt.notifyHomepageVisibilityChange(drawerItem == DrawerItem.HOMEPAGE);
-
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
@@ -7614,7 +7612,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setPreferredViewList(isList);
         }
 
-        EventNotifierKt.notifyListGridChange(this.isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
@@ -7699,7 +7697,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			EventNotifierKt.notifyNodesChange(false);
+			LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -10868,7 +10866,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("New order: " + newOrderCloud);
 		this.setOrderCloud(newOrderCloud);
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
@@ -11240,7 +11238,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-						EventNotifierKt.notifyNodesChange(false);
+						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -13237,7 +13235,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if(maFLol!=null){
 						maFLol.updateAvatar(false);
 					}
-					EventNotifierKt.notifyAvatarChange(true);
+
+					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
 				}
 				else{
 					if(request.getFile()!=null) {
@@ -13330,7 +13329,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						maFLol.updateAvatar(false);
 					}
 				}
-				EventNotifierKt.notifyAvatarChange(false);
+				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){
@@ -14403,7 +14402,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		EventNotifierKt.notifyNodesChange(true);
+		LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
 		// Invalidate the menu will collapse/expand the search view and set the query text to ""
 		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -14613,7 +14612,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				EventNotifierKt.notifyNodesChange(false);
+				LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
 				if (isTransfersInProgressAdded()){
 					tFLol.transferFinish(transfer.getTag());

@@ -38,6 +38,7 @@ android {
 
     buildTypes {
         debug {
+            debuggable true
             //  minifyEnabled false
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -175,10 +176,14 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
+    implementation "com.github.zhpanvip:BannerViewPager:$bannerViewPagerVersion"
+
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
