@@ -39,6 +39,11 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -116,7 +121,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.5_349";
+	static final public String USER_AGENT = "MEGAAndroid/3.8.5_350";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
@@ -127,6 +132,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	MegaChatApiAndroid megaChatApi;
 	@Inject
 	DatabaseHandler dbH;
+	@Inject
+	GetCookieSettingsUseCase getCookieSettingsUseCase;
 
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -190,6 +197,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
+	private static boolean isCookieBannerEnabled = false;
+	private static boolean arePreferenceCookiesEnabled = false;
+	private static boolean areAdvertisingCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -958,6 +968,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaChatApi.addChatCallListener(callListener);
 			registeredChatListeners = true;
 		}
+	}
+
+	/**
+	 * Check current enabled cookies and set the corresponding flags to true/false
+	 */
+	public void checkEnabledCookies() {
+		getCookieSettingsUseCase.get()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((cookies, throwable) -> {
+					if (throwable == null) {
+						setPreferenceCookiesEnabled(cookies.contains(CookieType.PREFERENCE));
+						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
+					}
+				});
 	}
 
 	public MegaApiAndroid getMegaApi() {
@@ -1942,5 +1967,29 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public void setCookieBannerEnabled(boolean enabled) {
+		isCookieBannerEnabled = enabled;
+	}
+
+	public static boolean isCookieBannerEnabled() {
+		return isCookieBannerEnabled;
+	}
+
+	public static boolean arePreferenceCookiesEnabled() {
+		return arePreferenceCookiesEnabled;
+	}
+
+	public static void setPreferenceCookiesEnabled(boolean enabled) {
+		arePreferenceCookiesEnabled = enabled;
+	}
+
+	public static boolean areAdvertisingCookiesEnabled() {
+		return areAdvertisingCookiesEnabled;
+	}
+
+	public static void setAdvertisingCookiesEnabled(boolean enabled) {
+		areAdvertisingCookiesEnabled = enabled;
 	}
 }

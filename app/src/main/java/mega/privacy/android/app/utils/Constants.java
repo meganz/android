@@ -344,6 +344,7 @@ public class Constants {
     public static final int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE + 1;
 
     public static final int DEVICE_ANDROID = 1;
+    public static final int DEVICE_HUAWEI = 4;
     public static final int DEVICE_IOS = 2;
 
     public static final int NOTIFICATION_SUMMARY_CHAT = 0;
@@ -710,6 +711,19 @@ public class Constants {
     public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
     public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
 
+    public static final long GET_THUMBNAIL_THROTTLE_MS = 50;
+
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
+
+    /** Event Keys */
+    public static final String EVENT_NODES_CHANGE = "nodes_change";
+    public static final String EVENT_ORDER_CHANGE = "order_change";
+    public static final String EVENT_LIST_GRID_CHANGE = "list_grid_change";
+    public static final String EVENT_AVATAR_CHANGE = "avatar_change";
+    public static final String EVENT_SCROLLING_CHANGE = "scrolling_change";
+    public static final String EVENT_NOTIFICATION_COUNT_CHANGE = "notification_count_change";
+    public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
+    public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
+    public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
 }

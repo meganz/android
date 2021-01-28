@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -18,8 +19,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
-
-import com.android.billingclient.api.SkuDetails;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -33,6 +32,8 @@ import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.*;
@@ -313,7 +314,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 		String currency = product.getCurrency();
 
 		// Try get the local pricing details from the store if available
-		SkuDetails details = getSkuDetails(myAccountInfo.getAvailableSkus(), getSku(product));
+		MegaSku details = getSkuDetails(myAccountInfo.getAvailableSkus(), getSku(product));
 		if (details != null) {
 			price = details.getPriceAmountMicros() / 1000000.00;
 			currency = details.getPriceCurrencyCode();
@@ -437,7 +438,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 
 			TextView googleWalletText = selectPaymentMethodClicked.findViewById(R.id.payment_method_google_wallet_text);
 
-            String textGoogleWallet = getString(R.string.payment_method_google_wallet);
+            String textGoogleWallet = getString(BillingManagerImpl.PAY_METHOD_RES_ID);
             try{
                 textGoogleWallet = textGoogleWallet.replace("[A]", "<font color='#000000'>");
                 textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>");
@@ -446,6 +447,7 @@ public class UpgradeAccountFragmentLollipop extends BaseFragment implements OnCl
 			}
 
             googleWalletText.setText(HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY));
+            selectPaymentMethodClicked.<ImageView>findViewById(R.id.payment_method_google_wallet_icon).setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID);
 
 
 			creditCardLayout = selectPaymentMethodClicked.findViewById(R.id.payment_method_credit_card);
