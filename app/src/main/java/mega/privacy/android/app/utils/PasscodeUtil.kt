@@ -268,20 +268,10 @@ class PasscodeUtil @Inject constructor(
     }
 
     private fun updatePasscode(enable: Boolean, type: String, passcode: String, requiredTime: Int) {
-        val prefs = dbH.preferences
-
-        if (prefs != null) {
-            prefs.passcodeLockEnabled = enable.toString()
-            prefs.passcodeLockType = type
-            prefs.passcodeLockCode = passcode
-            prefs.passcodeLockRequireTime = requiredTime.toString()
-            dbH.preferences = prefs
-        } else {
-            dbH.isPasscodeLockEnabled = enable
-            dbH.passcodeLockType = type
-            dbH.passcodeLockCode = passcode
-            dbH.passcodeRequiredTime = requiredTime
-        }
+        dbH.isPasscodeLockEnabled = enable
+        dbH.passcodeLockType = type
+        dbH.passcodeLockCode = passcode
+        dbH.passcodeRequiredTime = requiredTime
     }
 
     /**
