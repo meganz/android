@@ -3503,11 +3503,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 
 		switch (currentTab) {
 			case CLOUD_FRAGMENT:
-				MegaNode rootNode = megaApi.getRootNode();
-				long parentHandle = rootNode != null ? rootNode.getHandle() : INVALID_HANDLE;
-
 				if (getCloudExplorerFragment() == null
-						|| (!hide && parentHandleCloud != parentHandle)) {
+						|| (!hide && parentHandleCloud != getCloudRootHandle() && parentHandleCloud != INVALID_HANDLE)) {
 					return;
 				}
 

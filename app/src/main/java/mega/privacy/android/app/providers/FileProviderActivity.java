@@ -93,6 +93,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -1903,7 +1904,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	public void hideTabs(boolean hide, int currentTab) {
 		switch (currentTab) {
 			case CLOUD_TAB:
-				if (getCDriveProviderLol() == null || (!hide && gParentHandle != INVALID_HANDLE)) {
+				if (getCDriveProviderLol() == null
+						|| (!hide && gParentHandle != getCloudRootHandle() && gParentHandle != INVALID_HANDLE)) {
 					return;
 				}
 
