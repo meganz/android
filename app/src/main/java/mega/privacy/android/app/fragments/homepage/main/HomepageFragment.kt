@@ -10,11 +10,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.view.View.OnClickListener
-import android.view.ViewGroup
-import android.view.Window
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,7 +22,13 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.jeremyliao.liveeventbus.LiveEventBus
+import com.zhpan.bannerview.BannerViewPager
+import com.zhpan.bannerview.constants.IndicatorGravity
+import com.zhpan.bannerview.utils.BannerUtils
+import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_homepage.*
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
 import kotlinx.android.synthetic.main.homepage_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
@@ -32,7 +37,7 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.fragments.homepage.homepageVisibilityChange
+import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
@@ -42,8 +47,10 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
@@ -51,33 +58,51 @@ class HomepageFragment : Fragment() {
     private val viewModel: HomePageViewModel by viewModels()
 
     private lateinit var viewDataBinding: FragmentHomepageBinding
+
+    /** Shorthand for viewDataBinding.root */
     private lateinit var rootView: View
+
     private lateinit var bottomSheetBehavior: HomepageBottomSheetBehavior<View>
     private lateinit var searchInputView: FloatingSearchView
+    private lateinit var bannerViewPager: BannerViewPager<MegaBanner>
+
+    /** The fab button in normal state */
     private lateinit var fabMain: FloatingActionButton
+
+    /** The main fab button in expanded state */
     private lateinit var fabMaskMain: FloatingActionButton
+
+    /** The layout for showing the full screen grey mask at FAB expanded state */
     private lateinit var fabMaskLayout: View
+
+    /** The view pager in the bottom sheet, containing 2 pages: Recents and Offline */
     private lateinit var viewPager: ViewPager2
+
+    /** The tab layout in the bottom sheet, associated with the view pager */
     private lateinit var tabLayout: TabLayout
+
     private var currentSelectedTabFragment: Fragment? = null
+
+    /** The list of all sub views of the TabLayout*/
     private val tabsChildren = ArrayList<View>()
+
     private var windowContent: ViewGroup? = null
 
-    private var pendingExpandBottomSheet = false
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it && pendingExpandBottomSheet) {
-            pendingExpandBottomSheet = false
-            post {
-                fullyExpandBottomSheet(true)
-            }
+        if (it) {
+            post { setBottomSheetHeight() }
         }
     }
 
+    var isFabExpanded = false
+
+    /** The broadcast receiver for network connectivity.
+     *  Switch the UI appearance between offline and online status
+     */
     private val networkReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null) {
-                return
-            }
+            if (intent == null) return
+
             when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
                 GO_OFFLINE -> showOfflineMode()
                 GO_ONLINE -> showOnlineMode()
@@ -85,15 +110,15 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    var isFabExpanded = false
-
+    /** The click listener for clicking on the file category buttons.
+     *  Clicking to navigate to corresponding fragments */
     private val categoryClickListener = OnClickListener {
         with(viewDataBinding.category) {
             val direction = when (it) {
                 categoryPhoto -> HomepageFragmentDirections.actionHomepageFragmentToPhotosFragment()
                 categoryDocument -> HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
                 categoryAudio -> HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
-                categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment();
+                categoryVideo -> HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
                 else -> return@with
             }
 
@@ -104,25 +129,27 @@ class HomepageFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
 
-        homepageVisibilityChange.observeForever(homepageVisibilityChangeObserver)
+        LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
+            .observeForever(homepageVisibilityChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
-        if (savedInstanceState != null) {
-            val isBottomSheetExpanded = savedInstanceState.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED)
-            post {
-                if (isBottomSheetExpanded) {
-                    if (rootView.height == 0) {
-                        pendingExpandBottomSheet = true
-                    } else {
-                        fullyExpandBottomSheet(true)
+
+        // Fully expand the BottomSheet if it had been, e.g. rotate screen
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (rootView.height > 0) {
+                    if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
+                        fullyExpandBottomSheet()
                     }
+                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             }
-        }
+        })
 
         (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
 
@@ -134,6 +161,7 @@ class HomepageFragment : Fragment() {
 
         setupMask()
         setupSearchView()
+        setupBannerView()
         setupCategories()
         setupBottomSheetUI()
         setupBottomSheetBehavior()
@@ -152,6 +180,10 @@ class HomepageFragment : Fragment() {
         if (!isOnline(context)) {
             showOfflineMode()
         }
+
+        // Retrieve the banners from the server again, for the banners are possibly varied
+        // while the app is on the background
+        viewModel.getBanners()
     }
 
     override fun onDestroyView() {
@@ -159,61 +191,85 @@ class HomepageFragment : Fragment() {
 
         tabsChildren.clear()
         requireContext().unregisterReceiver(networkReceiver)
-        homepageVisibilityChange.removeObserver(homepageVisibilityChangeObserver)
+
+        LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
+            .removeObserver(homepageVisibilityChangeObserver)
     }
 
+    /**
+     * Show the UI appearance for network connected status (normal UI)
+     */
     private fun showOnlineMode() {
         if (viewModel.isRootNodeNull()) return
 
         viewPager.isUserInputEnabled = true
         rootView.category.isVisible = true
-        fullyCollapseBottomSheet()
+        rootView.banner_view.isVisible = true
 
-        tabsChildren.forEach { tab ->
-            tab.isEnabled = true
-        }
+        fullyCollapseBottomSheet()
+        bottomSheetBehavior.isDraggable = true
+
+        enableTabs(true)
     }
 
+    /**
+     * Show the UI appearance for network disconnected status
+     */
     private fun showOfflineMode() {
         viewPager.isUserInputEnabled = false
+
+        // other code is doing too much work when enter offline mode,
+        // to prevent janky frame when change several UI elements together,
+        // we have to post to end of UI thread.
         post {
-            // other code is doing too much work when enter offline mode,
-            // to prevent janky frame when change several UI elements together,
-            // we have to post to end of UI thread.
             viewPager.setCurrentItem(BottomSheetPagerAdapter.OFFLINE_INDEX, false)
             rootView.category.isVisible = false
-            fullyExpandBottomSheet(false)
+            rootView.banner_view.isVisible = false
+            fullyExpandBottomSheet()
+            bottomSheetBehavior.isDraggable = false
         }
 
+        enableTabs(false)
+    }
+
+    /**
+     * Enable/Disable all touchable sub views in the TabLayout
+     */
+    private fun enableTabs(enable: Boolean) {
         if (tabsChildren.isEmpty()) {
             tabLayout.touchables.forEach { tab ->
-                tab.isEnabled = false
                 tabsChildren.add(tab)
             }
-        } else {
-            tabsChildren.forEach { tab ->
-                tab.isEnabled = false
-            }
+        }
+
+        tabsChildren.forEach { tab ->
+            tab.isEnabled = enable
         }
     }
 
-    private fun fullyExpandBottomSheet(draggable: Boolean) {
+    /**
+     * Expand the bottom sheet to the bottom of the search view
+     */
+    private fun fullyExpandBottomSheet() {
         val bottomSheetRoot = viewDataBinding.homepageBottomSheet.root
         bottomSheetBehavior.state = HomepageBottomSheetBehavior.STATE_EXPANDED
-        bottomSheetBehavior.isDraggable = draggable
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
-        val layoutParams = bottomSheetRoot.layoutParams
-        layoutParams.height = rootView.height - searchInputView.bottom
-        bottomSheetRoot.layoutParams = layoutParams
+        setBottomSheetHeight(true)
     }
 
-    private fun fullyCollapseBottomSheet() {
+    /**
+     * Collapse the bottom sheet to its initial position (its top is in the middle of the screen)
+     */
+    private fun fullyCollapseBottomSheet() =
         bottomSheetBehavior.setState(HomepageBottomSheetBehavior.STATE_COLLAPSED)
-        bottomSheetBehavior.isDraggable = true
-    }
 
+    /**
+     * Set up the UI elements of the Search view
+     * Associate the Search View hamburger icon with the Navigation Drawer
+     * Set click listeners, observe the changes of chat status, notification count
+     */
     private fun setupSearchView() {
         val activity = activity as ManagerActivityLollipop
 
@@ -222,7 +278,7 @@ class HomepageFragment : Fragment() {
             activity.drawerLayout!!
         )
 
-        viewModel.notification.observe(viewLifecycleOwner) {
+        viewModel.notificationCount.observe(viewLifecycleOwner) {
             searchInputView.setLeftNotificationCount(it)
         }
         viewModel.avatar.observe(viewLifecycleOwner) {
@@ -261,6 +317,7 @@ class HomepageFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
             outState.putBoolean(
@@ -270,6 +327,9 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Set up the view pager, tab layout and fragments contained in the Homepage main bottom sheet
+     */
     private fun setupBottomSheetUI() {
         viewPager = rootView.view_pager
         val adapter = BottomSheetPagerAdapter(this)
@@ -323,11 +383,54 @@ class HomepageFragment : Fragment() {
         viewPager.setBackgroundColor(ColorUtils.getColorForElevation(requireContext(), elevationPx))
     }
 
+    /**
+     * Set up the banner view pager layout
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun setupBannerView() {
+        bannerViewPager =
+            viewDataBinding.bannerView as BannerViewPager<MegaBanner>
+        bannerViewPager.setIndicatorSliderGap(BannerUtils.dp2px(6f))
+            .setScrollDuration(800)
+            .setAutoPlay(false)
+            .setLifecycleRegistry(lifecycle)
+            .setIndicatorStyle(IndicatorStyle.CIRCLE)
+            .setIndicatorSliderGap(Util.dp2px(6f))
+            .setIndicatorSliderRadius(
+                Util.dp2px(3f),
+                Util.dp2px(3f)
+            )
+            .setIndicatorGravity(IndicatorGravity.CENTER)
+            .setIndicatorSliderColor(
+                ContextCompat.getColor(requireContext(), R.color.grey_300_grey_600),
+                ContextCompat.getColor(requireContext(), R.color.white)
+            )
+            .setOnPageClickListener(null)
+            .setAdapter(BannerAdapter(viewModel))
+            .create()
+
+        viewModel.bannerList.observe(viewLifecycleOwner) {
+            if (it == null || it.isEmpty()) {
+                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
+            } else {
+                bannerViewPager.refreshData(it)
+                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+            }
+        }
+    }
+
+    /**
+     * Inflate the layout of the full screen mask
+     * The mask will actually be shown after clicking to expand the FAB
+     */
     private fun setupMask() {
         windowContent = activity?.window?.findViewById(Window.ID_ANDROID_CONTENT)
         fabMaskLayout = FabMaskLayoutBinding.inflate(layoutInflater, windowContent, false).root
     }
 
+    /**
+     * Set the click listeners for file categories buttons
+     */
     private fun setupCategories() {
         viewDataBinding.category.categoryPhoto.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
@@ -335,7 +438,13 @@ class HomepageFragment : Fragment() {
         viewDataBinding.category.categoryVideo.setOnClickListener(categoryClickListener)
     }
 
-    private fun getTabTitle(position: Int): String? {
+    /**
+     * Get the title of the bottom sheet tab
+     *
+     * @param position the tab index
+     * @return The title text or "" for invalid position param
+     */
+    private fun getTabTitle(position: Int): String {
         when (position) {
             BottomSheetPagerAdapter.RECENT_INDEX -> return resources.getString(R.string.recents_label)
             BottomSheetPagerAdapter.OFFLINE_INDEX -> return resources.getString(R.string.section_saved_for_offline_new)
@@ -351,13 +460,37 @@ class HomepageFragment : Fragment() {
         setBottomSheetExpandedTop()
     }
 
+    /**
+     * Set the initial height of the bottom sheet. The top is just below the banner view.
+     */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver?.addOnPreDrawListener {
-            bottomSheetBehavior.peekHeight = rootView.height - viewDataBinding.category.root.bottom
-            true
-        }
+        rootView.viewTreeObserver?.addOnPreDrawListener(object :
+            ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                if (category == null) {
+                    return true
+                }
+
+                if (bannerViewPager.data.isNotEmpty()) {
+                    bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+                } else {
+                    bottomSheetBehavior.peekHeight = rootView.height - category.bottom
+                }
+
+                if (bottomSheetBehavior.peekHeight > 0) {
+                    rootView.viewTreeObserver?.removeOnPreDrawListener(this)
+                }
+
+                return true
+            }
+        })
     }
 
+    /**
+     * Set the topmost height of the bottom sheet(when expanded).
+     * The top of the bottom sheet would always below the search view.
+     * In addition, set the transition effect while dragging the bottom sheet to/away from the top
+     */
     private fun setBottomSheetExpandedTop() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             HomepageBottomSheetBehavior.BottomSheetCallback() {
@@ -368,13 +501,7 @@ class HomepageFragment : Fragment() {
             val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                val layoutParams = bottomSheet.layoutParams
-                val maxHeight = rootView.height - searchInputView.bottom
-
-                if (bottomSheet.height > maxHeight) {
-                    layoutParams.height = maxHeight
-                    bottomSheet.layoutParams = layoutParams
-                }
+                setBottomSheetHeight()
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -398,14 +525,34 @@ class HomepageFragment : Fragment() {
         })
     }
 
-    private fun changeTabElevation(withElevation: Boolean) {
-        if (withElevation) {
-            tabLayout.elevation = Util.dp2px(4f, resources.displayMetrics).toFloat()
-        } else {
-            tabLayout.elevation = 0f
+    private fun setBottomSheetHeight(forceMaxHeight: Boolean = false) {
+        val bottomSheet = viewDataBinding.homepageBottomSheet.root
+        val maxHeight = rootView.measuredHeight - searchInputView.bottom
+
+        if (bottomSheet.measuredHeight > maxHeight || forceMaxHeight) {
+            val layoutParams = bottomSheet.layoutParams
+            layoutParams.height = maxHeight
+            bottomSheet.layoutParams = layoutParams
         }
     }
 
+    /**
+     * Elevate the tab or not based on the scrolling in Recents/Offline fragments.
+     *
+     *
+     * @param withElevation elevate the tab if true, false otherwise
+     */
+    private fun changeTabElevation(withElevation: Boolean) {
+        tabLayout.elevation = if (withElevation) {
+            Util.dp2px(4f).toFloat()
+        } else {
+            0f
+        }
+    }
+
+    /**
+     * Set up the Fab and Fabs in the expanded status
+     */
     private fun setupFabs() {
         fabMain = rootView.fab_home_main
         fabMaskMain = fabMaskLayout.fab_main
@@ -455,6 +602,12 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Do some operation if the network is connected, or show a snack bar for alerting the disconnection
+     *
+     * @param showSnackBar true for showing a snack bar for alerting the disconnection
+     * @param operation the operation to be executed if online
+     */
     private fun doIfOnline(showSnackBar: Boolean, operation: () -> Unit) {
         if (isOnline(context) && !viewModel.isRootNodeNull()) {
             operation()
@@ -467,28 +620,22 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private fun openNewChatActivity() {
-        doIfOnline(true) {
-            val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
-                putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-            }
-
-            activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
+    private fun openNewChatActivity() = doIfOnline(true) {
+        val intent = Intent(activity, AddContactActivityLollipop::class.java).apply {
+            putExtra(KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
         }
+
+        activity?.startActivityForResult(intent, REQUEST_CREATE_CHAT)
     }
 
-    private fun showUploadPanel() {
-        doIfOnline(true) {
-            (activity as ManagerActivityLollipop).showUploadPanel()
-        }
+    private fun showUploadPanel() = doIfOnline(true) {
+        (activity as ManagerActivityLollipop).showUploadPanel()
     }
 
-    private fun fabMainClickCallback() {
-        if (isFabExpanded) {
-            collapseFab()
-        } else {
-            expandFab()
-        }
+    private fun fabMainClickCallback() = if (isFabExpanded) {
+        collapseFab()
+    } else {
+        expandFab()
     }
 
     fun collapseFab() {
@@ -523,26 +670,62 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    /**
+     * Present the expanded FABs with animated transition
+     */
     private fun showIn(vararg fabs: View) {
         for (fab in fabs) {
-            showIn(fab)
+            fab.visibility = View.VISIBLE
+            fab.alpha = ALPHA_TRANSPARENT
+            fab.translationY = fab.height.toFloat()
+
+            fab.animate()
+                .setDuration(FAB_ANIM_DURATION)
+                .translationY(0f)
+                .setListener(object :
+                    AnimatorListenerAdapter() {/* No need to override any methods here. */ })
+                .alpha(ALPHA_OPAQUE)
+                .start()
         }
     }
 
+    /**
+     * Hide the expanded FABs with animated transition
+     */
     private fun showOut(vararg fabs: View) {
         for (fab in fabs) {
-            showOut(fab)
+            fab.animate()
+                .setDuration(FAB_ANIM_DURATION)
+                .translationY(fab.height.toFloat())
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        fab.visibility = View.GONE
+                        super.onAnimationEnd(animation)
+                    }
+                }).alpha(ALPHA_TRANSPARENT)
+                .start()
         }
     }
 
+    /**
+     * Showing the full screen mask by adding the mask layout to the window content
+     */
     private fun addMask() {
         windowContent?.addView(fabMaskLayout)
     }
 
+    /**
+     * Removing the full screen mask
+     */
     private fun removeMask() {
         windowContent?.removeView(fabMaskLayout)
     }
 
+    /**
+     * Animate the appearance of the main FAB when expanding and collapsing
+     *
+     * @param isExpand true if the FAB is being expanded, false for being collapsed
+     */
     private fun rotateFab(isExpand: Boolean) {
         val rotateAnim = ObjectAnimator.ofFloat(
             fabMaskMain, "rotation",
@@ -566,33 +749,6 @@ class HomepageFragment : Fragment() {
             playTogether(rotateAnim, backgroundTintAnim, tintAnim)
             start()
         }
-    }
-
-    private fun showIn(view: View) {
-        view.visibility = View.VISIBLE
-        view.alpha = ALPHA_TRANSPARENT
-        view.translationY = view.height.toFloat()
-
-        view.animate()
-            .setDuration(FAB_ANIM_DURATION)
-            .translationY(0f)
-            .setListener(object :
-                AnimatorListenerAdapter() {/* No need to override any methods here. */ })
-            .alpha(ALPHA_OPAQUE)
-            .start()
-    }
-
-    private fun showOut(view: View) {
-        view.animate()
-            .setDuration(FAB_ANIM_DURATION)
-            .translationY(view.height.toFloat())
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    view.visibility = View.GONE
-                    super.onAnimationEnd(animation)
-                }
-            }).alpha(ALPHA_TRANSPARENT)
-            .start()
     }
 
     companion object {

@@ -106,7 +106,6 @@ fun getRoundingParams(context: Context): RoundingParams? {
     roundingParams = RoundingParams.fromCornersRadius(
         Util.dp2px(
             context.resources.getDimension(R.dimen.photo_selected_icon_round_corner_radius),
-            context.resources.displayMetrics
         ).toFloat()
     )
 
@@ -114,7 +113,6 @@ fun getRoundingParams(context: Context): RoundingParams? {
         setBorder(
             ColorUtils.getThemeColor(context, R.attr.colorSecondary), Util.dp2px(
                 context.resources.getDimension(R.dimen.photo_selected_border_width),
-                context.resources.displayMetrics
             ).toFloat()
         )
     }

@@ -8,7 +8,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -27,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -35,7 +35,10 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
-import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
@@ -54,8 +57,6 @@ import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
 import java.lang.ref.WeakReference
-import java.util.*
-import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
@@ -385,7 +386,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     manager.supportActionBar?.setTitle(it)
                 } else {
                     manager.setToolbarTitleFromFullscreenOfflineFragment(
-                        it, false, !viewModel.searchMode()
+                        it, false, !viewModel.searchMode() && getItemCount() > 0
                     )
                 }
             }
@@ -727,7 +728,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             callManager {
                 it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
-            onScrolling(Pair(this, rv.canScrollVertically(-1)))
+            LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
+                .post(Pair(this, rv.canScrollVertically(-1)))
         }
     }
 

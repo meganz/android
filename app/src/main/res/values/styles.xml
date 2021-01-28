@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- =================== Dark mode refactor start ======================= -->
-
     <!-- Contained button, inherited elevation: 2dp, TextAppearance=?attr/textAppearanceButton  -->
     <style name="Widget.Mega.Button" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">wrap_content</item>
