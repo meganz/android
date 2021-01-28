@@ -244,6 +244,31 @@ https://github.com/barteksc/AndroidPdfViewer/blob/master/LICENSE
 
 --------------------------------------------------------------------
 
+### BannerViewPager
+Banner view for Android, Based on ViewPager2.
+https://github.com/zhpanvip/BannerViewPager
+
+Copyright 2017-2020 zhpanvip
+
+**License**\
+Apache License, Version 2.0
+https://github.com/zhpanvip/BannerViewPager/blob/master/LICENSE
+
+--------------------------------------------------------------------
+
+### LiveEventBus
+LiveEventBus is an Android message bus based on LiveData
+It has life cycle awareness, supports Sticky, supports AndroidX, supports cross-process and supports cross-APP.
+https://github.com/JeremyLiao/LiveEventBus
+
+Copyright Jeremy Liao
+
+**License**\
+Apache License, Version 2.0
+https://github.com/JeremyLiao/LiveEventBus/blob/master/LICENSE
+
+--------------------------------------------------------------------
+
 #### MEGA C++ SDK
 https://github.com/meganz/sdk
 (c) 2013-2016 by Mega Limited, Auckland, New Zealand

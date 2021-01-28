@@ -19,8 +19,8 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 349
-        versionName "3.8.5 (349)"
+        versionCode 350
+        versionName "3.8.5 (350)"
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
@@ -38,6 +38,7 @@ android {
 
     buildTypes {
         debug {
+            debuggable true
             //  minifyEnabled false
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -163,6 +164,7 @@ dependencies {
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
+    implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
@@ -174,12 +176,14 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+    implementation "com.github.zhpanvip:BannerViewPager:$bannerViewPagerVersion"
+
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
