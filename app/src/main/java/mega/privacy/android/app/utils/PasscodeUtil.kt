@@ -45,6 +45,10 @@ class PasscodeUtil @Inject constructor(
         const val TWO_MINUTES = 2
     }
 
+    /**
+     * Shows a dialog to choose the required time to ask for passcode.
+     * @return The AlertDialog.
+     */
     fun showRequirePasscodeDialog(): AlertDialog {
         val dialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
@@ -155,6 +159,12 @@ class PasscodeUtil @Inject constructor(
         return requirePasscodeDialog
     }
 
+    /**
+     * Enables or disabled a dialog button in a customized way.
+     *
+     * @param enable True if should enable, false if should disable.
+     * @param button The button to enable or disable.
+     */
     private fun enableOrDisableDialogButton(enable: Boolean, button: Button) {
         button.isEnabled = enable
         button.setTextColor(
@@ -165,6 +175,12 @@ class PasscodeUtil @Inject constructor(
         )
     }
 
+    /**
+     * Gets the time chosen depending on the clicked option.
+     *
+     * @param optionClicked The option clicked.
+     * @return The time chosen.
+     */
     private fun getPasscodeRequireTime(optionClicked: Int): Int {
         return when (optionClicked) {
             1 -> REQUIRE_PASSCODE_AFTER_5S
@@ -177,8 +193,14 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
-    private fun getPasscodeRequireTimeOption(optionClicked: Int): Int {
-        return when (optionClicked) {
+    /**
+     * Gets the option value depending on the required time set.
+     *
+     * @param requiredTime The required time set.
+     * @return The option value.
+     */
+    private fun getPasscodeRequireTimeOption(requiredTime: Int): Int {
+        return when (requiredTime) {
             REQUIRE_PASSCODE_IMMEDIATE -> 0
             REQUIRE_PASSCODE_AFTER_5S -> 1
             REQUIRE_PASSCODE_AFTER_10S -> 2
@@ -190,6 +212,12 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
+    /**
+     * Gets the text to show in the Preference depending on the time set.
+     *
+     * @param requiredTime The required time set.
+     * @return The string to show.
+     */
     fun getRequiredPasscodeText(requiredTime: Int): String {
         val requiredTimeValue = getPasscodeRequireTimeValue(requiredTime)
 
@@ -212,6 +240,12 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
+    /**
+     * Gets the value to set in the string which will be shown in the Preference.
+     *
+     * @param requiredTime The required time set.
+     * @return The value to set in the string.
+     */
     private fun getPasscodeRequireTimeValue(requiredTime: Int): Int {
         return when (requiredTime) {
             REQUIRE_PASSCODE_AFTER_5S -> FIVE_SECONDS_OR_MINUTES
@@ -250,6 +284,11 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
+    /**
+     * Checks if should lock the app and show the passcode screen.
+     *
+     * @return True if should lock the app, false otherwise.
+     */
     private fun shouldLock(): Boolean {
         val prefs = dbH.preferences
 
@@ -268,6 +307,9 @@ class PasscodeUtil @Inject constructor(
         } else false
     }
 
+    /**
+     * Called after resume some activity to check if should lock or not the app.
+     */
     fun resume() {
         if (shouldLock()) {
             MegaApplication.getPasscodeManagement().lastLocked = context
@@ -277,16 +319,25 @@ class PasscodeUtil @Inject constructor(
         }
     }
 
+    /**
+     * Called when some activity is paused to update the lastPause value.
+     */
     fun pause() {
         if (MegaApplication.getPasscodeManagement().lastLocked != context) {
             update()
         }
     }
 
+    /**
+     * Updates the lastPause value.
+     */
     fun update() {
         MegaApplication.getPasscodeManagement().lastPause = System.currentTimeMillis()
     }
 
+    /**
+     * Launches an intent to show passcode screen when the app is locked.
+     */
     private fun showLockScreen() {
         context.startActivity(Intent(context, PasscodeLockActivity::class.java))
     }

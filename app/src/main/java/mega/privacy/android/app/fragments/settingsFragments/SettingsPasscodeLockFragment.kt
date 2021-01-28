@@ -86,6 +86,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         passcodeUtil.disablePasscode()
     }
 
+    /**
+     * Launches an Intent to open passcode screen.
+     */
     private fun intentToPasscodeLock(reset: Boolean) {
         val intent = Intent(context, PasscodeLockActivity::class.java)
         intent.action = if (reset) ACTION_RESET_PASSCODE_LOCK else ACTION_SET_PASSCODE_LOCK

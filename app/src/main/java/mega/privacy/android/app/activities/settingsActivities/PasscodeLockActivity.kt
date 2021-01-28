@@ -90,21 +90,33 @@ class PasscodeLockActivity : BaseActivity() {
         setListeners()
     }
 
+    /**
+     * Increments the number of failed attempts.
+     */
     private fun incrementAttempts() {
         attempts++
         dbH.setAttrAttemps(attempts)
     }
 
+    /**
+     * Resets the number of failed attempts to 0.
+     */
     private fun resetAttempts() {
         attempts = 0
         dbH.setAttrAttemps(attempts)
     }
 
+    /**
+     * Resets the number of failed attempts and then logs out.
+     */
     private fun logout() {
         resetAttempts()
         AccountController.logout(this, megaApi)
     }
 
+    /**
+     * Sets the whole initial passcode screen.
+     */
     private fun initPasscodeScreen() {
         updateViewOrientation()
 
@@ -242,6 +254,9 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Sets the necessary listeners to all available views in passcode screen.
+     */
     private fun setListeners() {
         ListenScrollChangesHelper().addViewToListen(
             binding.passcodeScrollView
@@ -261,6 +276,9 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Updates the layout params of some views depending on de orientation of the screen.
+     */
     private fun updateViewOrientation() {
         val titleParams = binding.titleText.layoutParams as ConstraintLayout.LayoutParams
         titleParams.topMargin = dp2px(
@@ -324,6 +342,11 @@ class PasscodeLockActivity : BaseActivity() {
         binding.logoutButton.layoutParams = logoutParams
     }
 
+    /**
+     * Saves the typed passcode after check if it is completed and confirms it:
+     *  - After the first time the passcode was typed if it's unlocking.
+     *  - After the second time the passcode was typed if it's setting or resetting.
+     */
     private fun checkPasscode() {
         if (!isPassCodeComplete()) {
             return
@@ -348,6 +371,11 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Saves the typed pin if passcode type is PIN_4.
+     *
+     * @param sb StringBuilder in which the pin has to be saved.
+     */
     private fun savePin4(sb: StringBuilder) {
         sb.apply {
             append(binding.passFirstInput.text)
@@ -357,6 +385,11 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Saves the typed pin if passcode type is PIN_6.
+     *
+     * @param sb StringBuilder in which the pin has to be saved.
+     */
     private fun savePin6(sb: StringBuilder) {
         savePin4(sb)
         sb.apply {
@@ -365,6 +398,11 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Confirms the passcode after type it the second time if setting or resetting.
+     * Updates the passcode in DB and finishes if successful.
+     * Shows an error if not successful.
+     */
     private fun confirmPasscode() {
         if (sbFirst.toString() == sbSecond.toString()) {
             passcodeUtil.enablePasscode(passcodeType, sbFirst.toString())
@@ -377,6 +415,11 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Confirms the passcode after type it the first time if unlocking.
+     * Updates the passcode behaviour, failed attempts and finishes if successful.
+     * Shows an error and increments failed attempts if not successful.
+     */
     private fun confirmUnlockPasscode() {
         if (sbFirst.toString() == dbH.preferences.passcodeLockCode) {
             passcodeUtil.update()
@@ -390,6 +433,9 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Shows the right attempts error depending on the number of failed attempts.
+     */
     private fun showAttemptsError() {
         binding.failedAttemptsText.apply {
             visibility = VISIBLE
@@ -421,6 +467,9 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Checks if all the fields are filled in before confirm the passcode.
+     */
     private fun isPassCodeComplete(): Boolean {
         when (passcodeType) {
             PIN_4 -> {
@@ -445,6 +494,9 @@ class PasscodeLockActivity : BaseActivity() {
         return false
     }
 
+    /**
+     * Clears the passcode fields.
+     */
     private fun clearTypedPasscode(reEnter: Boolean) {
         binding.passFirstInput.text.clear()
         binding.passSecondInput.text.clear()
@@ -469,6 +521,9 @@ class PasscodeLockActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Opens the bottom sheet dialog to change the passcode type.
+     */
     private fun showPasscodeOptions() {
         if (isBottomSheetDialogShown(passcodeOptionsBottomSheetDialogFragment)) return
 
@@ -480,6 +535,11 @@ class PasscodeLockActivity : BaseActivity() {
         )
     }
 
+    /**
+     * Updates the passcode screen after change the type.
+     *
+     * @param passcodeType New passcode type.
+     */
     fun setPasscodeType(passcodeType: String) {
         this.passcodeType = passcodeType
         initPasscodeScreen()
