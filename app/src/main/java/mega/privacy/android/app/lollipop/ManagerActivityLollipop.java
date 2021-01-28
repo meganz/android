@@ -232,6 +232,7 @@ import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
+import mega.privacy.android.app.utils.StringUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -3588,7 +3589,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						updateCookieSettingsUseCase.acceptAll()
 								.subscribeOn(Schedulers.io())
 								.observeOn(AndroidSchedulers.mainThread())
-								.subscribe(() -> { }, (error) -> {
+								.subscribe(() -> {
+									app.checkEnabledCookies();
+								}, (error) -> {
 									logError(error.getMessage());
 								})
 				)
@@ -3597,9 +3600,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				)
 				.create();
 
-		dialog.show();
+		dialog.setOnShowListener(dialogInterface -> {
+			TextView message = dialog.findViewById(R.id.message);
+			message.setMovementMethod(LinkMovementMethod.getInstance());
+			message.setText(StringUtils.toSpannedHtmlText(getString(R.string.dialog_cookie_alert_message)));
+		});
 
-		((TextView) dialog.findViewById(R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+		dialog.show();
 	}
 
 	public void destroySMSVerificationFragment() {
