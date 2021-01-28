@@ -19,6 +19,7 @@ import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.*
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment() {
@@ -68,9 +69,13 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         analyticsCookiesPreference.onPreferenceChangeListener = this
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
+
+        thirdPartyCookiesPreference.summary =
+            getString(R.string.preference_cookies_thirdparty_summary).toSpannedHtmlText()
         thirdPartyCookiesPreference.setOnSummaryClickListener {
             showThirdPartyInfoDialog()
         }
+
         policiesPreference.setButton1(getString(R.string.preference_cookies_policies_cookie)) {
             openBrowser("https://mega.nz/cookie".toUri())
         }
