@@ -62,6 +62,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -149,7 +150,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	ChatController chatC;
 
-	private NodeSaver nodeSaver;
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
 	@Override
 	public void onDestroy(){
@@ -157,6 +159,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		{
 			megaApi.removeRequestListener(this);
 		}
+
+		nodeSaver.destroy();
 
 		super.onDestroy();
 	}
@@ -243,9 +247,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-		if (nodeSaver != null) {
-			nodeSaver.handleRequestPermissionsResult(requestCode);
-		}
+		nodeSaver.handleRequestPermissionsResult(requestCode);
 	}
 
 	@Override
@@ -260,12 +262,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			case R.id.chat_full_image_viewer_download: {
 				logDebug("Download option");
 
-				if (nodeSaver == null) {
-					nodeSaver = new NodeSaver(this, megaApi, dbH);
-				}
-
 				MegaNode node = chatC.authorizeNodeIfPreview(messages.get(positionG).getMegaNodeList().get(0), megaChatApi.getChatRoom(chatId));
-				nodeSaver.saveNode(node, this, this, this, true, false, true, true);
+				nodeSaver.saveNode(node, true, false, true, true);
 				break;
 			}
 
@@ -323,6 +321,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		}
 		if (savedInstanceState != null){
 			isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
+
+			nodeSaver.restoreState(savedInstanceState);
 		}
 		else {
 			isDeleteDialogShow = false;
@@ -671,6 +671,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 		savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		savedInstanceState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
+
+		nodeSaver.saveState(savedInstanceState);
 	}
 	
 	@Override
@@ -794,7 +796,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			return;
 		}
 
-		if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 

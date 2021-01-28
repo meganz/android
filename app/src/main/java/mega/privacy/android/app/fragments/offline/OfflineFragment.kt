@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.audioplayer.AudioPlayerActivity
@@ -37,9 +36,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
-import mega.privacy.android.app.interfaces.ActivityLauncher
-import mega.privacy.android.app.interfaces.PermissionRequester
-import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
@@ -776,21 +772,6 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         viewModel.refreshActionBarTitle()
     }
 
-    fun saveNodeToDevice(node: MegaOffline) {
-        viewModel.saveNodeToDevice(
-            listOf(node),
-            requireActivity() as ActivityLauncher,
-            requireActivity() as PermissionRequester,
-            requireActivity() as SnackbarShower
-        )
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (!viewModel.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
     private fun switchListGridView() {
         recyclerView = if (isList()) {
             binding.offlineBrowserList.isVisible = true
@@ -866,12 +847,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
-                viewModel.saveNodeToDevice(
-                    viewModel.getSelectedNodes(),
-                    requireActivity() as ActivityLauncher,
-                    requireActivity() as PermissionRequester,
-                    requireActivity() as SnackbarShower
-                )
+                callManager { it.saveOfflineNodesToDevice(viewModel.getSelectedNodes()) }
                 viewModel.clearSelection()
             }
             R.id.cab_menu_share_out -> {

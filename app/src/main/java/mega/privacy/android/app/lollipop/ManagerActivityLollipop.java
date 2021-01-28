@@ -145,6 +145,7 @@ import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
+import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -223,6 +224,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AvatarUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
@@ -390,6 +392,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	AccountController aC;
 
 	private final MegaAttacher nodeAttacher = new MegaAttacher(this);
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
 	long[] searchDate = null;
 
@@ -1939,6 +1943,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
+
+		nodeAttacher.saveState(outState);
+		nodeSaver.saveState(outState);
 	}
 
 	@Override
@@ -2036,6 +2043,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
+
+			nodeAttacher.restoreState(savedInstanceState);
+			nodeSaver.restoreState(savedInstanceState);
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -4685,6 +4695,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			miniAudioPlayerController.onDestroy();
 			miniAudioPlayerController = null;
 		}
+
+		nodeSaver.destroy();
 
     	super.onDestroy();
 	}
@@ -10402,6 +10414,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	/**
+	 * Save offline nodes to device.
+	 *
+	 * @param nodes nodes to save
+	 */
+	public void saveOfflineNodesToDevice(List<MegaOffline> nodes) {
+		nodeSaver.saveOfflineNodes(nodes);
+	}
+
+	/**
 	 * Attach node to chats, only used by NodeOptionsBottomSheetDialogFragment.
 	 *
 	 * @param node node to attach
@@ -11349,14 +11370,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
-	public void saveOfflineNodeToDevice(MegaOffline node) {
-		if (fullscreenOfflineFragment != null) {
-			fullscreenOfflineFragment.saveNodeToDevice(node);
-		} else if (pagerOfflineFragment != null) {
-			pagerOfflineFragment.saveNodeToDevice(node);
-		}
 	}
 
 	@Override

@@ -98,6 +98,7 @@ import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -214,7 +215,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private String pathNavigation;
 
     private final MegaAttacher nodeAttacher = new MegaAttacher(this);
-    private NodeSaver nodeSaver;
+    private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+            AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
     NodeController nC;
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
@@ -293,6 +295,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             toolbarVisible = savedInstanceState.getBoolean("toolbarVisible", toolbarVisible);
             password = savedInstanceState.getString("password");
             maxIntents = savedInstanceState.getInt("maxIntents", 3);
+
+            nodeAttacher.restoreState(savedInstanceState);
+            nodeSaver.restoreState(savedInstanceState);
         }
         else {
             currentPage = 1;
@@ -913,6 +918,9 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         outState.putBoolean("toolbarVisible", toolbarVisible);
         outState.putString("password", password);
         outState.putInt("maxIntents", maxIntents);
+
+        nodeAttacher.saveState(outState);
+        nodeSaver.saveState(outState);
     }
 
     @Override
@@ -1042,21 +1050,17 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     }
 
     public void download() {
-        if (nodeSaver == null) {
-            nodeSaver = new NodeSaver(this, megaApi, dbH);
-        }
-
         if (type == OFFLINE_ADAPTER) {
             MegaOffline node = dbH.findByHandle(handle);
             if (node != null) {
-                nodeSaver.saveOfflineNode(node, this, this, this);
+                nodeSaver.saveOfflineNode(node);
             }
         } else if (type == FILE_LINK_ADAPTER) {
-            nodeSaver.saveNode(currentDocument, this, this, this, false, false, true, false);
+            nodeSaver.saveNode(currentDocument, false, false, true, false);
         } else if (fromChat) {
-            nodeSaver.saveNode(nodeChat, this, this, this, true, false, true, true);
+            nodeSaver.saveNode(nodeChat, true, false, true, true);
         } else {
-            nodeSaver.saveHandle(handle, this, this, this, false, isFolderLink, true, false);
+            nodeSaver.saveHandle(handle, false, isFolderLink, true, false);
         }
     }
 
@@ -1064,9 +1068,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (nodeSaver != null) {
-            nodeSaver.handleRequestPermissionsResult(requestCode);
-        }
+        nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
     public void onIntentProcessed(List<ShareInfo> infos) {
@@ -2208,7 +2210,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             return;
         }
 
-        if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
             return;
         }
 
@@ -2635,6 +2637,8 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
         }
 
         unregisterReceiver(receiverToFinish);
+
+        nodeSaver.destroy();
 
         super.onDestroy();
     }

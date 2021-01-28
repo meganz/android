@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
+import kotlinx.android.parcel.Parcelize
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -20,7 +21,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
 
-class OfflineSaving(totalSize: Long, private val nodes: List<MegaOffline>) : Saving(totalSize) {
+@Parcelize
+class OfflineSaving(private val totalSize: Long, private val nodes: List<MegaOffline>) : Saving() {
+
+    override fun totalSize() = totalSize
 
     override fun hasUnsupportedFile(context: Context): Boolean {
         for (node in nodes) {

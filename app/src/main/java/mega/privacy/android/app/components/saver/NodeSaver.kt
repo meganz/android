@@ -2,18 +2,13 @@ package mega.privacy.android.app.components.saver
 
 import android.Manifest.permission
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.LinearLayout.LayoutParams
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.android.qualifiers.ActivityContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -23,7 +18,6 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
@@ -35,17 +29,16 @@ import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.util.concurrent.Callable
-import javax.inject.Inject
 
 /**
  * A class that encapsulate all the procedure of saving nodes into device,
@@ -57,59 +50,51 @@ import javax.inject.Inject
  * The initiation API of save should also be added by sub-classes, because it's usually
  * related with the final download step.
  *
- * It simplifies code in activity/fragment where nodes need to be saved.
+ * It simplifies code in app/fragment where nodes need to be saved.
  */
-class NodeSaver @Inject constructor(
-    @ActivityContext private val context: Context,
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbHandler: DatabaseHandler,
+class NodeSaver(
+    private val activityLauncher: ActivityLauncher,
+    private val permissionRequester: PermissionRequester,
+    private val snackbarShower: SnackbarShower,
+    private val confirmDialogShower: (message: String, onConfirmed: (Boolean) -> Unit) -> Unit
 ) {
     private val compositeDisposable = CompositeDisposable()
 
+    private val app = MegaApplication.getInstance()
+    private val megaApi = app.megaApi
+    private val dbHandler = DatabaseHandler.getDbHandler(app)
+
     private var saving = Saving.NOTHING
-    private var activityLauncher = ActivityLauncher.IDLE
-    private var permissionRequester = PermissionRequester.IDLE
-    private var snackbarShower = SnackbarShower.IDLE
+
+    /**
+     * Save an offline node into device.
+     *
+     * @param handle handle of the offline node to save
+     */
+    fun saveOfflineNode(handle: Long) {
+        val node = dbHandler.findByHandle(handle) ?: return
+        saveOfflineNodes(listOf(node))
+    }
 
     /**
      * Save an offline node into device.
      *
      * @param node the offline node to save
-     * @param activityLauncher interface to start activity
-     * @param permissionRequester interface to request permission
-     * @param snackbarShower interface to show snackbar
      */
-    fun saveOfflineNode(
-        node: MegaOffline,
-        activityLauncher: ActivityLauncher,
-        permissionRequester: PermissionRequester,
-        snackbarShower: SnackbarShower
-    ) {
-        saveOfflineNodes(listOf(node), activityLauncher, permissionRequester, snackbarShower)
+    fun saveOfflineNode(node: MegaOffline) {
+        saveOfflineNodes(listOf(node))
     }
 
     /**
      * Save offline nodes into device.
      *
      * @param nodes the offline nodes to save
-     * @param activityLauncher interface to start activity
-     * @param permissionRequester interface to request permission
-     * @param snackbarShower interface to show snackbar
      */
-    fun saveOfflineNodes(
-        nodes: List<MegaOffline>,
-        activityLauncher: ActivityLauncher,
-        permissionRequester: PermissionRequester,
-        snackbarShower: SnackbarShower
-    ) {
-        this.activityLauncher = activityLauncher
-        this.permissionRequester = permissionRequester
-        this.snackbarShower = snackbarShower
-
+    fun saveOfflineNodes(nodes: List<MegaOffline>) {
         save {
             var totalSize = 0L
             for (node in nodes) {
-                totalSize += FileUtil.getTotalSize(OfflineUtils.getOfflineFile(context, node))
+                totalSize += FileUtil.getTotalSize(getOfflineFile(app, node))
             }
             OfflineSaving(totalSize, nodes)
         }
@@ -119,9 +104,6 @@ class NodeSaver @Inject constructor(
      * Save a MegaNode into device.
      *
      * @param handle the handle of node to save
-     * @param activityLauncher interface to start activity
-     * @param permissionRequester interface to request permission
-     * @param snackbarShower interface to show snackbar
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
@@ -129,27 +111,18 @@ class NodeSaver @Inject constructor(
      */
     fun saveHandle(
         handle: Long,
-        activityLauncher: ActivityLauncher,
-        permissionRequester: PermissionRequester,
-        snackbarShower: SnackbarShower,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         fromChat: Boolean = false
     ) {
-        saveHandles(
-            listOf(handle), activityLauncher, permissionRequester, snackbarShower,
-            highPriority, isFolderLink, fromMediaViewer, fromChat
-        )
+        saveHandles(listOf(handle), highPriority, isFolderLink, fromMediaViewer, fromChat)
     }
 
     /**
      * Save a list of MegaNode into device.
      *
      * @param handles the handle list of nodes to save
-     * @param activityLauncher interface to start activity
-     * @param permissionRequester interface to request permission
-     * @param snackbarShower interface to show snackbar
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
@@ -157,18 +130,11 @@ class NodeSaver @Inject constructor(
      */
     fun saveHandles(
         handles: List<Long>,
-        activityLauncher: ActivityLauncher,
-        permissionRequester: PermissionRequester,
-        snackbarShower: SnackbarShower,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         fromChat: Boolean = false
     ) {
-        this.activityLauncher = activityLauncher
-        this.permissionRequester = permissionRequester
-        this.snackbarShower = snackbarShower
-
         save {
             val nodes = ArrayList<MegaNode>()
             var totalSize = 0L
@@ -189,9 +155,6 @@ class NodeSaver @Inject constructor(
      * Save a MegaNode into device.
      *
      * @param node node to save
-     * @param activityLauncher interface to start activity
-     * @param permissionRequester interface to request permission
-     * @param snackbarShower interface to show snackbar
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
@@ -199,27 +162,18 @@ class NodeSaver @Inject constructor(
      */
     fun saveNode(
         node: MegaNode,
-        activityLauncher: ActivityLauncher,
-        permissionRequester: PermissionRequester,
-        snackbarShower: SnackbarShower,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         fromChat: Boolean = false
     ) {
-        saveNodes(
-            listOf(node), activityLauncher, permissionRequester, snackbarShower,
-            highPriority, isFolderLink, fromMediaViewer, fromChat
-        )
+        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, fromChat)
     }
 
     /**
      * Save a list of MegaNode into device.
      *
      * @param nodes nodes to save
-     * @param activityLauncher interface to start activity
-     * @param permissionRequester interface to request permission
-     * @param snackbarShower interface to show snackbar
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
@@ -227,18 +181,11 @@ class NodeSaver @Inject constructor(
      */
     fun saveNodes(
         nodes: List<MegaNode>,
-        activityLauncher: ActivityLauncher,
-        permissionRequester: PermissionRequester,
-        snackbarShower: SnackbarShower,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         fromChat: Boolean = false
     ) {
-        this.activityLauncher = activityLauncher
-        this.permissionRequester = permissionRequester
-        this.snackbarShower = snackbarShower
-
         save {
             var totalSize = 0L
 
@@ -251,17 +198,16 @@ class NodeSaver @Inject constructor(
     }
 
     /**
-     * Handle activity result from FileStorageActivityLollipop launched by requestLocalFolder,
+     * Handle app result from FileStorageActivityLollipop launched by requestLocalFolder,
      * and take actions according to the state and result.
      *
-     * It should be called in onActivityResult (but this doesn't mean NodeSaver should be
-     * owned by a fragment or activity).
+     * It should be called in onActivityResult.
      *
      * @param requestCode the requestCode from onActivityResult
      * @param resultCode the resultCode from onActivityResult
      * @param intent the intent from onActivityResult
      * @return whether NodeSaver handles this result, if this method return false,
-     * fragment/activity should handle the result by other code.
+     * fragment/app should handle the result by other code.
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
         if (saving == Saving.NOTHING) {
@@ -291,9 +237,9 @@ class NodeSaver @Inject constructor(
                 logWarning("handleActivityResult REQUEST_CODE_TREE: result intent is null")
 
                 val message = if (resultCode != Activity.RESULT_OK) {
-                    context.getString(R.string.download_requires_permission)
+                    app.getString(R.string.download_requires_permission)
                 } else {
-                    context.getString(R.string.no_external_SD_card_detected)
+                    app.getString(R.string.no_external_SD_card_detected)
                 }
 
                 snackbarShower.showSnackbar(message)
@@ -307,7 +253,7 @@ class NodeSaver @Inject constructor(
                 return false
             }
 
-            val pickedDir = DocumentFile.fromTreeUri(context, uri)
+            val pickedDir = DocumentFile.fromTreeUri(app, uri)
             if (pickedDir == null || !pickedDir.canWrite()) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: pickedDir not writable")
                 return false
@@ -315,7 +261,7 @@ class NodeSaver @Inject constructor(
 
             dbHandler.sdCardUri = uri.toString()
 
-            val parentPath = getFullPathFromTreeUri(uri, context)
+            val parentPath = getFullPathFromTreeUri(uri, app)
             if (parentPath == null) {
                 logWarning("handleActivityResult REQUEST_CODE_TREE: parentPath is null")
                 return false
@@ -335,11 +281,11 @@ class NodeSaver @Inject constructor(
      * Handle request permission result, and take actions according to the state and result.
      *
      * It should be called in onRequestPermissionsResult (but this doesn't mean NodeSaver should be
-     * owned by an activity).
+     * owned by an app).
      *
      * @param requestCode the requestCode from onRequestPermissionsResult
      * @return whether NodeSaver handles this result, if this method return false,
-     * activity should handle the result by other code.
+     * app should handle the result by other code.
      */
     fun handleRequestPermissionsResult(requestCode: Int): Boolean {
         if (requestCode != REQUEST_WRITE_STORAGE) {
@@ -357,10 +303,34 @@ class NodeSaver @Inject constructor(
     }
 
     /**
-     * Initiate the saving.
+     * Save instance state, should be called from onSaveInstanceState of the owning
+     * activity/fragment.
      *
-     * @param savingProducer a high-order function to produce internal state needed for later use
+     * @param outState outState param of onSaveInstanceState
      */
+    fun saveState(outState: Bundle) {
+        outState.putParcelable(STATE_KEY_SAVING, saving)
+    }
+
+    /**
+     * Restore instance state, should be called from onCreate of the owning
+     * activity/fragment.
+     *
+     * @param savedInstanceState savedInstanceState param of onCreate
+     */
+    fun restoreState(savedInstanceState: Bundle) {
+        val oldSaving = savedInstanceState.getParcelable<Saving>(STATE_KEY_SAVING) ?: return
+        saving = oldSaving
+    }
+
+    /**
+     * Clear all internal state and cancel all flying operation, should be called
+     * in onDestroy lifecycle callback.
+     */
+    fun destroy() {
+        compositeDisposable.dispose()
+    }
+
     private fun save(savingProducer: () -> Saving?) {
         add(
             Completable
@@ -382,7 +352,7 @@ class NodeSaver @Inject constructor(
     private fun doSave() {
         val downloadLocationDefaultPath = getDownloadLocation()
 
-        if (Util.askMe(context)) {
+        if (Util.askMe(app)) {
             requestLocalFolder(null, activityLauncher)
         } else {
             checkSizeBeforeDownload(downloadLocationDefaultPath)
@@ -393,9 +363,9 @@ class NodeSaver @Inject constructor(
         prompt: String?, activityLauncher: ActivityLauncher
     ) {
         val intent = Intent(PICK_FOLDER.action)
-        intent.putExtra(EXTRA_BUTTON_PREFIX, context.getString(R.string.general_select))
+        intent.putExtra(EXTRA_BUTTON_PREFIX, app.getString(R.string.general_select))
         intent.putExtra(EXTRA_FROM_SETTINGS, false)
-        intent.setClass(context, FileStorageActivityLollipop::class.java)
+        intent.setClass(app, FileStorageActivityLollipop::class.java)
 
         if (prompt != null) {
             intent.putExtra(EXTRA_PROMPT, prompt)
@@ -411,23 +381,23 @@ class NodeSaver @Inject constructor(
             availableFreeSpace = stat.availableBlocksLong * stat.blockSizeLong
         } catch (ex: Exception) {
         }
-        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: ${saving.totalSize}")
+        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: ${saving.totalSize()}")
 
-        if (availableFreeSpace < saving.totalSize) {
+        if (availableFreeSpace < saving.totalSize()) {
             post { snackbarShower.showNotEnoughSpaceSnackbar() }
             logWarning("Not enough space")
             return
         }
 
         if (TextUtils.equals(dbHandler.attributes.askSizeDownload, false.toString())
-            || saving.totalSize < CONFIRM_SIZE_MIN_BYTES
+            || saving.totalSize() < CONFIRM_SIZE_MIN_BYTES
         ) {
             checkInstalledAppBeforeDownload(parentPath)
             return
         }
 
         showConfirmationDialog(
-            context.getString(R.string.alert_larger_file, Util.getSizeString(saving.totalSize))
+            app.getString(R.string.alert_larger_file, getSizeString(saving.totalSize()))
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
@@ -445,13 +415,13 @@ class NodeSaver @Inject constructor(
             return
         }
 
-        if (!saving.hasUnsupportedFile(context)) {
+        if (!saving.hasUnsupportedFile(app)) {
             download(parentPath)
             return
         }
 
         showConfirmationDialog(
-            context.getString(R.string.alert_no_app, saving.unsupportedFileName)
+            app.getString(R.string.alert_no_app, saving.unsupportedFileName)
         ) { notShowAgain ->
             if (notShowAgain) {
                 add(Completable.fromCallable { dbHandler.setAttrAskNoAppDownload(false.toString()) }
@@ -480,10 +450,10 @@ class NodeSaver @Inject constructor(
             return
         }
 
-        val sdCardOperator = SDCardOperator.initSDCardOperator(context, parentPath)
+        val sdCardOperator = SDCardOperator.initSDCardOperator(app, parentPath)
         if (sdCardOperator == null) {
             requestLocalFolder(
-                context.getString(R.string.no_external_SD_card_detected),
+                app.getString(R.string.no_external_SD_card_detected),
                 activityLauncher
             )
             return
@@ -498,40 +468,11 @@ class NodeSaver @Inject constructor(
     }
 
     private fun showConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
-        post { doShowConfirmationDialog(message, onConfirmed) }
-    }
-
-    private fun doShowConfirmationDialog(message: String, onConfirmed: (Boolean) -> Unit) {
-        val confirmationLayout = LinearLayout(context)
-        confirmationLayout.orientation = LinearLayout.VERTICAL
-        val params = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        params.setMargins(
-            Util.scaleWidthPx(20, context.resources.displayMetrics),
-            Util.scaleHeightPx(10, context.resources.displayMetrics),
-            Util.scaleWidthPx(17, context.resources.displayMetrics),
-            0
-        )
-
-        val notShowAgain = CheckBox(context)
-        notShowAgain.setText(R.string.checkbox_not_show_again)
-        notShowAgain.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-        confirmationLayout.addView(notShowAgain, params)
-
-        MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle)
-            .setView(confirmationLayout)
-            .setMessage(message)
-            .setPositiveButton(
-                R.string.general_save_to_device
-            ) { _, _ ->
-                onConfirmed(notShowAgain.isChecked)
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
-            .create()
-            .show()
+        post { confirmDialogShower(message, onConfirmed) }
     }
 
     private fun hasWriteExternalStoragePermission(): Boolean =
-        ContextCompat.checkSelfPermission(context, permission.WRITE_EXTERNAL_STORAGE) ==
+        ContextCompat.checkSelfPermission(app, permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED
 
     private fun lackPermission(): Boolean {
@@ -548,15 +489,9 @@ class NodeSaver @Inject constructor(
         compositeDisposable.add(disposable)
     }
 
-    /**
-     * Clear all internal state and cancel all flying operation, should be called
-     * in onDestroy lifecycle callback.
-     */
-    fun destroy() {
-        compositeDisposable.dispose()
-    }
-
     companion object {
         const val CONFIRM_SIZE_MIN_BYTES = 100 * 1024 * 1024L
+
+        private const val STATE_KEY_SAVING = "saving"
     }
 }

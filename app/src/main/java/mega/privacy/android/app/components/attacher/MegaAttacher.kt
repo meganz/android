@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.attacher
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.os.Bundle
 import android.text.TextUtils
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -90,6 +91,26 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                 attaching = false
             }
         }
+    }
+
+    /**
+     * Save instance state, should be called from onSaveInstanceState of the owning
+     * activity/fragment.
+     *
+     * @param outState outState param of onSaveInstanceState
+     */
+    fun saveState(outState: Bundle) {
+        outState.putBoolean(STATE_KEY_ATTACHING, attaching)
+    }
+
+    /**
+     * Restore instance state, should be called from onCreate of the owning
+     * activity/fragment.
+     *
+     * @param savedInstanceState savedInstanceState param of onCreate
+     */
+    fun restoreState(savedInstanceState: Bundle) {
+        attaching = savedInstanceState.getBoolean(STATE_KEY_ATTACHING, false)
     }
 
     /**
@@ -406,5 +427,9 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         snackbarShower.showSnackbarWithChat(
             message, if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
         )
+    }
+
+    companion object {
+        private const val STATE_KEY_ATTACHING = "attaching"
     }
 }

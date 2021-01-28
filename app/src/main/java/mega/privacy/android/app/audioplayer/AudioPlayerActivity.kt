@@ -22,6 +22,7 @@ import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -29,6 +30,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LinksUtil
@@ -64,6 +66,8 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     private var serviceBound = false
     private var playerService: AudioPlayerService? = null
+
+    private val nodeSaver = NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -104,6 +108,10 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
             return
         }
 
+        if (savedInstanceState != null) {
+            nodeSaver.restoreState(savedInstanceState)
+        }
+
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         changeStatusBarColor(this, window, R.color.black)
@@ -130,6 +138,12 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         viewModel.itemToRemove.observe(this) {
             playerService?.viewModel?.removeItem(it)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        nodeSaver.saveState(outState)
     }
 
     private fun stopPlayer() {
@@ -186,6 +200,8 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         if (serviceBound) {
             unbindService(connection)
         }
+
+        nodeSaver.destroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -334,9 +350,13 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         when (item.itemId) {
             R.id.save_to_device -> {
                 if (adapterType == OFFLINE_ADAPTER) {
-                    viewModel.saveOfflineNode(playingHandle, this, this, this)
+                    nodeSaver.saveOfflineNode(playingHandle)
                 } else {
-                    viewModel.saveMegaNode(playingHandle, isFolderLink, this, this, this)
+                    nodeSaver.saveHandle(
+                        playingHandle,
+                        isFolderLink = isFolderLink,
+                        fromMediaViewer = true
+                    )
                 }
                 return true
             }

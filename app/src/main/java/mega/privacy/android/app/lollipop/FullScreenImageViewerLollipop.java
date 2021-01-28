@@ -89,6 +89,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -155,7 +156,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	String regex = "[*|\\?:\"<>\\\\\\\\/]";
 
 	private final MegaAttacher nodeAttacher = new MegaAttacher(this);
-	private NodeSaver nodeSaver;
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
 	NodeController nC;
 	boolean isFileLink;
@@ -259,6 +261,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		unregisterReceiver(receiverToFinish);
 
 		DRAGGING_THUMBNAIL_CALLBACKS.clear();
+
+		nodeSaver.destroy();
 
 		super.onDestroy();
 	}
@@ -755,22 +759,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 				}
 			}
 			case R.id.full_image_viewer_download: {
-				if (nodeSaver == null) {
-					nodeSaver = new NodeSaver(this, megaApi, dbH);
-				}
-
 				switch (adapterType) {
 					case OFFLINE_ADAPTER:
-						nodeSaver.saveOfflineNode(mOffListImages.get(positionG), this, this, this);
+						nodeSaver.saveOfflineNode(mOffListImages.get(positionG));
 						break;
 					case ZIP_ADAPTER:
 						// don't have this option
 						break;
 					case FILE_LINK_ADAPTER:
-						nodeSaver.saveNode(currentDocument, this, this, this, false, false, true, false);
+						nodeSaver.saveNode(currentDocument, false, false, true, false);
 						break;
 					default:
-						nodeSaver.saveNode(node, this, this, this, false, isFolderLink, true, false);
+						nodeSaver.saveNode(node, false, isFolderLink, true, false);
 						break;
 				}
 
@@ -1151,6 +1151,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					return true;
 				}
 			});
+
+			nodeAttacher.restoreState(savedInstanceState);
+			nodeSaver.restoreState(savedInstanceState);
 		}
 	}
 
@@ -1562,9 +1565,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		logDebug("onRequestPermissionsResult");
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-		if (nodeSaver != null) {
-			nodeSaver.handleRequestPermissionsResult(requestCode);
-		}
+		nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
 	@Override
@@ -1578,13 +1579,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			}
 		}
 		savedInstanceState.putInt("adapterType", adapterType);
-		if ((adapterType == OFFLINE_ADAPTER) || (adapterType == ZIP_ADAPTER)){
-
-		}
-		else{
+		if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER) {
 			savedInstanceState.putBoolean("aBshown", adapterMega.isaBshown());
 			savedInstanceState.putBoolean("overflowVisible", adapterMega.isMenuVisible());
 		}
+
+		nodeAttacher.saveState(savedInstanceState);
+		nodeSaver.saveState(savedInstanceState);
 	}
 
 	@Override
@@ -2163,7 +2164,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 

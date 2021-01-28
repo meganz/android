@@ -1,12 +1,21 @@
 package mega.privacy.android.app.components.saver
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.SDCardOperator
 
-abstract class Saving(val totalSize: Long) {
+abstract class Saving : Parcelable {
     var unsupportedFileName = ""
         protected set
+
+    /**
+     * Get the total size of this saving.
+     *
+     * @return total size
+     */
+    abstract fun totalSize(): Long
 
     /**
      * Check if there is any unsupported file in this Saving.
@@ -32,7 +41,9 @@ abstract class Saving(val totalSize: Long) {
     )
 
     companion object {
-        val NOTHING = object : Saving(0) {
+        val NOTHING = object : Saving() {
+            override fun totalSize() = 0L
+
             override fun hasUnsupportedFile(context: Context): Boolean = false
 
             override fun doDownload(
@@ -41,6 +52,13 @@ abstract class Saving(val totalSize: Long) {
                 sdCardOperator: SDCardOperator?,
                 snackbarShower: SnackbarShower
             ) {
+            }
+
+            override fun describeContents(): Int {
+                return 0
+            }
+
+            override fun writeToParcel(dest: Parcel?, flags: Int) {
             }
         }
     }

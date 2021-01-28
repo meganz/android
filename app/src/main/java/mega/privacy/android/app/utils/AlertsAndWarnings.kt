@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
@@ -12,10 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -366,6 +364,27 @@ class AlertsAndWarnings {
             }
 
             input.requestFocus()
+        }
+
+        @JvmStatic
+        fun showSaveToDeviceConfirmDialog(activity: Activity): (message: String, onConfirmed: (Boolean) -> Unit) -> Unit {
+            return { message, onConfirmed ->
+                val customView = LayoutInflater.from(activity)
+                    .inflate(R.layout.dialog_confirm_with_not_show_again, null)
+                val notShowAgain = customView.findViewById<CheckBox>(R.id.not_show_again)
+
+                MaterialAlertDialogBuilder(activity, R.style.MaterialAlertDialogStyle)
+                    .setView(customView)
+                    .setMessage(message)
+                    .setPositiveButton(
+                        R.string.general_save_to_device
+                    ) { _, _ ->
+                        onConfirmed(notShowAgain.isChecked)
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                    .create()
+                    .show()
+            }
         }
     }
 }

@@ -2,6 +2,8 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
+import kotlinx.android.parcel.Parcelize
+import kotlinx.android.parcel.TypeParceler
 import mega.privacy.android.app.*
 import mega.privacy.android.app.DownloadService.*
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -17,14 +19,18 @@ import nz.mega.sdk.MegaNode
 import java.io.File
 import java.util.*
 
+@Parcelize
+@TypeParceler<MegaNode, MegaNodeParceler>()
 class MegaNodeSaving(
-    totalSize: Long,
+    private val totalSize: Long,
     private val highPriority: Boolean,
     private val isFolderLink: Boolean,
     private val nodes: List<MegaNode>,
     private val fromMediaViewer: Boolean,
     private val fromChat: Boolean,
-) : Saving(totalSize) {
+) : Saving() {
+
+    override fun totalSize() = totalSize
 
     override fun hasUnsupportedFile(context: Context): Boolean {
         for (node in nodes) {

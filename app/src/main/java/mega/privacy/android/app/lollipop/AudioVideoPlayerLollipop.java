@@ -125,6 +125,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -285,7 +286,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DisplayMetrics outMetrics;
 
     private final MegaAttacher nodeAttacher = new MegaAttacher(this);
-    private NodeSaver nodeSaver;
+    private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+            AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
     private boolean fromShared = false;
     private int typeExport = -1;
@@ -441,6 +443,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
             isAbHide = savedInstanceState.getBoolean("isAbHide", false);
             placeholderCount = savedInstanceState.getInt("placeholder", 0);
+
+            nodeAttacher.restoreState(savedInstanceState);
+            nodeSaver.restoreState(savedInstanceState);
         }
         else {
             logDebug("savedInstanceState null");
@@ -1834,6 +1839,9 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         outState.putBoolean("playWhenReady", playWhenReady);
         outState.putBoolean("isDeleteDialogShow", isDeleteDialogShow);
         outState.putBoolean("isAbHide", isAbHide);
+
+        nodeAttacher.saveState(outState);
+        nodeSaver.saveState(outState);
     }
 
     public String getFileName(Uri uri) {
@@ -3128,16 +3136,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     }
 
     public void downloadFile() {
-        if (nodeSaver == null) {
-            nodeSaver = new NodeSaver(this, megaApi, dbH);
-        }
-
         if (adapterType == OFFLINE_ADAPTER) {
-            nodeSaver.saveOfflineNode(mediaOffList.get(currentWindowIndex), this, this, this);
+            nodeSaver.saveOfflineNode(mediaOffList.get(currentWindowIndex));
         } else if (adapterType == FILE_LINK_ADAPTER) {
-            nodeSaver.saveNode(currentDocument, this, this, this, false, false, true, false);
+            nodeSaver.saveNode(currentDocument, false, false, true, false);
         } else if (fromChat) {
-            nodeSaver.saveNode(nodeChat, this, this, this, true, isFolderLink, true, true);
+            nodeSaver.saveNode(nodeChat, true, isFolderLink, true, true);
         }
     }
 
@@ -3145,9 +3149,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (nodeSaver != null) {
-            nodeSaver.handleRequestPermissionsResult(requestCode);
-        }
+        nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
     @Override
@@ -3158,7 +3160,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             return;
         }
 
-        if (nodeSaver != null && nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
             return;
         }
 
@@ -3381,6 +3383,8 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         unregisterReceiver(chatCallUpdateReceiver);
 
         DRAGGING_THUMBNAIL_CALLBACKS.clear();
+
+        nodeSaver.destroy();
 
         super.onDestroy();
     }
