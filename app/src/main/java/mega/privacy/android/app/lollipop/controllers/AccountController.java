@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,13 +41,14 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.psa.PsaViewModel;
+import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
+import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -439,14 +443,23 @@ public class AccountController {
         // clean time stamps preference settings after logout
         clearCUBackUp();
 
-        PsaViewModel.clearPreference();
+        SharedPreferences preferences = context.getSharedPreferences(MegaContactGetter.LAST_SYNC_TIMESTAMP_FILE, Context.MODE_PRIVATE);
+        preferences.edit().putLong(MegaContactGetter.LAST_SYNC_TIMESTAMP_KEY, 0).apply();
+
+        //clear push token
+        context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
 
         new LastShowSMSDialogTimeChecker(context).reset();
+
+        PsaManager.INSTANCE.stopChecking();
 
         //Clear MyAccountInfo
         MegaApplication app = MegaApplication.getInstance();
         app.getMyAccountInfo().clear();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
+
+        // Clear get banner success flag
+        LiveEventBus.get(EVENT_LOGOUT_CLEARED).post(null);
     }
 
     public static void removeFolder(Context context, File folder) {

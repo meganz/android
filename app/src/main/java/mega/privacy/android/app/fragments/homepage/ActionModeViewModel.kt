@@ -83,9 +83,15 @@ class ActionModeViewModel @ViewModelInject constructor() : ViewModel() {
         _actionModeDestroy.value = Event(Unit)
     }
 
+    /**
+     * Set the full range of the nodes
+     */
     fun setNodesData(nodeItems: List<NodeItem>) {
         nodesData = nodeItems
+        initSelectedNodeList()
+    }
 
+    private fun initSelectedNodeList() {
         // Some selected nodes may have been removed(e.g. by another Mega client),
         // so refresh selectedNodeList
         selectedNodeList.clear()

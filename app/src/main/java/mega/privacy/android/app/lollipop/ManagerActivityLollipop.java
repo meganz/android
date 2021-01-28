@@ -30,7 +30,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavOptions;
 import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Lifecycle;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -38,6 +38,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -63,6 +65,7 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -96,13 +99,8 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -116,7 +114,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -136,6 +138,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
@@ -152,11 +155,14 @@ import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
+import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.ContactsPageAdapter;
@@ -167,7 +173,6 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleAttachChatListener;
@@ -193,7 +198,6 @@ import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipo
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
 import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentLollipop;
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -204,6 +208,10 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
+import mega.privacy.android.app.middlelayer.iab.BillingManager;
+import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
@@ -219,14 +227,14 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
-import mega.privacy.android.app.psa.PsaViewModel;
-import mega.privacy.android.app.psa.PsaViewModelFactory;
+import mega.privacy.android.app.psa.PsaManager;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
+import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.billing.BillingManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -263,41 +271,44 @@ import nz.mega.sdk.MegaUtilsAndroid;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
+import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
+import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.*;
+import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingManager.BillingUpdatesListener {
+public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingUpdatesListener {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
+	private static final String DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
 	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
@@ -338,6 +349,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+
+    @Inject
+	GetCookieSettingsUseCase getCookieSettingsUseCase;
+
+    @Inject
+	UpdateCookieSettingsUseCase updateCookieSettingsUseCase;
 
 	public int accountFragment;
 
@@ -456,7 +473,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
-	private List<SkuDetails> mSkuDetailsList;
+	private List<MegaSku> mSkuDetailsList;
 
     public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -668,6 +685,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
 
+	private boolean mStopped = true;
+	private DrawerItem drawerItemBeforeOpenFullscreenOffline = null;
 	private OfflineFragment fullscreenOfflineFragment;
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
@@ -813,7 +832,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
-	private PsaViewModel psaViewModel;
 	private PsaViewHolder psaViewHolder;
 
 
@@ -1425,61 +1443,49 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     public void launchPayment(String productId) {
         //start purchase/subscription flow
-        SkuDetails skuDetails = getSkuDetails(mSkuDetailsList, productId);
-        Purchase purchase = app.getMyAccountInfo().getActiveGooglePlaySubscription();
+        MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
+        MegaPurchase purchase = app.getMyAccountInfo().getActiveSubscription();
         String oldSku = purchase == null ? null : purchase.getSku();
-        String token = purchase == null ? null : purchase.getPurchaseToken();
+        String token = purchase == null ? null : purchase.getToken();
         if (mBillingManager != null) {
             mBillingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
         }
     }
 
-	private void getInventory() {
-		SkuDetailsResponseListener listener = new SkuDetailsResponseListener() {
-			@Override
-			public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> skuDetailsList) {
-				if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-					logWarning("Failed to get SkuDetails, error code is " + billingResult.getResponseCode());
-				}
-				if (skuDetailsList != null && skuDetailsList.size() > 0) {
-					mSkuDetailsList = skuDetailsList;
-					app.getMyAccountInfo().setAvailableSkus(skuDetailsList);
+	private MegaSku getSkuDetails(List<MegaSku> list, String key) {
+		if (list == null || list.isEmpty()) {
+			return null;
+		}
 
-					upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
-					if (upAFL != null) {
-						upAFL.setPricingInfo();
-					}
-				}
+		for (MegaSku details : list) {
+			if (details.getSku().equals(key)) {
+				return details;
 			}
-		};
-
-		List<String> inAppSkus = new ArrayList<>();
-		inAppSkus.add(SKU_PRO_I_MONTH);
-		inAppSkus.add(SKU_PRO_I_YEAR);
-		inAppSkus.add(SKU_PRO_II_MONTH);
-		inAppSkus.add(SKU_PRO_II_YEAR);
-		inAppSkus.add(SKU_PRO_III_MONTH);
-		inAppSkus.add(SKU_PRO_III_YEAR);
-		inAppSkus.add(SKU_PRO_LITE_MONTH);
-		inAppSkus.add(SKU_PRO_LITE_YEAR);
-
-		//we only support subscription for google pay
-		mBillingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, inAppSkus, listener);
+		}
+		return null;
 	}
 
     public void initGooglePlayPayments() {
-        mBillingManager = new BillingManager(this, this);
+        mBillingManager = new BillingManagerImpl(this, this);
     }
 
 	@Override
-	public void onBillingClientSetupFinished() {
-		logInfo("Google play billing client setup finished");
-		getInventory();
-	}
+    public void onBillingClientSetupFinished() {
+        logInfo("Billing client setup finished");
+        mBillingManager.getInventory(skuList -> {
+            mSkuDetailsList = skuList;
+            app.getMyAccountInfo().setAvailableSkus(skuList);
+
+            upAFL = (UpgradeAccountFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.UPGRADE_ACCOUNT.getTag());
+            if (upAFL != null) {
+                upAFL.setPricingInfo();
+            }
+        });
+    }
 
 	@Override
-	public void onQueryPurchasesFinished(int resultCode, List<Purchase> purchases) {
-		if (resultCode != BillingClient.BillingResponseCode.OK || purchases == null) {
+	public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+		if (isFailed || purchases == null) {
 			logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
 			return;
 		}
@@ -1489,16 +1495,16 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	@Override
-	public void onPurchasesUpdated(int resultCode, List<Purchase> purchases) {
-        if (resultCode == BillingClient.BillingResponseCode.OK) {
+	public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (!isFailed) {
             String message;
             if (purchases != null && !purchases.isEmpty()) {
-                Purchase purchase = purchases.get(0);
+                MegaPurchase purchase = purchases.get(0);
                 //payment may take time to process, we will not give privilege until it has been fully processed
                 String sku = purchase.getSku();
                 String subscriptionType = getSubscriptionType(this, sku);
                 String subscriptionRenewalType = getSubscriptionRenewalType(this, sku);
-                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                if (mBillingManager.isPurchased(purchase)) {
                     //payment has been processed
                     updateAccountInfo(purchases);
                     logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
@@ -1522,12 +1528,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         }
 	}
 
-	private void updateAccountInfo(List<Purchase> purchases) {
+	private void updateAccountInfo(List<MegaPurchase> purchases) {
 		MyAccountInfo myAccountInfo = app.getMyAccountInfo();
 		int highest = -1;
 		int temp = -1;
-		Purchase max = null;
-		for (Purchase purchase : purchases) {
+		MegaPurchase max = null;
+		for (MegaPurchase purchase : purchases) {
 			switch (purchase.getSku()) {
 				case SKU_PRO_LITE_MONTH:
 				case SKU_PRO_LITE_YEAR:
@@ -1555,7 +1561,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
         if(max != null ){
             logDebug("Set current max subscription: " + max);
-            myAccountInfo.setActiveGooglePlaySubscription(max);
+            myAccountInfo.setActiveSubscription(max);
+        } else {
+            myAccountInfo.setActiveSubscription(null);
         }
 
 		myAccountInfo.setLevelInventory(highest);
@@ -1585,12 +1593,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void updateSubscriptionLevel(MyAccountInfo myAccountInfo) {
-		Purchase highestGooglePlaySubscription = myAccountInfo.getActiveGooglePlaySubscription();
+		MegaPurchase highestGooglePlaySubscription = myAccountInfo.getActiveSubscription();
 		if (!myAccountInfo.isAccountDetailsFinished() || highestGooglePlaySubscription == null) {
 			return;
 		}
 
-		String json = highestGooglePlaySubscription.getOriginalJson();
+		String json = highestGooglePlaySubscription.getReceipt();
 		logDebug("ORIGINAL JSON:" + json); //Print JSON in logs to help debug possible payments issues
 
 		MegaAttributes attributes = dbH.getAttributes();
@@ -1598,9 +1606,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		if (myAccountInfo.getLevelInventory() > myAccountInfo.getLevelAccountDetails()) {
 			if (lastPublicHandle == INVALID_HANDLE) {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, this);
+				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, this);
 			} else {
-				megaApi.submitPurchaseReceipt(MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET, json, lastPublicHandle,
+				megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
 						attributes.getLastPublicHandleType(), attributes.getLastPublicHandleTimeStamp(), this);
 			}
 		}
@@ -1828,6 +1836,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
+		outState.putSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
+				drawerItemBeforeOpenFullscreenOffline);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
@@ -1933,6 +1943,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onStart() {
 		logDebug("onStart");
+
+		mStopped = false;
+
 		super.onStart();
 	}
 
@@ -1972,6 +1985,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+			drawerItemBeforeOpenFullscreenOffline
+					= (DrawerItem) savedInstanceState.getSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
@@ -2124,7 +2139,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
-			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
+			getter.getMegaContacts(megaApi, TimeUtils.WEEK);
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -2206,7 +2221,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		logDebug("Preferred View List: " + isList);
 
-		EventNotifierKt.notifyListGridChange(isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -2247,7 +2262,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		handler = new Handler();
 
@@ -2808,17 +2823,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			dbH.setInvalidateSdkCache(false);
-
-			String token = FirebaseInstanceId.getInstance().getToken();
-			if (token != null) {
-				logDebug("FCM TOKEN: " + token);
-				megaApi.registerPushNotifications(DEVICE_ANDROID, token, this);
-//				Log.d("TOKEN___", token);
-
-//				Toast.makeText(this, "TOKEN: _" + token + "_", Toast.LENGTH_LONG).show();
-			}
-
-
+            MegaMessageService.getToken(this);
 			nVEmail.setVisibility(View.VISIBLE);
 			nVEmail.setText(megaApi.getMyEmail());
 //				megaApi.getUserData(this);
@@ -3350,6 +3355,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             showTransfersTransferOverQuotaWarning();
         }
 
+		PsaManager.INSTANCE.startChecking();
+
 		logDebug("END onCreate");
 	}
 
@@ -3581,6 +3588,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			hideFabButton();
 			showHideBottomNavigationView(true);
 		}
+	}
+
+	private void showCookieDialog() {
+		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+				.setCancelable(false)
+				.setView(R.layout.dialog_cookie_alert)
+				.setPositiveButton(R.string.preference_cookies_accept, (positiveDialog, which) ->
+						updateCookieSettingsUseCase.acceptAll()
+								.subscribeOn(Schedulers.io())
+								.observeOn(AndroidSchedulers.mainThread())
+								.subscribe(() -> { }, (error) -> {
+									logError(error.getMessage());
+								})
+				)
+				.setNegativeButton(R.string.settings_about_cookie_settings, (negativeDialog, which) ->
+						startActivity(new Intent(this, CookiePreferencesActivity.class))
+				)
+				.create();
+
+		dialog.show();
+
+		((TextView) dialog.findViewById(R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
 	public void destroySMSVerificationFragment() {
@@ -4582,6 +4611,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	protected void onStop(){
 		logDebug("onStop");
+
+		mStopped = true;
+
 		super.onStop();
 	}
 
@@ -4758,25 +4790,27 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		checkBeforeShowSMSVerificationDialog();
 
-        psaViewModel.checkPsa();
+		if (MegaApplication.isCookieBannerEnabled()) {
+			getCookieSettingsUseCase.shouldShowDialog()
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((showDialog, throwable) -> {
+						if (showDialog) showCookieDialog();
+					});
+		}
     }
 
     /**
 	 * Observe LiveData for PSA, and show PSA view when get it.
 	 */
     private void observePsa() {
-        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi, this))
-                .get(PsaViewModel.class);
-        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), PsaManager.INSTANCE);
 
-        psaViewModel.getPsa().observe(this, this::showPsa);
+		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
     }
 
 	/**
-	 * Show PSA view.
-	 *
-	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
-	 * directly. Otherwise, show the normal PSA view.
+	 * Show PSA view for old PSA type.
 	 *
 	 * @param psa the PSA to show
 	 */
@@ -4788,16 +4822,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             return;
         }
 
-        if (!TextUtils.isEmpty(psa.getUrl())) {
-            Intent intent = new Intent(this, WebViewActivity.class);
-            intent.setData(Uri.parse(psa.getUrl()));
-            startActivity(intent);
-            psaViewModel.dismissPsa(psa.getId());
-            return;
+        if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+				&& TextUtils.isEmpty(psa.getUrl())) {
+			psaViewHolder.bind(psa);
+			adjustNavHostViewHeight(true);
         }
-
-        psaViewHolder.bind(psa);
-		adjustNavHostViewHeight(true);
     }
 
     public void checkBeforeShowSMSVerificationDialog() {
@@ -5756,7 +5785,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-    	EventNotifierKt.notifyHomepageVisibilityChange(drawerItem == DrawerItem.HOMEPAGE);
+		LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean.class)
+				.post(drawerItem == DrawerItem.HOMEPAGE);
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -6124,6 +6154,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
 		if (fragment == fullscreenOfflineFragment) {
+			if (drawerItemBeforeOpenFullscreenOffline != null && !mStopped) {
+				if (drawerItem != drawerItemBeforeOpenFullscreenOffline) {
+					selectDrawerItemLollipop(drawerItemBeforeOpenFullscreenOffline);
+				}
+				drawerItemBeforeOpenFullscreenOffline = null;
+			}
+
 			setPathNavigationOffline("/");
 			fullscreenOfflineFragment = null;
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
@@ -7598,7 +7635,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setPreferredViewList(isList);
         }
 
-        EventNotifierKt.notifyListGridChange(this.isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
@@ -7683,7 +7720,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			EventNotifierKt.notifyNodesChange(false);
+			LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -7836,6 +7873,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
+
+		// If there is a displaying PSA, we should only close it, and not navigate back anymore,
+		// e.g. when we are at chat tab, and there is a displaying PSA, when we press back, if we
+		// keep executing the remaining logic, we would go back to cloud drive tab after close
+		// the PSA browser.
+		if (closeDisplayingPsa()) {
+			return;
+		}
 
 		retryConnectionsAndSignalPresence();
 
@@ -10844,7 +10889,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("New order: " + newOrderCloud);
 		this.setOrderCloud(newOrderCloud);
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
@@ -11092,40 +11137,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					sectionClicked = true;
 					drawerItem = DrawerItem.ACCOUNT;
 					accountFragment = MY_ACCOUNT_FRAGMENT;
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					checkIfShouldCloseSearchView(oldDrawerItem);
-					selectDrawerItemLollipop(drawerItem);
 				}
 				break;
 			}
 			case R.id.inbox_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.INBOX;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.contacts_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.CONTACTS;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.notifications_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.NOTIFICATIONS;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.offline_section: {
 				sectionClicked = true;
-				isFirstTimeCam();
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				drawerLayout.closeDrawer(Gravity.LEFT);
+				drawerItemBeforeOpenFullscreenOffline = drawerItem;
 				openFullscreenOfflineFragment(getPathNavigationOffline());
-				setTabsVisibility();
 				break;
 			}
 			case R.id.transfers_section:
@@ -11136,8 +11169,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case R.id.settings_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.SETTINGS;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.upgrade_navigation_view: {
@@ -11147,8 +11178,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				drawerItem = DrawerItem.ACCOUNT;
 				accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
 				displayedAccountType = -1;
-				checkIfShouldCloseSearchView(oldDrawerItem);
-				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
 			case R.id.lost_authentication_device: {
@@ -11233,7 +11262,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-						EventNotifierKt.notifyNodesChange(false);
+						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -11856,6 +11885,19 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             }
 
 			onNodesSharedUpdate();
+        }
+		// for HMS purchase only
+        else if (requestCode == REQ_CODE_BUY) {
+            if (resultCode == Activity.RESULT_OK) {
+                int purchaseResult = mBillingManager.getPurchaseResult(intent);
+                if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
+                    mBillingManager.updatePurchase();
+                } else {
+                    logWarning("Purchase failed, error code: " + purchaseResult);
+                }
+            } else {
+                logWarning("cancel subscribe");
+            }
         }
 		else{
 			logWarning("No requestcode");
@@ -13217,7 +13259,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if(maFLol!=null){
 						maFLol.updateAvatar(false);
 					}
-					EventNotifierKt.notifyAvatarChange(true);
+
+					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
 				}
 				else{
 					if(request.getFile()!=null) {
@@ -13310,7 +13353,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						maFLol.updateAvatar(false);
 					}
 				}
-				EventNotifierKt.notifyAvatarChange(false);
+				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){
@@ -14383,7 +14426,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		EventNotifierKt.notifyNodesChange(true);
+		LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
 		// Invalidate the menu will collapse/expand the search view and set the query text to ""
 		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -14593,7 +14636,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				EventNotifierKt.notifyNodesChange(false);
+				LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
 				if (isTransfersInProgressAdded()){
 					tFLol.transferFinish(transfer.getTag());
