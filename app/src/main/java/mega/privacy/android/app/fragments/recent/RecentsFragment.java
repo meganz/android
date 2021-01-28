@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.brandongogetap.stickyheaders.exposed.StickyHeader;
 import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,6 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.Scrollable;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -60,6 +60,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 
+
 public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
 
     public static ImageView imageDrag;
@@ -78,6 +79,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     private RelativeLayout emptyLayout;
     private ImageView emptyImage;
     private TextView emptyText;
+
     private StickyLayoutManager stickyLayoutManager;
     private RecyclerView listView;
     private FastScroller fastScroller;
@@ -108,7 +110,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         ((ManagerActivityLollipop) requireActivity()).pagerRecentsFragmentClosed(this);
     }
 
-    @Override public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();
         imageDrag = null;
     }
@@ -175,7 +178,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        EventNotifierKt.getNodesChange().observeForever(nodeChangeObserver);
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
     }
 
@@ -183,7 +186,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     public void onDestroyView() {
         super.onDestroyView();
 
-        EventNotifierKt.getNodesChange().removeObserver(nodeChangeObserver);
+        LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).removeObserver(nodeChangeObserver);
     }
 
     public SelectedBucketViewModel getSelectedBucketModel() {
@@ -222,7 +225,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     }
 
     public void refreshRecentsActions() {
-        if(adapter != null) {
+        if (adapter != null) {
             adapter.setItems(recentsItems);
         }
         setRecentsView();
@@ -250,7 +253,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
     @Override
     public void checkScroll() {
         if (listView == null) return;
-        EventNotifierKt.onScrolling(new Pair<>(this, listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE));
+        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair.class)
+                .post(new Pair<>(this, listView.canScrollVertically(-1)
+                        && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {
@@ -367,7 +372,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_ADAPTER);
             if (screenPosition != null) {
                 intent.putExtra(INTENT_EXTRA_KEY_SCREEN_POSITION, screenPosition);
-                int[] screenPositionForSwipeDismiss = new int[] {
+                int[] screenPositionForSwipeDismiss = new int[]{
                         screenPosition[0] + screenPosition[2] / 2,
                         screenPosition[1] + screenPosition[3] / 2,
                         screenPosition[2],

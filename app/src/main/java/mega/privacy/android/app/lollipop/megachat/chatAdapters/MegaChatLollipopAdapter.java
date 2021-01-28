@@ -6684,7 +6684,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public void clearSelections() {
         for(AndroidMegaChatMessage message:messages){
-            if(isItemChecked(message.getMessage().getMsgId())){
+            if (message != null && message.getMessage() != null &&
+                    isItemChecked(message.getMessage().getMsgId())) {
                 toggleSelection(message.getMessage().getMsgId());
             }
         }

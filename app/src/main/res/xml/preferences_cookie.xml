@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white">
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_cookie_accept"
+        android:title="@string/preference_cookies_accept"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+    <Preference
+        android:key="settings_cookie_essential"
+        android:summary="@string/preference_cookies_essential_summary"
+        android:title="@string/preference_cookies_essential_title"
+        android:widgetLayout="@layout/preference_widget_always_on"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_cookie_preference"
+        android:summary="@string/preference_cookies_preference_summary"
+        android:title="@string/preference_cookies_preference_title"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_cookie_performance_analytics"
+        android:summary="@string/preference_cookies_performance_summary"
+        android:title="@string/preference_cookies_performance_title"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+    <androidx.preference.SwitchPreferenceCompat
+        android:key="settings_cookie_advertising"
+        android:summary="@string/preference_cookies_advertising_summary"
+        android:title="@string/preference_cookies_advertising_title"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+    <mega.privacy.android.app.components.ClickableSummarySwitchPreference
+        android:key="settings_cookie_third_party"
+        android:summary="@string/preference_cookies_thirdparty_summary"
+        android:title="@string/preference_cookies_thirdparty_title"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="false"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+    <mega.privacy.android.app.components.TwoButtonsPreference
+        android:key="setting_cookie_policies"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="false"
+        app:iconSpaceReserved="false"
+        app:shouldDisableView="false" />
+
+</androidx.preference.PreferenceScreen>
