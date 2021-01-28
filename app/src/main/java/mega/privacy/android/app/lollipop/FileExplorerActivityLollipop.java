@@ -3453,10 +3453,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			if (isCloudVisible()){
 				cDriveExplorer.navigateToFolder(handle);
 				parentHandleCloud = handle;
+				hideTabs(true, CLOUD_TAB);
 			}
 			else if (isIncomingVisible()){
 				iSharesExplorer.navigateToFolder(handle);
 				parentHandleIncoming = handle;
+				hideTabs(true, INCOMING_TAB);
 			}
 		}
 	}
