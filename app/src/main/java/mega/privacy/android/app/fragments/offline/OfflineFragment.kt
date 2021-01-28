@@ -372,7 +372,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     manager.supportActionBar?.setTitle(it)
                 } else {
                     manager.setToolbarTitleFromFullscreenOfflineFragment(
-                        it, false, !viewModel.searchMode()
+                        it, false, !viewModel.searchMode() && getItemCount() > 0
                     )
                 }
             }
