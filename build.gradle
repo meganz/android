@@ -75,4 +75,6 @@ ext {
     ankoVersion = '0.10.8'
     frescoVersion = '2.3.0'
     playServicesAdsVersion = '19.7.0'
+    bannerViewPagerVersion = '3.4.0'
+    liveEventBus = '1.7.3'
 }
