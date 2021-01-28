@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -1144,7 +1144,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case HOMEPAGE:
-                EventNotifierKt.notifyNodesChange(false);
+                LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
                 break;
         }
     }

@@ -2950,4 +2950,27 @@
     <string name="audio_player_now_playing_paused" context="Text that indicates the song is now playing, but paused">Now Playing (paused)</string>
     <string name="audio_track_info" context="Title of the song info screen">Track info</string>
 
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
+    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
+    <string name="preference_cookies_performance_title" context="Preference screen item title">Performance and Analytics Cookies</string>
+    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
+    <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertising Cookies</string>
+    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
+    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Third Party Cookies</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
+    <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
+    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
+
 </resources>

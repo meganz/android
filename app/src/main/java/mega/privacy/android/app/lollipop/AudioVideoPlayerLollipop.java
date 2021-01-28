@@ -213,6 +213,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private boolean isFolderLink = false;
     private PlayerView playerView;
     private SimpleExoPlayer player;
+    private Player.EventListener playerListener;
     private Uri uri;
     private TextView exoPlayerName;
     private ProgressBar progressBar;
@@ -1127,7 +1128,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             //MediaSource mediaSource = new HlsMediaSource(uri, dataSourceFactory, handler, null);
             //DashMediaSource mediaSource = new DashMediaSource(uri, dataSourceFactory, new DefaultDashChunkSource.Factory(dataSourceFactory), null, null);
 
-            player.addListener(new Player.EventListener() {
+            playerListener = new Player.EventListener() {
                 @Override
                 public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
                     logDebug("playerListener: onTimelineChanged");
@@ -1252,7 +1253,10 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     updateContainers();
                     enableNextButton();
                 }
-            });
+            };
+
+            player.addListener(playerListener);
+
             numErrors = 0;
             if (playWhenReady) {
                 startPlayback();
@@ -1394,13 +1398,23 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     void showErrorDialog() {
         logWarning("Error open video file");
-        new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
-            .setCancelable(false)
-            .setMessage(isOnline(this) ? R.string.unsupported_file_type
-                : R.string.error_fail_to_open_file_no_network)
-            .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
-                (dialog, which) -> finish())
-            .show();
+
+        // Google Play Console reports crash here, which should be caused by showing a dialog
+        // after activity is destroyed, but since we already stop player in onDestroy,
+        // so it may be caused by bug in other parts. So we should add protection here.
+        if (!isFinishing()) {
+            try {
+                new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle)
+                        .setCancelable(false)
+                        .setMessage(isOnline(this) ? R.string.unsupported_file_type
+                                : R.string.error_fail_to_open_file_no_network)
+                        .setPositiveButton(getResources().getString(R.string.general_ok).toUpperCase(),
+                                (dialog, which) -> finish())
+                        .show();
+            } catch (Exception e) {
+                logError("Exception trying to show A/V player error dialog", e);
+            }
+        }
 
         numErrors = 0;
     }
@@ -3352,6 +3366,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         abandonAudioFocus(audioFocusListener, mAudioManager, request);
 
         if (player != null){
+            player.removeListener(playerListener);
             player.release();
 
             AudioPlayerService.resumeAudioPlayer(this);
