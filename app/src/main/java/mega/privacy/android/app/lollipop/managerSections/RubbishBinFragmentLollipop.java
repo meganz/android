@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -831,10 +831,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						else {
 							((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available), -1);
 							adapter.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(nodes.get(position).getHandle());
-							NodeController nC = new NodeController(context);
-							nC.prepareForDownload(handleList, true);
+							((ManagerActivityLollipop) context).saveNodesToDevice(
+									Collections.singletonList(nodes.get(position)),
+									true, false, false, false);
 						}
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
@@ -895,10 +894,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(nodes.get(position)),
+								true, false, false, false);
 					}
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -945,10 +943,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 									if (isIntentAvailable(context, intent)) {
 										startActivity(intent);
 									} else {
-										ArrayList<Long> handleList = new ArrayList<Long>();
-										handleList.add(nodes.get(position).getHandle());
-										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList, true);
+										((ManagerActivityLollipop) context).saveNodesToDevice(
+												Collections.singletonList(nodes.get(position)),
+												true, false, false, false);
 									}
 								}
 							}
@@ -965,10 +962,9 @@ public class RubbishBinFragmentLollipop extends Fragment{
 							if (isIntentAvailable(context, intent)) {
 								startActivity(intent);
 							} else {
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(nodes.get(position).getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList, true);
+								((ManagerActivityLollipop) context).saveNodesToDevice(
+										Collections.singletonList(nodes.get(position)),
+										true, false, false, false);
 							}
 
 						} finally {
@@ -980,17 +976,15 @@ public class RubbishBinFragmentLollipop extends Fragment{
 							}
 						}
 					} else {
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(nodes.get(position)),
+								true, false, false, false);
 					}
 				} else{
 					adapter.notifyDataSetChanged();
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(nodes.get(position).getHandle());
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, true);
+					((ManagerActivityLollipop) context).saveNodesToDevice(
+							Collections.singletonList(nodes.get(position)),
+							true, false, false, false);
 				}
 			}
 		}

@@ -31,7 +31,6 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.*
@@ -441,8 +440,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                 getString(R.string.intent_not_available),
                 MEGACHAT_INVALID_HANDLE
             )
-            val nC = NodeController(context)
-            nC.prepareForDownload(arrayListOf(node.handle), true)
+            callManager { it.saveNodesToDevice(listOf(node), true, false, false, false) }
         }
     }
 

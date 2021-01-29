@@ -27,9 +27,7 @@ import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
@@ -37,10 +35,11 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.MegaNodeUtil.*
 import mega.privacy.android.app.utils.MegaNodeUtilKt
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectCopyFolder
+import mega.privacy.android.app.utils.MegaNodeUtilKt.Companion.selectMoveFolder
 import mega.privacy.android.app.utils.Util.changeStatusBarColor
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -424,22 +423,11 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 return true
             }
             R.id.move -> {
-                val intent = Intent(this, FileExplorerActivityLollipop::class.java)
-                intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
-                intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
-                startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER)
+                selectMoveFolder(this, longArrayOf(playingHandle))
                 return true
             }
             R.id.copy -> {
-                if (app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
-                    showOverDiskQuotaPaywallWarning()
-                    return true
-                }
-
-                val intent = Intent(this, FileExplorerActivityLollipop::class.java)
-                intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
-                intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
-                startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER)
+                selectCopyFolder(this, longArrayOf(playingHandle))
                 return true
             }
             R.id.move_to_trash -> {

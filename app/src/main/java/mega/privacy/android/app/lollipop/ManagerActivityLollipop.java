@@ -1739,6 +1739,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						refreshOfflineNodes();
 					}
 				}
+
+				nodeSaver.handleRequestPermissionsResult(requestCode);
 	        	break;
 	        }
 
@@ -10414,6 +10416,34 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	/**
+	 * Save nodes to device.
+	 *
+	 * @param nodes nodes to save
+	 * @param highPriority whether this download is high priority or not
+	 * @param isFolderLink whether this download is a folder link
+	 * @param fromMediaViewer whether this download is from media viewer
+	 * @param fromChat whether this download is from chat
+	 */
+	public void saveNodesToDevice(List<MegaNode> nodes, boolean highPriority, boolean isFolderLink,
+								  boolean fromMediaViewer, boolean fromChat) {
+		nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
+	}
+
+	/**
+	 * Save nodes to device.
+	 *
+	 * @param handles handles of nodes to save
+	 * @param highPriority whether this download is high priority or not
+	 * @param isFolderLink whether this download is a folder link
+	 * @param fromMediaViewer whether this download is from media viewer
+	 * @param fromChat whether this download is from chat
+	 */
+	public void saveHandlesToDevice(List<Long> handles, boolean highPriority, boolean isFolderLink,
+								  boolean fromMediaViewer, boolean fromChat) {
+		nodeSaver.saveHandles(handles, highPriority, isFolderLink, fromMediaViewer, fromChat);
+	}
+
+	/**
 	 * Save offline nodes to device.
 	 *
 	 * @param nodes nodes to save
@@ -11426,6 +11456,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
 
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+			return;
+		}
+
 		if (nodeAttacher.handleActivityResult(requestCode, resultCode, intent, this)) {
 			return;
 		}
@@ -11668,25 +11702,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
 			nC.copyNodes(copyHandles, toHandle);
-		}
-		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			logDebug("REQUEST_CODE_SELECT_LOCAL_FOLDER");
-
-			if (intent == null) {
-				logWarning("Intent NULL");
-				return;
-			}
-
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			logDebug("Size: " + size);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			logDebug("Hashes size: " + hashes.length);
-
-			boolean highPriority = intent.getBooleanExtra(HIGH_PRIORITY_TRANSFER, false);
-
-			nC.checkSizeBeforeDownload(parentPath,url, size, hashes, highPriority);
 		}
 		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
 			logDebug("Resfresh DONE");

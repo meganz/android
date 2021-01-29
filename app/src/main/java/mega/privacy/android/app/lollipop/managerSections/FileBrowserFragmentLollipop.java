@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,13 +181,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			List<MegaNode> documents = adapter.getSelectedNodes();
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
+					((ManagerActivityLollipop) context).saveNodesToDevice(
+							documents, false, false, false, false);
 
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, false);
 					clearSelections();
 					hideMultipleSelect();
 					break;
@@ -769,10 +766,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					logWarning("itemClick:noAvailableIntent");
 					((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.intent_not_available), -1);
 
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(node.getHandle());
-					NodeController nC = new NodeController(context);
-					nC.prepareForDownload(handleList, true);
+					((ManagerActivityLollipop) context).saveNodesToDevice(
+							Collections.singletonList(node),
+							true, false, false, false);
 				}
 			}
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
@@ -818,10 +814,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 							if (isIntentAvailable(context, intent)){
 								startActivity(intent);
 							} else {
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(node.getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList, true);
+								((ManagerActivityLollipop) context).saveNodesToDevice(
+										Collections.singletonList(node),
+										true, false, false, false);
 							}
 						}
 					}
@@ -838,10 +833,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					if (isIntentAvailable(context, intent)) {
 						startActivity(intent);
 					} else {
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(node.getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ManagerActivityLollipop) context).saveNodesToDevice(
+								Collections.singletonList(node),
+								true, false, false, false);
 					}
 				} finally {
 					// close the file.
@@ -852,10 +846,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					}
 				}
 			} else {
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(node.getHandle());
-				NodeController nC = new NodeController(context);
-				nC.prepareForDownload(handleList, true);
+				((ManagerActivityLollipop) context).saveNodesToDevice(
+						Collections.singletonList(node),
+						true, false, false, false);
 			}
 		} else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
 			logDebug("itemClick:isFile:isPdf");
@@ -906,18 +899,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			} else {
 				Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(node.getHandle());
-				NodeController nC = new NodeController(context);
-				nC.prepareForDownload(handleList, true);
+				((ManagerActivityLollipop) context).saveNodesToDevice(
+						Collections.singletonList(node),
+						true, false, false, false);
 			}
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else {
 			logDebug("itemClick:isFile:otherOption");
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(node.getHandle());
-			NodeController nC = new NodeController(context);
-			nC.prepareForDownload(handleList, true);
+			((ManagerActivityLollipop) context).saveNodesToDevice(
+					Collections.singletonList(node),
+					true, false, false, false);
 		}
 	}
 

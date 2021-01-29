@@ -25,7 +25,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -307,10 +306,7 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun download(handle: Long) {
-        val handleList = ArrayList<Long>()
-        handleList.add(handle)
-        val nC = NodeController(activity)
-        nC.prepareForDownload(handleList, true)
+        callManager { it.saveHandlesToDevice(listOf(handle), true, false, false, false) }
     }
 
     override fun onDestroy() {

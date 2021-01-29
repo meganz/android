@@ -51,8 +51,8 @@ class CuActionModeCallback implements ActionMode.Callback {
         switch (item.getItemId()) {
             case R.id.cab_menu_download:
                 mViewModel.clearSelection();
-                new NodeController(mContext)
-                        .prepareForDownload(getDocumentHandles(documents), false);
+                ((ManagerActivityLollipop) mContext)
+                        .saveNodesToDevice(documents, false, false, false, false);
                 break;
             case R.id.cab_menu_copy:
                 mViewModel.clearSelection();

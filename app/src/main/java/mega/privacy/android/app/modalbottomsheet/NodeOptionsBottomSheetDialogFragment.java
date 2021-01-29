@@ -20,6 +20,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
@@ -992,7 +993,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         switch (v.getId()) {
             case R.id.option_download_layout:
-                nC.prepareForDownload(handleList, false);
+                ((ManagerActivityLollipop) context).saveNodesToDevice(
+                        Collections.singletonList(node), false, false, false, false);
                 break;
 
             case R.id.option_favourite_layout:

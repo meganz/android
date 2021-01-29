@@ -12,9 +12,11 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.CopyNodeListener
 import mega.privacy.android.app.listeners.MoveNodeListener
 import mega.privacy.android.app.listeners.RenameNodeListener
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -22,6 +24,20 @@ import java.util.*
 
 class MegaNodeUtilKt {
     companion object {
+
+        /**
+         * Start FileExplorerActivityLollipop to select move folder.
+         *
+         * @param activity current Android activity
+         * @param handles handles to move
+         */
+        @JvmStatic
+        fun selectMoveFolder(activity: Activity, handles: LongArray) {
+            val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
+            intent.action = FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER
+            intent.putExtra(INTENT_EXTRA_KEY_MOVE_FROM, handles)
+            activity.startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER)
+        }
 
         /**
          * Handle activity result of REQUEST_CODE_SELECT_MOVE_FOLDER.
@@ -66,6 +82,25 @@ class MegaNodeUtilKt {
             }
 
             return result
+        }
+
+        /**
+         * Start FileExplorerActivityLollipop to select copy folder.
+         *
+         * @param activity current Android activity
+         * @param handles handles to copy
+         */
+        @JvmStatic
+        fun selectCopyFolder(activity: Activity, handles: LongArray) {
+            if (MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+                AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                return
+            }
+
+            val intent = Intent(activity, FileExplorerActivityLollipop::class.java)
+            intent.action = FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER
+            intent.putExtra(INTENT_EXTRA_KEY_COPY_FROM, handles)
+            activity.startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER)
         }
 
         /**

@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,7 +145,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
 
             switch (item.getItemId()) {
                 case R.id.cab_menu_download:
-                    nC.prepareForDownload(handleList, false);
+                    managerActivity.saveNodesToDevice(selected, false, false, false, false);
                     hideActionMode();
                     break;
 
@@ -682,10 +683,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
         }
 
-        ArrayList<Long> handleList = new ArrayList<>();
-        handleList.add(node.getHandle());
-        NodeController nC = new NodeController(context);
-        nC.prepareForDownload(handleList, true);
+        managerActivity.saveNodesToDevice(Collections.singletonList(node), true, false, false, false);
     }
 
     private int getIntentOrder(int fragmentAdapter) {

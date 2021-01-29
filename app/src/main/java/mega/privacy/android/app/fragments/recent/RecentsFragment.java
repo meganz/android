@@ -29,6 +29,7 @@ import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import kotlin.Pair;
@@ -46,7 +47,6 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
@@ -434,10 +434,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             return;
         }
 
-        ArrayList<Long> handleList = new ArrayList<Long>();
-        handleList.add(node.getHandle());
-        NodeController nC = new NodeController(context);
-        nC.prepareForDownload(handleList, true);
+        ((ManagerActivityLollipop) context).saveNodesToDevice(Collections.singletonList(node),
+                true, false, false, false);
     }
 
     public void setBucketSelected(MegaRecentActionBucket bucketSelected) {

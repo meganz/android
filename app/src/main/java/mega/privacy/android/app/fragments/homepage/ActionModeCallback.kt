@@ -32,7 +32,7 @@ class ActionModeCallback constructor(
 
         when (item.itemId) {
             R.id.cab_menu_download -> {
-                NodeController(mainActivity).prepareForDownload(nodesHandles, false)
+                mainActivity.saveNodesToDevice(selectedNodes, false, false, false, false)
             }
             R.id.cab_menu_copy -> {
                 NodeController(mainActivity).chooseLocationToCopyNodes(nodesHandles)
