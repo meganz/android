@@ -71,7 +71,10 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
 
         thirdPartyCookiesPreference.summary =
-            getString(R.string.preference_cookies_thirdparty_summary).toSpannedHtmlText()
+            getString(R.string.preference_cookies_thirdparty_summary)
+                .replace("[B]", "<b>")
+                .replace("[/B]", "</b>")
+                .toSpannedHtmlText()
         thirdPartyCookiesPreference.setOnSummaryClickListener {
             showThirdPartyInfoDialog()
         }
