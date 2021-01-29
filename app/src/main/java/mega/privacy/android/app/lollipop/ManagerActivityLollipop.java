@@ -10511,35 +10511,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationClearChat(final MegaChatListItem c){
-		logDebug("showConfirmationClearChat");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						logDebug("Clear chat!");
-//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
-						logDebug("Clear history selected!");
-						ChatController chatC = new ChatController(managerActivity);
-						chatC.clearHistory(c.getChatId());
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		String message= getResources().getString(R.string.confirmation_clear_group_chat);
-		builder.setTitle(R.string.title_confirmation_clear_group_chat);
-		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void showConfirmationResetPasswordFromMyAccount (){
 		logDebug("showConfirmationResetPasswordFromMyAccount");
 
@@ -12934,17 +12905,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logDebug("onRequestFinish(CHAT): " + request.getRequestString()+"_"+e.getErrorCode());
 
-		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-			logDebug("Truncate history request finish.");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
-				logError("Error clearing history: "+e.getErrorString());
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			logDebug("Create chat request finish");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
 		}

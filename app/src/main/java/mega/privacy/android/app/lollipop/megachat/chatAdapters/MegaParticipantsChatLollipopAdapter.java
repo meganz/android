@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -37,6 +38,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -152,7 +154,8 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         private TextView privateText;
         private View privateSeparator;
         private RelativeLayout sharedFilesLayout;
-        private RelativeLayout clearChatLayout;
+        private RelativeLayout manageChatLayout;
+        private TextView retentionTimeText;
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
         private View dividerLeaveLayout;
@@ -217,8 +220,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 holderHeader.sharedFilesLayout.setOnClickListener(this);
 
                 //Clear chat Layout
-                holderHeader.clearChatLayout = v.findViewById(R.id.chat_group_contact_properties_clear_layout);
-                holderHeader.clearChatLayout.setOnClickListener(this);
+                holderHeader.manageChatLayout =  v.findViewById(R.id.manage_chat_history_group_info_layout);
+                holderHeader.manageChatLayout.setOnClickListener(this);
+                holderHeader.retentionTimeText =  v.findViewById(R.id.manage_chat_history_group_info_subtitle);
+                holderHeader.retentionTimeText.setVisibility(View.GONE);
                 holderHeader.dividerClearLayout = v.findViewById(R.id.divider_clear_layout);
 
                 //Archive chat Layout
@@ -324,7 +329,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     holderHeader.chatLinkSeparator.setVisibility(View.GONE);
                     holderHeader.privateLayout.setVisibility(View.GONE);
                     holderHeader.privateSeparator.setVisibility(View.GONE);
-                    holderHeader.clearChatLayout.setVisibility(View.GONE);
+                    holderHeader.manageChatLayout.setVisibility(View.GONE);
                     holderHeader.dividerClearLayout.setVisibility(View.GONE);
                     holderHeader.archiveChatLayout.setVisibility(View.GONE);
                     holderHeader.archiveChatSeparator.setVisibility(View.GONE);
@@ -337,7 +342,7 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                     if (getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR) {
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
-                        holderHeader.clearChatLayout.setVisibility(View.VISIBLE);
+                        holderHeader.manageChatLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerLeaveLayout.setVisibility(View.VISIBLE);
                         holderHeader.privateLayout.setVisibility(View.VISIBLE);
                         holderHeader.privateSeparator.setVisibility(View.VISIBLE);
@@ -364,10 +369,12 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                                 holderHeader.privateLayout.setOnClickListener(null);
                             }
                         }
+
+                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()));
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
                         holderHeader.dividerClearLayout.setVisibility(View.GONE);
-                        holderHeader.clearChatLayout.setVisibility(View.GONE);
+                        holderHeader.manageChatLayout.setVisibility(View.GONE);
                         holderHeader.privateLayout.setVisibility(View.GONE);
                         holderHeader.privateSeparator.setVisibility(View.GONE);
 
@@ -604,8 +611,11 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                 groupChatInfoActivity.showConfirmationLeaveChat();
                 break;
 
-            case R.id.chat_group_contact_properties_clear_layout:
-                groupChatInfoActivity.showConfirmationClearChat();
+            case R.id.manage_chat_history_group_info_layout:
+                Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
+                intentManageChat.putExtra(CHAT_ID, chatId);
+                intentManageChat.putExtra(IS_FROM_CONTACTS, false);
+                groupChatInfoActivity.startActivity(intentManageChat);
                 break;
 
             case R.id.chat_group_contact_properties_archive_layout:
@@ -677,6 +687,18 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
         int positionInAdapter = getParticipantPositionInAdapter(positionInArray);
         if (listFragment.findViewHolderForAdapterPosition(positionInAdapter) instanceof MegaParticipantsChatLollipopAdapter.ViewHolderParticipantsList) {
             notifyItemChanged(positionInAdapter);
+        }
+    }
+
+    /**
+     * Method for updating the text indicating the retention time.
+     *
+     * @param seconds The retention time.
+     */
+    public void updateRetentionTimeUI(long seconds) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            updateRetentionTimeLayout(holderHeader.retentionTimeText, seconds);
         }
     }
 

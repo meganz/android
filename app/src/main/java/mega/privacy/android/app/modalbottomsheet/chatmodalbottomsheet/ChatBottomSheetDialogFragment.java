@@ -277,7 +277,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
             case R.id.chat_list_clear_history_chat_layout:
                 logDebug("Clear chat - Chat ID: " + chat.getChatId());
-                ((ManagerActivityLollipop) context).showConfirmationClearChat(chat);
+                showConfirmationClearChat(((ManagerActivityLollipop) context), megaChatApi.getChatRoom(chat.getChatId()));
                 break;
 
             case R.id.chat_list_mute_chat_layout:
