@@ -1,5 +1,6 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.service.ads
 
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.*
@@ -19,7 +20,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
     private const val SLOT_NUM = 5
 
     // Ad Flag (see API doc)
-    private const val AD_FLAG = 512
+    private const val AD_FLAG = 0
 
     // The time threshold for requiring a new fetch/query
     private const val TIME_THRESHOLD = TimeUtils.HOUR * 6

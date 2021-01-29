@@ -38,8 +38,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.doubleclick.PublisherAdView;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,9 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -69,6 +65,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -126,12 +123,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 
-	boolean allFiles = true;
 	String downloadLocationDefaultPath;
     
     private int placeholderCount;
 
-	private PublisherAdView adView;
     private RelativeLayout transferOverQuotaBanner;
     private TextView transferOverQuotaBannerText;
 

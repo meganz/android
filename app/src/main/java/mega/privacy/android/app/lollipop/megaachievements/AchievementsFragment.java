@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
@@ -21,13 +20,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import mega.privacy.android.app.BaseActivity;
-import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 

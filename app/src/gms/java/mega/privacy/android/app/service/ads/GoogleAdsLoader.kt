@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.service.ads
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -66,7 +66,7 @@ class GoogleAdsLoader(
 
             val adWidth = (adWidthPixels / density).toInt()
             return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-                MegaApplication.getInstance(),
+                context,
                 adWidth
             )
         }
@@ -113,7 +113,7 @@ class GoogleAdsLoader(
         this.adUnitId = adUnitId
 
         adViewContainer.removeAllViews()
-        adView = AdManagerAdView(MegaApplication.getInstance())
+        adView = AdManagerAdView(context)
         adView?.adListener = object : AdListener() {
             override fun onAdLoaded() {
                 showedAdUnitId = this@GoogleAdsLoader.adUnitId

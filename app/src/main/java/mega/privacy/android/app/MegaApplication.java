@@ -39,8 +39,6 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -75,6 +73,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.service.ads.AdsLibInitializer;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -747,7 +746,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
 
-		boolean staging = false;
+		boolean staging = true;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null && attrs.getStaging() != null) {
@@ -833,7 +832,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		Fresco.initialize(this);
 
-		MobileAds.initialize(this);
+		AdsLibInitializer.INSTANCE.init(this);
 	}
 
 	public void askForFullAccountInfo(){

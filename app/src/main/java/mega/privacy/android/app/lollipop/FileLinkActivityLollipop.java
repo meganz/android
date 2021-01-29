@@ -41,7 +41,6 @@ import java.io.File;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
@@ -49,6 +48,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;

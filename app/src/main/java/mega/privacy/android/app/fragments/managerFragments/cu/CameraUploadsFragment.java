@@ -12,13 +12,13 @@ import android.os.Handler;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListAdapter;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -28,14 +28,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Locale;
 
-import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.GoogleAdsLoader;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -49,6 +48,7 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaNode;
 
