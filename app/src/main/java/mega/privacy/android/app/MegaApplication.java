@@ -746,7 +746,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
 
-		boolean staging = true;
+		boolean staging = false;
 		if (dbH != null) {
 			MegaAttributes attrs = dbH.getAttributes();
 			if (attrs != null && attrs.getStaging() != null) {
