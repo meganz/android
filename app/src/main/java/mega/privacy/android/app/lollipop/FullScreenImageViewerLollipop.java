@@ -41,7 +41,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -63,7 +62,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
@@ -145,7 +143,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	Toolbar tB;
 	ActionBar aB;
 
-	private boolean isGetLink = false;
 	float scaleText;
 
 	Context context;
@@ -167,7 +164,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	private int positionG;
 	private ArrayList<Long> imageHandles;
-	private boolean fromShared = false;
 	private RelativeLayout fragmentContainer;
 	private TextView fileNameTextView;
 	private MenuItem getlinkIcon;
@@ -181,8 +177,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private MenuItem removeIcon;
 	private MenuItem removelinkIcon;
 	private MenuItem chatIcon;
-
-	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
 	MegaOffline currentNode;
 
@@ -202,7 +196,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 
-
 	MegaNode node;
 
 	int typeExport = -1;
@@ -210,7 +203,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	boolean shareIt = true;
 	boolean moveToRubbish = false;
 
-	private static int EDIT_TEXT_ID = 1;
 	private Handler handler;
 
 	private androidx.appcompat.app.AlertDialog renameDialog;
@@ -218,16 +210,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	int orderGetChildren = ORDER_DEFAULT_ASC;
 
 	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
 
 	boolean isFolderLink = false;
 
-	ArrayList<Long> handleListM = new ArrayList<Long>();
-
 	ArrayList<MegaOffline> mOffList;
 	ArrayList<MegaOffline> mOffListImages;
-	String pathImage;
-
 
 	public DraggableView draggableView;
 	public static int screenHeight;
@@ -767,7 +754,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						// don't have this option
 						break;
 					case FILE_LINK_ADAPTER:
-						nodeSaver.saveNode(currentDocument, false, false, true, false);
+						nodeSaver.saveNode(currentDocument, false, false, true, true);
 						break;
 					default:
 						nodeSaver.saveNode(node, false, isFolderLink, true, false);
@@ -913,7 +900,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		imageHandles = new ArrayList<>();
 		paths = new ArrayList<>();
 		parentNodeHandle = intent.getLongExtra("parentNodeHandle", INVALID_HANDLE);
-		fromShared = intent.getBooleanExtra("fromShared", false);
 		MegaNode parentNode;
 		bottomLayout = findViewById(R.id.image_viewer_layout_bottom);
 
@@ -1959,13 +1945,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 	}
 
-	public void setIsGetLink(boolean value){
-		logDebug("Value: " + value);
-
-		this.isGetLink = value;
-	}
-
-
 	//Display keyboard
 	private void showKeyboardDelayed(final View view) {
 		logDebug("showKeyboardDelayed");
@@ -2160,11 +2139,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			return;
 		}
 
-		if (intent == null) {
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
 			return;
 		}
 
-		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+		if (intent == null) {
 			return;
 		}
 
@@ -2272,102 +2251,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
-
-	public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-        logDebug("askSizeConfirmationBeforeDownload");
-
-		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long [] hashesC = hashes;
-		final long sizeC=size;
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskSizeDownload("false");
-						}
-						if(nC==null){
-							nC = new NodeController(fullScreenImageViewer, isFolderLink);
-						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
-
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-        logDebug("askConfirmationNoAppInstaledBeforeDownload");
-
-		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long [] hashesC = hashes;
-		final long sizeC=size;
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskNoAppDownload("false");
-						}
-						if(nC==null){
-							nC = new NodeController(fullScreenImageViewer, isFolderLink);
-						}
-						nC.download(parentPathC,urlC, sizeC, hashesC, highPriority);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskNoAppDownload("false");
-				}
-			}
-		});
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
 
 	public void touchImage() {
 		logDebug("touchImage");

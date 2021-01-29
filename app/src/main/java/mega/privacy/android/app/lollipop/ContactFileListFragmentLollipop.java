@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -47,7 +48,6 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -117,12 +117,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
 			switch (item.getItemId()) {
 				case R.id.cab_menu_download: {
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i = 0; i < documents.size(); i++) {
-						handleList.add(documents.get(i).getHandle());
-					}
-
-					((ContactFileListActivityLollipop)context).onFileClick(handleList);
+					((ContactFileListActivityLollipop)context).downloadFile(documents);
 					break;
 				}
 				case R.id.cab_menu_copy: {
@@ -643,9 +638,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						else{
 							((ContactFileListActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getResources().getString(R.string.intent_not_available));
 							adapter.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(contactNodes.get(position).getHandle());
-							((ContactFileListActivityLollipop)context).onFileClick(handleList);
+							((ContactFileListActivityLollipop)context).downloadFile(
+									Collections.singletonList(contactNodes.get(position)));
 						}
 					}
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
@@ -700,10 +694,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					else{
 						Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(contactNodes.get(position).getHandle());
-						NodeController nC = new NodeController(context);
-						nC.prepareForDownload(handleList, true);
+						((ContactFileListActivityLollipop)context).downloadFile(
+								Collections.singletonList(contactNodes.get(position)));
 					}
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
@@ -751,10 +743,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 										startActivity(intent);
 									}
 									else{
-										ArrayList<Long> handleList = new ArrayList<Long>();
-										handleList.add(contactNodes.get(position).getHandle());
-										NodeController nC = new NodeController(context);
-										nC.prepareForDownload(handleList, true);
+										((ContactFileListActivityLollipop)context).downloadFile(
+												Collections.singletonList(contactNodes.get(position)));
 									}
 								}
 							}
@@ -772,10 +762,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 								startActivity(intent);
 							}
 							else{
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(contactNodes.get(position).getHandle());
-								NodeController nC = new NodeController(context);
-								nC.prepareForDownload(handleList, true);
+								((ContactFileListActivityLollipop)context).downloadFile(
+										Collections.singletonList(contactNodes.get(position)));
 							}
 
 						} finally {
@@ -788,16 +776,14 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 						}
 					}
 					else {
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(contactNodes.get(position).getHandle());
-						((ContactFileListActivityLollipop)context).onFileClick(handleList);
+						((ContactFileListActivityLollipop)context).downloadFile(
+								Collections.singletonList(contactNodes.get(position)));
 					}
 				}
 				else {
 					adapter.notifyDataSetChanged();
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(contactNodes.get(position).getHandle());
-					((ContactFileListActivityLollipop)context).onFileClick(handleList);
+					((ContactFileListActivityLollipop)context).downloadFile(
+							Collections.singletonList(contactNodes.get(position)));
 				}
 			}
 		}

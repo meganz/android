@@ -1,20 +1,16 @@
 package mega.privacy.android.app.lollipop;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -25,9 +21,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
@@ -37,17 +31,20 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -65,7 +62,8 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
+public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener,
+		SnackbarShower {
 
 	private static final String TAG_DECRYPT = "decrypt";
 
@@ -77,7 +75,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
     ActionBar aB;
 	DisplayMetrics outMetrics;
 	String url;
-	Handler handler;
 	ProgressDialog statusDialog;
 
 	File previewFile = null;
@@ -95,16 +92,12 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	RelativeLayout iconViewLayout;
 	RelativeLayout imageViewLayout;
 
-	ScrollView scrollView;
 	TextView sizeTextView;
 	TextView importButton;
 	TextView downloadButton;
 	Button buttonPreviewContent;
-	LinearLayout optionsBar;
 	MegaNode document = null;
-	RelativeLayout infoLayout;
 	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
 
@@ -115,13 +108,18 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 	private String mKey;
 
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null)
 		{
 			megaApi.removeRequestListener(this);
 		}
-		
+
+		nodeSaver.destroy();
+
 		super.onDestroy();
 	}
 	
@@ -134,11 +132,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		Display display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = getScaleW(outMetrics, density);
-	    float scaleH = getScaleH(outMetrics, density);
-		
+
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -176,6 +170,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				finish();
 				return;
 			}
+		}
+
+		if (savedInstanceState != null) {
+			nodeSaver.restoreState(savedInstanceState);
 		}
 
 		setContentView(R.layout.activity_file_link);
@@ -239,6 +237,13 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		else{
 			logWarning("url NULL");
 		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		nodeSaver.saveState(outState);
 	}
 
 	@Override
@@ -604,8 +609,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		switch(v.getId()){
 			case R.id.file_link_button_download:{
-				NodeController nC = new NodeController(this);
-				nC.downloadFileLink(document, url);
+				nodeSaver.saveNode(document, false, false, false, true);
 				break;
 			}
 			case R.id.file_link_button_import:{
@@ -786,18 +790,12 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		if (intent == null) {
 			return;
 		}
-		
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			logDebug("Local folder selected");
-			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
-			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
-			logDebug("URL: " + url + ", SIZE: " + size);
 
-			NodeController nC = new NodeController(this);
-			nC.downloadTo(document, parentPath, url);
-        } else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+			return;
+		}
+
+		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if (!isOnline(this)) {
 				try {
 					statusDialog.dismiss();
@@ -845,13 +843,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, fragmentContainer, s);
 	}
-	
-	@SuppressLint("NewApi") 
-	public void downloadWithPermissions(){
-	    logDebug("downloadWithPermissions");
-        NodeController nC = new NodeController(this);
-        nC.downloadFileLink(document, url);
-	}
 
 	public void successfulCopy(){
 		if (getIntent() != null && getIntent().getBooleanExtra(OPENED_FROM_CHAT, false)) {
@@ -878,15 +869,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode){
-        	case REQUEST_WRITE_STORAGE:{
-		        boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (hasStoragePermission) {
-					downloadWithPermissions();
-				}
-	        	break;
-	        }
-        }
+
+        nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
 	public void errorOverquota() {
@@ -912,5 +896,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	@Override
 	public void onDialogNegativeClick() {
 		finish();
+	}
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, fragmentContainer, content, chatId);
 	}
 }

@@ -260,12 +260,7 @@ public class ContactSharedFolderFragment extends ContactFileBaseFragment {
             
             switch (item.getItemId()) {
                 case R.id.cab_menu_download: {
-                    ArrayList<Long> handleList = new ArrayList<Long>();
-                    for (int i = 0; i < documents.size(); i++) {
-                        handleList.add(documents.get(i).getHandle());
-                    }
-                    
-                    ((ContactInfoActivityLollipop)context).onFileClick(handleList);
+                    ((ContactInfoActivityLollipop)context).downloadFile(documents);
                     break;
                 }
                 case R.id.cab_menu_copy: {

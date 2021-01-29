@@ -6,10 +6,10 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_COPY_FOLDER
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_MOVE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeUtilKt
 
 /**
@@ -19,13 +19,6 @@ class AudioPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
 
     private val _itemToRemove = MutableLiveData<Long>()
     val itemToRemove: LiveData<Long> = _itemToRemove
-
-    private var nodeAttacher: MegaAttacher? = null
-
-    fun attachNodeToChats(handle: Long, activityLauncher: ActivityLauncher) {
-        nodeAttacher = MegaAttacher(activityLauncher)
-        nodeAttacher?.attachNode(handle)
-    }
 
     /**
      * Handle activity result.
@@ -48,9 +41,6 @@ class AudioPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
         }
 
         when (requestCode) {
-            REQUEST_CODE_SELECT_CHAT -> {
-                nodeAttacher?.handleActivityResult(requestCode, resultCode, data, snackbarShower)
-            }
             REQUEST_CODE_SELECT_MOVE_FOLDER -> {
                 val handles = MegaNodeUtilKt.handleSelectMoveFolderResult(
                     requestCode, resultCode, data, snackbarShower
@@ -66,9 +56,5 @@ class AudioPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
                 )
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
     }
 }

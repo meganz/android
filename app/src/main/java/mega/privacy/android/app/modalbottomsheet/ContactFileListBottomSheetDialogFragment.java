@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -233,9 +234,9 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         switch (v.getId()) {
             case R.id.option_download_layout:
                 if (context instanceof ContactFileListActivityLollipop) {
-                    contactFileListActivity.onFileClick(handleList);
+                    contactFileListActivity.downloadFile(Collections.singletonList(node));
                 } else if (context instanceof ContactInfoActivityLollipop) {
-                    contactInfoActivity.onFileClick(handleList);
+                    contactInfoActivity.downloadFile(Collections.singletonList(node));
                 }
                 break;
 

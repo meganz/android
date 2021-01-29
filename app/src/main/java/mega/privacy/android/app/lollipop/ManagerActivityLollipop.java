@@ -86,7 +86,6 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.Chronometer;
 import android.widget.EditText;
@@ -203,7 +202,6 @@ import mega.privacy.android.app.lollipop.managerSections.UpgradeAccountFragmentL
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
@@ -404,7 +402,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	MegaContactRequest selectedRequest;
 
 	public long selectedChatItemId;
-//	String fullNameChat;
 
 	private BadgeDrawerArrowDrawable badgeDrawable;
 
@@ -416,10 +413,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	FloatingActionButton thirdFabButtonChat;
 	private Animation openFabAnim,closeFabAnim,rotateLeftAnim,rotateRightAnim, collectionFABLayoutOut;
 	boolean isFabOpen=false;
-	//
 
 	MegaPreferences prefs = null;
-	ChatSettings chatSettings = null;
 	MegaAttributes attr = null;
 	static ManagerActivityLollipop managerActivity = null;
 	MegaApplication app = null;
@@ -429,7 +424,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	DisplayMetrics outMetrics;
     float scaleText;
 	FragmentContainerView fragmentContainer;
-//	boolean tranfersPaused = false;
     ActionBar aB;
     AppBarLayout abL;
 	private AppBarLayout toolbarLayout;
@@ -561,7 +555,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	BottomNavigationViewEx bNV;
 	NavigationView nV;
 	RelativeLayout usedSpaceLayout;
-    RelativeLayout accountInfoFrame;
 	private EmojiTextView nVDisplayName;
 	TextView nVEmail;
 	TextView businessLabel;
@@ -602,7 +595,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public boolean textSubmitted = false;
 	public boolean textsearchQuery = false;
 	boolean isSearching = false;
-	ArrayList<MegaNode> searchNodes;
 	public int levelsSearch = -1;
 	boolean openLink = false;
 
@@ -612,18 +604,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public int orderContacts = ORDER_DEFAULT_ASC;
 	public int orderOthers = ORDER_DEFAULT_ASC;
 	public int orderCamera = MegaApiJava.ORDER_MODIFICATION_DESC;
-//	private int orderOffline = MegaApiJava.ORDER_DEFAULT_ASC;
-//	private int orderOutgoing = MegaApiJava.ORDER_DEFAULT_ASC;
-//	private int orderIncoming = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean firstLogin = false;
 	private boolean askPermissions = false;
-	private boolean isGetLink = false;
 	private boolean isClearRubbishBin = false;
 	private boolean moveToRubbish = false;
 	private boolean restoreFromRubbish = false;
 
-	private List<ShareInfo> filePreparedInfos;
 	boolean megaContacts = true;
 	String feedback;
 
@@ -634,15 +621,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
 	}
 
-	//	private boolean isListCloudDrive = true;
-//	private boolean isListOffline = true;
-//	private boolean isListRubbishBin = true;
 	public boolean isSmallGridCameraUploads = false;
 
-	//	private boolean isListInbox = true;
-//	private boolean isListContacts = true;
-//	private boolean isListIncoming = true;
-//	private boolean isListOutgoing = true;
 	public boolean passwordReminderFromMyAccount = false;
 
 	public boolean isList = true;
@@ -710,11 +690,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean openLinkDialogIsErrorShown = false;
 	private AlertDialog alertNotPermissionsUpload;
 	private AlertDialog clearRubbishBinDialog;
-	private AlertDialog downloadConfirmationDialog;
 	private AlertDialog insertPassDialog;
 	private AlertDialog changeUserAttributeDialog;
-	private AlertDialog generalDialog;
-	private AlertDialog alertDialogTransferOverquota;
 	private AlertDialog alertDialogStorageStatus;
 	private AlertDialog alertDialogSMSVerification;
 
@@ -722,7 +699,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private MenuItem gridSmallLargeMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem addMenuItem;
-//	private MenuItem pauseRestartTransfersItem;
 	private MenuItem createFolderMenuItem;
 	private MenuItem importLinkMenuItem;
 	private MenuItem enableSelectMenuItem;
@@ -6533,7 +6509,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_manager, menu);
 
-		final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 		searchMenuItem = menu.findItem(R.id.action_search);
 		searchMenuItem.setIcon(mutateIcon(this, R.drawable.ic_menu_search, R.color.black));
 
@@ -8291,143 +8266,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     	showSnackbar(type, fragmentContainer, content, chatId);
 	}
 
-	public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-        logDebug("askConfirmationNoAppInstaledBeforeDownload");
-
-		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long [] hashesC = hashes;
-		final long sizeC=size;
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-		builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskNoAppDownload("false");
-						}
-						nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskNoAppDownload("false");
-				}
-			}
-		});
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
-
-
-	public void askSizeConfirmationBeforeDownload(String parentPath,String url, long size, long [] hashes, final boolean highPriority){
-        logDebug("askSizeConfirmationBeforeDownload");
-
-		final String parentPathC = parentPath;
-		final String urlC = url;
-		final long [] hashesC = hashes;
-		final long sizeC=size;
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskSizeDownload("false");
-						}
-						nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
-
-	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-		logDebug("askSizeConfirmationBeforeChatDownload");
-
-		final String parentPathC = parentPath;
-		final ArrayList<MegaNode> nodeListC = nodeList;
-		final long sizeC = size;
-		final ChatController chatC = new ChatController(this);
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskSizeDownload("false");
-						}
-						chatC.download(parentPathC, nodeListC);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
-
 	public void restoreFromRubbish(final MegaNode node) {
 		logDebug("Node Handle: " + node.getHandle());
 
@@ -8653,10 +8491,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
-	}
-
-	public void setIsGetLink(boolean value){
-		this.isGetLink = value;
 	}
 
 	public void setIsClearRubbishBin(boolean value){
@@ -12754,7 +12588,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 */
 	public void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
-//		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -15250,18 +15083,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("New state: " + newState);
 		if (newState == MegaChatApi.INIT_ERROR) {
 			// chat cannot initialize, disable chat completely
-//			logDebug("newState == MegaChatApi.INIT_ERROR");
-//			if (chatSettings == null) {
-//				logDebug("1 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-//				chatSettings = new ChatSettings(false + "", true + "", "", true + "");
-//				dbH.setChatSettings(chatSettings);
-//			} else {
-//				logDebug("2 - onChatInitStateUpdate: ERROR----> Switch OFF chat");
-//				dbH.setEnabledChat(false + "");
-//			}
-//			if(megaChatApi!=null){
-//				megaChatApi.logout(null);
-//			}
 		}
 	}
 
@@ -15991,9 +15812,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				File offlineFile = new File(transfer.getOriginalPath());
 				saveOffline(offlineFile.getParentFile(), node, this, ManagerActivityLollipop.this);
 			} else {
-				long[] handleList = new long[1];
-				handleList[0] = node.getHandle();
-				nC.checkSizeBeforeDownload(transfer.getPath(), null, node.getSize(), handleList, false);
+				nodeSaver.saveNode(node, transfer.getPath());
 			}
 		} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
 			String originalPath = transfer.getOriginalPath();

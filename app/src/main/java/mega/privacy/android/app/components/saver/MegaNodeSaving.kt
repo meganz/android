@@ -8,7 +8,6 @@ import mega.privacy.android.app.*
 import mega.privacy.android.app.DownloadService.*
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
@@ -27,7 +26,7 @@ class MegaNodeSaving(
     private val isFolderLink: Boolean,
     private val nodes: List<MegaNode>,
     private val fromMediaViewer: Boolean,
-    private val fromChat: Boolean,
+    private val needSerialize: Boolean,
 ) : Saving() {
 
     override fun totalSize() = totalSize
@@ -62,7 +61,7 @@ class MegaNodeSaving(
         snackbarShower: SnackbarShower,
     ) {
         val app = MegaApplication.getInstance()
-        val megaApi = app.megaApi
+        val megaApi = if (isFolderLink) app.megaApiFolder else app.megaApi
         val dbHandler = DatabaseHandler.getDbHandler(app)
 
         var numberOfNodesAlreadyDownloaded = 0
@@ -104,7 +103,7 @@ class MegaNodeSaving(
                 val destFile = if (destDir.isDirectory) {
                     File(
                         destDir,
-                        megaApi.escapeFsIncompatible(
+                        app.megaApi.escapeFsIncompatible(
                             document.name, destDir.absolutePath + Constants.SEPARATOR
                         )
                     )
@@ -122,16 +121,17 @@ class MegaNodeSaving(
 
                     val intent = Intent(app, DownloadService::class.java)
 
-                    if (fromChat) {
+                    if (needSerialize) {
                         intent.putExtra(EXTRA_SERIALIZE_STRING, document.serialize())
                     } else {
                         intent.putExtra(EXTRA_HASH, document.handle)
                     }
 
                     if (sdCardOperator!!.isSDCardDownload) {
-                        NodeController.getDownloadToSDCardIntent(
-                            intent, path, targetPath, dbHandler.sdCardUri
-                        )
+                        intent.putExtra(EXTRA_PATH, path)
+                        intent.putExtra(EXTRA_DOWNLOAD_TO_SDCARD, true)
+                        intent.putExtra(EXTRA_TARGET_PATH, targetPath)
+                        intent.putExtra(EXTRA_TARGET_URI, dbHandler.sdCardUri)
                     } else {
                         intent.putExtra(EXTRA_PATH, path)
                     }

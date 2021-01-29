@@ -22,6 +22,7 @@ import mega.privacy.android.app.audioplayer.service.AudioPlayerService
 import mega.privacy.android.app.audioplayer.service.AudioPlayerServiceBinder
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragmentArgs
+import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.di.MegaApi
@@ -66,6 +67,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     private var serviceBound = false
     private var playerService: AudioPlayerService? = null
 
+    private val nodeAttacher = MegaAttacher(this)
     private val nodeSaver = NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
 
     private val connection = object : ServiceConnection {
@@ -108,6 +110,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
         }
 
         if (savedInstanceState != null) {
+            nodeAttacher.restoreState(savedInstanceState)
             nodeSaver.restoreState(savedInstanceState)
         }
 
@@ -142,6 +145,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
+        nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
     }
 
@@ -389,7 +393,7 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
                 return true
             }
             R.id.send_to_chat -> {
-                viewModel.attachNodeToChats(playingHandle, this)
+                nodeAttacher.attachNode(playingHandle)
                 return true
             }
             R.id.get_link -> {
@@ -481,6 +485,15 @@ class AudioPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        if (nodeAttacher.handleActivityResult(requestCode, resultCode, data, this)) {
+            return
+        }
+
+        if (nodeSaver.handleActivityResult(requestCode, resultCode, data)) {
+            return
+        }
+
         viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
     }
 

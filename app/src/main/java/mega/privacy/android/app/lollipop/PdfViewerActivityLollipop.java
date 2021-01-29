@@ -42,7 +42,6 @@ import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -75,7 +74,6 @@ import java.util.regex.Pattern;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -97,7 +95,6 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.fragments.recent.RecentsFragment;
 import mega.privacy.android.app.lollipop.managerSections.RubbishBinFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaApiAndroid;
@@ -149,15 +146,11 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     int screenWidth;
     int screenHeight;
 
-    static PdfViewerActivityLollipop pdfViewerActivityLollipop;
-
     MegaApplication app = null;
     MegaApiAndroid megaApi;
     MegaApiAndroid megaApiFolder;
     MegaChatApiAndroid megaChatApi;
-    MegaPreferences prefs = null;
 
-    private AlertDialog alertDialogTransferOverquota;
     public ProgressBar progressBar;
 
     public static boolean loading = true;
@@ -171,7 +164,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     UserCredentials credentials;
     private String lastEmail;
     DatabaseHandler dbH = null;
-    ChatSettings chatSettings;
     boolean isUrl;
     DefaultScrollHandle defaultScrollHandle;
 
@@ -206,10 +198,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     private MenuItem saveForOfflineMenuItem;
     private MenuItem chatRemoveMenuItem;
 
-    private List<ShareInfo> filePreparedInfos;
-    ArrayList<Long> handleListM = new ArrayList<Long>();
-
-    private String downloadLocationDefaultPath = "";
     private boolean renamed = false;
     private String path;
     private String pathNavigation;
@@ -219,7 +207,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
     NodeController nC;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private RelativeLayout bottomLayout;
@@ -230,7 +217,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
     String regex = "[*|\\?:\"<>\\\\\\\\/]";
     boolean moveToRubbish = false;
     ProgressDialog moveToTrashStatusDialog;
-    private boolean fromShared = false;
 
     private TextView actualPage;
     private TextView totalPages;
@@ -273,8 +259,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
         super.onCreate(savedInstanceState);
 
-        pdfViewerActivityLollipop = this;
-
         registerReceiver(receiverToFinish, new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN));
 
         final Intent intent = getIntent();
@@ -312,7 +296,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             }
         }
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
-        fromShared = intent.getBooleanExtra("fromShared", false);
         inside = intent.getBooleanExtra("inside", false);
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
@@ -703,7 +686,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             finish();
             return;
         }
-        pdfViewerActivityLollipop = this;
 
         handler = new Handler();
         if (intent.getBooleanExtra("inside", false)){
@@ -1056,7 +1038,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 nodeSaver.saveOfflineNode(node);
             }
         } else if (type == FILE_LINK_ADAPTER) {
-            nodeSaver.saveNode(currentDocument, false, false, true, false);
+            nodeSaver.saveNode(currentDocument, false, false, true, true);
         } else if (fromChat) {
             nodeSaver.saveNode(nodeChat, true, false, true, true);
         } else {
@@ -1102,7 +1084,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
                 startService(intent);
             }
-            filePreparedInfos = null;
         }
     }
 
@@ -1654,7 +1635,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         if (chatC == null){
-                            chatC = new ChatController(pdfViewerActivityLollipop);
+                            chatC = new ChatController(PdfViewerActivityLollipop.this);
                         }
                         chatC.deleteMessage(message, chatId);
                         isDeleteDialogShow = false;
@@ -1915,7 +1896,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 if (error_layout.getVisibility() == View.VISIBLE) {
                     error_layout.setVisibility(View.GONE);
                     input.getBackground().mutate().clearColorFilter();
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.accentColor), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         });
@@ -1928,7 +1909,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
                     String value = v.getText().toString().trim();
                     if (value.length() == 0) {
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_string));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -1936,7 +1917,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                     } else {
                         boolean result = matches(regex, value);
                         if (result) {
-                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                            input.getBackground().mutate().setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                             textError.setText(getString(R.string.invalid_characters));
                             error_layout.setVisibility(View.VISIBLE);
                             input.requestFocus();
@@ -1981,7 +1962,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 String value = input.getText().toString().trim();
 
                 if (value.length() == 0) {
-                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                    input.getBackground().mutate().setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                     textError.setText(getString(R.string.invalid_string));
                     error_layout.setVisibility(View.VISIBLE);
                     input.requestFocus();
@@ -1989,7 +1970,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
                 else{
                     boolean result=matches(regex, value);
                     if(result){
-                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(pdfViewerActivityLollipop, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
+                        input.getBackground().mutate().setColorFilter(ContextCompat.getColor(PdfViewerActivityLollipop.this, R.color.login_warning), PorterDuff.Mode.SRC_ATOP);
                         textError.setText(getString(R.string.invalid_characters));
                         error_layout.setVisibility(View.VISIBLE);
                         input.requestFocus();
@@ -2122,7 +2103,7 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 typeExport=TYPE_EXPORT_REMOVE;
-                megaApi.disableExport(megaApi.getNodeByHandle(handle), pdfViewerActivityLollipop);
+                megaApi.disableExport(megaApi.getNodeByHandle(handle), PdfViewerActivityLollipop.this);
             }
         });
 
@@ -2226,7 +2207,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
             final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-            final int totalMoves = moveHandles.length;
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
             moveToRubbish = false;
@@ -2254,7 +2234,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
 
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
-            final int totalCopy = copyHandles.length;
 
             ProgressDialog temp = null;
             try{
@@ -2719,146 +2698,6 @@ public class PdfViewerActivityLollipop extends PinActivityLollipop implements Me
             Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
             toast.show();
         }
-    }
-
-    public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-        logDebug("askSizeConfirmationBeforeChatDownload");
-
-        final String parentPathC = parentPath;
-        final ArrayList<MegaNode> nodeListC = nodeList;
-        final long sizeC = size;
-        final ChatController chatC = new ChatController(this);
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_save_to_device),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskSizeDownload("false");
-                        }
-                        chatC.download(parentPathC, nodeListC);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if(dontShowAgain.isChecked()){
-                    dbH.setAttrAskSizeDownload("false");
-                }
-            }
-        });
-
-        downloadConfirmationDialog = builder.create();
-        downloadConfirmationDialog.show();
-    }
-
-    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-        logDebug("askSizeConfirmationBeforeDownload");
-
-        final String parentPathC = parentPath;
-        final String urlC = url;
-        final long [] hashesC = hashes;
-        final long sizeC=size;
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-
-        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_save_to_device),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskSizeDownload("false");
-                        }
-                        if(nC==null){
-                            nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
-                        }
-                        nC.checkInstalledAppBeforeDownload(parentPathC,urlC, sizeC, hashesC, highPriority);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if(dontShowAgain.isChecked()){
-                    dbH.setAttrAskSizeDownload("false");
-                }
-            }
-        });
-
-        downloadConfirmationDialog = builder.create();
-        downloadConfirmationDialog.show();
-    }
-
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath, String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-        logDebug("askConfirmationNoAppInstaledBeforeDownload");
-
-        final String parentPathC = parentPath;
-        final String urlC = url;
-        final long [] hashesC = hashes;
-        final long sizeC=size;
-
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-        LinearLayout confirmationLayout = new LinearLayout(this);
-        confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-        final CheckBox dontShowAgain =new CheckBox(this);
-        dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-        dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-        confirmationLayout.addView(dontShowAgain, params);
-
-        builder.setView(confirmationLayout);
-
-//				builder.setTitle(getString(R.string.confirmation_required));
-        builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-        builder.setPositiveButton(getString(R.string.general_save_to_device),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskNoAppDownload("false");
-                        }
-                        if(nC==null){
-                            nC = new NodeController(pdfViewerActivityLollipop, isFolderLink);
-                        }
-                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if(dontShowAgain.isChecked()){
-                    dbH.setAttrAskNoAppDownload("false");
-                }
-            }
-        });
-        downloadConfirmationDialog = builder.create();
-        downloadConfirmationDialog.show();
     }
 
     public Uri getUri() {

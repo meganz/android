@@ -1277,12 +1277,6 @@ public class ChatController {
                 else if (context instanceof ChatFullScreenImageViewer) {
                     ((ChatFullScreenImageViewer) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
-                else if (context instanceof PdfViewerActivityLollipop) {
-                    ((PdfViewerActivityLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
-                else if (context instanceof AudioVideoPlayerLollipop) {
-                    ((AudioVideoPlayerLollipop) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
-                }
                 else if (context instanceof NodeAttachmentHistoryActivity) {
                     ((NodeAttachmentHistoryActivity) context).askSizeConfirmationBeforeChatDownload(parentPathC, nodeList, sizeC);
                 }
@@ -1539,7 +1533,10 @@ public class ChatController {
                             service.putExtra("fromMV", true);
                         }
                         if (sdCardOperator.isSDCardDownload()) {
-                            service = NodeController.getDownloadToSDCardIntent(service, path, targetPath, dbH.getSDCardUri());
+                            service.putExtra(DownloadService.EXTRA_PATH, path);
+                            service.putExtra(DownloadService.EXTRA_DOWNLOAD_TO_SDCARD, true);
+                            service.putExtra(DownloadService.EXTRA_TARGET_PATH, targetPath);
+                            service.putExtra(DownloadService.EXTRA_TARGET_URI, dbH.getSDCardUri());
                         } else {
                             service.putExtra(DownloadService.EXTRA_PATH, path);
                         }

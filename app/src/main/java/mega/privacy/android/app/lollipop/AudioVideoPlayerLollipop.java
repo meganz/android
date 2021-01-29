@@ -1,8 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -99,7 +97,6 @@ import java.util.regex.Pattern;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
@@ -148,7 +145,6 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.SearchNodesTask.getSearchedNodes;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
-import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.ARRAY_SEARCH;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -202,7 +198,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH = null;
-    private MegaPreferences prefs = null;
 
     private Handler handler;
     private Runnable runnableActionStatusBar = new Runnable() {
@@ -246,7 +241,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private RelativeLayout audioContainer;
     private long handle = -1;
-    private boolean transferOverquota = false;
 
     private boolean video = false;
     private ProgressDialog statusDialog = null;
@@ -254,13 +248,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private long currentTime;
 
     private RelativeLayout containerAudioVideoPlayer;
-
-    private Notification.Builder mBuilder;
-    private NotificationManager mNotificationManager;
-
-    private boolean isUrl;
-
-    private ArrayList<Long> handleListM = new ArrayList<Long>();
 
     private int currentPosition = 0;
     private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -282,15 +269,12 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private DraggableView draggableView;
     private ImageView ivShadow;
     private NodeController nC;
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private DisplayMetrics outMetrics;
 
     private final MegaAttacher nodeAttacher = new MegaAttacher(this);
     private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
-    private boolean fromShared = false;
-    private int typeExport = -1;
     private AlertDialog renameDialog;
     private String regex = "[*|\\?:\"<>\\\\\\\\/]";
     boolean moveToRubbish = false;
@@ -306,7 +290,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
     private FrameLayout fragmentContainer;
     private boolean onPlaylist = false;
-//    public LoopingMediaSource loopingMediaSource;
     public ConcatenatingMediaSource concatenatingMediaSource = null;
     private PlaylistFragment playlistFragment;
     private ProgressBar playlistProgressBar;
@@ -340,7 +323,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
     private List<MediaSource> mediaSourcePlaylist = new ArrayList<>();
     private int createPlayListErrorCounter = 0;
 
-    private String query;
     private File zipFile;
     private ArrayList<File> zipFiles = new ArrayList<>();
     private ArrayList<File> zipMediaFiles = new ArrayList<>();
@@ -469,7 +451,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
-        fromShared = intent.getBooleanExtra("fromShared", false);
         path = intent.getStringExtra("path");
         adapterType = getIntent().getIntExtra("adapterType", 0);
         isPlayList = intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true);
@@ -502,9 +483,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                     return;
                 }
             }
-        }
-        else if (adapterType == SEARCH_ADAPTER) {
-            query = intent.getStringExtra("searchQuery");
         }
         else if (adapterType == FROM_CHAT){
             fromChat = true;
@@ -761,13 +739,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             }
         }
         logDebug("uri: " + uri);
-
-        if (uri.toString().contains("http://")){
-            isUrl = true;
-        }
-        else {
-            isUrl = false;
-        }
 
         if (isAbHide) {
             hideActionStatusBar(0);
@@ -1333,11 +1304,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             exoPlayerName.setText(fileName);
             if (mediaUris != null && mediaUris.size() > currentWindowIndex) {
                 uri = mediaUris.get(currentWindowIndex);
-                if (uri.toString().contains("http://")) {
-                    isUrl = true;
-                } else {
-                    isUrl = false;
-                }
             }
             supportInvalidateOptionsMenu();
         }
@@ -2577,40 +2543,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
          });
      }
 
-     public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-         logDebug("Nodes: " + nodeList.size() + ", Size: " + size);
-
-         final String parentPathC = parentPath;
-         final ArrayList<MegaNode> nodeListC = nodeList;
-         final long sizeC = size;
-         final ChatController chatC = new ChatController(this);
-
-         Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
-         AlertDialog.Builder builder = pair.first;
-         CheckBox dontShowAgain = pair.second;
-
-         builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-         builder.setPositiveButton(getString(R.string.general_save_to_device),
-                 new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskSizeDownload("false");
-                        }
-                        chatC.download(parentPathC, nodeListC);
-                    }
-         });
-         builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-             public void onClick(DialogInterface dialog, int whichButton) {
-                 if(dontShowAgain.isChecked()){
-                     dbH.setAttrAskSizeDownload("false");
-                 }
-             }
-         });
-
-         downloadConfirmationDialog = builder.create();
-         downloadConfirmationDialog.show();
-    }
-
     /**
      * Create an AlertDialog.Builder with a "Do not show again" CheckBox.
      *
@@ -3077,7 +3009,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                typeExport=TYPE_EXPORT_REMOVE;
                 megaApi.disableExport(megaApi.getNodeByHandle(handle), audioVideoPlayerLollipop);
             }
         });
@@ -3139,9 +3070,11 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         if (adapterType == OFFLINE_ADAPTER) {
             nodeSaver.saveOfflineNode(mediaOffList.get(currentWindowIndex));
         } else if (adapterType == FILE_LINK_ADAPTER) {
-            nodeSaver.saveNode(currentDocument, false, false, true, false);
+            nodeSaver.saveNode(currentDocument, false, false, true, true);
         } else if (fromChat) {
             nodeSaver.saveNode(nodeChat, true, isFolderLink, true, true);
+        } else {
+            nodeSaver.saveHandle(handle, false, isFolderLink, true, false);
         }
     }
 
@@ -3457,12 +3390,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
                             uri = Uri.parse(url);
                         }
                     }
-                    if (uri.toString().contains("http://")){
-                        isUrl = true;
-                    }
-                    else {
-                        isUrl = false;
-                    }
                     supportInvalidateOptionsMenu();
                     renamed = true;
                 }
@@ -3675,44 +3602,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
         }
     }
 
-    public void askSizeConfirmationBeforeDownload(String parentPath, String url, long size, long [] hashes, final boolean highPriority){
-        logDebug("askSizeConfirmationBeforeDownload");
-
-        final String parentPathC = parentPath;
-        final String urlC = url;
-        final long [] hashesC = hashes;
-        final long sizeC=size;
-
-
-        Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
-        AlertDialog.Builder builder = pair.first;
-        CheckBox dontShowAgain = pair.second;
-
-        builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-        builder.setPositiveButton(getString(R.string.general_save_to_device),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskSizeDownload("false");
-                        }
-                        if(nC==null){
-                            nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
-                        }
-                        nC.checkInstalledAppBeforeDownload(parentPathC, urlC, sizeC, hashesC, highPriority);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if(dontShowAgain.isChecked()){
-                    dbH.setAttrAskSizeDownload("false");
-                }
-            }
-        });
-
-        downloadConfirmationDialog = builder.create();
-        downloadConfirmationDialog.show();
-    }
-
     private void startPlayback() {
         audioFocusListener = new AudioFocusListener(this);
         request = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT);
@@ -3726,42 +3615,6 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             player.setPlayWhenReady(false);
         }
         abandonAudioFocus(audioFocusListener, mAudioManager, request);
-    }
-
-    public void askConfirmationNoAppInstaledBeforeDownload (String parentPath,String url, long size, long [] hashes, String nodeToDownload, final boolean highPriority){
-        logDebug("askConfirmationNoAppInstaledBeforeDownload");
-
-        final String parentPathC = parentPath;
-        final String urlC = url;
-        final long [] hashesC = hashes;
-        final long sizeC=size;
-
-        Pair<AlertDialog.Builder, CheckBox> pair = confirmationDialog();
-        AlertDialog.Builder builder = pair.first;
-        CheckBox dontShowAgain = pair.second;
-
-        builder.setMessage(getString(R.string.alert_no_app, nodeToDownload));
-        builder.setPositiveButton(getString(R.string.general_save_to_device),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if(dontShowAgain.isChecked()){
-                            dbH.setAttrAskNoAppDownload("false");
-                        }
-                        if(nC==null){
-                            nC = new NodeController(audioVideoPlayerLollipop, isFolderLink);
-                        }
-                        nC.download(parentPathC, urlC, sizeC, hashesC, highPriority);
-                    }
-                });
-        builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if(dontShowAgain.isChecked()){
-                    dbH.setAttrAskNoAppDownload("false");
-                }
-            }
-        });
-        downloadConfirmationDialog = builder.create();
-        downloadConfirmationDialog.show();
     }
 
     @Override

@@ -62,6 +62,7 @@ class NodeSaver(
 
     private val app = MegaApplication.getInstance()
     private val megaApi = app.megaApi
+    private val megaApiFolder = app.megaApiFolder
     private val dbHandler = DatabaseHandler.getDbHandler(app)
 
     private var saving = Saving.NOTHING
@@ -107,16 +108,16 @@ class NodeSaver(
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
-     * @param fromChat whether this download is from chat
+     * @param needSerialize whether this download need serialize
      */
     fun saveHandle(
         handle: Long,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        fromChat: Boolean = false
+        needSerialize: Boolean = false
     ) {
-        saveHandles(listOf(handle), highPriority, isFolderLink, fromMediaViewer, fromChat)
+        saveHandles(listOf(handle), highPriority, isFolderLink, fromMediaViewer, needSerialize)
     }
 
     /**
@@ -126,28 +127,32 @@ class NodeSaver(
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
-     * @param fromChat whether this download is from chat
+     * @param needSerialize whether this download need serialize
      */
     fun saveHandles(
         handles: List<Long>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        fromChat: Boolean = false
+        needSerialize: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
             var totalSize = 0L
 
+            val api = if (isFolderLink) megaApiFolder else megaApi
+
             for (handle in handles) {
-                val node = megaApi.getNodeByHandle(handle)
+                val node = api.getNodeByHandle(handle)
                 if (node != null) {
                     nodes.add(node)
                     totalSize += node.size
                 }
             }
 
-            MegaNodeSaving(totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, fromChat)
+            MegaNodeSaving(
+                totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+            )
         }
     }
 
@@ -158,16 +163,16 @@ class NodeSaver(
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
-     * @param fromChat whether this download is from chat
+     * @param needSerialize whether this download need serialize
      */
     fun saveNode(
         node: MegaNode,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        fromChat: Boolean = false
+        needSerialize: Boolean = false
     ) {
-        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, fromChat)
+        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize)
     }
 
     /**
@@ -177,14 +182,14 @@ class NodeSaver(
      * @param highPriority whether this download is high priority or not
      * @param isFolderLink whether this download is a folder link
      * @param fromMediaViewer whether this download is from media viewer
-     * @param fromChat whether this download is from chat
+     * @param needSerialize whether this download need serialize
      */
     fun saveNodes(
         nodes: List<MegaNode>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        fromChat: Boolean = false
+        needSerialize: Boolean = false
     ) {
         save {
             var totalSize = 0L
@@ -193,8 +198,40 @@ class NodeSaver(
                 totalSize += node.size
             }
 
-            MegaNodeSaving(totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, fromChat)
+            MegaNodeSaving(
+                totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+            )
         }
+    }
+
+    /**
+     * Save a MegaNode into device.
+     *
+     * @param node node to save
+     * @param parentPath parent path
+     */
+    fun saveNode(node: MegaNode, parentPath: String) {
+        add(
+            Completable
+                .fromCallable(Callable {
+                    this.saving = MegaNodeSaving(
+                        node.size,
+                        highPriority = false,
+                        isFolderLink = false,
+                        nodes = listOf(node),
+                        fromMediaViewer = false,
+                        needSerialize = false
+                    )
+
+                    if (lackPermission()) {
+                        return@Callable
+                    }
+
+                    checkSizeBeforeDownload(parentPath)
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver save"))
+        )
     }
 
     /**
