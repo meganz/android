@@ -2,9 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.content.Context;
 
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -14,6 +11,8 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -69,8 +68,8 @@ public class MyAccountInfo {
 
     public ArrayList<Product> productAccounts;
 
-    private List<SkuDetails> availableSkus = new ArrayList<>();
-    private Purchase activeGooglePlaySubscription = null;
+    private List<MegaSku> availableSkus = new ArrayList<>();
+    private MegaPurchase activeSubscription = null;
 
     MegaPricing pricing;
 
@@ -143,7 +142,7 @@ public class MyAccountInfo {
             availableSkus.clear();
         }
 
-        activeGooglePlaySubscription = null;
+        activeSubscription = null;
 
         pricing = null;
 
@@ -592,30 +591,30 @@ public class MyAccountInfo {
         return shouldShowBusinessAlert;
     }
 
-    public Purchase getActiveGooglePlaySubscription() {
-        return activeGooglePlaySubscription;
+    public MegaPurchase getActiveSubscription() {
+        return activeSubscription;
     }
 
-    public void setActiveGooglePlaySubscription(Purchase activeGooglePlaySubscription) {
-        this.activeGooglePlaySubscription = activeGooglePlaySubscription;
+    public void setActiveSubscription(MegaPurchase activeSubscription) {
+        this.activeSubscription = activeSubscription;
     }
 
     public boolean isPurchasedAlready(String sku) {
-        if (activeGooglePlaySubscription == null) {
+        if (activeSubscription == null) {
             return false;
         }
-        boolean result = activeGooglePlaySubscription.getSku().equals(sku);
+        boolean result = activeSubscription.getSku().equals(sku);
         if (result) {
             logDebug(sku + " already subscribed.");
         }
         return result;
     }
 
-    public List<SkuDetails> getAvailableSkus() {
+    public List<MegaSku> getAvailableSkus() {
         return this.availableSkus;
     }
 
-    public void setAvailableSkus(List<SkuDetails> skuDetailsList) {
+    public void setAvailableSkus(List<MegaSku> skuDetailsList) {
         this.availableSkus = skuDetailsList;
     }
 

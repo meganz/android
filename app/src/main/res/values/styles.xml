@@ -209,6 +209,11 @@
         <item name="android:textColorPrimary">@color/transparent_black2</item>
     </style>
 
+    <style name="ConfirmationWarning" parent="AppCompatAlertDialogStyle">
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:textColorPrimary">@color/secondary_text</item>
+    </style>
+
     <style name="ButtonAlertDialogStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/accentColor</item>
     </style>
@@ -620,5 +625,12 @@
         <item name="android:paddingStart">32dp</item>
         <item name="android:minWidth">0dp</item>
         <item name="android:button">@drawable/selector_label</item>
+    </style>
+
+    <style name="Widget.Mega.Button.Preferences" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:textColor">@color/accentColor</item>
+        <item name="android:textAppearance">?textAppearanceCaption</item>
     </style>
 </resources>

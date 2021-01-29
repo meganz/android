@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.lollipop.FileContactListActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -41,6 +41,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -225,7 +226,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
-                nodeInfo.setText(getInfoFolder(node, context, megaApi));
+                nodeInfo.setText(getMegaNodeFolderInfo(node));
                 nodeVersionsIcon.setVisibility(View.GONE);
 
                 nodeThumb.setImageResource(getFolderIcon(node, drawerItem));
@@ -606,7 +607,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         ArrayList<MegaShare> sl = megaApi.getOutShares(node);
                         if (sl != null) {
                             if (sl.size() != 0) {
-                                nodeInfo.setText(context.getResources().getString(R.string.file_properties_shared_folder_select_contact) + " " + sl.size() + " " + context.getResources().getQuantityString(R.plurals.general_num_users, sl.size()));
+                                nodeInfo.setText(getQuantityString(R.plurals.general_num_shared_with,
+                                                sl.size(), sl.size()));
                             }
                         }
                     } else {
@@ -1148,7 +1150,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case HOMEPAGE:
-                EventNotifierKt.notifyNodesChange(false);
+                LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
                 break;
         }
     }

@@ -87,6 +87,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -362,7 +364,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			if (intent != null) {
 				position = intent.getIntExtra("position", -1);
 				adapterType = intent.getIntExtra("adapterType", 0);
-				actionType = intent.getIntExtra("actionType", -1);
+				actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
 				if (position != -1) {
 					if (adapterType == FOLDER_LINK_ADAPTER) {
@@ -528,7 +530,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		emptyTextView.setVisibility(View.GONE);
 
 		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, outMetrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());
