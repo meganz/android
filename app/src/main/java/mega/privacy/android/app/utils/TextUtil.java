@@ -1,5 +1,10 @@
 package mega.privacy.android.app.utils;
 
+import android.content.Context;
+import android.text.Spanned;
+import androidx.core.text.HtmlCompat;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -31,6 +36,37 @@ public class TextUtil {
             logWarning("Error replacing text. ", e);
         }
         return text;
+    }
+
+    /**
+     * Add the appropriate format in the chat messages.
+     *
+     * @param context Current Context object, to get a resource(for example, color) should not use application context, need to pass it from the caller.
+     * @param textToShow   The message text
+     * @param isOwnMessage If it is a sent or received message
+     * @return The formatted text
+     */
+    public static Spanned replaceFormatChatMessages(Context context, String textToShow, boolean isOwnMessage) {
+        try {
+            textToShow = textToShow.replace("[A]", "<font color=\'"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "\'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            if (isOwnMessage) {
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                        + "\'>");
+            } else {
+                textToShow = textToShow.replace("[B]", "<font color=\'"
+                        + ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary)
+                        + "\'>");
+            }
+            textToShow = textToShow.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Error replacing text. ", e);
+        }
+
+        return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     public static boolean isEmail(String str) {

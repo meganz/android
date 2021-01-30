@@ -39,6 +39,12 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
     </style>
 
+    <style name="Widget.Mega.NumberPicker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:textSize">20sp</item>
+        <item name="android:colorControlNormal">?attr/colorSecondary</item>
+        <item name="android:background">@null</item>
+    </style>
+
     <!-- Use the legacy style for TextInputLayout: https://material.io/blog/migrate-android-material-components
     colorControlActivated is the floating label, underline and cursor colors, when focused. If we
     don’t define it, it will fall back to use your colorAccent(colorSecondary for Material)
