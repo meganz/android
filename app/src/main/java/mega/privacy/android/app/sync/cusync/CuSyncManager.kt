@@ -383,7 +383,7 @@ object CuSyncManager {
 
     /**
      * Update a backup.
-     * For the values keep the same, pass invliad value to avoid to send to the server.
+     * For the values keep the same, pass invalid value to avoid to send to the server.
      * @see MegaApiJava.updateBackup
      *
      * @param backupId ID of the backup which is to be updated.
