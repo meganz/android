@@ -19,6 +19,7 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_RESUME_TRANSFERS = "INTENT_RESUME_TRANSFERS";
     public static final String BROADCAST_ACTION_TRANSFER_FINISH = "INTENT_TRANSFER_FINISH";
     public static final String BROADCAST_ACTION_REENABLE_CU_PREFERENCE = "BROADCAST_ACTION_REENABLE_CU_PREFERENCE";
+    public static final String BROADCAST_ACTION_UPDATE_HISTORY_BY_RT = "ACTION_UPDATE_HISTORY_BY_RT";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
@@ -54,6 +55,7 @@ public class BroadcastConstants {
     public static final String ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE = "ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE";
     public static final String ACTION_UPDATE_RB_SCHEDULER = "ACTION_UPDATE_RB_SCHEDULER";
     public static final String ACTION_UPDATE_FILE_VERSIONS = "ACTION_UPDATE_FILE_VERSIONS";
+    public static final String ACTION_UPDATE_RETENTION_TIME = "ACTION_UPDATE_RETENTION_TIME";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -90,4 +92,5 @@ public class BroadcastConstants {
     public static final String DAYS_COUNT = "DAYS_COUNT";
     public static final String KEY_REENABLE_WHICH_PREFERENCE = "REENABLE_WHICH_PREFERENCE";
 
+    public static final String RETENTION_TIME = "RETENTION_TIME";
 }
