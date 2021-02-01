@@ -11,6 +11,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
@@ -33,11 +35,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,8 +53,9 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
-import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -62,6 +66,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.AlertsAndWarnings;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -93,7 +98,8 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>> {
+public class NodeAttachmentHistoryActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener, MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface, StoreDataBeforeForward<ArrayList<MegaChatMessage>>,
+		SnackbarShower {
 
 	public static int NUMBER_MESSAGES_TO_LOAD = 20;
 	public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
@@ -104,9 +110,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	Toolbar tB;
 	NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
-    private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     DatabaseHandler dbH = null;
     public boolean isList = true;
+
+	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
+			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
 
 	RelativeLayout container;
 	LinearLayout linearLayoutList;
@@ -200,6 +208,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 		if (savedInstanceState != null){
 			chatId = savedInstanceState.getLong("chatId", -1);
+
+			nodeSaver.restoreState(savedInstanceState);
 		}
 
 		//Set toolbar
@@ -362,6 +372,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if (handler != null) {
 			handler.removeCallbacksAndMessages(null);
 		}
+
+		nodeSaver.destroy();
     }
 	
 	@Override
@@ -800,6 +812,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		if(chatRoom!=null){
 			outState.putLong("chatId", chatRoom.getChatId());
 		}
+
+		nodeSaver.saveState(outState);
 	}
 
 	@Override
@@ -817,6 +831,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	public void storedUnhandledData(ArrayList<MegaChatMessage> messagesSelected, ArrayList<MegaChatMessage> messagesToImport) {
 		preservedMessagesSelected = messagesSelected;
 		preservedMessagesToImport = messagesToImport;
+	}
+
+	@Override
+	public void showSnackbar(int type, @Nullable String content, long chatId) {
+		showSnackbar(type, container, content, chatId);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -865,7 +884,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 						MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
 						list.add(megaNodeList);
 					}
-					chatC.prepareForChatDownload(list);
+					nodeSaver.saveNodeLists(list, false, false, false, true);
 					break;
 				}
 				case R.id.chat_cab_menu_import:{
@@ -1069,8 +1088,21 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 	}
 
 	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+										   @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		nodeSaver.handleRequestPermissionsResult(requestCode);
+	}
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		logDebug("Result Code: " + resultCode);
+
+		if (nodeSaver.handleActivityResult(requestCode, resultCode, intent)) {
+			return;
+		}
+
 		if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
 			if(!isOnline(this) || megaApi==null) {
 				try{
@@ -1141,11 +1173,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			else {
 				logError("Error on sending to chat");
 			}
-		}
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-            logDebug("Local folder selected");
-            String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
-			chatC.prepareForDownload(intent, parentPath);
 		}
 	}
 
@@ -1549,49 +1576,6 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
 	public void showSnackbar(int type, String s){
 		showSnackbar(type, container, s);
-	}
-
-	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-		logDebug("Size: " + size);
-
-		final String parentPathC = parentPath;
-		final ArrayList<MegaNode> nodeListC = nodeList;
-		final long sizeC = size;
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskSizeDownload("false");
-						}
-						chatC.download(parentPathC, nodeListC);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
 	}
 
 	public void checkScroll () {

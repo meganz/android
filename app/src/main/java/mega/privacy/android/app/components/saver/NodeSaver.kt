@@ -23,10 +23,9 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
-import mega.privacy.android.app.utils.FileUtil.getFullPathFromTreeUri
+import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
@@ -37,7 +36,9 @@ import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import java.util.concurrent.Callable
 
 /**
@@ -95,7 +96,7 @@ class NodeSaver(
         save {
             var totalSize = 0L
             for (node in nodes) {
-                totalSize += FileUtil.getTotalSize(getOfflineFile(app, node))
+                totalSize += getTotalSize(getOfflineFile(app, node))
             }
             OfflineSaving(totalSize, nodes)
         }
@@ -176,6 +177,38 @@ class NodeSaver(
     }
 
     /**
+     * Save a list of MegaNodeList into device.
+     *
+     * @param nodeLists MegaNodeLists to save
+     * @param highPriority whether this download is high priority or not
+     * @param isFolderLink whether this download is a folder link
+     * @param fromMediaViewer whether this download is from media viewer
+     * @param needSerialize whether this download need serialize
+     */
+    fun saveNodeLists(
+        nodeLists: List<MegaNodeList>,
+        highPriority: Boolean = false,
+        isFolderLink: Boolean = false,
+        fromMediaViewer: Boolean = false,
+        needSerialize: Boolean = false
+    ) {
+        save {
+            val nodes = ArrayList<MegaNode>()
+            for (nodeList in nodeLists) {
+                val array = nodeListToArray(nodeList)
+                if (array != null) {
+                    nodes.addAll(array)
+                }
+            }
+
+            MegaNodeSaving(
+                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
+                needSerialize
+            )
+        }
+    }
+
+    /**
      * Save a list of MegaNode into device.
      *
      * @param nodes nodes to save
@@ -192,14 +225,9 @@ class NodeSaver(
         needSerialize: Boolean = false
     ) {
         save {
-            var totalSize = 0L
-
-            for (node in nodes) {
-                totalSize += node.size
-            }
-
             MegaNodeSaving(
-                totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
+                needSerialize
             )
         }
     }
@@ -230,7 +258,47 @@ class NodeSaver(
                     checkSizeBeforeDownload(parentPath)
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("NodeSaver save"))
+                .subscribe(IGNORE, logErr("NodeSaver saveNode"))
+        )
+    }
+
+    /**
+     * Download voice clip.
+     *
+     * @param nodeList voice clip to download
+     */
+    fun downloadVoiceClip(nodeList: MegaNodeList) {
+        add(
+            Completable
+                .fromCallable(Callable {
+                    val nodes = nodeListToArray(nodeList)
+                    if (nodes == null || nodes.isEmpty()) {
+                        return@Callable
+                    }
+
+                    val parentPath =
+                        buildVoiceClipFile(app, nodes[0].name)?.parentFile?.path ?: return@Callable
+
+                    val totalSize = nodesTotalSize(nodes)
+
+                    if (notEnoughSpace(parentPath, totalSize)) {
+                        return@Callable
+                    }
+
+                    val voiceClipSaving = MegaNodeSaving(
+                        totalSize,
+                        highPriority = true,
+                        isFolderLink = false,
+                        nodes = nodes,
+                        fromMediaViewer = false,
+                        needSerialize = true,
+                        isVoiceClip = true
+                    )
+
+                    voiceClipSaving.doDownload(parentPath, false, null, snackbarShower)
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(IGNORE, logErr("NodeSaver downloadVoiceClip"))
         )
     }
 
@@ -411,18 +479,36 @@ class NodeSaver(
         activityLauncher.launchActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER)
     }
 
-    private fun checkSizeBeforeDownload(parentPath: String) {
+    private fun nodesTotalSize(nodes: List<MegaNode>): Long {
+        var totalSize = 0L
+
+        for (node in nodes) {
+            totalSize += node.size
+        }
+
+        return totalSize
+    }
+
+    private fun notEnoughSpace(parentPath: String, totalSize: Long): Boolean {
         var availableFreeSpace = Long.MAX_VALUE
         try {
             val stat = StatFs(parentPath)
             availableFreeSpace = stat.availableBlocksLong * stat.blockSizeLong
         } catch (ex: Exception) {
         }
-        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: ${saving.totalSize()}")
+        logDebug("availableFreeSpace: $availableFreeSpace, totalSize: $totalSize")
 
-        if (availableFreeSpace < saving.totalSize()) {
+        if (availableFreeSpace < totalSize) {
             post { snackbarShower.showNotEnoughSpaceSnackbar() }
             logWarning("Not enough space")
+            return true
+        }
+
+        return false
+    }
+
+    private fun checkSizeBeforeDownload(parentPath: String) {
+        if (notEnoughSpace(parentPath, saving.totalSize())) {
             return
         }
 

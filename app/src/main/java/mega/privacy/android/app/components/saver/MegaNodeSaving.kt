@@ -9,7 +9,7 @@ import mega.privacy.android.app.DownloadService.*
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest
 import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
@@ -27,6 +27,7 @@ class MegaNodeSaving(
     private val nodes: List<MegaNode>,
     private val fromMediaViewer: Boolean,
     private val needSerialize: Boolean,
+    private val isVoiceClip: Boolean = false
 ) : Saving() {
 
     override fun totalSize() = totalSize
@@ -127,7 +128,12 @@ class MegaNodeSaving(
                         intent.putExtra(EXTRA_HASH, document.handle)
                     }
 
-                    if (sdCardOperator!!.isSDCardDownload) {
+                    if (isVoiceClip) {
+                        intent.putExtra(EXTRA_OPEN_FILE, false)
+                        intent.putExtra(EXTRA_TRANSFER_TYPE, APP_DATA_VOICE_CLIP)
+                    }
+
+                    if (sdCardOperator?.isSDCardDownload == true) {
                         intent.putExtra(EXTRA_PATH, path)
                         intent.putExtra(EXTRA_DOWNLOAD_TO_SDCARD, true)
                         intent.putExtra(EXTRA_TARGET_PATH, targetPath)

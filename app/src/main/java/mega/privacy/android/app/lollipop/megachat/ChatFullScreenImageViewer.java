@@ -31,7 +31,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -47,7 +46,6 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -109,7 +107,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	private boolean aBshown = true;
 
 	ProgressDialog statusDialog;
-	private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -133,7 +130,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
     private MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 
-    private ArrayList<String> paths;
 	MegaNode nodeToImport;
 
 	long [] messageIds;
@@ -142,9 +138,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	ArrayList<MegaChatMessage> messages;
 
 	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
-
-	ArrayList<Long> handleListM = new ArrayList<Long>();
 
 	boolean isDeleteDialogShow = false;
 
@@ -420,7 +413,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 		messages = new ArrayList<MegaChatMessage>();
 
 		imageHandles = new ArrayList<Long>();
-		paths = new ArrayList<String>();
 
 		if(messageIds==null){
 			return;
@@ -608,50 +600,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			}
 		}
 	}
-
-	public void askSizeConfirmationBeforeChatDownload(String parentPath, ArrayList<MegaNode> nodeList, long size){
-		logDebug("Size: " + size);
-
-		final String parentPathC = parentPath;
-		final ArrayList<MegaNode> nodeListC = nodeList;
-		final long sizeC = size;
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		LinearLayout confirmationLayout = new LinearLayout(this);
-		confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(10, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final CheckBox dontShowAgain =new CheckBox(this);
-		dontShowAgain.setText(getString(R.string.checkbox_not_show_again));
-		dontShowAgain.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
-
-		confirmationLayout.addView(dontShowAgain, params);
-
-		builder.setView(confirmationLayout);
-
-		builder.setMessage(getString(R.string.alert_larger_file, getSizeString(sizeC)));
-		builder.setPositiveButton(getString(R.string.general_save_to_device),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						if(dontShowAgain.isChecked()){
-							dbH.setAttrAskSizeDownload("false");
-						}
-						chatC.download(parentPathC, nodeListC);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				if(dontShowAgain.isChecked()){
-					dbH.setAttrAskSizeDownload("false");
-				}
-			}
-		});
-
-		downloadConfirmationDialog = builder.create();
-		downloadConfirmationDialog.show();
-	}
-	
 
 	public void importNode(MegaNode node){
 		logDebug("Node Handle: " + node.getHandle());
