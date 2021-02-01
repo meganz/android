@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColorStateList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
@@ -374,8 +375,7 @@ class MegaNodeDialogUtil {
             error: String
         ) {
             typeText?.apply {
-                backgroundTintList =
-                    activity.resources.getColorStateList(R.color.background_error_input_text)
+                backgroundTintList = getColorStateList(activity, R.color.background_error_input_text)
                 setTextColor(ContextCompat.getColor(activity, R.color.dark_primary_color))
                 requestFocus()
             }
@@ -398,8 +398,7 @@ class MegaNodeDialogUtil {
             activity: Activity, typeText: EditText?, errorText: TextView?
         ) {
             typeText?.apply {
-                backgroundTintList =
-                    activity.resources.getColorStateList(R.color.background_right_input_text)
+                backgroundTintList = getColorStateList(activity, R.color.background_right_input_text)
                 setTextColor(ContextCompat.getColor(activity, R.color.text_secondary))
                 requestFocus()
             }
