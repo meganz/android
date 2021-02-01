@@ -6386,6 +6386,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		selectDrawerItemLollipop(drawerItem);
 	}
 
+	/**
+	 * Resets the scroll of settings page
+	 */
+	public void resetSettingsScrollIfNecessary() {
+		openSettingsStorage = false;
+		openSettingsQR = false;
+
+		if (getSettingsFragment() != null) {
+			sttFLol.goToFirstCategory();
+		}
+	}
+
 	public void moveToChatSection (long idChat) {
 		if (idChat != -1) {
 			Intent intent = new Intent(this, ChatActivityLollipop.class);
@@ -7054,6 +7066,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
 						}
 						else {
+							if (drawerItem == DrawerItem.SETTINGS) {
+								resetSettingsScrollIfNecessary();
+							}
+
 							backToDrawerItem(bottomNavigationCurrentItem);
 						}
 					} else {
@@ -7923,6 +7939,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			if (!isOnline(this)) {
 				showOfflineMode();
 			}
+
+			resetSettingsScrollIfNecessary();
 			backToDrawerItem(bottomNavigationCurrentItem);
 		} else if (drawerItem == DrawerItem.SHARED_ITEMS) {
 			switch (getTabItemShares()) {
