@@ -3601,9 +3601,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.create();
 
 		dialog.setOnShowListener(dialogInterface -> {
-			TextView message = dialog.findViewById(R.id.message);
-			message.setMovementMethod(LinkMovementMethod.getInstance());
-			message.setText(StringUtils.toSpannedHtmlText(getString(R.string.dialog_cookie_alert_message)));
+			String message = getString(R.string.dialog_cookie_alert_message)
+					.replace("[A]", "<a href='https://mega.nz/cookie'>")
+					.replace("[/A]", "</a>");
+			Spanned spannedHtmlText = StringUtils.toSpannedHtmlText(message);
+
+			TextView messageView = dialog.findViewById(R.id.message);
+			messageView.setMovementMethod(LinkMovementMethod.getInstance());
+			messageView.setText(spannedHtmlText);
 		});
 
 		dialog.show();

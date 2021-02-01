@@ -3,8 +3,10 @@ package mega.privacy.android.app.fragments.settingsFragments.cookie
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.core.text.bold
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -19,7 +21,6 @@ import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType.*
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
 @AndroidEntryPoint
 class CookieSettingsFragment : SettingsBaseFragment() {
@@ -70,8 +71,11 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
 
-        thirdPartyCookiesPreference.summary =
-            getString(R.string.preference_cookies_thirdparty_summary).toSpannedHtmlText()
+        thirdPartyCookiesPreference.summary = SpannableStringBuilder()
+            .append(getString(R.string.preference_cookies_thirdparty_summary))
+            .append(" ")
+            .bold { append(getString(R.string.action_more_information)) }
+
         thirdPartyCookiesPreference.setOnSummaryClickListener {
             showThirdPartyInfoDialog()
         }
