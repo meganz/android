@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import android.text.Spanned;
+import androidx.core.text.HtmlCompat;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -38,6 +40,30 @@ public class TextUtil {
             logWarning("Error replacing text. ", e);
         }
         return text;
+    }
+
+    /**
+     * Add the appropriate format in the chat messages.
+     *
+     * @param textToShow   The message text
+     * @param isOwnMessage If it is a sent or received message
+     * @return The formatted text
+     */
+    public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
+        try {
+            textToShow = textToShow.replace("[A]", "<font color='#060000'>");
+            textToShow = textToShow.replace("[/A]", "</font>");
+            if (isOwnMessage) {
+                textToShow = textToShow.replace("[B]", "<font color='#868686'>");
+            } else {
+                textToShow = textToShow.replace("[B]", "<font color='#00BFA5'>");
+            }
+            textToShow = textToShow.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Error replacing text. ", e);
+        }
+
+        return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     public static boolean isEmail(String str) {

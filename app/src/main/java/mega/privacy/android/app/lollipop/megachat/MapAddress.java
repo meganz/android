@@ -1,14 +1,14 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import com.google.android.gms.maps.model.LatLng;
+import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 
 public class MapAddress {
 
-    private LatLng latLng;
+    private MegaLatLng latLng;
     private String name;
     private String address;
 
-    public MapAddress(LatLng latLng, String name, String address) {
+    public MapAddress(MegaLatLng latLng, String name, String address) {
         this.latLng = latLng;
         this.name = name;
         this.address = address;
@@ -30,7 +30,7 @@ public class MapAddress {
         this.name = name;
     }
 
-    public LatLng getLatLng() {
+    public MegaLatLng getLatLng() {
         return latLng;
     }
 }

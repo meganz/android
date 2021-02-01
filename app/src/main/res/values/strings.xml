@@ -1162,8 +1162,6 @@
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Call ringtone</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Notification sound</string>
 
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">After cleared, neither %s nor you will be able to see messages of this chat.</string>
-
     <string name="general_clear" context="Button to clear the chat history">Clear</string>
     <!--
     <string name="login_initializing_chat" context="After login, initializing chat">Initializing chat</string>
@@ -1225,10 +1223,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">If you leave, you will no longer have access to read or send messages.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Leave group chat?</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">All messages and media in this conversation will be cleared.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Clear history?</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">The participant is already included in this group chat</string>
 
@@ -1632,8 +1626,8 @@
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">from</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">New shared folder</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">New contact request</string>
-
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Clear chat history</string>
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Remove contact</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Chat notifications</string>
@@ -2387,6 +2381,7 @@
     <string name="button_continue" context="dialog option continue in alert dialog">Continue</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (subscription)</string>
+    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Mobile Carrier[/A] (one-off)</string>
@@ -2899,6 +2894,57 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">You have reached the maximum limit of %d reactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option ">History clearing</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than&#58;</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation&#63;</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+    </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
 
     <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don't remove the place holder, it's to set the name of the transfer. Example: The priority change of the transfer 'video.mp4' failed.">The priority change of the transfer \'%1$s\' failed.</string>
@@ -2940,4 +2986,28 @@
     <string name="label_blue" context="A user can mark a folder or file with blue colour.">Blue</string>
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Purple</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grey</string>
+
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
+    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
+    <string name="preference_cookies_performance_title" context="Preference screen item title">Performance and Analytics Cookies</string>
+    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
+    <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertising Cookies</string>
+    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
+    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Third Party Cookies</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
+    <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
+    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
+
 </resources>
