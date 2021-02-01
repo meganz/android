@@ -19,8 +19,8 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 349
-        versionName "3.8.5 (349)"
+        versionCode 350
+        versionName "3.8.5 (350)"
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a','x86', 'x86_64', 'arm64-v8a'
@@ -38,6 +38,7 @@ android {
 
     buildTypes {
         debug {
+            debuggable true
             //  minifyEnabled false
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -115,6 +116,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
 
     implementation "androidx.navigation:navigation-runtime-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -161,11 +164,10 @@ dependencies {
 
     implementation "io.reactivex.rxjava3:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava3:rxandroid:$rxAndroidVersion"
+    implementation "io.reactivex.rxjava3:rxkotlin:3.0.1"
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.10'
-
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0'
 
     implementation "com.facebook.fresco:fresco:$frescoVersion"
     implementation "com.facebook.fresco:animated-gif:$frescoVersion"
@@ -174,12 +176,14 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
 
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+    implementation "com.github.zhpanvip:BannerViewPager:$bannerViewPagerVersion"
+
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'

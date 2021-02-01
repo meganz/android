@@ -30,7 +30,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.navigation.NavOptions;
 import androidx.core.text.HtmlCompat;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.Lifecycle;
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -38,6 +38,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -63,6 +65,7 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -97,6 +100,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -110,7 +114,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -130,6 +138,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
@@ -146,10 +155,11 @@ import mega.privacy.android.app.fragments.homepage.video.VideoFragment;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -217,8 +227,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaViewHolder;
-import mega.privacy.android.app.psa.PsaViewModel;
-import mega.privacy.android.app.psa.PsaViewModelFactory;
+import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
@@ -299,6 +308,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
+	private static final String DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
 	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
@@ -339,6 +349,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
+
+    @Inject
+	GetCookieSettingsUseCase getCookieSettingsUseCase;
+
+    @Inject
+	UpdateCookieSettingsUseCase updateCookieSettingsUseCase;
 
 	public int accountFragment;
 
@@ -669,6 +685,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private PermissionsFragment pF;
 	private SMSVerificationFragment svF;
 
+	private boolean mStopped = true;
+	private DrawerItem drawerItemBeforeOpenFullscreenOffline = null;
 	private OfflineFragment fullscreenOfflineFragment;
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
@@ -814,7 +832,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean businessCUFirstTime;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
-	private PsaViewModel psaViewModel;
 	private PsaViewHolder psaViewHolder;
 
 
@@ -1819,6 +1836,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
+		outState.putSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
+				drawerItemBeforeOpenFullscreenOffline);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
@@ -1924,6 +1943,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onStart() {
 		logDebug("onStart");
+
+		mStopped = false;
+
 		super.onStart();
 	}
 
@@ -1963,6 +1985,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
+			drawerItemBeforeOpenFullscreenOffline
+					= (DrawerItem) savedInstanceState.getSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
@@ -2115,7 +2139,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (hasPermissions(this, Manifest.permission.READ_CONTACTS) && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 		    logDebug("sync mega contacts");
 			MegaContactGetter getter = new MegaContactGetter(this);
-			getter.getMegaContacts(megaApi, MegaContactGetter.WEEK);
+			getter.getMegaContacts(megaApi, TimeUtils.WEEK);
 		}
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -2197,7 +2221,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 		logDebug("Preferred View List: " + isList);
 
-		EventNotifierKt.notifyListGridChange(isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
 		if(prefs!=null){
 			if(prefs.getPreferredSortCloud()!=null){
@@ -2238,7 +2262,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			orderOthers = ORDER_DEFAULT_ASC;
 		}
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		handler = new Handler();
 
@@ -3331,6 +3355,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             showTransfersTransferOverQuotaWarning();
         }
 
+		PsaManager.INSTANCE.startChecking();
+
 		logDebug("END onCreate");
 	}
 
@@ -3562,6 +3588,28 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			hideFabButton();
 			showHideBottomNavigationView(true);
 		}
+	}
+
+	private void showCookieDialog() {
+		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+				.setCancelable(false)
+				.setView(R.layout.dialog_cookie_alert)
+				.setPositiveButton(R.string.preference_cookies_accept, (positiveDialog, which) ->
+						updateCookieSettingsUseCase.acceptAll()
+								.subscribeOn(Schedulers.io())
+								.observeOn(AndroidSchedulers.mainThread())
+								.subscribe(() -> { }, (error) -> {
+									logError(error.getMessage());
+								})
+				)
+				.setNegativeButton(R.string.settings_about_cookie_settings, (negativeDialog, which) ->
+						startActivity(new Intent(this, CookiePreferencesActivity.class))
+				)
+				.create();
+
+		dialog.show();
+
+		((TextView) dialog.findViewById(R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
 	public void destroySMSVerificationFragment() {
@@ -4563,6 +4611,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	protected void onStop(){
 		logDebug("onStop");
+
+		mStopped = true;
+
 		super.onStop();
 	}
 
@@ -4739,25 +4790,27 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		checkBeforeShowSMSVerificationDialog();
 
-        psaViewModel.checkPsa();
+		if (MegaApplication.isCookieBannerEnabled()) {
+			getCookieSettingsUseCase.shouldShowDialog()
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((showDialog, throwable) -> {
+						if (showDialog) showCookieDialog();
+					});
+		}
     }
 
     /**
 	 * Observe LiveData for PSA, and show PSA view when get it.
 	 */
     private void observePsa() {
-        psaViewModel = new ViewModelProvider(this, new PsaViewModelFactory(megaApi, this))
-                .get(PsaViewModel.class);
-        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), psaViewModel);
+        psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), PsaManager.INSTANCE);
 
-        psaViewModel.getPsa().observe(this, this::showPsa);
+		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
     }
 
 	/**
-	 * Show PSA view.
-	 *
-	 * If the url exists, which means this is a new format of PSA, open the url with in-app browser
-	 * directly. Otherwise, show the normal PSA view.
+	 * Show PSA view for old PSA type.
 	 *
 	 * @param psa the PSA to show
 	 */
@@ -4769,16 +4822,11 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             return;
         }
 
-        if (!TextUtils.isEmpty(psa.getUrl())) {
-            Intent intent = new Intent(this, WebViewActivity.class);
-            intent.setData(Uri.parse(psa.getUrl()));
-            startActivity(intent);
-            psaViewModel.dismissPsa(psa.getId());
-            return;
+        if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+				&& TextUtils.isEmpty(psa.getUrl())) {
+			psaViewHolder.bind(psa);
+			adjustNavHostViewHeight(true);
         }
-
-        psaViewHolder.bind(psa);
-		adjustNavHostViewHeight(true);
     }
 
     public void checkBeforeShowSMSVerificationDialog() {
@@ -5737,7 +5785,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 		}
 
-    	EventNotifierKt.notifyHomepageVisibilityChange(drawerItem == DrawerItem.HOMEPAGE);
+		LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean.class)
+				.post(drawerItem == DrawerItem.HOMEPAGE);
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
@@ -6105,6 +6154,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
 		if (fragment == fullscreenOfflineFragment) {
+			if (drawerItemBeforeOpenFullscreenOffline != null && !mStopped) {
+				if (drawerItem != drawerItemBeforeOpenFullscreenOffline) {
+					selectDrawerItemLollipop(drawerItemBeforeOpenFullscreenOffline);
+				}
+				drawerItemBeforeOpenFullscreenOffline = null;
+			}
+
 			setPathNavigationOffline("/");
 			fullscreenOfflineFragment = null;
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
@@ -7579,7 +7635,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             dbH.setPreferredViewList(isList);
         }
 
-        EventNotifierKt.notifyListGridChange(this.isList);
+		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
@@ -7664,7 +7720,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		} else if (drawerItem == DrawerItem.SEARCH) {
 			refreshSearch();
 		} else if (drawerItem == DrawerItem.HOMEPAGE) {
-			EventNotifierKt.notifyNodesChange(false);
+			LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 		}
 
         checkCameraUploadFolder(true,null);
@@ -7817,6 +7873,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
+
+		// If there is a displaying PSA, we should only close it, and not navigate back anymore,
+		// e.g. when we are at chat tab, and there is a displaying PSA, when we press back, if we
+		// keep executing the remaining logic, we would go back to cloud drive tab after close
+		// the PSA browser.
+		if (closeDisplayingPsa()) {
+			return;
+		}
 
 		retryConnectionsAndSignalPresence();
 
@@ -10447,35 +10511,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
-	public void showConfirmationClearChat(final MegaChatListItem c){
-		logDebug("showConfirmationClearChat");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						logDebug("Clear chat!");
-//						megaChatApi.truncateChat(chatHandle, MegaChatHandle.MEGACHAT_INVALID_HANDLE);
-						logDebug("Clear history selected!");
-						ChatController chatC = new ChatController(managerActivity);
-						chatC.clearHistory(c.getChatId());
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
-		String message= getResources().getString(R.string.confirmation_clear_group_chat);
-		builder.setTitle(R.string.title_confirmation_clear_group_chat);
-		builder.setMessage(message).setPositiveButton(R.string.general_clear, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void showConfirmationResetPasswordFromMyAccount (){
 		logDebug("showConfirmationResetPasswordFromMyAccount");
 
@@ -10825,7 +10860,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		logDebug("New order: " + newOrderCloud);
 		this.setOrderCloud(newOrderCloud);
 
-		EventNotifierKt.notifyOrderChange(orderCloud);
+		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(orderCloud);
 
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
@@ -11093,6 +11128,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 			case R.id.offline_section: {
 				sectionClicked = true;
+				drawerItemBeforeOpenFullscreenOffline = drawerItem;
 				openFullscreenOfflineFragment(getPathNavigationOffline());
 				break;
 			}
@@ -11197,7 +11233,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
                         }
 
 						onNodesSharedUpdate();
-						EventNotifierKt.notifyNodesChange(false);
+						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 						break;
 					}
 					case DialogInterface.BUTTON_NEGATIVE: {
@@ -12869,17 +12905,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logDebug("onRequestFinish(CHAT): " + request.getRequestString()+"_"+e.getErrorCode());
 
-		if(request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY){
-			logDebug("Truncate history request finish.");
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_success), -1);
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.clear_history_error), -1);
-				logError("Error clearing history: "+e.getErrorString());
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+		if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			logDebug("Create chat request finish");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle());
 		}
@@ -13194,7 +13220,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					if(maFLol!=null){
 						maFLol.updateAvatar(false);
 					}
-					EventNotifierKt.notifyAvatarChange(true);
+
+					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
 				}
 				else{
 					if(request.getFile()!=null) {
@@ -13287,7 +13314,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 						maFLol.updateAvatar(false);
 					}
 				}
-				EventNotifierKt.notifyAvatarChange(false);
+				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
 			}
 			else if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
 				if (e.getErrorCode() == MegaError.API_OK){
@@ -14360,7 +14387,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			muFragment.reloadNodes(orderCamera);
 		}
 
-		EventNotifierKt.notifyNodesChange(true);
+		LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 
 		// Invalidate the menu will collapse/expand the search view and set the query text to ""
 		// (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -14570,7 +14597,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				onNodesInboxUpdate();
 				onNodesSearchUpdate();
 				onNodesSharedUpdate();
-				EventNotifierKt.notifyNodesChange(false);
+				LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
 
 				if (isTransfersInProgressAdded()){
 					tFLol.transferFinish(transfer.getTag());
