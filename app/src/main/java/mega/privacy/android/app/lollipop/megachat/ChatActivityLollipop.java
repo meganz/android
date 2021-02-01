@@ -9534,6 +9534,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         positionLastMessage = positionLastMessage + 1;
+        if(positionLastMessage >= messages.size())
+            return;
+
         AndroidMegaChatMessage message = messages.get(positionLastMessage);
 
         while (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
