@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.zhpan.bannerview.BannerViewPager
 import com.zhpan.bannerview.constants.IndicatorGravity
 import com.zhpan.bannerview.utils.BannerUtils
@@ -31,7 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_homepage.*
 import kotlinx.android.synthetic.main.fragment_homepage.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
-import kotlinx.android.synthetic.main.user_reaction_item.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
@@ -85,6 +85,12 @@ class HomepageFragment : Fragment() {
 
     private var windowContent: ViewGroup? = null
 
+    private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
+        if (it) {
+            post { setBottomSheetHeight() }
+        }
+    }
+
     var isFabExpanded = false
 
     /** The broadcast receiver for network connectivity.
@@ -123,6 +129,9 @@ class HomepageFragment : Fragment() {
     ): View {
         viewDataBinding = FragmentHomepageBinding.inflate(inflater, container, false)
         rootView = viewDataBinding.root
+
+        LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
+            .observeForever(homepageVisibilityChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -177,6 +186,9 @@ class HomepageFragment : Fragment() {
 
         tabsChildren.clear()
         requireContext().unregisterReceiver(networkReceiver)
+
+        LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
+            .removeObserver(homepageVisibilityChangeObserver)
     }
 
     /**
@@ -239,9 +251,7 @@ class HomepageFragment : Fragment() {
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
-        val layoutParams = bottomSheetRoot.layoutParams
-        layoutParams.height = rootView.height - searchInputView.bottom
-        bottomSheetRoot.layoutParams = layoutParams
+        setBottomSheetHeight(true)
     }
 
     /**
@@ -416,6 +426,10 @@ class HomepageFragment : Fragment() {
         rootView.viewTreeObserver?.addOnPreDrawListener(object :
             ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
+                if (category == null) {
+                    return true
+                }
+
                 if (bannerViewPager.data.isNotEmpty()) {
                     bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
                 } else {
@@ -446,13 +460,7 @@ class HomepageFragment : Fragment() {
             val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                val layoutParams = bottomSheet.layoutParams
-                val maxHeight = rootView.height - searchInputView.bottom
-
-                if (bottomSheet.height > maxHeight) {
-                    layoutParams.height = maxHeight
-                    bottomSheet.layoutParams = layoutParams
-                }
+                setBottomSheetHeight()
 
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     tabLayout.setBackgroundResource(R.drawable.bg_cardview_white)
@@ -480,6 +488,17 @@ class HomepageFragment : Fragment() {
                 bottomSheet.elevation = maxElevation - res * maxElevation
             }
         })
+    }
+
+    private fun setBottomSheetHeight(forceMaxHeight: Boolean = false) {
+        val bottomSheet = viewDataBinding.homepageBottomSheet.root
+        val maxHeight = rootView.measuredHeight - searchInputView.bottom
+
+        if (bottomSheet.measuredHeight > maxHeight || forceMaxHeight) {
+            val layoutParams = bottomSheet.layoutParams
+            layoutParams.height = maxHeight
+            bottomSheet.layoutParams = layoutParams
+        }
     }
 
     /**
