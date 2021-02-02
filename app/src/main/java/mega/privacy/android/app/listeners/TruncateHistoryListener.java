@@ -26,7 +26,7 @@ public class TruncateHistoryListener extends ChatBaseListener {
         if (e.getErrorCode() == MegaError.API_OK) {
             Util.showSnackbar(context, getString(R.string.clear_history_success));
             if (context instanceof ChatActivityLollipop) {
-                ((ChatActivityLollipop) context).hideMessageJump();
+                ((ChatActivityLollipop) context).hideScrollToLastMsgButton();
             }
         } else {
             Util.showSnackbar(context, getString(R.string.clear_history_error));

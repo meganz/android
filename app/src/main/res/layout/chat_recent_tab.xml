@@ -148,66 +148,10 @@
                 android:layout_alignParentBottom="true"/>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <ScrollView
-            android:id="@+id/scroller"
+        <include layout="@layout/empty_screen_recents_chat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="10dp"
-            android:elevation="-1dp"
-            android:fadeScrollbars="false"
-            android:fillViewport="true">
-
-            <RelativeLayout
-                android:id="@+id/linear_empty_layout_chat_recent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="100dp">
-
-                <ImageView
-                    android:id="@+id/empty_image_view_recent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/empty_text_chat_recent_invite"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true" />
-
-                <TextView
-                    android:id="@+id/empty_text_chat_recent_invite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/empty_text_chat_recent"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:maxWidth="300dp"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/empty_text_chat_recent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center"
-                    android:textColor="@color/adapters_background"
-                    android:textSize="18sp" />
-
-                <Button
-                    android:id="@+id/invite_button"
-                    style="@style/AccentBorderBackgroundBorderlessButton"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/empty_text_chat_recent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center_horizontal"
-                    android:minWidth="96dp"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="10dp"
-                    android:paddingRight="20dp"
-                    android:paddingBottom="10dp"
-                    android:textSize="16sp" />
-            </RelativeLayout>
-        </ScrollView>
+            android:layout_below="@+id/linear_layout_add"/>
 
         <LinearLayout
             android:id="@+id/linear_layout_recycler"

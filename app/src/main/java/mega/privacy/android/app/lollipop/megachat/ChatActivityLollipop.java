@@ -9011,9 +9011,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     /**
-     * Method to hide the button to scroll to the last message in a chatroom.
+     * Method to hide the button, to scroll to the last message, in a chatroom.
      */
-    private void hideScrollToLastMsgButton() {
+    public void hideScrollToLastMsgButton() {
         msgsReceived.clear();
         if (unreadMsgsLayout.getVisibility() != View.VISIBLE)
             return;

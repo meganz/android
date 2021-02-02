@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -67,6 +68,7 @@ import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
@@ -82,6 +84,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.replaceFormatText;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class RecentChatsFragmentLollipop extends RotatableFragment implements View.OnClickListener, MegaContactGetter.MegaContactUpdater {
@@ -148,8 +151,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     //Empty screen
     private TextView emptyTextView;
-    private RelativeLayout emptyLayout;
+    private LinearLayout emptyLayout;
     private TextView emptyTextViewInvite;
+    private TextView emptyDescriptionText;
     private ImageView emptyImageView;
 
     Button inviteButton;
@@ -358,8 +362,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         });
 
         emptyLayout = v.findViewById(R.id.linear_empty_layout_chat_recent);
+        emptyDescriptionText = v.findViewById(R.id.empty_description_text_recent);
+        emptyDescriptionText.setText(replaceFormatText(context.getString(R.string.empty_screen_recent_chats_description_text), COLOR_END, COLOR_START));
+
         emptyTextViewInvite = v.findViewById(R.id.empty_text_chat_recent_invite);
-        emptyTextViewInvite.setWidth(scaleWidthPx(236, outMetrics));
         emptyTextView = v.findViewById(R.id.empty_text_chat_recent);
         emptyImageView = v.findViewById(R.id.empty_image_view_recent);
         emptyImageView.setOnClickListener(this);
@@ -369,7 +375,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             emptyImageView.setVisibility(View.GONE);
         } else {
             addMarginTop();
-            emptyImageView.setImageResource(R.drawable.ic_empty_chat_list);
+            emptyImageView.setImageResource(R.drawable.ic_zero_data_chat);
         }
 
         inviteButton = (Button) v.findViewById(R.id.invite_button);
@@ -577,12 +583,11 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         emptyLayout.setVisibility(View.VISIBLE);
         String textToShow, colorStart, colorEnd;
         Spanned result;
-
+        colorStart = COLOR_END;
+        colorEnd = COLOR_START;
         if (context instanceof ArchivedChatsActivity) {
             textToShow = context.getString(R.string.recent_chat_empty).toUpperCase();
-            colorStart = COLOR_END;
-            colorEnd = COLOR_START;
-            result = getSpannedMessageForEmptyChat(textToShow, colorStart, colorEnd);
+            result = replaceFormatText(textToShow, colorStart, colorEnd);
 
             if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 emptyTextView.setVisibility(View.GONE);
@@ -591,43 +596,25 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             }
 
             emptyTextViewInvite.setVisibility(View.GONE);
+            emptyDescriptionText.setVisibility(View.GONE);
             inviteButton.setVisibility(View.GONE);
             emptyTextView.setText(result);
 
-
         } else {
-            emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
+            textToShow = context.getString(R.string.context_empty_list_of_chats).toUpperCase();
+            result = replaceFormatText(textToShow, colorStart, colorEnd);
+            emptyTextViewInvite.setText(result);
             emptyTextViewInvite.setVisibility(View.VISIBLE);
+            emptyDescriptionText.setVisibility(View.VISIBLE);
             inviteButton.setText(getString(R.string.new_chat_link_label));
             inviteButton.setVisibility(View.VISIBLE);
         }
     }
 
-    private Spanned getSpannedMessageForEmptyChat(String originalMessage, String colorStart, String colorEnd){
-        String textToShow = originalMessage;
-        Spanned result;
-        try {
-            textToShow = textToShow.replace("[A]", "<font color=" + colorStart + ">");
-            textToShow = textToShow.replace("[/A]", "</font>");
-            textToShow = textToShow.replace("[B]", "<font color=" + colorEnd + ">");
-            textToShow = textToShow.replace("[/B]", "</font>");
-        } catch (Exception e) {
-            logError(e.getStackTrace().toString());
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            result = Html.fromHtml(textToShow);
-        }
-
-        return result;
-    }
-
     private void addMarginTop() {
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, scaleHeightPx(60, outMetrics), 0, 0);
-        emptyLayoutContainer.setLayoutParams(layoutParams);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(dp2px(108, outMetrics), dp2px(52, outMetrics), dp2px(108, outMetrics), dp2px(12, outMetrics));
+        emptyImageView.setLayoutParams(lp);
     }
 
     public void showConnectingChatScreen(){
@@ -638,8 +625,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             ((ManagerActivityLollipop) context).hideFabButton();
         }
 
-        emptyTextViewInvite.setText(getString(R.string.recent_chat_empty_text));
         emptyTextViewInvite.setVisibility(View.INVISIBLE);
+        emptyDescriptionText.setVisibility(View.INVISIBLE);
 
         inviteButton.setVisibility(View.GONE);
 
@@ -671,6 +658,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         emptyTextViewInvite.setText(getString(R.string.error_server_connection_problem));
         emptyTextViewInvite.setVisibility(View.VISIBLE);
+        emptyDescriptionText.setVisibility(View.GONE);
         inviteButton.setVisibility(View.GONE);
         emptyLayout.setVisibility(View.VISIBLE);
     }

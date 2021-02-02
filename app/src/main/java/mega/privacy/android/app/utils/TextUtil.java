@@ -4,6 +4,7 @@ import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
 import mega.privacy.android.app.R;
 
+import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -43,17 +44,19 @@ public class TextUtil {
      * @return The formatted text
      */
     public static Spanned replaceFormatChatMessages(String textToShow, boolean isOwnMessage) {
+        String colorStart = "'#060000'";
+        String colorEnd = isOwnMessage ? "'#868686'" : "'#00BFA5'";
+        return replaceFormatText(textToShow, colorStart, colorEnd);
+    }
+
+    public static Spanned replaceFormatText(String textToShow, String colorStart, String colorEnd) {
         try {
-            textToShow = textToShow.replace("[A]", "<font color='#060000'>");
+            textToShow = textToShow.replace("[A]", "<font color=" + colorStart + ">");
             textToShow = textToShow.replace("[/A]", "</font>");
-            if (isOwnMessage) {
-                textToShow = textToShow.replace("[B]", "<font color='#868686'>");
-            } else {
-                textToShow = textToShow.replace("[B]", "<font color='#00BFA5'>");
-            }
+            textToShow = textToShow.replace("[B]", "<font color=" + colorEnd + ">");
             textToShow = textToShow.replace("[/B]", "</font>");
         } catch (Exception e) {
-            logWarning("Error replacing text. ", e);
+            logError(e.getStackTrace().toString());
         }
 
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);

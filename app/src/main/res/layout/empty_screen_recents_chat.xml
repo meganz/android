@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scroller"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="-1dp"
+        android:fadeScrollbars="false"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/linear_empty_layout_chat_recent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="26dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/empty_description_text_recent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginStart="72dp"
+                android:layout_marginEnd="16dp"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/empty_image_view_recent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/empty_text_chat_recent_invite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginStart="113dp"
+                android:layout_marginEnd="113dp"
+                android:textColor="@color/secondary_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/empty_text_chat_recent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/adapters_background"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/invite_button"
+                style="@style/AccentBorderBackgroundBorderlessButton"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="96dp"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </ScrollView>
