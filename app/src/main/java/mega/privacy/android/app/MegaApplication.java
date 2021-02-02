@@ -54,6 +54,7 @@ import java.util.Locale;
 
 import dagger.hilt.android.HiltAndroidApp;
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -61,6 +62,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
@@ -127,6 +129,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static ChatManagement chatManagement;
 
 	@MegaApi
 	@Inject
@@ -746,6 +749,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        chatManagement = new ChatManagement();
 
 		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
@@ -1929,6 +1933,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static TransfersManagement getTransfersManagement() {
 		return transfersManagement;
+	}
+
+	public static ChatManagement getChatManagement() {
+		return chatManagement;
 	}
 
 	public static void setVerifyingCredentials(boolean verifyingCredentials) {
