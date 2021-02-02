@@ -1789,6 +1789,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             return;
         }
 
+        if (position >= messages.size()) {
+            //There is no next message
+            ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+            ((ChatActivityLollipop) context).setLastIdMsgSeen(message.getMsgId());
+            return;
+        }
+
         MegaChatMessage nextMessage = messages.get(position).getMessage();
         int typeMessage = nextMessage.getType();
         int codeMessage = nextMessage.getCode();
