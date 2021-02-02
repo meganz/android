@@ -16,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BucketSaved
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
@@ -28,6 +27,7 @@ import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -45,7 +45,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private lateinit var listView: RecyclerView
 
-    private var mAdapter: MultipleBucketAdapter? = null
+    private var adapter: MultipleBucketAdapter? = null
 
     private lateinit var bucket: BucketSaved
 
@@ -86,9 +86,9 @@ class RecentsBucketFragment : BaseFragment() {
     }
 
     private fun setupListView(nodes: List<MegaNode>) {
-        if(mAdapter == null) {
-            mAdapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
-            listView.adapter = mAdapter
+        if (adapter == null) {
+            adapter = MultipleBucketAdapter(activity, this, nodes, bucket.isMedia)
+            listView.adapter = adapter
 
             if (bucket.isMedia) {
                 val numCells: Int = if (Util.isScreenInPortrait(activity)) 4 else 6
@@ -114,7 +114,7 @@ class RecentsBucketFragment : BaseFragment() {
             listView.clipToPadding = false
             listView.setHasFixedSize(true)
         } else {
-            mAdapter?.setNodes(nodes)
+            adapter?.setNodes(nodes)
         }
     }
 
@@ -234,11 +234,7 @@ class RecentsBucketFragment : BaseFragment() {
         localPath: String?
     ) {
         val intent = if (FileUtil.isInternalIntent(node)) {
-            if (MimeTypeList.typeForName(node.name).isAudio) {
-                Intent(activity, AudioPlayerActivity::class.java)
-            } else {
-                Intent(activity, AudioVideoPlayerLollipop::class.java)
-            }
+            getMediaIntent(activity, node.name)
         } else {
             Intent(Intent.ACTION_VIEW)
         }
