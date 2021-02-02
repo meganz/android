@@ -39,6 +39,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -99,6 +100,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     long handle = -1;
     long handleContactLink = -1;
     private boolean success = true;
+    private boolean printEmail = false;
 
     private boolean inviteShown = false;
     private boolean dialogshown = false;
@@ -135,6 +137,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             contactNameContent = savedInstanceState.getString("contactNameContent");
             myEmail = savedInstanceState.getString("myEmail");
             success = savedInstanceState.getBoolean("success", true);
+            printEmail = savedInstanceState.getBoolean("printEmail", false);
             handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
 
             byte[] avatarByteArray = savedInstanceState.getByteArray("avatar");
@@ -214,7 +217,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             showInviteDialog();
         }
         else if (dialogshown){
-            showAlertDialog(dialogTitleContent, dialogTextContent, success);
+            showAlertDialog(dialogTitleContent, dialogTextContent, success, printEmail);
         }
 
 //        return scannerView;
@@ -237,6 +240,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         if (dialogshown || inviteShown){
             outState.putString("myEmail", myEmail);
             outState.putBoolean("success", success);
+            outState.putBoolean("printEmail", printEmail);
             outState.putLong("handleContactLink", handleContactLink);
             if (avatarImage != null){
                 avatarImage.buildDrawingCache(true);
@@ -280,25 +284,27 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         codeScanner.releaseResources();
     }
 
-//    @Override
-//    public void handleResult(Result rawResult) {
-//        log("handleResult");
-//
-//        invite(rawResult);
-//    }
-
-    public void showAlertDialog (int title, int text, final boolean success) {
-//        scannerView.stopCamera();
+    /**
+     * Method to display an alert dialog just after scan QR code and send the contact invitation to
+     * communicate the operation result to the user.
+     *
+     * @param title      String resource ID of the dialog title.
+     * @param text       String resource ID of the dialog message.
+     * @param success    Flag to indicate if the operation finished with success or not.
+     * @param printEmail Flag to indicate if the dialog message includes contact email or not.
+     */
+    public void showAlertDialog (int title, int text, final boolean success, final boolean printEmail) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View v = inflater.inflate(R.layout.dialog_invite, null);
         builder.setView(v);
 
-        dialogTitle = (TextView) v.findViewById(R.id.dialog_invite_title);
-        dialogText = (TextView) v.findViewById(R.id.dialog_invite_text);
-        dialogButton = (Button) v.findViewById(R.id.dialog_invite_button);
+        dialogTitle = v.findViewById(R.id.dialog_invite_title);
+        dialogText = v.findViewById(R.id.dialog_invite_text);
+        dialogButton = v.findViewById(R.id.dialog_invite_button);
         dialogButton.setOnClickListener(this);
         this.success = success;
+        this.printEmail = printEmail;
 
         if (dialogTitleContent == -1){
             dialogTitleContent = title;
@@ -306,27 +312,22 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         if (dialogTextContent == -1) {
             dialogTextContent = text;
         }
-        dialogTitle.setText(getResources().getString(dialogTitleContent));
-        if (success){
-            dialogText.setText(getResources().getString(dialogTextContent, myEmail));
-        }
-        else {
-            dialogText.setText(getResources().getString(dialogTextContent));
+        dialogTitle.setText(StringResourcesUtils.getString(dialogTitleContent));
+        if (printEmail){
+            dialogText.setText(StringResourcesUtils.getString(dialogTextContent, myEmail));
+        } else {
+            dialogText.setText(StringResourcesUtils.getString(dialogTextContent));
         }
 
         requestedAlertDialog = builder.create();
-        requestedAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                if (success){
-//                    scannerView.stopCamera();
-                    dialogshown = false;
-                    codeScanner.releaseResources();
-                    getActivity().finish();
-                }
-                else {
-                    codeScanner.startPreview();
-                }
+        requestedAlertDialog.setOnDismissListener(dialog -> {
+            if (success){
+                dialogshown = false;
+                codeScanner.releaseResources();
+                getActivity().finish();
+            }
+            else {
+                codeScanner.startPreview();
             }
         });
         dialogshown = true;
@@ -705,11 +706,11 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         } else if (e.getErrorCode() == MegaError.API_EEXIST) {
             dialogTitleContent = R.string.invite_not_sent;
             dialogTextContent = R.string.invite_not_sent_text_already_contact;
-            showAlertDialog(dialogTitleContent, dialogTextContent, true);
+            showAlertDialog(dialogTitleContent, dialogTextContent, true, true);
         } else {
             dialogTitleContent = R.string.invite_not_sent;
             dialogTextContent = R.string.invite_not_sent_text;
-            showAlertDialog(dialogTitleContent, dialogTextContent, false);
+            showAlertDialog(dialogTitleContent, dialogTextContent, false, false);
         }
     }
 }
