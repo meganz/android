@@ -3329,6 +3329,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+
+            boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+            // Should set as default download location.
+            if (!askMe) {
+                dbH.setStorageDownloadLocation(parentPath);
+            }
+
             chatC.prepareForDownload(intent, parentPath);
         } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
             sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));

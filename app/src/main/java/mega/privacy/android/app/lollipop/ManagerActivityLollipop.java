@@ -11635,6 +11635,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+
+			boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+            // Should set as default download location.
+            if (!askMe) {
+                dbH.setStorageDownloadLocation(parentPath);
+            }
+
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			logDebug("Size: " + size);
