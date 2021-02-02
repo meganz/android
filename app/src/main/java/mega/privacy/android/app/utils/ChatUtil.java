@@ -41,12 +41,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
 import mega.privacy.android.app.lollipop.listeners.ManageReactionListener;
@@ -84,6 +86,12 @@ public class ChatUtil {
     private static final boolean SHOULD_BUILD_FOCUS_REQUEST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     public static final int AUDIOFOCUS_DEFAULT = AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE;
     public static final int STREAM_MUSIC_DEFAULT = AudioManager.STREAM_MUSIC;
+
+    private static final int RETENTION_TIME_DIALOG_OPTION_DISABLED = 0;
+    private static final int RETENTION_TIME_DIALOG_OPTION_DAY = 1;
+    private static final int RETENTION_TIME_DIALOG_OPTION_WEEK = 2;
+    private static final int RETENTION_TIME_DIALOG_OPTION_MONTH = 3;
+    private static final int RETENTION_TIME_DIALOG_OPTION_CUSTOM = 4;
 
     public static boolean isVoiceClip(String name) {
         return MimeTypeList.typeForName(name).isAudioVoiceClip();
@@ -977,5 +985,256 @@ public class ChatUtil {
         }
 
         return invalidMetaMessage;
+    }
+
+    /**
+     * Dialog to confirm if you want to delete the history of a chat.
+     *
+     * @param chat The MegaChatRoom.
+     */
+    public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.ResumeTransfersWarning);
+        String message = context.getString(R.string.confirmation_clear_chat_history);
+
+        builder.setTitle(R.string.title_properties_chat_clear)
+                .setMessage(message)
+                .setPositiveButton(R.string.general_clear, (dialog, which) -> new ChatController(context).clearHistory(chat))
+                .setNegativeButton(R.string.general_cancel, null)
+                .show();
+    }
+
+    /**
+     * Method to display a dialog to configure the history retention.
+     *
+     * @param context    Context of Activity.
+     * @param idChat     The chat ID.
+     * @param isDisabled True, if the Retention Time is disabled. False, otherwise.
+     */
+    public static void createHistoryRetentionAlertDialog(Activity context, long idChat, boolean isDisabled) {
+        if (idChat == MEGACHAT_INVALID_HANDLE)
+            return;
+
+        final AlertDialog historyRetentionDialog;
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+
+        View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
+        TextView title = view.findViewById(R.id.title);
+        title.setText(context.getString(R.string.title_properties_history_retention));
+        TextView subtitle = view.findViewById(R.id.subtitle);
+        subtitle.setText(context.getString(R.string.subtitle_properties_manage_chat));
+        dialogBuilder.setCustomTitle(view);
+
+        AtomicReference<Integer> itemClicked = new AtomicReference<>();
+
+        ArrayList<String> stringsArray = new ArrayList<>();
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_DISABLED, context.getString(R.string.history_retention_option_disabled));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_DAY, context.getString(R.string.history_retention_option_one_day));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_WEEK, context.getString(R.string.history_retention_option_one_week));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_MONTH, context.getString(R.string.history_retention_option_one_month));
+        stringsArray.add(RETENTION_TIME_DIALOG_OPTION_CUSTOM, context.getString(R.string.history_retention_option_custom));
+
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+        ListView listView = new ListView(context);
+        listView.setAdapter(itemsAdapter);
+        int optionSelected = isDisabled ? RETENTION_TIME_DIALOG_OPTION_DISABLED : getOptionSelectedFromRetentionTime(idChat);
+
+        itemClicked.set(optionSelected);
+
+        dialogBuilder.setSingleChoiceItems(itemsAdapter, optionSelected, (dialog, item) -> {
+            ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE).setText(
+                    context.getString(item == RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                            R.string.general_next :
+                            R.string.general_ok));
+
+            itemClicked.set(item);
+
+            updatePositiveButton(((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE),
+                    checkIfPositiveButtonShouldBeShown(idChat, item));
+        });
+
+        dialogBuilder.setPositiveButton(context.getString(itemClicked.get() ==
+                        RETENTION_TIME_DIALOG_OPTION_CUSTOM ?
+                        R.string.general_next : R.string.general_ok),
+                (dialog, which) -> {
+                    if (itemClicked.get() == RETENTION_TIME_DIALOG_OPTION_CUSTOM) {
+                        if (context instanceof ManageChatHistoryActivity) {
+                            ((ManageChatHistoryActivity) context).showPickers(isDisabled ?
+                                    DISABLED_RETENTION_TIME :
+                                    getUpdatedRetentionTimeFromAChat(idChat));
+                        }
+                    } else {
+                        MegaApplication.getInstance().getMegaChatApi().setChatRetentionTime(idChat,
+                                getSecondsFromOption(itemClicked.get()), new SetRetentionTimeListener(context));
+                    }
+                });
+
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), null);
+
+        historyRetentionDialog = dialogBuilder.create();
+        historyRetentionDialog.show();
+
+        updatePositiveButton(historyRetentionDialog.getButton(AlertDialog.BUTTON_POSITIVE),
+                checkIfPositiveButtonShouldBeShown(idChat, itemClicked.get()));
+    }
+
+    /**
+     * Method for checking whether the positive button should be enabled or not.
+     *
+     * @param idChat        The chat ID.
+     * @param itemClicked   The option selected.
+     * @return              True, if it must be enabled. False, if not.
+     */
+    private static boolean checkIfPositiveButtonShouldBeShown(long idChat, int itemClicked) {
+        return getOptionSelectedFromRetentionTime(idChat) != RETENTION_TIME_DIALOG_OPTION_DISABLED ||
+                itemClicked != RETENTION_TIME_DIALOG_OPTION_DISABLED;
+    }
+
+    /**
+     * Gets retention time for a particular chat.
+     *
+     * @param idChat The chat ID.
+     * @return The retention time in seconds.
+     */
+    public static long getUpdatedRetentionTimeFromAChat(long idChat) {
+        MegaChatRoom chat = MegaApplication.getInstance().getMegaChatApi().getChatRoom(idChat);
+        if (chat != null) {
+            return chat.getRetentionTime();
+        }
+
+        return DISABLED_RETENTION_TIME;
+    }
+
+    /**
+     * Gets the appropriate dialogue option from the chat ID.
+     *
+     * @param idChat The chat ID.
+     * @return The option.
+     */
+    private static int getOptionSelectedFromRetentionTime(long idChat) {
+        long seconds = getUpdatedRetentionTimeFromAChat(idChat);
+
+        if (seconds == DISABLED_RETENTION_TIME) {
+            return RETENTION_TIME_DIALOG_OPTION_DISABLED;
+        }
+
+        long days = seconds % SECONDS_IN_DAY;
+        long weeks = seconds % SECONDS_IN_WEEK;
+        long months = seconds % SECONDS_IN_MONTH_30;
+        long years = seconds % SECONDS_IN_YEAR;
+
+        if (years == 0) {
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
+
+        if (months == 0) {
+            if (seconds / SECONDS_IN_MONTH_30 == 1) {
+                return RETENTION_TIME_DIALOG_OPTION_MONTH;
+            } else {
+                return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            }
+        }
+
+        if (weeks == 0) {
+            if (seconds / SECONDS_IN_WEEK == 1) {
+                return RETENTION_TIME_DIALOG_OPTION_WEEK;
+            } else {
+                return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+            }
+        }
+
+        if (days == 0 && seconds / SECONDS_IN_DAY == 1) {
+            return RETENTION_TIME_DIALOG_OPTION_DAY;
+        } else {
+            return RETENTION_TIME_DIALOG_OPTION_CUSTOM;
+        }
+    }
+
+    /**
+     * Update Retention Time Dialog Positive Button.
+     *
+     * @param buttonPositive The button
+     * @param isEnabled      True, if it must be enabled. False, if not.
+     */
+    private static void updatePositiveButton(final Button buttonPositive, boolean isEnabled) {
+        buttonPositive.setEnabled(isEnabled);
+        buttonPositive.setAlpha(isEnabled ? 1f : 0.30f);
+    }
+
+    /**
+     * Method for getting the seconds from an selected option.
+     *
+     * @param itemClicked The selected item.
+     * @return The seconds.
+     */
+    private static long getSecondsFromOption(int itemClicked) {
+        switch (itemClicked) {
+            case 1:
+                return SECONDS_IN_DAY;
+            case 2:
+                return SECONDS_IN_WEEK;
+            case 3:
+                return SECONDS_IN_MONTH_30;
+            default:
+                return DISABLED_RETENTION_TIME;
+        }
+    }
+
+    /**
+     * Method for getting the appropriate String from the seconds of rentention time.
+     *
+     * @param seconds The retention time in seconds
+     * @return The right text
+     */
+    public static String transformSecondsInString(long seconds) {
+        if (seconds == DISABLED_RETENTION_TIME)
+            return " ";
+
+        long hours = seconds % SECONDS_IN_HOUR;
+        long days = seconds % SECONDS_IN_DAY;
+        long weeks = seconds % SECONDS_IN_WEEK;
+        long months = seconds % SECONDS_IN_MONTH_30;
+        long years = seconds % SECONDS_IN_YEAR;
+
+        if (years == 0) {
+            return MegaApplication.getInstance().getBaseContext().getResources().getString(R.string.subtitle_properties_manage_chat_label_year);
+        }
+
+        if (months == 0) {
+            int month = (int) (seconds / SECONDS_IN_MONTH_30);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_months, month, month);
+        }
+
+        if (weeks == 0) {
+            int week = (int) (seconds / SECONDS_IN_WEEK);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_weeks, week, week);
+        }
+
+        if (days == 0) {
+            int day = (int) (seconds / SECONDS_IN_DAY);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.label_time_in_days_full, day, day);
+        }
+
+        if (hours == 0) {
+            int hour = (int) (seconds / SECONDS_IN_HOUR);
+            return MegaApplication.getInstance().getBaseContext().getResources().getQuantityString(R.plurals.subtitle_properties_manage_chat_label_hours, hour, hour);
+        }
+
+        return " ";
+    }
+
+    /**
+     * Method for updating the Time retention layout.
+     *
+     * @param time The retention time in seconds.
+     */
+    public static void updateRetentionTimeLayout(final TextView retentionTimeText, long time) {
+        String timeFormatted = transformSecondsInString(time);
+        if (isTextEmpty(timeFormatted)) {
+            retentionTimeText.setVisibility(View.GONE);
+        } else {
+            String subtitleText = getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
+            retentionTimeText.setText(subtitleText);
+            retentionTimeText.setVisibility(View.VISIBLE);
+        }
     }
 }
