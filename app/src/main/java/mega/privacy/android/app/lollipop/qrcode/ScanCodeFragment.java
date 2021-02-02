@@ -61,6 +61,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     public static String EXTRA_CONTACTS = "extra_contacts";
     public static String EXTRA_NODE_HANDLE = "node_handle";
     public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
+    public static String PRINT_EMAIL = "PRINT_EMAIL";
 
     // Bug #14988: disableLocalCamera() may hasn't completely released the camera resource as
     // the megaChatApi.disableVideo() is async call. A simply way to solve the issue is
@@ -100,7 +101,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
     long handle = -1;
     long handleContactLink = -1;
     private boolean success = true;
-    private boolean printEmail = false;
+    private boolean printEmail;
 
     private boolean inviteShown = false;
     private boolean dialogshown = false;
@@ -137,7 +138,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
             contactNameContent = savedInstanceState.getString("contactNameContent");
             myEmail = savedInstanceState.getString("myEmail");
             success = savedInstanceState.getBoolean("success", true);
-            printEmail = savedInstanceState.getBoolean("printEmail", false);
+            printEmail = savedInstanceState.getBoolean(PRINT_EMAIL, false);
             handleContactLink = savedInstanceState.getLong("handleContactLink", 0);
 
             byte[] avatarByteArray = savedInstanceState.getByteArray("avatar");
@@ -240,7 +241,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
         if (dialogshown || inviteShown){
             outState.putString("myEmail", myEmail);
             outState.putBoolean("success", success);
-            outState.putBoolean("printEmail", printEmail);
+            outState.putBoolean(PRINT_EMAIL, printEmail);
             outState.putLong("handleContactLink", handleContactLink);
             if (avatarImage != null){
                 avatarImage.buildDrawingCache(true);
