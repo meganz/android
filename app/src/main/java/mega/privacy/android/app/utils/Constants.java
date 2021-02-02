@@ -176,6 +176,13 @@ public class Constants {
     public static final int PRO_LITE = 4;
     public static final int BUSINESS = 100;
 
+    public static final long DISABLED_RETENTION_TIME = 0;
+    public static final int SECONDS_IN_HOUR = 3600;
+    public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
+    public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
+    public static final int SECONDS_IN_MONTH_30 = SECONDS_IN_DAY * 30;
+    public static final int SECONDS_IN_MONTH_31 = SECONDS_IN_DAY * 31;
+    public static final int SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
 
     public static final int COLOR_STATUS_BAR_ACCENT = 1;
     public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
@@ -334,6 +341,12 @@ public class Constants {
     public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
     public static final int PRICING_MIN_DIFFERENCE = 720;
     public static final int EXTENDED_ACCOUNT_DETAILS_MIN_DIFFERENCE = 30;
+
+    public static final String HISTORY_RETENTION_DISABLED = "HISTORY_RETENTION_DISABLED";
+    public static final String HISTORY_RETENTION_1_DAY = "HISTORY_RETENTION_1_DAY";
+    public static final String HISTORY_RETENTION_1_WEEK = "HISTORY_RETENTION_1_WEEK";
+    public static final String HISTORY_RETENTION_1_MONTH = "HISTORY_RETENTION_1_MONTH";
+    public static final String HISTORY_RETENTION_CUSTOM = "HISTORY_RETENTION_CUSTOM";
 
     public static final int CONTACT_TYPE_MEGA = 0;
     public static final int CONTACT_TYPE_DEVICE = 1;
@@ -533,6 +546,7 @@ public class Constants {
     public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
     public static final String COPIED_TEXT_LABEL = "Copied Text";
     public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
+    public static final String IS_FROM_CONTACTS = "IS_FROM_CONTACTS";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
@@ -712,6 +726,19 @@ public class Constants {
     public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
     public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
 
+    public static final long GET_THUMBNAIL_THROTTLE_MS = 50;
+
     // 15360 GB = 15TB
     public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
+
+    /** Event Keys */
+    public static final String EVENT_NODES_CHANGE = "nodes_change";
+    public static final String EVENT_ORDER_CHANGE = "order_change";
+    public static final String EVENT_LIST_GRID_CHANGE = "list_grid_change";
+    public static final String EVENT_AVATAR_CHANGE = "avatar_change";
+    public static final String EVENT_SCROLLING_CHANGE = "scrolling_change";
+    public static final String EVENT_NOTIFICATION_COUNT_CHANGE = "notification_count_change";
+    public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
+    public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
+    public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
 }

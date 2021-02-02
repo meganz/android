@@ -30,9 +30,15 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Constants.ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.hideKeyboard;
 
 public class AchievementsActivity extends PinActivityLollipop {
     private static final String TAG_ACHIEVEMENTS = "achievementsFragment";
@@ -51,16 +57,16 @@ public class AchievementsActivity extends PinActivityLollipop {
 
     protected void onCreate(Bundle savedInstanceState) {
         logDebug("onCreate");
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
+        if (megaApi == null) {
             megaApi = ((MegaApplication) getApplication()).getMegaApi();
         }
 
-        if(megaApi==null||megaApi.getRootNode()==null){
+        if (megaApi == null || megaApi.getRootNode() == null) {
             logDebug("Refresh session - sdk");
             Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
+            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();

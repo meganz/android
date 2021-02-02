@@ -73,7 +73,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentAudioBinding.inflate(inflater, container, false).apply {
             viewModel = this@AudioFragment.viewModel
             sortByHeaderViewModel = this@AudioFragment.sortByHeaderViewModel

@@ -159,6 +159,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     };
 
+    private BroadcastReceiver retentionTimeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || adapter == null ||
+                    !intent.getAction().equals(ACTION_UPDATE_RETENTION_TIME))
+                return;
+
+            long seconds = intent.getLongExtra(RETENTION_TIME, DISABLED_RETENTION_TIME);
+            adapter.updateRetentionTimeUI(seconds);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -239,6 +251,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
+            registerReceiver(retentionTimeReceiver,
+                    new IntentFilter(ACTION_UPDATE_RETENTION_TIME));
+
             IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
             contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
@@ -263,6 +278,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(retentionTimeReceiver);
         unregisterReceiver(contactUpdateReceiver);
     }
 
@@ -674,16 +690,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void showConfirmationClearChat() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message = getResources().getString(R.string.confirmation_clear_group_chat);
-        builder.setTitle(R.string.title_confirmation_clear_group_chat);
-        builder.setMessage(message)
-                .setPositiveButton(R.string.general_clear, (dialog, which) -> chatC.clearHistory(chat))
-                .setNegativeButton(R.string.general_cancel, null)
-                .show();
-    }
-
     public void showConfirmationLeaveChat() {
         logDebug("Chat ID: " + chat.getChatId());
 
@@ -801,15 +807,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             } else {
                 logError("ERROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY) {
-            logDebug("Truncate history request finish!!!");
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Ok. Clear history done");
-                showSnackbar(getString(R.string.clear_history_success));
-            } else {
-                logError("Error clearing history: " + e.getErrorString());
-                showSnackbar(getString(R.string.clear_history_error));
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             logDebug("Create chat request finish!!!");
