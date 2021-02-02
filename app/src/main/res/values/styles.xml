@@ -39,7 +39,7 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Mega.Button.TextButton</item>
     </style>
 
-    <style name="Widget.Mega.NumberPicker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Widget.Mega.NumberPicker" parent="">
         <item name="android:textSize">20sp</item>
         <item name="android:colorControlNormal">?attr/colorSecondary</item>
         <item name="android:background">@null</item>
