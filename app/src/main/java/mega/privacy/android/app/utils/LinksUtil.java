@@ -41,7 +41,6 @@ public class LinksUtil {
             if (start != -1) {
                 String path = url.substring(start + REQUIRES_TRANSFER_SESSION.length());
                 if (!isTextEmpty(path)) {
-                    Log.i("Alex", "requiresTransferSession");
                     MegaApplication.getInstance().getMegaApi().getSessionTransferURL(path, new SessionTransferURLListener(context));
                     return true;
                 }

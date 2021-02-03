@@ -13,7 +13,7 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.admanager.AdManagerAdView
-import mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED
+import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TextUtil
 
@@ -141,7 +141,7 @@ class GoogleAdsLoader(
         // has just upgraded to pro user, then should not show Ads)
         context.registerReceiver(
             updateAccountDetailsReceiver,
-            IntentFilter(ACTION_STORAGE_STATE_CHANGED)
+            IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
     }
 

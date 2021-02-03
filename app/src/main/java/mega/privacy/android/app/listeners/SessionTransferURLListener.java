@@ -32,7 +32,6 @@ public class SessionTransferURLListener extends BaseListener {
                     if (context instanceof OpenLinkActivity) {
                         ((OpenLinkActivity) context).openWebLink(link);
                     } else {
-                        Log.i("Alex", "transferred url" + uri);
                         context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     }
                     return;
