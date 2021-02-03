@@ -367,16 +367,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mManagerActivity = (ManagerActivityLollipop) context;
 
-        initAdsLoader();
-    }
-
-    /**
-     * Init the Ads Loader and associate it with tht Ad Slot
-     * Add it as the fragment lifecycle observer
-     */
-    private void initAdsLoader() {
-        mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
-        getLifecycle().addObserver(mAdsLoader);
+        initAdsLoader(AD_SLOT, true);
     }
 
     @Nullable @Override

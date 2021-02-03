@@ -86,6 +86,9 @@ class GoogleAdsLoader(
         adView?.loadAd(adRequest)
     }
 
+    /**
+     * Get the Ad unit id and show the Ads in the container view
+     */
     private fun setUpBanner() {
         if (!isContainerSet) return
 
@@ -218,6 +221,8 @@ class GoogleAdsLoader(
     }
 
     companion object {
+        /** 0 means should show Ads (e.g. the owner of the shared file handle isn't a Pro user)
+           , otherwise don't show Ads */
         private const val SHOW_AD_FOR_USER = 0
     }
 }

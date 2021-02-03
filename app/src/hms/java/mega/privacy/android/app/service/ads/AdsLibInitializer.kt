@@ -7,6 +7,6 @@ import android.content.Context
  */
 object AdsLibInitializer {
 
-    @SuppressWarnings("unused")
+    @Suppress("unused")
     fun init(context: Context) {}
 }

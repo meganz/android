@@ -24,7 +24,6 @@ import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -461,19 +460,10 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 		}
 
-		initAdsLoader();
+		initAdsLoader(AD_SLOT, true);
 
 		super.onCreate(savedInstanceState);
 		logDebug("After onCreate called super");
-	}
-
-	/**
-	 * Init the Ads Loader and associate it with tht Ad Slot
-	 * Add it as the fragment lifecycle observer
-	 */
-	private void initAdsLoader() {
-		mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
-		getLifecycle().addObserver(mAdsLoader);
 	}
 
 	public void checkScroll() {

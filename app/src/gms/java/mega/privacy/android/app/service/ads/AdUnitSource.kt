@@ -4,9 +4,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.TimeUtils
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.GOOGLE_ADS_DEFAULT
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaError.API_OK
+
 
 /**
  * Provide interfaces for fetching/querying Ad unit ids and user status
@@ -20,7 +22,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
     private const val SLOT_NUM = 5
 
     // Ad Flag (see API doc)
-    private const val AD_FLAG = 0
+    private const val AD_FLAG = GOOGLE_ADS_DEFAULT
 
     // The time threshold for requiring a new fetch/query
     private const val TIME_THRESHOLD = TimeUtils.HOUR * 6
@@ -67,14 +69,26 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
         fun queryShowOrNotDone(result: Int)
     }
 
+    /**
+     * Set callback of querying about "show or not show" the Ads
+     * @param cb the QueryShowOrNotCallback
+     */
     fun setQueryShowOrNotCallback(cb: QueryShowOrNotCallback?) {
         queryShowOrNotCallback = cb
     }
 
+    /**
+     * Set callback of fetching Ad Unit Id
+     * @param cb the FetchCallback
+     */
     fun addFetchCallback(cb: FetchCallback) {
         callbacks.add(cb)
     }
 
+    /**
+     * Remove callback of fetching Ad Unit Id
+     * @param cb the FetchCallback
+     */
     fun removeFetchCallback(cb: FetchCallback) {
         callbacks.remove(cb)
     }

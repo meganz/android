@@ -132,22 +132,12 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 	private AchievementsActivity mActivity;
 
-	private GoogleAdsLoader mAdsLoader;
 	private static final String AD_SLOT = "and2";
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		initAdsLoader();
-	}
-
-	/**
-	 * Init the Ads Loader and associate it with tht Ad Slot
-	 * Add it as the fragment lifecycle observer
-	 */
-	private void initAdsLoader() {
-		mAdsLoader = new GoogleAdsLoader(context, AD_SLOT, true);
-		getLifecycle().addObserver(mAdsLoader);
+		initAdsLoader(AD_SLOT, true);
 	}
 
 	@Override
