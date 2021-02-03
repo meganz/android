@@ -147,10 +147,7 @@ public class ImportFilesFragment extends Fragment implements View.OnClickListene
                 showMoreLayout.setVisibility(View.VISIBLE);
             }
 
-            // The first letter of "file/files" should be capital.
-            StringBuilder sb = new StringBuilder(StringResourcesUtils.getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
-            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-            contentText.setText(sb.toString());
+            contentText.setText(StringResourcesUtils.getQuantityString(R.plurals.general_num_files, filePreparedInfos.size()));
 
             if (adapter == null) {
                 adapter = new ImportFilesAdapter(context, this, filePreparedInfos, nameFiles);

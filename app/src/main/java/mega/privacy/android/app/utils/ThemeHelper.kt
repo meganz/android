@@ -10,8 +10,8 @@ object ThemeHelper {
 
     private const val KEY_THEME_MODE = "settings_appearance_color_theme"
 
-    const val LIGHT_MODE = "light"
-    const val DARK_MODE = "dark"
+    private const val LIGHT_MODE = "light"
+    private const val DARK_MODE = "dark"
     const val DEFAULT_MODE = "default"
 
     fun applyTheme(themePref: String) {

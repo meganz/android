@@ -45,7 +45,7 @@ object ColorUtils {
 
     @JvmStatic
     fun tintIcon(context: Context, drawableId: Int, color: Int): Drawable {
-        val icon = context.getDrawable(drawableId)
+        val icon = ContextCompat.getDrawable(context, drawableId)
         val drawableWrap = DrawableCompat.wrap(icon!!).mutate()
         DrawableCompat.setTint(drawableWrap, color)
         return drawableWrap

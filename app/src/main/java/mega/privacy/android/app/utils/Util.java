@@ -1377,12 +1377,14 @@ public class Util {
 
 		if (drawUnderStatusBar) {
 			int visibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
 			if (Util.isDarkMode(activity)) {
 				visibility |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
 			} else {
 				// View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
 				visibility |= 0x00002000 | 0x00000010;
 			}
+
 			window.getDecorView().setSystemUiVisibility(visibility);
 			window.setStatusBarColor(Color.TRANSPARENT);
 		} else {
