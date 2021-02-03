@@ -31,6 +31,9 @@ val chatOnlineStatusChange: LiveData<Int> = chatOnlineStatusChange_
 private val homepageVisibilityChange_ = MutableLiveData<Boolean>()
 val homepageVisibilityChange: LiveData<Boolean> = homepageVisibilityChange_
 
+private val psaVisibilityChange_ = MutableLiveData<Int>()
+val psaVisibilityChange: LiveData<Int> = psaVisibilityChange_
+
 fun notifyNodesChange(forceUpdate: Boolean) {
     nodesChange_.value = forceUpdate
 }
@@ -61,4 +64,8 @@ fun notifyChatOnlineStatusChange(status: Int) {
 
 fun notifyHomepageVisibilityChange(visible: Boolean) {
     homepageVisibilityChange_.value = visible
+}
+
+fun notifyPsaVisibilityChange(height: Int) {
+    psaVisibilityChange_.value = height
 }
