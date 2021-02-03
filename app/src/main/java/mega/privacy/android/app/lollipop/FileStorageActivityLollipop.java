@@ -1321,12 +1321,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
                     dbH.setUriMediaExternalSdCard(uriString);
                 } else {
                     dbH.setSDCardUri(uriString);
-
-                    boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
-                    // Should set as default download location, download location must match the uri.
-                    if (!askMe) {
-                        dbH.setStorageDownloadLocation(pathString);
-                    }
                 }
 
                 finishPickFolder();
