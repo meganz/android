@@ -487,10 +487,11 @@ public class Util {
 	/**
 	 * Checks if device is on specific network.
 	 *
-	 * @param networkType The type of network.
+	 * @param networkType The type of network,
+	 * @see ConnectivityManager to check the available network types available.
 	 * @return True if device is on specified network, false otherwise.
 	 */
-	public static boolean isOnNetwork(Context context, int networkType) {
+	private static boolean isOnNetwork(Context context, int networkType) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 
