@@ -383,20 +383,14 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
             @Nullable ViewGroup container) {
-        mManagerActivity.showHideBottomNavigationView(true);
         mViewModel.setInitialPreferences();
 
         mFirstLoginBinding =
                 FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
 
         new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
-                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                    if (mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)) {
-                        mManagerActivity.changeActionBarElevation(true);
-                    } else {
-                        mManagerActivity.changeActionBarElevation(false);
-                    }
-                });
+                (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity
+                        .changeActionBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)));
 
         mFirstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
@@ -407,7 +401,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             } else {
                 requestCameraUploadPermission(permissions, REQUEST_CAMERA_ON_OFF_FIRST_TIME);
             }
-            mManagerActivity.showHideBottomNavigationView(false);
         });
         mFirstLoginBinding.camSyncButtonSkip.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
