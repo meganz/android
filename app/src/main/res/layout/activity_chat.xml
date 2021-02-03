@@ -226,6 +226,7 @@
                                 android:layout_centerVertical="true"
                                 android:layout_marginStart="10dp"
                                 android:layout_marginEnd="58dp"
+                                android:background="@android:color/transparent"
                                 android:gravity="center_vertical|start"
                                 android:inputType="textMultiLine|textCapSentences"
                                 android:maxLines="5"
