@@ -470,32 +470,37 @@ public class Util {
 		return decrypted;
 	}
 	
-	/*
-	 * Check is device on WiFi
+	/**
+	 * Checks if device is on WiFi.
 	 */
 	public static boolean isOnWifi(Context context) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = null;
-		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+		return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
 	}
 
-	/*
-	 * Check is device on Mobile Data
+	/**
+	 * Checks if device is on Mobile Data.
 	 */
 	public static boolean isOnMobileData(Context context) {
+		return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
+	}
+
+	/**
+	 * Checks if device is on specific network.
+	 *
+	 * @param networkType The type of network.
+	 * @return True if device is on specified network, false otherwise.
+	 */
+	public static boolean isOnNetwork(Context context, int networkType) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
 		NetworkInfo networkInfo = null;
+
 		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+			networkInfo = connectivityManager.getNetworkInfo(networkType);
 		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+
+		return networkInfo != null && networkInfo.isConnected();
 	}
 
 	static public boolean isOnline(Context context) {
