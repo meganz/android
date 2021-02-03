@@ -4816,15 +4816,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private void showPsa(Psa psa) {
         if (psa == null || drawerItem != DrawerItem.HOMEPAGE
 				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
-        	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
-        	adjustNavHostViewHeight(true);
+			EventNotifierKt.notifyPsaVisibilityChange(0);
             return;
         }
 
         if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+				&& getProLayout.getVisibility() == View.GONE
 				&& TextUtils.isEmpty(psa.getUrl())) {
 			psaViewHolder.bind(psa);
-			adjustNavHostViewHeight(true);
+			handler.post(() -> EventNotifierKt.notifyPsaVisibilityChange(psaViewHolder.psaLayoutHeight()));
         }
     }
 
@@ -8076,35 +8076,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private void updatePsaViewVisibility() {
 		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
 				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
-		adjustNavHostViewHeight(true);
-	}
-
-    /**
-	 * Adjust the height of NavHostView according to the visibility of the PSA view.
-	 * When the PSA view is visible, the FAB within homepage should be displayed above
-	 * the PSA view, limit the height of NavHostView is an easier way to do that.
-	 *
-	 * @param needPost in some cases, e.g. go back from transfer fragment, the BNV isn't visible
-	 *                 when we call this function, so we need post this function call to the
-	 *                 next draw cycle.
-	 */
-    private void adjustNavHostViewHeight(boolean needPost) {
-    	if (drawerItem != DrawerItem.HOMEPAGE) {
-    		return;
-		}
-
-    	if (psaViewHolder.visible()) {
-    		if (fragmentLayout.getMeasuredHeight() <= 0 || psaViewHolder.psaLayoutHeight() <= 0 || needPost) {
-    			handler.post(() -> adjustNavHostViewHeight(false));
-			} else {
-				LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
-				params.height = fragmentLayout.getMeasuredHeight() - psaViewHolder.psaLayoutHeight();
-				mNavHostView.setLayoutParams(params);
-			}
+		if (psaViewHolder.visible()) {
+			handler.post(() -> EventNotifierKt.notifyPsaVisibilityChange(psaViewHolder.psaLayoutHeight()));
 		} else {
-    		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
-    		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-    		mNavHostView.setLayoutParams(params);
+			EventNotifierKt.notifyPsaVisibilityChange(0);
 		}
 	}
 
