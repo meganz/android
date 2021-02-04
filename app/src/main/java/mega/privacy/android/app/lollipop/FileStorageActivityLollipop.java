@@ -602,6 +602,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 		}
 
+		logDebug("Request SD card write permission with intent: " + intent);
 		startActivityForResult(intent, REQUEST_CODE_TREE);
 	}
 
