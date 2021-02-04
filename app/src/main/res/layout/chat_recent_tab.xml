@@ -177,7 +177,7 @@
 
                 <Button
                     android:id="@+id/invite_button"
-                    style="?attr/borderlessButtonStyle"
+                    style="?attr/materialButtonOutlinedStyle"
                     android:layout_below="@id/empty_text_chat_recent"
                     android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal" />
