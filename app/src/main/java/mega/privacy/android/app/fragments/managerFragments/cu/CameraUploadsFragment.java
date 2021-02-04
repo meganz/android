@@ -110,7 +110,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private CuViewModel mViewModel;
     private long mDraggingNodeHandle = INVALID_HANDLE;
 
-    private GoogleAdsLoader mAdsLoader;
     private static final String AD_SLOT = "and3";
 
     public static CameraUploadsFragment newInstance(int type) {

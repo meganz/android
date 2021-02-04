@@ -129,7 +129,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
     private RelativeLayout transferOverQuotaBanner;
     private TextView transferOverQuotaBannerText;
 
-    private GoogleAdsLoader mAdsLoader;
     private static final String AD_SLOT = "and1";
 
 	@Override

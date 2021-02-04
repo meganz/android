@@ -37,9 +37,6 @@ import static nz.mega.sdk.MegaShare.ACCESS_FULL;
 
 public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
-	private GoogleAdsLoader mAdsLoader;
-	private static final String AD_SLOT = "and4";
-
 	@Override
 	public void activateActionMode() {
 		if (!adapter.isMultipleSelect()) {
@@ -104,12 +101,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		initAdsLoader(AD_SLOT, true);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("Parent Handle: " + managerActivity.getParentHandleIncoming());
 
@@ -158,9 +149,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		recyclerView.setAdapter(adapter);
 		visibilityFastScroller();
 		setEmptyView();
-
-		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
-				managerActivity.getOutMetrics());
 
 		logDebug("Deep browser tree: " + managerActivity.deepBrowserTreeIncoming);
 

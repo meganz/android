@@ -191,6 +191,7 @@ object AdUnitSource : BaseListener(MegaApplication.getInstance()) {
                 lastQueryTime = System.currentTimeMillis()
 
                 if (e.errorCode == API_OK) {
+                    // numDetails: 0 indicates ads should be show, non-zero otherwise (see comment of queryGoogleAds())
                     val result = request.numDetails
                     handleQueryCache[request.nodeHandle] = result
                     queryShowOrNotCallback?.queryShowOrNotDone(result)

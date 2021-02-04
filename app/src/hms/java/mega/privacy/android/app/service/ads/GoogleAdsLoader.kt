@@ -8,16 +8,14 @@ import androidx.lifecycle.DefaultLifecycleObserver
 /**
  * Stub for product flavor compilation
  */
-@Suppress("unused")
+@Suppress("UNUSED_PARAMETER")
 class GoogleAdsLoader(
     private val context: Context,
     private val slotId: String,
     private var loadImmediate: Boolean = true
 ) : DefaultLifecycleObserver {
 
-    @Suppress("unused")
     fun setAdViewContainer(adViewContainer: ViewGroup, displayMetrics: DisplayMetrics) {}
 
-    @Suppress("unused")
     fun queryShowOrNotByHandle(handle: Long) {}
 }

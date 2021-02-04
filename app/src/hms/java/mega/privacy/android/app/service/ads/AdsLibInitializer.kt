@@ -6,7 +6,6 @@ import android.content.Context
  * Stub for product flavor compilation
  */
 object AdsLibInitializer {
-
-    @Suppress("unused")
+    @Suppress("UNUSED_PARAMETER")
     fun init(context: Context) {}
 }
