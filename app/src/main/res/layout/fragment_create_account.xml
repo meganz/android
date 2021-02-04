@@ -328,7 +328,7 @@
                     android:layout_marginTop="5dp"
                     android:text="@string/create_account_creating_account" />
 
-                <com.google.android.material.progressindicator.ProgressIndicator
+                <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/create_account_progress_bar"
                     android:indeterminate="true"
                     android:layout_width="80dp"
