@@ -42,8 +42,7 @@ import mega.privacy.android.app.lollipop.PinLockActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
-import mega.privacy.android.app.sync.cusync.CuSyncManager;
-import mega.privacy.android.app.utils.CameraUploadUtil;
+import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
@@ -415,14 +414,6 @@ public class AccountController {
         DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
         dbH.clearCredentials();
 
-        if (CameraUploadUtil.isPrimaryEnabled()) {
-            CuSyncManager.INSTANCE.removePrimaryBackup();
-        }
-
-        if (CameraUploadUtil.isSecondaryEnabled()) {
-            CuSyncManager.INSTANCE.removeSecondaryBackup();
-        }
-
         if (dbH.getPreferences() != null){
             dbH.clearPreferences();
             dbH.setFirstTime(false);
@@ -486,6 +477,8 @@ public class AccountController {
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
         logDebug("logout");
+
+        BackupToolsKt.removeBackupsBeforeLogout();
 
         if (megaApi == null){
             megaApi = MegaApplication.getInstance().getMegaApi();

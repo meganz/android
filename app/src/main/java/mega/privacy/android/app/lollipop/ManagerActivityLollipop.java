@@ -271,6 +271,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -16111,19 +16112,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			retryTransfer(transfer);
 		}
 	}
-
-    /**
-     * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
-     */
-    private void initCuSync() {
-        if(CameraUploadUtil.isPrimaryEnabled() && dbH.getCuBackup() == null) {
-            CuSyncManager.INSTANCE.setPrimaryBackup();
-        }
-
-        if(CameraUploadUtil.isSecondaryEnabled() && dbH.getMuBackup() == null) {
-            CuSyncManager.INSTANCE.setSecondaryBackup();
-        }
-    }
 
     /**
      * Checks if there are failed or cancelled transfers.

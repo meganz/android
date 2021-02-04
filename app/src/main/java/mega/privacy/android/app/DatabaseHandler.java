@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.sync.Backup;
-import mega.privacy.android.app.sync.ToolsKt;
+import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
@@ -34,7 +33,6 @@ import nz.mega.sdk.MegaTransfer;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
@@ -4363,11 +4361,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void deleteBackupById(long id) {
-        db.execSQL(ToolsKt.deleteSQL(id));
+        db.execSQL(BackupToolsKt.deleteSQL(id));
     }
 
     public void updateBackup(Backup backup) {
-        db.execSQL(ToolsKt.updateSQL(backup));
+        db.execSQL(BackupToolsKt.updateSQL(backup));
     }
 
     public void clearBackups() {
