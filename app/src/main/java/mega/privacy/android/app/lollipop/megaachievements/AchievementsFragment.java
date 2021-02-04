@@ -24,7 +24,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 

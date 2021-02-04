@@ -64,7 +64,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;

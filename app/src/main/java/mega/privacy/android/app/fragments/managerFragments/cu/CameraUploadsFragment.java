@@ -48,7 +48,6 @@ import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.DraggingThumbnailCallback;
 import nz.mega.sdk.MegaNode;
 

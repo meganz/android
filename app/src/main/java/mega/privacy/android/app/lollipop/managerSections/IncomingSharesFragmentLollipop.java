@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
