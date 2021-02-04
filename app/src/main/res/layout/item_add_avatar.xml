@@ -48,13 +48,13 @@
         android:singleLine="true"
         android:visibility="gone"/>
 
-    <Button
+    <TextView
         android:id="@+id/invite_more"
-        style="?attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/chip_layout"
         android:layout_gravity="center_horizontal"
         android:text="@string/invite_more"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
         android:visibility="gone"/>
 </RelativeLayout>

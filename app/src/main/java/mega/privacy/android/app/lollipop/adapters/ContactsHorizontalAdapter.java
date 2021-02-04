@@ -188,7 +188,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
     public static class ContactViewHolder extends MegaContactsLollipopAdapter.ViewHolderContacts {
 
         TextView textViewName;
-        Button inviteMore;
+        TextView inviteMore;
 
         ImageView addIcon;
 
