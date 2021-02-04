@@ -3,8 +3,13 @@ package mega.privacy.android.app.components;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
 
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+
 public class ChatManagement {
+
     private final ChatRoomListener chatRoomListener;
+
+    private String pendingJoinLink;
 
     public ChatManagement() {
         chatRoomListener = new ChatRoomListener();
@@ -28,5 +33,17 @@ public class ChatManagement {
      */
     private void closeChatRoom(long chatId) {
         MegaApplication.getInstance().getMegaChatApi().closeChatRoom(chatId, chatRoomListener);
+    }
+
+    public void setPendingJoinLink(String link) {
+        pendingJoinLink = link;
+    }
+
+    public String getPendingJoinLink() {
+        return pendingJoinLink;
+    }
+
+    public boolean isPendingJoinLink() {
+        return !isTextEmpty(pendingJoinLink);
     }
 }
