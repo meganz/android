@@ -449,6 +449,7 @@
                     app:elevation="0dp"
                     app:fabSize="normal"
                     app:pressedTranslationZ="12dp"
+                    app:tint="@null"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>
@@ -485,7 +486,10 @@
                         app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp"
-                        tools:ignore="ContentDescription" />
+                        app:tint="@null"
+                        tools:ignore="ContentDescription"
+                        tools:enabled="false"
+                        tools:visibility="visible" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -510,6 +514,7 @@
                         app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp"
+                        app:tint="@null"
                         tools:ignore="ContentDescription" />
 
                     <!-- ANSWER -->
@@ -534,6 +539,7 @@
                             app:elevation="0dp"
                             app:fabSize="normal"
                             app:pressedTranslationZ="12dp"
+                            app:tint="@null"
                             tools:ignore="ContentDescription" />
 
                         <LinearLayout
@@ -606,7 +612,9 @@
                         app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp"
-                        tools:ignore="ContentDescription" />
+                        app:tint="@null"
+                        tools:ignore="ContentDescription"
+                        tools:src="@drawable/ic_video_off" />
 
                     <LinearLayout
                         android:id="@+id/linear_arrow_video"
@@ -678,6 +686,7 @@
                         app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp"
+                        app:tint="@null"
                         tools:ignore="ContentDescription" />
 
                     <!-- REJECT -->
@@ -695,6 +704,7 @@
                         app:elevation="0dp"
                         app:fabSize="normal"
                         app:pressedTranslationZ="12dp"
+                        app:tint="@null"
                         tools:ignore="ContentDescription" />
                 </FrameLayout>
 
