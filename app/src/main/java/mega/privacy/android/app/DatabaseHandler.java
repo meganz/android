@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Base64;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,8 @@ import nz.mega.sdk.MegaTransfer;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
+import static mega.privacy.android.app.utils.Util.aes_decrypt;
+import static mega.privacy.android.app.utils.Util.aes_encrypt;
 import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
