@@ -131,16 +131,14 @@
             android:name="mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Mega.Swipe">
+            android:uiOptions="splitActionBarWhenNarrow">
         </activity>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:theme="@style/Theme.Mega.Swipe">
+            android:uiOptions="splitActionBarWhenNarrow">
         </activity>
 
         <activity
@@ -387,7 +385,6 @@
             android:name="mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Mega.Swipe"
             android:configChanges="orientation|screenSize">
         </activity>
 

@@ -112,9 +112,4 @@
         <!-- In material design, TextInputLayout hint,error,helper text, BNV item text, etc. -->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
     </style>
-
-    <style name="Theme.Mega.Swipe">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
 </resources>
