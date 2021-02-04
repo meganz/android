@@ -11639,6 +11639,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			logDebug("Size: " + size);

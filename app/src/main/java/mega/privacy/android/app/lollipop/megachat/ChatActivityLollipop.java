@@ -133,6 +133,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttach
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -3329,6 +3330,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         } else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            Util.storeDownloadLocationIfNeeded(parentPath);
+
             chatC.prepareForDownload(intent, parentPath);
         } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
             sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));

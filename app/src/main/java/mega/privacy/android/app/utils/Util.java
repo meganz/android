@@ -1848,4 +1848,20 @@ public class Util {
 		}
 		return false;
 	}
+
+    /**
+     * Store the selected download location if user unticket "Always ask for download location",
+     * then this location should be set as download location.
+     *
+     * @param downloadLocation The download location selected by the user.
+     */
+    public static void storeDownloadLocationIfNeeded(String downloadLocation) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        // Should set as default download location.
+        if (!askMe) {
+            dbH.setStorageDownloadLocation(downloadLocation);
+        }
+    }
 }
