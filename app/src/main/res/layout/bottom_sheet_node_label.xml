@@ -11,6 +11,7 @@
         android:id="@+id/txt_title"
         android:layout_width="match_parent"
         android:layout_height="56dp"
+        android:padding="16dp"
         android:gravity="center_vertical"
         android:text="@string/title_label"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary" />
