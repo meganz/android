@@ -24,7 +24,7 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Scarica</string>
     <string name="general_add" context="button">Aggiungi</string>
     <string name="general_move" context="Item menu option upon right click on one or multiple files.">Sposta</string>
-    <string name="general_remove" context="Menu option to delete one or multiple selected items.">Elimina</string>
+    <string name="general_remove" context="Menu option to delete one or multiple selected items.">Rimuovi</string>
     <string name="general_share" context="button">Condividi</string>
     <!--
     <string name="general_confirm" context="button">Confirm</string>
@@ -129,8 +129,8 @@
     </plurals>
 
     <plurals name="general_num_shared_with">
-        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Shared with %1$s</item>
-        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Shared with %1$d contacts</item>
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Condiviso con %1$s</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Condiviso con %1$d contatti</item>
     </plurals>
 
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s verrà scaricato.</string>
@@ -208,8 +208,8 @@
     <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Annulla tutto</string>
 
     <plurals name="cancel_selected_transfers">
-        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">The selected transfer will be cancelled.</item>
-        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">The selected transfers will be cancelled.</item>
+        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">Il trasferimento selezionato sarà annullato.</item>
+        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">I trasferimenti selezionati saranno annullati.</item>
     </plurals>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Cloud Drive</string>
@@ -343,7 +343,7 @@
     <string name="download_touch_to_show" context="Hint how to cancel the download">Vedi trasferimenti</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">La maggior parte dei dispositivi non possono scaricare file più grandi di 4GB. Il tuo download probabilmente fallirà</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Non c\'è nessuna applicazione disponibile per eseguire il file sul tuo dispositivo</string>
-    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">There isn’t any available app to open this location on your device</string>
+    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Non c\'è nessuna app disponibile sul tuo dispositivo per aprire questa posizione</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Condividi foto usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Condividi link</string>
@@ -407,7 +407,7 @@
     <!--
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     -->
-    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Elimina</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Rimuovi</string>
     <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Rimuovi da uso offline</string>
     <string name="context_share_folder" context="menu item">Condividi cartella</string>
     <string name="context_send_file" context="menu item">Invia file a chat</string>
@@ -1046,8 +1046,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d risposte inviate con successo ma %2$d non sono state inviate.</string>
 
     <plurals name="general_num_request">
-        <item context="referring to a invitation request in the Contacts section" quantity="one">richiesta</item>
-        <item context="referring to a invitation request in the Contacts section" quantity="other">richieste</item>
+        <item context="Referring to a invitation request in the Contacts section. Singular." quantity="one">1 richiesta</item>
+        <item context="Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests" quantity="other">%1$d richieste</item>
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1072,8 +1072,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Controlla la tua e-Mail e clicca sul link per conferma il tuo account.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. 1 item" quantity="one">oggetto</item>
-        <item context="Plural of items which contains a folder. 2 items" quantity="other">oggetti</item>
+        <item context="Singular of items which contains a folder. 1 item" quantity="one">1 oggetto</item>
+        <item context="Plural of items which contains a folder. 2 items" quantity="other">%1$d oggetti</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">L\'account dell\'utente associato è stato chiuso a causa di ripetute violazioni dei nostri Termini di Servizio.</string>
@@ -1407,7 +1407,7 @@
 
 	<string name="label_process_finishing" contest="Progress text shown when user stop upload/download and the app is waiting for async response">Il processo sta per finire&#8230;</string>
     <string name="option_to_transfer_manager" context="positive button on dialog to view a contact" formatted="false">Vedi</string>
-    <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Pausa tutti i trasferimenti</string>
+    <string name="option_to_pause_transfers" context="Label of the modal bottom sheet to pause all transfers">Metti in pausa tutti i trasferimenti</string>
     <string name="option_to_resume_transfers" context="Label of the modal bottom sheet to resume all transfers">Riprendi tutti i trasferimenti</string>
     <string name="option_to_clear_transfers" context="Label of the modal bottom sheet to clear completed transfers">Pulisci tutti i trasferimenti</string>
     <string name="option_to_retry_transfers" context="Label indicating action to retry failed or cancelled transfers">Ritenta tutti i trasferimenti</string>
@@ -1415,7 +1415,7 @@
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Riprendere i trasferimenti?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Riprendi</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Cancellare i trasferimenti completati?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Cancellare tutti i trasferimenti?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">In corso</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Completato</string>
@@ -1795,7 +1795,7 @@
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Il QRcode non è stato resettato a causa di un errore. Per favore, riprova.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Il QRcode non è stato eliminato a causa di un errore. Per favore, riprova.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">Invito spedito</string>
-    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">L\'utente %s è stato invitato e apparirà nella tua lista dei contatti una volta accettato l\'invito.</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">L\'utente è stato invitato e apparirà nella tua lista dei contatti una volta accettato l\'invito.</string>
     <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">Gli utenti sono stati invitati e appariranno nell\'elenco dei contatti una volta accettati gli inviti.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Un errore è stato riscontrato durante la condivisione del file QR. Forse il file non esiste. Per favore, riprova più tardi.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Un errore è stato riscontrato durante il caricamento del file QR. Forse il file non esiste. Per favore, riprova più tardi.</string>
@@ -2273,8 +2273,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Attiva la rotazione della chiave di criptazione</string>
     <string name="private_chat" context="Title of the view to inform that a chat is private">Rotazione della chiave di criptazione attivata</string>
-    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
-    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è disabilitata per le chat con più di 100 partecipanti.</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotazione della chiave di criptazione è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non potranno vedere i messaggi inviati prima del loro ingresso.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave di criptazione è disabilitata per le chat con più di 100 partecipanti.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">È stato impossibile convertire questa chat in chat privata in quanto il limite di partecipanti è stato superato.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A] [B]ha creato il link della chat.[/B]</string>
@@ -2306,9 +2306,9 @@
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Link della chat non valido</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotazione della chiave di criptazione</string>
-    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotazione della chiave di criptazione è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non potranno vedere i messaggi inviati prima del loro ingresso.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotazione della chiave di criptazione è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non potranno vedere i messaggi inviati prima del loro ingresso.</string>
     <string name="action_open_chat_link" context="Menu item">Apri link della chat</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">L\'invito al contatto %s è già stato spedito in precedenza e può essere consultato nella sezione Richieste Inviate.</string>
@@ -2387,13 +2387,13 @@
     <string name="button_continue" context="dialog option continue in alert dialog">Continua</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Wallet[/A] (abbonamento)</string>
-    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (subscription)</string>
+    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (abbonamento)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Credit Card[/A] (abbonamento)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Operatore mobile[/A] (una volta sola)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Operatore mobile[/A] (una volta sola)</string>
 
     <string name="new_label_notification_item" context="Capital letters. Text of the label of a new historic notifications">NUOVO</string>
-    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Per aggiornare il tuo abbonamento corrente, per favore contatta il supporto per un [A]piano fatto apposta per te[/A].</string>
+    <string name="label_custom_plan" context="When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan.">Per aggiornare il tuo abbonamento corrente, per favore contatta il nostro team di supporto per un [A]piano fatto apposta per te[/A].</string>
 
     <string name="context_new_file_name_hint" context="Input field description in the create file dialog.">nome file</string>
     <string name="option_enable_last_green_chat" context="Option in Settings section to enable the last active connection in chat">Mostra Ultima visita&#8230;</string>
@@ -2408,8 +2408,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">Compressione di video %1$d su %2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Cartella non valida selezionata</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file">1 folder . 1 file</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder . 7 files">1 folder . %1$d files</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 cartella. 1 file</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 cartella. %1$d file</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d file</item>
@@ -2422,8 +2422,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders . 1 file" quantity="one">%1$d folders . 1 file</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders . 2 files" quantity="other">%1$d folders . %2$d files</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d cartelle. 1 file</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d cartelle. %2$d file</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A] [B]ha aggiunto %2$s e %3$s[/B]</string>
@@ -2624,7 +2624,7 @@
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">La rotazione della chiave di criptazione non ti permette di ottenere un link della chat senza creare una nuova chat di gruppo.</string>
     <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Vuoi creare una nuova chat di gruppo ed ottenere un link della chat?</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotazione della chiave è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotazione della chiave di criptazione è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non potranno vedere i messaggi inviati prima del loro ingresso.</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">Ti sei unito con successo alla chat.</string>
 
@@ -2701,7 +2701,7 @@
     <string name="recents_label" context="Label to reference a recents section">Recenti</string>
     <string name="chats_label" context="Label to reference a chats section">Chat</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nessuna attività sui file da mostrare nelle[/B] [A]Attività recenti[/A]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Nessun file nelle tue[/B] [A]Attività recenti[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s e altri %2$d</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d immagini</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d video</string>
@@ -2885,7 +2885,7 @@
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Cerca su GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Nessuna [A]GIF[/A] trovata</string>
-    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">No available GIFs. Please try again later</string>
+    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">Nessuna GIF disponibile. Per favore, riprova più tardi</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]Fine dei[/A] risultati</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Riprendere i trasferimenti?</string>
@@ -2900,31 +2900,31 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Hai raggiunto il limite massimo di %d reazioni.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Questo messaggio ha raggiunto il limite massimo di %d reazioni.</string>
 
-    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Select transfers</string>
+    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Seleziona trasferimenti</string>
 
-    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer ‘video.mp4’ failed.">The priority change of the transfer ’%1$s’ failed.</string>
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">Il cambiamento di priorità del trasferimento ”%1$s” è fallito.</string>
 
-    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Send decryption key separately</string>
-    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Export link and decryption key separately.</string>
-    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Learn more</string>
-    <string name="key_label" context="Label key referring to a link decryption key">Key</string>
-    <string name="button_share_key" context="Button which action is share the decryption key of a link">Share key</string>
-    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">Copy key</string>
-    <string name="button_copy_password" context="Button which action is copy the password of a link">Copy password</string>
-    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">Link copied to the clipboard.</string>
-    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">Key copied to the clipboard.</string>
-    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">Password copied to the clipboard.</string>
-    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">Link successfully sent.</string>
-    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and key successfully sent.</string>
-    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link and password successfully sent.</string>
-    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Upgrade to Pro</string>
-    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
-    <string name="decryption_key_explanation" context="Meaning of links decryption key">Our end-to-end encryption system requires a unique key automatically generated for this file. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
-    <string name="reset_password_label" context="Reset password label">Reset password</string>
-    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Share the key for this link?</string>
-    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Share the password for this link?</string>
-    <string name="button_share_password" context="Button which action is share the password of a link">Share password</string>
-    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Link: %1$s\n\nKey: %2$s</string>
+    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Invia la chiave di decriptazione separatamente</string>
+    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Esporta il link e la chiave di decriptazione separatamente.</string>
+    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">Scopri di più</string>
+    <string name="key_label" context="Label key referring to a link decryption key">Chiave</string>
+    <string name="button_share_key" context="Button which action is share the decryption key of a link">Condividi chiave</string>
+    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">Copia chiave</string>
+    <string name="button_copy_password" context="Button which action is copy the password of a link">Copia password</string>
+    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">Link copiato negli appunti.</string>
+    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">Chiave copiata negli appunti.</string>
+    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">Password copiata negli appunti.</string>
+    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">Link inviato con successo.</string>
+    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link e chiave inviati con successo.</string>
+    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Link e password inviati con successo.</string>
+    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Aggiorna a Pro</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">Gli utenti MEGA Pro hanno accesso esclusivo a feature che comportano un link addizionale di sicurezza rendendo il tuo account ancora più sicuro.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Il nostro sistema di criptazione end-to-end necessita di una chiave unica creata automaticamente per questo file. Un link con questa chiave è creato di default, ma puoi esportare la chiave di decriptazione separatamente per uno strato aggiuntivo di sicurezza.</string>
+    <string name="reset_password_label" context="Reset password label">Resetta la password</string>
+    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Condividere la chiave di questo link?</string>
+    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Condividere la password di questo link?</string>
+    <string name="button_share_password" context="Button which action is share the password of a link">Condividi la password</string>
+    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Link: %1$s\n\nChiave: %2$s</string>
     <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">Link: %1$s\n\nPassword: %2$s</string>
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA ha bisogno del tuo permesso per poter condividere questi file.</string>
@@ -2942,26 +2942,27 @@
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">Viola</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">Grigio</string>
 
-    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Cookie Policy</string>
-    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Cookie Settings</string>
-    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Before you continue</string>
-    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">We use local storage and similar technologies (‘Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our <a href="https://mega.nz/cookie">Cookie Policy</a>.</string>
-    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Third Party Cookies</string>
-    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Google Advertising Cookies</string>
-    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Category: Advertising Cookies</string>
-    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Used by Google to:\n• customise adverts which are shown by Google on our services and on other websites and services based on such things as your location and your actions on our services and the actions you have taken on other websites and services you have previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
-    <string name="preference_cookies_accept" context="Preference screen item title">Accept Cookies</string>
-    <string name="preference_cookies_essential_title" context="Preference screen item title">Essential Cookies</string>
-    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essential for providing you important functionality and secure access to our services. For this reason, they do not require consent.</string>
-    <string name="preference_cookies_preference_title" context="Preference screen item title">Preference Cookies</string>
-    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Allow us to remember certain display and formatting settings you choose. Not accepting these Cookies will mean we won’t be able to remember some things for you such as your preferred screen layout.</string>
-    <string name="preference_cookies_performance_title" context="Preference screen item title">Performance and Analytics Cookies</string>
-    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
-    <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertising Cookies</string>
-    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
-    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Third Party Cookies</string>
-    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information\' below for details on all the third party Cookies we use. <b>More Information</b></string>
+    <string name="action_more_information" context="Action to get more information">Maggiori informazioni</string>
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Politica dei Cookie</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Impostazioni dei Cookie</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Prima di continuare</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Noi utilizziamo archiviazione locale e tecnologie simili (“Cookie”) per fornirti i nostri servizi, migliorare la tua esperienza con essi e personalizzare le pubblicità che vedi, incluse quelle tramite terze parti. Accetta l\'utilizzo dei nostri Cookie dall\'inizio della tua visita personalizza i Cookie nelle Impostazioni dei Cookie. Leggi di più riguardo la nostra [A]Politica dei Cookie[/A].</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Cookie di terze parti</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Cookie della pubblicità di Google</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Categoria: Cookie pubblicitari</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Utilizzati da Google per:\n• personalizzare le pubblicità che Google ti mostra sui nostri e su altri servizi, basati su informazioni come la tua posizione e le tue azioni sui nostri servizi e le azioni che fai sugli altri siti web e servizi che hai precedentemente visitato;\n• monitorare quanto spesso ti vengono mostrate certe pubblicità;\n• fornire una prevenzione alle frodi; e\n• determinare quando clicchi su una determinata pubblicità e in seguito tracciare le azioni che fai in risposta a quella pubblicità.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">Accetta Cookie</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">Cookie essenziali</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Essenziali per fornirti importanti funzionalità e un accesso sicuro ai nostri servizi. Per questo motivo, non hanno bisogno del tuo consenso.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">Preferenze dei Cookie</string>
+    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Permettici di ricordare certe impostazioni di display e formattazione che scegli. Non accettare questi Cookie significa che non potremo ricordare alcune cose per te, come ad esempio il tuo layout di schermo preferito.</string>
+    <string name="preference_cookies_performance_title" context="Preference screen item title">Cookie di performance e statistiche</string>
+    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Aiutaci a capire come utilizzi i nostri servizi e forniscici dati che possiamo utilizzare per fare miglioramenti. Non accettare questi Cookie significa che avremo meno dati disponibili per fare dei miglioramenti grafici.</string>
+    <string name="preference_cookies_advertising_title" context="Preference screen item title">Cookie pubblicitari</string>
+    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Utilizzati da noi e dai nostri partner pubblicitari approvati per personalizzare le pubblicità che vedi sui nostri servizi e sugli altri siti basati sulla tua cronologia. Non accettare questi Cookie significa che potremmo mostrarti pubblicità meno rilevanti.</string>
+    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Cookie di terze parti</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">Questi sono Cookie che sono controllati da qualcun altro oltre noi; noi utilizziamo questi Cookie per fornire i tipi di funzionalità descritti qui sopra. Non accettare questi Cookie avrà diverse implicazioni, in base a quale tipo di Cookie è ogni Cookie di terze parti. Clicca su “Maggiori informazioni” qui sotto per i dettagli su tutti i Cookie di terze parti che utilizziamo.</string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
-    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
-    <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
+    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Policy sui Cookie</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Sempre attivi</string>
 </resources>
