@@ -40,12 +40,16 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import java.io.File;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import nz.mega.sdk.MegaApiAndroid;
@@ -65,6 +69,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
 
 	private static final String TAG_DECRYPT = "decrypt";
@@ -114,6 +119,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	public static final int FILE_LINK = 1;
 
 	private String mKey;
+
+	@Inject
+	CookieDialogFactory cookieDialogFactory;
 
 	@Override
 	public void onDestroy(){
@@ -239,6 +247,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		else{
 			logWarning("url NULL");
 		}
+
+		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
 	}
 
 	@Override
