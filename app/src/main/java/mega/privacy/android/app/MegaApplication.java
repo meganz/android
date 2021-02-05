@@ -1317,10 +1317,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
 			chatManagement.removeJoiningChatId(request.getChatHandle());
 			chatManagement.removeJoiningChatId(request.getUserHandle());
-		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
-			if (request.getUserHandle() == INVALID_HANDLE) {
-				chatManagement.removeLeavingChatId(request.getChatHandle());
-			}
+		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
+				&& request.getUserHandle() == INVALID_HANDLE) {
+			chatManagement.removeLeavingChatId(request.getChatHandle());
 		}
 	}
 

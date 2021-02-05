@@ -12,9 +12,12 @@ public class ChatManagement {
 
     private final ChatRoomListener chatRoomListener;
 
+    // If this has a valid value, means there is a pending chat link to join.
     private String pendingJoinLink;
-    private List<Long> joiningChatIds = new ArrayList<>();
-    private List<Long> leavingChatIds = new ArrayList<>();
+    // List of chat ids to control if a chat is already joining.
+    private final List<Long> joiningChatIds = new ArrayList<>();
+    // List of chat ids to control if a chat is already leaving.
+    private final List<Long> leavingChatIds = new ArrayList<>();
 
     public ChatManagement() {
         chatRoomListener = new ChatRoomListener();

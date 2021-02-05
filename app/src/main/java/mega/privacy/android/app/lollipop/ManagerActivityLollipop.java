@@ -486,30 +486,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
 
-	@Override
-	public void confirmLeaveChat(long chatId) {
-		megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this));
-	}
-
-	@Override
-	public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
-		if (getChatsFragment() != null) {
-			rChatFL.clearSelections();
-			rChatFL.hideMultipleSelect();
-		}
-
-		for (MegaChatListItem chat : chats) {
-			if (chat != null) {
-				megaChatApi.leaveChat(chat.getChatId(), new RemoveFromChatRoomListener(this));
-			}
-		}
-	}
-
-	@Override
-	public void leaveChatSuccess() {
-		// No update needed.
-	}
-
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
@@ -10455,6 +10431,30 @@ public class ManagerActivityLollipop extends SorterContentActivity
 				.show();
 
 		refreshAfterMovingToRubbish();
+	}
+
+	@Override
+	public void confirmLeaveChat(long chatId) {
+		megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this));
+	}
+
+	@Override
+	public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
+		if (getChatsFragment() != null) {
+			rChatFL.clearSelections();
+			rChatFL.hideMultipleSelect();
+		}
+
+		for (MegaChatListItem chat : chats) {
+			if (chat != null) {
+				megaChatApi.leaveChat(chat.getChatId(), new RemoveFromChatRoomListener(this));
+			}
+		}
+	}
+
+	@Override
+	public void leaveChatSuccess() {
+		// No update needed.
 	}
 
 	public void showConfirmationResetPasswordFromMyAccount (){
