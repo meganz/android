@@ -13,7 +13,7 @@ public class ChatManagement {
     private final ChatRoomListener chatRoomListener;
 
     private String pendingJoinLink;
-    private List<String> joiningLinks = new ArrayList<>();
+    private List<Long> joiningChatIds = new ArrayList<>();
     private List<Long> leavingChatIds = new ArrayList<>();
 
     public ChatManagement() {
@@ -52,16 +52,16 @@ public class ChatManagement {
         return !isTextEmpty(pendingJoinLink);
     }
 
-    public void addJoiningLink(String joiningLink) {
-        joiningLinks.add(joiningLink);
+    public void addJoiningChatId(long joiningChatId) {
+        joiningChatIds.add(joiningChatId);
     }
 
-    public void removeJoiningLink(String joiningLink) {
-        joiningLinks.remove(joiningLink);
+    public void removeJoiningChatId(long joiningChatId) {
+        joiningChatIds.remove(joiningChatId);
     }
 
-    public boolean isAlreadyJoining(String joinLink) {
-        return joiningLinks.contains(joinLink);
+    public boolean isAlreadyJoining(long joinChatId) {
+        return joiningChatIds.contains(joinChatId);
     }
 
     public void addLeavingChatId(long leavingChatId) {

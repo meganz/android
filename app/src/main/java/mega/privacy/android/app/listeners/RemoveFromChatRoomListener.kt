@@ -34,7 +34,9 @@ class RemoveFromChatRoomListener : ChatBaseListener {
     override fun onRequestFinish(api: MegaChatApiJava, request: MegaChatRequest, e: MegaChatError) {
         if (request.type != TYPE_REMOVE_FROM_CHATROOM) return
 
-        MegaApplication.getChatManagement().removeLeavingChatId(request.chatHandle)
+        if (request.userHandle == INVALID_HANDLE) {
+            MegaApplication.getChatManagement().removeLeavingChatId(request.chatHandle)
+        }
 
         if (e.errorCode == ERROR_OK) {
             if (request.userHandle == INVALID_HANDLE) chatManagementCallback?.leaveChatSuccess()

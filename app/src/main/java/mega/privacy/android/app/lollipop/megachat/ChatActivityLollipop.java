@@ -547,7 +547,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     @Override
     public void confirmLeaveChat(long chatId) {
         stopReproductions();
-        setJoiningOrLeaving(getString(R.string.leaving_label));
+        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.leaving_label));
         megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this, this));
     }
 
@@ -729,7 +729,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     };
 
-    private BroadcastReceiver leftChatReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver leftChatReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null)
@@ -741,7 +741,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     megaChatApi.leaveChat(extraIdChat, new RemoveFromChatRoomListener(chatActivity, chatActivity));
 
                     if (idChat == extraIdChat) {
-                        setJoiningOrLeaving(getString(R.string.leaving_label));
+                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.leaving_label));
                     }
                 }
             }
@@ -1339,7 +1339,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
                     if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         openingAndJoining = true;
-                        setJoiningOrLeaving(getString(R.string.joining_label));
+                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
                     }
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -1570,7 +1570,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (!initChat()) {
             return;
         }
+
         initializeInputText();
+        checkIfIsAlreadyJoiningOrLeaving();
 
         int chatConnection = megaChatApi.getChatConnectionState(idChat);
         logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
@@ -1658,6 +1660,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
      * It controls if it is the real first time, or the device was rotated with the "isTurn" flag.
      */
     public void loadHistory() {
+        if (chatRoom == null) {
+            return;
+        }
+
         long unreadCount = chatRoom.getUnreadCount();
         lastSeenReceived = unreadCount == 0;
 
@@ -3791,10 +3797,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
             case R.id.join_button:
                 if (chatC.isInAnonymousMode()) {
                     ifAnonymousModeLogin(true);
-                } else {
-                    setJoiningOrLeaving(getString(R.string.joining_label));
+                } else if (!isAlreadyJoining(idChat)) {
+                    setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
+
                 break;
 
 		}
@@ -7596,7 +7603,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 MegaApplication.setOpenChatId(idChat);
 
                 if (e.getErrorCode() == MegaChatError.ERROR_OK && openingAndJoining) {
-                    megaChatApi.autojoinPublicChat(idChat, this);
+                    if (!isAlreadyJoining(idChat)) {
+                        megaChatApi.autojoinPublicChat(idChat, this);
+                    }
+
                     openingAndJoining = false;
                 } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
                     if (megaChatApi.getChatRoom(idChat).isActive()) {
@@ -7606,17 +7616,22 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     } else {
                         if (initChat()) {
                             //Chat successfully initialized, now can rejoin
-                            setJoiningOrLeaving(getString(R.string.joining_label));
+                            setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
                             titleToolbar.setText(chatRoom.getTitle());
                             groupalSubtitleToolbar.setText(null);
                             setGroupalSubtitleToolbarVisibility(false);
+
                             if (adapter == null) {
                                 createAdapter();
                             } else {
                                 adapter.updateChatRoom(chatRoom);
                                 adapter.notifyDataSetChanged();
                             }
-                            megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+
+                            if (!isAlreadyJoining(idChat)
+                                    && !isAlreadyJoining(request.getUserHandle())) {
+                                megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                            }
                         } else {
                             logWarning("Error opening chat before rejoin");
                         }
@@ -9410,6 +9425,19 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     /**
+     * Checks if it is already joining or leaving the chat to set the right UI.
+     */
+    private void checkIfIsAlreadyJoiningOrLeaving() {
+        if (MegaApplication.getChatManagement().isAlreadyJoining(idChat)) {
+            joiningOrLeaving = true;
+            joiningOrLeavingAction = StringResourcesUtils.getString(R.string.joining_label);
+        } else if (MegaApplication.getChatManagement().isAlreadyLeaving(idChat)) {
+            joiningOrLeaving = true;
+            joiningOrLeavingAction = StringResourcesUtils.getString(R.string.leaving_label);
+        }
+    }
+
+    /**
      * Initializes the joining or leaving UI depending on the action received.
      *
      * @param action    String which indicates if the UI to set is the joining or leaving state.
@@ -9420,6 +9448,20 @@ public class ChatActivityLollipop extends PinActivityLollipop
         joiningLeavingText.setText(action);
         setBottomLayout(SHOW_JOINING_OR_LEFTING_LAYOUT);
         invalidateOptionsMenu();
+    }
+
+    /**
+     * Checks if the chat is already joining before add it to the list.
+     *
+     * @return True if the chat is already joining, false otherwise.
+     */
+    private boolean isAlreadyJoining(long id) {
+        if (MegaApplication.getChatManagement().isAlreadyJoining(id)) {
+            return true;
+        }
+
+        MegaApplication.getChatManagement().addJoiningChatId(id);
+        return false;
     }
 
     public void setLastIdMsgSeen(long lastIdMsgSeen) {
