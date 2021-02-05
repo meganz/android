@@ -9103,49 +9103,35 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     private void checkExpandOrCollapseInputText() {
-
-
-        if (writingContainerLayout != null)
-            writingContainerLayout.getLayoutParams().width = MATCH_PARENT;
-
-        if (bottomItems != null)
-            bottomItems.getLayoutParams().width = MATCH_PARENT;
-
-
-        if (inputTextLayout != null)
-            inputTextLayout.getLayoutParams().width = MATCH_PARENT;
-
         if (!isInputTextExpanded) {
-            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_expand_text_input));
+            writingContainerLayout.setBackgroundColor(Color.TRANSPARENT);
+            inputTextLayout.setBackground(null);
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
-            if (writingContainerLayout != null)
-                writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
-
-            if (bottomItems != null)
-                bottomItems.getLayoutParams().height = WRAP_CONTENT;
-
-            if (inputTextLayout != null)
-                inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
-
+            tB.setVisibility(View.VISIBLE);
+            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_expand_text_input));
+            writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
+            bottomItems.getLayoutParams().height = WRAP_CONTENT;
+            inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
+            writeMsgLayout.getLayoutParams().height = WRAP_CONTENT;
+            textChat.getLayoutParams().height = WRAP_CONTENT;
         } else {
-            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_collapse_text_input));
+            writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.black_12_alpha));
+            inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
             writeMsgLayout.setBackground(null);
-            writeMsgLayout.setBackgroundColor(Color.WHITE);
-
-            if (writingContainerLayout != null)
-                writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
-
-            if (bottomItems != null)
-                bottomItems.getLayoutParams().height = MATCH_PARENT;
-
-            if (inputTextLayout != null)
-                inputTextLayout.getLayoutParams().height = MATCH_PARENT;
-
+            tB.setVisibility(View.GONE);
+            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_collapse_text_input));
+            writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
+            bottomItems.getLayoutParams().height = MATCH_PARENT;
+            inputTextLayout.getLayoutParams().height = MATCH_PARENT;
+            writeMsgLayout.getLayoutParams().height = MATCH_PARENT;
+            textChat.getLayoutParams().height = MATCH_PARENT;
         }
 
         writingContainerLayout.requestLayout();
         bottomItems.requestLayout();
         inputTextLayout.requestLayout();
+        writeMsgLayout.requestLayout();
+        textChat.requestLayout();
     }
 
     /**

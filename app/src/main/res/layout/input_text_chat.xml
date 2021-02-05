@@ -49,8 +49,8 @@
                     android:paddingTop="10dp"
                     android:paddingBottom="8dp"
                     android:fontFamily="sans-serif"
-                    android:gravity="center_vertical|start"
-                    android:layout_gravity="center_vertical"
+                    android:gravity="start"
+                    android:layout_gravity="center_horizontal|top"
                     android:background="@android:color/transparent"
                     android:inputType="textMultiLine|textCapSentences"
                     android:maxLines="5"
@@ -78,8 +78,7 @@
 
         <RelativeLayout
             android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:gravity="bottom">
+            android:layout_height="match_parent">
             <RelativeLayout
                 android:id="@+id/expand_input_text_rl"
                 android:layout_width="match_parent"
