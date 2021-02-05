@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaTransfer;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR;
 import static mega.privacy.android.app.utils.Constants.APP_DATA_SD_CARD;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
@@ -90,6 +91,7 @@ public class SDCardUtils {
     public static String getSDCardTargetUri(String appData) {
         String[] appDataParts = getSDCardAppDataParts(appData);
         if (appDataParts == null || appDataParts.length <= APP_DATA_SD_CARD_PARTS) {
+            logDebug("App data doesn't contain SD card uri.");
             return null;
         }
 

@@ -3,11 +3,14 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="23dp"
-    android:paddingTop="22dp">
+    android:paddingStart="24dp"
+    android:paddingTop="20dp"
+    android:paddingEnd="30dp">
     <TextView
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:textColor="@color/black"
         android:text="@string/title_dialog_mute_chat_notifications"
         android:textSize="20sp"
@@ -17,11 +20,12 @@
         android:letterSpacing="0"
         android:textAlignment="gravity"/>
     <TextView
+        android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/secondary_text"
         android:text="@string/subtitle_dialog_mute_chat_notifications"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:fontFamily="Roboto"
         android:letterSpacing="0"
         android:gravity="start"

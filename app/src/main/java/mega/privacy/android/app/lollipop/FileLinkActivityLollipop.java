@@ -52,6 +52,7 @@ import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -73,6 +74,7 @@ import static mega.privacy.android.app.utils.Util.*;
 public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
 
 	private static final String TAG_DECRYPT = "decrypt";
+	private static final String AD_SLOT = "and5";
 
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -122,6 +124,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 	@Inject
 	CookieDialogFactory cookieDialogFactory;
+
+	private GoogleAdsLoader mAdsLoader;
 
 	@Override
 	public void onDestroy(){
@@ -249,6 +253,18 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}
 
 		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+		initAdsLoader();
+	}
+
+	/**
+	 * Init the Ads Loader and associate it with tht Ad Slot
+	 * Add it as the fragment lifecycle observer
+	 * Set the Ads view container to the Ads Loader
+	 */
+	private void initAdsLoader() {
+		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
+		getLifecycle().addObserver(mAdsLoader);
+		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
 	}
 
 	@Override
@@ -394,15 +410,19 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					return;
 				}
 
-				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + document.getHandle());
+				long handle = document.getHandle();
+
+				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + handle);
 				if (dbH == null){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
 
-				if (document.getHandle() != MegaApiJava.INVALID_HANDLE) {
-					dbH.setLastPublicHandle(document.getHandle());
+				if (handle != MegaApiJava.INVALID_HANDLE) {
+					dbH.setLastPublicHandle(handle);
 					dbH.setLastPublicHandleTimeStamp();
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
+
+					mAdsLoader.queryShowOrNotByHandle(handle);
 				}
 
 //				nameView.setText(document.getName());

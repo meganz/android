@@ -440,6 +440,11 @@ public class Util {
 		return (int)(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, outMetrics));
 	}
 
+	public static int dp2px(float dp) {
+		return (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+				Resources.getSystem().getDisplayMetrics()));
+	}
+
 	/*
 	 * AES encryption
 	 */
@@ -463,32 +468,38 @@ public class Util {
 		return decrypted;
 	}
 	
-	/*
-	 * Check is device on WiFi
+	/**
+	 * Checks if device is on WiFi.
 	 */
 	public static boolean isOnWifi(Context context) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = null;
-		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+		return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
 	}
 
-	/*
-	 * Check is device on Mobile Data
+	/**
+	 * Checks if device is on Mobile Data.
 	 */
 	public static boolean isOnMobileData(Context context) {
+		return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
+	}
+
+	/**
+	 * Checks if device is on specific network.
+	 *
+	 * @param networkType The type of network,
+	 * @see ConnectivityManager to check the available network types available.
+	 * @return True if device is on specified network, false otherwise.
+	 */
+	private static boolean isOnNetwork(Context context, int networkType) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
 		NetworkInfo networkInfo = null;
+
 		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+			networkInfo = connectivityManager.getNetworkInfo(networkType);
 		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+
+		return networkInfo != null && networkInfo.isConnected();
 	}
 
 	static public boolean isOnline(Context context) {
@@ -1827,4 +1838,20 @@ public class Util {
 		}
 		return false;
 	}
+
+    /**
+     * Store the selected download location if user unticket "Always ask for download location",
+     * then this location should be set as download location.
+     *
+     * @param downloadLocation The download location selected by the user.
+     */
+    public static void storeDownloadLocationIfNeeded(String downloadLocation) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        // Should set as default download location.
+        if (!askMe) {
+            dbH.setStorageDownloadLocation(downloadLocation);
+        }
+    }
 }
