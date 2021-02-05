@@ -39,7 +39,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -65,7 +64,6 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -116,8 +114,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -137,7 +133,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
@@ -158,8 +153,7 @@ import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -232,7 +226,6 @@ import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
-import mega.privacy.android.app.utils.StringUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -350,11 +343,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
-    @Inject
-	GetCookieSettingsUseCase getCookieSettingsUseCase;
-
-    @Inject
-	UpdateCookieSettingsUseCase updateCookieSettingsUseCase;
+	@Inject
+	CookieDialogFactory cookieDialogFactory;
 
 	public int accountFragment;
 
@@ -3581,39 +3571,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 	}
 
-	private void showCookieDialog() {
-		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
-				.setCancelable(false)
-				.setView(R.layout.dialog_cookie_alert)
-				.setPositiveButton(R.string.preference_cookies_accept, (positiveDialog, which) ->
-						updateCookieSettingsUseCase.acceptAll()
-								.subscribeOn(Schedulers.io())
-								.observeOn(AndroidSchedulers.mainThread())
-								.subscribe(() -> {
-									app.checkEnabledCookies();
-								}, (error) -> {
-									logError(error.getMessage());
-								})
-				)
-				.setNegativeButton(R.string.settings_about_cookie_settings, (negativeDialog, which) ->
-						startActivity(new Intent(this, CookiePreferencesActivity.class))
-				)
-				.create();
-
-		dialog.setOnShowListener(dialogInterface -> {
-			String message = getString(R.string.dialog_cookie_alert_message)
-					.replace("[A]", "<a href='https://mega.nz/cookie'>")
-					.replace("[/A]", "</a>");
-			Spanned spannedHtmlText = StringUtils.toSpannedHtmlText(message);
-
-			TextView messageView = dialog.findViewById(R.id.message);
-			messageView.setMovementMethod(LinkMovementMethod.getInstance());
-			messageView.setText(spannedHtmlText);
-		});
-
-		dialog.show();
-	}
-
 	public void destroySMSVerificationFragment() {
         if (!isTablet(this)) {
             logDebug("mobile, all orientation");
@@ -4789,14 +4746,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		checkBeforeShowSMSVerificationDialog();
 
-		if (MegaApplication.isCookieBannerEnabled()) {
-			getCookieSettingsUseCase.shouldShowDialog()
-					.subscribeOn(Schedulers.io())
-					.observeOn(AndroidSchedulers.mainThread())
-					.subscribe((showDialog, throwable) -> {
-						if (showDialog) showCookieDialog();
-					});
-		}
+		cookieDialogFactory.showDialogIfNeeded(this);
     }
 
     /**
