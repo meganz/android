@@ -500,7 +500,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 		}
 	}
 
-	public void checkSelectModeAfterChangeTab() {
+	public void checkSelectModeAfterChangeTabOrDrawerItem() {
 		if (adapter != null && adapter.isMultipleSelect()) {
 			destroyActionMode();
 		}

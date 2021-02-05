@@ -123,13 +123,14 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 
-	boolean allFiles = true;
 	String downloadLocationDefaultPath;
     
     private int placeholderCount;
 
     private RelativeLayout transferOverQuotaBanner;
     private TextView transferOverQuotaBannerText;
+
+    private static final String AD_SLOT = "and1";
 
 	@Override
 	protected MegaNodeAdapter getAdapter() {
@@ -453,6 +454,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
 		}
 
+		initAdsLoader(AD_SLOT, true);
+
 		super.onCreate(savedInstanceState);
 		logDebug("After onCreate called super");
 	}
@@ -619,6 +622,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		});
 
 		setTransferOverQuotaBannerVisibility();
+
+		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
+				((ManagerActivityLollipop) context).getOutMetrics());
 
 		return v;
     }

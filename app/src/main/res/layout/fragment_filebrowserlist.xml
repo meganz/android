@@ -39,14 +39,19 @@
         <include
             layout="@layout/transfer_over_quota_banner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/call_in_progress_layout" />
+            android:layout_height="wrap_content" />
 
-        <RelativeLayout
-            android:id="@+id/relative_layout_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/transfer_over_quota_banner">
+		<FrameLayout
+			android:id="@+id/ad_view_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@id/transfer_over_quota_banner" />
+
+		<RelativeLayout
+			android:id="@+id/relative_layout_recycler"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_below="@id/ad_view_container">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/file_list_view_browser"

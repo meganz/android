@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Locale;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -108,6 +110,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private CuViewModel mViewModel;
     private long mDraggingNodeHandle = INVALID_HANDLE;
+
+    private static final String AD_SLOT = "and3";
 
     public static CameraUploadsFragment newInstance(int type) {
         CameraUploadsFragment fragment = new CameraUploadsFragment();
@@ -362,6 +366,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         mManagerActivity = (ManagerActivityLollipop) context;
+
+        initAdsLoader(AD_SLOT, true);
     }
 
     @Nullable @Override
@@ -377,6 +383,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             mBinding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
+            setupGoogleAds();
             return mBinding.getRoot();
         }
     }
@@ -421,6 +428,14 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         setupOtherViews();
         observeLiveData();
         setDraggingThumbnailCallback();
+    }
+
+    /**
+     * Set the Ads view container to the Ads Loader
+     */
+    private void setupGoogleAds() {
+        mAdsLoader.setAdViewContainer(mBinding.adViewContainer,
+                mManagerActivity.getOutMetrics());
     }
 
     private void setDraggingThumbnailCallback() {

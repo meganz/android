@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
@@ -132,6 +131,14 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	private Button inviteFriendsButton;
 
 	private AchievementsActivity mActivity;
+
+	private static final String AD_SLOT = "and2";
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		initAdsLoader(AD_SLOT, true);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -309,6 +316,9 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		figureUnlockedRewardStorage.setText("...");
 
 		figureUnlockedRewardTransfer.setText("...");
+
+		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
+				mActivity.getOutMetrics());
 
 		if (Util.isDarkMode(context)) {
 			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);

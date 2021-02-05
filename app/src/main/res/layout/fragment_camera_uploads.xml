@@ -32,6 +32,11 @@
             tools:text="@string/no_results_found" />
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/ad_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cu_list"
         android:layout_width="match_parent"

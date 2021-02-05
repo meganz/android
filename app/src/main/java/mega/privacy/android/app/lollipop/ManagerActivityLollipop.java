@@ -2495,7 +2495,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					}
 
 					if (isTransfersInProgressAdded()) {
-						tFLol.checkSelectModeAfterChangeTab();
+						tFLol.checkSelectModeAfterChangeTabOrDrawerItem();
 					}
 				}
 			}
@@ -5818,6 +5818,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (item != DrawerItem.CHAT) {
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
 			removeFragment(getChatsFragment());
+		}
+
+		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
+			tFLol.checkSelectModeAfterChangeTabOrDrawerItem();
 		}
 
 		MegaApplication.getTransfersManagement().setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
@@ -11501,6 +11505,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			}
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			logDebug("Size: " + size);
