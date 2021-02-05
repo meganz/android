@@ -1740,7 +1740,7 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">The new password cannot be the same as the old password</string>
 
     <string name="action_search_by_date" context="Menu item">Search by date</string>
-    <string name="general_apply" context="title of a button to apply search by date">Apply</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">Apply</string>
     <string name="general_search_month" context="title of a button to apply search by month">Last month</string>
     <string name="general_search_year" context="title of a button to apply search by year">Last year</string>
 
