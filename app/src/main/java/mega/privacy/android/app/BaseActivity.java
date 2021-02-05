@@ -12,7 +12,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -689,17 +688,6 @@ public class BaseActivity extends AppCompatActivity {
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
-
-        if (snackbarLayout.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
-            final CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
-        else if (snackbarLayout.getLayoutParams() instanceof FrameLayout.LayoutParams) {
-            final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) snackbarLayout.getLayoutParams();
-            params.setMargins(dp2px(8, outMetrics),0, dp2px(8, outMetrics), dp2px(8, outMetrics));
-            snackbarLayout.setLayoutParams(params);
-        }
 
         switch (type) {
             case SNACKBAR_TYPE: {

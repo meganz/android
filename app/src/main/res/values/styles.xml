@@ -68,6 +68,11 @@
         <item name="android:elevation">0dp</item>
     </style>
 
+    <!-- Snackbar -->
+    <style name="Widget.Mega.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:layout_margin">0dp</item>
+    </style>
+
     <!-- BottomSheet Dialog -->
     <style name="Theme.Mega.BottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/Widget.Mega.BottomSheetModal</item>

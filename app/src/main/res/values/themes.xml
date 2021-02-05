@@ -85,6 +85,9 @@
         <!-- Toolbar -->
         <item name="toolbarStyle">@style/Widget.Mega.Toolbar</item>
 
+        <!-- Snackbar -->
+        <item name="snackbarStyle">@style/Widget.Mega.Snackbar</item>
+
         <!-- Alert Dialog -->
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.Mega.MaterialAlertDialog</item>
 
