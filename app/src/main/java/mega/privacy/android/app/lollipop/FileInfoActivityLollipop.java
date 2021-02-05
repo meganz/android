@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
@@ -1142,6 +1141,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         moveMenuItem.setVisible(true);
                         copyMenuItem.setVisible(true);
                     }
+                }
+
+                if(isDarkMode(this)) {
+                    collapsingToolbar.setContentScrimColor(ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation)));
                 }
 
                 if (node.hasPreview() || node.hasThumbnail()) {
