@@ -125,6 +125,11 @@ object ColorUtils {
         return shapeDrawable
     }
 
+    /**
+     * Get the view background color in Dark Mode according to its elevation
+     * @param context Context
+     * @param elevation the elevation value of the View
+     */
     @JvmStatic
     fun getColorForElevation(context: Context, elevation: Float) =
         ElevationOverlayProvider(context).compositeOverlayWithThemeSurfaceColorIfNeeded(

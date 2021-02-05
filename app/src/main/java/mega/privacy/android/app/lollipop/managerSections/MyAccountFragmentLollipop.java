@@ -65,6 +65,7 @@ import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -913,7 +914,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		Canvas c = new Canvas(bitmap);
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
-		paint.setColor(WHITE);
+		int paintColor = ContextCompat.getColor(context, R.color.white_dark_grey);
+		paint.setColor(paintColor);
 		c.drawRect(0, 0, WIDTH, WIDTH, paint);
 		paint.setColor(color);
 
@@ -927,7 +929,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 //				log("pixels[offset + x]: "+Integer.toString(pixels[offset + x])+ " offset+x: "+(offset+x));
 			}
 		}
-		paint.setColor(WHITE);
+		paint.setColor(paintColor);
 		c.drawRect(3*resize, 3*resize, 11.5f*resize, 11.5f*resize, paint);
 		c.drawRect(28.5f*resize, 3*resize, 37*resize, 11.5f*resize, paint);
 		c.drawRect(3*resize, 28.5f*resize, 11.5f*resize, 37*resize, paint);
@@ -939,7 +941,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			c.drawRoundRect(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize, 30, 30, paint);
 			c.drawRoundRect(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize, 30, 30, paint);
 
-			paint.setColor(WHITE);
+			paint.setColor(paintColor);
 			c.drawRoundRect(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize, 25, 25, paint);
 			c.drawRoundRect(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize, 25, 25, paint);
 			c.drawRoundRect(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize, 25, 25, paint);
@@ -949,7 +951,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			c.drawRoundRect(new RectF(29.25f * resize, 3.75f * resize, 36.25f * resize, 10.75f * resize), 30, 30, paint);
 			c.drawRoundRect(new RectF(3.75f * resize, 29.25f * resize, 10.75f * resize, 36.25f * resize), 30, 30, paint);
 
-			paint.setColor(WHITE);
+			paint.setColor(paintColor);
 			c.drawRoundRect(new RectF(4.75f * resize, 4.75f * resize, 9.75f * resize, 9.75f * resize), 25, 25, paint);
 			c.drawRoundRect(new RectF(30.25f * resize, 4.75f * resize, 35.25f * resize, 9.75f * resize), 25, 25, paint);
 			c.drawRoundRect(new RectF(4.75f * resize, 30.25f * resize, 9.75f * resize, 35.25f * resize), 25, 25, paint);
