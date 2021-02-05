@@ -5913,7 +5913,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if(!pendingMessagesLoaded){
             pendingMessagesLoaded = true;
             loadPendingMessages();
-            if(positionToScroll<=0){
+
+            if (positionToScroll <= 0) {
                 mLayoutManager.scrollToPosition(messages.size());
             }
         }
@@ -6024,9 +6025,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         checkMegaLink(msg);
-
-//        mLayoutManager.setStackFromEnd(true);
-//        mLayoutManager.scrollToPosition(0);
     }
     public void sendToDownload(MegaNodeList nodelist){
         logDebug("sendToDownload");
@@ -7945,6 +7943,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     long newidChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
                     if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
                         cleanBuffers();
+                        pendingMessagesLoaded = false;
                     }
                     if (messagesPlaying != null && !messagesPlaying.isEmpty()) {
                         for (MessageVoiceClip m : messagesPlaying) {
