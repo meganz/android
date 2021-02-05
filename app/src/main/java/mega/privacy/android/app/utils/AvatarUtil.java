@@ -172,13 +172,21 @@ public class AvatarUtil {
      * @return The color of the avatar in particular.
      */
     public static int getSpecificAvatarColor(String typeColor) {
+        // We need use activity context to retrieve correct color.
+        Context context = MegaApplication.getInstance().getCurrentActivity();
+        if (context == null) {
+            // But if we can't get it (which shouldn't happen in normal case),
+            // let's use application context.
+            context = MegaApplication.getInstance().getBaseContext();
+        }
+
         switch (typeColor) {
             case AVATAR_GROUP_CHAT_COLOR:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.grey_012_white_012);
+                return ContextCompat.getColor(context, R.color.grey_012_white_012);
             case AVATAR_PHONE_COLOR:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.grey_500);
+                return ContextCompat.getColor(context, R.color.grey_500_grey_400);
             default:
-                return ContextCompat.getColor(MegaApplication.getInstance().getBaseContext(), R.color.red_600_red_300);
+                return ContextCompat.getColor(context, R.color.red_600_red_300);
         }
     }
 
@@ -268,7 +276,7 @@ public class AvatarUtil {
         String mail = ((AddContactActivityLollipop) context).getShareContactMail(contact);
         int color;
         if (contact.isPhoneContact()) {
-            color = ContextCompat.getColor(context, R.color.grey_500);
+            color = ContextCompat.getColor(context, R.color.grey_500_grey_400);
         } else if (contact.isMegaContact()) {
             color = getColorAvatar(contact.getMegaContactAdapter().getMegaUser());
         } else {
