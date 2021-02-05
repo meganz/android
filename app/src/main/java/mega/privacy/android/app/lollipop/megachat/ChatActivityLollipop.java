@@ -67,6 +67,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -540,6 +542,18 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         return false;
+    }
+
+    @Override
+    public void confirmLeaveChat(long chatId) {
+        stopReproductions();
+        setJoiningOrLeaving(getString(R.string.leaving_label));
+        megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this, this));
+    }
+
+    @Override
+    public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
+        // No option available to leave more than one chat here.
     }
 
     @Override
@@ -2493,7 +2507,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 if(recordView.isRecordingNow()) break;
 
                 logDebug("Leave selected!");
-                showConfirmationLeaveChat(chatRoom);
+                showConfirmationLeaveChat(chatActivity, chatRoom.getChatId(), chatActivity);
                 break;
             }
             case R.id.cab_menu_archive_chat:{
@@ -3597,19 +3611,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
     public void controlCamera(){
         stopReproductions();
         openCameraApp();
-    }
-
-    public void showConfirmationLeaveChat (final MegaChatRoom c){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
-                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which) -> {
-                    stopReproductions();
-                    setJoiningOrLeaving(getString(R.string.leaving_label));
-                    megaChatApi.leaveChat(c.getChatId(), new RemoveFromChatRoomListener(chatActivity, chatActivity));
-                })
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-                .show();
     }
 
     @Override

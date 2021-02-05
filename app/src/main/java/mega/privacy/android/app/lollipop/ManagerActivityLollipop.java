@@ -102,6 +102,8 @@ import android.widget.Toast;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -160,6 +162,7 @@ import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
+import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -303,7 +306,13 @@ import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class ManagerActivityLollipop extends SorterContentActivity implements MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener, View.OnFocusChangeListener, View.OnLongClickListener, BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener, BillingUpdatesListener {
+public class ManagerActivityLollipop extends SorterContentActivity
+		implements MegaRequestListenerInterface, MegaChatListenerInterface,
+		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
+		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
+		View.OnFocusChangeListener, View.OnLongClickListener,
+		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
+		BillingUpdatesListener, ChatManagementCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -477,7 +486,31 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
 
-    public enum FragmentTag {
+	@Override
+	public void confirmLeaveChat(long chatId) {
+		megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this));
+	}
+
+	@Override
+	public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
+		if (getChatsFragment() != null) {
+			rChatFL.clearSelections();
+			rChatFL.hideMultipleSelect();
+		}
+
+		for (MegaChatListItem chat : chats) {
+			if (chat != null) {
+				megaChatApi.leaveChat(chat.getChatId(), new RemoveFromChatRoomListener(this));
+			}
+		}
+	}
+
+	@Override
+	public void leaveChatSuccess() {
+		// No update needed.
+	}
+
+	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, FORTUMO, CENTILI, CREDIT_CARD, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
 		public String getTag () {
@@ -10422,36 +10455,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.show();
 
 		refreshAfterMovingToRubbish();
-	}
-
-	public void showConfirmationLeaveChat(final long chatId) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
-				.setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-				.setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
-						-> megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(managerActivity)))
-				.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-				.show();
-	}
-
-	public void showConfirmationLeaveChats (final  ArrayList<MegaChatListItem> cs){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
-				.setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-				.setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which) -> {
-					for (MegaChatListItem chat : cs) {
-						if (chat != null) {
-							megaChatApi.leaveChat(chat.getChatId(), new RemoveFromChatRoomListener(managerActivity));
-						}
-					}
-				})
-				.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), (dialog, which) -> {
-					if (getChatsFragment() != null) {
-						rChatFL.clearSelections();
-						rChatFL.hideMultipleSelect();
-					}
-				})
-				.show();
 	}
 
 	public void showConfirmationResetPasswordFromMyAccount (){
