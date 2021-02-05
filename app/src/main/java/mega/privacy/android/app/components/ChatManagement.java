@@ -1,5 +1,8 @@
 package mega.privacy.android.app.components;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.listeners.ChatRoomListener;
 
@@ -10,6 +13,8 @@ public class ChatManagement {
     private final ChatRoomListener chatRoomListener;
 
     private String pendingJoinLink;
+    private List<String> joiningLinks = new ArrayList<>();
+    private List<Long> leavingChatIds = new ArrayList<>();
 
     public ChatManagement() {
         chatRoomListener = new ChatRoomListener();
@@ -45,5 +50,29 @@ public class ChatManagement {
 
     public boolean isPendingJoinLink() {
         return !isTextEmpty(pendingJoinLink);
+    }
+
+    public void addJoiningLink(String joiningLink) {
+        joiningLinks.add(joiningLink);
+    }
+
+    public void removeJoiningLink(String joiningLink) {
+        joiningLinks.remove(joiningLink);
+    }
+
+    public boolean isAlreadyJoining(String joinLink) {
+        return joiningLinks.contains(joinLink);
+    }
+
+    public void addLeavingChatId(long leavingChatId) {
+        leavingChatIds.add(leavingChatId);
+    }
+
+    public void removeLeavingChatId(long leavingChatId) {
+        leavingChatIds.remove(leavingChatId);
+    }
+
+    public boolean isAlreadyLeaving(long leaveChatId) {
+        return leavingChatIds.contains(leaveChatId);
     }
 }

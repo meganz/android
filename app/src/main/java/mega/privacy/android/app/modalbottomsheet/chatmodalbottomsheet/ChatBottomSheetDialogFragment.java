@@ -272,7 +272,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
             case R.id.chat_list_leave_chat_layout:
                 logDebug("Leave chat - Chat ID: " + chat.getChatId());
-                ((ManagerActivityLollipop) context).showConfirmationLeaveChat(chat);
+                ((ManagerActivityLollipop) context).showConfirmationLeaveChat(chat.getChatId());
                 break;
 
             case R.id.chat_list_clear_history_chat_layout:
