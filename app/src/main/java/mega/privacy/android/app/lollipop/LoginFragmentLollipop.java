@@ -1759,7 +1759,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         LoginActivityLollipop loginActivityLollipop = ((LoginActivityLollipop) context);
 
         if(confirmLink==null && !accountConfirmed){
-            MegaApplication.getChatManagement().setPendingJoinLink(null);
+            if (MegaApplication.getChatManagement().isPendingJoinLink()) {
+                LoginActivityLollipop.isBackFromLoginPage = false;
+                MegaApplication.getChatManagement().setPendingJoinLink(null);
+            }
 
             logDebug("confirmLink==null");
 
@@ -1927,11 +1930,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             accountConfirmed = false;
 
             if (MegaApplication.getChatManagement().isPendingJoinLink()) {
+                LoginActivityLollipop.isBackFromLoginPage = false;
+
                 Intent intent = new Intent(context, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
                 intent.setData(Uri.parse(MegaApplication.getChatManagement().getPendingJoinLink()));
-                MegaApplication.getChatManagement().setPendingJoinLink(null);
                 startActivity(intent);
+
+                MegaApplication.getChatManagement().setPendingJoinLink(null);
                 loginActivityLollipop.finish();
             } else {
                 loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
