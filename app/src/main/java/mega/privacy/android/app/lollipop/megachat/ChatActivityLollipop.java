@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -162,6 +163,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
@@ -190,6 +193,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
+    private static final int MIN_LINES_TO_EXPAND_INPUT_TEXT = 4;
     private static final int INVALID_LAST_SEEN_ID = 0;
 
     public MegaChatLollipopAdapter.ViewHolderMessageChat holder_imageDrag;
@@ -278,6 +282,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private androidx.appcompat.app.AlertDialog downloadConfirmationDialog;
     private AlertDialog chatAlertDialog;
     private AlertDialog errorReactionsDialog;
+    private boolean isInputTextExpanded;
     private boolean errorReactionsDialogIsShown;
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private android.app.AlertDialog dialogCall;
@@ -349,6 +354,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private CoordinatorLayout fragmentContainer;
     private RelativeLayout writingContainerLayout;
     private RelativeLayout inputTextLayout;
+    private LinearLayout bottomItems;
 
 
     private RelativeLayout joinChatLinkLayout;
@@ -389,7 +395,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private EmojiEditText textChat;
     private ImageButton sendIcon;
-    private RelativeLayout expandCollapseInputTextIcon;
+    private RelativeLayout expandCollapseInputTextLayout;
+    private LinearLayout writeMsgLayout;
+    private ImageButton expandCollapseInputTextIcon;
+
     RelativeLayout messagesContainerLayout;
 
     RelativeLayout observersLayout;
@@ -896,9 +905,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         textChat.setVisibility(View.VISIBLE);
         textChat.setEnabled(true);
 
-        expandCollapseInputTextIcon = findViewById(R.id.expand_input_text_rl);
+        expandCollapseInputTextLayout = findViewById(R.id.expand_input_text_rl);
+        expandCollapseInputTextIcon = findViewById(R.id.expand_input_text_icon);
+        writeMsgLayout = findViewById(R.id.write_msg_rl);
+
+
         expandCollapseInputTextIcon.setOnClickListener(this);
-        expandCollapseInputTextIcon.setVisibility(View.GONE);
+        expandCollapseInputTextLayout.setVisibility(View.GONE);
 
         emptyLayout = findViewById(R.id.empty_messages_layout);
         emptyTextView = findViewById(R.id.empty_text_chat_recent);
@@ -906,6 +919,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
+        bottomItems = findViewById(R.id.bottom_items_layout);
+
         inputTextLayout = findViewById(R.id.write_and_options_layout);
 
         titleToolbar.setText("");
@@ -949,6 +964,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         keyboardHeight = getOutMetrics().heightPixels / 2 - getActionBarHeight(this, getResources());
         marginBottomDeactivated = dp2px(MARGIN_BUTTON_DEACTIVATED, getOutMetrics());
         marginBottomActivated = dp2px(MARGIN_BUTTON_ACTIVATED, getOutMetrics());
+        checkExpandOrCollapseInputText();
 
         callInProgressLayout = findViewById(R.id.call_in_progress_layout);
         callInProgressLayout.setVisibility(View.GONE);
@@ -1039,7 +1055,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if (s != null && !s.toString().trim().isEmpty()) {
                     showSendIcon();
-                    controlExpanableInputText(textChat.getLineCount());
+                    controlExpandableInputText(textChat.getLineCount());
                 } else {
                     refreshTextInput();
                 }
@@ -1406,7 +1422,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
                 textChat.setText(written);
                 textChat.post(() -> {
-                    controlExpanableInputText(textChat.getLineCount());
+                    controlExpandableInputText(textChat.getLineCount());
                 });
                 showSendIcon();
                 return;
@@ -1449,7 +1465,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 title = getString(R.string.type_message_hint_with_default_title, getTitleChat(chatRoom));
             }
             textChat.setHint(transformEmojis(title, textChat.getTextSize()));
-            controlExpanableInputText(1);
+            controlExpandableInputText(1);
         }
     }
 
@@ -3669,6 +3685,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 }
                 break;
 
+            case R.id.expand_input_text_icon:
+                isInputTextExpanded = !isInputTextExpanded;
+                checkExpandOrCollapseInputText();
+                break;
+
             case R.id.record_and_send_icon:
                 String text = textChat.getText().toString();
                 if(text.trim().isEmpty()) break;
@@ -3680,7 +3701,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     sendMessage(text);
                 }
                 textChat.setText("", TextView.BufferType.EDITABLE);
-                controlExpanableInputText(1);
+                controlExpandableInputText(1);
                 break;
 
             case R.id.emoji_rl:
@@ -4098,7 +4119,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             textChat.setText(messageToEdit.getContent());
             textChat.setSelection(textChat.getText().length());
             textChat.post(() -> {
-                controlExpanableInputText(textChat.getLineCount());
+                controlExpandableInputText(textChat.getLineCount());
             });
             setSizeInputText(false);
         }
@@ -8127,7 +8148,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
         LinearLayout confirmationLayout = new LinearLayout(this);
         confirmationLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, WRAP_CONTENT);
         params.setMargins(scaleWidthPx(20, getOutMetrics()), scaleHeightPx(10, getOutMetrics()), scaleWidthPx(17, getOutMetrics()), 0);
 
         final CheckBox dontShowAgain =new CheckBox(this);
@@ -9077,8 +9098,54 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return new File(storageDir, imageFileName + ".jpg");
     }
 
-    private void controlExpanableInputText(int linesCount) {
-        expandCollapseInputTextIcon.setVisibility(linesCount > 3 ? View.VISIBLE : View.GONE);
+    private void controlExpandableInputText(int linesCount) {
+        expandCollapseInputTextLayout.setVisibility(linesCount >= MIN_LINES_TO_EXPAND_INPUT_TEXT ? View.VISIBLE : View.GONE);
+    }
+
+    private void checkExpandOrCollapseInputText() {
+
+
+        if (writingContainerLayout != null)
+            writingContainerLayout.getLayoutParams().width = MATCH_PARENT;
+
+        if (bottomItems != null)
+            bottomItems.getLayoutParams().width = MATCH_PARENT;
+
+
+        if (inputTextLayout != null)
+            inputTextLayout.getLayoutParams().width = MATCH_PARENT;
+
+        if (!isInputTextExpanded) {
+            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_expand_text_input));
+            writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
+            if (writingContainerLayout != null)
+                writingContainerLayout.getLayoutParams().height = WRAP_CONTENT;
+
+            if (bottomItems != null)
+                bottomItems.getLayoutParams().height = WRAP_CONTENT;
+
+            if (inputTextLayout != null)
+                inputTextLayout.getLayoutParams().height = WRAP_CONTENT;
+
+        } else {
+            expandCollapseInputTextIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_collapse_text_input));
+            writeMsgLayout.setBackground(null);
+            writeMsgLayout.setBackgroundColor(Color.WHITE);
+
+            if (writingContainerLayout != null)
+                writingContainerLayout.getLayoutParams().height = MATCH_PARENT;
+
+            if (bottomItems != null)
+                bottomItems.getLayoutParams().height = MATCH_PARENT;
+
+            if (inputTextLayout != null)
+                inputTextLayout.getLayoutParams().height = MATCH_PARENT;
+
+        }
+
+        writingContainerLayout.requestLayout();
+        bottomItems.requestLayout();
+        inputTextLayout.requestLayout();
     }
 
     /**

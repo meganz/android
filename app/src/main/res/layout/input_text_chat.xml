@@ -4,50 +4,53 @@
     android:id="@+id/write_and_options_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="bottom"
     android:background="@android:color/white">
 
     <RelativeLayout
         android:id="@+id/more_options_rl"
         android:layout_width="wrap_content"
         android:layout_height="56dp"
-        android:paddingStart="21dp"
-        android:paddingEnd="13dp"
         android:gravity="center_vertical"
         android:layout_alignBottom="@id/layout">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/ic_add" />
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/more_options_rl">
+        android:layout_toEndOf="@id/more_options_rl"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/write_msg_rl"
-                android:layout_width="264dp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/background_write_layout"
-                android:layout_alignParentStart="true"
-                android:layout_marginEnd="10dp"
-                android:paddingStart="12dp"
-                android:paddingEnd="10dp">
+                android:orientation="horizontal"
+                android:paddingEnd="10dp"
+                android:paddingStart="12dp">
 
                 <mega.privacy.android.app.components.twemoji.EmojiEditText
                     android:id="@+id/input_text_chat"
-                    android:layout_width="208dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
                     android:paddingTop="10dp"
                     android:paddingBottom="8dp"
-                    android:layout_marginEnd="14dp"
                     android:fontFamily="sans-serif"
                     android:gravity="center_vertical|start"
+                    android:layout_gravity="center_vertical"
                     android:background="@android:color/transparent"
                     android:inputType="textMultiLine|textCapSentences"
                     android:maxLines="5"
@@ -60,52 +63,57 @@
                     android:id="@+id/emoji_rl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/input_text_chat"
-                    android:paddingBottom="8dp"
-                    android:layout_toEndOf="@id/input_text_chat">
+                    android:layout_gravity="bottom"
+                    android:paddingBottom="8dp">
 
                     <ImageButton
                         android:id="@+id/emoji_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:background="@null"
                         android:src="@drawable/ic_emojicon"
                         app:tint="@color/unread_msgs_badge"/>
                 </RelativeLayout>
+            </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:gravity="bottom">
+            <RelativeLayout
+                android:id="@+id/expand_input_text_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:paddingTop="18dp"
+                android:gravity="center_horizontal">
+
+                <ImageButton
+                    android:id="@+id/expand_input_text_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_expand_text_input"
+                    android:visibility="visible" />
             </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/expand_input_text_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/write_msg_rl"
-            android:layout_toEndOf="@id/write_msg_rl">
+            <RelativeLayout
+                android:id="@+id/record_and_send_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_horizontal"
+                android:paddingBottom="18dp">
 
-            <ImageButton
-                android:id="@+id/expand_input_text_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@null"
-                android:src="@drawable/ic_expand_text_input"
-                android:visibility="visible" />
+                <ImageButton
+                    android:id="@+id/record_and_send_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_send_black"
+                    android:visibility="visible"
+                    app:tint="@color/accentColor" />
+            </RelativeLayout>
         </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/record_and_send_rl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/write_msg_rl"
-            android:layout_toEndOf="@id/write_msg_rl"
-            android:paddingBottom="9dp">
-
-            <ImageButton
-                android:id="@+id/record_and_send_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@null"
-                android:src="@drawable/ic_send_black"
-                android:visibility="visible"
-                app:tint="@color/accentColor" />
-        </RelativeLayout>
-    </RelativeLayout>
+    </LinearLayout>
 </RelativeLayout>

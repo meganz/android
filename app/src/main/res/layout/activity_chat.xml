@@ -165,15 +165,16 @@
             <RelativeLayout
                 android:id="@+id/writing_container_layout_chat_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_alignParentBottom="true"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"
                 android:visibility="visible">
 
                 <LinearLayout
+                    android:id="@+id/bottom_items_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     android:orientation="vertical">
 
@@ -219,8 +220,6 @@
 
                     <include
                         layout="@layout/input_text_chat"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:gravity="bottom" />
 
                     <LinearLayout
