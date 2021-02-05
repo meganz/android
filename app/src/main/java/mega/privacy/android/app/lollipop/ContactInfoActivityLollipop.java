@@ -887,6 +887,9 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			sendFileMenuItem.setVisible(false);
 		}
 
+		if(isDarkMode(this)) {
+			collapsingToolbar.setContentScrimColor(ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation)));
+		}
         collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
 
 		appBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {

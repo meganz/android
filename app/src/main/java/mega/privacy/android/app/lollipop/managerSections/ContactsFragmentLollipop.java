@@ -691,44 +691,43 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			checkScroll();
 		}
 
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaUser> selected = adapter.getSelectedUsers();
-			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-			if (selected.size() != 0) {
-				menu.findItem(R.id.cab_menu_delete).setVisible(true);
-				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
-				menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            List<MegaUser> selected = adapter.getSelectedUsers();
+            MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
-				menu.findItem(R.id.cab_menu_send_file).setVisible(true);
-				menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            if (selected.size() != 0) {
+                menu.findItem(R.id.cab_menu_delete).setVisible(true);
+                menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
+                menu.findItem(R.id.cab_menu_share_folder).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
-				menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+                menu.findItem(R.id.cab_menu_send_file).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
-				menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                menu.findItem(R.id.cab_menu_start_conversation).setVisible(true);
+                menu.findItem(R.id.cab_menu_start_conversation).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-				if(selected.size()==adapter.getItemCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					unselect.setTitle(getString(R.string.action_unselect_all));
-					unselect.setVisible(true);
-				}
-			}	
-			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
-			}
-			menu.findItem(R.id.cab_menu_help).setVisible(false);
-			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
-			return false;
-		}		
-	}
+                menu.findItem(R.id.cab_menu_send_to_chat).setVisible(true);
+                menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
+                if (selected.size() == adapter.getItemCount()) {
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+                    unselect.setTitle(getString(R.string.action_unselect_all));
+                    unselect.setVisible(true);
+                } else {
+                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                    unselect.setTitle(getString(R.string.action_unselect_all));
+                    unselect.setVisible(true);
+                }
+            } else {
+                menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+                menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+            }
+            menu.findItem(R.id.cab_menu_help).setVisible(false);
+            menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
+            return false;
+        }
+    }
 
 	/*
 	 * Disable selection

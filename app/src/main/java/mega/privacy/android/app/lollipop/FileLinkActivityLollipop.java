@@ -305,6 +305,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			return;
 		}
 
+        if (isDarkMode(this)) {
+            collapsingToolbar.setContentScrimColor(ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation)));
+        }
+
 		if (preview != null) {
 			appBarLayout.addOnOffsetChangedListener((appBarLayout, offset) -> {
 				if (offset == 0) {
