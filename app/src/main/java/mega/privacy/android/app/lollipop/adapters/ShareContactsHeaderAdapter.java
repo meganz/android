@@ -213,7 +213,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                 setContactStatus(megaChatApi.getUserOnlineStatus(contact.getMegaContactAdapter().getMegaUser().getHandle()), holder.contactStateIcon);
 
                 if (contact.getMegaContactAdapter().isSelected()) {
-                    holder.avatar.setImageResource(R.drawable.ic_select_avatar);
+                    holder.avatar.setImageResource(R.drawable.ic_select_folder);
                 } else {
                     Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaContactAdapter().getMegaUser().getHandle()), contact.getMegaContactAdapter().getMegaUser().getEmail());
                     if (bitmap != null) {

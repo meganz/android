@@ -256,7 +256,7 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 		} else {
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
+				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
 			else{
 				createDefaultAvatar(holder, contact);

@@ -283,7 +283,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			}
 
 			if(multipleSelect && this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
+				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}else{
 				/*Default Avatar*/
 				int color = getColorAvatar(contact);

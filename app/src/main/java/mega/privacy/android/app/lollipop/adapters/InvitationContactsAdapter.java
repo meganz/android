@@ -244,7 +244,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     private void setItemHighlighted(View view) {
         logDebug("setItemHighlighted");
         ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
-        Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_select_avatar);
+        Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_select_folder);
         if (image != null) {
             imageView.setImageBitmap(image);
         }

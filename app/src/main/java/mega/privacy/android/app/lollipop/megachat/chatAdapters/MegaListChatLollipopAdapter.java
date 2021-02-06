@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
@@ -223,7 +222,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
 					holder.itemLayout.setBackground(null);
 					setUserAvatar(holder, userHandleEncoded);
@@ -254,7 +253,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
-					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_avatar);
+					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
 					holder.itemLayout.setBackground(null);
 					createGroupChatAvatar(holder, getTitleChat(chat));

@@ -370,7 +370,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		holder.textViewContactName.setText(contact.getFullName());
 
 		if (contact.isSelected()) {
-			holder.imageView.setImageResource(R.drawable.ic_select_avatar);
+			holder.imageView.setImageResource(R.drawable.ic_select_folder);
 		} else {
 
 			Bitmap bitmap = getUserAvatar(MegaApiJava.userHandleToBase64(contact.getMegaUser().getHandle()), contact.getMegaUser().getEmail());
@@ -483,7 +483,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		} else {
 
 			if(this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_avatar);
+				holder.imageView.setImageResource(R.drawable.ic_select_folder);
 			}
 			else{
 				createDefaultAvatar(holder, contact);
