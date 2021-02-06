@@ -837,7 +837,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
 	private PsaViewHolder psaViewHolder;
 
-
 	/**
 	 * Broadcast to update the completed transfers tab.
 	 */
@@ -15152,8 +15151,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	 * This method is used to change the elevation of the toolbar when a call is in progress.
 	 */
 	public void changeToolbarLayoutElevation() {
-		toolbarLayout.setElevation(callInProgressLayout.getVisibility() == View.VISIBLE ?
-				dp2px(16, outMetrics) : 0);
+		changeActionBarElevation(callInProgressLayout.getVisibility() == View.VISIBLE);
 	}
 
 	public void changeActionBarElevation(boolean withElevation){
@@ -15164,14 +15162,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				abL.postDelayed(() -> doSetActionBarElevation(
 						getResources().getDimension(R.dimen.toolbar_elevation)), 100);
 			}
-		} else {
+		} else if (callInProgressLayout.getVisibility() != View.VISIBLE) {  // Should elevate when call in progress
 			doSetActionBarElevation(0);
 		}
 	}
 
 	private void doSetActionBarElevation(float elevation) {
-		// Can only make the elevation effect in Dark mode by elevating the Toolbar
+		// Can only make the elevation effect in Dark mode by elevating the Toolbar and toolbarLayout
 		if (Util.isDarkMode(this)) {
+			toolbarLayout.setElevation(elevation);
 			toolbar.setElevation(elevation);
 		} else {  // Light mode only need to elevate the AppBarLayout
 			abL.setElevation(elevation);
