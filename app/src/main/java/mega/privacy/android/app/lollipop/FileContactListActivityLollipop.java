@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -17,7 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -390,7 +388,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 			mLayoutManager = new LinearLayoutManager(this);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

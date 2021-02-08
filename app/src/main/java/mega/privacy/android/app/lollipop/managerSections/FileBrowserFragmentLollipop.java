@@ -523,9 +523,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
-			DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
-			itemAnimator.setSupportsChangeAnimations(false);
-			recyclerView.setItemAnimator(itemAnimator);
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

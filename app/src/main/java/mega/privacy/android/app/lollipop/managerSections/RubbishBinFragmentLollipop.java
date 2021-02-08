@@ -374,7 +374,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 			//Add bottom padding for recyclerView like in other fragments.
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

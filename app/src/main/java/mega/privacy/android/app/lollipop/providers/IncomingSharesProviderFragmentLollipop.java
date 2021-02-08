@@ -9,7 +9,6 @@ import android.os.Handler;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -224,7 +222,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment{
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);

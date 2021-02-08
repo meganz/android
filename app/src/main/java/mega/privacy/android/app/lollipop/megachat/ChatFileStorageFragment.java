@@ -13,7 +13,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -121,7 +120,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
         recyclerView = (RecyclerView) v.findViewById(R.id.file_storage_grid_view_browser);
         recyclerView.setClipToPadding(false);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         sendIcon = (FloatingActionButton) v.findViewById(R.id.send_file_icon_chat);
         sendIcon.setVisibility(View.GONE);
         sendIcon.setOnClickListener(new View.OnClickListener() {

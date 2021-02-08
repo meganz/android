@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,8 +29,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import nz.mega.sdk.MegaTransfer;
 
-import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ACCENT;
-import static mega.privacy.android.app.utils.Constants.COLOR_STATUS_BAR_ZERO_DELAY;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -85,7 +82,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 		itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
 			private boolean addElevation = true;

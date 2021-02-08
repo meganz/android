@@ -184,7 +184,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
-        listView.setItemAnimator(new DefaultItemAnimator());
+        listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.setClipToPadding(false);
         listView.setPadding(0,scaleHeightPx(8, outMetrics),0, 0);
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {

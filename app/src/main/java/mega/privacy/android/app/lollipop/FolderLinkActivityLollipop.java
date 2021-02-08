@@ -17,7 +17,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.StatFs;
@@ -49,7 +48,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -521,7 +519,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
 		separator = (View) findViewById(R.id.separator_3);

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -54,6 +53,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
@@ -211,7 +211,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator());
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 		if (adapter == null){
 			adapter = new MegaContactsAttachedLollipopAdapter(this, contacts, listView);

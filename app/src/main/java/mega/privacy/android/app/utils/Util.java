@@ -48,6 +48,8 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Html;
 import android.text.Spannable;
@@ -1879,4 +1881,15 @@ public class Util {
             dbH.setStorageDownloadLocation(downloadLocation);
         }
     }
+
+    /**
+	 * Create a RecyclerView.ItemAnimator that doesn't support change animation.
+	 *
+	 * @return the RecyclerView.ItemAnimator
+	 */
+    public static RecyclerView.ItemAnimator noChangeRecyclerViewItemAnimator() {
+		DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+		itemAnimator.setSupportsChangeAnimations(false);
+		return itemAnimator;
+	}
 }

@@ -19,13 +19,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
@@ -51,6 +49,7 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -291,19 +290,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
         rv.clipToPadding = false
         rv.setHasFixedSize(true)
-        rv.itemAnimator = DefaultItemAnimator()
+        rv.itemAnimator = noChangeRecyclerViewItemAnimator()
         rv.addOnScrollListener(object : OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 checkScroll()
             }
         })
-
-        val animator = rv.itemAnimator
-        if (animator is SimpleItemAnimator) {
-            // prevent item blink when uiDirty
-            animator.supportsChangeAnimations = false
-        }
     }
 
     private fun observeLiveData() {

@@ -15,7 +15,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -335,7 +334,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
 			Resources res = getResources();
 			int valuePaddingTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, res.getDisplayMetrics());

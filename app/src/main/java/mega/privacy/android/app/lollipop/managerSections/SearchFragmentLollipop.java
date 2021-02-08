@@ -606,7 +606,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

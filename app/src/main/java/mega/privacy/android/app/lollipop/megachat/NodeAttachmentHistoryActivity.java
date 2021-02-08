@@ -11,12 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -248,7 +245,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			mLayoutManager = new LinearLayoutManager(this);
 			mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 			listView.setLayoutManager(mLayoutManager);
-			listView.setItemAnimator(new DefaultItemAnimator());
+			listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		}
 		else{
 			linearLayoutList.setVisibility(View.GONE);

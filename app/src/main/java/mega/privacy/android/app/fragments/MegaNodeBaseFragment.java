@@ -729,6 +729,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView.setLayoutManager(mLayoutManager);
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
+        recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 
         emptyImageView = v.findViewById(R.id.file_list_empty_image);
         emptyLinearLayout = v.findViewById(R.id.file_list_empty_text);
@@ -748,6 +749,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         emptyImageView = v.findViewById(R.id.file_grid_empty_image);
         emptyLinearLayout = v.findViewById(R.id.file_grid_empty_text);
@@ -764,7 +766,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
         recyclerView.setClipToPadding(false);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

@@ -23,7 +23,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
@@ -348,9 +347,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
-        DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
-        itemAnimator.setSupportsChangeAnimations(false);
-        listView.setItemAnimator(itemAnimator);
+        listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

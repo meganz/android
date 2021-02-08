@@ -27,7 +27,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -874,7 +873,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
     
             listView = (RecyclerView)findViewById(R.id.file_info_contact_list_view);
             //listView.addOnItemTouchListener(this);
-            listView.setItemAnimator(new DefaultItemAnimator());
+            listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
             listView.addItemDecoration(new SimpleDividerItemDecoration(this));
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
             listView.setLayoutManager(mLayoutManager);

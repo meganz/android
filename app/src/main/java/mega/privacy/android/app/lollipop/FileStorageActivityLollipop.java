@@ -26,7 +26,6 @@ import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
@@ -450,7 +449,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
-		listView.setItemAnimator(new DefaultItemAnimator()); 
+		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 		
 		if (adapter == null){
 			adapter = new FileStorageLollipopAdapter(this, listView, mode);

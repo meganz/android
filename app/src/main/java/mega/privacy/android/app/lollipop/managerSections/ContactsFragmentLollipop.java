@@ -870,7 +870,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			recyclerView.setHasFixedSize(true);
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);
-		    recyclerView.setItemAnimator(new DefaultItemAnimator());
+		    recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
