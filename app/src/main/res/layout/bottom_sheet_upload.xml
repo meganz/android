@@ -53,7 +53,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_from_device"
+                    android:src="@drawable/ic_from_device"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -83,7 +83,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_pick_file_system"
+                    android:src="@drawable/ic_pick_file_system"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -120,7 +120,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_scan_document"
+                    android:src="@drawable/ic_scan_document"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -187,7 +187,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_new_folder"
+                    android:src="@drawable/ic_new_folder"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 

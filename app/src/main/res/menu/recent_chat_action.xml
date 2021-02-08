@@ -20,7 +20,7 @@
 
     <item
         android:id="@+id/cab_menu_archive"
-        android:icon="@drawable/ic_w_archive"
+        android:icon="@drawable/ic_archive"
         android:orderInCategory="100"
         android:title="@string/tab_archive_chat"
         app:iconTint="?attr/colorSecondary"
@@ -28,7 +28,7 @@
 
     <item
         android:id="@+id/cab_menu_unarchive"
-        android:icon="@drawable/ic_w_unarchive"
+        android:icon="@drawable/ic_unarchive"
         android:orderInCategory="100"
         android:title="@string/general_unarchive"
         app:iconTint="?attr/colorSecondary"

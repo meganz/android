@@ -19,7 +19,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp">
+            android:layout_marginStart="12dp">
 
             <ImageView
                 android:id="@+id/folder_link_thumbnail"
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp">
+            android:layout_marginStart="12dp">
 
             <TextView
                 android:id="@+id/folder_link_name_text"
@@ -64,8 +64,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="16dp"
-        android:background="@color/grey_012_white_012"/>
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -92,11 +92,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_save_to_device"
+                    android:src="@drawable/ic_save_to_device"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"  />
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_download_text"
@@ -105,7 +105,7 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
@@ -121,7 +121,7 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_import_to_cloud_white"
@@ -135,7 +135,7 @@
                     android:text="@string/add_to_cloud"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginStart="18dp"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 

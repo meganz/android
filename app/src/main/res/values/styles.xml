@@ -58,7 +58,7 @@
 
     <style name="Widget.Mega.TextInputLayout.Password">
         <item name="endIconMode">password_toggle</item>
-        <item name="endIconDrawable">@drawable/ic_b_see</item>
+        <item name="endIconDrawable">@drawable/ic_see</item>
         <item name="endIconTint">@color/password_color_toggle</item>
     </style>
 

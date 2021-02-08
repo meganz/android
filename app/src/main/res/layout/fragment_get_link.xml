@@ -204,7 +204,7 @@
                 android:layout_height="24dp"
                 android:layout_below="@id/password_protection_text"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_b_see"
+                android:src="@drawable/ic_see"
                 app:tint="@color/grey_012_white_038"
                 tools:ignore="ContentDescription" />
 

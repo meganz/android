@@ -44,7 +44,7 @@
                 android:singleLine="true"
                 android:maxLines="1"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                app:emojiSize="14sp"/>
+                app:emojiSize="14sp" />
 
             <TextView
                 android:id="@+id/file_contact_list_contact_mail_text"
@@ -54,7 +54,7 @@
                 android:gravity="center_vertical"
                 android:layout_below="@+id/file_contact_list_contact_name_text"
                 android:singleLine="true"
-                android:ellipsize="middle"/>
+                android:ellipsize="middle" />
 
         </RelativeLayout>
     </LinearLayout>
@@ -63,8 +63,8 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginLeft="16dp"
-        android:background="@color/grey_012_white_012"/>
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012" />
 
     <LinearLayout
         android:id="@+id/items_layout"
@@ -86,7 +86,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:paddingTop="2dp"
                 android:src="@drawable/info_ic"
                 android:visibility="visible"
@@ -98,7 +98,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
+                android:layout_marginStart="18dp"
                 android:text="@string/contact_properties_activity"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
@@ -107,9 +107,9 @@
             android:id="@+id/separator_info"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
+            android:layout_marginStart="72dp"
             android:orientation="vertical"
-            android:background="@color/grey_012_white_012"/>
+            android:background="@color/grey_012_white_012" />
 
         <LinearLayout
             android:id="@+id/file_contact_list_option_permissions_layout"
@@ -123,7 +123,7 @@
                 style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 android:src="@drawable/ic_change_permissions"
@@ -136,7 +136,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
+                android:layout_marginStart="18dp"
                 android:text="@string/file_properties_shared_folder_change_permissions"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
@@ -144,8 +144,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginLeft="72dp"
-            android:background="@color/grey_012_white_012"/>
+            android:layout_marginStart="72dp"
+            android:background="@color/grey_012_white_012" />
 
         <LinearLayout
             android:id="@+id/file_contact_list_option_delete_layout"
@@ -159,7 +159,7 @@
                 style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 app:tint="@color/red_600_red_300"
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
-                android:layout_marginLeft="18dp"
+                android:layout_marginStart="18dp"
                 android:text="@string/context_remove"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
         </LinearLayout>

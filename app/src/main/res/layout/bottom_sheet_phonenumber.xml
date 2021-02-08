@@ -66,8 +66,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:text="@string/option_modify_phone_number"
-                        android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                     <View
                         android:layout_width="match_parent"
@@ -100,8 +99,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_remove"
-                    android:textColor="@color/red_600_red_300"
-                    android:textSize="16sp" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
         </LinearLayout>

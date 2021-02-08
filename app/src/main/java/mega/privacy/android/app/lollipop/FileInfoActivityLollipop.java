@@ -950,11 +950,11 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
         upArrow = upArrow.mutate();
 
-        drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link_w);
+        drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link);
         drawableRemoveLink = drawableRemoveLink.mutate();
         drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
         drawableLink = drawableLink.mutate();
-        drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+        drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share);
         drawableShare = drawableShare.mutate();
         drawableDownload = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_download_white);
         drawableDownload = drawableDownload.mutate();

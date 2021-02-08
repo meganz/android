@@ -997,7 +997,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
         fileStorageLayout = findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+        pickFileStorageButton.setImageResource(R.drawable.ic_select_image);
 
         chatRelativeLayout  = findViewById(R.id.relative_chat_layout);
 
@@ -1281,7 +1281,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if ((!fileStorageLayout.isShown())) return;
         showInputText();
         fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_b_select_image);
+        pickFileStorageButton.setImageResource(R.drawable.ic_select_image);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
         if (fileStorageF == null) return;
         fileStorageF.clearSelections();

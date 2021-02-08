@@ -106,7 +106,7 @@
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
                         android:text="@string/context_delete"
-                        android:textAppearance="?attr/textAppearanceSubtitle1" />
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
                 </LinearLayout>
 
             </LinearLayout>

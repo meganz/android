@@ -311,7 +311,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/ic_b_share_to_contact"
+                android:src="@drawable/ic_share_to_contact"
                 app:tint="?android:attr/textColorPrimary" />
 
             <TextView

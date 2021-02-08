@@ -399,7 +399,7 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"
+                        android:src="@drawable/ic_forward"
                         app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!--End Rich links-->
@@ -642,7 +642,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
@@ -798,7 +798,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
                 </RelativeLayout>
@@ -951,7 +951,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
@@ -1037,7 +1037,7 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"
+                        android:src="@drawable/ic_forward"
                         app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
 
@@ -1146,7 +1146,7 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"
+                        android:src="@drawable/ic_forward"
                         app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
 
@@ -1498,7 +1498,7 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"
+                        android:src="@drawable/ic_forward"
                         app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!--end contact's rich links-->
@@ -1666,7 +1666,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
                 </RelativeLayout>
@@ -1771,7 +1771,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
@@ -1868,7 +1868,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
 
@@ -1944,7 +1944,7 @@
                             android:scaleType="fitXY"
                             android:background="@null"
                             android:layout_margin="5dp"
-                            android:src="@drawable/ic_w_forward"
+                            android:src="@drawable/ic_forward"
                             app:tint="@color/grey_200_grey_500" />
                     </RelativeLayout>
                 </RelativeLayout>
@@ -2032,7 +2032,7 @@
                         android:scaleType="fitXY"
                         android:background="@null"
                         android:layout_margin="5dp"
-                        android:src="@drawable/ic_w_forward"
+                        android:src="@drawable/ic_forward"
                         app:tint="@color/grey_200_grey_500" />
                 </RelativeLayout>
                 <!--End RelativeLayout contact-->

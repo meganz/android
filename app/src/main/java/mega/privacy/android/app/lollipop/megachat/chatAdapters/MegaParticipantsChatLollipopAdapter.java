@@ -7,7 +7,6 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -39,7 +38,6 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
@@ -314,10 +312,10 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
-                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_b_unarchive);
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_unarchive);
                 } else {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_archive));
-                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_b_archive);
+                    holderHeader.archiveChatIcon.setImageResource(R.drawable.ic_archive);
                 }
 
                 long participantsCount = getChat().getPeerCount();

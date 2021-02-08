@@ -233,9 +233,9 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_share_to_contact"
+                    android:src="@drawable/ic_share_to_contact"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorPrimary" />
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/contacts_list_option_send_contact_text"

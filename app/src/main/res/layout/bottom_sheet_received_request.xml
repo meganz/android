@@ -136,7 +136,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/contact_ignore"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
 
@@ -167,8 +167,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/contact_decline"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"
-                    android:textColor="@color/red_600_red_300" />
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
         </LinearLayout>

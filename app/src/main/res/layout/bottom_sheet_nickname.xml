@@ -56,9 +56,9 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_rename_nickname"
+                    android:src="@drawable/ic_rename"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorPrimary" />
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -95,9 +95,9 @@
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_remove_nickname"
+                    android:src="@drawable/ic_remove"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorPrimary" />
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/remove_nickname_text"

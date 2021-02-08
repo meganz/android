@@ -178,7 +178,7 @@
                     android:layout_height="1dp"
                     android:layout_marginStart="72dp"
                     android:orientation="vertical"
-                    android:background="@color/grey_012_white_012"/>
+                    android:background="@color/grey_012_white_012" />
 
                 <!--Call-->
                 <LinearLayout
@@ -229,7 +229,7 @@
                         android:paddingTop="2dp"
                         android:src="@drawable/ic_chat"
                         android:visibility="visible"
-                        app:tint="?android:attr/textColorSecondary"  />
+                        app:tint="?android:attr/textColorSecondary" />
 
                     <TextView
                         android:id="@+id/start_chat_group_participants_chat_text"
@@ -248,7 +248,7 @@
                     android:layout_height="1dp"
                     android:layout_marginStart="72dp"
                     android:orientation="vertical"
-                    android:background="@color/grey_012_white_012"/>
+                    android:background="@color/grey_012_white_012" />
 
                 <!--Change Permissions-->
                 <LinearLayout
@@ -318,7 +318,7 @@
                     android:layout_height="1dp"
                     android:layout_marginStart="72dp"
                     android:orientation="vertical"
-                    android:background="@color/grey_012_white_012"/>
+                    android:background="@color/grey_012_white_012" />
 
                 <!--Leave chat-->
                 <LinearLayout
@@ -357,7 +357,7 @@
                     android:layout_height="1dp"
                     android:layout_marginStart="72dp"
                     android:orientation="vertical"
-                    android:background="@color/grey_012_white_012"/>
+                    android:background="@color/grey_012_white_012" />
 
                 <!--Remove contact-->
                 <LinearLayout

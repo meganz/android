@@ -24,7 +24,7 @@
 
     <item
         android:id="@+id/cab_menu_remove_link"
-        android:icon="@drawable/ic_remove_link_w"
+        android:icon="@drawable/ic_remove_link"
         android:orderInCategory="130"
         android:title="@string/context_remove_link_menu"
         android:visible="false"
@@ -44,7 +44,7 @@
 
     <item
         android:id="@+id/cab_menu_rename"
-        android:icon="@drawable/ic_rename_white"
+        android:icon="@drawable/ic_rename"
         android:orderInCategory="150"
         android:title="@string/context_rename"
         android:visible="false"
@@ -74,7 +74,7 @@
 
     <item
         android:id="@+id/cab_menu_share_folder"
-        android:icon="@drawable/ic_share_white"
+        android:icon="@drawable/ic_share"
         android:orderInCategory="170"
         android:title="@string/context_share_folder"
         android:visible="false"

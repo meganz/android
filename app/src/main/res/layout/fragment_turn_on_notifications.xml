@@ -95,7 +95,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_w_apps"
+                    android:src="@drawable/ic_apps"
                     app:tint="@color/white_grey_087" />
 
                 <LinearLayout
@@ -132,7 +132,7 @@
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_w_mega_logo"
+                    android:src="@drawable/ic_mega_logo"
                     app:tint="@color/white_grey_087" />
 
                 <LinearLayout

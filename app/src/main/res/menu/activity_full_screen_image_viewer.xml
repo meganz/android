@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/full_image_viewer_remove_link"
-        android:icon="@drawable/ic_remove_link_w"
+        android:icon="@drawable/ic_remove_link"
         android:orderInCategory="115"
         android:title="@string/context_remove_link_menu"
         android:visible="false"

@@ -2,6 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_file_list_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -46,7 +47,7 @@
                 android:singleLine="true"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
 
             <TextView
                 android:id="@+id/contact_file_list_info_text"
@@ -56,7 +57,7 @@
                 android:layout_below="@+id/contact_file_list_name_text"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
-                android:ellipsize="middle"/>
+                android:ellipsize="middle" />
 
         </RelativeLayout>
 
@@ -75,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:tint="@color/grey_038_white_038"
-                android:background="@null"/>
+                android:background="@null" />
 
         </RelativeLayout>
 
@@ -85,7 +86,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
-        android:background="@color/grey_012_white_012"/>
+        android:background="@color/grey_012_white_012" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -124,7 +125,8 @@
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1"
+                    tools:text="Folder info" />
             </LinearLayout>
 
             <LinearLayout
@@ -133,7 +135,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <!-- Options -->
             <LinearLayout
@@ -152,7 +154,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_save_to_device"
+                    android:src="@drawable/ic_save_to_device"
                     android:visibility="visible" />
 
                 <TextView
@@ -163,7 +165,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginLeft="18dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -172,7 +174,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
@@ -201,7 +203,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_rename"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -231,7 +233,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/general_move_to"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -261,7 +263,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_copy"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -270,7 +272,7 @@
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_leave_layout"
@@ -329,7 +331,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

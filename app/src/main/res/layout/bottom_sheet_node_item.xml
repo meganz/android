@@ -86,7 +86,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_centerVertical="true"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/node_info_text"
@@ -95,7 +95,7 @@
                     android:singleLine="true"
                     android:layout_toEndOf="@id/node_info_versions_icon"
                     android:ellipsize="middle"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
             </RelativeLayout>
 
         </RelativeLayout>
@@ -147,7 +147,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/info_ic"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_properties_text"
@@ -175,8 +175,9 @@
                     android:paddingBottom="2dp"
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_view_in_folder"
-                    android:visibility="visible" />
+                    android:src="@drawable/ic_upload_pick_file"
+                    android:visibility="visible"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -206,7 +207,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_add_favourite"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_favourite_text"
@@ -237,7 +238,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:src="@drawable/ic_label"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_label_text"
@@ -270,7 +271,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_download_layout"
@@ -287,9 +288,9 @@
                     android:paddingBottom="2dp"
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_save_to_device"
+                    android:src="@drawable/ic_save_to_device"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_download_text"
@@ -299,7 +300,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/general_save_to_device"
                     android:layout_marginStart="18dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -317,9 +318,9 @@
                     android:paddingBottom="2dp"
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_save_offline"
+                    android:src="@drawable/ic_save_offline"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_offline_text"
@@ -330,16 +331,14 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/file_properties_available_offline"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"
-                    />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="16dp"
-                    android:layout_weight="1"
-                    />
+                    android:layout_weight="1" />
             </LinearLayout>
 
             <LinearLayout
@@ -348,7 +347,7 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_link_layout"
@@ -367,8 +366,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/link_ic"
                     app:tint="?android:attr/textColorSecondary"
-                    android:visibility="visible"
-                   />
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/option_link_text"
@@ -398,7 +396,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_remove_link"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_remove_link_text"
@@ -428,7 +426,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_social_share_white"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_share_text"
@@ -438,7 +436,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/general_share"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -458,7 +456,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_share"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_share_folder_text"
@@ -488,7 +486,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_send_to_contact"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/send_chat_text"
@@ -498,7 +496,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_send_file_to_chat"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -528,7 +526,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_clean_shares_menu"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -537,7 +535,7 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_rename_layout"
@@ -566,7 +564,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_rename"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -586,7 +584,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_move"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_move_text"
@@ -616,7 +614,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_menu_copy"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_copy_text"
@@ -626,7 +624,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_copy"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -644,9 +642,9 @@
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_restore"
+                    android:src="@drawable/ic_restore"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_restore_text"
@@ -656,7 +654,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_restore"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -665,7 +663,7 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_open_with_layout"
@@ -682,9 +680,9 @@
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_b_open_with"
+                    android:src="@drawable/ic_open_with"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_open_with_text"
@@ -694,7 +692,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/external_play"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -714,7 +712,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_upload_pick_file"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/option_open_folder_text"
@@ -724,7 +722,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/search_open_location"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -733,7 +731,7 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:orientation="vertical"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/option_leave_share_layout"
@@ -762,7 +760,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/alert_leave_share"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -792,7 +790,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_move_to_trash"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
             <LinearLayout
@@ -822,7 +820,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginStart="18dp"
                     android:text="@string/context_remove"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"/>
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
             </LinearLayout>
 
         </LinearLayout>

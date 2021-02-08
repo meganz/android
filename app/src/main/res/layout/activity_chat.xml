@@ -294,7 +294,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:background="@null"
-                                android:src="@drawable/ic_b_select_image"
+                                android:src="@drawable/ic_select_image"
                                 app:tint="@color/grey_054_white_054" />
                     </FrameLayout>
 

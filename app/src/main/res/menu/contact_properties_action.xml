@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/cab_menu_share_folder"
-        android:icon="@drawable/ic_share_white"
+        android:icon="@drawable/ic_share"
         android:orderInCategory="110"
         android:title="@string/context_share_folder"
         android:visible="true"

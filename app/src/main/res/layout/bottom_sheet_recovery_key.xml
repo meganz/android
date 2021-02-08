@@ -55,24 +55,24 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_print"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/recovery_key_print_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
                     android:text="@string/context_option_print"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginLeft="72dp"
-                android:background="@color/grey_012_white_012"/>
+                android:background="@color/grey_012_white_012" />
 
             <LinearLayout
                 android:id="@+id/recovery_key_copytoclipboard_layout"
@@ -90,8 +90,8 @@
                     android:paddingLeft="-2dp"
                     android:paddingRight="-2dp"
                     android:visibility="visible"
-                    android:src="@drawable/ic_b_clipboard"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    android:src="@drawable/ic_clipboard"
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/recovery_key_copytoclipboard_text"
@@ -101,7 +101,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/option_copy_to_clipboard"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -121,7 +121,7 @@
                     android:paddingTop="2dp"
                     android:src="@drawable/ic_pick_file_system"
                     android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="?android:attr/textColorSecondary" />
 
                 <TextView
                     android:id="@+id/recovery_key_saveTo_fileSystem_text"
@@ -131,7 +131,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/option_save_on_filesystem"
-                    android:textAppearance="?attr/textAppearanceSubtitle1"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

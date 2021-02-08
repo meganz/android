@@ -94,7 +94,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_b_save_to_device"
+                    android:src="@drawable/ic_save_to_device"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -106,7 +106,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_save_to_device"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View
@@ -143,7 +143,7 @@
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
                     android:text="@string/general_revert"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <View

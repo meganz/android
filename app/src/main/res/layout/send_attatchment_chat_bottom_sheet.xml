@@ -69,7 +69,7 @@
                         android:paddingTop="2dp"
                         android:layout_marginStart="32dp"
                         android:text="@string/attachment_upload_panel_from_cloud"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
                 </LinearLayout>
 
                 <!--From Cloud-->
@@ -99,7 +99,7 @@
                         android:paddingTop="2dp"
                         android:layout_marginStart="32dp"
                         android:text="@string/attachment_upload_panel_from_device"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
                 </LinearLayout>
 
                 <!--Contact-->
@@ -129,7 +129,7 @@
                         android:paddingTop="2dp"
                         android:layout_marginStart="32dp"
                         android:text="@string/attachment_upload_panel_contact"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
                 </LinearLayout>
 
                 <!--Location-->
@@ -159,7 +159,7 @@
                         android:paddingTop="2dp"
                         android:layout_marginStart="32dp"
                         android:text="@string/file_properties_info_location"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                        android:textAppearance="?attr/textAppearanceSubtitle1" />
                 </LinearLayout>
 
             </LinearLayout>

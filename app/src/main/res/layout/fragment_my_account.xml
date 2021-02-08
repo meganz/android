@@ -78,7 +78,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="2dp"
                                 android:layout_toRightOf="@+id/my_account_name"
-                                android:src="@drawable/ic_rename_title"
+                                android:src="@drawable/ic_rename"
                                 rounded:tint="?android:attr/textColorSecondary" />
 
                         </RelativeLayout>

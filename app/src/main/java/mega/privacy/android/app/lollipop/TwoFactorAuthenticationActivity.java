@@ -27,10 +27,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -219,7 +217,7 @@ public class TwoFactorAuthenticationActivity extends PinActivityLollipop impleme
 
         explainSeed = (TextView) findViewById(R.id.explain_qr_seed_2fa_2);
         SpannableString text =  new SpannableString(getString(R.string.explain_qr_seed_2fa_2) + "  QM");
-        Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_b_question_mark);
+        Drawable questionMarck = ContextCompat.getDrawable(this, R.drawable.ic_question_mark);
         questionMarck.setBounds(0, 0, questionMarck.getIntrinsicWidth(), questionMarck.getIntrinsicHeight());
         ImageSpan imageSpan =  new ImageSpan(questionMarck, ImageSpan.ALIGN_BOTTOM);
         text.setSpan(imageSpan, text.length()-2,text.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);

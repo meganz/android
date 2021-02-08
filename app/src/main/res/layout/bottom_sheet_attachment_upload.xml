@@ -66,8 +66,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/attachment_upload_panel_photo"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
             <LinearLayout
@@ -96,8 +95,7 @@
                     android:paddingTop="2dp"
                     android:text="@string/attachment_upload_panel_from_cloud"
                     android:layout_marginLeft="18dp"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
 
@@ -127,8 +125,7 @@
                     android:paddingTop="2dp"
                     android:layout_marginLeft="18dp"
                     android:text="@string/attachment_upload_panel_contact"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp"/>
+                    android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
         </LinearLayout>

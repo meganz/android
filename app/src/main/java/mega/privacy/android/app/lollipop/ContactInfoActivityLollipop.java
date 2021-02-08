@@ -58,7 +58,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
@@ -856,7 +855,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 		drawableArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
 		drawableArrow = drawableArrow.mutate();
 
-		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+		drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share);
 		drawableShare = drawableShare.mutate();
 		drawableSend = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
 		drawableSend = drawableSend.mutate();
