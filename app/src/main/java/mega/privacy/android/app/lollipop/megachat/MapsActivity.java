@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.Util.*;
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PinActivityLollipop implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, LocationListener {
 
+    public static final int MY_LOCATION_ALPHA = 143;
     public static final String SNAPSHOT = "snapshot";
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
@@ -170,9 +171,15 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        Toolbar tB = (Toolbar) findViewById(R.id.toolbar_maps);
+        Toolbar tB = findViewById(R.id.toolbar_maps);
         setSupportActionBar(tB);
+
         ActionBar aB = getSupportActionBar();
+        if (aB == null) {
+            finish();
+            return;
+        }
+
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
         aB.setTitle(getString(R.string.title_activity_maps).toUpperCase());
@@ -191,8 +198,12 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         setFullScreenFab.setOnClickListener(this);
         setFullScreenFab.setVisibility(View.GONE);
         myLocationFab = findViewById(R.id.my_location_fab);
+
         Drawable myLocationFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_small_location));
-        myLocationFabDrawable.setAlpha(143);
+        if (myLocationFabDrawable != null) {
+            myLocationFabDrawable.setAlpha(MY_LOCATION_ALPHA);
+        }
+
         myLocationFab.setImageDrawable(myLocationFabDrawable);
         myLocationFab.setOnClickListener(this);
         myLocationFab.setVisibility(View.GONE);
