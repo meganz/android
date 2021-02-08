@@ -31,7 +31,6 @@ public class EmojiKeyboard extends LinearLayout {
     private View rootView;
     private String type;
     private int keyboardHeight;
-
     private VariantEmoji variantEmoji;
     private EmojiVariantPopup variantPopup;
     private RecentEmoji recentEmoji;
@@ -202,10 +201,12 @@ public class EmojiKeyboard extends LinearLayout {
 
     public void changeKeyboardIcon(boolean isKeyboard){
         Drawable drawable;
-        if(isKeyboard){
+        if (isKeyboard) {
             drawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
-        }else {
-            drawable = getResources().getDrawable(R.drawable.ic_emojicon);
+        } else {
+            drawable = getResources().getDrawable(editInterface.isTextEmpty() ?
+                    R.drawable.ic_emoji_light :
+                    R.drawable.ic_emoji_dark);
         }
         emojiIcon.setImageDrawable(drawable);
     }

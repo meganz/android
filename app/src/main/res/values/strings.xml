@@ -3010,6 +3010,7 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
 
     <string name="empty_screen_recent_chats_description_text" context="Preference screen item state description">[A]Invite friends to [/A][B]Chat [/B][A]and enjoy our encrypted platform with privacy and security.[/A]</string>
+    <string name="edit_message" context="Text shown when editing a message in chat">Edit message</string>
 
 
 </resources>

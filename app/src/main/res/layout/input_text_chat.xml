@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="bottom"
+    android:layout_gravity="bottom"
     android:background="@android:color/white">
 
     <RelativeLayout
@@ -36,43 +37,94 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="10dp"
-                android:background="@drawable/background_write_layout"
                 android:orientation="horizontal"
                 android:paddingEnd="10dp"
-                android:paddingStart="12dp">
-
-                <mega.privacy.android.app.components.twemoji.EmojiEditText
-                    android:id="@+id/input_text_chat"
+                android:paddingStart="12dp"
+                android:baselineAligned="false">
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="8dp"
-                    android:fontFamily="sans-serif"
-                    android:gravity="start"
-                    android:layout_gravity="center_horizontal|top"
-                    android:background="@android:color/transparent"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:maxLines="5"
-                    android:minHeight="38dp"
-                    android:textColor="@color/primary_text"
-                    android:textSize="14sp"
-                    app:emojiSize="18sp"/>
+                    android:orientation="vertical">
+                    <RelativeLayout
+                        android:id="@+id/edit_msg_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:paddingTop="10dp"
+                        android:layout_marginBottom="12dp">
+                        <RelativeLayout
+                            android:id="@+id/edit_icon"
+                            android:layout_width="2dp"
+                            android:layout_height="31dp"
+                            android:background="@color/accentColor"
+                            android:layout_marginEnd="12dp"/>
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/edit_icon">
+                            <TextView
+                                android:id="@+id/edit_msg_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/edit_message"
+                                android:fontFamily="sans-serif-medium"
+                                android:textSize="12sp"
+                                android:textColor="@color/accentColor"/>
+                            <mega.privacy.android.app.components.twemoji.EmojiTextView
+                                android:id="@+id/edit_msg_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/secondary_text"
+                                android:fontFamily="sans-serif"
+                                android:layout_below="@id/edit_msg_title"
+                                android:textSize="13sp"/>
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+                    <mega.privacy.android.app.components.twemoji.EmojiEditText
+                        android:id="@+id/input_text_chat"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="8dp"
+                        android:fontFamily="sans-serif"
+                        android:gravity="start"
+                        android:layout_gravity="start|top"
+                        android:background="@android:color/transparent"
+                        android:inputType="textMultiLine|textCapSentences"
+                        android:maxLines="5"
+                        android:minHeight="38dp"
+                        android:textColor="@color/primary_text"
+                        android:textSize="14sp"
+                        app:emojiSize="18sp"/>
+                </LinearLayout>
 
                 <RelativeLayout
                     android:id="@+id/emoji_rl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
                     android:paddingBottom="8dp">
+
+                    <ImageButton
+                        android:id="@+id/cancel_edit"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:background="@null"
+                        android:src="@drawable/ic_remove_chat_toolbar"/>
 
                     <ImageButton
                         android:id="@+id/emoji_icon"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_alignParentBottom="true"
                         android:background="@null"
-                        android:src="@drawable/ic_emojicon"
-                        app:tint="@color/unread_msgs_badge"/>
+                        android:src="@drawable/ic_emoji_light" />
                 </RelativeLayout>
             </LinearLayout>
 
@@ -106,8 +158,8 @@
 
                 <ImageButton
                     android:id="@+id/record_and_send_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="@null"
                     android:src="@drawable/ic_send_black"
                     android:visibility="visible"

@@ -110,8 +110,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
                                 android:background="@null"
-                                android:src="@drawable/ic_emojicon"
-                                app:tint="@color/transparent_black" />
+                                android:src="@drawable/ic_emoji_dark" />
                         </RelativeLayout>
 
                         <RelativeLayout

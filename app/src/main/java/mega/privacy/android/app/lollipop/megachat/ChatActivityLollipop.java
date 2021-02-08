@@ -223,7 +223,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private final static int ROTATION_LANDSCAPE = 1;
     private final static int ROTATION_REVERSE_PORTRAIT = 2;
     private final static int ROTATION_REVERSE_LANDSCAPE = 3;
-    private final static int MAX_LINES_INPUT_TEXT = 5;
+    private final static int MAX_LINES_INPUT_TEXT_COLLAPSED = 5;
+    private final static int MAX_LINES_INPUT_TEXT_EXPANDED = 20;
+
     private final static int TITLE_TOOLBAR_PORT = 140;
     private final static int TITLE_TOOLBAR_LAND = 250;
     private final static int TITLE_TOOLBAR_IND_PORT = 100;
@@ -286,6 +288,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     private boolean errorReactionsDialogIsShown;
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private android.app.AlertDialog dialogCall;
+
+    private RelativeLayout editMsgLayout;
+    private ImageButton cancelEdit;
+    private EmojiTextView editMsgText;
 
     ProgressDialog dialog;
     ProgressDialog statusDialog;
@@ -908,7 +914,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         expandCollapseInputTextLayout = findViewById(R.id.expand_input_text_rl);
         expandCollapseInputTextIcon = findViewById(R.id.expand_input_text_icon);
         writeMsgLayout = findViewById(R.id.write_msg_rl);
-
+        editMsgLayout = findViewById(R.id.edit_msg_layout);
+        editMsgText = findViewById(R.id.edit_msg_text);
+        cancelEdit = findViewById(R.id.cancel_edit);
+        cancelEdit.setOnClickListener(this);
+        hideEditMsgLayout();
 
         expandCollapseInputTextIcon.setOnClickListener(this);
         expandCollapseInputTextLayout.setVisibility(View.GONE);
@@ -1042,7 +1052,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         emojiKeyboard = findViewById(R.id.emojiView);
         emojiKeyboard.initEmoji(this, textChat, keyboardTwemojiButton);
         emojiKeyboard.setListenerActivated(true);
-
         observersLayout = findViewById(R.id.observers_layout);
         observersNumberText = findViewById(R.id.observers_text);
 
@@ -1261,7 +1270,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void showLetterKB() {
         hideFileStorage();
-        if (emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown()) return;
+        if(emojiKeyboard == null || emojiKeyboard.getLetterKeyboardShown())
+            return;
+
         emojiKeyboard.showLetterKeyboard();
     }
 
@@ -1297,7 +1308,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
-
+        logDebug("initAfterIntent");
         if (newIntent != null){
             logDebug("Intent is not null");
             intentAction = newIntent.getAction();
@@ -1410,6 +1421,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     private void initializeInputText() {
+        logDebug("initializeInputText");
         hideKeyboard();
         setChatSubtitle();
         ChatItemPreferences chatPrefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
@@ -1420,18 +1432,24 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 String editedMsgId = chatPrefs.getEditedMsgId();
                 editingMessage = !isTextEmpty(editedMsgId);
                 messageToEdit = editingMessage ? megaChatApi.getMessage(idChat, Long.parseLong(editedMsgId)) : null;
-                textChat.setText(written);
-                textChat.post(() -> {
-                    controlExpandableInputText(textChat.getLineCount());
-                });
-                showSendIcon();
+
+                if (editingMessage) {
+                    editMsgUI(written);
+                } else {
+                    hideEditMsgLayout();
+                    textChat.setText(written);
+                    textChat.post(() -> {
+                        controlExpandableInputText(textChat.getLineCount());
+                    });
+                    showSendIcon();
+                }
+
                 return;
             }
         } else {
             chatPrefs = new ChatItemPreferences(Long.toString(idChat), "");
             dbH.setChatItemPreferences(chatPrefs);
         }
-
         refreshTextInput();
     }
 
@@ -1452,8 +1470,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void refreshTextInput() {
         recordButtonStates(RECORD_BUTTON_DEACTIVATED);
+        collapseInputText();
         sendIcon.setVisibility(View.GONE);
         sendIcon.setEnabled(false);
+        keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
         sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_trans));
         if (chatRoom != null) {
             megaChatApi.sendStopTypingNotification(chatRoom.getChatId());
@@ -1535,6 +1555,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      *                      If not, a simple Snackbar has to be shown with this text.
      */
     private void initAndShowChat(String textSnackbar) {
+        logDebug("initAndShowChat");
         if (!initChat()) {
             return;
         }
@@ -2655,6 +2676,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         disableButton(rLPickAttachButton, pickAttachButton);
         disableButton(rLPickFileStorageButton, pickFileStorageButton);
         disableButton(rlGifButton, gifButton);
+        keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
     }
 
     private void disableButton(final  RelativeLayout layout, final  ImageButton button){
@@ -2692,10 +2714,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             return;
 
         sendIcon.setEnabled(true);
-        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_send_black));
+        sendIcon.setImageDrawable(ContextCompat.getDrawable(chatActivity, editingMessage ?
+                R.drawable.ic_select_thumbnail : R.drawable.ic_send_black));
+       
         textChat.setHint(" ");
         setSizeInputText(false);
         sendIcon.setVisibility(View.VISIBLE);
+        keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_dark));
         currentRecordButtonState = 0;
         recordLayout.setVisibility(View.GONE);
         recordButtonLayout.setVisibility(View.GONE);
@@ -2709,6 +2734,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             showSendIcon();
         } else {
             recordButtonLayout.setBackground(null);
+            keyboardTwemojiButton.setImageDrawable(ContextCompat.getDrawable(chatActivity, R.drawable.ic_emoji_light));
             sendIcon.setVisibility(View.GONE);
             recordButton.setVisibility(View.VISIBLE);
 
@@ -3497,14 +3523,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void setSizeInputText(boolean isEmpty){
         textChat.setMinLines(1);
-        if(isEmpty){
+        if (isEmpty) {
             textChat.setMaxLines(1);
-        }else {
+        } else {
             int maxLines;
-            if (textChat.getMaxLines() < MAX_LINES_INPUT_TEXT && textChat.getLineCount() == textChat.getMaxLines()) {
+            if (textChat.getMaxLines() < (isInputTextExpanded ? MAX_LINES_INPUT_TEXT_EXPANDED : MAX_LINES_INPUT_TEXT_COLLAPSED) && textChat.getLineCount() == textChat.getMaxLines()) {
                 maxLines = textChat.getLineCount() + 1;
             } else {
-                maxLines = MAX_LINES_INPUT_TEXT;
+                maxLines = isInputTextExpanded ? MAX_LINES_INPUT_TEXT_EXPANDED : MAX_LINES_INPUT_TEXT_COLLAPSED;
             }
 
             textChat.setEllipsize(null);
@@ -3616,7 +3642,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     @Override
     public void onBackPressed() {
-        logDebug("onBackPressed");
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
@@ -3697,6 +3722,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     editMessage(text);
                     finishMultiselectionMode();
                     checkActionMode();
+                    hideEditMsgLayout();
                 } else {
                     sendMessage(text);
                 }
@@ -3704,7 +3730,18 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 controlExpandableInputText(1);
                 break;
 
-            case R.id.emoji_rl:
+            case R.id.cancel_edit:
+                editingMessage = false;
+                messageToEdit = null;
+                hideEditMsgLayout();
+                textChat.setText(null);
+                textChat.post(() -> {
+                    controlExpandableInputText(textChat.getLineCount());
+                });
+                showSendIcon();
+                refreshTextInput();
+                break;
+
             case R.id.emoji_icon:
                 logDebug("keyboard_icon_chat");
                 hideFileStorage();
@@ -3730,7 +3767,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 logDebug("file storage icon ");
                 if (fileStorageLayout.isShown()) {
                     hideFileStorage();
-                    if(emojiKeyboard != null) emojiKeyboard.changeKeyboardIcon(false);
+                    if(emojiKeyboard != null){
+                        emojiKeyboard.changeKeyboardIcon(false);
+                    }
                 } else {
                     if ((emojiKeyboard != null) && (emojiKeyboard.getLetterKeyboardShown())) {
                         emojiKeyboard.hideBothKeyboard(this);
@@ -3818,9 +3857,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     private void changeKeyboard(ImageButton btn){
         Drawable currentDrawable = btn.getDrawable();
-        Drawable emojiDrawable = getResources().getDrawable(R.drawable.ic_emojicon);
+        Drawable emojiDrawableLight = getResources().getDrawable(R.drawable.ic_emoji_light);
+        Drawable emojiDrawableDark = getResources().getDrawable(R.drawable.ic_emoji_dark);
         Drawable keyboardDrawable = getResources().getDrawable(R.drawable.ic_keyboard_white);
-        if(areDrawablesIdentical(currentDrawable, emojiDrawable) && !emojiKeyboard.getEmojiKeyboardShown()){
+        if ((areDrawablesIdentical(currentDrawable, emojiDrawableLight) ||
+                areDrawablesIdentical(currentDrawable, emojiDrawableDark)) &&
+                !emojiKeyboard.getEmojiKeyboardShown()) {
             if(emojiKeyboard.getLetterKeyboardShown()){
                 emojiKeyboard.hideLetterKeyboard();
                 handlerKeyboard.postDelayed(new Runnable() {
@@ -4116,13 +4158,30 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             finishMultiselectionMode();
             checkActionMode();
         } else {
-            textChat.setText(messageToEdit.getContent());
-            textChat.setSelection(textChat.getText().length());
-            textChat.post(() -> {
-                controlExpandableInputText(textChat.getLineCount());
-            });
-            setSizeInputText(false);
+            editMsgUI(messageToEdit.getContent());
         }
+    }
+
+    private void hideEditMsgLayout(){
+        editMsgLayout.setVisibility(View.GONE);
+        cancelEdit.setVisibility(View.GONE);
+    }
+
+    private void editMsgUI(String written){
+        editMsgLayout.setVisibility(View.VISIBLE);
+        cancelEdit.setVisibility(View.VISIBLE);
+        editMsgText.setText(written);
+        textChat.setText(written);
+        textChat.setSelection(textChat.getText().length());
+        textChat.post(() -> {
+            controlExpandableInputText(textChat.getLineCount());
+        });
+        setSizeInputText(false);
+        showSendIcon();
+        hideKeyboard();
+        showLetterKB();
+
+        checkExpandOrCollapseInputText();
     }
 
     public void editMessage(String text) {
@@ -4219,7 +4278,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             switch(item.getItemId()){
                 case R.id.chat_cab_menu_edit:
-                    logDebug("Edit text");
                     editMessage(messagesSelected);
                     break;
 
@@ -9102,8 +9160,16 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         expandCollapseInputTextLayout.setVisibility(linesCount >= MIN_LINES_TO_EXPAND_INPUT_TEXT ? View.VISIBLE : View.GONE);
     }
 
+    private void collapseInputText(){
+        isInputTextExpanded = false;
+        checkExpandOrCollapseInputText();
+    }
+
     private void checkExpandOrCollapseInputText() {
         if (!isInputTextExpanded) {
+            expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
+                    58 : 18, getOutMetrics()), 0, 0);
+
             writingContainerLayout.setBackgroundColor(Color.TRANSPARENT);
             inputTextLayout.setBackground(null);
             writeMsgLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_write_layout));
@@ -9115,6 +9181,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             writeMsgLayout.getLayoutParams().height = WRAP_CONTENT;
             textChat.getLayoutParams().height = WRAP_CONTENT;
         } else {
+            expandCollapseInputTextLayout.setPadding(0, dp2px(editMsgLayout.getVisibility() == View.VISIBLE ?
+                    71 : 18, getOutMetrics()), 0, 0);
             writingContainerLayout.setBackgroundColor(getResources().getColor(R.color.black_12_alpha));
             inputTextLayout.setBackground(ContextCompat.getDrawable(this, R.drawable.background_expanded_write_layout));
             writeMsgLayout.setBackground(null);
@@ -9132,6 +9200,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         inputTextLayout.requestLayout();
         writeMsgLayout.requestLayout();
         textChat.requestLayout();
+
+        setSizeInputText(isTextEmpty(textChat.getText().toString()));
     }
 
     /**
@@ -9171,9 +9241,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     public void hideKeyboard() {
-        logDebug("hideKeyboard");
         hideFileStorage();
-        if (emojiKeyboard == null) return;
+        if (emojiKeyboard == null)
+            return;
+
         emojiKeyboard.hideBothKeyboard(this);
     }
 
