@@ -15168,11 +15168,10 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void doSetActionBarElevation(float elevation) {
-		// Can only make the elevation effect in Dark mode by elevating the Toolbar and toolbarLayout
+		// Can only make the elevation effect in Dark mode by elevating the inner AppBarLayout
 		if (Util.isDarkMode(this)) {
 			toolbarLayout.setElevation(elevation);
-			toolbar.setElevation(elevation);
-		} else {  // Light mode only need to elevate the AppBarLayout
+		} else {  // Light mode need to elevate the outer AppBarLayout
 			abL.setElevation(elevation);
 		}
 	}

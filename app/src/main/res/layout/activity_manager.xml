@@ -30,10 +30,13 @@
                     android:layout_height="wrap_content"
                     app:elevation="0dp">
 
+                    <!-- As per the doc of MaterialToolbar, set it to transparent background
+                    to make the whole AppBarLayout elevation overlay effect correct -->
                     <com.google.android.material.appbar.MaterialToolbar
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
                         android:minHeight="?attr/actionBarSize" />
 
                     <com.google.android.material.tabs.TabLayout
