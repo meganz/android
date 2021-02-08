@@ -45,11 +45,9 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -1712,14 +1710,6 @@ public class Util {
 			}
 		}, SHOW_IM_DELAY);
     }
-
-	public static Spanned getSpannedHtmlText(String string) {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
-		}
-
-		return Html.fromHtml(string);
-	}
 
 	public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {
