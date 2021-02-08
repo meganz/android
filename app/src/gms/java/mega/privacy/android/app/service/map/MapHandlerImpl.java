@@ -4,9 +4,13 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Location;
+import android.os.Looper;
 import android.view.View;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,11 +47,17 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 @SuppressLint("MissingPermission")
 public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, OnMyLocationClickListener, OnMyLocationButtonClickListener, OnCameraMoveStartedListener, OnCameraIdleListener, OnMarkerClickListener, OnInfoWindowClickListener {
 
+    private static final int REQUEST_INTERVAL = 3000;
+
     private GoogleMap mMap;
 
     private MapView mapView;
 
     private final FusedLocationProviderClient fusedLocationProviderClient;
+    private final LocationRequest locationRequest;
+    private final LocationCallback locationCallback;
+
+    private Location lastLocation;
 
     private Marker fullScreenMarker;
 
@@ -61,6 +71,32 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         }
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(REQUEST_INTERVAL);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    logWarning("locationResult is null");
+                    return;
+                }
+
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        lastLocation = location;
+                        onGetLastLocation(location.getLatitude(), location.getLongitude());
+
+                        if (!activity.isFullScreenEnabled()) {
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
+                        }
+
+                        break;
+                    }
+                }
+            }
+        };
     }
 
     /**
@@ -228,25 +264,25 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
     }
 
     @Override
+    public void disableCurrentLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    @Override
+    public void enableCurrentLocationUpdates() {
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+    }
+
+    @Override
     public void setMyLocation(boolean animateCamera) {
-        if (mMap == null) {
-            logWarning("mMap is null");
+        if (lastLocation == null) {
+            logWarning("lastLocation is null");
             return;
         }
 
-        fusedLocationProviderClient.getLastLocation().addOnFailureListener(e -> {
-            logError("getLastLocation() onFailure: " + e.getMessage());
-            showError();
-        }).addOnSuccessListener(location -> {
-            if (location != null) {
-                logDebug("getLastLocation() onSuccess");
-                onGetLastLocation(location.getLatitude(), location.getLongitude());
-
-                if (animateCamera) {
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
-                }
-            }
-        });
+        if (animateCamera) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), DEFAULT_ZOOM));
+        }
     }
 
     @Override

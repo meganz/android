@@ -14,9 +14,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
@@ -54,7 +51,7 @@ import static mega.privacy.android.app.utils.Util.*;
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PinActivityLollipop implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, LocationListener {
 
-    public static final int MY_LOCATION_ALPHA = 143;
+    public static final int ICONS_ALPHA = 143;
     public static final String SNAPSHOT = "snapshot";
     public static final String LATITUDE = "latitude";
     public static final String LONGITUDE = "longitude";
@@ -81,7 +78,6 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
     private MapHandler mapHandler;
 
     private boolean isGPSEnabled;
-
     private int screenOrientation;
 
     @Override
@@ -127,7 +123,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
         Drawable myLocationFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_small_location));
         if (myLocationFabDrawable != null) {
-            myLocationFabDrawable.setAlpha(MY_LOCATION_ALPHA);
+            myLocationFabDrawable.setAlpha(ICONS_ALPHA);
         }
 
         myLocationFab.setImageDrawable(myLocationFabDrawable);
@@ -303,7 +299,13 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
      * This method disable the updates of the Location Manager service
      */
     private void disableLocationUpdates() {
-        if (locationManager != null) locationManager.removeUpdates(this);
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
+        }
+
+        if (mapHandler != null) {
+            mapHandler.disableCurrentLocationUpdates();
+        }
     }
 
     /**
@@ -315,6 +317,10 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         }
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+        if (mapHandler != null) {
+            mapHandler.enableCurrentLocationUpdates();
+        }
     }
 
     /**
@@ -322,14 +328,15 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
      * mode button
      */
     public void setLocationFabDrawable() {
-        Drawable setFullScreenFabDrawable;
-        if (isFullScreenEnabled) {
-            setFullScreenFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_exit_location));
-        } else {
-            setFullScreenFabDrawable = (ContextCompat.getDrawable(this, R.drawable.ic_fullscreen_location));
+        Drawable setFullScreenFabDrawable = (ContextCompat.getDrawable(this,
+                isFullScreenEnabled
+                        ? R.drawable.ic_fullscreen_exit_location
+                        : R.drawable.ic_fullscreen_location));
+
+        if (setFullScreenFabDrawable != null) {
+            setFullScreenFabDrawable.setAlpha(ICONS_ALPHA);
+            setFullScreenFab.setImageDrawable(setFullScreenFabDrawable);
         }
-        setFullScreenFabDrawable.setAlpha(143);
-        setFullScreenFab.setImageDrawable(setFullScreenFabDrawable);
     }
 
     /**
@@ -458,7 +465,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
      * Callback when snapshot of current location is ready.
      *
      * @param byteArray Binary data of the snapshot.
-     * @param latitude Latitude of the location.
+     * @param latitude  Latitude of the location.
      * @param longitude Longitude of the location.
      */
     public void onSnapshotReady(byte[] byteArray, double latitude, double longitude) {
@@ -568,11 +575,9 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
         mapHandler.clearMap();
         mapHandler.setMyLocationEnabled(true);
-        new Handler().postDelayed(() -> {
-            isFullScreenEnabled = false;
-            setCurrentLocationVisibility();
-            mapHandler.initMap();
-        }, 3000);
+        isFullScreenEnabled = false;
+        setCurrentLocationVisibility();
+        mapHandler.initMap();
     }
 
     private void providerDisabled() {
@@ -611,7 +616,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
     public void onProviderDisabled(String provider) {
         logDebug("LocationListener onProviderDisabled");
 
-        if (!provider.equals(LocationManager.GPS_PROVIDER)){
+        if (!provider.equals(LocationManager.GPS_PROVIDER)) {
             return;
         }
 
