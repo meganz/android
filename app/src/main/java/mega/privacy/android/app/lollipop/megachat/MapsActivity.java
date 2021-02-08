@@ -27,11 +27,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.text.HtmlCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -44,6 +46,7 @@ import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.middlelayer.map.MapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 import mega.privacy.android.app.service.map.MapHandlerImpl;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -57,8 +60,6 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
     public static final String LONGITUDE = "longitude";
     public static final String EDITING_MESSAGE = "editingMessage";
     public static final String MSG_ID = "msg_id";
-
-    private final String IS_FULL_SCREEN_ENABLED = "isFullScreenEnabled";
 
     private static Geocoder geocoder;
 
@@ -81,78 +82,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
     private boolean isGPSEnabled;
 
-    /**
-     * This method gets an address from the coordinates passed like parameters
-     *
-     * @param context   from which the action is done
-     * @param latitude  is the latitude of a coordinate
-     * @param longitude is the longitude of a coordinate
-     * @return A list with the address.
-     */
-    public static List<Address> getAddresses(Context context, double latitude, double longitude) {
-        if (geocoder == null) {
-            geocoder = new Geocoder(context, Locale.getDefault());
-        }
-
-        try {
-            return geocoder.getFromLocation(latitude, longitude, 1);
-        } catch (IOException e) {
-            logError("Exception trying to get an address from a latitude and a longitude", e);
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Callback when get a location's coordinate.
-     *
-     * @param latitude  Latitude of the location.
-     * @param longitude Longitude of the location.
-     */
-    public void onGetLastLocation(double latitude, double longitude) {
-        List<Address> addresses = getAddresses(this, latitude, longitude);
-        if (addresses != null) {
-            MegaLatLng latLng = new MegaLatLng(latitude, longitude);
-            String addressLine = addresses.get(0).getAddressLine(0);
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                currentAddress = new MapAddress(latLng, getString(R.string.current_location_label), addressLine);
-                currentLocationName.setText(currentAddress.getName());
-                currentLocationAddress.setText(currentAddress.getAddress());
-            } else {
-                currentAddress = new MapAddress(latLng, getString(R.string.current_location_landscape_label, addressLine), addressLine);
-                String textToShow = currentAddress.getName();
-                try {
-                    textToShow = textToShow.replace("[A]", "<font color=\'#8c8c8c\'>");
-                    textToShow = textToShow.replace("[/A]", "</font>");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logError("Exception changing the format of a string", e);
-                }
-                Spanned result;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                    result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY);
-                } else {
-                    result = Html.fromHtml(textToShow);
-                }
-                currentLocationLandscape.setText(result);
-            }
-        }
-        progressBar.setVisibility(View.GONE);
-    }
-
-    /**
-     * This method starts an animation of the full screen marker
-     * with a duration received by the duration parameter
-     *
-     * @param duration length of the animation
-     */
-    public void setAnimatingMarker(long duration) {
-        if (isFullScreenEnabled && mapHandler.hideMarker()) {
-            fullscreenMarkerIcon.setVisibility(View.VISIBLE);
-            fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
-            fullscreenMarkerIcon.animate().translationY(-dp2px(12, outMetrics)).setDuration(duration).start();
-        }
-    }
+    private int screenOrientation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,11 +91,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.dark_primary_color));
 
-        if (savedInstanceState != null) {
-            isFullScreenEnabled = savedInstanceState.getBoolean(IS_FULL_SCREEN_ENABLED, false);
-        } else {
-            isFullScreenEnabled = false;
-        }
+        screenOrientation = getResources().getConfiguration().orientation;
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -182,7 +108,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
-        aB.setTitle(getString(R.string.title_activity_maps).toUpperCase());
+        aB.setTitle(StringResourcesUtils.getString(R.string.title_activity_maps).toUpperCase());
 
         ((ViewGroup) findViewById(R.id.parent_layout_maps)).getLayoutTransition().setDuration(500);
         ((ViewGroup) findViewById(R.id.parent_layout_maps)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
@@ -223,6 +149,96 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         isGPSEnabled = isGPSEnabled();
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (screenOrientation == newConfig.orientation) {
+            return;
+        }
+
+        screenOrientation = newConfig.orientation;
+
+        if (isGPSEnabled()) {
+            setCurrentLocationVisibility();
+        }
+    }
+
+    /**
+     * This method gets an address from the coordinates passed like parameters
+     *
+     * @param context   from which the action is done
+     * @param latitude  is the latitude of a coordinate
+     * @param longitude is the longitude of a coordinate
+     * @return A list with the address.
+     */
+    public static List<Address> getAddresses(Context context, double latitude, double longitude) {
+        if (geocoder == null) {
+            geocoder = new Geocoder(context, Locale.getDefault());
+        }
+
+        try {
+            return geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            logError("Exception trying to get an address from a latitude and a longitude", e);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Callback when get a location's coordinate.
+     *
+     * @param latitude  Latitude of the location.
+     * @param longitude Longitude of the location.
+     */
+    public void onGetLastLocation(double latitude, double longitude) {
+        List<Address> addresses = getAddresses(this, latitude, longitude);
+        if (addresses != null) {
+            MegaLatLng latLng = new MegaLatLng(latitude, longitude);
+            String addressLine = addresses.get(0).getAddressLine(0);
+
+            // Portrait
+            currentAddress = new MapAddress(latLng,
+                    StringResourcesUtils.getString(R.string.current_location_label), addressLine);
+
+            currentLocationName.setText(currentAddress.getName());
+            currentLocationAddress.setText(currentAddress.getAddress());
+
+            // Landscape
+            currentAddress = new MapAddress(latLng,
+                    StringResourcesUtils.getString(R.string.current_location_landscape_label, addressLine), addressLine);
+
+            String textToShow = currentAddress.getName();
+
+            try {
+                textToShow = textToShow.replace("[A]", "<font color=\'#8c8c8c\'>");
+                textToShow = textToShow.replace("[/A]", "</font>");
+            } catch (Exception e) {
+                e.printStackTrace();
+                logWarning("Exception changing the format of a string", e);
+            }
+
+            currentLocationLandscape.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        }
+
+        progressBar.setVisibility(View.GONE);
+    }
+
+    /**
+     * This method starts an animation of the full screen marker
+     * with a duration received by the duration parameter
+     *
+     * @param duration length of the animation
+     */
+    public void setAnimatingMarker(long duration) {
+        if (isFullScreenEnabled && mapHandler.hideMarker()) {
+            fullscreenMarkerIcon.setVisibility(View.VISIBLE);
+            fullscreenMarkerIconShadow.setVisibility(View.VISIBLE);
+            fullscreenMarkerIcon.animate().translationY(-dp2px(12, outMetrics)).setDuration(duration).start();
+        }
+    }
+
     /**
      * This method determines if the view of the send current
      * location option has to be shown or hide
@@ -230,22 +246,18 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
     public void setCurrentLocationVisibility() {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mapLayout.getLayoutParams();
 
-        if (isGPSEnabled()) {
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                sendCurrentLocationLayout.setVisibility(View.GONE);
-                sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
-                params.bottomMargin = dp2px(45, outMetrics);
-            } else {
-                sendCurrentLocationLayout.setVisibility(View.VISIBLE);
-                sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
-                params.bottomMargin = dp2px(72, outMetrics);
-            }
-            mapLayout.setLayoutParams(params);
-            return;
-        } else {
+        if (!isGPSEnabled()) {
             sendCurrentLocationLayout.setVisibility(View.GONE);
             sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
             params.bottomMargin = 0;
+        } else if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            sendCurrentLocationLayout.setVisibility(View.GONE);
+            sendCurrentLocationLandscapeLayout.setVisibility(View.VISIBLE);
+            params.bottomMargin = dp2px(45, outMetrics);
+        } else {
+            sendCurrentLocationLayout.setVisibility(View.VISIBLE);
+            sendCurrentLocationLandscapeLayout.setVisibility(View.GONE);
+            params.bottomMargin = dp2px(72, outMetrics);
         }
 
         mapLayout.setLayoutParams(params);
@@ -305,12 +317,6 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(IS_FULL_SCREEN_ENABLED, isFullScreenEnabled);
-    }
-
     /**
      * This methods sets the correspondent icon of the full screen
      * mode button
@@ -341,17 +347,21 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
             if (myLocationFab.getVisibility() != View.VISIBLE) {
                 myLocationFab.setVisibility(View.VISIBLE);
             }
+
             if (setFullScreenFab.getVisibility() != View.VISIBLE) {
                 setFullScreenFab.setVisibility(View.VISIBLE);
             }
+
             return true;
         } else {
             if (myLocationFab.getVisibility() != View.GONE) {
                 myLocationFab.setVisibility(View.GONE);
             }
+
             if (setFullScreenFab.getVisibility() != View.GONE) {
                 setFullScreenFab.setVisibility(View.GONE);
             }
+
             isFullScreenEnabled = true;
             return false;
         }
@@ -397,7 +407,8 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
     }
 
     public void showError() {
-        showSnackbar(findViewById(R.id.parent_layout_maps), getString(R.string.general_error));
+        showSnackbar(findViewById(R.id.parent_layout_maps),
+                StringResourcesUtils.getString(R.string.general_error));
     }
 
     /**
@@ -430,13 +441,10 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
         final double latitude = location.getLatLng().getLatitude();
         final double longitude = location.getLatLng().getLongitude();
-        final int mapWidth;
+        final int mapWidth = screenOrientation == Configuration.ORIENTATION_PORTRAIT
+                ? outMetrics.widthPixels
+                : outMetrics.heightPixels;
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mapWidth = outMetrics.widthPixels;
-        } else {
-            mapWidth = outMetrics.heightPixels;
-        }
         mapHandler.createSnapshot(latitude, longitude, mapWidth);
     }
 
@@ -550,6 +558,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
     private void providerEnabled() {
         if (mapHandler == null || mapHandler.isMapNull()) {
+            logWarning("mapHandler or mMap is null");
             return;
         }
 
@@ -568,6 +577,7 @@ public class MapsActivity extends PinActivityLollipop implements ActivityCompat.
 
     private void providerDisabled() {
         if (mapHandler == null || mapHandler.isMapNull()) {
+            logWarning("mapHandler or mMap is null");
             return;
         }
 
