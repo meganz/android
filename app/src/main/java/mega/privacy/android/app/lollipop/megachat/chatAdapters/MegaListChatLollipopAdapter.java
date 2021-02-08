@@ -64,7 +64,6 @@ import nz.mega.sdk.MegaChatGiphy;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -86,9 +85,8 @@ import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListChatLollipopAdapter.ViewHolderChatList> implements OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 
-	public static final int ITEM_VIEW_TYPE_NORMAL_SELECTED = 0;
-	public static final int ITEM_VIEW_TYPE_NORMAL_UNSELECTED = 1;
-	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 2;
+	public static final int ITEM_VIEW_TYPE_NORMAL_CHATS = 0;
+	public static final int ITEM_VIEW_TYPE_ARCHIVED_CHATS = 1;
 
 	public static final int ADAPTER_RECENT_CHATS = 0;
 	public static final int ADAPTER_ARCHIVED_CHATS = 1;
@@ -104,7 +102,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	boolean multipleSelect = false;
-	private SparseBooleanArray selectedItems;
+	private SparseBooleanArray selectedItems = new SparseBooleanArray();
 	Object fragment;
 
 	DisplayMetrics outMetrics;
@@ -135,7 +133,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		cC = new ChatController(context);
 		
 		if(context instanceof ChatExplorerActivity || context instanceof FileExplorerActivityLollipop){
-			selectedItems = new SparseBooleanArray();
 			multipleSelect = true;
 		}
 	}
@@ -203,10 +200,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		final int itemType = getItemViewType(position);
 		logDebug("position: " + position + ", itemType: " + itemType);
 
-		holder.itemView.setVisibility(View.VISIBLE);
-
-		if(itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED || itemType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
-			((ViewHolderNormalChatList)holder).imageView.setImageBitmap(null);
+		if(itemType == ITEM_VIEW_TYPE_NORMAL_CHATS) {
 			MegaChatListItem chat = (MegaChatListItem) getItem(position);
 
 			setTitle(position, holder);
@@ -220,7 +214,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).contactMail = megaChatApi.getContactEmail(contactHandle);
 
-				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
+				if (isItemChecked(position)) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
@@ -251,7 +245,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).privateChatIcon.setVisibility(View.VISIBLE);
 				}
 
-				if (itemType == ITEM_VIEW_TYPE_NORMAL_SELECTED) {
+				if (isItemChecked(position)) {
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.new_multiselect_color));
 					((ViewHolderNormalChatList) holder).imageView.setImageResource(R.drawable.ic_select_folder);
 				} else {
@@ -466,7 +460,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		dbH = DatabaseHandler.getDbHandler(context);
 		View v = null;
 
-		if(viewType == ITEM_VIEW_TYPE_NORMAL_SELECTED || viewType == ITEM_VIEW_TYPE_NORMAL_UNSELECTED) {
+		if(viewType == ITEM_VIEW_TYPE_NORMAL_CHATS) {
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recent_chat_list, parent, false);
 			holder = new ViewHolderNormalChatList(v);
 			holder.itemLayout = v.findViewById(R.id.recent_chat_list_item_layout);
@@ -605,10 +599,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public int getItemViewType(int position) {
 		if (position >= chats.size()) {
 			return ITEM_VIEW_TYPE_ARCHIVED_CHATS;
-		} else if (multipleSelect && isItemChecked(position)) {
-			return ITEM_VIEW_TYPE_NORMAL_SELECTED;
 		} else {
-			return ITEM_VIEW_TYPE_NORMAL_UNSELECTED;
+			return ITEM_VIEW_TYPE_NORMAL_CHATS;
 		}
 	}
 
@@ -619,9 +611,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 	public void setMultipleSelect(boolean multipleSelect) {
 		logDebug("setMultipleSelect");
-		if (!this.multipleSelect && multipleSelect) {
-			selectedItems = new SparseBooleanArray();
-		}
 		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 		}
@@ -656,11 +645,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
-							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
-						}
-					}
+					hideMultipleSelect();
 					notifyItemChanged(positionToflip);
 				}
 
@@ -680,15 +665,17 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 	public void toggleSelection(int pos) {
 		logDebug("position: " + pos);
 
+		final boolean delete;
 		if (selectedItems.get(pos, false)) {
 			logDebug("Delete pos: " + pos);
 			selectedItems.delete(pos);
+			delete = true;
 		}
 		else {
 			logDebug("PUT pos: " + pos);
 			selectedItems.put(pos, true);
+			delete = false;
 		}
-		notifyItemChanged(pos);
 
 		if (!(listFragment.findViewHolderForLayoutPosition(pos) instanceof ViewHolderNormalChatList)) {
 			return;
@@ -701,31 +688,34 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			flipAnimation.setAnimationListener(new Animation.AnimationListener() {
 				@Override
 				public void onAnimationStart(Animation animation) {
-
+					if (!delete) {
+						notifyItemChanged(pos);
+					}
 				}
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
-							((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
-						}
+					hideMultipleSelect();
+					if (delete) {
+						notifyItemChanged(pos);
 					}
 				}
 
 				@Override
 				public void onAnimationRepeat(Animation animation) {
-
 				}
 			});
 			view.imageView.startAnimation(flipAnimation);
+		} else {
+			hideMultipleSelect();
+			notifyItemChanged(pos);
 		}
-		else {
-			if (selectedItems.size() <= 0){
-				if(context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity){
-					((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
-				}
-			}
+	}
+
+	private void hideMultipleSelect() {
+		if (selectedItems.size() <= 0
+				&& (context instanceof ManagerActivityLollipop || context instanceof ArchivedChatsActivity)) {
+			((RecentChatsFragmentLollipop) fragment).hideMultipleSelect();
 		}
 	}
 

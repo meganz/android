@@ -348,7 +348,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         mLayoutManager = new LinearLayoutManager(context);
         listView.setLayoutManager(mLayoutManager);
         listView.setHasFixedSize(true);
-        listView.setItemAnimator(new DefaultItemAnimator());
+        DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setSupportsChangeAnimations(false);
+        listView.setItemAnimator(itemAnimator);
         listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
