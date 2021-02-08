@@ -353,7 +353,7 @@ public class ChatController {
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
-                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+                showSnackbar(context, getCorrectStringDependingOnCalendar(option));
                 break;
 
             default:
