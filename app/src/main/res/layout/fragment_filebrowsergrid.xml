@@ -94,6 +94,11 @@
 
             <include layout="@layout/transfer_over_quota_banner"/>
 
+            <FrameLayout
+                android:id="@+id/ad_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -119,17 +124,6 @@
             </RelativeLayout>
 
         </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/file_grid_browser_camera_upload_on_off"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/accentColor"
-            android:visibility="gone" />
 
     </RelativeLayout>
 

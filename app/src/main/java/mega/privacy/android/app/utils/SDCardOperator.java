@@ -349,6 +349,16 @@ public class SDCardOperator {
      * @param tag            Identifier of the SD transfer on DB.
      */
     public void moveDownloadedFileToDestinationPath(File downloadedFile, String targetPath, String uri, int tag) {
+       if(!downloadedFile.exists()) {
+           logError("Download file doesn't exist!");
+           return;
+       }
+
+       if(TextUtil.isTextEmpty(targetPath)) {
+           logError("Target path is empty!");
+           return;
+       }
+
         MegaApplication app = MegaApplication.getInstance();
         try {
             initDocumentFileRoot(uri != null ? uri
