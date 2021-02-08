@@ -716,7 +716,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Dọn Các Tệp Ngoại Tuyến</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Mở tệp tin khi tải xong</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Xóa bỏ tài khoản này</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Hủy tài khoản</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Hiện đang dùng %s</string>

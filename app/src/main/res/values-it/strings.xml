@@ -716,7 +716,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Elimina file Offline</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Apri il file quando viene scaricato</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancella il tuo account</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Cancella account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Attualmente %s usati</string>

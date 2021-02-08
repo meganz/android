@@ -716,7 +716,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Hapus File Offilne</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Buka file saat diunduh</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Hapus akun anda</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Hapus akun</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Sekarang memakai %s</string>

@@ -716,7 +716,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Opruimen van offline bestanden</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Open bestand wanneer het gedownload is</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Annuleer uw account</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Verwijder account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Momenteel %s in gebruik</string>

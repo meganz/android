@@ -687,7 +687,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Open file when downloaded</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Delete account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
@@ -1588,8 +1587,8 @@
     <string name="attachment_upload_panel_contact">Contact</string>
     <string name="attachment_upload_panel_photo">From device</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Cancel Account</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.\nYou will not be able to undo this action.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Delete account</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will not be able to access your account data, your MEGA contacts or conversations.\nYou will not be able to undo this action.</string>
     <string name="delete_button" context="menu item">Delete</string>
 
     <string name="file_properties_info_info_file">Info</string>

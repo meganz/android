@@ -716,7 +716,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">オフラインのファイルをクリア</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">ダウンロード時にファイルを開く</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">アカウントをキャンセルする</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">アカウントを削除</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">利用している領域 %s</string>

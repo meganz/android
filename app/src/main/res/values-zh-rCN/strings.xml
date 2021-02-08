@@ -716,7 +716,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">清除离线文件</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">下载完成后打开文件</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">取消账户</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">删除账户</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">目前已使用%s</string>
