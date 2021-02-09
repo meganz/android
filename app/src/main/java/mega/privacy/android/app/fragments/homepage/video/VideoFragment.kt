@@ -132,7 +132,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         listView
     ) { v: View?, _, _, _, _ ->
         callManager {
-            it.changeActionBarElevation(v!!.canScrollVertically(-1))
+            it.changeAppBarElevation(v!!.canScrollVertically(-1))
         }
     }
 

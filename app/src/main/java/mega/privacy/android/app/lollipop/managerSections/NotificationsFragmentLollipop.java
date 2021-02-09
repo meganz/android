@@ -93,10 +93,10 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
     public void checkScroll() {
         if (listView != null) {
             if (listView.canScrollVertically(-1)) {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(true);
+                ((ManagerActivityLollipop) context).changeAppBarElevation(true);
             }
             else {
-                ((ManagerActivityLollipop) context).changeActionBarElevation(false);
+                ((ManagerActivityLollipop) context).changeAppBarElevation(false);
             }
         }
     }

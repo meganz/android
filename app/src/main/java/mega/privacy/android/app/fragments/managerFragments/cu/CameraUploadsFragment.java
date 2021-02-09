@@ -1,7 +1,6 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -145,9 +144,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         }
 
         if (mViewModel.isSelecting() || mBinding.cuList.canScrollVertically(-1)) {
-            mManagerActivity.changeActionBarElevation(true);
+            mManagerActivity.changeAppBarElevation(true);
         } else {
-            mManagerActivity.changeActionBarElevation(false);
+            mManagerActivity.changeAppBarElevation(false);
         }
     }
 
@@ -397,7 +396,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity
-                        .changeActionBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)));
+                        .changeAppBarElevation(mFirstLoginBinding.camSyncScrollView.canScrollVertically(-1)));
 
         mFirstLoginBinding.camSyncButtonOk.setOnClickListener(v -> {
             ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();

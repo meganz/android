@@ -467,7 +467,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				|| MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()
 				|| (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE);
 
-		((ManagerActivityLollipop) context).changeActionBarElevation(visible);
+		((ManagerActivityLollipop) context).changeAppBarElevation(visible);
 	}
 
 	@Override

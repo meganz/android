@@ -840,10 +840,10 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void checkScroll () {
 		if (recyclerView != null) {
 			if (recyclerView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}

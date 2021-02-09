@@ -264,7 +264,8 @@ public class CallUtil {
         callInProgressLayout.setVisibility(View.VISIBLE);
 
         if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+            ((ManagerActivityLollipop) context).changeAppBarElevation(true,
+                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
         }
         if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
@@ -322,7 +323,8 @@ public class CallUtil {
         callInProgressLayout.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, null);
         if (context instanceof ManagerActivityLollipop) {
-            ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+            ((ManagerActivityLollipop) context).changeAppBarElevation(false,
+                    ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
         }
         if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
@@ -411,7 +413,8 @@ public class CallUtil {
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
             callInProgressLayout.setVisibility(View.GONE);
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).changeToolbarLayoutElevation();
+                ((ManagerActivityLollipop) context).changeAppBarElevation(false,
+                        ManagerActivityLollipop.ELEVATION_CALL_IN_PROGRESS);
             }
             if (context instanceof ContactInfoActivityLollipop) {
                 ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();

@@ -208,7 +208,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      */
     public void checkScroll() {
         if (listView != null) {
-            ((ManagerActivityLollipop) context).changeActionBarElevation(listView.canScrollVertically(-1));
+            ((ManagerActivityLollipop) context).changeAppBarElevation(listView.canScrollVertically(-1));
         }
     }
 

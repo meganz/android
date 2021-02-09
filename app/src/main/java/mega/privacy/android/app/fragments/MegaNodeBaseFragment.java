@@ -487,9 +487,9 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public void checkScroll() {
         if (recyclerView != null) {
             if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
-                managerActivity.changeActionBarElevation(true);
+                managerActivity.changeAppBarElevation(true);
             } else {
-                managerActivity.changeActionBarElevation(false);
+                managerActivity.changeAppBarElevation(false);
             }
         }
     }

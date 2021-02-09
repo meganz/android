@@ -76,10 +76,10 @@ public class MyStorageFragmentLollipop extends Fragment {
 	public void checkScroll () {
 		if (scrollView != null) {
 			if (scrollView.canScrollVertically(-1)) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}
@@ -104,10 +104,10 @@ public class MyStorageFragmentLollipop extends Fragment {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 				if (scrollView.canScrollVertically(-1)){
-					((ManagerActivityLollipop) context).changeActionBarElevation(true);
+					((ManagerActivityLollipop) context).changeAppBarElevation(true);
 				}
 				else {
-					((ManagerActivityLollipop) context).changeActionBarElevation(false);
+					((ManagerActivityLollipop) context).changeAppBarElevation(false);
 				}
 			}
 		});

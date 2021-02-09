@@ -155,7 +155,7 @@ class RecentsBucketFragment : BaseFragment() {
 
     private fun checkScroll() {
         val canScroll = listView.canScrollVertically(-1)
-        (activity as ManagerActivityLollipop).changeActionBarElevation(canScroll)
+        (activity as ManagerActivityLollipop).changeAppBarElevation(canScroll)
     }
 
     private fun getNodesHandles(isImage: Boolean): LongArray? = viewModel.items.value?.filter {

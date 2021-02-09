@@ -28,10 +28,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.widget.FrameLayout;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -85,10 +83,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -282,7 +277,6 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -296,7 +290,6 @@ import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
-import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -304,13 +297,10 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -361,6 +351,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private static final int MEDIA_UPLOADS_BNV = 6;
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
+
+	/** The causes of elevating the app bar */
+	public static final int ELEVATION_SCROLL = 0x01;
+    public static final int ELEVATION_CALL_IN_PROGRESS = 0x02;
+    /** The cause bitmap of elevating the app bar */
+    private int mElevationCause;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
@@ -429,7 +425,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     ActionBar aB;
     MaterialToolbar toolbar;
     AppBarLayout abL;
-	private AppBarLayout toolbarLayout;
 
 	int selectedPaymentMethod;
 	int selectedAccountType;
@@ -471,7 +466,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private LinearLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
 
-    float elevation = 0;
     private boolean isSMSDialogShowing;
     private String bonusStorageSMS = "GB";
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
@@ -1902,7 +1896,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         if (onAskingSMSVerificationFragment && svF != null) {
             getSupportFragmentManager().putFragment(outState, FragmentTag.SMS_VERIFICATION.getTag(), svF);
         }
-		outState.putFloat("elevation", abL.getElevation());
+		outState.putInt("elevation", mElevationCause);
 		outState.putInt("storageState", storageState);
 		outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown);
 		outState.putSerializable("drawerItemPreUpgradeAccount", drawerItemPreUpgradeAccount);
@@ -2014,7 +2008,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
             if (onAskingSMSVerificationFragment) {
                 svF = (SMSVerificationFragment) getSupportFragmentManager().getFragment(savedInstanceState, FragmentTag.SMS_VERIFICATION.getTag());
             }
-			elevation = savedInstanceState.getFloat("elevation", 0);
+			mElevationCause = savedInstanceState.getInt("elevation", 0);
 			storageState = savedInstanceState.getInt("storageState", MegaApiJava.STORAGE_STATE_UNKNOWN);
 			isStorageStatusDialogShown = savedInstanceState.getBoolean("isStorageStatusDialogShown", false);
 			drawerItemPreUpgradeAccount = (DrawerItem) savedInstanceState.getSerializable("drawerItemPreUpgradeAccount");
@@ -2266,7 +2260,6 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		//Set toolbar
 		abL = (AppBarLayout) findViewById(R.id.app_bar_layout);
-		toolbarLayout = (AppBarLayout) findViewById(R.id.toolbar_and_tabs_layout);
 
 		toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
@@ -2509,7 +2502,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 		callInProgressText = findViewById(R.id.call_in_progress_text);
 		callInProgressLayout.setVisibility(View.GONE);
-		changeToolbarLayoutElevation();
+
+		if (mElevationCause > 0) {
+			// A work around: mElevationCause will be changed unexpectedly shortly
+			int elevationCause = mElevationCause;
+			// Apply the previous Appbar elevation(e.g. before rotation) after all views have been created
+			handler.postDelayed(()-> changeAppBarElevation(true, elevationCause), 100);
+		}
 
 		mNavHostView = findViewById(R.id.nav_host_fragment);
 		setupNavDestListener();
@@ -15148,32 +15147,30 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     }
 
 	/**
-	 * This method is used to change the elevation of the toolbar when a call is in progress.
+	 * This method is used to change the elevation of the AppBarLayout when
+	 * scrolling the RecyclerView
+	 * @param withElevation true if need elevation, false otherwise
 	 */
-	public void changeToolbarLayoutElevation() {
-		changeActionBarElevation(callInProgressLayout.getVisibility() == View.VISIBLE);
+	public void changeAppBarElevation(boolean withElevation) {
+		changeAppBarElevation(withElevation, ELEVATION_SCROLL);
 	}
 
-	public void changeActionBarElevation(boolean withElevation){
+	/**
+	 * This method is used to change the elevation of the AppBarLayout for some reason
+	 *
+	 * @param withElevation true if need elevation, false otherwise
+	 * @param cause for what cause adding/removing elevation. Only if mElevationCause(cause bitmap)
+	 *              is zero will the elevation being eliminated
+	 */
+	public void changeAppBarElevation(boolean withElevation, int cause) {
 		if (withElevation) {
-			doSetActionBarElevation(getResources().getDimension(R.dimen.toolbar_elevation));
-			if (elevation > 0) {
-				elevation = 0;
-				abL.postDelayed(() -> doSetActionBarElevation(
-						getResources().getDimension(R.dimen.toolbar_elevation)), 100);
-			}
-		} else if (callInProgressLayout.getVisibility() != View.VISIBLE) {  // Should elevate when call in progress
-			doSetActionBarElevation(0);
+			mElevationCause |= cause;
+		} else if ((mElevationCause & cause) > 0) {
+			mElevationCause ^= cause;
 		}
-	}
 
-	private void doSetActionBarElevation(float elevation) {
-		// Can only make the elevation effect in Dark mode by elevating the inner AppBarLayout
-		if (Util.isDarkMode(this)) {
-			toolbarLayout.setElevation(elevation);
-		} else {  // Light mode need to elevate the outer AppBarLayout
-			abL.setElevation(elevation);
-		}
+		abL.setElevation(mElevationCause > 0 ?
+				getResources().getDimension(R.dimen.toolbar_elevation) : 0);
 	}
 
 	public long getParentHandleInbox() {

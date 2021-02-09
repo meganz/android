@@ -69,7 +69,7 @@ public class TransfersBaseFragment extends RotatableFragment {
     }
 
     public void checkScroll() {
-        managerActivity.changeActionBarElevation(listView != null && listView.canScrollVertically(-1));
+        managerActivity.changeAppBarElevation(listView != null && listView.canScrollVertically(-1));
     }
 
     /**

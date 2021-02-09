@@ -719,7 +719,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (rv != null) {
             callManager {
-                it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
+                it.changeAppBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
             LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
                 .post(Pair(this, rv.canScrollVertically(-1)))

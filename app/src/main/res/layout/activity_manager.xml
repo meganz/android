@@ -24,56 +24,50 @@
                 android:layout_height="wrap_content"
                 app:elevation="0dp">
 
-                <com.google.android.material.appbar.AppBarLayout
-                    android:id="@+id/toolbar_and_tabs_layout"
+                <!-- As per the doc of MaterialToolbar, set it to transparent background
+                to make the whole AppBarLayout elevation overlay effect correct -->
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:elevation="0dp">
+                    android:background="@android:color/transparent"
+                    android:minHeight="?attr/actionBarSize" />
 
-                    <!-- As per the doc of MaterialToolbar, set it to transparent background
-                    to make the whole AppBarLayout elevation overlay effect correct -->
-                    <com.google.android.material.appbar.MaterialToolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:minHeight="?attr/actionBarSize" />
-
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_contacts"
-                        style="@style/Widget.Mega.TabLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginStart="@dimen/standard_margin" />
-
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_shares"
-                        style="@style/Widget.Mega.TabLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_my_account"
-                        style="@style/Widget.Mega.TabLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/sliding_tabs_transfers"
-                        style="@style/Widget.Mega.TabLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-                </com.google.android.material.appbar.AppBarLayout>
-
-                <include
-                    layout="@layout/item_call_in_progress_layout"
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/sliding_tabs_contacts"
+                    style="@style/Widget.Mega.TabLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:visibility="gone" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="@dimen/standard_margin" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/sliding_tabs_shares"
+                    style="@style/Widget.Mega.TabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/sliding_tabs_my_account"
+                    style="@style/Widget.Mega.TabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/sliding_tabs_transfers"
+                    style="@style/Widget.Mega.TabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
             </com.google.android.material.appbar.AppBarLayout>
+
+            <include
+                layout="@layout/item_call_in_progress_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:visibility="gone"
+                android:elevation="16dp" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/contact_tabs_pager"
@@ -176,7 +170,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start">
 
-        <include layout="@layout/navigation_view_layout"/>
+        <include layout="@layout/navigation_view_layout" />
 
     </com.google.android.material.navigation.NavigationView>
 

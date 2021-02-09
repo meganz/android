@@ -314,10 +314,10 @@ public class SentRequestsFragmentLollipop extends Fragment {
 	public void checkScroll () {
 		if (listView != null) {
 			if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-				((ManagerActivityLollipop) context).changeActionBarElevation(true);
+				((ManagerActivityLollipop) context).changeAppBarElevation(true);
 			}
 			else {
-				((ManagerActivityLollipop) context).changeActionBarElevation(false);
+				((ManagerActivityLollipop) context).changeAppBarElevation(false);
 			}
 		}
 	}

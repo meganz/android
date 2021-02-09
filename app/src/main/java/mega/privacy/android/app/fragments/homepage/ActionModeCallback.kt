@@ -81,7 +81,7 @@ class ActionModeCallback constructor(
             val inflater = it.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
         }
-        mainActivity.changeActionBarElevation(true)
+        mainActivity.changeAppBarElevation(true)
 
         return true
     }
@@ -125,7 +125,7 @@ class ActionModeCallback constructor(
     override fun onDestroyActionMode(mode: ActionMode?) {
         viewModel.clearSelection()
 
-        mainActivity.changeActionBarElevation(false)
+        mainActivity.changeAppBarElevation(false)
 
         viewModel.actionModeDestroy()
     }

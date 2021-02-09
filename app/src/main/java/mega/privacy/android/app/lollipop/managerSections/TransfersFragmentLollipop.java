@@ -344,7 +344,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 	@Override
 	public void checkScroll() {
-		managerActivity.changeActionBarElevation((listView != null && listView.canScrollVertically(-1))
+		managerActivity.changeAppBarElevation((listView != null && listView.canScrollVertically(-1))
 				|| (adapter != null && adapter.isMultipleSelect()));
 	}
 

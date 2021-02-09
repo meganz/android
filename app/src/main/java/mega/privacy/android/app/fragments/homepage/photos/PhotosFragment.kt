@@ -152,7 +152,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        (activity as ManagerActivityLollipop).changeActionBarElevation(v!!.canScrollVertically(-1))
+        (activity as ManagerActivityLollipop).changeAppBarElevation(v!!.canScrollVertically(-1))
     }
 
     private fun setupListView() {

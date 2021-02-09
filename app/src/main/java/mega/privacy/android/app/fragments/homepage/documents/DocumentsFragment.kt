@@ -205,7 +205,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         listView
     ) { v: View?, _, _, _, _ ->
         callManager { manager ->
-            manager.changeActionBarElevation(v!!.canScrollVertically(-1))
+            manager.changeAppBarElevation(v!!.canScrollVertically(-1))
         }
     }
 
