@@ -5,6 +5,11 @@
     android:background="@color/white"
     tools:context=".FileExplorerListFragment" >
 
+	<FrameLayout
+		android:id="@+id/ad_view_container"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" />
+
 	<RelativeLayout
 		android:id="@+id/content_layout"
 		android:layout_width="match_parent"

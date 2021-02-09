@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop.managerSections;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import android.view.LayoutInflater;
