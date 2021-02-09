@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.nodeListToArray
 import nz.mega.sdk.MegaNode
@@ -332,7 +333,11 @@ class NodeSaver(
                 return false
             }
 
-            add(Completable.fromCallable { checkSizeBeforeDownload(parentPath) }
+            add(Completable
+                .fromCallable {
+                    storeDownloadLocationIfNeeded(parentPath)
+                    checkSizeBeforeDownload(parentPath)
+                }
                 .subscribeOn(Schedulers.io())
                 .subscribe(IGNORE, logErr("NodeSaver handleActivityResult")))
 

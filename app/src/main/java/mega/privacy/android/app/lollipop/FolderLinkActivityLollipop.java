@@ -62,6 +62,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -71,6 +74,7 @@ import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
@@ -97,6 +101,7 @@ import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+@AndroidEntryPoint
 public class FolderLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener, DecryptAlertDialog.DecryptDialogListener,
 		SnackbarShower {
 
@@ -170,6 +175,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 	private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
 			AlertsAndWarnings.showSaveToDeviceConfirmDialog(this));
+
+	@Inject
+	CookieDialogFactory cookieDialogFactory;
 
 	public void activateActionMode(){
 		logDebug("activateActionMode");
@@ -649,6 +657,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		if (dbH == null){
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
+
+		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
     }
 
 	@Override
