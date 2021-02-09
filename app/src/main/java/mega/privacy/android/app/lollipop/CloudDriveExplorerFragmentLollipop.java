@@ -964,4 +964,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
     public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
 	}
+
+	public boolean isFolderEmpty() {
+		return adapter == null || adapter.getItemCount() <= 0;
+	}
 }

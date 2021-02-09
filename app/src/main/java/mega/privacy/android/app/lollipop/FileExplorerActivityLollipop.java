@@ -1052,7 +1052,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
+						cDriveExplorer = getCloudExplorerFragment();
+						searchMenuItem.setVisible(cDriveExplorer != null && !cDriveExplorer.isFolderEmpty());
 					}
 				}
 
@@ -1093,7 +1094,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
+						searchMenuItem.setVisible(!iSharesExplorer.isFolderEmpty());
 					}
 				}
 			}
