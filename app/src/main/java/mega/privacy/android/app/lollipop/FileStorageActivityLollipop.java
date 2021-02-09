@@ -603,6 +603,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 		}
 
+		logDebug("Request SD card write permission with intent: " + intent);
 		startActivityForResult(intent, REQUEST_CODE_TREE);
 	}
 
@@ -1285,8 +1286,6 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				return;
 			}
 
-			dbH.setSDCardUri(treeUri.toString());
-
 			SDCardOperator sdCardOperator = null;
 			try {
 				sdCardOperator = new SDCardOperator(this);
@@ -1300,30 +1299,36 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				return;
 			}
 
-			if (isBasedOnFileStorage()) {
-				sdRoot = sdCardOperator.getSDCardRoot();
-				openSDCardPath();
-			} else {
-				String pathString = getFullPathFromTreeUri(treeUri, this);
-				if (isTextEmpty(pathString)) {
-					logWarning("getFullPathFromTreeUri is Null.");
-					return;
-				}
+            String uriString = treeUri.toString();
+            if (isBasedOnFileStorage()) {
+                // The uri is SD card root uri.
+                dbH.setSDCardUri(uriString);
+                sdRoot = sdCardOperator.getSDCardRoot();
+                openSDCardPath();
+            } else {
+                String pathString = getFullPathFromTreeUri(treeUri, this);
 
-				path = new File(pathString);
+                if (isTextEmpty(pathString)) {
+                    logWarning("getFullPathFromTreeUri is Null.");
+                    return;
+                }
 
-				if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-					dbH.setCameraFolderExternalSDCard(true);
-					dbH.setUriExternalSDCard(treeUri.toString());
-				} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-					dbH.setMediaFolderExternalSdCard(true);
-					dbH.setUriMediaExternalSdCard(treeUri.toString());
-				}
+                path = new File(pathString);
 
-				finishPickFolder();
-			}
-		}
-	}
+                if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+                    dbH.setCameraFolderExternalSDCard(true);
+                    dbH.setUriExternalSDCard(uriString);
+                } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+                    dbH.setMediaFolderExternalSdCard(true);
+                    dbH.setUriMediaExternalSdCard(uriString);
+                } else {
+                    dbH.setSDCardUri(uriString);
+                }
+
+                finishPickFolder();
+            }
+        }
+    }
 
 	/**
 	 * Shows a warning indicating no SD card was detected.
