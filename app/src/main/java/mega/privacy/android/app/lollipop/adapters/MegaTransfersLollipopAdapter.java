@@ -512,6 +512,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     private void startAnimation(final int pos, final boolean delete) {
 		MegaTransfersLollipopAdapter.ViewHolderTransfer view = (MegaTransfersLollipopAdapter.ViewHolderTransfer) listFragment.findViewHolderForLayoutPosition(pos);
 		if (view == null) {
+		    notifyItemChanged(pos);
 			return;
 		}
 
@@ -564,7 +565,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                 continue;
             }
 
-            MegaTransfer transfer = tL.get(i);
+            MegaTransfer transfer = tL.get(selectedItems.keyAt(i));
             if (transfer != null) {
                 selectedTransfers.add(transfer);
             }

@@ -45,11 +45,9 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -472,32 +470,38 @@ public class Util {
 		return decrypted;
 	}
 	
-	/*
-	 * Check is device on WiFi
+	/**
+	 * Checks if device is on WiFi.
 	 */
 	public static boolean isOnWifi(Context context) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = null;
-		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+		return isOnNetwork(context, ConnectivityManager.TYPE_WIFI);
 	}
 
-	/*
-	 * Check is device on Mobile Data
+	/**
+	 * Checks if device is on Mobile Data.
 	 */
 	public static boolean isOnMobileData(Context context) {
+		return isOnNetwork(context, ConnectivityManager.TYPE_MOBILE);
+	}
+
+	/**
+	 * Checks if device is on specific network.
+	 *
+	 * @param networkType The type of network,
+	 * @see ConnectivityManager to check the available network types available.
+	 * @return True if device is on specified network, false otherwise.
+	 */
+	private static boolean isOnNetwork(Context context, int networkType) {
 		ConnectivityManager connectivityManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
 		NetworkInfo networkInfo = null;
+
 		if (connectivityManager != null) {
-			networkInfo = connectivityManager
-					.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+			networkInfo = connectivityManager.getNetworkInfo(networkType);
 		}
-		return networkInfo == null ? false : networkInfo.isConnected();
+
+		return networkInfo != null && networkInfo.isConnected();
 	}
 
 	static public boolean isOnline(Context context) {
@@ -1709,14 +1713,6 @@ public class Util {
 		}, SHOW_IM_DELAY);
     }
 
-	public static Spanned getSpannedHtmlText(String string) {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
-		}
-
-		return Html.fromHtml(string);
-	}
-
 	public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {
 			if(option == TAKE_PHOTO_CODE) {
@@ -1859,4 +1855,20 @@ public class Util {
 		}
 		return false;
 	}
+
+    /**
+     * Store the selected download location if user unticket "Always ask for download location",
+     * then this location should be set as download location.
+     *
+     * @param downloadLocation The download location selected by the user.
+     */
+    public static void storeDownloadLocationIfNeeded(String downloadLocation) {
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+        boolean askMe = Boolean.parseBoolean(dbH.getPreferences().getStorageAskAlways());
+
+        // Should set as default download location.
+        if (!askMe) {
+            dbH.setStorageDownloadLocation(downloadLocation);
+        }
+    }
 }

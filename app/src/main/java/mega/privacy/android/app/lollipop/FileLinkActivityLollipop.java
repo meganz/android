@@ -40,14 +40,19 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import java.io.File;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -65,9 +70,11 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
 
 	private static final String TAG_DECRYPT = "decrypt";
+	private static final String AD_SLOT = "and5";
 
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -114,6 +121,11 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	public static final int FILE_LINK = 1;
 
 	private String mKey;
+
+	@Inject
+	CookieDialogFactory cookieDialogFactory;
+
+	private GoogleAdsLoader mAdsLoader;
 
 	@Override
 	public void onDestroy(){
@@ -239,6 +251,20 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		else{
 			logWarning("url NULL");
 		}
+
+		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+		initAdsLoader();
+	}
+
+	/**
+	 * Init the Ads Loader and associate it with tht Ad Slot
+	 * Add it as the fragment lifecycle observer
+	 * Set the Ads view container to the Ads Loader
+	 */
+	private void initAdsLoader() {
+		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
+		getLifecycle().addObserver(mAdsLoader);
+		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
 	}
 
 	@Override
@@ -384,15 +410,19 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					return;
 				}
 
-				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + document.getHandle());
+				long handle = document.getHandle();
+
+				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + handle);
 				if (dbH == null){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				}
 
-				if (document.getHandle() != MegaApiJava.INVALID_HANDLE) {
-					dbH.setLastPublicHandle(document.getHandle());
+				if (handle != MegaApiJava.INVALID_HANDLE) {
+					dbH.setLastPublicHandle(handle);
 					dbH.setLastPublicHandleTimeStamp();
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
+
+					mAdsLoader.queryShowOrNotByHandle(handle);
 				}
 
 //				nameView.setText(document.getName());

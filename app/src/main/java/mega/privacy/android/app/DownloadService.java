@@ -505,8 +505,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 			logDebug("CurrentDocument is not null");
 			if (highPriority) {
-				String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
-				megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
+			    // Download to SD card from chat.
+                if (!isTextEmpty(appData)) {
+                    megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", appData);
+                } else {
+                    String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
+                    megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
+                }
 			} else if (!isTextEmpty(appData)) {
 				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData);
 			} else {

@@ -1,13 +1,21 @@
 package mega.privacy.android.app.components
 
 import android.content.Context
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.AttributeSet
+import android.view.View
 import android.widget.TextView
+import androidx.core.text.bold
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreferenceCompat
 
+
 /**
- * A SwitchPreference that provides a click listener for the summary.
+ * A SwitchPreference that provides a click listener for the end part of the summary.
  *
  * @param context      The {@link Context} that will style this preference
  * @param attrs        Style attributes that differ from the default
@@ -25,24 +33,70 @@ class ClickableSummarySwitchPreference @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : SwitchPreferenceCompat(context, attrs, defStyleAttr, defStyleRes) {
 
-    private var summaryListener: (() -> Unit)? = null
+    private var summaryText: String? = null
+    private var clickableText: String? = null
+    private var clickListener: (() -> Unit)? = null
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
 
-        if (summaryListener != null) {
+        if (clickListener != null && !summaryText.isNullOrBlank() && !clickableText.isNullOrBlank()) {
             (holder.findViewById(android.R.id.summary) as TextView?)?.apply {
-                setOnClickListener { summaryListener?.invoke() }
+                val stringBuilder = SpannableStringBuilder()
+                    .append(summaryText)
+                    .append(" ")
+                    .bold { append(clickableText) }
+
+                stringBuilder.setSpan(object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        holder.itemView.performClick()
+                    }
+
+                    override fun updateDrawState(ds: TextPaint) {
+                        ds.isUnderlineText = false
+                    }
+                }, 0, summaryText!!.length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+
+
+                stringBuilder.setSpan(
+                    object : ClickableSpan() {
+                        override fun onClick(widget: View) {
+                            clickListener?.invoke()
+                        }
+
+                        override fun updateDrawState(ds: TextPaint) {
+                            ds.isUnderlineText = false
+                        }
+                    },
+                    summaryText!!.length + 1,
+                    summaryText!!.length + 1 + clickableText!!.length,
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                )
+
+                text = stringBuilder
+                linksClickable = true
+                movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }
 
     /**
-     * Set summary click listener to be called when the summary text is clicked.
+     * Set summary text to be shown.
      *
-     * @param listener Callback to be called
+     * @param text  Text to be shown
      */
-    fun setOnSummaryClickListener(listener: (() -> Unit)?) {
-        summaryListener = listener
+    fun setSummaryText(text: String) {
+        summaryText = text
+    }
+
+    /**
+     * Set clickable text to be placed after the summary text.
+     *
+     * @param text      Clickable text to be shown
+     * @param listener  Click listener
+     */
+    fun setClickableText(text: String, listener: (() -> Unit)?) {
+        clickableText = text
+        clickListener = listener
     }
 }
