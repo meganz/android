@@ -39,7 +39,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
@@ -65,7 +64,6 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -119,8 +117,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -140,7 +136,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
@@ -149,6 +144,7 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
@@ -163,6 +159,7 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragm
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -361,11 +358,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
-    @Inject
-	GetCookieSettingsUseCase getCookieSettingsUseCase;
-
-    @Inject
-	UpdateCookieSettingsUseCase updateCookieSettingsUseCase;
+	@Inject
+	CookieDialogFactory cookieDialogFactory;
 
 	public int accountFragment;
 
@@ -2564,7 +2558,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 
 					if (isTransfersInProgressAdded()) {
-						tFLol.checkSelectModeAfterChangeTab();
+						tFLol.checkSelectModeAfterChangeTabOrDrawerItem();
 					}
 				}
 			}
@@ -3599,28 +3593,6 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			hideFabButton();
 			showHideBottomNavigationView(true);
 		}
-	}
-
-	private void showCookieDialog() {
-		AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
-				.setCancelable(false)
-				.setView(R.layout.dialog_cookie_alert)
-				.setPositiveButton(R.string.preference_cookies_accept, (positiveDialog, which) ->
-						updateCookieSettingsUseCase.acceptAll()
-								.subscribeOn(Schedulers.io())
-								.observeOn(AndroidSchedulers.mainThread())
-								.subscribe(() -> { }, (error) -> {
-									logError(error.getMessage());
-								})
-				)
-				.setNegativeButton(R.string.settings_about_cookie_settings, (negativeDialog, which) ->
-						startActivity(new Intent(this, CookiePreferencesActivity.class))
-				)
-				.create();
-
-		dialog.show();
-
-		((TextView) dialog.findViewById(R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 	}
 
 	public void destroySMSVerificationFragment() {
@@ -4801,14 +4773,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 		checkBeforeShowSMSVerificationDialog();
 
-		if (MegaApplication.isCookieBannerEnabled()) {
-			getCookieSettingsUseCase.shouldShowDialog()
-					.subscribeOn(Schedulers.io())
-					.observeOn(AndroidSchedulers.mainThread())
-					.subscribe((showDialog, throwable) -> {
-						if (showDialog) showCookieDialog();
-					});
-		}
+		cookieDialogFactory.showDialogIfNeeded(this);
     }
 
     /**
@@ -4828,15 +4793,15 @@ public class ManagerActivityLollipop extends SorterContentActivity
     private void showPsa(Psa psa) {
         if (psa == null || drawerItem != DrawerItem.HOMEPAGE
 				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
-        	// Dismiss PSA will trigger a null Psa event, we should adjust NavHostView height too.
-        	adjustNavHostViewHeight(true);
+			EventNotifierKt.notifyPsaVisibilityChange(0);
             return;
         }
 
         if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+				&& getProLayout.getVisibility() == View.GONE
 				&& TextUtils.isEmpty(psa.getUrl())) {
 			psaViewHolder.bind(psa);
-			adjustNavHostViewHeight(true);
+			handler.post(() -> EventNotifierKt.notifyPsaVisibilityChange(psaViewHolder.psaLayoutHeight()));
         }
     }
 
@@ -5887,6 +5852,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			removeFragment(getChatsFragment());
 		}
 
+		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
+			tFLol.checkSelectModeAfterChangeTabOrDrawerItem();
+		}
+
 		MegaApplication.getTransfersManagement().setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
 
     	switch (item){
@@ -6404,6 +6373,18 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		openSettingsQR = true;
 		drawerItem=DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
+	}
+
+	/**
+	 * Resets the scroll of settings page
+	 */
+	public void resetSettingsScrollIfNecessary() {
+		openSettingsStorage = false;
+		openSettingsQR = false;
+
+		if (getSettingsFragment() != null) {
+			sttFLol.goToFirstCategory();
+		}
 	}
 
 	public void moveToChatSection (long idChat) {
@@ -7074,6 +7055,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
 							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
 						}
 						else {
+							if (drawerItem == DrawerItem.SETTINGS) {
+								resetSettingsScrollIfNecessary();
+							}
+
 							backToDrawerItem(bottomNavigationCurrentItem);
 						}
 					} else {
@@ -7943,6 +7928,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			if (!isOnline(this)) {
 				showOfflineMode();
 			}
+
+			resetSettingsScrollIfNecessary();
 			backToDrawerItem(bottomNavigationCurrentItem);
 		} else if (drawerItem == DrawerItem.SHARED_ITEMS) {
 			switch (getTabItemShares()) {
@@ -8078,35 +8065,10 @@ public class ManagerActivityLollipop extends SorterContentActivity
     private void updatePsaViewVisibility() {
 		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
 				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
-		adjustNavHostViewHeight(true);
-	}
-
-    /**
-	 * Adjust the height of NavHostView according to the visibility of the PSA view.
-	 * When the PSA view is visible, the FAB within homepage should be displayed above
-	 * the PSA view, limit the height of NavHostView is an easier way to do that.
-	 *
-	 * @param needPost in some cases, e.g. go back from transfer fragment, the BNV isn't visible
-	 *                 when we call this function, so we need post this function call to the
-	 *                 next draw cycle.
-	 */
-    private void adjustNavHostViewHeight(boolean needPost) {
-    	if (drawerItem != DrawerItem.HOMEPAGE) {
-    		return;
-		}
-
-    	if (psaViewHolder.visible()) {
-    		if (fragmentLayout.getMeasuredHeight() <= 0 || psaViewHolder.psaLayoutHeight() <= 0 || needPost) {
-    			handler.post(() -> adjustNavHostViewHeight(false));
-			} else {
-				LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
-				params.height = fragmentLayout.getMeasuredHeight() - psaViewHolder.psaLayoutHeight();
-				mNavHostView.setLayoutParams(params);
-			}
+		if (psaViewHolder.visible()) {
+			handler.post(() -> EventNotifierKt.notifyPsaVisibilityChange(psaViewHolder.psaLayoutHeight()));
 		} else {
-    		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mNavHostView.getLayoutParams();
-    		params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-    		mNavHostView.setLayoutParams(params);
+			EventNotifierKt.notifyPsaVisibilityChange(0);
 		}
 	}
 
@@ -11581,6 +11543,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			}
 
 			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			Util.storeDownloadLocationIfNeeded(parentPath);
+
 			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			logDebug("Size: " + size);

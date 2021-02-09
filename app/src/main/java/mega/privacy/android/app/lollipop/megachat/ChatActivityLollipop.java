@@ -138,6 +138,7 @@ import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1735,8 +1736,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (chatRoom.isGroup()) {
             iconStateToolbar.setVisibility(View.GONE);
         }
-
-        subtitleCall.setVisibility(View.GONE);
     }
 
     private void setPreviewGroupalSubtitle() {
@@ -1770,7 +1769,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
         titleToolbar.setMaxWidthEmojis(width);
         titleToolbar.setTypeEllipsize(TextUtils.TruncateAt.END);
-
         setSubtitleVisibility();
 
         if (chatC.isInAnonymousMode() && megaChatApi.getChatConnectionState(idChat)==MegaChatApi.CHAT_CONNECTION_ONLINE) {
@@ -2020,7 +2018,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                     if (!chatRoom.isPreview()) {
                         customSubtitle.append(", ").append(getString(R.string.bucket_word_me));
                     }
-
                     groupalSubtitleToolbar.setText(adjustForLargeFont(customSubtitle.toString()));
                 }
             }
@@ -3364,6 +3361,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
         } else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
             logDebug("Local folder selected");
             String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+            Util.storeDownloadLocationIfNeeded(parentPath);
+
             chatC.prepareForDownload(intent, parentPath);
         } else if (requestCode == REQUEST_CODE_PICK_GIF && resultCode == RESULT_OK && intent != null) {
             sendGiphyMessageFromGifData(intent.getParcelableExtra(GIF_DATA));
@@ -8760,6 +8759,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (callInProgressLayout != null) {
             callInProgressLayout.setVisibility(View.GONE);
             callInProgressLayout.setOnClickListener(null);
+            subtitleCall.setVisibility(View.GONE);
             setSubtitleVisibility();
         }
         if(returnCallOnHoldButton != null) {
@@ -8816,6 +8816,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (chatRoom == null || chatRoom.isPreview() || !chatRoom.isActive() ||
                 megaChatApi.getNumCalls() <= 0 || !isStatusConnected(this, idChat)) {
             /*No calls*/
+            subtitleCall.setVisibility(View.GONE);
             setSubtitleVisibility();
             MegaChatCall call = megaChatApi.getChatCall(idChat);
             hideCallBar(call);
@@ -8843,6 +8844,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         int callStatus = callInThisChat.getStatus();
         logDebug("The call status in this chatRoom is "+callStatusToString(callStatus));
         if (callStatus == MegaChatCall.CALL_STATUS_DESTROYED) {
+            subtitleCall.setVisibility(View.GONE);
             setSubtitleVisibility();
             if ((anotherActiveCall != null || anotherOnHoldCall != null) &&
                     MegaApplication.getCallLayoutStatus(anotherActiveCall != null ? anotherActiveCall.getChatid() : anotherOnHoldCall.getChatid())) {
@@ -9579,6 +9581,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         positionLastMessage = positionLastMessage + 1;
+        if(positionLastMessage >= messages.size())
+            return;
+
         AndroidMegaChatMessage message = messages.get(positionLastMessage);
 
         while (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
