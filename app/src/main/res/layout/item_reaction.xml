@@ -56,7 +56,7 @@
         android:layout_width="40dp"
         android:layout_height="28dp"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/own_reaction_added"
+        android:background="@drawable/contact_reaction_added"
         android:visibility="visible">
 
         <ImageView
@@ -64,8 +64,10 @@
             android:layout_height="24dp"
             android:layout_centerInParent="true"
             android:adjustViewBounds="true"
+            android:padding="3dp"
             android:background="@null"
             android:src="@drawable/ic_emoji_add"
             app:tint="?attr/textColorHint" />
     </RelativeLayout>
 </RelativeLayout>
+
