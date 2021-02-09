@@ -443,22 +443,22 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                     logDebug("OK INVITE CONTACT: " + request.getEmail());
                     scanCodeFragment.dialogTitleContent = R.string.invite_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_sent_text;
-                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, false);
                 }
                 else if (e.getErrorCode() == MegaError.API_EACCESS){
                     scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_error;
-                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, false);
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, false, false);
                 }
                 else if (e.getErrorCode() == MegaError.API_EEXIST){
                     scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
                     scanCodeFragment.dialogTextContent = R.string.invite_not_sent_text_already_contact;
-                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, true);
                 }
                 else if (e.getErrorCode() == MegaError.API_EARGS){
                     scanCodeFragment.dialogTitleContent = R.string.invite_not_sent;
                     scanCodeFragment.dialogTextContent = R.string.error_own_email_as_contact;
-                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true);
+                    scanCodeFragment.showAlertDialog(scanCodeFragment.dialogTitleContent, scanCodeFragment.dialogTextContent, true, false);
                 }
             }
         } else if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_QUERY){

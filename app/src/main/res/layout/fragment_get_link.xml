@@ -75,7 +75,7 @@
                     android:id="@+id/decrypted_key_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/option_send_decrypted_key_separately"
+                    android:text="@string/option_send_decryption_key_separately"
                     android:textAllCaps="true"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
@@ -83,7 +83,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="@string/explanation_send_decrypted_key_separately"
+                    android:text="@string/explanation_send_decryption_key_separately"
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
 
                 <TextView

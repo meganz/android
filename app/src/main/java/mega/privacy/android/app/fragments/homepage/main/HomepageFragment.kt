@@ -12,7 +12,10 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
+import android.view.ViewGroup
+import android.view.Window
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -93,6 +96,19 @@ class HomepageFragment : Fragment() {
             post { setBottomSheetHeight() }
         }
     }
+    private val psaVisibilityChangeObserver = androidx.lifecycle.Observer<Int> {
+        if (isResumed) {
+            val fabMainParams = fabMain.layoutParams as ConstraintLayout.LayoutParams
+            fabMainParams.bottomMargin =
+                resources.getDimensionPixelSize(R.dimen.fab_margin_span) + it
+            fabMain.layoutParams = fabMainParams
+
+            val fabMaskMainParams = fabMaskMain.layoutParams as ConstraintLayout.LayoutParams
+            fabMaskMainParams.bottomMargin =
+                resources.getDimensionPixelSize(R.dimen.fab_margin_span) + it
+            fabMaskMain.layoutParams = fabMaskMainParams
+        }
+    }
 
     var isFabExpanded = false
 
@@ -135,6 +151,8 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .observeForever(homepageVisibilityChangeObserver)
+        LiveEventBus.get(EVENT_PSA_VISIBILITY, Int::class.java)
+            .observeForever(psaVisibilityChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -194,6 +212,8 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
+        LiveEventBus.get(EVENT_PSA_VISIBILITY, Int::class.java)
+            .removeObserver(psaVisibilityChangeObserver)
     }
 
     /**

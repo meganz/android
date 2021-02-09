@@ -15,7 +15,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -26,9 +25,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
@@ -43,12 +40,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -70,6 +70,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class FileLinkActivityLollipop extends TransfersManagementActivity implements MegaRequestListenerInterface, OnClickListener,DecryptAlertDialog.DecryptDialogListener {
 
 	private static final String TAG_DECRYPT = "decrypt";
@@ -83,7 +84,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
     ActionBar aB;
 	DisplayMetrics outMetrics;
 	String url;
-	Handler handler;
 	ProgressDialog statusDialog;
 
 	File previewFile = null;
@@ -102,16 +102,12 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	RelativeLayout iconViewLayout;
 	RelativeLayout imageViewLayout;
 
-	ScrollView scrollView;
 	TextView sizeTextView;
 	Button importButton;
 	Button downloadButton;
 	Button buttonPreviewContent;
-	LinearLayout optionsBar;
 	MegaNode document = null;
-	RelativeLayout infoLayout;
 	DatabaseHandler dbH = null;
-	MegaPreferences prefs = null;
 
 	boolean decryptionIntroduced=false;
 
@@ -125,6 +121,10 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	private MenuItem shareMenuItem;
 	private Drawable upArrow;
 	private Drawable drawableShare;
+
+	@Inject
+	CookieDialogFactory cookieDialogFactory;
+
 	private GoogleAdsLoader mAdsLoader;
 
 	@Override
@@ -250,6 +250,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
+		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
 		initAdsLoader();
 	}
 

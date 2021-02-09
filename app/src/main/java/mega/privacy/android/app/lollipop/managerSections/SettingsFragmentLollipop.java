@@ -411,6 +411,20 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         }
     }
 
+    /**
+     * Scroll to the beginning of Settings page.
+     * In this case, the beginning is category KEY_FEATURES.
+     *
+     * Note: If the first category changes, this method should be updated with the new one.
+     */
+    public void goToFirstCategory() {
+        PreferenceCategory firstCategory = findPreference(KEY_FEATURES);
+
+        if (firstCategory != null) {
+            scrollToPreference(firstCategory);
+        }
+    }
+
     public void goToCategoryStorage() {
         scrollToPreference(fileManagementPrefence);
         onPreferenceClick(fileManagementPrefence);

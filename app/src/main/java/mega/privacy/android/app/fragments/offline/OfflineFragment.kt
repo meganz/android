@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -283,7 +284,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             logError("Exception formatting string", e)
         }
 
-        binding.emptyHintText.text = Util.getSpannedHtmlText(textToShow)
+        binding.emptyHintText.text = textToShow.toSpannedHtmlText()
     }
 
     private fun setupRecyclerView(rv: RecyclerView) {
