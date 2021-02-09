@@ -378,4 +378,13 @@
         <item name="android:textColor">?attr/colorSecondary</item>
         <item name="android:textAppearance">?textAppearanceCaption</item>
     </style>
+
+    <style name="AppBottomSheetDialogThemeReactions" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyleReactions</item>
+    </style>
+
+    <style name="AppModalStyleReactions" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
+
 </resources>

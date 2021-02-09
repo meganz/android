@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
@@ -88,6 +89,12 @@ public class InfoReactionsBottomSheet extends BottomSheetDialogFragment implemen
             chatId = ((ChatActivityLollipop) context).idChat;
             messageId = ((ChatActivityLollipop) context).selectedMessageId;
         }
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        return new ViewPagerBottomSheetDialog(getContext(), R.style.AppBottomSheetDialogThemeReactions);
     }
 
     @SuppressLint("RestrictedApi")
