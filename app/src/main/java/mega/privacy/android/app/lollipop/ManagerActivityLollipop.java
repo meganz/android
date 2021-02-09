@@ -2560,7 +2560,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					}
 
 					if (isTransfersInProgressAdded()) {
-						tFLol.checkSelectModeAfterChangeTab();
+						tFLol.checkSelectModeAfterChangeTabOrDrawerItem();
 					}
 				}
 			}

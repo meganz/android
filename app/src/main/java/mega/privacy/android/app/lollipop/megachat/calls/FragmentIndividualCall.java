@@ -170,7 +170,6 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
         }
 
         showAvatar();
-        showMuteIcon(peerid, clientid);
     }
 
     /**
@@ -200,6 +199,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             videoLayout.setVisibility(View.VISIBLE);
         }
         surfaceView.setVisibility(View.VISIBLE);
+        showMuteIcon(peerid, clientid);
     }
 
     /**
@@ -277,6 +277,7 @@ public class FragmentIndividualCall extends BaseFragment implements View.OnClick
             checkIndividualAudioCall();
             return;
         }
+        showMuteIcon(peerid, clientid);
         showOnHoldImage();
     }
 
