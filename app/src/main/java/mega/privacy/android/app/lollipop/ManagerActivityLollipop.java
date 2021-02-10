@@ -51,6 +51,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
@@ -218,6 +219,7 @@ import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AvatarUtil;
+import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
@@ -225,6 +227,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -263,6 +266,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -5903,7 +5907,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
+
 				showGlobalAlertDialogsIfNeeded();
+				initCuSync();
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -8620,9 +8626,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setMoveToRubbish(true);
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					if (getPrimaryFolderHandle() == handle ) {
+					if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
-					} else if (getSecondaryFolderHandle() == handle ) {
+					} else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
 						builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
 					} else {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
@@ -12294,6 +12300,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					showStorageAlmostFullDialog();
 				}
 				storageState = newStorageState;
+                logDebug("Try to start CU, false.");
                 startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
@@ -13690,7 +13697,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					pauseTransfersMenuIcon.setVisible(!paused);
 					playTransfersMenuIcon.setVisible(paused);
 				}
-			}
+
+                // Update CU backup state.
+                int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        ? CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP
+                        : CuSyncManager.State.CU_SYNC_STATE_ACTIVE;
+
+                CuSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
+                CuSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+            }
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
