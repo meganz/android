@@ -144,6 +144,12 @@
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
+    <!--  Same as colorOnSecondary  -->
+    <color name="white_087_dark_grey">@color/white_alpha_087</color>
+
+    <!-- Same as colorError -->
+    <color name="red_900_red_400">@color/red_900</color>
+
     <!-- Notification badge -->
     <color name="white_dark_grey">@color/white</color>
 

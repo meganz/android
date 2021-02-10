@@ -42,6 +42,7 @@
                 android:layout_marginEnd="4dp"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:textColor="@color/grey_087_white_087"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
             <ImageView
@@ -62,8 +63,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_collapse_notification_arrow"
-                app:tint="?android:attr/textColorSecondary" />
+                android:src="@drawable/ic_expand"/>
         </RelativeLayout>
 
         <TextView
@@ -71,7 +71,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Secondary" />
+            android:textColor="@color/grey_054_white_054"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal" />
 
         <LinearLayout
             android:id="@+id/small_layout"
@@ -94,8 +95,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_remove"
-                    app:tint="?attr/colorSecondary" />
+                    android:src="@drawable/ic_remove_not"
+                    app:tint="@color/teal_300_teal_200" />
 
                 <TextView
                     android:id="@+id/decline_button_text"
@@ -103,7 +104,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="11dp"
                     android:layout_toEndOf="@id/decline_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
+                    android:textColor="@color/teal_300_teal_200"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -121,7 +123,7 @@
                     android:layout_marginStart="13dp"
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_call"
-                    app:tint="?attr/colorSecondary" />
+                    app:tint="@color/teal_300_teal_200" />
 
                 <TextView
                     android:id="@+id/answer_button_text"
@@ -129,7 +131,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_toEndOf="@id/answer_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
+                    android:textColor="@color/teal_300_teal_200"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -154,8 +157,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_remove"
-                    app:tint="?attr/colorSecondary" />
+                    android:src="@drawable/ic_remove_not"
+                    app:tint="@color/teal_300_teal_200" />
 
                 <TextView
                     android:id="@+id/first_button_text"
@@ -163,7 +166,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
                     android:layout_toEndOf="@id/first_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
+                    android:textColor="@color/teal_300_teal_200"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -180,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_transfers_pause"
-                    app:tint="?attr/colorSecondary" />
+                    app:tint="@color/teal_300_teal_200" />
 
                 <TextView
                     android:id="@+id/second_button_text"
@@ -188,7 +192,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
                     android:layout_toEndOf="@id/second_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
+                    android:textColor="@color/teal_300_teal_200"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -204,7 +209,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_call"
-                    app:tint="?attr/colorSecondary" />
+                    app:tint="@color/teal_300_teal_200" />
 
                 <TextView
                     android:id="@+id/third_button_text"
@@ -212,7 +217,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
                     android:layout_toEndOf="@id/third_image"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
+                    android:textColor="@color/teal_300_teal_200"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
