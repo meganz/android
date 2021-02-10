@@ -1870,6 +1870,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		return tabShown;
 	}
 
+	/**
+	 * Gets Cloud Drive fragment.
+	 *
+	 * @return The fragment if available, null if does not exist or is not added.
+	 */
 	private CloudDriveProviderFragmentLollipop getCDriveProviderLol() {
 		CloudDriveProviderFragmentLollipop cDriveProviderLol =
 				(CloudDriveProviderFragmentLollipop) getSupportFragmentManager()
@@ -1882,6 +1887,11 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		return null;
 	}
 
+	/**
+	 * Gets Incoming Shares fragment.
+	 *
+	 * @return The fragment if available, null if does not exist or is not added.
+	 */
 	private IncomingSharesProviderFragmentLollipop getISharesProviderLol() {
 		IncomingSharesProviderFragmentLollipop iSharesProviderLol =
 				(IncomingSharesProviderFragmentLollipop) getSupportFragmentManager()

@@ -131,7 +131,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		public void onDestroyActionMode(ActionMode arg0) {
             clearSelections();
 			adapterList.setMultipleSelect(false);
-			((ManagerActivityLollipop) context).hideTabs(true, RECEIVED_REQUESTS_TAB);
+			((ManagerActivityLollipop) context).hideTabs(false, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
