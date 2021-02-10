@@ -99,7 +99,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DraggableView;
@@ -161,7 +161,7 @@ import static mega.privacy.android.app.utils.Util.*;
 
 /**
  * Note: this class is only used to play video, audio will be played by
- * {@link mega.privacy.android.app.audioplayer.AudioPlayerActivity}.
+ * {@link mega.privacy.android.app.mediaplayer.MediaPlayerActivity}.
  */
 public class AudioVideoPlayerLollipop extends PinActivityLollipop implements View.OnClickListener, View.OnTouchListener, MegaGlobalListenerInterface, VideoRendererEventListener, MegaRequestListenerInterface,
         MegaTransferListenerInterface, DraggableView.DraggableListener,
@@ -752,7 +752,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             createPlayer();
         }
 
-        AudioPlayerService.pauseAudioPlayer(this);
+        MediaPlayerService.pauseAudioPlayer(this);
 
         if (savedInstanceState == null){
             ViewTreeObserver observer = playerView.getViewTreeObserver();
@@ -3304,7 +3304,7 @@ public class AudioVideoPlayerLollipop extends PinActivityLollipop implements Vie
             player.removeListener(playerListener);
             player.release();
 
-            AudioPlayerService.resumeAudioPlayer(this);
+            MediaPlayerService.resumeAudioPlayer(this);
         }
 
         if (handler != null) {

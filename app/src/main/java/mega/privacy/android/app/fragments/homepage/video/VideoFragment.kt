@@ -35,6 +35,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -380,7 +381,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
         val internalIntent = FileUtil.isInternalIntent(node)
         val intent = if (internalIntent) {
-            Intent(context, AudioVideoPlayerLollipop::class.java)
+            getMediaIntent(context, node.name)
         } else {
             Intent(Intent.ACTION_VIEW)
         }

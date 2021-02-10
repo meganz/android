@@ -95,9 +95,8 @@ import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity;
+import mega.privacy.android.app.mediaplayer.MediaPlayerActivity;
 import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
@@ -1750,15 +1749,11 @@ public class Util {
 	 * Get an Intent to play audio or video node.
 	 *
 	 * @param context Android context
-	 * @param nodeName the node name
+	 * @param nodeName the node name (not needed when New Video Player is implemented)
 	 * @return the Intent with corresponding target activity class
 	 */
 	public static Intent getMediaIntent(Context context, String nodeName) {
-		if (MimeTypeList.typeForName(nodeName).isAudio()) {
-			return new Intent(context, AudioPlayerActivity.class);
-		} else {
-			return new Intent(context, AudioVideoPlayerLollipop.class);
-		}
+		return new Intent(context, MediaPlayerActivity.class);
 	}
 
 	public static void resetActionBar(ActionBar aB) {

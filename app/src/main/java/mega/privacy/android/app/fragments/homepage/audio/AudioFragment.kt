@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.audioplayer.AudioPlayerActivity
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
@@ -39,6 +38,7 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
+import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.showSnackbar
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -214,7 +214,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
         val internalIntent = isInternalIntent(node)
         val intent = if (internalIntent) {
-            Intent(context, AudioPlayerActivity::class.java)
+            getMediaIntent(context, node.name)
         } else {
             Intent(Intent.ACTION_VIEW)
         }

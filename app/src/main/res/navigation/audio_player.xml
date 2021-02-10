@@ -6,7 +6,7 @@
     app:startDestination="@id/audio_player">
     <fragment
         android:id="@+id/audio_player"
-        android:name="mega.privacy.android.app.audioplayer.AudioPlayerFragment"
+        android:name="mega.privacy.android.app.mediaplayer.MediaPlayerFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_player">
         <action
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/playlist"
-        android:name="mega.privacy.android.app.audioplayer.playlist.PlaylistFragment"
+        android:name="mega.privacy.android.app.mediaplayer.playlist.PlaylistFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_playlist">
         <action
@@ -30,7 +30,7 @@
 
     <fragment
         android:id="@+id/track_info"
-        android:name="mega.privacy.android.app.audioplayer.trackinfo.TrackInfoFragment"
+        android:name="mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_track_info">
         <argument

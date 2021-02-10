@@ -83,6 +83,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.checkFingerprint;
 import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -689,7 +690,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 internalIntent = false;
             } else {
                 internalIntent = true;
-                mediaIntent = new Intent(context, AudioVideoPlayerLollipop.class);
+                mediaIntent = getMediaIntent(context, node.getName());
             }
 
             putExtras(mediaIntent, cuNode.getIndexForViewer(), node, thumbnailLocation);

@@ -69,7 +69,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.GiphyViewerActivity;
-import mega.privacy.android.app.audioplayer.service.AudioPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.EqualSpacingItemDecoration;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -8041,7 +8041,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * Play the voice clip
      */
     private void playVoiceClip(MessageVoiceClip m, String voiceClipPath){
-        AudioPlayerService.pauseAudioPlayer(context);
+        MediaPlayerService.pauseAudioPlayer(context);
 
         stopAllReproductionsInProgress();
         final long mId = m.getIdMessage();
