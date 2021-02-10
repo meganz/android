@@ -688,7 +688,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Open file when downloaded</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Cancel your account</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Delete account</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>
@@ -1150,12 +1149,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Until I turn them back on</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Chat notifications will be muted for %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Chat notifications will be muted until %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Chat notifications will be muted until %1$s at %2$s</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Chat notifications are muted</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Chat notifications enabled</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Mute until %1$s</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Notifications</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Message sound</string>
@@ -1590,8 +1598,8 @@
     <string name="attachment_upload_panel_contact">Contact</string>
     <string name="attachment_upload_panel_photo">From device</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Cancel Account</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you cancel your account you will not be able to access your account data, your MEGA contacts or conversations.\nYou will not be able to undo this action.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Delete account</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">If you delete your account you will not be able to access your account data, your MEGA contacts or conversations.\nYou will not be able to undo this action.</string>
     <string name="delete_button" context="menu item">Delete</string>
 
     <string name="file_properties_info_info_file">Info</string>

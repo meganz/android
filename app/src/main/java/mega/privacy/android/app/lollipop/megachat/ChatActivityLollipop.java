@@ -1976,7 +1976,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if ((i == 1 || i == 2) && areMoreParticipants(i)) {
                 customSubtitle.append(", ");
             }
-            String participantName = chatC.getParticipantFullName(chatRoom.getPeerHandle(i));
+            String participantName = chatC.getParticipantFirstName(chatRoom.getPeerHandle(i));
             if (isTextEmpty(participantName)) {
                 sendGetPeerAttributesRequest(participantsCount);
                 return;
