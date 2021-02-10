@@ -352,6 +352,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     public static final int ELEVATION_CALL_IN_PROGRESS = 0x02;
     /** The cause bitmap of elevating the app bar */
     private int mElevationCause;
+    /** True if any TabLayout is visible */
+    private boolean mShowAnyTabLayout;
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
@@ -5635,6 +5637,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		viewPagerMyAccount.setVisibility(View.GONE);
 		tabLayoutTransfers.setVisibility(View.GONE);
 		viewPagerTransfers.setVisibility(View.GONE);
+		mShowAnyTabLayout = false;
 
     	fragmentContainer.setVisibility(View.GONE);
     	mNavHostView.setVisibility(View.GONE);
@@ -5651,11 +5654,13 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case SHARED_ITEMS: {
 				tabLayoutShares.setVisibility(View.VISIBLE);
 				viewPagerShares.setVisibility(View.VISIBLE);
+				mShowAnyTabLayout = true;
 				break;
 			}
 			case CONTACTS: {
 				tabLayoutContacts.setVisibility(View.VISIBLE);
 				viewPagerContacts.setVisibility(View.VISIBLE);
+				mShowAnyTabLayout = true;
 				break;
 			}
 			case ACCOUNT: {
@@ -5671,6 +5676,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					default:{
 						tabLayoutMyAccount.setVisibility(View.VISIBLE);
 						viewPagerMyAccount.setVisibility(View.VISIBLE);
+						mShowAnyTabLayout = true;
 						break;
 					}
 				}
@@ -5679,6 +5685,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			case TRANSFERS: {
 				tabLayoutTransfers.setVisibility(View.VISIBLE);
 				viewPagerTransfers.setVisibility(View.VISIBLE);
+				mShowAnyTabLayout = true;
 				break;
 			}
 			case HOMEPAGE:
@@ -15125,8 +15132,26 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			mElevationCause ^= cause;
 		}
 
-		abL.setElevation(mElevationCause > 0 ?
-				getResources().getDimension(R.dimen.toolbar_elevation) : 0);
+		// If any Tablayout is visible, set the background of the toolbar to transparent (or its elevation
+		// overlay won't be correctly set via AppBarLayout) and then set the elevation of AppBarLayout,
+		// in this way, both Toolbar and TabLayout would have expected elevation overlay.
+		// If TabLayout is invisible, directly set toolbar's color for the elevation effect. Set AppBarLayout
+		// elevation in this case, a crack would appear between toolbar and ChatRecentFragment's Appbarlayout, for example.
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+		boolean onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout;
+
+		if (mElevationCause > 0) {
+			if (onlySetToolbar) {
+				toolbar.setBackgroundColor(toolbarElevationColor);
+			} else {
+				toolbar.setBackgroundColor(android.R.color.transparent);
+				abL.setElevation(elevation);
+			}
+		} else {
+			toolbar.setBackgroundColor(android.R.color.transparent);
+			abL.setElevation(0);
+		}
 	}
 
 	public long getParentHandleInbox() {
