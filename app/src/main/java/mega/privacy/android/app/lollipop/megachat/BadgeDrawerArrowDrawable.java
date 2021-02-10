@@ -20,6 +20,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
     // Fraction of the drawable's intrinsic size we want the badge to be.
     private static final float SIZE_FACTOR = .5f;
     private static final float HALF_SIZE_FACTOR = SIZE_FACTOR / 4;
+    private static final float TEXT_SIZE_FACTOR = .4f;
 
     private Paint backgroundPaint;
     private Paint bigBackgroundPaint;
@@ -44,7 +45,7 @@ public class BadgeDrawerArrowDrawable extends DrawerArrowDrawable {
         textPaint.setAntiAlias(true);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        textPaint.setTextSize(SIZE_FACTOR * getIntrinsicHeight());
+        textPaint.setTextSize(TEXT_SIZE_FACTOR * getIntrinsicHeight());
     }
 
     @Override
