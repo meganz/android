@@ -58,11 +58,13 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Util.changeStatusBarColorActionMode;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
@@ -164,6 +166,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -171,6 +174,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			if (!((FileExplorerActivityLollipop) context).shouldReopenSearch()) {
+				((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 				((FileExplorerActivityLollipop) context).clearQuerySearch();
 				getNodes();
 				setNodes(nodes);
@@ -303,6 +307,10 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		emptyTextView = v.findViewById(R.id.file_list_empty_text);
 		emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first);
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleIncoming();
+
+		if (parentHandle != INVALID_HANDLE) {
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
+		}
 
 		modeCloud = ((FileExplorerActivityLollipop)context).getMode();
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
@@ -595,6 +603,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		if (n.isFolder()){
 		    searchNodes = null;
+			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
 		    ((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
 
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
@@ -662,8 +671,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		((FileExplorerActivityLollipop)context).decreaseDeepBrowserTree();
 
 		if(((FileExplorerActivityLollipop)context).getDeepBrowserTree()==0){
-			setParentHandle(-1);
-//			uploadButton.setText(getString(R.string.choose_folder_explorer));
+			setParentHandle(INVALID_HANDLE);
+			((FileExplorerActivityLollipop) context).hideTabs(false, INCOMING_FRAGMENT);
 			findNodes();
 
 			setNodes(nodes);

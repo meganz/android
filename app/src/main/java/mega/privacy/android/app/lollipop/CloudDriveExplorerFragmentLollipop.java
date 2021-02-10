@@ -57,8 +57,10 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
 		OnClickListener, CheckScrollInterface {
@@ -164,6 +166,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
+			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 			changeStatusBarColorActionMode(context, ((FileExplorerActivityLollipop) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -171,6 +174,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			if (!((FileExplorerActivityLollipop) context).shouldReopenSearch()) {
+				((FileExplorerActivityLollipop) context).hideTabs(false, CLOUD_FRAGMENT);
 				((FileExplorerActivityLollipop) context).clearQuerySearch();
 				getNodes();
 				setNodes(nodes);
@@ -266,7 +270,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 
 		((FileExplorerActivityLollipop) context).changeActionBarElevation(
-				recyclerView.canScrollVertically(-1), FileExplorerActivityLollipop.CLOUD_FRAGMENT);
+				recyclerView.canScrollVertically(-1), CLOUD_FRAGMENT);
 	}
 
 	@Override
@@ -326,6 +330,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		selectFile = ((FileExplorerActivityLollipop)context).isSelectFile();
 
 		parentHandle = ((FileExplorerActivityLollipop)context).getParentHandleCloud();
+
+		if (parentHandle != INVALID_HANDLE && megaApi.getRootNode() != null
+				&& parentHandle != megaApi.getRootNode().getHandle()) {
+			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
+		}
 
 		if (modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER) {
 			setParentHandle(-1);
@@ -549,6 +558,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		if (n.isFolder()){
 		    searchNodes = null;
+		    ((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
 			((FileExplorerActivityLollipop) context).setShouldRestartSearch(false);
 
 			if(selectFile && ((FileExplorerActivityLollipop)context).isMultiselect() && adapter.isMultipleSelect()){
@@ -638,6 +648,11 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 
             setParentHandle(parentNode.getHandle());
+
+			if (parentNode.getType() == MegaNode.TYPE_ROOT) {
+				((FileExplorerActivityLollipop) context).hideTabs(false, CLOUD_FRAGMENT);
+			}
+
             ((FileExplorerActivityLollipop) context).changeTitle();
 
 			if((modeCloud == FileExplorerActivityLollipop.MOVE) || (modeCloud == FileExplorerActivityLollipop.COPY)){
@@ -676,7 +691,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			adapter.setParentHandle(parentHandle);
 			((FileExplorerActivityLollipop)context).setParentHandleCloud(parentHandle);
-
 
 			return 2;
 		}
