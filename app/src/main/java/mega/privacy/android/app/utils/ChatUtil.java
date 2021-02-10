@@ -31,6 +31,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -1235,7 +1238,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
         builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
@@ -1245,7 +1248,7 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
         builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
