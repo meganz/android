@@ -308,9 +308,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                         }
                     } else {
                         appBarLayout.setElevation(0);
-                        if (isDarkMode(context)) {
-                            ((ManagerActivityLollipop) context).changeAppBarElevation(false);
-                        }
+                        // Reset the AppBar elevation whatever in the light and dark mode
+                        ((ManagerActivityLollipop) context).changeAppBarElevation(false);
                     }
                 }
             } else if (context instanceof ArchivedChatsActivity) {
