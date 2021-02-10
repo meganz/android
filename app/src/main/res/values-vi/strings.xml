@@ -3,6 +3,8 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA cung cấp không gian lưu trữ điện toán đám mây với công nghệ mã hoá đầu-cuối được điều hành bởi người sử dụng, cùng với dịch vụ chat thông qua trình duyệt web và các ứng dụng cho điện thoại di động. Không như các hãng khác, dữ liệu không thể bị giải mã bởi máy chủ, chỉ có thể thực hiện bởi người dùng trên chính chương trình được sử dụng.\n\nTải lên tệp tin từ smartphone hay máy tính bảng và quản lý bằng cách lưu trữ, tải về, truyền tải, chia sẻ, đổi tên, hay xóa bỏ dữ liệu vào bất cứ thời điểm, thiết bị muốn sử dụng ở bất cứ đâu. Chia sẻ thư mục với tên liên lạc và xem tương tác được cập nhật ngay tức thì. Bảo mật đầu-cuối mang nghĩa rằng mật khẩu BẮT BUỘC phải nhớ (hay cần phải có lưu lại Mã Phục Hồi) không thì sẽ mất toàn quyền truy cập vào tài khoản và mất hết dữ liệu.\n\nCông nghệ mã hóa đầu-cuối điều hành bởi người dùng cho phép thực hiện gọi video một cách bảo mật, và được hỗ trợ từ năm 2016 cho trình duyệt nay đã thực hiện cho app điện thoại, cùng với lịch sử cuộc trò chuyện có thể được xem trên nhiều thiết bị khác nhau. Nguời sử dụng còn có thể chia sẻ tệp tin từ Ổ Mây MEGA của mình vào cuộc chat.\n\nMEGA cung cấp cho mọi tài khoản không gian lưu trữ miễn phí lên đến 50 GB với các nhiệm vụ thưởng để mở rộng thêm không gian cùng các thuê bao trả phí như:\n\n\nGói Pro Lite: €4.99 (US$4.99) mỗi tháng hay €49.99 (US$49.99) mỗi năm cung cấp cho bạn 400 GB không gian lưu trữ và 1 TB cho băng thông truyền tải mỗi tháng.\nGói Pro I: €9.99 (US$9.99) mỗi tháng hay €99.99 (US$99.99) mỗi năm cung cấp cho bạn 2 TB không gian lưu trữ và 2 TB cho băng thông truyền tải mỗi tháng.\nGói Pro II: €19.99 (US$19.99) mỗi tháng hay €199.99 (US$199.99) mỗi năm cung cấp cho bạn 8 TB không gian lưu trữ và 8 TB cho băng thông truyền tải mỗi tháng.\nGói Pro III: €29.99 (US$29.99) mỗi tháng hay €299.99 (US$299.99) mỗi năm cung cấp cho bạn 16 TB không gian lưu trữ và 16 TB cho băng thông truyền tải mỗi tháng. tải mỗi tháng.\n\nGói thuê bao trả phí sẽ tự động mua chu kỳ mới vào ngày cuối hạn với cùng giá và thời hạn như thời kỳ ban đầu. Để quản lý việc mua gói cước, xin vào CH Play trên điện thoại, đăng nhập vào đia chỉ Gmail/Google ID (nếu chưa làm) và tìm đến app MEGA. Từ đó xem, quản lý, mua, hay hủy gói cước hạng thành viên.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -> Tải về tệp tin từ MEGA vào trong điện thoại và để lấy tệp tin trong máy tải lên MEGA\nCAMERA -> Chụp ảnh và đăng tải lên MEGA\nREAD_CONTACTS -> Để dễ dàng tìm các tên liên lạc có sử dụng MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic và camera) -> MEGA cung cấp tính năng bảo mật đầu-cuối và cần dùng để thực hiện các cuộc gọi thoại/video\n\n\nCác lập trình viên cho ứng dụng Android muốn tương tác với mã nguồn của MEGA có thể xem qua: https://github.com/meganz/android\n\nĐể biết thêm thông tin xin vào website:\nSee https://mega.nz/terms\n\n\nTrên máy tính - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA - dịch vụ Lưu Trữ Điện Toán Đám Mây với Tính Bảo Mật Liên Hồi mạnh mẽ.</string>
 
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA Xem PDF</string>
 
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">trong tổng</string>
@@ -96,7 +98,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Đăng Xuất</string>
     <string name="action_add" context="Item menu option upon right click on one or multiple files.">Tải lên</string>
     <string name="action_create_folder" context="Menu item">Tạo thư mục mới</string>
-    <string name="action_open_link" context="Item menu option upon right click on one or multiple files.">Mở đường dẫn liên kết</string>
+    <string name="action_open_link" context="Menu option to open a link. Also title of the dialog to open a link.">Mở đường dẫn liên kết</string>
     <!--
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     -->
@@ -104,7 +106,7 @@
     <string name="action_settings" context="Menu item">Thiết Đặt</string>
     <string name="action_search" context="Search button">Tìm kiếm</string>
     <string name="action_search_country" context="Select country page title">Chọn quốc gia</string>
-    <string name="action_play" context="Search button">Play</string>
+    <string name="action_play" context="Alternative text or description text for the “Play” button">Play</string>
     <string name="action_pause" context="Search button">Tạm dừng</string>
     <string name="action_refresh" context="Menu item">Tải lại thông tin</string>
     <string name="action_sort_by" context="Menu item">Xếp theo</string>
@@ -205,7 +207,7 @@
     -->
     <string name="cancel_transfer_confirmation">Hủy bỏ truyền tải này?</string>
     <string name="cancel_all_transfer_confirmation">Hủy bỏ tất cả các truyền tải?</string>
-    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Hủy tất cả</string>
+    <string name="cancel_all_action" context="Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible).">Hủy tất cả</string>
 
     <plurals name="cancel_selected_transfers">
         <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">Phiên truyền tải đã chọn sẽ bị hủy.</item>
@@ -227,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Sổ Liên Lạc</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Liên Lạc [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="the user has not sent any contact request to other users">[B]Chưa có [/B][A]yêu cầu[/A][B] nào được gửi đi.[/B]</string>
-    <string name="received_requests_empty" context="the user has not received any contact request from other users">[B]Chưa nhận được [/B][A]yêu cầu[/A][B] nào.[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Chưa có [/B][A]yêu cầu[/A][B] nào được gửi đi.[/B]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Chưa nhận được [/B][A]yêu cầu[/A][B] nào.[/B]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Các Phiên Truyền Tải</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Trang Tài Khoản</string>
@@ -266,7 +268,7 @@
     -->
     <string name="file_properties_info_size_file" context="category in sort by action">Kích cỡ</string>
     <string name="file_properties_info_last_modified" context="When the file/folder was last modified">Thay đổi lần cuối</string>
-    <string name="file_properties_info_added" context="when was the file added in MEGA">Ngày Tạo</string>
+    <string name="file_properties_info_added" context="Label to display the date and time when a file/folder has been added (uploaded) to MEGA.">Ngày Tạo</string>
     <!--
     <string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
     -->
@@ -362,7 +364,7 @@
         <item context="Warning that appears prior to remove links of files. Plural." quantity="other">Những đường liên kết này sẽ không còn được công khai nữa.</item>
     </plurals>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Đổi tên</string>
-    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Mở đường dẫn liên kết</string>
+    <string name="context_open_link_title" context="Menu option to open a link. Also title of the dialog to open a link.">Mở đường dẫn liên kết</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Mở</string>
     <string name="context_renaming" context="while renaming a file or folder">Đang đổi tên</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Đang chuẩn bị tệp tin</string>
@@ -963,7 +965,7 @@
     <string name="title_dialog_insert_MK" context="Title of the dialog to write MK after opening the recovery link">Đặt lại mật khẩu</string>
     <string name="text_dialog_insert_MK" context="Text of the dialog to write MK after opening the recovery link">Xin nhập Mã Khóa Phục Hồi ở dưới đây</string>
 
-    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Đã thay đổi mật khẩu!</string>
+    <string name="pass_changed_alert" context="Text of the alert when the pass has been correctly changed">Bạn vừa đổi mật khẩu.</string>
 
     <string name="park_account_dialog_title" context="Title of the dialog to park an account">Thay mới tài khoản</string>
     <string name="park_account_button" context="Button to park an account">Thay Thế Mới</string>
@@ -1146,12 +1148,21 @@
     <string name="mute_chatroom_notification_option_forever" context="Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again.">Cho đến khi tôi bật lại</string>
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">Âm báo chát sẽ tắt tiếng trong %s</string>
-    <string name="success_muting_a_chat_until_this_morning" context="Message when a chat has been muted, until this morning, successfully. For example: “Chat notifications will be muted until 8:00”">Âm báo chát sẽ tắt tiếng cho đến %1$s</string>
-    <string name="success_muting_a_chat_until_tomorrow_morning" context="Message when a chat has been muted, until tomorrow morning, successfully. For example: Chat notifications will be muted until tomorrow at 8">Âm báo chát sẽ tắt tiếng cho đến %1$s lúc %2$s</string>
+    <plurals name="success_muting_chat_until_specific_time">
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+    </plurals>
+    <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+    </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">Âm báo chát đã tắt tiếng</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">Âm báo chát được bật</string>
-    <string name="chat_notifications_muted_today" context="String that appears when we show the date until which a specific chat is silenced, this date is on the same day.">Tắt tiếng cho đến %1$s</string>
+    <plurals name="chat_notifications_muted_until_specific_time">
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+    </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">Thông Báo</string>
     <string name="title_properties_chat_contact_message_sound" context="Title of the section to choose the sound of incoming messages in the Contact Properties screen">Âm báo tin nhắn</string>
@@ -1160,8 +1171,6 @@
 
     <string name="call_ringtone_title" context="Title of the screen to select the ringtone of the calls">Âm báo cuộc gọi</string>
     <string name="notification_sound_title" context="Title of the screen to select the sound of the notifications">Âm thông báo</string>
-
-    <string name="confirmation_clear_chat" context="Text of the confirmation dialog to clear the chat history">Một khi nội dung chat đã bị xóa, không có ai kể cả bạn và %s sẽ thấy các tin nhắn đã gửi trong cuộc trò chuyện này.</string>
 
     <string name="general_clear" context="Button to clear the chat history">Dọn sạch</string>
     <!--
@@ -1224,10 +1233,6 @@
 
     <string name="confirmation_leave_group_chat" context="confirmation message before leaving a group chat">Nếu rời khỏi cuộc chat, bạn sẽ không còn quyền truy cập vào nhóm để xem và gửi tin nhắn.</string>
     <string name="title_confirmation_leave_group_chat" context="title confirmation message before leaving a group chat">Rời khỏi nhóm chát?</string>
-
-    <string name="confirmation_clear_group_chat" context="Text of the confirmation dialog to clear a group chat history">Tất cả các tin nhắn cũng như hình ảnh và tài liệu có trong cuộc trò chuyện này sẽ bị xóa.</string>
-    <string name="title_confirmation_clear_group_chat" context="Title of the confirmation dialog to clear a group chat history">Xóa lịch sử?</string>
-
 
     <string name="add_participant_error_already_exists" context="Message show when a participant hasn’t been successfully invited to a group chat">Thành viên này đã có mặt trong nhóm chát này rồi</string>
 
@@ -1591,8 +1596,8 @@
     <string name="attachment_upload_panel_contact">Tên liên lạc</string>
     <string name="attachment_upload_panel_photo">Lấy từ trong điện thoại</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently his account">Xoá Bỏ Tài Khoản</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the cancellation of an account">Nếu hủy bỏ tài khoản, bạn sẽ mất hết quyền truy cập vào dữ liệu hiện có, các tên liên lạc trên MEGA và các cuộc trò chuyện.\nMột khi thực hiện, thao tác này sẽ không thể ngừng lại.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Xoá Bỏ Tài Khoản</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Nếu hủy bỏ tài khoản, bạn sẽ mất hết quyền truy cập vào dữ liệu hiện có, các tên liên lạc trên MEGA và các cuộc trò chuyện.\nMột khi thực hiện, thao tác này sẽ không thể ngừng lại.</string>
     <string name="delete_button" context="menu item">Xóa</string>
 
     <string name="file_properties_info_info_file">Thông tin</string>
@@ -1625,14 +1630,14 @@
 
     <string name="settings_set_up_automatic_uploads" context="settings option">Đặt chế độ tự động đăng tải</string>
 
-    <string name="settings_chat_silent_sound_not" context="settings option for chat notification">Im lặng</string>
+    <string name="settings_chat_silent_sound_not" context="Message sound option when no sound has been selected for chat notifications">Im lặng</string>
 
     <string name="messages_chat_notification" context="messages string in chat notification">tin nhắn</string>
     <string name="incoming_folder_notification" context="part of the string in incoming shared folder notification">Giá từ</string>
     <string name="title_incoming_folder_notification" context="title of incoming shared folder notification">Thư mục chia sẻ mới</string>
     <string name="title_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
-
     <string name="title_properties_chat_clear" context="Title of the section to clear the chat content in the Contact Properties screen">Xóa lịch sử nội dung chát</string>
+
     <string name="title_properties_remove_contact" context="Title of the section to remove contact in the Contact Properties screen">Xóa tên liên lạc</string>
 
     <string name="title_properties_chat_notifications_contact" context="Title of the section to enable notifications in the Contact Properties screen">Âm báo chát</string>
@@ -1721,8 +1726,8 @@
     <string name="dialog_title_new_file" context="Title of the dialog to create a new file by inserting the name">Tệp tin mới</string>
     <string name="context_new_file_name" context="Input field description in the create file dialog.">Tên Tệp Tin</string>
 
-    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name">Tên đường liên kết</string>
-    <string name="context_new_link_name" context="Input field description in the create link dialog.">Liên kết URL</string>
+    <string name="dialog_title_new_link" context="Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Tên đường liên kết</string>
+    <string name="context_new_link_name" context="Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares.">Liên kết URL</string>
 
     <string name="new_file_subject_when_uploading" context="Title of the field subject when a new file is created to upload">TIÊU ĐỀ</string>
     <string name="new_file_content_when_uploading" context="Title of the field content when a new file is created to upload">NỘI DUNG</string>
@@ -1739,7 +1744,7 @@
     <string name="old_and_new_passwords_equals" context="when changing the password , the old password and new password are equals">Mật khẩu mới không được trùng với mật khẩu cũ đã dùng trước đây</string>
 
     <string name="action_search_by_date" context="Menu item">Tìm theo ngày</string>
-    <string name="general_apply" context="title of a button to apply search by date">Áp dụng</string>ç
+    <string name="general_apply" context="title of a button to apply search by date">Áp dụng</string>
     <string name="general_search_month" context="title of a button to apply search by month">Tháng truớc</string>
     <string name="general_search_year" context="title of a button to apply search by year">Năm truớc</string>
 
@@ -2043,9 +2048,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Lời mời thêm liên lạc mới</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
-    <string name="transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A] [B]nào hoạt động.[/B]</string>
-    <string name="completed_transfers_empty_new" context="message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A] [B]nào.[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]trống[/B][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A] [B]nào hoạt động.[/B]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Không có[/B] [A]Phiên Truyền Tải[/A] [B]nào.[/B]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Thư Mục[/A] [B]trống[/B][B].[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Viết tin nhắn cho "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Viết tin nhắn cho %s&#8230;</string>
@@ -2588,8 +2593,8 @@
     </plurals>
 
     <plurals name="versions_not_deleted" formatted="false">
-        <item context="Alert shown when some versions are not deleted successfully, version item" quantity="one">%d phiên bản chưa được xóa xong</item>
-        <item context="Alert shown when some versions are not deleted successfully, version items" quantity="other">%d phiên bản chưa được xóa xong</item>
+        <item context="Alert shown when one version is not deleted successfully" quantity="one">%d phiên bản chưa được xóa xong</item>
+        <item context="Alert shown when several versions are not deleted successfully" quantity="other">%d phiên bản chưa được xóa xong</item>
     </plurals>
 
     <string name="no_contacts_invite" context="Alert shown when the user tries to realize some action in chat and has not contacts">Bạn không có tên nào trong danh sách liên lạc. Xin mời bạn bè cùng tham gia sử dụng MEGA.</string>
@@ -2831,7 +2836,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left" context="Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk.">[B]Bạn cần hành động ngay để lưu giữ dữ liệu của mình.[/B]</string>
 
     <plurals name="label_time_in_days_full">
-        <item context="Time 1 day (singular). The placeholder is for the time value, please adjust the position based on linguistics" quantity="one">1 ngày</item>
+        <item context="Time 1 day (singular). It is used to indicate any time frame of “1 day”, e.g. the chat history cleaning period." quantity="one">1 ngày</item>
         <item context="Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics" quantity="other">%d ngày</item>
     </plurals>
 
@@ -2899,9 +2904,60 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Bạn đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Tin nhắn này đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
 
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than:</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+
+    <plurals name="retention_time_picker_hours">
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_days">
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_weeks">
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+    </plurals>
+
+    <plurals name="retention_time_picker_months">
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+    </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Chọn phiên truyền tải</string>
 
-    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">The priority change of the transfer ’%1$s’ failed.</string>
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">The priority change of the transfer ”%1$s” failed.</string>
 
     <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Gửi chìa khóa giải mã ra riêng</string>
     <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Xuất ra đường liên kết và mã giải khóa ở hai mục khác nhau.</string>
