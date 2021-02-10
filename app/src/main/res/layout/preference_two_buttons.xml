@@ -1,17 +1,22 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.flexbox.FlexboxLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
-    android:paddingBottom="16dp">
+    android:paddingBottom="16dp"
+    app:alignContent="stretch"
+    app:alignItems="stretch"
+    app:flexWrap="wrap">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_first"
         style="@style/Widget.Mega.Button.Preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
         android:theme="@style/Theme.MaterialComponents.Bridge"
         tools:text="Cookie Policy" />
 
@@ -20,8 +25,7 @@
         style="@style/Widget.Mega.Button.Preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
         android:theme="@style/Theme.MaterialComponents.Bridge"
         tools:text="Privacy Policy" />
 
-</LinearLayout>
+</com.google.android.flexbox.FlexboxLayout>

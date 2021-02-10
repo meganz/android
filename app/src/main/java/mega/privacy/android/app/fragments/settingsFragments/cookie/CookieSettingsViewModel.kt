@@ -70,12 +70,11 @@ class CookieSettingsViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { configuration ->
-                    if (configuration.isNullOrEmpty()) {
+                onSuccess = { settings ->
+                    if (settings.isNullOrEmpty()) {
                         updateCookieSettings() // Save essential cookie settings by default
                     } else {
-                        enabledCookies.value?.addAll(configuration)
-                        enabledCookies.notifyObserver()
+                        enabledCookies.value = settings.toMutableSet()
                     }
 
                     updateResult.value = true
