@@ -1094,7 +1094,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(!iSharesExplorer.isFolderEmpty());
+						searchMenuItem.setVisible(iSharesExplorer != null && !iSharesExplorer.isFolderEmpty());
 					}
 				}
 			}
