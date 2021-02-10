@@ -395,8 +395,8 @@ echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
     pwd
-    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "b66778a32c38976748a0f35a9ae204532e69f54e" ]; then
-        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/1qQTUIzY#Q3euQPnLZ5jpJCOE3GgNUfXp4Xw7nuuE_BG2eX73byI"
+    if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "8cf2e0fc63743670e71f5f72e961e92dcfd2faa5" ]; then
+        echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/93AmybIL#RyKXV3L_TlQTvfXhh1vrmnwg_3S4HEdBAXjl4brcvFI"
         echo "and uncompress it in megachat/webrtc"
         exit 1
     else
