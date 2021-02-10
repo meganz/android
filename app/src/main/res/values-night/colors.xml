@@ -2,6 +2,12 @@
 <resources>
     <color name="black_white">@color/white</color>
 
+    <!--  Same as colorOnSecondary  -->
+    <color name="white_087_dark_grey">@color/dark_grey</color>
+
+    <!-- Same as colorError -->
+    <color name="red_900_red_400">@color/red_400</color>
+
     <!-- chat room message loading image tint  -->
     <color name="grey_005_white_008">@color/white_alpha_008</color>
 
