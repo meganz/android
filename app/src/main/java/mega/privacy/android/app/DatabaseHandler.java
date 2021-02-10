@@ -3412,6 +3412,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param value      Value to set.
 	 */
 	private void setStringValue(String tableName, String columnName, String value) {
+        if (TextUtils.isEmpty(value)) {
+            logWarning("Set " + columnName + " with empty value!");
+        }
+
 		String selectQuery = "SELECT * FROM " + tableName;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
@@ -3439,13 +3443,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
 			value = decrypt(cursor.getString(0));
-			logDebug("Value: " + value);
+			logDebug(columnName + " value: " + value);
 		} else {
 			logWarning("No value found, setting default");
 			ContentValues values = new ContentValues();
 			values.put(columnName, encrypt(defaultValue));
 			db.insert(tableName, null, values);
-			logDebug("Default value: " + defaultValue);
+			logDebug("Default value for " + columnName + ": " + defaultValue);
 		}
 		cursor.close();
 		return value;

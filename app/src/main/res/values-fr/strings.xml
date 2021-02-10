@@ -124,52 +124,15 @@
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Erreur de fermeture des sessions ouvertes</string>
 
     <plurals name="general_num_files">
-        <item context="this is used for example when downloading 1 file or 2 files, Singular of file. 1 file" quantity="one">fichier</item>
-        <item context="this is used for example when downloading 1 file or 2 files, Plural of file. 2 files" quantity="other">fichiers</item>
+        <item context="General file label. Singular of file. File" quantity="one">Fichier</item>
+        <item context="General label for files" quantity="other">Fichiers</item>
     </plurals>
 
-    <plurals name="general_num_contacts">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">contact</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">contacts</item>
+    <plurals name="general_num_shared_with">
+        <item context="Indicates how many contacts a folder is shared with. Singular. e.g. Shared with Pepe" quantity="one">Partagé avec %1$s</item>
+        <item context="Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts" quantity="other">Partagé avec %1$d contacts</item>
     </plurals>
 
-    <plurals name="num_contacts_selected">
-        <item context="chat invitation - tool bar subtitle, when users selected single contact. Placeholder - number of contacts selected" quantity="one">%d contact</item>
-        <item context="chat invitation - tool bar subtitle, when users selected multiple contacts. Placeholder - number of contacts selected" quantity="other">%d contacts</item>
-    </plurals>
-
-    <plurals name="general_num_folders">
-        <item context="Singular of folder/directory. 1 folder" quantity="one">dossier</item>
-        <item context="Plural of folder/directory. 2 folders" quantity="other">dossiers</item>
-    </plurals>
-
-    <plurals name="general_num_shared_folders">
-        <item context="Title of the incoming shared folders of a user in singular" quantity="one">dossier partagé</item>
-        <item context="Title of the incoming shared folders of a user in plural." quantity="other">dossiers partagés</item>
-    </plurals>
-
-    <!--
-    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item context="Item menu option upon clicking on one or multiple files. Singular" quantity="one">download</item>
-        <item context="Item menu option upon clicking on one or multiple files. Plural" quantity="other">downloads</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_num_uploads">
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Singular" quantity="one">upload</item>
-        <item context="Transfer type description in the active file transfer panel, can either be upload or download. Plural" quantity="other">uploads</item>
-    </plurals>
-    -->
-
-    <plurals name="general_num_users">
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 1 user" quantity="one">contact</item>
-        <item context="used for example when a folder is shared with 1 user or 2 users, used for example when a folder is shared with 2 or more users" quantity="other">contacts</item>
-    </plurals>
-
-    <!--
-    <string name="confirmation_required" context="Alert title before download">Confirmation required</string>
-    -->
     <string name="alert_larger_file" context="Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded">%s sera à téléchargé.</string>
     <string name="alert_no_app" context="Alert text before download">Il n\'y a aucune appli pour ouvrir le fichier %s. Voulez-vous poursuivre le téléchargement ?</string>
     <string name="checkbox_not_show_again" context="Dialog option that permits user do not show it again">Ne plus afficher</string>
@@ -243,6 +206,11 @@
     <string name="cancel_transfer_confirmation">Supprimer ce transfert ?</string>
     <string name="cancel_all_transfer_confirmation">Supprimer tous les transferts ?</string>
     <string name="cancel_all_action" context="Label for any ‘Cancel all’ button, link, etc. - (String as short as possible).">Tout annuler</string>
+
+    <plurals name="cancel_selected_transfers">
+        <item context="Warning to confirm remove selected transfer. Singular 1 transfer" quantity="one">Le transfert sélectionné sera annulé.</item>
+        <item context="Warning to confirm remove selected transfers. Plural more than 1 transfer" quantity="other">Les transferts sélectionnés seront annulés.</item>
+    </plurals>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disque nuagique</string>
     <string name="section_recents" context="Label to reference a recents section">Récents</string>
@@ -375,6 +343,7 @@
     <string name="download_touch_to_show" context="Hint how to cancel the download">Visualiser les transferts</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4 Go. Votre téléchargement échouera probablement</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
+    <string name="intent_not_available_location" context="Message when trying to open a location message but there isn’t any app that open that location.">Aucune appli n\'est proposée sur votre appareil pour ouvrir cette position</string>
 
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partager l\'image avec</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partager le lien</string>
@@ -716,7 +685,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Vider les fichiers Hors ligne</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Ouvrir le fichier une fois téléchargé</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Annuler votre compte</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Supprimer le compte</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">%s utilisés actuellement</string>
@@ -975,7 +943,7 @@
     <string name="edit_text_insert_pass" context="Hint of the text where the user can write his password">Saisissez votre mot de passe ici</string>
     <string name="delete_account_text_last_step" context="Text shown in the last alert dialog to confirm the cancellation of an account">Ceci est la dernière étape pour annuler votre compte. Vous perdrez irrémédiablement toutes les données stockées dans le nuage. Veuillez saisir votre mot de passe ci-dessous.</string>
 
-    <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Vérification de l\'adresse courriel</string>
+    <string name="email_verification_title" context="Title of the alert dialog to inform the user that have to check the email">Confirmation de l\'adresse courriel</string>
     <string name="email_verification_text" context="Text of the alert dialog to inform the user that have to check the email">Veuillez vérifier vos courriels afin de poursuivre.</string>
     <string name="general_text_error" context="Text to inform the user when an error occurs">Une erreur est survenue, veuillez réessayer.</string>
 
@@ -1077,8 +1045,8 @@
     <string name="number_incorrectly_invitation_reply_sent" context="error message when replying to multiple received request">%1$d réponses à une demande ont été envoyées avec succès mais %2$d n\'ont pas été envoyées.</string>
 
     <plurals name="general_num_request">
-        <item context="referring to a invitation request in the Contacts section" quantity="one">demande</item>
-        <item context="referring to a invitation request in the Contacts section" quantity="other">demandes</item>
+        <item context="Referring to a invitation request in the Contacts section. Singular." quantity="one">1 demande</item>
+        <item context="Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests" quantity="other">%1$d demandes</item>
     </plurals>
 
     <plurals name="confirmation_remove_outgoing_shares">
@@ -1103,8 +1071,8 @@
     <string name="confirm_email_explanation" context="Text below the title that explains the user should check the email and click the link to confirm the account">Veuillez vérifier vos courriels et cliquer sur le lien pour confirmer votre compte.</string>
 
     <plurals name="general_num_items">
-        <item context="Singular of items which contains a folder. 1 item" quantity="one">élément</item>
-        <item context="Plural of items which contains a folder. 2 items" quantity="other">éléments</item>
+        <item context="Singular of items which contains a folder. 1 item" quantity="one">1 élément</item>
+        <item context="Plural of items which contains a folder. 2 items" quantity="other">%1$d éléments</item>
     </plurals>
 
     <string name="file_link_unavaible_delete_account" context="Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation">Le compte utilisateur associé a été annulé en raison du non-respect répété de nos Conditions générales d\'utilisation.</string>
@@ -1135,27 +1103,6 @@
 
     <!--
     <string name="videocall_title" context="Title shown in the list of main chat screen for a videocall">Video call</string>
-    -->
-
-    <!--
-    <plurals name="general_minutes">
-        <item context="Singular of minutes. 1 minute" quantity="one">minute</item>
-        <item context="Plural of minutes. 2 minute" quantity="other">minutes</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_hours">
-        <item context="Singular of hours. 1 hour" quantity="one">hour</item>
-        <item context="Plural of hours. 2 hours" quantity="other">hours</item>
-    </plurals>
-    -->
-
-    <!--
-    <plurals name="general_seconds">
-        <item context="Singular of seconds. 1 second" quantity="one">second</item>
-        <item context="Plural of seconds. 2 second" quantity="other">seconds</item>
-    </plurals>
     -->
 
     <string name="initial_hour" context="Initial of the word hour to show the duration of a video or audio call">h</string>
@@ -1467,7 +1414,7 @@
     <string name="menu_resume_individual_transfer" context="Dialog to confirm the action of restarting one transfer">Reprendre le transfert ?</string>
     <string name="button_resume_individual_transfer" context="Button to confirm the action of restarting one transfer">Reprendre</string>
 
-    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Effacer les transferts terminés ?</string>
+    <string name="confirmation_to_clear_completed_transfers" context="Dialog to confirm before removing completed transfers">Effacer tous les transferts ?</string>
 
     <string name="title_tab_in_progress_transfers" context="Title of the tab section for transfers in progress">En cours</string>
     <string name="title_tab_completed_transfers" context="Title of the tab section for completed transfers">Terminés</string>
@@ -1847,7 +1794,7 @@
     <string name="qrcode_reset_not_successfully" context="Text shown when it has not been reseted the QR code successfully">Le code QR n\'a pas été réinitialisé en raison d\'une erreur. Veuillez réessayer.</string>
     <string name="qrcode_delete_not_successfully" context="Text shown when it has not been delete the QR code successfully">Le code QR n\'a pas été supprimé en raison d\'une erreur. Veuillez réessayer.</string>
     <string name="invite_sent" context="Title of dialog shown when a contact request has been sent with QR code">L\'invitation a été envoyée</string>
-    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent with QR code">L\'utilisateur %s a été invité et apparaîtra dans votre liste de contacts une fois l\'invitation acceptée.</string>
+    <string name="invite_sent_text" context="Text of dialog shown when a contact request has been sent.">L\'utilisateur a été invité et apparaîtra dans votre liste de contacts une fois l\'invitation acceptée.</string>
     <string name="invite_sent_text_multi" context="Text of dialog shown when multiple contacts request has been sent">Les utilisateurs ont été invités et apparaîtront dans votre liste de contacts s\'ils acceptent.</string>
     <string name="error_share_qr" context="Text shown when it tries to share the QR and occurs an error to process the action">Une erreur est survenue en tentant de partager le fichier QR. Le fichier n\'existe peut-être pas. Veuillez réessayer ultérieurement.</string>
     <string name="error_upload_qr" context="Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action">Une erreur est survenue en tentant de téléverser le fichier QR. Le fichier n\'existe peut-être pas. Veuillez réessayer ultérieurement.</string>
@@ -2325,8 +2272,8 @@
 
     <string name="make_chat_private_option" context="Title of the option to make a public chat private">Activer la rotation de la clé de chiffrement</string>
     <string name="private_chat" context="Title of the view to inform that a chat is private">La rotation de la clé de chiffrement est activée</string>
-    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
-    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotation de clé est désactivée pour les conversations de plus de 100 participants.</string>
+    <string name="make_chat_private_option_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="make_chat_private_not_available_text" context="Text of the option to change a public chat to private (enable encrypted key rotation)">La rotation de clé de chiffrement est désactivée pour les conversations de plus de 100 participants.</string>
     <string name="warning_make_chat_private" context="Warning show to the user when tries to make private a public chat and the chat has more than 100 participants">Il est impossible de rendre cette conversation privée, car la limite de participants a été dépassée.</string>
 
     <string name="message_created_chat_link" context="Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime.">[A]%1$s[/A][B] a créé un lien de conversation.[/B]</string>
@@ -2358,9 +2305,9 @@
     <string name="invalid_chat_link_args" context="error message shown when a chat link is not well formed">Le lien de conversation est invalide</string>
 
     <string name="ekr_label" context="When it is creating a new group chat, this option permits to establish it private or public">Rotation de la clé de chiffrement</string>
-    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="ekr_explanation" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
 
-    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="subtitle_chat_message_enabled_ERK" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
     <string name="action_open_chat_link" context="Menu item">Ouvrir un lien de conversation</string>
 
     <string name="invite_not_sent_already_sent" context="Message shown when a contact request has not been sent because the invitation has been sent before">L\'invitation pour le contact %s a été envoyée auparavant et peut être consultée dans l\'onglet Demandes envoyées.</string>
@@ -2439,6 +2386,7 @@
     <string name="button_continue" context="dialog option continue in alert dialog">Poursuivre</string>
 
     <string name="payment_method_google_wallet" context="one of the payment methods">[A]Google Pay[/A] (abonnement)</string>
+    <string name="payment_method_huawei_wallet" context="one of the payment methods">[A]HUAWEI Pay[/A] (abonnement)</string>
     <string name="payment_method_credit_card" context="one of the payment methods">[A]Carte de crédit[/A] (abonnement)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">[A]Opérateur de réseau mobile[/A] (une fois)</string>
     <string name="payment_method_centili" context="one of the payment methods">[A]Opérateur de réseau mobile[/A] (une fois)</string>
@@ -2459,6 +2407,9 @@
 	<string name="title_compress_video" context="notification title when compressing video">Compression des vidéos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Un dossier invalide a été sélectionné</string>
 
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 dossier. 1 fichier</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 dossier. %1$d fichiers</string>
+
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d fichier</item>
         <item context="on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files" quantity="other">%d fichiers</item>
@@ -2467,6 +2418,11 @@
     <plurals name="num_folders_with_parameter">
         <item context="on the section notifications indicates the number of folder added to a shared folder, Singular of folder/directory. 1 folder" quantity="one">%d dossier</item>
         <item context="on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders" quantity="other">%d dossiers</item>
+    </plurals>
+
+    <plurals name="num_folders_num_files">
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d dossiers. 1 fichier</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d dossiers. %2$d fichiers</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] a ajouté %2$s et %3$s[/B]</string>
@@ -2667,7 +2623,7 @@
     <string name="context_create_chat_link_warning_text" context="Description text of the dialog to generate a public chat link">La rotation de la clé chiffrée ne vous permet pas d\'obtenir de lien vers une conversation sans en créer une nouvelle.</string>
     <string name="context_create_chat_link_question_text" context="Question of the dialog to generate a public chat link">Souhaitez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
 
-    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encrypted key rotation)">La rotation de la clé est un peu plus sécurisée, mais elle ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les anciens messages.</string>
+    <string name="context_make_private_chat_warning_text" context="Text of the dialog to change a public chat to private (enable encryption key rotation)">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
 
     <string name="message_joined_successfully" context="Message shown when a user has joined to a public chat successfully">Vous vous êtes joints à la conversation avec succès.</string>
 
@@ -2744,7 +2700,7 @@
     <string name="recents_label" context="Label to reference a recents section">Récents</string>
     <string name="chats_label" context="Label to reference a chats section">Conversations</string>
 
-    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Il n\'y a aucune activité à afficher dans [/B][A]Récents[/A]</string>
+    <string name="context_empty_recents" context="Text of the empty screen when there are not elements in Recents">[B]Il n\'y a aucun fichier dans [/B][A]Récents[/A]</string>
     <string name="title_bucket" cotext="Title of a recents bucket">%1$s et %2$d de plus</string>
     <string name="title_media_bucket_only_images" cotext="Title of a media recents bucket that only contains some images">%d images</string>
     <string name="title_media_bucket_only_videos" cotext="Title of a media recents bucket that only contains some videos">%d vidéos</string>
@@ -2928,6 +2884,7 @@
 
     <string name="search_giphy_title" context="Title of the screen to attach GIFs">Chercher dans GIPHY</string>
     <string name="empty_search_giphy" context="Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors.">Aucun [A]GIF[/A] n\'a été trouvé</string>
+    <string name="server_down_giphy" context="Label indicating there is not available GIFs due to down server">Aucun GIF n\'est proposé. Veuillez réessayer plus tard</string>
     <string name="end_of_results_giphy" context="Label indicating the end of Giphy list. The format placeholders are to showing it in different colors.">[A]Fin[/A] des résultats</string>
 
     <string name="warning_resume_transfers" context="Title of a dialog to confirm the action of resume all transfers">Reprendre les transferts ?</string>
@@ -2941,6 +2898,33 @@
     <string name="show_info_chat_msg_disabled" context="Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option">Les renseignements spéciaux sont désactivés pour les messages du dialogue en ligne</string>
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Vous avez atteint la limite maximale de %d réactions.</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
+
+    <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Sélectionner des transferts</string>
+
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">Échec de changement de priorité du transfert « %1$s »</string>
+
+    <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">Envoyer la clé de déchiffrement séparément</string>
+    <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">Envoyer le lien et la clé de déchiffrement séparément.</string>
+    <string name="learn_more_option" context="Label option indicating if it is pressed, an explanation will be shown with more details">En apprendre davantage</string>
+    <string name="key_label" context="Label key referring to a link decryption key">Clé</string>
+    <string name="button_share_key" context="Button which action is share the decryption key of a link">Partager la clé</string>
+    <string name="button_copy_key" context="Button which action is copy the decryption key of a link">Copier la clé</string>
+    <string name="button_copy_password" context="Button which action is copy the password of a link">Copier le mot de passe</string>
+    <string name="link_copied_clipboard" context="Confirmation shown informing a link it’s copied to the clipboard">Le lien a été copié dans le presse-papiers.</string>
+    <string name="key_copied_clipboard" context="Confirmation shown informing a key link it’s copied to the clipboard">La clé a été copiée dans le presse-papiers.</string>
+    <string name="password_copied_clipboard" context="Confirmation shown informing a password link it’s copied to the clipboard">Le mot de passe a été copié dans le presse-papiers.</string>
+    <string name="link_sent" context="Confirmation shown informing a link it’s copied to the clipboard">Le lien a été envoyé avec succès.</string>
+    <string name="link_and_key_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Le lien et la clé ont été envoyés avec succès.</string>
+    <string name="link_and_password_sent" context="Confirmation shown informing a key link it’s copied to the clipboard">Le lien et le mot de passe ont été envoyés avec succès.</string>
+    <string name="upgrade_pro" context="Title of a warning recommending upgrade to Pro">Passer à un compte Pro</string>
+    <string name="link_upgrade_pro_explanation" context="Explanation of a warning recommending upgrade to Pro in relation to link available options">Les utilisateurs de MEGA Pro ont l\'accès exclusif à des fonctions supplémentaires de sécurité des liens qui rendent votre compte encore plus sûr.</string>
+    <string name="decryption_key_explanation" context="Meaning of links decryption key">Notre système de chiffrement de bout en bout exige une clé unique générée automatiquement pour ce fichier. Un lien qui comprend cette clé est créé par défaut, mais vous pouvez exporter séparément la clé de chiffrement par mesure supplémentaire de sécurité.</string>
+    <string name="reset_password_label" context="Reset password label">Réinitialiser le mot de passe</string>
+    <string name="share_key_warning" context="Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link">Partager la clé pour ce lien ?</string>
+    <string name="share_password_warning" context="Warning show to the user when has set a password protection of a link and tries to share the link">Partager le mot de passe pour ce lien ?</string>
+    <string name="button_share_password" context="Button which action is share the password of a link">Partager le mot de passe</string>
+    <string name="share_link_with_key" context="String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g">Lien : %1$s\n\nClé : %2$s</string>
+    <string name="share_link_with_password" context="String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g">Lien : %1$s\n\nMot de passe : %2$s</string>
 
     <string name="files_required_permissions_warning" context="Warning show to the user when the app needs permissions to share files and the user has denied them.">MEGA a besoin de votre autorisation afin de partager des fichiers.</string>
 
@@ -2956,4 +2940,28 @@
     <string name="label_blue" context="A user can mark a folder or file with blue colour.">bleue</string>
     <string name="label_purple" context="A user can mark a folder or file with purple colour.">violette</string>
     <string name="label_grey" context="A user can mark a folder or file with grey colour.">grise</string>
+
+    <string name="action_more_information" context="Action to get more information">Plus de précisions</string>
+    <string name="settings_about_cookie_policy" context="Preferences screen item title for Cookie Policy">Politique sur les Témoins de navigation</string>
+    <string name="settings_about_cookie_settings" context="Preferences screen item title for cookie settings">Paramètres des Témoins de navigation</string>
+    <string name="dialog_cookie_alert_title" context="Cookie dialog title">Avant que vous ne poursuiviez</string>
+    <string name="dialog_cookie_alert_message" context="Cookie dialog message. Please, keep the placeholders to format the string.">Nous utilisons la mémoire locale et des technologies semblables (« cookies ») pour vous fournir nos services, améliorer votre expérience d\'utilisation de nos services et personnaliser les publicités que vous voyez, dont celles provenant de tiers. Acceptez dès le début de votre visite notre utilisation de Témoins ou personnalisez les Témoins dans les paramètres des Témoins de navigation. Apprenez-en davantage dans notre [A]Politique sur les Témoins de navigation[/A].</string>
+    <string name="dialog_cookie_thirdparty_title" context="Cookie dialog third party title">Témoins tiers</string>
+    <string name="dialog_cookie_thirdparty_subtitle1" context="Cookie dialog third party first subtitle">Témoins publicitaires de Google</string>
+    <string name="dialog_cookie_thirdparty_subtitle2" context="Cookie dialog third party second subtitle">Catégorie : Témoins publicitaires</string>
+    <string name="dialog_cookie_thirdparty_message" context="Cookie dialog third party message. Please, keep the placeholders to format the string.">Utilisés par Google pour : \n• Personnaliser les publicités que Google affiche sur nos services et notre site Web, et sur d\'autres services et sites Web, d\'après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d\'affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer quand vous cliquez sur une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="preference_cookies_accept" context="Preference screen item title">Accepter les Témoins de navigation</string>
+    <string name="preference_cookies_essential_title" context="Preference screen item title">Témoins essentiels</string>
+    <string name="preference_cookies_essential_summary" context="Preference screen item summary">Ils sont essentiels pour une fonction importante et pour un accès sécurisé à nos services. Pour cette raison, ils ne demandent pas de consentement.</string>
+    <string name="preference_cookies_preference_title" context="Preference screen item title">Témoins des préférences</string>
+    <string name="preference_cookies_preference_summary" context="Preference screen item summary">Ils nous permettent de mémoriser certains paramètres d\'affichage et de formatage que vous choisissez. Le refus de ces Témoins signifierait que nous ne pourrions pas mémoriser certaines choses pour vous, telles que votre disposition d\'écran préférée.</string>
+    <string name="preference_cookies_performance_title" context="Preference screen item title">Témoins de performances et d\'analyses</string>
+    <string name="preference_cookies_performance_summary" context="Preference screen item summary">Ils nous permettent de comprendre comment vous utilisez nos services et nous fournissent des données que nous pouvons utiliser pour apporter des améliorations. Le refus de ces Témoins signifierait que moins de données seraient à notre disposition pour faciliter les améliorations conceptionnelles.</string>
+    <string name="preference_cookies_advertising_title" context="Preference screen item title">Témoins publicitaires</string>
+    <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Ils sont utilisés par nous et par nos partenaires publicitaires approuvés afin de personnaliser les publicités que vous voyez dans nos services et sur d\'autres sites Web, d\'après votre historique de navigation. Le refus de ces Témoins signifierait que nous pourrions afficher des publicités moins pertinentes.</string>
+    <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Témoins tiers</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en cliquant sur « Plus de précision » ci-dessous.</string>
+    <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Politique de confidentialité</string>
+    <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Politique sur les Témoins de navigation</string>
+    <string name="preference_cookies_always_on" context="Preference screen item state description">Toujours activés</string>
 </resources>

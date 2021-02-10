@@ -616,6 +616,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			lastPositionStack.push(lastFirstVisiblePosition);
 
 			setParentHandle(n.getHandle());
+			((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 			setNodes(megaApi.getChildren(nodes.get(position), order));
 			recyclerView.scrollToPosition(0);
 
@@ -987,5 +989,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
 		this.headerItemDecoration = headerItemDecoration;
+	}
+
+	public boolean isFolderEmpty() {
+		return adapter == null || adapter.getItemCount() <= 0;
 	}
 }
