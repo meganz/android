@@ -7,7 +7,10 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.PorterDuff;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -142,6 +145,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
         // Bind 'Invite more'.
         if (isInviteMore(megaContact)) {
             holder.avatar.setImageResource(R.drawable.invite_more);
+            holder.avatar.setColorFilter(ContextCompat.getColor(context, R.color.teal_300_teal_200), PorterDuff.Mode.SRC_IN);
             holder.inviteMore.setVisibility(View.VISIBLE);
             holder.textViewName.setVisibility(View.GONE);
             holder.addIcon.setVisibility(View.GONE);
@@ -154,6 +158,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             holder.textViewName.setText(localName);
 
             setImageAvatar(megaContact.getHandle(), email, localName, holder.avatar);
+            holder.avatar.setColorFilter(null);
             Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(megaContact.getHandle()), email);
             if (bitmap == null) {
                 UserAvatarListener listener = new UserAvatarListener(context, holder);
