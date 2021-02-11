@@ -186,16 +186,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             viewInFolder.setOnClickListener(this);
         }
 
+        int counterOpen = 2;
         int counterSave = 2;
         int counterShares = 6;
         int counterModify = 4;
-        int counterOpen = 2;
         int counterRemove = 3;
 
+        LinearLayout separatorOpen = contentView.findViewById(R.id.separator_open_options);
         LinearLayout separatorDownload = contentView.findViewById(R.id.separator_download_options);
         LinearLayout separatorShares = contentView.findViewById(R.id.separator_share_options);
         LinearLayout separatorModify = contentView.findViewById(R.id.separator_modify_options);
-        LinearLayout separatorOpen = contentView.findViewById(R.id.separator_open_options);
 
         nodeIconLayout.setVisibility(View.GONE);
         permissionsIcon.setVisibility(View.GONE);
@@ -595,7 +595,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     offlineSwitch.setChecked(availableOffline(context, node));
                     optionInfo.setVisibility(View.VISIBLE);
                     optionRename.setVisibility(View.VISIBLE);
-                    optionMove.setVisibility(View.VISIBLE);
+                    counterModify--;
+                    optionMove.setVisibility(View.GONE);
                     optionCopy.setVisibility(View.VISIBLE);
                     optionRubbishBin.setVisibility(View.VISIBLE);
 
@@ -655,7 +656,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionLink.setVisibility(View.VISIBLE);
 
                     optionRename.setVisibility(View.VISIBLE);
-                    optionMove.setVisibility(View.VISIBLE);
+                    counterModify--;
+                    optionMove.setVisibility(View.GONE);
                     optionCopy.setVisibility(View.VISIBLE);
 
                     optionLabel.setVisibility(View.VISIBLE);
@@ -915,10 +917,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
         }
 
+        separatorOpen.setVisibility(counterOpen <= 0 ? View.GONE : View.VISIBLE);
         separatorDownload.setVisibility(counterSave <= 0 ? View.GONE : View.VISIBLE);
         separatorShares.setVisibility(counterShares <= 0 ? View.GONE : View.VISIBLE);
         separatorModify.setVisibility(counterModify <= 0 ? View.GONE : View.VISIBLE);
-        separatorOpen.setVisibility(counterOpen <= 0 || counterRemove <= 0 ? View.GONE : View.VISIBLE);
 
         offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
 
