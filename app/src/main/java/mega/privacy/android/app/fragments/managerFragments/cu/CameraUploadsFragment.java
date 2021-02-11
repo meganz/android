@@ -298,7 +298,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     .setTitle(getString(R.string.section_photo_sync))
                     .setSingleChoiceItems(adapter, -1, (dialog, which) -> {
                         resetCUTimestampsAndCache();
-                        dbH.setCamSyncEnabled(true);
                         dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
                         File localFile =
                                 Environment.getExternalStoragePublicDirectory(
@@ -306,6 +305,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                         String localPath = localFile.getAbsolutePath();
                         dbH.setCamSyncLocalPath(localPath);
                         dbH.setCameraFolderExternalSDCard(false);
+                        // After target and local folder setup, then enable CU.
+                        dbH.setCamSyncEnabled(true);
 
                         switch (which) {
                             case 0: {
