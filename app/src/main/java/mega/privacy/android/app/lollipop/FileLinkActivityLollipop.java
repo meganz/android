@@ -201,7 +201,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}else{
 			collapsingToolbar.setExpandedTitleMarginBottom(scaleHeightPx(35, outMetrics));
 		}
-		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.recycler_view_separator));
+		collapsingToolbar.setExpandedTitleMarginStart((int) getResources().getDimension(R.dimen.divider_width));
 		tB = (Toolbar) findViewById(R.id.toolbar_file_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();

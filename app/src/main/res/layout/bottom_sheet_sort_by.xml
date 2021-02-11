@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -23,92 +24,93 @@
             android:id="@+id/sort_by_name_asc"
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            tools:text="Name     Ascending"
+            app:drawableStartCompat="@drawable/ic_sort_name_ascending"
+            app:drawableTint="?android:attr/textColorSecondary"
+            tools:drawableTint="?attr/colorSecondary"
+            tools:text="Name (ascending)"
             tools:textColor="?attr/colorSecondary" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/grey_012_white_012" />
 
         <TextView
             android:id="@+id/sort_by_name_desc"
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            tools:text="Name     Descending" />
+            app:drawableStartCompat="@drawable/ic_sort_name_descending"
+            app:drawableTint="?android:attr/textColorSecondary"
+            tools:text="Name (descending)" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/grey_012_white_012" />
-
-        <TextView
-            android:id="@+id/sort_by_newest_date"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="@string/sort_by_newest_date"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/grey_012_white_012" />
-
-        <TextView
-            android:id="@+id/sort_by_oldest_date"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="@string/sort_by_oldest_date"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/divider_width"
             android:background="@color/grey_012_white_012" />
 
         <TextView
             android:id="@+id/sort_by_largest_size"
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="@string/sort_by_largest_size"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/grey_012_white_012" />
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            app:drawableStartCompat="@drawable/ic_sort_largest"
+            app:drawableTint="?android:attr/textColorSecondary" />
 
         <TextView
             android:id="@+id/sort_by_smallest_size"
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="@string/sort_by_smallest_size"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            app:drawableStartCompat="@drawable/ic_sort_largest"
+            app:drawableTint="?android:attr/textColorSecondary" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="@dimen/divider_width"
+            android:background="@color/grey_012_white_012" />
+
+        <TextView
+            android:id="@+id/sort_by_newest_date"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/sort_by_newest_date"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            app:drawableStartCompat="@drawable/ic_sort_newest"
+            app:drawableTint="?android:attr/textColorSecondary" />
+
+        <TextView
+            android:id="@+id/sort_by_oldest_date"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/sort_by_oldest_date"
+            android:textAppearance="?attr/textAppearanceSubtitle1"
+            app:drawableStartCompat="@drawable/ic_sort_oldest"
+            app:drawableTint="?android:attr/textColorSecondary" />
 
     </LinearLayout>
 </ScrollView>
