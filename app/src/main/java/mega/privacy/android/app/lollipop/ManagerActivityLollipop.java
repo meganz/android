@@ -2995,7 +2995,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-						if (getIntent().getBooleanExtra("moveToChatSection", false)){
+						if (getIntent().getBooleanExtra(EXTRA_MOVE_TO_CHAT_SECTION, false)){
 							moveToChatSection(chatId);
 						}
 						else {
@@ -4060,7 +4060,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-					if (getIntent().getBooleanExtra("moveToChatSection", false)){
+					if (getIntent().getBooleanExtra(EXTRA_MOVE_TO_CHAT_SECTION, false)){
 						moveToChatSection(chatId);
 					}
 					else {
