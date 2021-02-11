@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +35,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
+import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -189,24 +189,23 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     }
 
     private void showSingleNodeSelected() {
-        if (node.hasThumbnail()) {
-            RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-            params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-            params1.setMargins(20, 0, 12, 0);
-            nodeThumb.setLayoutParams(params1);
+        Bitmap thumb = null;
 
-            Bitmap thumb = getThumbnailFromCache(node);
-            if (thumb != null) {
-                nodeThumb.setImageBitmap(thumb);
-            } else {
+        if (node.hasThumbnail()) {
+            thumb = getThumbnailFromCache(node);
+
+            if (thumb == null) {
                 thumb = getThumbnailFromFolder(node, context);
-                if (thumb != null) {
-                    nodeThumb.setImageBitmap(thumb);
-                } else {
-                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                }
             }
+        }
+
+        if (thumb != null) {
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
+            params.height = params.width = dp2px(THUMB_SIZE_DP);
+            int margin = dp2px(THUMB_MARGIN_DP);
+            params.setMargins(margin, margin, margin, margin);
+            nodeThumb.setLayoutParams(params);
+            nodeThumb.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_ROUND_DP)));
         } else {
             nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
         }
