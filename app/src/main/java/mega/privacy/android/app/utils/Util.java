@@ -45,11 +45,9 @@ import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
@@ -98,12 +96,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.GetLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -121,6 +119,7 @@ import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
@@ -292,10 +291,7 @@ public class Util {
 			count =  list.length;
 		}
 
-		Context context = MegaApplication.getInstance().getApplicationContext();
-		String numChilden = count + " " + context.getResources().getQuantityString(R.plurals.general_num_items, count);
-
-		return numChilden;
+		return getQuantityString(R.plurals.general_num_items, count, count);
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
@@ -1483,8 +1479,8 @@ public class Util {
 			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof ContactInfoActivityLollipop) {
 			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof GetLinkActivityLollipop) {
-			((GetLinkActivityLollipop) context).showSnackbar(message);
+		} else if (context instanceof GetLinkActivity) {
+			((GetLinkActivity) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ChatFullScreenImageViewer) {
 			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof AudioVideoPlayerLollipop) {
@@ -1703,14 +1699,6 @@ public class Util {
 			}
 		}, SHOW_IM_DELAY);
     }
-
-	public static Spanned getSpannedHtmlText(String string) {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY);
-		}
-
-		return Html.fromHtml(string);
-	}
 
 	public static void checkTakePicture(Activity activity, int option) {
 		if (isNecessaryDisableLocalCamera() != -1) {

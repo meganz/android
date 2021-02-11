@@ -18,7 +18,10 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.Lifecycle;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -36,11 +39,15 @@ import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.psa.Psa;
+import mega.privacy.android.app.psa.PsaManager;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
@@ -110,6 +117,10 @@ public class BaseActivity extends AppCompatActivity {
     private boolean isResumeTransfersWarningShown;
     private AlertDialog resumeTransfersWarning;
 
+    private FrameLayout psaWebBrowserContainer;
+    private PsaWebBrowser psaWebBrowser;
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -166,6 +177,83 @@ public class BaseActivity extends AppCompatActivity {
                 showResumeTransfersWarning(this);
             }
         }
+
+        PsaManager.INSTANCE.getPsa().observe(this, psa -> {
+            if (getLifecycle().getCurrentState() == Lifecycle.State.RESUMED
+                    && psa != null && !TextUtils.isEmpty(psa.getUrl())) {
+                launchPsaWebBrowser(psa);
+            }
+        });
+    }
+
+    /**
+     * Launch web browser to display the new url PSA.
+     *
+     * @param psa the psa to display
+     */
+    private void launchPsaWebBrowser(Psa psa) {
+        // If there is a PsaWebBrowser launched, we shouldn't launch a new one.
+        if (psaWebBrowser != null && psaWebBrowser.isResumed()) {
+            return;
+        }
+
+        if (psaWebBrowserContainer == null) {
+            psaWebBrowserContainer = new FrameLayout(this);
+            psaWebBrowserContainer.setId(R.id.psa_web_browser_container);
+
+            ViewGroup contentView = findViewById(android.R.id.content);
+
+            contentView.addView(psaWebBrowserContainer,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
+        Bundle args = new Bundle();
+        args.putString(PsaWebBrowser.ARGS_URL_KEY, psa.getUrl());
+        psaWebBrowser = new PsaWebBrowser();
+        psaWebBrowser.setArguments(args);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.psa_web_browser_container, psaWebBrowser)
+                .addToBackStack(PsaWebBrowser.class.getSimpleName())
+                .commit();
+    }
+
+    /**
+     * Notify the PSA web browser is closed.
+     *
+     * @param visible whether it's visible when closed
+     */
+    public void onPsaWebViewDestroyed(boolean visible) {
+        if (psaWebBrowserContainer != null) {
+            ViewGroup contentView = findViewById(android.R.id.content);
+            contentView.removeView(psaWebBrowserContainer);
+        }
+
+        psaWebBrowserContainer = null;
+        psaWebBrowser = null;
+
+        // The PsaWebBrowser is launched, but isn't displayed yet, and a back press is consumed
+        // by it, so we need fire another back press event, so user will get expected result
+        // from the consumed back press.
+        if (!visible) {
+            uiHandler.post(this::onBackPressed);
+        }
+    }
+
+    /**
+     * Close the displaying PSA if there is one.
+     *
+     * @return whether there is one PSA closed
+     */
+    public boolean closeDisplayingPsa() {
+        if (psaWebBrowser != null) {
+            super.onBackPressed();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -179,6 +267,17 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        // If the PsaWebBrowser is launched but not visible, and current activity is paused,
+        // we should close PsaWebBrowser, otherwise new PsaWebBrowser won't be launched
+        // because of the check in launchPsaWebBrowser.
+        if (psaWebBrowser != null && !psaWebBrowser.visible()) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(psaWebBrowser)
+                    .commitAllowingStateLoss();
+            psaWebBrowser = null;
+        }
+
         checkMegaObjects();
         isPaused = true;
         super.onPause();
@@ -194,6 +293,8 @@ public class BaseActivity extends AppCompatActivity {
         isPaused = false;
 
         retryConnectionsAndSignalPresence();
+
+        PsaManager.INSTANCE.displayPendingPsa();
     }
 
     /**
@@ -943,5 +1044,43 @@ public class BaseActivity extends AppCompatActivity {
 
     public AlertDialog getResumeTransfersWarning() {
         return resumeTransfersWarning;
+    }
+
+    /**
+     * Checks if should refresh session due to megaApi.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToSDK() {
+        if (megaApi == null || megaApi.getRootNode() == null) {
+            logWarning("Refresh session - sdk");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if should refresh session due to karere.
+     *
+     * @return True if should refresh session, false otherwise.
+     */
+    protected boolean shouldRefreshSessionDueToKarere() {
+        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+            logWarning("Refresh session - karere");
+            refreshSession();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void refreshSession() {
+        Intent intent = new Intent(this, LoginActivityLollipop.class);
+        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

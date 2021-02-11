@@ -1789,6 +1789,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             return;
         }
 
+        if (position >= messages.size()) {
+            //There is no next message
+            ((ViewHolderMessageChat) holder).newMessagesLayout.setVisibility(View.GONE);
+            ((ChatActivityLollipop) context).setLastIdMsgSeen(message.getMsgId());
+            return;
+        }
+
         MegaChatMessage nextMessage = messages.get(position).getMessage();
         int typeMessage = nextMessage.getType();
         int codeMessage = nextMessage.getCode();
@@ -6622,7 +6629,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      */
     public void clearSelections() {
         for(AndroidMegaChatMessage message:messages){
-            if(isItemChecked(message.getMessage().getMsgId())){
+            if (message != null && message.getMessage() != null &&
+                    isItemChecked(message.getMessage().getMsgId())) {
                 toggleSelection(message.getMessage().getMsgId());
             }
         }

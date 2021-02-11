@@ -1224,7 +1224,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				else{
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
+					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
 
 					if(isTextEmpty(fullNameTitle)){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1492,7 +1492,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("Participant privilege change!");
 
 					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageSender());
+					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
 
 					if(isTextEmpty(fullNameTitle)){
 						if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -2400,39 +2400,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
         }
 
 		notifyDataSetChanged();
-	}
-	
-	public String getDescription(ArrayList<MegaNode> nodes){
-		int numFolders = 0;
-		int numFiles = 0;
-		
-		for (int i=0;i<nodes.size();i++){
-			MegaNode c = nodes.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			if (numFiles == 0){
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			}
-			else{
-				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		
-		return info;
 	}
 
 	public void updateMultiselectionPosition(int oldPosition){

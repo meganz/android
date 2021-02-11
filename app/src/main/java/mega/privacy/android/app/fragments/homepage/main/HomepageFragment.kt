@@ -15,6 +15,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -34,6 +35,7 @@ import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.fragments.homepage.homepageVisibilityChange
+import mega.privacy.android.app.fragments.homepage.psaVisibilityChange
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.Constants.*
@@ -68,6 +70,19 @@ class HomepageFragment : Fragment() {
             post {
                 fullyExpandBottomSheet(true)
             }
+        }
+    }
+    private val psaVisibilityChangeObserver = androidx.lifecycle.Observer<Int> {
+        if (isResumed) {
+            val fabMainParams = fabMain.layoutParams as ConstraintLayout.LayoutParams
+            fabMainParams.bottomMargin =
+                resources.getDimensionPixelSize(R.dimen.fab_margin_span) + it
+            fabMain.layoutParams = fabMainParams
+
+            val fabMaskMainParams = fabMaskMain.layoutParams as ConstraintLayout.LayoutParams
+            fabMaskMainParams.bottomMargin =
+                resources.getDimensionPixelSize(R.dimen.fab_margin_span) + it
+            fabMaskMain.layoutParams = fabMaskMainParams
         }
     }
 
@@ -107,6 +122,7 @@ class HomepageFragment : Fragment() {
         rootView = viewDataBinding.root
 
         homepageVisibilityChange.observeForever(homepageVisibilityChangeObserver)
+        psaVisibilityChange.observeForever(psaVisibilityChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
         if (savedInstanceState != null) {
@@ -156,6 +172,7 @@ class HomepageFragment : Fragment() {
         tabsChildren.clear()
         requireContext().unregisterReceiver(networkReceiver)
         homepageVisibilityChange.removeObserver(homepageVisibilityChangeObserver)
+        psaVisibilityChange.removeObserver(psaVisibilityChangeObserver)
     }
 
     private fun showOnlineMode() {

@@ -32,6 +32,7 @@ import nz.mega.sdk.MegaChatApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class AchievementsActivity extends PinActivityLollipop {
@@ -226,12 +227,11 @@ public class AchievementsActivity extends PinActivityLollipop {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK && data != null) {
-            String email = data.getStringExtra(InviteContactActivity.KEY_SENT_EMAIL);
             int sentNumber = data.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1);
             if (sentNumber > 1) {
                 showInviteConfirmationDialog(getString(R.string.invite_sent_text_multi));
             } else {
-                showInviteConfirmationDialog(getString(R.string.invite_sent_text, email));
+                showInviteConfirmationDialog(getString(R.string.invite_sent_text));
             }
         }
     }
