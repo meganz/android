@@ -12023,39 +12023,24 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		if (contactsSection != null) {
 			contactsSection.setEnabled(false);
+
 			if (contactsSectionText == null) {
-				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
-			}
-			String contactsText = contactsSectionText.getText().toString();
-			if (!contactsText.equals(getString(R.string.section_contacts))){
-				int start = contactsText.indexOf('(');
-				start++;
-				int end = contactsText.indexOf(')');
-				if (start>0 && end>0) {
-					int pendingRequest = Integer.parseInt(contactsText.substring(start, end));
-					setFormattedContactTitleSection(pendingRequest, false);
-				}
+				contactsSectionText = contactsSection.findViewById(R.id.contacts_section_text);
 			}
 
-			contactsSectionText.setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
+			contactsSectionText.setAlpha(0.38F);
+			setContactTitleSection();
 		}
 
 		if (notificationsSection != null) {
 			notificationsSection.setEnabled(false);
+
 			if (notificationsSectionText == null) {
-				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.contacts_section_text);
+				notificationsSectionText = notificationsSection.findViewById(R.id.contacts_section_text);
 			}
 
-			int unread = megaApi.getNumUnreadUserAlerts();
-
-			if(unread == 0){
-				notificationsSectionText.setText(getString(R.string.title_properties_chat_contact_notifications));
-			}
-			else{
-				setFormattedNotificationsTitleSection(unread, false);
-			}
-
-			notificationsSectionText.setTextColor(ContextCompat.getColor(this, R.color.grey_038_white_038));
+			notificationsSectionText.setAlpha(0.38F);
+			setNotificationsTitleSection();
 		}
 
 		if (upgradeAccount != null) {
@@ -12125,21 +12110,23 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		if (contactsSection != null) {
 			contactsSection.setEnabled(true);
+
 			if (contactsSectionText == null) {
-				contactsSectionText = (TextView) contactsSection.findViewById(R.id.contacts_section_text);
+				contactsSectionText = contactsSection.findViewById(R.id.contacts_section_text);
 			}
-			contactsSectionText.setTextColor(
-					ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
+
+			contactsSectionText.setAlpha(1F);
 			setContactTitleSection();
 		}
 
 		if (notificationsSection != null) {
 			notificationsSection.setEnabled(true);
+
 			if (notificationsSectionText == null) {
-				notificationsSectionText = (TextView) notificationsSection.findViewById(R.id.notification_section_text);
+				notificationsSectionText = notificationsSection.findViewById(R.id.notification_section_text);
 			}
-			notificationsSectionText.setTextColor(
-					ColorUtils.getThemeColor(this, android.R.attr.textColorPrimary));
+
+			notificationsSectionText.setAlpha(1F);
 			setNotificationsTitleSection();
 		}
 
