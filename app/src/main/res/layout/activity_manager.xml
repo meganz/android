@@ -64,17 +64,16 @@
                 layout="@layout/item_call_in_progress_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
                 android:visibility="gone"
                 android:elevation="16dp" />
 
-            <androidx.viewpager.widget.ViewPager
+            <mega.privacy.android.app.components.CustomViewPager
                 android:id="@+id/contact_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <androidx.viewpager.widget.ViewPager
+            <mega.privacy.android.app.components.CustomViewPager
                 android:id="@+id/shares_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -86,7 +85,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <androidx.viewpager.widget.ViewPager
+            <mega.privacy.android.app.components.CustomViewPager
                 android:id="@+id/transfers_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

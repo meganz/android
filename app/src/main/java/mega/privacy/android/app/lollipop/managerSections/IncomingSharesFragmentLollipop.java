@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -40,12 +41,19 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	public void activateActionMode() {
 		if (!adapter.isMultipleSelect()) {
 			super.activateActionMode();
-			actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(
-					new ActionBarCallBack());
+
+			if (getActivity() != null) {
+				actionMode = ((AppCompatActivity) getActivity())
+						.startSupportActionMode(new ActionBarCallBack(INCOMING_TAB));
+			}
 		}
 	}
 
 	private class ActionBarCallBack extends BaseActionBarCallBack {
+
+		public ActionBarCallBack(int currentTab) {
+			super(currentTab);
+		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -130,6 +138,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			logWarning("ParentHandle -1");
 			findNodes();
 		} else {
+			managerActivity.hideTabs(true, INCOMING_TAB);
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
 			logDebug("ParentHandle to find children: " + managerActivity.getParentHandleIncoming());
 
@@ -181,6 +190,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				updateActionModeTitle();
 			}
 		} else if (nodes.get(position).isFolder()) {
+			managerActivity.hideTabs(true, INCOMING_TAB);
 			managerActivity.increaseDeepBrowserTreeIncoming();
 			logDebug("Is folder deep: " + managerActivity.deepBrowserTreeIncoming);
 
@@ -256,7 +266,8 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				//In the beginning of the navigation
 
 				logDebug("deepBrowserTree==0");
-				managerActivity.setParentHandleIncoming(-1);
+				managerActivity.setParentHandleIncoming(INVALID_HANDLE);
+				managerActivity.hideTabs(false, INCOMING_TAB);
 				managerActivity.setToolbarTitle();
 				findNodes();
 				visibilityFastScroller();

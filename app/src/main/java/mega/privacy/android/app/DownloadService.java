@@ -1584,35 +1584,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						logDebug("NOT video!");
 					}
 
-					String filePath = path;
-					File f = new File(filePath);
-					try {
-						Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-						Uri finishedContentUri;
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-							finishedContentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", f);
-						} else {
-							finishedContentUri = Uri.fromFile(f);
-						}
-						mediaScanIntent.setData(finishedContentUri);
-						mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-							mediaScanIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						}
-						sendBroadcast(mediaScanIntent);
-					}
-					catch (Exception e){}
-
-					try {
-						MediaScannerConnection.scanFile(getApplicationContext(), new String[]{
-								f.getAbsolutePath()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-							@Override
-							public void onScanCompleted(String path, Uri uri) {
-								logDebug("File was scanned successfully");
-							}
-						});
-					}
-					catch (Exception e){}
+					sendBroadcastToUpdateGallery(this, new File(path));
 
 					if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
 						logDebug("Now copy the file to the SD Card");

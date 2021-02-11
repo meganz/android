@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <androidx.viewpager.widget.ViewPager
+        <mega.privacy.android.app.components.CustomViewPager
             android:id="@+id/provider_tabs_pager"
             android:layout_width="match_parent"
             android:layout_height="0dp"

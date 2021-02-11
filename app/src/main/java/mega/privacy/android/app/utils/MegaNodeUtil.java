@@ -811,4 +811,14 @@ public class MegaNodeUtil {
                 return R.color.grey_300;
         }
     }
+
+    /**
+     * Gets the handle of Cloud root node.
+     *
+     * @return The handle of Cloud root node if available, invalid handle otherwise.
+     */
+    public static long getCloudRootHandle() {
+        MegaNode rootNode = MegaApplication.getInstance().getMegaApi().getRootNode();
+        return rootNode != null ? rootNode.getHandle() : INVALID_HANDLE;
+    }
 }

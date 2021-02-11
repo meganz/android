@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.RECEIVED_REQUESTS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -119,6 +120,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.received_request_action, menu);
+			((ManagerActivityLollipop) context).hideTabs(true, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).hideFabButton();
 			checkScroll();
 			return true;
@@ -128,6 +130,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		public void onDestroyActionMode(ActionMode arg0) {
             clearSelections();
 			adapterList.setMultipleSelect(false);
+			((ManagerActivityLollipop) context).hideTabs(false, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
 			checkScroll();
 		}

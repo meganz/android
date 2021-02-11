@@ -353,7 +353,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     private boolean isSearchItemChecked(int position) {
-        return searchSelectedItems.get(position);
+        return searchSelectedItems != null && searchSelectedItems.get(position);
     }
 
     public void toggleSelection(int pos) {

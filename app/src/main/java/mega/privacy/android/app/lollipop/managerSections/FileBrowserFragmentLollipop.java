@@ -1061,7 +1061,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
         }
         
         ((ManagerActivityLollipop)context).setParentHandleBrowser(n.getHandle());
-        
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
         ((ManagerActivityLollipop)context).setToolbarTitle();
         
         adapter.setParentHandle(((ManagerActivityLollipop)context).getParentHandleBrowser());

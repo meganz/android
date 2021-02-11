@@ -111,6 +111,16 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         }
     };
 
+    private BroadcastReceiver reEnableCameraUploadsPreferenceReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && BROADCAST_ACTION_REENABLE_CU_PREFERENCE.equals(intent.getAction()) && sttCameraUploads != null) {
+                sttCameraUploads.reEnableCameraUploadsPreference(intent.getIntExtra(KEY_REENABLE_WHICH_PREFERENCE, 0));
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,6 +149,8 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
 
         registerReceiver(receiverCUAttrChanged,
                 new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
+
+        registerReceiver(reEnableCameraUploadsPreferenceReceiver, new IntentFilter(BROADCAST_ACTION_REENABLE_CU_PREFERENCE));
     }
 
     @Override
@@ -203,5 +215,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(enableDisableCameraUploadReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
         unregisterReceiver(receiverCUAttrChanged);
+        unregisterReceiver(reEnableCameraUploadsPreferenceReceiver);
     }
 }

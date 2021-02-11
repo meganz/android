@@ -32,6 +32,7 @@ import java.util.Locale;
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -267,6 +268,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
+                    BackupToolsKt.removeBackupsBeforeLogout();
+
                     /*
                        If the account is trying to login,
                        at this stage should set isLoggingRunning as `false` to indicate the login process is ended.

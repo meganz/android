@@ -56,6 +56,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
@@ -137,6 +138,7 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -220,6 +222,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.AvatarUtil;
+import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment;
 import mega.privacy.android.app.psa.Psa;
@@ -227,6 +230,7 @@ import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -265,6 +269,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -556,12 +561,12 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     //Tabs in Shares
 	private TabLayout tabLayoutShares;
 	private SharesPageAdapter sharesPageAdapter;
-	private ViewPager viewPagerShares;
+	private CustomViewPager viewPagerShares;
 
 	//Tabs in Contacts
 	private TabLayout tabLayoutContacts;
 	private ContactsPageAdapter contactsPageAdapter;
-	private ViewPager viewPagerContacts;
+	private CustomViewPager viewPagerContacts;
 
 	//Tabs in My Account
 	private TabLayout tabLayoutMyAccount;
@@ -571,7 +576,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	//Tabs in Transfers
 	private TabLayout tabLayoutTransfers;
 	private TransfersPageAdapter mTabsAdapterTransfers;
-	private ViewPager viewPagerTransfers;
+	private CustomViewPager viewPagerTransfers;
 
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
@@ -2396,8 +2401,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         spaceTV = (TextView) findViewById(R.id.navigation_drawer_space);
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         //TABS section Contacts
-		tabLayoutContacts =  (TabLayout) findViewById(R.id.sliding_tabs_contacts);
-		viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);
+		tabLayoutContacts =  findViewById(R.id.sliding_tabs_contacts);
+		viewPagerContacts = findViewById(R.id.contact_tabs_pager);
 		viewPagerContacts.setOffscreenPageLimit(3);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
@@ -2408,8 +2413,8 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		}
 
 		//TABS section Shared Items
-		tabLayoutShares =  (TabLayout) findViewById(R.id.sliding_tabs_shares);
-		viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);
+		tabLayoutShares =  findViewById(R.id.sliding_tabs_shares);
+		viewPagerShares = findViewById(R.id.shares_tabs_pager);
 		viewPagerShares.setOffscreenPageLimit(3);
 
 		viewPagerShares.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -5652,7 +5657,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
     	switch (drawerItem) {
 			case SHARED_ITEMS: {
-				tabLayoutShares.setVisibility(View.VISIBLE);
+				int tabItemShares = getTabItemShares();
+
+				if ((tabItemShares == INCOMING_TAB && parentHandleIncoming != INVALID_HANDLE)
+						|| (tabItemShares == OUTGOING_TAB && parentHandleOutgoing != INVALID_HANDLE)
+						|| (tabItemShares == LINKS_TAB && parentHandleLinks != INVALID_HANDLE)) {
+					tabLayoutShares.setVisibility(View.GONE);
+					viewPagerShares.disableSwipe(true);
+				} else {
+					tabLayoutShares.setVisibility(View.VISIBLE);
+					viewPagerShares.disableSwipe(false);
+				}
+
 				viewPagerShares.setVisibility(View.VISIBLE);
 				mShowAnyTabLayout = true;
 				break;
@@ -5701,6 +5717,75 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				.post(drawerItem == DrawerItem.HOMEPAGE);
 
 		drawerLayout.closeDrawer(Gravity.LEFT);
+	}
+
+	/**
+	 * Hides or shows tabs of a section depending on the navigation level
+	 * and if select mode is enabled or not.
+	 *
+	 * @param hide       If true, hides the tabs, else shows them.
+	 * @param currentTab The current tab where the action happens.
+	 */
+	public void hideTabs(boolean hide, int currentTab) {
+		int visibility = hide ? View.GONE : View.VISIBLE;
+
+		switch (drawerItem) {
+			case SHARED_ITEMS:
+				switch (currentTab) {
+					case INCOMING_TAB:
+						if (!isIncomingAdded() || (!hide && parentHandleIncoming != INVALID_HANDLE)) {
+							return;
+						}
+
+						break;
+
+					case OUTGOING_TAB:
+						if (!isOutgoingAdded() || (!hide && parentHandleOutgoing != INVALID_HANDLE)) {
+							return;
+						}
+
+						break;
+
+					case LINKS_TAB:
+						if (!isLinksAdded() || (!hide && parentHandleLinks != INVALID_HANDLE)) {
+							return;
+						}
+
+						break;
+				}
+
+				tabLayoutShares.setVisibility(visibility);
+				viewPagerShares.disableSwipe(hide);
+				break;
+
+			case CONTACTS:
+				switch (currentTab) {
+					case CONTACTS_TAB:
+						if (!isContactsAdded()) return;
+						else break;
+
+					case SENT_REQUESTS_TAB:
+						if (!isSentRequestAdded()) return;
+						else break;
+
+					case RECEIVED_REQUESTS_TAB:
+						if (!isReceivedRequestAdded()) return;
+						else break;
+				}
+
+				tabLayoutContacts.setVisibility(visibility);
+				viewPagerContacts.disableSwipe(hide);
+				break;
+
+			case TRANSFERS:
+				if (currentTab == PENDING_TAB && !isTransfersInProgressAdded()) {
+					return;
+				}
+
+				tabLayoutTransfers.setVisibility(visibility);
+				viewPagerTransfers.disableSwipe(hide);
+				break;
+		}
 	}
 
 	private void removeFragment(Fragment fragment) {
@@ -5852,7 +5937,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = HOMEPAGE_BNV;
 				}
+
 				showGlobalAlertDialogsIfNeeded();
+				initCuSync();
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -6122,6 +6209,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CLOUD_DRIVE.getTag());
         return fbFLol != null && fbFLol.isAdded();
     }
+
+	private boolean isContactsAdded() {
+		return getContactsFragment() != null && cFLol.isAdded();
+	}
+
+	private boolean isSentRequestAdded() {
+		return getSentRequestFragment() != null && sRFLol.isAdded();
+	}
+
+	private boolean isReceivedRequestAdded() {
+		return getReceivedRequestFragment() != null && rRFLol.isAdded();
+	}
 
 	private boolean isIncomingAdded () {
     	if (sharesPageAdapter == null) return false;
@@ -8542,9 +8641,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					setMoveToRubbish(true);
 
 					MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-					if (getPrimaryFolderHandle() == handle ) {
+					if (getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_cu_folder_to_rubbish));
-					} else if (getSecondaryFolderHandle() == handle ) {
+					} else if (getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
 						builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish);
 					} else {
 						builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
@@ -12165,6 +12264,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					showStorageAlmostFullDialog();
 				}
 				storageState = newStorageState;
+                logDebug("Try to start CU, false.");
                 startCameraUploadService(ManagerActivityLollipop.this);
 				break;
 
@@ -13563,7 +13663,15 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					pauseTransfersMenuIcon.setVisible(!paused);
 					playTransfersMenuIcon.setVisible(paused);
 				}
-			}
+
+                // Update CU backup state.
+                int newBackupState = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        ? CuSyncManager.State.CU_SYNC_STATE_PAUSE_UP
+                        : CuSyncManager.State.CU_SYNC_STATE_ACTIVE;
+
+                CuSyncManager.INSTANCE.updatePrimaryBackupState(newBackupState);
+                CuSyncManager.INSTANCE.updateSecondaryBackupState(newBackupState);
+            }
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFER) {
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");

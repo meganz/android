@@ -65,6 +65,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
@@ -95,6 +96,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -157,7 +159,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private TabLayout tabLayoutProvider;
 	private LinearLayout providerSectionLayout;
 	private ProviderPageAdapter mTabsAdapterProvider;
-	private ViewPager viewPagerProvider;
+	private CustomViewPager viewPagerProvider;
 
 	private ArrayList<MegaNode> nodes;
 	private int incomingDeepBrowserTree = -1;
@@ -1852,5 +1854,68 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	public int getTabShown() {
 		return tabShown;
+	}
+
+	/**
+	 * Gets Cloud Drive fragment.
+	 *
+	 * @return The fragment if available, null if does not exist or is not added.
+	 */
+	private CloudDriveProviderFragmentLollipop getCDriveProviderLol() {
+		CloudDriveProviderFragmentLollipop cDriveProviderLol =
+				(CloudDriveProviderFragmentLollipop) getSupportFragmentManager()
+						.findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
+
+		if (cDriveProviderLol != null && cDriveProviderLol.isAdded()) {
+			return this.cDriveProviderLol = cDriveProviderLol;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Gets Incoming Shares fragment.
+	 *
+	 * @return The fragment if available, null if does not exist or is not added.
+	 */
+	private IncomingSharesProviderFragmentLollipop getISharesProviderLol() {
+		IncomingSharesProviderFragmentLollipop iSharesProviderLol =
+				(IncomingSharesProviderFragmentLollipop) getSupportFragmentManager()
+						.findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, INCOMING_TAB));
+
+		if (iSharesProviderLol != null && iSharesProviderLol.isAdded()) {
+			return this.iSharesProviderLol = iSharesProviderLol;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Hides or shows tabs of a section depending on the navigation level
+	 * and if select mode is enabled or not.
+	 *
+	 * @param hide       If true, hides the tabs, else shows them.
+	 * @param currentTab The current tab where the action happens.
+	 */
+	public void hideTabs(boolean hide, int currentTab) {
+		switch (currentTab) {
+			case CLOUD_TAB:
+				if (getCDriveProviderLol() == null
+						|| (!hide && gParentHandle != getCloudRootHandle() && gParentHandle != INVALID_HANDLE)) {
+					return;
+				}
+
+				break;
+
+			case INCOMING_TAB:
+				if (getISharesProviderLol() == null || !hide && incParentHandle != INVALID_HANDLE) {
+					return;
+				}
+
+				break;
+		}
+
+		viewPagerProvider.disableSwipe(hide);
+		tabLayoutProvider.setVisibility(hide ? View.GONE : View.VISIBLE);
 	}
 }
