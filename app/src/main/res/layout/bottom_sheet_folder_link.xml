@@ -1,40 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/folder_link_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/folder_link_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_marginTop="8dp"
         android:orientation="horizontal" >
 
-        <RelativeLayout
-            android:id="@+id/folder_link_relative_layout_thumb"
+        <ImageView
+            android:id="@+id/folder_link_thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp">
-
-            <ImageView
-                android:id="@+id/folder_link_thumbnail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:scaleType="fitCenter" />
-
-        </RelativeLayout>
+            android:layout_centerVertical="true"
+            android:layout_margin="12dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp">
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/folder_link_thumbnail">
 
             <TextView
                 android:id="@+id/folder_link_name_text"
@@ -56,13 +50,12 @@
                 android:layout_below="@+id/folder_link_name_text"
                 android:textSize="14sp"
                 android:singleLine="true"
-                android:maxLines="1"
                 android:ellipsize="middle"/>
 
         </RelativeLayout>
 
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
