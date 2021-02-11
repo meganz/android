@@ -152,7 +152,8 @@
                 android:visibility="gone"
                 app:controller_layout_id="@layout/audio_player_control_in_mini_player"
                 app:player_layout_id="@layout/audio_player_view_controller_only"
-                app:surface_type="none" />
+                app:surface_type="none"
+                tools:visibility="visible" />
 
             <include
                 android:id="@+id/psa_layout"

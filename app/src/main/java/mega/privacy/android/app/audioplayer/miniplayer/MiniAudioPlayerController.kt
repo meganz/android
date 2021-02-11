@@ -63,7 +63,7 @@ class MiniAudioPlayerController(
                 setupPlayerView(service.service.exoPlayer)
                 service.service.metadata.observeForever(metadataObserver)
 
-                if (isVisible()) {
+                if (visible()) {
                     onPlayerVisibilityChanged.run()
                 }
             }
@@ -127,7 +127,14 @@ class MiniAudioPlayerController(
         onAudioPlayerServiceStopped()
     }
 
-    fun isVisible() = playerView.isVisible
+    /**
+     * Get height of the mini player view.
+     *
+     * @return height of the mini player view
+     */
+    fun playerHeight() = playerView.measuredHeight
+
+    fun visible() = playerView.isVisible
 
     private fun updatePlayerViewVisibility() {
         playerView.isVisible = playerService != null && shouldVisible

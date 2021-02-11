@@ -143,7 +143,6 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.audio.AudioFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
@@ -2291,6 +2290,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					// we need update fragmentLayout's layout params when player view is closed.
 					if (bNV.getVisibility() == View.VISIBLE) {
 						showBNVImmediate();
+						updateHomepageFabPosition();
 					}
 				});
 
@@ -4801,7 +4801,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private void showPsa(Psa psa) {
         if (psa == null || drawerItem != DrawerItem.HOMEPAGE
 				|| mHomepageScreen != HomepageScreen.HOMEPAGE) {
-			EventNotifierKt.notifyPsaVisibilityChange(0);
+			updateHomepageFabPosition();
             return;
         }
 
@@ -4809,7 +4809,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 				&& getProLayout.getVisibility() == View.GONE
 				&& TextUtils.isEmpty(psa.getUrl())) {
 			psaViewHolder.bind(psa);
-			handler.post(() -> EventNotifierKt.notifyPsaVisibilityChange(psaViewHolder.psaLayoutHeight()));
+			handler.post(this::updateHomepageFabPosition);
         }
     }
 
@@ -6182,19 +6182,14 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	}
 
 	private void showBNVImmediate() {
+		updateMiniAudioPlayerVisibility(true);
+
 		bNV.setTranslationY(0);
 		bNV.setVisibility(View.VISIBLE);
-
-		boolean miniAudioPlayerVisible = updateMiniAudioPlayerVisibility(true);
-		int extraBottomMargin = miniAudioPlayerVisible
-				? getResources().getDimensionPixelSize(R.dimen.audio_player_mini_controller_height)
-				: 0;
-
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(
 				ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		params.setMargins(0, 0, 0,
-				getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height)
-						+ extraBottomMargin);
+				getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
 		fragmentLayout.setLayoutParams(params);
 	}
 
@@ -6208,10 +6203,24 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 	private boolean updateMiniAudioPlayerVisibility(boolean shouldVisible) {
 		if (miniAudioPlayerController != null) {
 			miniAudioPlayerController.setShouldVisible(shouldVisible);
-			return miniAudioPlayerController.isVisible();
+
+			updateHomepageFabPosition();
+
+			return miniAudioPlayerController.visible();
 		}
 
 		return false;
+	}
+
+	/**
+	 * Update homepage FAB position, considering the visibility of PSA layout and mini audio player.
+	 */
+	private void updateHomepageFabPosition() {
+		HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
+		if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE && fragment != null) {
+			fragment.updateFabPosition(psaViewHolder.visible() ? psaViewHolder.psaLayoutHeight() : 0,
+					miniAudioPlayerController.visible() ? miniAudioPlayerController.playerHeight() : 0);
+		}
 	}
 
 	private boolean isCloudAdded () {
@@ -8098,9 +8107,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
 				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
 		if (psaViewHolder.visible()) {
-			handler.post(() -> EventNotifierKt.notifyPsaVisibilityChange(psaViewHolder.psaLayoutHeight()));
+			handler.post(this::updateHomepageFabPosition);
 		} else {
-			EventNotifierKt.notifyPsaVisibilityChange(0);
+			updateHomepageFabPosition();
 		}
 	}
 
@@ -15668,12 +15677,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
 			bNV.setVisibility(View.VISIBLE);
 			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> {
-				boolean miniAudioPlayerVisible = updateMiniAudioPlayerVisibility(true);
-				int extraBottomMargin = miniAudioPlayerVisible
-						? getResources().getDimensionPixelSize(R.dimen.audio_player_mini_controller_height)
-						: 0;
-				params.bottomMargin += extraBottomMargin;
-
+				updateMiniAudioPlayerVisibility(true);
 				fragmentLayout.setLayoutParams(params);
 			}).start();
 		}
