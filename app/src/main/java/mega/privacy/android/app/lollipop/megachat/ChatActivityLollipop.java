@@ -2252,12 +2252,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             checkSelectOption();
             callMenuItem.setEnabled(false);
-            callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
+            callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_054_white_054));
             if (chatRoom.isGroup()) {
                 videoMenuItem.setVisible(false);
             }else{
                 videoMenuItem.setEnabled(false);
-                videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_087_white_087));
+                videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_054_white_054));
             }
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
