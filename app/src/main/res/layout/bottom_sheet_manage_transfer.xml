@@ -17,7 +17,6 @@
             android:id="@+id/manage_transfer_thumbnail"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="18dp"
             android:scaleType="fitCenter"
             android:layout_centerVertical="true"/>
 
@@ -35,8 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/manage_transfer_thumbnail"
             android:layout_marginTop="16dp"
-            android:layout_marginLeft="13dp"
-            android:layout_marginRight="13dp"
+            android:layout_marginEnd="13dp"
             android:textColor="@color/file_list_first_row"
             android:ellipsize="middle"
             android:textSize="16sp"

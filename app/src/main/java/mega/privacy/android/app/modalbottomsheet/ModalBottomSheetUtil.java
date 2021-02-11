@@ -97,7 +97,7 @@ public class ModalBottomSheetUtil {
     }
 
     /**
-     * Sets a node thumbnail if available or default if not.
+     * Gets a node thumbnail if available and sets it in the UI.
      *
      * @param node      MegaNode from which the thumbnail has to be set.
      * @param nodeThumb ImageView in which the thumbnail has to be set.
@@ -113,6 +113,18 @@ public class ModalBottomSheetUtil {
             }
         }
 
+        setThumbnail(context, thumb, nodeThumb, node.getName());
+    }
+
+    /**
+     * Sets a thumbnail in the UI if available or the default file icon if not.
+     *
+     * @param thumb     Bitmap thumbnail if available, null otherwise.
+     * @param nodeThumb ImageView in which the thumbnail has to be set.
+     * @param fileName  Name of the file.
+     * @return True if thumbnail is available, false otherwise.
+     */
+    public static boolean setThumbnail(Context context, Bitmap thumb, ImageView nodeThumb, String fileName) {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
 
         if (thumb != null) {
@@ -124,9 +136,11 @@ public class ModalBottomSheetUtil {
             params.height = params.width = dp2px(ICON_SIZE_DP);
             int margin = dp2px(ICON_MARGIN_DP);
             params.setMargins(margin, margin, margin, margin);
-            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+            nodeThumb.setImageResource(MimeTypeList.typeForName(fileName).getIconResourceId());
         }
 
         nodeThumb.setLayoutParams(params);
+
+        return  thumb != null;
     }
 }
