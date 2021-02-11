@@ -47,11 +47,9 @@ task clean(type: Delete) {
 
 // Define versions in a single place
 ext {
-    // App, SDK and Karere
+    // App
     appVersion = "4.0.0"
     versionCode = 352
-    sdkVersion = "6f3447b"
-    karereVersion = "3dea0d2"
 
     // Sdk and tools
     compileSdkVersion = 29
