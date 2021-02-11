@@ -7,6 +7,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -400,6 +401,8 @@ public class FileUtil {
             outputChannel.close();
             inputStream.close();
             outputStream.close();
+
+            sendBroadcastToUpdateGallery(MegaApplication.getInstance(), dest);
         }
     }
 
@@ -834,6 +837,40 @@ public class FileUtil {
         }
 
         return copyFile;
+    }
+
+    /**
+     * Notifies a new file has been added to the local storage.
+     *
+     * @param context Current context.
+     * @param file    File to notify.
+     */
+    public static void sendBroadcastToUpdateGallery(Context context, File file) {
+        try {
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+
+            Uri finishedContentUri = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                    ? FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file)
+                    : Uri.fromFile(file);
+
+            mediaScanIntent.setData(finishedContentUri);
+            mediaScanIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                mediaScanIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+
+            context.sendBroadcast(mediaScanIntent);
+        } catch (Exception e) {
+            logWarning("Exception sending mediaScanIntent.", e);
+        }
+
+        try {
+            MediaScannerConnection.scanFile(context, new String[]{file.getAbsolutePath()}, null, (path1, uri)
+                    -> logDebug("File was scanned successfully"));
+        } catch (Exception e) {
+            logWarning("Exception scanning file.", e);
+        }
     }
 
     public static File getCameraFolder() {

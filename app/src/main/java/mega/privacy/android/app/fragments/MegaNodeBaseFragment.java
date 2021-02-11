@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
@@ -26,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -71,6 +75,8 @@ import static nz.mega.sdk.MegaApiJava.*;
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
 
+    private static final String AD_SLOT = "and4";
+
     protected ManagerActivityLollipop managerActivity;
 
     public static ImageView imageDrag;
@@ -111,9 +117,20 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         downloadLocationDefaultPath = getDownloadLocation();
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initAdsLoader(AD_SLOT, true);
+    }
+
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
+        private int currentTab;
+
+        public BaseActionBarCallBack (int currentTab) {
+            this.currentTab = currentTab;
+        }
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -121,6 +138,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             inflater.inflate(R.menu.cloud_storage_action, menu);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.hideFabButton();
+                managerActivity.hideTabs(true, currentTab);
                 managerActivity.showHideBottomNavigationView(true);
                 managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
             }
@@ -239,6 +257,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             adapter.setMultipleSelect(false);
             if (context instanceof ManagerActivityLollipop) {
                 managerActivity.showFabButton();
+                managerActivity.hideTabs(false, currentTab);
                 managerActivity.showHideBottomNavigationView(false);
                 managerActivity.changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
             }
@@ -812,5 +831,14 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected void hideActionMode() {
         clearSelections();
         hideMultipleSelect();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Set the Ad view container to the Ads Loader,
+        // in order to let it know in where to show the Ads
+        mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
+                managerActivity.getOutMetrics());
     }
 }

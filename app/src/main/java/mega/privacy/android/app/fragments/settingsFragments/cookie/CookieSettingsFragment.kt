@@ -68,9 +68,12 @@ class CookieSettingsFragment : SettingsBaseFragment() {
         analyticsCookiesPreference.onPreferenceChangeListener = this
         advertisingCookiesPreference.onPreferenceChangeListener = this
         thirdPartyCookiesPreference.onPreferenceChangeListener = this
-        thirdPartyCookiesPreference.setOnSummaryClickListener {
+
+        thirdPartyCookiesPreference.setSummaryText(getString(R.string.preference_cookies_thirdparty_summary))
+        thirdPartyCookiesPreference.setClickableText(getString(R.string.action_more_information)) {
             showThirdPartyInfoDialog()
         }
+
         policiesPreference.setButton1(getString(R.string.preference_cookies_policies_cookie)) {
             openBrowser("https://mega.nz/cookie".toUri())
         }
