@@ -248,29 +248,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     nodeVersionsIcon.setVisibility(View.GONE);
                 }
 
-                if (node.hasThumbnail()) {
-                    logDebug("Node has thumbnail");
-                    RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                    params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                    params1.setMargins(20, 0, 12, 0);
-                    nodeThumb.setLayoutParams(params1);
-
-                    Bitmap thumb = getThumbnailFromCache(node);
-                    if (thumb != null) {
-                        nodeThumb.setImageBitmap(thumb);
-                    } else {
-                        thumb = getThumbnailFromFolder(node, context);
-                        if (thumb != null) {
-                            nodeThumb.setImageBitmap(thumb);
-                        } else {
-                            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                        }
-                    }
-                } else {
-                    nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                }
-
+                setNodeThumbnail(context, node, nodeThumb);
                 optionSendChat.setVisibility(View.VISIBLE);
             }
         }
