@@ -30,10 +30,6 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
-    protected static final int THUMB_ROUND_DP = 4;
-    protected static final int THUMB_SIZE_DP = 36;
-    protected static final int THUMB_MARGIN_DP = 18;
-
     protected static final int HEIGHT_HEADER_RADIO_GROUP = 56;
     protected static final int HEIGHT_HEADER_LARGE = 81;
     protected static final int HEIGHT_HEADER_LOW = 48;

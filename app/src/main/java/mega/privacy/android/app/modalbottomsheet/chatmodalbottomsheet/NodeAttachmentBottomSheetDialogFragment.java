@@ -3,7 +3,6 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -29,13 +28,12 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
 import static mega.privacy.android.app.utils.OfflineUtils.removeOffline;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -189,32 +187,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     }
 
     private void showSingleNodeSelected() {
-        Bitmap thumb = null;
-
-        if (node.hasThumbnail()) {
-            thumb = getThumbnailFromCache(node);
-
-            if (thumb == null) {
-                thumb = getThumbnailFromFolder(node, context);
-            }
-        }
-
-        if (thumb != null) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-            params.height = params.width = dp2px(THUMB_SIZE_DP);
-            int margin = dp2px(THUMB_MARGIN_DP);
-            params.setMargins(margin, margin, margin, margin);
-            nodeThumb.setLayoutParams(params);
-            nodeThumb.setImageBitmap(getRoundedBitmap(context, thumb, dp2px(THUMB_ROUND_DP)));
-        } else {
-            nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-        }
-
+        setNodeThumbnail(context, node, nodeThumb);
         nodeName.setText(node.getName());
-
-        long nodeSize = node.getSize();
-        nodeInfo.setText(getSizeString(nodeSize));
-
+        nodeInfo.setText(getSizeString(node.getSize()));
         optionView.setVisibility(View.GONE);
     }
 

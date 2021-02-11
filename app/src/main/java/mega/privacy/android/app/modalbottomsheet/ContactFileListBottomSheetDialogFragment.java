@@ -22,6 +22,7 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -142,29 +143,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             long nodeSize = node.getSize();
             nodeInfo.setText(getSizeString(nodeSize));
             nodeIconLayout.setVisibility(View.GONE);
-
-            if (node.hasThumbnail()) {
-                RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) nodeThumb.getLayoutParams();
-                params1.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                params1.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36, context.getResources().getDisplayMetrics());
-                params1.setMargins(20, 0, 12, 0);
-                nodeThumb.setLayoutParams(params1);
-
-                Bitmap thumb = getThumbnailFromCache(node);
-                if (thumb != null) {
-                    nodeThumb.setImageBitmap(thumb);
-                } else {
-                    thumb = getThumbnailFromFolder(node, context);
-                    if (thumb != null) {
-                        nodeThumb.setImageBitmap(thumb);
-                    } else {
-                        nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-                    }
-                }
-            } else {
-                nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-            }
-
+            setNodeThumbnail(context, node, nodeThumb);
             optionLeave.setVisibility(View.GONE);
         }
 
