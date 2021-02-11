@@ -2,16 +2,12 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
 import nz.mega.sdk.MegaNode;
@@ -20,7 +16,6 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.set
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
