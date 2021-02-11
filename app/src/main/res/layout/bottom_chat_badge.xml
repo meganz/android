@@ -15,7 +15,7 @@
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:layout_centerInParent="true"
-            app:srcCompat="@drawable/notification_badge"
+            app:srcCompat="@drawable/bnv_notification_badge"
             android:gravity="center" />
 
         <TextView
@@ -27,7 +27,7 @@
             android:fontFamily="roboto"
             android:textSize="8sp"
             android:textStyle="bold"
-            android:textColor="@color/red_600_red_300"
+            android:textColor="?attr/colorPrimary"
             android:gravity="center"/>
 
     </RelativeLayout>
