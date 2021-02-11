@@ -24,6 +24,7 @@ import nz.mega.sdk.MegaChatMessage;
 import static android.text.format.DateFormat.getBestDateTimePattern;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class TimeUtils implements Comparator<Calendar> {
@@ -38,6 +39,12 @@ public class TimeUtils implements Comparator<Calendar> {
     public static final int DATE_AND_TIME_YYYY_MM_DD_HH_MM_FORMAT = 4;
     private static final int TIME_OF_CHANGE = 8;
     private static final int INITIAL_PERIOD_TIME = 0;
+
+    public static final long SECOND = 1000;
+    public static final long MINUTE = 60 * SECOND;
+    public static final long HOUR = 60 * MINUTE;
+    public static final long DAY = 24 * HOUR;
+    public static final long WEEK = 7 * DAY;
 
     int type;
 
@@ -398,19 +405,23 @@ public class TimeUtils implements Comparator<Calendar> {
     /**
      * Method for obtaining the appropriate String depending on the current time.
      *
-     * @param context Activity context.
      * @param option  Selected mute type.
      * @return The right string.
      */
-    public static String getCorrectStringDependingOnCalendar(Context context, String option) {
+    public static String getCorrectStringDependingOnCalendar(String option) {
         Calendar calendar = getCalendarSpecificTime(option);
         TimeZone tz = calendar.getTimeZone();
-        java.text.DateFormat df = new SimpleDateFormat("h", Locale.getDefault());
+
+        Locale locale = MegaApplication.getInstance().getBaseContext().getResources().getConfiguration().locale;
+        java.text.DateFormat df = new SimpleDateFormat(getBestDateTimePattern(locale, "HH:mm"), locale);
         df.setTimeZone(tz);
+
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
         String time = df.format(calendar.getTime());
+
         return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ?
-                context.getString(R.string.success_muting_a_chat_until_this_morning, time) :
-                context.getString(R.string.success_muting_a_chat_until_tomorrow_morning, context.getString(R.string.label_tomorrow).toLowerCase(), time);
+                getQuantityString(R.plurals.success_muting_chat_until_specific_time, hour, time) :
+                getQuantityString(R.plurals.success_muting_chat_until_specific_date_and_time, hour, getString(R.string.label_tomorrow).toLowerCase(), time);
     }
 
     /**
@@ -435,7 +446,8 @@ public class TimeUtils implements Comparator<Calendar> {
 
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
-        return MegaApplication.getInstance().getString(R.string.chat_notifications_muted_today, df.format(cal.getTime()));
+
+        return getQuantityString(R.plurals.chat_notifications_muted_until_specific_time, cal.get(Calendar.HOUR_OF_DAY), df.format(cal.getTime()));
     }
 
     /**

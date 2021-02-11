@@ -2,68 +2,82 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-  <LinearLayout
-      android:id="@+id/empty_hint"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:gravity="center_horizontal"
-      android:orientation="vertical"
-      android:visibility="gone"
-      tools:visibility="visible"
-      >
-    <ImageView
-        android:id="@+id/empty_hint_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        tools:src="@drawable/ic_empty_camera_uploads"
-        tools:visibility="visible"
-        />
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/empty_hint_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/text_secondary"
-        android:textSize="18sp"
-        tools:text="@string/no_results_found"
-        />
-  </LinearLayout>
-
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/cu_list"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      />
-
-  <mega.privacy.android.app.components.scrollBar.FastScroller
-      android:id="@+id/scroller"
-      android:layout_width="wrap_content"
-      android:layout_height="match_parent"
-      android:layout_gravity="end"
-      android:orientation="vertical"
-      />
-
-  <FrameLayout
-      android:id="@+id/turn_on_cu_layout"
-      android:layout_width="match_parent"
-      android:layout_height="48dp"
-      android:layout_gravity="bottom"
-      android:visibility="gone"
-      tools:visibility="visible"
-      >
-    <TextView
-        android:id="@+id/turn_on_cu_text"
+    <LinearLayout
+        android:id="@+id/empty_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="@color/accentColor"
-        tools:text="@string/settings_camera_upload_turn_on"
-        />
-  </FrameLayout>
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/empty_hint_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:src="@drawable/ic_empty_camera_uploads"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/empty_hint_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/text_secondary"
+            android:textSize="18sp"
+            tools:text="@string/no_results_found" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/ad_view_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/cu_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <mega.privacy.android.app.components.scrollBar.FastScroller
+                android:id="@+id/scroller"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:orientation="vertical" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/turn_on_cu_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom"
+        android:background="?attr/colorPrimary"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/turn_on_cu_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/accentColor"
+            tools:text="@string/settings_camera_upload_turn_on" />
+    </FrameLayout>
 </FrameLayout>
+

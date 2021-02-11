@@ -27,6 +27,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -51,6 +52,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
@@ -78,6 +80,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
@@ -169,19 +172,7 @@ public class ChatController {
 
     public void clearHistory(long chatId){
         logDebug("Chat ID: " + chatId);
-        if(context instanceof ManagerActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ManagerActivityLollipop) context);
-        }
-        else if(context instanceof ChatActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ChatActivityLollipop) context);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (ContactInfoActivityLollipop) context);
-        }
-        else if(context instanceof GroupChatInfoActivityLollipop){
-            megaChatApi.clearChatHistory(chatId, (GroupChatInfoActivityLollipop) context);
-        }
-
+        megaChatApi.clearChatHistory(chatId, new TruncateHistoryListener(context));
         dbH.removePendingMessageByChatId(chatId);
     }
 
@@ -362,7 +353,7 @@ public class ChatController {
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
-                showSnackbar(context, getCorrectStringDependingOnCalendar(context, option));
+                showSnackbar(context, getCorrectStringDependingOnCalendar(option));
                 break;
 
             default:
@@ -1827,6 +1818,9 @@ public class ChatController {
         long[] contactHandles = intent.getLongArrayExtra(SELECTED_USERS);
         long[] nodeHandles = intent.getLongArrayExtra(NODE_HANDLES);
         long[] userHandles = intent.getLongArrayExtra(USER_HANDLES);
+        String extraLink = intent.getStringExtra(EXTRA_LINK);
+        String extraKey = intent.getStringExtra(EXTRA_KEY);
+        String extraPassword = intent.getStringExtra(EXTRA_PASSWORD);
 
         if ((chatHandles != null && chatHandles.length > 0) || (contactHandles != null && contactHandles.length > 0)) {
             if (contactHandles != null && contactHandles.length > 0) {
@@ -1853,11 +1847,13 @@ public class ChatController {
                 boolean createChats = false;
 
                 if (nodeHandles != null) {
-                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES, -1);
+                    listener = new CreateChatListener(chats, users, nodeHandles, context, CreateChatListener.SEND_FILES);
                     createChats = true;
                 } else if (userHandles != null) {
-                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS, -1);
+                    listener = new CreateChatListener(chats, users, userHandles, context, CreateChatListener.SEND_CONTACTS);
                     createChats = true;
+                } else if (!isTextEmpty(extraLink)) {
+                    listener = new CreateChatListener(chats, users, extraLink, extraKey, extraPassword, context, CreateChatListener.SEND_LINK);
                 } else {
                     logWarning("Error on sending to chat");
                 }
@@ -1879,11 +1875,63 @@ public class ChatController {
                 } else if (userHandles != null) {
                     logDebug("Send " + userHandles.length + " contacts");
                     sendContactsToChats(chatHandles, userHandles);
+                } else if (!isTextEmpty(extraLink)) {
+                    sendLinkToChats(context, chatHandles, extraLink, extraKey, extraPassword);
                 } else {
                     logWarning("Error on sending to chat");
                 }
             }
         }
+    }
+
+    /**
+     * Shares a link to chats. The link can be received along with its decryption key or with it.
+     * There are several possibilities to share a link:
+     * - Link along with decryption key:
+     *      * Without password protection. Here key and password params should be null.
+     *      * With password protection. Here key param should be null and password param:
+     *              + Can contain the password protection.
+     *              + Be null if only the protected link is shared.
+     * - Link without decryption key. Here password param should be always null and key param:
+     *      * Can contain the decryption key.
+     *      * Be null if only the link is shared.
+     *
+     * @param context      Current context.
+     * @param chatHandles List of chat identifiers to which the link has to be shared.
+     * @param link        Link to share.
+     * @param key         Decryption key of the link to share. It can be null.
+     * @param password    Password protection of the link to share. It can be null.
+     */
+    public static void sendLinkToChats(Context context, long[] chatHandles, String link, String key, String password) {
+        MegaChatApiJava megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        if (megaChatApi == null) {
+            logError("MegaChatApi is null");
+            return;
+        }
+
+        for (Long chatId : chatHandles) {
+            megaChatApi.sendMessage(chatId, link);
+
+            if (!isTextEmpty(key)) {
+                megaChatApi.sendMessage(chatId, key);
+            } else if (!isTextEmpty(password)) {
+                megaChatApi.sendMessage(chatId, password);
+            }
+        }
+
+        String message;
+
+        if (!isTextEmpty(key)) {
+            message = context.getString(R.string.link_and_key_sent);
+        } else if (!isTextEmpty(password)) {
+            message = context.getString(R.string.link_and_password_sent);
+        } else {
+            message = context.getString(R.string.link_sent);
+        }
+
+        showSnackbar(context, MESSAGE_SNACKBAR_TYPE, message, chatHandles.length == 1
+                ? chatHandles[0]
+                : MEGACHAT_INVALID_HANDLE);
     }
 
     public void sendContactsToChats(long[] chatHandles, long[] userHandles) {

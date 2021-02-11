@@ -41,9 +41,11 @@ import mega.privacy.android.app.providers.FileProviderActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.providers.FileProviderActivity.CLOUD_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
 public class CloudDriveProviderFragmentLollipop extends Fragment{
@@ -92,6 +94,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			logDebug("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
+			((FileProviderActivity) context).hideTabs(true, CLOUD_TAB);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 1);
 			return true;
 		}
@@ -184,6 +187,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
 			changeStatusBarColorActionMode(context, ((FileProviderActivity) context).getWindow(), handler, 0);
 		}
 	}
@@ -226,7 +230,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 
 		listView = (RecyclerView) v.findViewById(R.id.provider_list_view_browser);
 
-		listView.addItemDecoration(new SimpleDividerItemDecoration(context, metrics));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator());
@@ -313,7 +317,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		if (context instanceof FileProviderActivity){
 			int tabShown = ((FileProviderActivity)context).getTabShown();
 
-			if(tabShown==FileProviderActivity.CLOUD_TAB){
+			if(tabShown== CLOUD_TAB){
 				((FileProviderActivity) context).changeTitle(folder);
 			}
 		}
@@ -345,6 +349,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		else {
 			((FileProviderActivity)context).activateButton(false);
 			if (nodes.get(position).isFolder()){
+				((FileProviderActivity) context).hideTabs(true, CLOUD_TAB);
 
 				MegaNode n = nodes.get(position);
 
@@ -390,12 +395,13 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 		if (parentNode != null){
-			
-			if(parentNode.getType()==MegaNode.TYPE_ROOT){
-				parentHandle=-1;
+			boolean parentIsRoot = false;
+
+			if (parentNode.getType() == MegaNode.TYPE_ROOT) {
+				parentHandle = INVALID_HANDLE;
+				parentIsRoot = true;
 				changeActionBarTitle(context.getString(R.string.file_provider_title).toUpperCase());
-			}
-			else{
+			} else {
 				String path=parentNode.getName();	
 				String[] temp;
 				temp = path.split("/");
@@ -423,6 +429,10 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			adapter.setParentHandle(parentHandle);
 			if (context instanceof FileProviderActivity){
 				((FileProviderActivity)context).setParentHandle(parentHandle);
+
+				if (parentIsRoot) {
+					((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
+				}
 			}
 			
 			return 2;

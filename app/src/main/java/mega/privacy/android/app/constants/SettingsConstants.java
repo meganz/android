@@ -2,6 +2,7 @@ package mega.privacy.android.app.constants;
 
 public class SettingsConstants {
     /* General settings */
+    public static final String KEY_FEATURES = "settings_features";
     public static final String KEY_FEATURES_CAMERA_UPLOAD = "settings_features_camera_upload";
     public static final String KEY_FEATURES_CHAT = "settings_features_chat";
     public static final String CATEGORY_STORAGE = "settings_storage";
@@ -17,6 +18,8 @@ public class SettingsConstants {
     public static final String KEY_HELP_SEND_FEEDBACK = "settings_help_send_feedback";
     public static final String CATEGORY_ABOUT = "settings_about";
     public static final String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
+    public static final String KEY_ABOUT_COOKIE_POLICY = "settings_about_cookie_policy";
+    public static final String KEY_COOKIE_SETTINGS = "settings_cookie";
     public static final String KEY_ABOUT_TOS = "settings_about_terms_of_service";
     public static final String KEY_ABOUT_GDPR = "settings_about_gdpr";
     public static final String KEY_ABOUT_CODE_LINK = "settings_about_code_link";
@@ -95,4 +98,13 @@ public class SettingsConstants {
 
     /* Advance settings  */
     public static final String KEY_HTTPS_ONLY = "settings_use_https_only";
+
+    /* Cookie settings  */
+    public static final String KEY_COOKIE_ACCEPT = "settings_cookie_accept";
+    public static final String KEY_COOKIE_ESSENTIAL = "settings_cookie_essential";
+    public static final String KEY_COOKIE_PREFERENCE = "settings_cookie_preference";
+    public static final String KEY_COOKIE_ANALYTICS = "settings_cookie_performance_analytics";
+    public static final String KEY_COOKIE_ADVERTISING = "settings_cookie_advertising";
+    public static final String KEY_COOKIE_THIRD_PARTY = "settings_cookie_third_party";
+    public static final String KEY_COOKIE_POLICIES = "setting_cookie_policies";
 }

@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.PermissionUtils;
+import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -182,6 +183,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (!adapterList.isMultipleSelect()) {
             adapterList.setMultipleSelect(true);
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+            bannerContainer.setVisibility(View.GONE);
         }
     }
 
@@ -818,6 +820,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 adapterList.selectAll();
 
                 actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
+                bannerContainer.setVisibility(View.GONE);
             }
 
             new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
@@ -1749,6 +1752,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             } else if (context instanceof ArchivedChatsActivity) {
                 ((ArchivedChatsActivity) context).changeStatusBarColor(0);
             }
+
+            if(showInviteBanner()) {
+                bannerContainer.setVisibility(View.VISIBLE);
+            }
         }
 
         @Override
@@ -1867,7 +1874,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     private void loadMegaContacts() {
-        contactGetter.getMegaContacts(megaApi, MegaContactGetter.DAY);
+        contactGetter.getMegaContacts(megaApi, TimeUtils.DAY);
     }
 
     class FilterChatsTask extends AsyncTask<String, Void, Void> {

@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -45,6 +46,7 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.scaleHeightPx
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -256,7 +258,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (args.rootFolderOnly) {
             binding.offlineBrowserList.addItemDecoration(
-                SimpleDividerItemDecoration(requireContext(), resources.displayMetrics)
+                SimpleDividerItemDecoration(requireContext())
             )
         } else {
             listDivider = PositionDividerItemDecoration(requireContext(), resources.displayMetrics)
@@ -275,7 +277,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             logError("Exception formatting string", e)
         }
 
-        binding.emptyHintText.text = Util.getSpannedHtmlText(textToShow)
+        binding.emptyHintText.text = textToShow.toSpannedHtmlText()
     }
 
     private fun setupRecyclerView(rv: RecyclerView) {
@@ -371,7 +373,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     manager.supportActionBar?.setTitle(it)
                 } else {
                     manager.setToolbarTitleFromFullscreenOfflineFragment(
-                        it, false, !viewModel.searchMode()
+                        it, false, !viewModel.searchMode() && getItemCount() > 0
                     )
                 }
             }
@@ -713,7 +715,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             callManager {
                 it.changeActionBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
             }
-            onScrolling(Pair(this, rv.canScrollVertically(-1)))
+            LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
+                .post(Pair(this, rv.canScrollVertically(-1)))
         }
     }
 

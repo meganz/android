@@ -42,8 +42,10 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.SENT_REQUESTS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class SentRequestsFragmentLollipop extends Fragment {
@@ -118,6 +120,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.sent_request_action, menu);
+			((ManagerActivityLollipop) context).hideTabs(true, SENT_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
@@ -128,6 +131,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		public void onDestroyActionMode(ActionMode arg0) {
 			clearSelections();
 			adapterList.setMultipleSelect(false);
+			((ManagerActivityLollipop) context).hideTabs(false, SENT_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
@@ -193,10 +197,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 		}
 		List<MegaContactRequest> users = adapterList.getSelectedRequest();
 
-		Resources res = getResources();
-		String format = "%d %s";
-
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_request, users.size())));
+		actionMode.setTitle(getQuantityString(R.plurals.general_num_request, users.size(), users.size()));
 
 		try {
 			actionMode.invalidate();
@@ -352,7 +353,7 @@ public class SentRequestsFragmentLollipop extends Fragment {
 			listView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 	        listView.setClipToPadding(false);;
 			
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());

@@ -1,13 +1,14 @@
 package mega.privacy.android.app.listeners;
 
 import android.content.Intent;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import java.util.ArrayList;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
-import mega.privacy.android.app.fragments.homepage.EventNotifierKt;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -53,7 +54,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
-                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetAttrUserListener(megaApplication));
+                logDebug("Get CU attribute when change on other client.");
+                api.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(megaApplication));
                 break;
             }
 
@@ -84,7 +86,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
     private void notifyNotificationCountChange(MegaApiJava api) {
         ArrayList<MegaContactRequest> incomingContactRequests = api.getIncomingContactRequests();
-        EventNotifierKt.notifyNotificationCountChange(api.getNumUnreadUserAlerts()
+        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Integer.class).post(api.getNumUnreadUserAlerts()
                 + (incomingContactRequests == null ? 0 : incomingContactRequests.size()));
     }
 
@@ -191,6 +193,12 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
             case MegaEvent.EVENT_BUSINESS_STATUS:
                 megaApplication.updateBusinessStatus();
+
+                break;
+
+            case MegaEvent.EVENT_MISC_FLAGS_READY:
+                megaApplication.setCookieBannerEnabled(api.isCookieBannerEnabled());
+                megaApplication.checkEnabledCookies();
 
                 break;
         }

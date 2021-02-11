@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -456,7 +455,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		emptyTextView.setText(HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY));
 
 		listView = findViewById(R.id.file_storage_list_view);
-		listView.addItemDecoration(new SimpleDividerItemDecoration(this, getOutMetrics()));
+		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
@@ -603,6 +602,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 		}
 
+		logDebug("Request SD card write permission with intent: " + intent);
 		startActivityForResult(intent, REQUEST_CODE_TREE);
 	}
 
@@ -747,24 +747,9 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				files++;
 			}
 		}
-		
-		Resources res = this.getResources();
-		String format = "%d %s";
-		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = foldersStr + ", " + filesStr;
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}
-		actionMode.setTitle(title);
+
+		actionMode.setTitle(getFolderInfo(folders, files));
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -1300,8 +1285,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			dbH.setSDCardUri(treeUri.toString());
-
 			SDCardOperator sdCardOperator = null;
 			try {
 				sdCardOperator = new SDCardOperator(this);
@@ -1315,30 +1298,36 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				return;
 			}
 
-			if (isBasedOnFileStorage()) {
-				sdRoot = sdCardOperator.getSDCardRoot();
-				openSDCardPath();
-			} else {
-				String pathString = getFullPathFromTreeUri(treeUri, this);
-				if (isTextEmpty(pathString)) {
-					logWarning("getFullPathFromTreeUri is Null.");
-					return;
-				}
+            String uriString = treeUri.toString();
+            if (isBasedOnFileStorage()) {
+                // The uri is SD card root uri.
+                dbH.setSDCardUri(uriString);
+                sdRoot = sdCardOperator.getSDCardRoot();
+                openSDCardPath();
+            } else {
+                String pathString = getFullPathFromTreeUri(treeUri, this);
 
-				path = new File(pathString);
+                if (isTextEmpty(pathString)) {
+                    logWarning("getFullPathFromTreeUri is Null.");
+                    return;
+                }
 
-				if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-					dbH.setCameraFolderExternalSDCard(true);
-					dbH.setUriExternalSDCard(treeUri.toString());
-				} else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-					dbH.setMediaFolderExternalSdCard(true);
-					dbH.setUriMediaExternalSdCard(treeUri.toString());
-				}
+                path = new File(pathString);
 
-				finishPickFolder();
-			}
-		}
-	}
+                if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
+                    dbH.setCameraFolderExternalSDCard(true);
+                    dbH.setUriExternalSDCard(uriString);
+                } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
+                    dbH.setMediaFolderExternalSdCard(true);
+                    dbH.setUriMediaExternalSdCard(uriString);
+                } else {
+                    dbH.setSDCardUri(uriString);
+                }
+
+                finishPickFolder();
+            }
+        }
+    }
 
 	/**
 	 * Shows a warning indicating no SD card was detected.

@@ -74,6 +74,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CONTACTS_TAB;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -676,6 +677,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
+			((ManagerActivityLollipop) context).hideTabs(true, CONTACTS_TAB);
 			((ManagerActivityLollipop)context).hideFabButton();
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
@@ -687,6 +689,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			((ManagerActivityLollipop) context).hideTabs(false, CONTACTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
@@ -873,7 +876,7 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			recyclerView.setHasFixedSize(true);
 			LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);

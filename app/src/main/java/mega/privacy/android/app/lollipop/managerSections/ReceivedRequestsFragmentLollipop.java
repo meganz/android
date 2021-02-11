@@ -42,8 +42,10 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.RECEIVED_REQUESTS_TAB;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 
 public class ReceivedRequestsFragmentLollipop extends Fragment {
 
@@ -118,6 +120,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.received_request_action, menu);
+			((ManagerActivityLollipop) context).hideTabs(true, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).hideFabButton();
 			((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ACCENT);
 			checkScroll();
@@ -128,6 +131,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		public void onDestroyActionMode(ActionMode arg0) {
             clearSelections();
 			adapterList.setMultipleSelect(false);
+			((ManagerActivityLollipop) context).hideTabs(false, RECEIVED_REQUESTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
             ((ManagerActivityLollipop) context).changeStatusBarColor(COLOR_STATUS_BAR_ZERO_DELAY);
 			checkScroll();
@@ -190,10 +194,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 		}
 		List<MegaContactRequest> users = adapterList.getSelectedRequest();
 
-		Resources res = getResources();
-		String format = "%d %s";
-
-		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_request, users.size())));
+		actionMode.setTitle(getQuantityString(R.plurals.general_num_request, users.size(), users.size()));
 
 		try {
 			actionMode.invalidate();
@@ -307,7 +308,7 @@ public class ReceivedRequestsFragmentLollipop extends Fragment {
 	        View v = inflater.inflate(R.layout.contacts_received_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
 
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
+			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
 			listView.setItemAnimator(new DefaultItemAnimator());

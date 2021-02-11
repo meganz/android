@@ -39,6 +39,11 @@ import android.util.Log;
 import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -47,6 +52,7 @@ import java.util.Locale;
 
 import dagger.hilt.android.HiltAndroidApp;
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -55,6 +61,7 @@ import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
@@ -65,9 +72,10 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
-
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.service.ads.AdsLibInitializer;
+
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -116,10 +124,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/3.8.4_347";
+	static final public String USER_AGENT = "MEGAAndroid/4.0.0_352";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static ChatManagement chatManagement;
 
 	@Inject
 	MegaApiAndroid megaApi;
@@ -127,6 +136,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	MegaChatApiAndroid megaChatApi;
 	@Inject
 	DatabaseHandler dbH;
+	@Inject
+	GetCookieSettingsUseCase getCookieSettingsUseCase;
 
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -190,6 +201,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isReactionFromKeyboard = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
+	private static boolean isCookieBannerEnabled = false;
+	private static boolean arePreferenceCookiesEnabled = false;
+	private static boolean areAdvertisingCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
 	private static boolean verifyingCredentials;
@@ -209,7 +223,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void networkAvailable() {
 		logDebug("Net available: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-		intent.putExtra("actionType", GO_ONLINE);
+		intent.putExtra(ACTION_TYPE, GO_ONLINE);
 		sendBroadcast(intent);
 	}
 
@@ -217,7 +231,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	public void networkUnavailable() {
 		logDebug("Net unavailable: Broadcast to ManagerActivity");
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE);
-		intent.putExtra("actionType", GO_OFFLINE);
+		intent.putExtra(ACTION_TYPE, GO_OFFLINE);
 		sendBroadcast(intent);
 	}
 
@@ -332,7 +346,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						megaApi.getMyChatFilesFolder(listener);
 					}
 					//Ask for MU and CU folder when App in init state
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+					logDebug("Get CU attribute on fetch nodes.");
+					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
 					//Login transfers resumption
 					TransfersManagement.enableTransfersResumption();
@@ -388,7 +403,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_GET_PRICING);
+					intent.putExtra(ACTION_TYPE, UPDATE_GET_PRICING);
 					sendBroadcast(intent);
 				}
 				else{
@@ -408,7 +423,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_PAYMENT_METHODS);
+					intent.putExtra(ACTION_TYPE, UPDATE_PAYMENT_METHODS);
 					sendBroadcast(intent);
 				}
 			}
@@ -420,7 +435,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-					intent.putExtra("actionType", UPDATE_CREDIT_CARD_SUBSCRIPTION);
+					intent.putExtra(ACTION_TYPE, UPDATE_CREDIT_CARD_SUBSCRIPTION);
 					sendBroadcast(intent);
 				}
 			}
@@ -473,7 +488,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private void sendBroadcastUpdateAccountDetails() {
 		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
-		intent.putExtra("actionType", UPDATE_ACCOUNT_DETAILS);
+		intent.putExtra(ACTION_TYPE, UPDATE_ACCOUNT_DETAILS);
 		sendBroadcast(intent);
 	}
 
@@ -731,6 +746,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        chatManagement = new ChatManagement();
 
 		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
@@ -820,6 +836,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+		AdsLibInitializer.INSTANCE.init(this);
 	}
 
 	public void askForFullAccountInfo(){
@@ -958,6 +976,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaChatApi.addChatCallListener(callListener);
 			registeredChatListeners = true;
 		}
+	}
+
+	/**
+	 * Check current enabled cookies and set the corresponding flags to true/false
+	 */
+	public void checkEnabledCookies() {
+		getCookieSettingsUseCase.get()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((cookies, throwable) -> {
+					if (throwable == null) {
+						setPreferenceCookiesEnabled(cookies.contains(CookieType.PREFERENCE));
+						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
+					}
+				});
 	}
 
 	public MegaApiAndroid getMegaApi() {
@@ -1611,6 +1644,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             }
             logDebug("Creating RTC Audio Manager");
 			removeRTCAudioManagerRingIn();
+			this.isSpeakerOn = isSpeakerOn;
 			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, callStatus);
 			startProximitySensor();
         }
@@ -1915,6 +1949,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		return transfersManagement;
 	}
 
+	public static ChatManagement getChatManagement() {
+		return chatManagement;
+	}
+
 	public static void setVerifyingCredentials(boolean verifyingCredentials) {
 		MegaApplication.verifyingCredentials = verifyingCredentials;
 	}
@@ -1941,5 +1979,29 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
+	}
+
+	public void setCookieBannerEnabled(boolean enabled) {
+		isCookieBannerEnabled = enabled;
+	}
+
+	public static boolean isCookieBannerEnabled() {
+		return isCookieBannerEnabled;
+	}
+
+	public static boolean arePreferenceCookiesEnabled() {
+		return arePreferenceCookiesEnabled;
+	}
+
+	public static void setPreferenceCookiesEnabled(boolean enabled) {
+		arePreferenceCookiesEnabled = enabled;
+	}
+
+	public static boolean areAdvertisingCookiesEnabled() {
+		return areAdvertisingCookiesEnabled;
+	}
+
+	public static void setAdvertisingCookiesEnabled(boolean enabled) {
+		areAdvertisingCookiesEnabled = enabled;
 	}
 }
