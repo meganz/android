@@ -49,7 +49,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.service.ads.GoogleAdsLoader;
@@ -123,7 +123,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 	private String mKey;
 
 	@Inject
-	CookieDialogFactory cookieDialogFactory;
+    CookieDialogHandler cookieDialogHandler;
 
 	private GoogleAdsLoader mAdsLoader;
 
@@ -252,7 +252,8 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			logWarning("url NULL");
 		}
 
-		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+		getLifecycle().addObserver(cookieDialogHandler);
+		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
 		initAdsLoader();
 	}
 

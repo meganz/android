@@ -24,6 +24,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieTy
 class CookieSettingsFragment : SettingsBaseFragment() {
 
     private val viewModel by viewModels<CookieSettingsViewModel>()
+    private var isThirdPartyDialogShowing = false
 
     private lateinit var acceptCookiesPreference: SwitchPreferenceCompat
     private lateinit var preferenceCookiesPreference: SwitchPreferenceCompat
@@ -143,11 +144,16 @@ class CookieSettingsFragment : SettingsBaseFragment() {
      * Show third party cookie information dialog.
      */
     private fun showThirdPartyInfoDialog() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
-            .setView(R.layout.dialog_cookie_thirdparty)
-            .setPositiveButton(android.R.string.yes, null)
-            .create()
-            .show()
+        if (!isThirdPartyDialogShowing) {
+            isThirdPartyDialogShowing = true
+
+            MaterialAlertDialogBuilder(requireContext(), R.style.MaterialAlertDialogStyle)
+                .setView(R.layout.dialog_cookie_thirdparty)
+                .setPositiveButton(android.R.string.yes, null)
+                .setOnDismissListener { isThirdPartyDialogShowing = false }
+                .create()
+                .show()
+        }
     }
 
     /**

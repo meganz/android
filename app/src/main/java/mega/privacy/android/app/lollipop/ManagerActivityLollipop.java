@@ -154,7 +154,7 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogFactory;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.listeners.CancelTransferListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -346,7 +346,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
 	@Inject
-	CookieDialogFactory cookieDialogFactory;
+	CookieDialogHandler cookieDialogHandler;
 
 	public int accountFragment;
 
@@ -1955,6 +1955,9 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
         if (shouldShowDialog) {
             showProcessFileDialog(this,null);
         }
+
+		getLifecycle().addObserver(cookieDialogHandler);
+
 		if(savedInstanceState!=null){
 			logDebug("Bundle is NOT NULL");
 			parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser", -1);
@@ -4760,7 +4763,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 
 		checkBeforeShowSMSVerificationDialog();
 
-		cookieDialogFactory.showDialogIfNeeded(this);
+		cookieDialogHandler.showDialogIfNeeded(this);
     }
 
     /**
