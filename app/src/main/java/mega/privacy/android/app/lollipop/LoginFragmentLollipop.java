@@ -64,6 +64,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -315,7 +316,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 et_passwordLayout.setEndIconVisible(hasFocus));
 
         bLogin = (Button) v.findViewById(R.id.button_login_login);
-        bLogin.setText(R.string.login_text);
+        bLogin.setText(StringResourcesUtils.getString(R.string.login_text));
         bLogin.setOnClickListener(this);
 
         loginInProgressPb = v.findViewById(R.id.pb_login_in_progress);
@@ -1534,8 +1535,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
  */
     public void handleConfirmationIntent(Intent intent) {
         confirmLink = intent.getStringExtra(EXTRA_CONFIRMATION);
-        loginTitle.setText(R.string.login_confirm_account);
-        bLogin.setText(R.string.login_confirm_account);
+        loginTitle.setText(StringResourcesUtils.getString(R.string.login_confirm_account));
+        bLogin.setText(StringResourcesUtils.getString(R.string.login_confirm_account));
         updateConfirmEmail(confirmLink);
     }
 
@@ -2062,8 +2063,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     bForgotPass.setVisibility(View.VISIBLE);
                     loginProgressBar.setVisibility(View.GONE);
 
-                    loginTitle.setText(R.string.login_to_mega);
-                    bLogin.setText(R.string.login_text);
+                    loginTitle.setText(StringResourcesUtils.getString(R.string.login_to_mega));
+                    bLogin.setText(StringResourcesUtils.getString(R.string.login_text));
                     confirmLink = null;
                     ((LoginActivityLollipop)context).showSnackbar(getString(R.string.account_confirmed));
                     accountConfirmed = true;
