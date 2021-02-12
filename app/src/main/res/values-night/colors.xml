@@ -176,6 +176,9 @@
     <!-- Same to colorSecondary -->
     <color name="teal_300_teal_200">@color/teal_200</color>
 
+    <!-- Error text highlight color (selection background) -->
+    <color name="teal_100_teal_050">@color/teal_050</color>
+
     <!-- Turn on notification screen background -->
     <color name="teal_500_teal_400">@color/teal_400</color>
 

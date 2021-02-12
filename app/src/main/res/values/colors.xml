@@ -65,6 +65,8 @@
     <color name="grey_alpha_070">#B3000000</color>
     <color name="grey_alpha_087">#DD000000</color>
 
+    <color name="teal_050">#DCF4F0</color>
+    <color name="teal_100">#A9E3D8</color>
     <color name="teal_200">#6DD2BF</color>
     <color name="teal_300">#00BFA5</color>
     <color name="teal_400">#00B092</color>
@@ -326,6 +328,9 @@
 
     <!-- Same to colorSecondary -->
     <color name="teal_300_teal_200">@color/teal_300</color>
+
+    <!-- Error text highlight color (selection background) -->
+    <color name="teal_100_teal_050">@color/teal_100</color>
 
     <!-- Turn on notification screen background -->
     <color name="teal_500_teal_400">@color/teal_500</color>

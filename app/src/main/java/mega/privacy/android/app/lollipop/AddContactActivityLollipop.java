@@ -228,7 +228,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
     private String confirmDeleteMail;
 
     private RelativeLayout mailError;
-    private Drawable editTextBackground;
     private RelativeLayout typeContactLayout;
     private EditText typeContactEditText;
     private RelativeLayout scanQRButton;
@@ -1633,7 +1632,6 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp2px(40, outMetrics));
             typeContactLayout.setLayoutParams(params1);
         }
-        editTextBackground = typeContactEditText.getBackground().mutate().getConstantState().newDrawable();
         typeContactEditText.addTextChangedListener(this);
         typeContactEditText.setOnEditorActionListener(this);
         typeContactEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -2008,10 +2006,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             typeContactEditText.setLayoutParams(params);
         }
         mailError.setVisibility(View.VISIBLE);
-        PorterDuffColorFilter porterDuffColorFilter = new PorterDuffColorFilter(ContextCompat.getColor(this, R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-        Drawable background = editTextBackground.mutate().getConstantState().newDrawable();
-        background.setColorFilter(porterDuffColorFilter);
-        typeContactEditText.setBackground(background);
+
+        ColorUtils.setErrorAwareInputAppearance(typeContactEditText, true);
     }
 
     private void quitError(){
@@ -2024,7 +2020,8 @@ public class AddContactActivityLollipop extends PinActivityLollipop implements V
             params.setMargins(dp2px(18, outMetrics), dp2px(0, outMetrics), dp2px(18, outMetrics), 0);
             typeContactEditText.setLayoutParams(params);
         }
-        typeContactEditText.setBackground(editTextBackground);
+
+        ColorUtils.setErrorAwareInputAppearance(typeContactEditText, false);
     }
 
     private void addShareContact (ShareContactInfo contact) {

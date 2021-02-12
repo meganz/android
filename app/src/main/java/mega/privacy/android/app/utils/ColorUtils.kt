@@ -78,7 +78,9 @@ object ColorUtils {
 
     @JvmStatic
     fun setEditTextUnderlineColor(editText: EditText, @ColorRes color: Int) {
-        doSetEditTextUnderlineColor(editText, false, ContextCompat.getColor(editText.context, color))
+        doSetEditTextUnderlineColor(
+            editText, false, ContextCompat.getColor(editText.context, color)
+        )
     }
 
     @JvmStatic
@@ -161,5 +163,26 @@ object ColorUtils {
     ) {
         if (!Util.isDarkMode(context) || alpha < 0f || alpha > 1f) return
         imageView.imageAlpha = (255 * alpha).roundToInt()
+    }
+
+    /**
+     * Set appearance (text color, underline color, highlight color) for an error aware text input.
+     *
+     * @param editText the text input
+     * @param error whether it's in error state
+     */
+    @JvmStatic
+    fun setErrorAwareInputAppearance(editText: EditText, error: Boolean) {
+        if (error) {
+            editText.setTextColor(getThemeColor(editText.context, R.attr.colorError))
+            setEditTextUnderlineColorAttr(editText, R.attr.colorError)
+            editText.highlightColor =
+                ContextCompat.getColor(editText.context, R.color.teal_100_teal_050)
+        } else {
+            editText.setTextColor(getThemeColor(editText.context, android.R.attr.textColorPrimary))
+            resetEditTextUnderlineColor(editText)
+            editText.highlightColor =
+                getThemeColor(editText.context, android.R.attr.textColorHighlight)
+        }
     }
 }

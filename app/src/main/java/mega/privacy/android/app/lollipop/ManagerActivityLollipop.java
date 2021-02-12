@@ -56,7 +56,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuItemCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
@@ -284,7 +283,6 @@ import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_F
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.service.iab.BillingManagerImpl.PAYMENT_GATEWAY;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.TEMPORAL_FOLDER;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -9362,8 +9360,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		if (openLinkDialog != null) {
 			if (show) {
 				openLinkDialogIsErrorShown = true;
-				openLinkText.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorError));
-				ColorUtils.setEditTextUnderlineColorAttr(openLinkText, R.attr.colorError);
+				ColorUtils.setErrorAwareInputAppearance(openLinkText, true);
 				openLinkError.setVisibility(View.VISIBLE);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 					if (openLinkText.getText().toString().isEmpty()) {
@@ -9402,9 +9399,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			else {
 				openLinkDialogIsErrorShown = false;
 				if (openLinkError.getVisibility() == View.VISIBLE) {
-					openLinkText.setTextColor(ColorUtils.getThemeColor(this,
-							android.R.attr.textColorPrimary));
-					ColorUtils.resetEditTextUnderlineColor(openLinkText);
+					ColorUtils.setErrorAwareInputAppearance(openLinkText, false);
 					openLinkError.setVisibility(View.GONE);
 					openLinkOpenButton.setText(R.string.context_open_link);
 				}
@@ -9773,7 +9768,7 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 			public void afterTextChanged(Editable editable) {
 				if (errorLayout.getVisibility() == View.VISIBLE) {
 					errorLayout.setVisibility(View.GONE);
-					ColorUtils.resetEditTextUnderlineColor(input);
+					ColorUtils.setErrorAwareInputAppearance(input, false);
 				}
 			}
 		});
@@ -9781,21 +9776,18 @@ public class ManagerActivityLollipop extends SorterContentActivity implements Me
 		Runnable validateInput = () -> {
 			String value = input.getText().toString().trim();
 			if (value.length() == 0) {
-				ColorUtils.setEditTextUnderlineColorAttr(input, R.attr.colorError);
+				ColorUtils.setErrorAwareInputAppearance(input, true);
 				errorText.setText(getString(R.string.invalid_string));
 				errorLayout.setVisibility(View.VISIBLE);
 				input.requestFocus();
+			} else if (matches(regex, value)) {
+				ColorUtils.setErrorAwareInputAppearance(input, true);
+				errorText.setText(getString(R.string.invalid_characters));
+				errorLayout.setVisibility(View.VISIBLE);
+				input.requestFocus();
 			} else {
-				boolean result = matches(regex, value);
-				if (result) {
-					ColorUtils.setEditTextUnderlineColorAttr(input, R.attr.colorError);
-					errorText.setText(getString(R.string.invalid_characters));
-					errorLayout.setVisibility(View.VISIBLE);
-					input.requestFocus();
-				} else {
-					createFolder(value);
-					newFolderDialog.dismiss();
-				}
+				createFolder(value);
+				newFolderDialog.dismiss();
 			}
 		};
 

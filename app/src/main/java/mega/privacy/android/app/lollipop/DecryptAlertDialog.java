@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -206,8 +204,7 @@ public class DecryptAlertDialog extends DialogFragment {
 
         mEdit.setText(mKey);
         mEdit.setSelectAllOnFocus(true);
-        mEdit.setTextColor(ColorUtils.getThemeColor(mContext, R.attr.colorError));
-        ColorUtils.setEditTextUnderlineColorAttr(mEdit, R.attr.colorError);
+        ColorUtils.setErrorAwareInputAppearance(mEdit, true);
 
         mErrorView.setVisibility(View.VISIBLE);
     }
@@ -216,9 +213,7 @@ public class DecryptAlertDialog extends DialogFragment {
         if (mEdit == null || mErrorView == null) return;
 
         mErrorView.setVisibility(View.GONE);
-        mEdit.setTextColor(ContextCompat.getColor(mContext, R.color.grey_087_white_087));
-        mEdit.getBackground().mutate().clearColorFilter();
-        mEdit.getBackground().mutate().setColorFilter(ColorUtils.getThemeColor(mContext, R.attr.colorSecondary), PorterDuff.Mode.SRC_ATOP);
+        ColorUtils.setErrorAwareInputAppearance(mEdit, false);
     }
 
     private boolean validateInput() {
