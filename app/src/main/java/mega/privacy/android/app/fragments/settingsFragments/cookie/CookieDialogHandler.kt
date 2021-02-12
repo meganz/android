@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.CheckCookieBannerEnabledUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.ContextUtils.isValid
@@ -29,7 +30,8 @@ import javax.inject.Inject
  */
 class CookieDialogHandler @Inject constructor(
     private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
-    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase
+    private val updateCookieSettingsUseCase: UpdateCookieSettingsUseCase,
+    private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase
 ) : LifecycleObserver {
 
     private val disposable = CompositeDisposable()
@@ -41,20 +43,21 @@ class CookieDialogHandler @Inject constructor(
      * @param context   View context for the Dialog to be shown.
      */
     fun showDialogIfNeeded(context: Context) {
-        if (MegaApplication.isCookieBannerEnabled()) {
-            getCookieSettingsUseCase.shouldShowDialog()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { showDialog ->
-                        if (showDialog) createDialog(context)
-                    },
-                    onError = { error ->
-                        LogUtil.logError(error.message)
-                    }
-                )
-                .addTo(disposable)
-        }
+        disposable.clear()
+
+        checkCookieBannerEnabledUseCase.check()
+            .concatMap { getCookieSettingsUseCase.shouldShowDialog() }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { showDialog ->
+                    if (showDialog) createDialog(context)
+                },
+                onError = { error ->
+                    LogUtil.logError(error.message)
+                }
+            )
+            .addTo(disposable)
     }
 
     private fun createDialog(context: Context) {
@@ -64,19 +67,7 @@ class CookieDialogHandler @Inject constructor(
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
             .setPositiveButton(R.string.preference_cookies_accept) { _, _ ->
-                updateCookieSettingsUseCase.acceptAll()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onComplete = {
-                            if (context.isValid()) {
-                                (context.applicationContext as MegaApplication).checkEnabledCookies()
-                            }
-                        },
-                        onError = { error ->
-                            LogUtil.logError(error.message)
-                        }
-                    )
+                acceptAllCookies(context)
             }
             .setNegativeButton(R.string.settings_about_cookie_settings) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
@@ -95,6 +86,22 @@ class CookieDialogHandler @Inject constructor(
                     }
                 }
             }.also { it.show() }
+    }
+
+    private fun acceptAllCookies(context: Context) {
+        updateCookieSettingsUseCase.acceptAll()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    if (context.isValid()) {
+                        (context.applicationContext as MegaApplication).checkEnabledCookies()
+                    }
+                },
+                onError = { error ->
+                    LogUtil.logError(error.message)
+                }
+            )
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)

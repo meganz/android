@@ -9,6 +9,9 @@ import nz.mega.sdk.*
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * Use Case to update cookie settings on SDK
+ */
 class UpdateCookieSettingsUseCase @Inject constructor(
     private val megaApi: MegaApiAndroid
 ) {
