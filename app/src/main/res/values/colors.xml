@@ -11,6 +11,7 @@
     <color name="white_alpha_009">#16FFFFFF</color>
     <color name="white_alpha_012">#1EFFFFFF</color>
     <color name="white_alpha_015">#26FFFFFF</color>
+    <color name="white_alpha_016">#29FFFFFF</color>
     <color name="white_alpha_018">#2EFFFFFF</color>
     <color name="white_alpha_020">#33FFFFFF</color>
     <color name="white_alpha_023">#3AFFFFFF</color>
@@ -52,7 +53,7 @@
     <color name="grey_alpha_005">#0D000000</color>
     <color name="grey_alpha_006">#0F000000</color>
     <color name="grey_alpha_012">#1E000000</color>
-    <color name="grey_alpha_015">#26000000</color>
+    <color name="grey_alpha_016">#29000000</color>
     <color name="grey_alpha_020">#33000000</color>
     <color name="grey_alpha_026">#42000000</color>
     <color name="grey_alpha_033">#54000000</color>
@@ -196,6 +197,9 @@
 
     <!-- Drawer item disabled text color, same to textColorHint  -->
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
+
+    <!-- Bottom navigation menu disabled tint color  -->
+    <color name="grey_016_white_016">@color/grey_alpha_016</color>
 
     <!-- Record voice clip audio level indicator -->
     <color name="white_045_grey_045">@color/white_alpha_045</color>

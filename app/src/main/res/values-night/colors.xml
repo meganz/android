@@ -32,6 +32,9 @@
     <!-- Drawer item disabled text color  -->
     <color name="grey_038_white_038">@color/white_alpha_038</color>
 
+    <!-- Bottom navigation menu disabled tint color  -->
+    <color name="grey_016_white_016">@color/white_alpha_016</color>
+
     <!-- Record voice clip audio level indicator -->
     <color name="white_045_grey_045">@color/grey_alpha_045</color>
 
