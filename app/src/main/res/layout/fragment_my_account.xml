@@ -233,18 +233,14 @@
                             android:id="@+id/my_account_account_upgrade_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true">
+                            android:layout_alignParentEnd="true">
 
                             <Button
                                 android:id="@+id/my_account_account_type_button"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
                                 style="@style/Widget.Mega.Button.Variant1"
-                                android:minHeight="0dp"
                                 android:text="@string/my_account_upgrade_pro" />
-                            />
 
                         </RelativeLayout>
 
@@ -422,13 +418,9 @@
                     style="?attr/materialButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="2dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
+                    android:layout_marginStart="2dp"
                     android:layout_marginTop="16dp"
                     android:elevation="@dimen/elevation_upgrade_low"
-                    android:minHeight="0dp"
                     android:text="@string/action_export_master_key" />
 
                 <Button
@@ -436,13 +428,9 @@
                     style="@style/Widget.Mega.Button.Variant2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:layout_marginLeft="2dp"
+                    android:layout_marginStart="2dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:minHeight="0dp"
                     android:text="@string/my_account_change_password" />
 
                 <LinearLayout
@@ -549,10 +537,7 @@
                                 style="@style/Widget.Mega.Button.Variant3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
                                 android:layout_centerVertical="true"
-                                android:minHeight="0dp"
                                 android:text="@string/action_logout" />
 
                         </RelativeLayout>

@@ -190,7 +190,7 @@
     </style>
 
     <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
-    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton"></style>
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton"/>
 
     <!-- My Account "CHANGE PASSWORD" Button, solid white in Light, outlined in Dark -->
     <style name="Widget.Mega.Button.Variant2">
