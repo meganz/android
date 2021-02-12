@@ -1690,9 +1690,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
                 case R.id.chat_list_leave_chat_layout: {
                     //Leave group chat
-                    ((ManagerActivityLollipop) context).showConfirmationLeaveChats(chats);
-                    clearSelections();
-                    hideMultipleSelect();
+                    showConfirmationLeaveChats(context, chats, ((ManagerActivityLollipop) context));
                     break;
                 }
             }

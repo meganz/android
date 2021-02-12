@@ -50,6 +50,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
@@ -1241,5 +1242,25 @@ public class ChatUtil {
             retentionTimeText.setText(subtitleText);
             retentionTimeText.setVisibility(View.VISIBLE);
         }
+    }
+
+    public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+                        -> chatManagementCallback.confirmLeaveChat(chatId))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
+    }
+
+    public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+                        -> chatManagementCallback.confirmLeaveChats(chats))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
     }
 }
