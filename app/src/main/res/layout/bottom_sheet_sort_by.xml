@@ -77,7 +77,7 @@
             android:paddingEnd="16dp"
             android:text="@string/sort_by_smallest_size"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_sort_largest"
+            app:drawableStartCompat="@drawable/ic_sort_smallest"
             app:drawableTint="?android:attr/textColorSecondary" />
 
         <View
