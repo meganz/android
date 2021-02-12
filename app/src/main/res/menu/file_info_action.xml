@@ -6,7 +6,6 @@
         android:icon="@drawable/ic_download_white"
         android:orderInCategory="95"
         android:title="@string/general_save_to_device"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
@@ -15,7 +14,6 @@
         android:orderInCategory="100"
         android:title="@string/context_share_folder"
         android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
@@ -23,7 +21,6 @@
         android:icon="@drawable/link_ic_white"
         android:orderInCategory="100"
         android:title="@string/context_get_link_menu"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
@@ -31,7 +28,6 @@
         android:icon="@drawable/ic_send_to_contact"
         android:orderInCategory="115"
         android:title="@string/context_send_file_to_chat"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
@@ -45,7 +41,6 @@
         android:icon="@drawable/ic_remove_link"
         android:orderInCategory="100"
         android:title="@string/context_remove_link_menu"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
@@ -65,7 +60,6 @@
         android:icon="@drawable/ic_copy_white"
         android:orderInCategory="110"
         android:title="@string/context_copy"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
@@ -79,7 +73,6 @@
         android:icon="@drawable/ic_leave_share_w"
         android:orderInCategory="100"
         android:title="@string/general_leave"
-        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item

@@ -190,7 +190,7 @@ class OfflineFileInfoFragment : Fragment() {
             ContextCompat.getColor(
                 requireContext(),
                 R.color.grey_087_white_087
-            ), PorterDuff.Mode.SRC_ATOP
+            ), PorterDuff.Mode.SRC_IN
         )
         binding.toolbar.navigationIcon = upArrow
     }
@@ -200,7 +200,7 @@ class OfflineFileInfoFragment : Fragment() {
             ContextCompat.getColor(
                 requireContext(),
                 R.color.white_alpha_087
-            ), PorterDuff.Mode.SRC_ATOP
+            ), PorterDuff.Mode.SRC_IN
         )
         binding.toolbar.navigationIcon = upArrow
     }

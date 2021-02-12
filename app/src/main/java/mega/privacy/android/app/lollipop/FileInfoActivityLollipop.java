@@ -1184,76 +1184,76 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	void setColorFilterBlack () {
         int color = getResources().getColor(R.color.grey_087_white_087);
-        upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
-        drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         toolbar.setOverflowIcon(drawableDots);
 
         if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             removeLinkMenuItem.setIcon(drawableRemoveLink);
         }
         if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             getLinkMenuItem.setIcon(drawableLink);
         }
         if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             downloadMenuItem.setIcon(drawableDownload);
         }
         if (shareMenuItem != null) {
-            drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             shareMenuItem.setIcon(drawableShare);
         }
         if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             leaveMenuItem.setIcon(drawableLeave);
         }
         if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             copyMenuItem.setIcon(drawableCopy);
         }
         if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             sendToChatMenuItem.setIcon(drawableChat);
         }
     }
 
     void setColorFilterWhite () {
         int color = getResources().getColor(R.color.white_alpha_087);
-        upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
-        drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_IN);
         toolbar.setOverflowIcon(drawableDots);
 
         if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             removeLinkMenuItem.setIcon(drawableRemoveLink);
         }
         if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             getLinkMenuItem.setIcon(drawableLink);
         }
         if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             downloadMenuItem.setIcon(drawableDownload);
         }
         if (shareMenuItem != null) {
-            drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             shareMenuItem.setIcon(drawableShare);
         }
         if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             leaveMenuItem.setIcon(drawableLeave);
         }
         if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             copyMenuItem.setIcon(drawableCopy);
         }
         if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_IN);
             sendToChatMenuItem.setIcon(drawableChat);
         }
     }
@@ -2042,7 +2042,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		error_layout.setVisibility(View.GONE);
 
 		input.getBackground().mutate().clearColorFilter();
-		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_600), PorterDuff.Mode.SRC_ATOP);
+		input.getBackground().mutate().setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_600), PorterDuff.Mode.SRC_IN);
 		input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -2058,8 +2058,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			public void afterTextChanged(Editable editable) {
 				if(error_layout.getVisibility() == View.VISIBLE){
 					error_layout.setVisibility(View.GONE);
-					input.getBackground().mutate().clearColorFilter();
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.teal_300_teal_600), PorterDuff.Mode.SRC_ATOP);
+                    ColorUtils.setErrorAwareInputAppearance(input, false);
 				}
 			}
 		});
@@ -2071,7 +2070,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
-						input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
+					    ColorUtils.setErrorAwareInputAppearance(input, true);
 						textError.setText(getString(R.string.invalid_string));
 						error_layout.setVisibility(View.VISIBLE);
 						input.requestFocus();
@@ -2113,7 +2112,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 			{
 				String value = input.getText().toString().trim();
 				if (value.length() == 0) {
-					input.getBackground().mutate().setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
+                    ColorUtils.setErrorAwareInputAppearance(input, true);
 					textError.setText(getString(R.string.invalid_string));
 					error_layout.setVisibility(View.VISIBLE);
 					input.requestFocus();
