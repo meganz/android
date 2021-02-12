@@ -67,6 +67,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -97,12 +99,14 @@ import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.KeepAliveService;
+import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
+import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -132,6 +136,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMes
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.FileUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -188,7 +193,10 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ChatActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener, StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>> {
+public class ChatActivityLollipop extends PinActivityLollipop
+        implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
+        MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
+        StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -537,6 +545,23 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         return false;
     }
 
+    @Override
+    public void confirmLeaveChat(long chatId) {
+        stopReproductions();
+        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.leaving_label));
+        megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this, this));
+    }
+
+    @Override
+    public void confirmLeaveChats(@NotNull List<? extends MegaChatListItem> chats) {
+        // No option available to leave more than one chat here.
+    }
+
+    @Override
+    public void leaveChatSuccess() {
+        joiningOrLeaving = false;
+    }
+
     private class UserTyping {
         MegaChatParticipant participantTyping;
         long timeStampTyping;
@@ -705,7 +730,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
     };
 
-    private BroadcastReceiver leftChatReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver leftChatReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null)
@@ -714,9 +739,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             if (intent.getAction().equals(ACTION_LEFT_CHAT)) {
                 long extraIdChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
                 if (extraIdChat != MEGACHAT_INVALID_HANDLE) {
-                    chatC.leaveChat(extraIdChat);
+                    megaChatApi.leaveChat(extraIdChat, new RemoveFromChatRoomListener(chatActivity, chatActivity));
+
                     if (idChat == extraIdChat) {
-                        setJoiningOrLeaving(getString(R.string.leaving_label));
+                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.leaving_label));
                     }
                 }
             }
@@ -1314,7 +1340,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                     if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         openingAndJoining = true;
-                        setJoiningOrLeaving(getString(R.string.joining_label));
+                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
                     }
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -1545,7 +1571,9 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (!initChat()) {
             return;
         }
+
         initializeInputText();
+        checkIfIsAlreadyJoiningOrLeaving();
 
         int chatConnection = megaChatApi.getChatConnectionState(idChat);
         logDebug("Chat connection (" + idChat + ") is: " + chatConnection);
@@ -1633,6 +1661,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
      * It controls if it is the real first time, or the device was rotated with the "isTurn" flag.
      */
     public void loadHistory() {
+        if (chatRoom == null) {
+            return;
+        }
+
         long unreadCount = chatRoom.getUnreadCount();
         lastSeenReceived = unreadCount == 0;
 
@@ -2370,9 +2402,12 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if (chatC.isInAnonymousMode()) {
             Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
             if (pendingJoin && getIntent() != null && getIntent().getDataString() != null) {
+                String link = getIntent().getDataString();
+
+                MegaApplication.getChatManagement().setPendingJoinLink(link);
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
                 loginIntent.setAction(ACTION_JOIN_OPEN_CHAT_LINK);
-                loginIntent.setData(Uri.parse(getIntent().getDataString()));
+                loginIntent.setData(Uri.parse(link));
             } else {
                 loginIntent.putExtra(VISIBLE_FRAGMENT,  TOUR_FRAGMENT);
             }
@@ -2475,7 +2510,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 if(recordView.isRecordingNow()) break;
 
                 logDebug("Leave selected!");
-                showConfirmationLeaveChat(chatRoom);
+                showConfirmationLeaveChat(chatActivity, chatRoom.getChatId(), chatActivity);
                 break;
             }
             case R.id.cab_menu_archive_chat:{
@@ -3583,41 +3618,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         openCameraApp();
     }
 
-    public void showConfirmationLeaveChat (final MegaChatRoom c){
-        logDebug("showConfirmationLeaveChat");
-
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE: {
-                        stopReproductions();
-
-                        setJoiningOrLeaving(getString(R.string.leaving_label));
-                        ChatController chatC = new ChatController(chatActivity);
-                        chatC.leaveChat(c);
-                        break;
-                    }
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            }
-        };
-
-        androidx.appcompat.app.AlertDialog.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        }
-        else{
-            builder = new AlertDialog.Builder(this);
-        }
-        builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
-        String message= getResources().getString(R.string.confirmation_leave_group_chat);
-        builder.setMessage(message).setPositiveButton(R.string.general_leave, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-    }
-
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
@@ -3796,10 +3796,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
             case R.id.join_button:
                 if (chatC.isInAnonymousMode()) {
                     ifAnonymousModeLogin(true);
-                } else {
-                    setJoiningOrLeaving(getString(R.string.joining_label));
+                } else if (!isAlreadyJoining(idChat)) {
+                    setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
+
                 break;
 
 		}
@@ -5911,7 +5912,8 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         if(!pendingMessagesLoaded){
             pendingMessagesLoaded = true;
             loadPendingMessages();
-            if(positionToScroll<=0){
+
+            if (positionToScroll <= 0) {
                 mLayoutManager.scrollToPosition(messages.size());
             }
         }
@@ -6022,9 +6024,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         checkMegaLink(msg);
-
-//        mLayoutManager.setStackFromEnd(true);
-//        mLayoutManager.scrollToPosition(0);
     }
     public void sendToDownload(MegaNodeList nodelist){
         logDebug("sendToDownload");
@@ -7528,24 +7527,17 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     logError("Error putting the call on hold" + e.getErrorCode());
                 }
 
-        }else if(request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM){
-            logDebug("Remove participant: " + request.getUserHandle() + " my user: " + megaChatApi.getMyUserHandle());
+       } else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
+           logDebug("Remove participant: " + request.getUserHandle() + " my user: " + megaChatApi.getMyUserHandle());
 
-            if (request.getUserHandle() == INVALID_HANDLE) {
-                joiningOrLeaving = false;
-            }
-
-            if(e.getErrorCode()==MegaChatError.ERROR_OK){
-                logDebug("Participant removed OK");
-                invalidateOptionsMenu();
-
-            }
-            else{
-                logError("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
-                showSnackbar(SNACKBAR_TYPE, getTranslatedErrorString(e), MEGACHAT_INVALID_HANDLE);
-            }
-
-        } else if(request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE){
+           if (e.getErrorCode() == MegaChatError.ERROR_OK) {
+               logDebug("Participant removed OK");
+               invalidateOptionsMenu();
+           } else {
+               logError("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM " + e.getErrorString());
+               showSnackbar(SNACKBAR_TYPE, getTranslatedErrorString(e), MEGACHAT_INVALID_HANDLE);
+           }
+       } else if (request.getType() == MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE) {
             removeProgressDialog();
 
             disableMultiselection();
@@ -7608,7 +7600,10 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 MegaApplication.setOpenChatId(idChat);
 
                 if (e.getErrorCode() == MegaChatError.ERROR_OK && openingAndJoining) {
-                    megaChatApi.autojoinPublicChat(idChat, this);
+                    if (!isAlreadyJoining(idChat)) {
+                        megaChatApi.autojoinPublicChat(idChat, this);
+                    }
+
                     openingAndJoining = false;
                 } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
                     if (megaChatApi.getChatRoom(idChat).isActive()) {
@@ -7618,17 +7613,22 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     } else {
                         if (initChat()) {
                             //Chat successfully initialized, now can rejoin
-                            setJoiningOrLeaving(getString(R.string.joining_label));
+                            setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
                             titleToolbar.setText(chatRoom.getTitle());
                             groupalSubtitleToolbar.setText(null);
                             setGroupalSubtitleToolbarVisibility(false);
+
                             if (adapter == null) {
                                 createAdapter();
                             } else {
                                 adapter.updateChatRoom(chatRoom);
                                 adapter.notifyDataSetChanged();
                             }
-                            megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+
+                            if (!isAlreadyJoining(idChat)
+                                    && !isAlreadyJoining(request.getUserHandle())) {
+                                megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
+                            }
                         } else {
                             logWarning("Error opening chat before rejoin");
                         }
@@ -7942,6 +7942,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                     long newidChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
                     if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
                         cleanBuffers();
+                        pendingMessagesLoaded = false;
                     }
                     if (messagesPlaying != null && !messagesPlaying.isEmpty()) {
                         for (MessageVoiceClip m : messagesPlaying) {
@@ -9425,6 +9426,19 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
     }
 
     /**
+     * Checks if it is already joining or leaving the chat to set the right UI.
+     */
+    private void checkIfIsAlreadyJoiningOrLeaving() {
+        if (MegaApplication.getChatManagement().isAlreadyJoining(idChat)) {
+            joiningOrLeaving = true;
+            joiningOrLeavingAction = StringResourcesUtils.getString(R.string.joining_label);
+        } else if (MegaApplication.getChatManagement().isAlreadyLeaving(idChat)) {
+            joiningOrLeaving = true;
+            joiningOrLeavingAction = StringResourcesUtils.getString(R.string.leaving_label);
+        }
+    }
+
+    /**
      * Initializes the joining or leaving UI depending on the action received.
      *
      * @param action    String which indicates if the UI to set is the joining or leaving state.
@@ -9435,6 +9449,20 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         joiningLeavingText.setText(action);
         setBottomLayout(SHOW_JOINING_OR_LEFTING_LAYOUT);
         invalidateOptionsMenu();
+    }
+
+    /**
+     * Checks if the chat is already joining before add it to the list.
+     *
+     * @return True if the chat is already joining, false otherwise.
+     */
+    private boolean isAlreadyJoining(long id) {
+        if (MegaApplication.getChatManagement().isAlreadyJoining(id)) {
+            return true;
+        }
+
+        MegaApplication.getChatManagement().addJoiningChatId(id);
+        return false;
     }
 
     public void setLastIdMsgSeen(long lastIdMsgSeen) {

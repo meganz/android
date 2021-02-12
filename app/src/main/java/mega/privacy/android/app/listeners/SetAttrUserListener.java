@@ -9,6 +9,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -87,14 +88,18 @@ public class SetAttrUserListener extends BaseListener {
 
                     long primaryHandle = request.getNodeHandle();
                     long secondaryHandle = request.getParentHandle();
+
+                    logDebug("Set CU folders successfully primary: " + primaryHandle + ", secondary: " + secondaryHandle);
                     if(primaryHandle != INVALID_HANDLE){
                         resetPrimaryTimeline();
                         dBH.setCamSyncHandle(primaryHandle);
                         prefs.setCamSyncHandle(String.valueOf(primaryHandle));
                         forceUpdateCameraUploadFolderIcon(false, primaryHandle);
                         if (context instanceof CameraUploadsService) {
+                            logDebug("Trigger on onSetFolderAttribute by set primary.");
                             ((CameraUploadsService) context).onSetFolderAttribute();
                         } else {
+                            logDebug("Start CU by set primary, try to start CU, true.");
                             JobUtil.stopRunningCameraUploadService(context);
                             JobUtil.startCameraUploadServiceIgnoreAttr(context);
                         }
@@ -106,8 +111,10 @@ public class SetAttrUserListener extends BaseListener {
                         forceUpdateCameraUploadFolderIcon(true, secondaryHandle);
                         //make sure to start the process once secondary is enabled
                         if (context instanceof CameraUploadsService) {
+                            logDebug("Trigger on onSetFolderAttribute by set secondary.");
                             ((CameraUploadsService) context).onSetFolderAttribute();
                         } else {
+                            logDebug("Start CU by set secondary, try to start CU, true.");
                             JobUtil.stopRunningCameraUploadService(context);
                             JobUtil.startCameraUploadServiceIgnoreAttr(context);
                         }
