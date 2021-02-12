@@ -6368,10 +6368,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("Checking with Msg ID: " + messageToCheck.getMessage().getMsgId()
                         + " and Msg TEMP ID: " + messageToCheck.getMessage().getTempId());
 
-                if (checkTempId && messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+                if (checkTempId && msg.getMessage().getTempId() != MEGACHAT_INVALID_HANDLE
+                        && msg.getMessage().getTempId() == messageToCheck.getMessage().getTempId()) {
                     logDebug("Modify received message with idTemp");
                     return itr.nextIndex();
-                } else if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
+                } else if (msg.getMessage().getMsgId() != MEGACHAT_INVALID_HANDLE
+                        && msg.getMessage().getMsgId() == messageToCheck.getMessage().getMsgId()) {
                     logDebug("modifyMessageReceived");
                     return itr.nextIndex();
                 }
