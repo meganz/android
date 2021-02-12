@@ -11039,9 +11039,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		logDebug("navigateToAchievements");
 		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
 		getProLayout.setVisibility(View.GONE);
-		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = MY_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
 		selectDrawerItemLollipop(drawerItem);
@@ -11060,9 +11058,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		logDebug("navigateToMyAccount");
 		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
 		getProLayout.setVisibility(View.GONE);
-		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = MY_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
 		comesFromNotifications = true;
