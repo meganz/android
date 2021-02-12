@@ -292,33 +292,32 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     public void checkScroll() {
-        if (listView != null) {
-            if (context instanceof ManagerActivityLollipop) {
-                if(bannerContainer.getVisibility() == View.GONE) {
-                    if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                        ((ManagerActivityLollipop) context).changeAppBarElevation(true);
-                    } else {
-                        ((ManagerActivityLollipop) context).changeAppBarElevation(false);
-                    }
-                } else {
-                    if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                        appBarLayout.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
-                        if (isDarkMode(context)) {
-                            ((ManagerActivityLollipop) context).changeAppBarElevation(true);
-                        }
-                    } else {
-                        appBarLayout.setElevation(0);
-                        // Reset the AppBar elevation whatever in the light and dark mode
-                        ((ManagerActivityLollipop) context).changeAppBarElevation(false);
-                    }
+        if (listView == null) {
+            return;
+        }
+
+        if (context instanceof ManagerActivityLollipop) {
+            if(bannerContainer.getVisibility() == View.GONE) {
+                ((ManagerActivityLollipop) context).changeAppBarElevation(
+                        listView.canScrollVertically(-1)
+                                || (adapterList != null && adapterList.isMultipleSelect()));
+            } else if (listView.canScrollVertically(-1)
+                    || (adapterList != null && adapterList.isMultipleSelect())
+                    || contactsListLayout.getVisibility() == View.VISIBLE) {
+                appBarLayout.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+
+                if (isDarkMode(context)) {
+                    ((ManagerActivityLollipop) context).changeAppBarElevation(true);
                 }
-            } else if (context instanceof ArchivedChatsActivity) {
-                if (listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect())) {
-                    ((ArchivedChatsActivity) context).changeActionBarElevation(true);
-                } else {
-                    ((ArchivedChatsActivity) context).changeActionBarElevation(false);
-                }
+            } else {
+                appBarLayout.setElevation(0);
+                // Reset the AppBar elevation whatever in the light and dark mode
+                ((ManagerActivityLollipop) context).changeAppBarElevation(false);
             }
+        } else if (context instanceof ArchivedChatsActivity) {
+            ((ArchivedChatsActivity) context).changeActionBarElevation(
+                    listView.canScrollVertically(-1)
+                            || (adapterList != null && adapterList.isMultipleSelect()));
         }
     }
 
