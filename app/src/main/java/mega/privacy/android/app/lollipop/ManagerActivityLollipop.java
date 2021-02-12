@@ -556,7 +556,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	private int searchSharedTab = -1;
 	private DrawerItem searchDrawerItem = null;
-	static DrawerItem drawerItem = null;
+	private DrawerItem drawerItem;
 	DrawerItem drawerItemPreUpgradeAccount = null;
 	int accountFragmentPreUpgradeAccount = -1;
 	static MenuItem drawerMenuItem = null;
@@ -14798,12 +14798,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		deepBrowserTreeLinks--;
 	}
 
-	public static DrawerItem getDrawerItem() {
+	public DrawerItem getDrawerItem() {
 		return drawerItem;
 	}
 
-	public static void setDrawerItem(DrawerItem drawerItem) {
-		ManagerActivityLollipop.drawerItem = drawerItem;
+	public void setDrawerItem(DrawerItem drawerItem) {
+		this.drawerItem = drawerItem;
 	}
 
 	public int getTabItemShares(){
