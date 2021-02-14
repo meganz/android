@@ -25,6 +25,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.SortUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -85,6 +86,17 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				}
 			}
 
+			if (managerActivity.getDeepBrowserTreeIncoming() > 0 && selected.size() > 0
+					&& allHaveFullAccess(selected)) {
+				control.move().setVisible(true);
+
+				if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+					control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+				} else {
+					control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+				}
+			}
+
 			control.copy().setVisible(true);
 			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 				control.copy().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -94,7 +106,7 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			control.selectAll().setVisible(notAllNodesSelected());
 			control.trash().setVisible(managerActivity.getDeepBrowserTreeIncoming() > 0
-					&& MegaNodeUtil.allHaveFullAccess(selected));
+					&& allHaveFullAccess(selected));
 
 			CloudStorageOptionControlUtil.applyControl(menu, control);
 
