@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import nz.mega.documentscanner.openCV.ImageScanner;
 
 public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -37,6 +38,8 @@ public class UploadBottomSheetDialogFragment extends BaseBottomSheetDialogFragme
             optionCreateFolder.setVisibility(View.VISIBLE);
             createFolderSeparator.setVisibility(View.VISIBLE);
         }
+
+        optionScanDocument.setVisibility(ImageScanner.INSTANCE.isCpuCompatible() ? View.VISIBLE : View.GONE);
 
         optionFromDevice.setOnClickListener(this);
         optionFromSystem.setOnClickListener(this);
