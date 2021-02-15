@@ -310,11 +310,11 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity"
-            android:label="@string/settings_passcode_lock"
-            android:windowSoftInputMode="adjustResize|stateVisible"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.Megaactionbar">
-        </activity>
+            android:label="@string/settings_passcode_lock"
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.Megaactionbar"
+            android:windowSoftInputMode="adjustResize|stateVisible"/>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
