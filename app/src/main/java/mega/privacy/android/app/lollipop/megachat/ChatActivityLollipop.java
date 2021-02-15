@@ -505,7 +505,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     private AudioManager mAudioManager;
     private AudioFocusListener audioFocusListener;
 
-    private boolean downloadToGallery = false;
+    private boolean downloadToGallery;
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
         this.preservedMessagesSelected = preservedData;
@@ -514,10 +514,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
     @Override
     public void handleStoredData() {
         if (preservedMessagesSelected != null && !preservedMessagesSelected.isEmpty()) {
-            forwardMessages(preservedMessagesSelected, FORWARD_ONLY_OPTION, null);
+            forwardMessages(preservedMessagesSelected, FORWARD_ONLY_OPTION);
             preservedMessagesSelected = null;
         } else if (preservedMsgSelected != null && !preservedMsgSelected.isEmpty()) {
-            setExportListener(exportListener);
             chatC.proceedWithForward(myChatFilesFolder, preservedMsgSelected, preservedMsgToImport, idChat, typeImport == IMPORT_TO_SHARE_OPTION
                     ? MULTIPLE_IMPORT_CONTACT_MESSAGES
                     : MULTIPLE_FORWARD_MESSAGES);
@@ -3167,7 +3166,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     }
 
-    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, int typeImport, ExportListener exportListener){
+    public void forwardMessages(ArrayList<AndroidMegaChatMessage> messagesSelected, int typeImport){
         if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return;
@@ -3180,7 +3179,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         this.typeImport = typeImport;
-        this.exportListener = exportListener;
         isForwardingMessage = true;
         storedUnhandledData(messagesSelected);
         checkIfIsNeededToAskForMyChatFilesFolder();
@@ -4268,7 +4266,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
                 case R.id.chat_cab_menu_forward:
                     logDebug("Forward message");
-                    forwardMessages(messagesSelected, FORWARD_ONLY_OPTION, null);
+                    forwardMessages(messagesSelected, FORWARD_ONLY_OPTION);
                     break;
 
                 case R.id.chat_cab_menu_copy:

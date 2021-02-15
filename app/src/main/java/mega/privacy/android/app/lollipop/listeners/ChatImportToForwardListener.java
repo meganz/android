@@ -113,7 +113,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
                         if (error <= 0 && context instanceof ChatActivityLollipop &&
                                 messagesSelected.get(0).getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
 
-                            MegaNode node = MegaApplication.getInstance().getMegaApi().getNodeByHandle(request.getNodeHandle());
+                            MegaNode node = api.getNodeByHandle(request.getNodeHandle());
                             if (node == null) {
                                 logWarning("Node is NULL");
                                 return;
@@ -121,7 +121,7 @@ public class ChatImportToForwardListener implements MegaRequestListenerInterface
 
                             if (exportListener != null) {
                                 exportListener.updateNodeHandle(messagesSelected.get(0).getMsgId(), node.getHandle());
-                                MegaApplication.getInstance().getMegaApi().exportNode(node, exportListener);
+                                api.exportNode(node, exportListener);
                             } else {
                                 MegaNodeUtil.shareNode(context, node);
                             }

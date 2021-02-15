@@ -1187,7 +1187,8 @@ public class ChatController {
             return;
         }
 
-        boolean askMe = askMe(context);
+        boolean askMe = downloadToGallery ? false : askMe(context);
+
         if (askMe){
             requestLocalFolder(size, serializeNodes(nodeList));
         }
@@ -1587,7 +1588,8 @@ public class ChatController {
 
         if(context instanceof  ChatActivityLollipop){
             if (typeImport == IMPORT_TO_SHARE_OPTION) {
-                ((ChatActivityLollipop) context).forwardMessages(messages, typeImport, exportListener);
+                ((ChatActivityLollipop) context).setExportListener(exportListener);
+                ((ChatActivityLollipop) context).forwardMessages(messages, typeImport);
             } else {
                 ((ChatActivityLollipop) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
             }

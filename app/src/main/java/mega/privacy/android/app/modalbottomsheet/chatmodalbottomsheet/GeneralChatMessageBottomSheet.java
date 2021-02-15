@@ -370,7 +370,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 break;
 
             case R.id.forward_layout:
-                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, FORWARD_ONLY_OPTION, null);
+                ((ChatActivityLollipop) context).forwardMessages(messagesSelected, FORWARD_ONLY_OPTION);
                 break;
 
             case R.id.edit_layout:
