@@ -12,6 +12,7 @@ public class Constants {
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
     public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
     public static final int BOOT_JOB_ID = 10097;
+    public static final int CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID = 10098;
 
     public static final int REQUEST_CODE_GET = 1000;
     public static final int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -740,4 +741,7 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
+
+    /** In database, invalid value is defined as '-1' */
+    public static final String INVALID_NON_NULL_VALUE = "-1";
 }

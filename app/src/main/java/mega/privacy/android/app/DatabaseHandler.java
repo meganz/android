@@ -24,7 +24,9 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.objects.SDTransfer;
-import mega.privacy.android.app.utils.PasscodeUtil;
+import mega.privacy.android.app.sync.Backup;
+import mega.privacy.android.app.sync.BackupToolsKt;
+import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
@@ -34,12 +36,13 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
 import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_INVALID;
 import static mega.privacy.android.app.utils.TextUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static mega.privacy.android.app.utils.Util.aes_decrypt;
+import static mega.privacy.android.app.utils.Util.aes_encrypt;
+import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 60;
+	private static final int DATABASE_VERSION = 61;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -58,6 +61,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String TABLE_SYNC_RECORDS = "syncrecords";
 	private static final String TABLE_MEGA_CONTACTS = "megacontacts";
 	private static final String TABLE_SD_TRANSFERS = "sdtransfers";
+    public static final String TABLE_BACKUPS = "backups";
 
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
@@ -264,6 +268,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			+ KEY_SD_TRANSFERS_PATH + " TEXT, "		//5
 			+ KEY_SD_TRANSFERS_APP_DATA + " TEXT)";	//6
 
+    public static final String KEY_BACKUP_ID = "backup_id";
+    public static final String KEY_BACKUP_TYPE = "backup_type";
+    public static final String KEY_BACKUP_TARGET_NODE = "target_node";
+    public static final String KEY_BACKUP_LOCAL_FOLDER = "local_folder";
+    public static final String KEY_BACKUP_NAME = "backup_name";
+    public static final String KEY_BACKUP_STATE = "state";
+    public static final String KEY_BACKUP_SUB_STATE = "sub_state";
+    public static final String KEY_BACKUP_EXTRA_DATA = "extra_data";
+    public static final String KEY_BACKUP_START_TIME = "start_timestamp";
+    public static final String KEY_BACKUP_LAST_TIME = "last_sync_timestamp";
+    public static final String KEY_BACKUP_TARGET_NODE_PATH = "target_folder_path";
+    public static final String KEY_BACKUP_EX = "exclude_subolders";
+    public static final String KEY_BACKUP_DEL = "delete_empty_subolders";
+    public static final String KEY_BACKUP_OUTDATED = "outdated";
+
+    private static final String CREATE_BACKUP_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BACKUPS + "("
+            + KEY_ID + " INTEGER PRIMARY KEY, "
+            + KEY_BACKUP_ID + " TEXT, "
+            + KEY_BACKUP_TYPE + " INTEGER,"
+            + KEY_BACKUP_TARGET_NODE + " TEXT,"
+            + KEY_BACKUP_LOCAL_FOLDER + " TEXT,"
+            + KEY_BACKUP_NAME + " TEXT,"
+            + KEY_BACKUP_STATE + " INTEGER,"
+            + KEY_BACKUP_SUB_STATE + " INTEGER,"
+            + KEY_BACKUP_EXTRA_DATA + " TEXT,"
+            + KEY_BACKUP_START_TIME + " TEXT,"
+            + KEY_BACKUP_LAST_TIME + " TEXT,"
+            + KEY_BACKUP_TARGET_NODE_PATH + " TEXT,"
+            + KEY_BACKUP_EX + " BOOLEAN,"
+            + KEY_BACKUP_DEL + " BOOLEAN,"
+            + KEY_BACKUP_OUTDATED + " BOOLEAN)";
+
     private static DatabaseHandler instance;
 
     private static SQLiteDatabase db;
@@ -443,6 +479,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_MEGA_CONTACTS_TABLE);
 
         db.execSQL(CREATE_SD_TRANSFERS_TABLE);
+
+        db.execSQL(CREATE_BACKUP_TABLE);
 	}
 
 	@Override
@@ -876,7 +914,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL(CREATE_SD_TRANSFERS_TABLE);
 		}
 
-		if (oldVersion <= 59) {
+        if (oldVersion <= 59) {
+            db.execSQL(CREATE_BACKUP_TABLE);
+        }
+
+		if (oldVersion <= 60) {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
 					+ " = '" + encrypt("" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
@@ -2978,6 +3020,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
+
+		// Set or remove corresponding CU backup.
+		if (enabled) {
+			CuSyncManager.INSTANCE.setPrimaryBackup();
+		} else {
+			CuSyncManager.INSTANCE.removePrimaryBackup();
+		}
 	}
 
 	public void setSecondaryUploadEnabled (boolean enabled){
@@ -2994,6 +3043,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
+
+		// Set or remove corresponding MU backup.
+		if (enabled) {
+			CuSyncManager.INSTANCE.setSecondaryBackup();
+		} else {
+			CuSyncManager.INSTANCE.removeSecondaryBackup();
+		}
 	}
 
 	public void setCamSyncHandle (long handle){
@@ -3010,6 +3066,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
+
+		logDebug("Set new primary handle: " + handle);
+		//Update CU backup when CU target folder changed.
+		CuSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
 	}
 
 	public void setSecondaryFolderHandle (long handle){
@@ -3027,6 +3087,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
+
+		logDebug("Set new secondary handle: " + handle);
+		//Update MU backup when MU target folder changed.
+		CuSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
 	}
 
 	public void setCamSyncLocalPath (String localPath){
@@ -4245,4 +4309,117 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				KEY_SD_TRANSFERS_TAG + "=" + tag,
 				null);
 	}
+
+    public boolean saveBackup(Backup backup) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_BACKUP_ID, encrypt(Long.toString(backup.getBackupId())));
+        values.put(KEY_BACKUP_TYPE, backup.getBackupType());
+        values.put(KEY_BACKUP_TARGET_NODE, encrypt(Long.toString(backup.getTargetNode())));
+        values.put(KEY_BACKUP_LOCAL_FOLDER, encrypt(backup.getLocalFolder()));
+        values.put(KEY_BACKUP_NAME, encrypt(backup.getBackupName()));
+        values.put(KEY_BACKUP_STATE,backup.getState());
+        values.put(KEY_BACKUP_SUB_STATE, backup.getSubState());
+        values.put(KEY_BACKUP_EXTRA_DATA, encrypt(backup.getExtraData()));
+        values.put(KEY_BACKUP_START_TIME, encrypt(Long.toString(backup.getStartTimestamp())));
+        values.put(KEY_BACKUP_LAST_TIME, encrypt(Long.toString(backup.getLastFinishTimestamp())));
+        values.put(KEY_BACKUP_TARGET_NODE_PATH, encrypt(backup.getTargetFolderPath()));
+        values.put(KEY_BACKUP_EX, encrypt(Boolean.toString(backup.isExcludeSubFolders())));
+        values.put(KEY_BACKUP_DEL, encrypt(Boolean.toString(backup.isDeleteEmptySubFolders())));
+        // Default value is false.
+        values.put(KEY_BACKUP_OUTDATED, encrypt(Boolean.toString(false)));
+        long result = db.insertOrThrow(TABLE_BACKUPS, null, values);
+        if(result != -1) {
+            logDebug("Save sync pair " + backup + " successfully, row id is: " + result);
+            return true;
+        } else {
+            logError("Save sync pair " + backup + " failed");
+            return false;
+        }
+    }
+
+    public Backup getCuBackup() {
+        return getBackupByType(BACKUP_TYPE_CAMERA_UPLOADS);
+    }
+
+    public Backup getMuBackup() {
+        return getBackupByType(BACKUP_TYPE_MEDIA_UPLOADS);
+    }
+
+    private Backup getBackupByType(int type) {
+        String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_TYPE + " = " + type +
+                " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "' ORDER BY " + KEY_ID + " DESC";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            Backup backup = getBackupFromCursor(cursor);
+            cursor.close();
+            return backup;
+        } else {
+            return null;
+        }
+    }
+
+    public void setBackupAsOutdated(long id) {
+        Backup backup = getBackupById(id);
+        if(backup != null) {
+            backup.setOutdated(true);
+            updateBackup(backup);
+        }
+    }
+
+    public Backup getBackupById(long id) {
+        String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_ID + " = '" + encrypt(Long.toString(id)) + "'";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            Backup pair = getBackupFromCursor(cursor);
+            cursor.close();
+            return pair;
+        } else {
+            return null;
+        }
+    }
+
+    public List<Backup> getAllBackups() {
+        String selectQuery = "SELECT * FROM " + TABLE_BACKUPS;
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        List<Backup> list = new ArrayList<>();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(getBackupFromCursor(cursor));
+            }
+            cursor.close();
+        }
+        return list;
+    }
+
+    private Backup getBackupFromCursor(Cursor cursor) {
+        return new Backup(
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_ID)))),
+                cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_TYPE)),
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_TARGET_NODE)))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LOCAL_FOLDER))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_NAME))),
+                cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_STATE)),
+                cursor.getInt(cursor.getColumnIndex(KEY_BACKUP_SUB_STATE)),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EXTRA_DATA))),
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_START_TIME)))),
+                Long.parseLong(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_LAST_TIME)))),
+                decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_TARGET_NODE_PATH))),
+                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_EX)))),
+                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_DEL)))),
+                Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndex(KEY_BACKUP_OUTDATED))))
+        );
+    }
+
+    public void deleteBackupById(long id) {
+        db.execSQL(BackupToolsKt.deleteSQL(id));
+    }
+
+    public void updateBackup(Backup backup) {
+        db.execSQL(BackupToolsKt.updateSQL(backup));
+    }
+
+    public void clearBackups() {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BACKUPS);
+        onCreate(db);
+    }
 }

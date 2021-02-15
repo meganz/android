@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaNode;
 
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
 import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -39,12 +40,18 @@ public class LinksFragment extends MegaNodeBaseFragment {
     public void activateActionMode() {
         if (!adapter.isMultipleSelect()) {
             super.activateActionMode();
-            actionMode =
-                ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack());
+
+            if (getActivity() != null) {
+                actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(new ActionBarCallBack(LINKS_TAB));
+            }
         }
     }
 
     private class ActionBarCallBack extends BaseActionBarCallBack {
+
+        public ActionBarCallBack(int currentTab) {
+            super(currentTab);
+        }
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -121,6 +128,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             findNodes();
             adapter.setParentHandle(INVALID_HANDLE);
         } else {
+            managerActivity.hideTabs(true, LINKS_TAB);
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
             logDebug("ParentHandle to find children: " + managerActivity.getParentHandleLinks());
 
@@ -173,6 +181,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
 
         if (managerActivity.getDeepBrowserTreeLinks() == 0) {
             managerActivity.setParentHandleLinks(INVALID_HANDLE);
+            managerActivity.hideTabs(false, LINKS_TAB);
             findNodes();
         } else if (managerActivity.getDeepBrowserTreeLinks() > 0) {
             MegaNode parentNodeLinks = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
@@ -214,6 +223,7 @@ public class LinksFragment extends MegaNodeBaseFragment {
             }
         } else if (nodes.get(position).isFolder()) {
             lastPositionStack.push(mLayoutManager.findFirstCompletelyVisibleItemPosition());
+            managerActivity.hideTabs(true, LINKS_TAB);
             managerActivity.increaseDeepBrowserTreeLinks();
             managerActivity.setParentHandleLinks(nodes.get(position).getHandle());
             managerActivity.supportInvalidateOptionsMenu();

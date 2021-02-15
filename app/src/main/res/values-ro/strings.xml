@@ -685,7 +685,6 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Șterge fișierele offline</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Deschide fișierul când este descărcat</string>
-    <string name="settings_advanced_features_cancel_account" context="Settings preference title for canceling the account">Anulează contul</string>
     <string name="settings_delete_account" context="Settings preference title for delete account">Șterge contul</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">În prezent folosind %s</string>

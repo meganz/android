@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -263,6 +264,8 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
+                    BackupToolsKt.removeBackupsBeforeLogout();
+
                     /*
                        If the account is trying to login,
                        at this stage should set isLoggingRunning as `false` to indicate the login process is ended.

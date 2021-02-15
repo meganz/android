@@ -60,8 +60,8 @@ import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
-import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
+import mega.privacy.android.app.listeners.GetCuAttributeListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
 import mega.privacy.android.app.fcm.KeepAliveService;
@@ -72,11 +72,11 @@ import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
-
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
+
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -346,7 +346,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						megaApi.getMyChatFilesFolder(listener);
 					}
 					//Ask for MU and CU folder when App in init state
-                    megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,listener);
+					logDebug("Get CU attribute on fetch nodes.");
+					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
 					//Login transfers resumption
 					TransfersManagement.enableTransfersResumption();
@@ -1310,6 +1311,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			else{
 				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());
 			}
+		} else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
+			chatManagement.removeJoiningChatId(request.getChatHandle());
+			chatManagement.removeJoiningChatId(request.getUserHandle());
+		} else if (request.getType() == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM
+				&& request.getUserHandle() == INVALID_HANDLE) {
+			chatManagement.removeLeavingChatId(request.getChatHandle());
 		}
 	}
 

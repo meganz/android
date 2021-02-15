@@ -41,6 +41,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
+import mega.privacy.android.app.sync.BackupToolsKt;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
@@ -436,6 +437,8 @@ public class AccountController {
 
         dbH.clearChatSettings();
 
+        dbH.clearBackups();
+
         //clear mega contacts and reset last sync time.
         dbH.clearMegaContacts();
         new MegaContactGetter(context).clearLastSyncTimeStamp();
@@ -473,6 +476,8 @@ public class AccountController {
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
         logDebug("logout");
+
+        BackupToolsKt.removeBackupsBeforeLogout();
 
         if (megaApi == null){
             megaApi = MegaApplication.getInstance().getMegaApi();

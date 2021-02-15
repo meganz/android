@@ -371,10 +371,9 @@ public class ContactAttachmentActivityLollipop extends PasscodeActivity implemen
 							contactEmails.add(contact.getMail());
 						}
 					}
-					if(contactEmails!=null){
-						if(!contactEmails.isEmpty()){
-							contactControllerC.inviteMultipleContacts(contactEmails);
-						}
+
+					if(!contactEmails.isEmpty()){
+						contactControllerC.inviteMultipleContacts(contactEmails);
 					}
 				}
 				else{
