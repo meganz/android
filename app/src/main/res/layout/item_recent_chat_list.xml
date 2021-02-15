@@ -89,8 +89,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:background="@null"
-                    android:src="@drawable/ongoing_call_green_item"
-                    app:tint="?attr/textColorHint" />
+                    android:src="@drawable/ongoing_call_green_item" />
 
                 <ImageView
                     android:id="@+id/recent_chat_list_private_icon"
