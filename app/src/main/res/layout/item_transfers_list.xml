@@ -61,7 +61,7 @@
 		android:layout_marginEnd="16dp"
 		android:background="@null"
 		android:src="@drawable/ic_reorder"
-		app:tint="?android:attr/textColorSecondary" />
+		app:tint="?android:attr/textColorPrimary" />
 
 	<ImageView
 		android:id="@+id/transfers_list_option_pause"
@@ -73,7 +73,7 @@
 		android:layout_toStartOf="@id/transfers_list_option_reorder"
 		android:background="@null"
 		android:src="@drawable/ic_pause"
-		app:tint="?android:attr/textColorSecondary" />
+		app:tint="?android:attr/textColorPrimary" />
 
     <TextView
         android:id="@+id/transfers_progress_text"

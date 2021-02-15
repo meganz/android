@@ -275,6 +275,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             collapseBtn.setVisibility(View.INVISIBLE);
             closeBtn.setVisibility(View.VISIBLE);
             moreContactsTitle.setVisibility(View.VISIBLE);
+            contactsListLayout.setVisibility(View.GONE);
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
@@ -453,7 +454,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private void showPermissionGrantedView() {
         requestPermissionLayout.setVisibility(View.GONE);
-        contactsListLayout.setVisibility(View.VISIBLE);
         collapseBtn.setVisibility(View.INVISIBLE);
         inviteTitle.setText(R.string.get_registered_contacts);
         inviteTitle.setClickable(false);
@@ -470,7 +470,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         inviteTitle.setClickable(true);
         inviteTitle.setText(R.string.see_local_contacts_on_mega);
         moreContactsTitle.setVisibility(View.GONE);
-        contactsListLayout.setVisibility(View.GONE);
         requestPermissionLayout.setVisibility(View.VISIBLE);
     }
 
