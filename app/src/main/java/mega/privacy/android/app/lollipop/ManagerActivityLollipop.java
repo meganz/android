@@ -9844,8 +9844,8 @@ public class ManagerActivityLollipop extends SorterContentActivity
     @Override
     public void scanDocument() {
         String[] saveDestinations = {
-                getString(R.string.section_cloud_drive),
-                getString(R.string.section_chat)
+				StringResourcesUtils.getString(R.string.section_cloud_drive),
+				StringResourcesUtils.getString(R.string.section_chat)
         };
         Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
         startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
@@ -11880,7 +11880,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
             if (resultCode == RESULT_OK) {
                 String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
                 Intent fileIntent = new Intent(this, FileExplorerActivityLollipop.class);
-                if (getString(R.string.section_chat).equals(savedDestination)) {
+				if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
                 } else {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
