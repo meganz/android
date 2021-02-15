@@ -283,16 +283,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 if (node.isExported()) {
                     //Node has public link
-                    nodeIconLayout.setVisibility(View.VISIBLE);
-                    nodeIcon.setImageResource(R.drawable.link_ic);
-
                     optionLinkText.setText(R.string.edit_link_option);
                     optionRemoveLink.setVisibility(View.VISIBLE);
-                    if (node.isExpired()) {
-                        logDebug("Node exported but expired!!");
-                    }
                 } else {
-                    nodeIconLayout.setVisibility(View.GONE);
                     optionLinkText.setText(R.string.context_get_link_menu);
                     counterShares--;
                     optionRemoveLink.setVisibility(View.GONE);
@@ -384,15 +377,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 if (node.isExported()) {
                     //Node has public link
-                    nodeIconLayout.setVisibility(View.VISIBLE);
-                    nodeIcon.setImageResource(R.drawable.link_ic);
                     optionLinkText.setText(R.string.edit_link_option);
                     optionRemoveLink.setVisibility(View.VISIBLE);
-                    if (node.isExpired()) {
-                        logDebug("Node exported but expired!!");
-                    }
                 } else {
-                    nodeIconLayout.setVisibility(View.GONE);
                     optionLinkText.setText(R.string.context_get_link_menu);
                     counterShares--;
                     optionRemoveLink.setVisibility(View.GONE);
@@ -552,15 +539,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     if (node.isExported()) {
                         //Node has public link
-                        nodeIconLayout.setVisibility(View.VISIBLE);
-                        nodeIcon.setImageResource(R.drawable.link_ic);
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
-                        if (node.isExpired()) {
-                            logDebug("Node exported but expired!!");
-                        }
                     } else {
-                        nodeIconLayout.setVisibility(View.GONE);
                         optionLinkText.setText(R.string.context_get_link_menu);
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
@@ -616,17 +597,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                     if (node.isExported()) {
                         //Node has public link
-                        if (((ManagerActivityLollipop) context).getDeepBrowserTreeLinks() > 0) {
-                            nodeIconLayout.setVisibility(View.VISIBLE);
-                            nodeIcon.setImageResource(R.drawable.link_ic);
-                        } else {
-                            nodeIconLayout.setVisibility(View.GONE);
-                        }
-
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                     } else {
-                        nodeIconLayout.setVisibility(View.GONE);
                         optionLinkText.setText(R.string.context_get_link_menu);
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
@@ -787,19 +760,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 } else {
                     if (node.isExported()) {
                         //Node has public link
-                        nodeIconLayout.setVisibility(View.VISIBLE);
-                        nodeIcon.setImageResource(R.drawable.link_ic);
                         optionLinkText.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
-                        if (node.isExpired()) {
-                            logDebug("Node exported but expired!!");
-                        }
                     } else {
-                        nodeIconLayout.setVisibility(View.GONE);
                         optionLinkText.setText(R.string.context_get_link_menu);
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
                     }
+
                     MegaNode parent = nC.getParent(node);
                     if (parent.getHandle() != megaApi.getRubbishNode().getHandle()) {
                         optionRubbishBin.setVisibility(View.VISIBLE);
@@ -878,12 +846,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionLink.setVisibility(View.VISIBLE);
 
                         if (node.isExported()) {
-                            nodeIconLayout.setVisibility(View.VISIBLE);
-                            nodeIcon.setImageResource(R.drawable.link_ic);
                             optionLinkText.setText(R.string.edit_link_option);
                             optionRemoveLink.setVisibility(View.VISIBLE);
                         } else {
-                            nodeIconLayout.setVisibility(View.GONE);
                             optionLinkText.setText(R.string.context_get_link_menu);
                             counterShares--;
                             optionRemoveLink.setVisibility(View.GONE);
