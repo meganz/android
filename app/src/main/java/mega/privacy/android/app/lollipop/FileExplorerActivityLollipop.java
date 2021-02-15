@@ -50,6 +50,7 @@ import mega.privacy.android.app.SorterContentActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.listeners.CreateFolderListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.lollipop.adapters.FileExplorerPagerAdapter;
@@ -214,7 +215,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	//Tabs in Cloud
 	private TabLayout tabLayoutExplorer;
 	private FileExplorerPagerAdapter mTabsAdapterExplorer;
-	private ViewPager viewPagerExplorer;
+	private CustomViewPager viewPagerExplorer;
 
 	private ArrayList<MegaNode> nodes;
 
@@ -913,37 +914,46 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 			@Override
 			public boolean onMenuItemActionExpand(MenuItem item) {
 				isSearchExpanded = true;
+
 				if (isSearchMultiselect()) {
+					hideTabs(true, isCloudVisible() ? CLOUD_FRAGMENT : INCOMING_FRAGMENT);
 					gridListMenuItem.setVisible(false);
 					sortByMenuItem.setVisible(false);
-				}
-				else {
+				} else {
+					hideTabs(true, CHAT_FRAGMENT);
 					chatExplorer = getChatExplorerFragment();
+
 					if (chatExplorer != null && chatExplorer.isVisible()) {
 						chatExplorer.enableSearch(true);
 					}
 				}
+
 				return true;
 			}
 
 			@Override
 			public boolean onMenuItemActionCollapse(MenuItem item) {
 				isSearchExpanded = false;
+
 				if (isSearchMultiselect()) {
 					if (isCloudVisible()) {
+						hideTabs(false, CLOUD_FRAGMENT);
 						cDriveExplorer.closeSearch(collapsedByClick);
-					}
-					else if (isIncomingVisible()) {
+					} else if (isIncomingVisible()) {
+						hideTabs(false, INCOMING_FRAGMENT);
 						iSharesExplorer.closeSearch(collapsedByClick);
 					}
+
 					supportInvalidateOptionsMenu();
-				}
-				else {
+				} else {
+					hideTabs(false, CHAT_FRAGMENT);
 					chatExplorer = getChatExplorerFragment();
+
 					if (chatExplorer != null && chatExplorer.isVisible()) {
 						chatExplorer.enableSearch(false);
 					}
 				}
+
 				return true;
 			}
 		});
@@ -1033,7 +1043,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
+						cDriveExplorer = getCloudExplorerFragment();
+						searchMenuItem.setVisible(cDriveExplorer != null && !cDriveExplorer.isFolderEmpty());
 					}
 				}
 
@@ -1074,7 +1085,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
 						sortByMenuItem.setVisible(true);
-						searchMenuItem.setVisible(true);
+						searchMenuItem.setVisible(iSharesExplorer != null && !iSharesExplorer.isFolderEmpty());
 					}
 				}
 			}
@@ -2839,10 +2850,12 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 			if (isCloudVisible()){
 				cDriveExplorer.navigateToFolder(handle);
 				parentHandleCloud = handle;
+				hideTabs(true, CLOUD_TAB);
 			}
 			else if (isIncomingVisible()){
 				iSharesExplorer.navigateToFolder(handle);
 				parentHandleIncoming = handle;
+				hideTabs(true, INCOMING_TAB);
 			}
 		}
 	}
@@ -2874,4 +2887,45 @@ public class FileExplorerActivityLollipop extends SorterContentActivity
 	    queryAfterSearch = null;
 	    return true;
     }
+
+	/**
+	 * Hides or shows tabs of a section depending on the navigation level
+	 * and if select mode is enabled or not.
+	 *
+	 * @param hide       If true, hides the tabs, else shows them.
+	 * @param currentTab The current tab where the action happens.
+	 */
+	public void hideTabs(boolean hide, int currentTab) {
+		if (!hide && (queryAfterSearch != null || isSearchExpanded || pendingToOpenSearchView)) {
+			return;
+		}
+
+		switch (currentTab) {
+			case CLOUD_FRAGMENT:
+				if (getCloudExplorerFragment() == null
+						|| (!hide && parentHandleCloud != getCloudRootHandle() && parentHandleCloud != INVALID_HANDLE)) {
+					return;
+				}
+
+				break;
+
+			case INCOMING_FRAGMENT:
+				if (getIncomingExplorerFragment() == null
+						|| (!hide && parentHandleIncoming != INVALID_HANDLE)) {
+					return;
+				}
+
+				break;
+
+			case CHAT_FRAGMENT:
+				if (getChatExplorerFragment() == null) {
+					return;
+				}
+
+				break;
+		}
+
+		viewPagerExplorer.disableSwipe(hide);
+		tabLayoutExplorer.setVisibility(hide ? View.GONE : View.VISIBLE);
+	}
 }
