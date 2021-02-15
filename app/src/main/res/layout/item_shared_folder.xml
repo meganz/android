@@ -70,12 +70,11 @@
 
         <ImageView
             android:id="@+id/shared_folder_state_icon"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_toRightOf="@+id/shared_folder_contact_name"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_toEndOf="@+id/shared_folder_contact_name"
             android:layout_centerVertical="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="4dp"
+            android:layout_marginStart="8dp"
             android:background="@null"
             android:src="@drawable/circle_status_contact_offline"
             android:visibility="gone"/>
