@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -120,6 +121,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private static int totalFolderUploadsCompleted = 0;
     private static int totalFolderUploads = 0;
     private static int totalFolderUploadsCompletedSuccessfully = 0;
+    private static int filesAlreadyUploaded = 0;
 
     private static int uploadCount = 0;
     private static int currentUpload = 0;
@@ -494,26 +496,42 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 .putExtra(NUMBER_FILES, totalFileUploads + totalFolderUploads));
     }
 
-    /*
+    /**
      * Show complete success notification
      */
     private void showFileUploadCompleteNotification() {
-		logDebug("showFileUploadCompleteNotification");
+        logDebug("showFileUploadCompleteNotification");
         if (isOverquota == NOT_OVERQUOTA_STATE) {
-            String notificationTitle, size;
             int quantity = totalFileUploadsCompletedSuccessfully == 0 ? 1 : totalFileUploadsCompletedSuccessfully;
-            notificationTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification,quantity,totalFileUploadsCompletedSuccessfully);
+            String notificationTitle = "";
+
+            if (filesAlreadyUploaded > 0) {
+                quantity -= filesAlreadyUploaded;
+
+                if (quantity > 0) {
+                    notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                            quantity, quantity) + STRING_SEPARATOR;
+                }
+
+                notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
+                        filesAlreadyUploaded, filesAlreadyUploaded);
+            } else {
+                notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                        quantity, quantity);
+            }
+
+            String size;
 
             if (errorCount > 0) {
-                size = getResources().getQuantityString(R.plurals.upload_service_failed,errorCount,errorCount);
+                size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
             } else {
                 long transferredBytes = getTransferredByte(mapProgressFileTransfers);
 
                 String totalBytes = getSizeString(transferredBytes);
-                size = getString(R.string.general_total_size,totalBytes);
+                size = getString(R.string.general_total_size, totalBytes);
             }
 
-            notifyNotification(notificationTitle,size,notificationIdFinalForFileUpload,notificationChannelIdForFileUpload,notificationChannelNameForFileUpload);
+            notifyNotification(notificationTitle, size, notificationIdFinalForFileUpload, notificationChannelIdForFileUpload, notificationChannelNameForFileUpload);
         }
     }
 
@@ -811,12 +829,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 			} else {
 				if (error.getErrorCode() == MegaError.API_OK) {
-					logDebug("Upload OK: " + transfer.getFileName());
-					if(transfer.isFolderTransfer()){
+                    if (transfer.isFolderTransfer()) {
                         totalFolderUploadsCompletedSuccessfully++;
-                    }else{
+                    } else {
                         totalFileUploadsCompletedSuccessfully++;
+
+                        if (transfer.getTransferredBytes() == 0) {
+                            logDebug("File already uploaded");
+                            filesAlreadyUploaded++;
+                        }
                     }
+
 					if (isVideoFile(transfer.getPath())) {
 						logDebug("Is video!!!");
 
@@ -1185,6 +1208,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         totalFolderUploadsCompleted = 0;
         totalFolderUploads = 0;
         totalFolderUploadsCompletedSuccessfully = 0;
+        filesAlreadyUploaded = 0;
         childUploadFailed = 0;
         childUploadSucceeded = 0;
         uploadCount = 0;

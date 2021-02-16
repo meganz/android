@@ -743,4 +743,6 @@ public class Constants {
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
+
+    public static final String STRING_SEPARATOR = " · ";
 }
