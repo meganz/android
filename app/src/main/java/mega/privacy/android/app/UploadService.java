@@ -56,6 +56,7 @@ import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_F
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.addStringSeparator;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -85,6 +86,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
 	private int childUploadFailed = 0;
+	private int childrenAlreadyUploaded = 0;
 
 	private boolean isForeground = false;
 	private boolean canceled;
@@ -497,66 +499,79 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     }
 
     /**
-     * Show complete success notification
+     * Show complete success notification. File upload.
      */
     private void showFileUploadCompleteNotification() {
         logDebug("showFileUploadCompleteNotification");
+
         if (isOverquota == NOT_OVERQUOTA_STATE) {
-            int quantity = totalFileUploadsCompletedSuccessfully == 0 ? 1 : totalFileUploadsCompletedSuccessfully;
             String notificationTitle = "";
 
-            if (filesAlreadyUploaded > 0) {
-                quantity -= filesAlreadyUploaded;
-
-                if (quantity > 0) {
+            if (totalFileUploadsCompletedSuccessfully == 0 && filesAlreadyUploaded == 0 && errorCount == 0) {
+                notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                        1, 1);
+            } else {
+                if (totalFileUploadsCompletedSuccessfully > 0) {
                     notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
-                            quantity, quantity) + STRING_SEPARATOR;
+                            totalFileUploadsCompletedSuccessfully, totalFileUploadsCompletedSuccessfully);
                 }
 
-                notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
-                        filesAlreadyUploaded, filesAlreadyUploaded);
-            } else {
-                notificationTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
-                        quantity, quantity);
+                if (filesAlreadyUploaded > 0) {
+                    addStringSeparator(notificationTitle);
+                    notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
+                            filesAlreadyUploaded, filesAlreadyUploaded);
+                }
+
+                if (errorCount > 0) {
+                    addStringSeparator(notificationTitle);
+                    notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_failed,
+                            errorCount, errorCount);
+                }
             }
 
-            String size;
-
-            if (errorCount > 0) {
-                size = getResources().getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount);
-            } else {
-                long transferredBytes = getTransferredByte(mapProgressFileTransfers);
-
-                String totalBytes = getSizeString(transferredBytes);
-                size = getString(R.string.general_total_size, totalBytes);
-            }
+            long transferredBytes = getTransferredByte(mapProgressFileTransfers);
+            String totalBytes = getSizeString(transferredBytes);
+            String size = getString(R.string.general_total_size, totalBytes);
 
             notifyNotification(notificationTitle, size, notificationIdFinalForFileUpload, notificationChannelIdForFileUpload, notificationChannelNameForFileUpload);
         }
     }
 
+    /**
+     * Show complete success notification. Folder upload.
+     */
     private void showFolderUploadCompleteNotification() {
-		logDebug("showFolderUploadCompleteNotification");
+        logDebug("showFolderUploadCompleteNotification");
+
         if (isOverquota == NOT_OVERQUOTA_STATE) {
-            String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification,totalFolderUploadsCompletedSuccessfully,totalFolderUploadsCompletedSuccessfully);
-            String notificationSubTitle;
+            String notificationTitle = getResources().getQuantityString(R.plurals.folder_upload_service_final_notification, totalFolderUploadsCompletedSuccessfully, totalFolderUploadsCompletedSuccessfully);
+            String notificationSubTitle = "";
 
-            if (childUploadSucceeded > 0 && childUploadFailed > 0) {
-                String uploadedString = getResources().getQuantityString(R.plurals.upload_service_final_notification,childUploadSucceeded,childUploadSucceeded);
-                String errorString = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
-                notificationSubTitle = uploadedString + ", " + errorString;
-            } else if (childUploadSucceeded > 0) {
-                notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_final_notification,childUploadSucceeded,childUploadSucceeded);
-            } else if(childUploadFailed > 0){
-                notificationSubTitle = getResources().getQuantityString(R.plurals.upload_service_failed,childUploadFailed,childUploadFailed);
-            }else{
-                long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
-
-                String totalBytes = getSizeString(transferredBytes);
-                notificationSubTitle = getString(R.string.general_total_size,totalBytes);
+            if (childUploadSucceeded > 0) {
+                notificationSubTitle = StringResourcesUtils.getQuantityString(R.plurals.upload_service_final_notification,
+                        childUploadSucceeded, childUploadSucceeded);
             }
 
-            notifyNotification(notificationTitle,notificationSubTitle,notificationIdFinalForFolderUpload,notificationChannelIdForFolderUpload,notificationChannelNameForFolderUpload);
+            if (childrenAlreadyUploaded > 0) {
+                addStringSeparator(notificationTitle);
+                notificationSubTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
+                        childrenAlreadyUploaded, childrenAlreadyUploaded);
+            }
+
+            if (childUploadFailed > 0) {
+                addStringSeparator(notificationTitle);
+                notificationSubTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_failed,
+                        childUploadFailed, childUploadFailed);
+            }
+
+            if (isTextEmpty(notificationSubTitle)) {
+                long transferredBytes = getTransferredByte(mapProgressFolderTransfers);
+                String totalBytes = getSizeString(transferredBytes);
+                notificationSubTitle = getString(R.string.general_total_size, totalBytes);
+            }
+
+            notifyNotification(notificationTitle, notificationSubTitle, notificationIdFinalForFolderUpload,
+                    notificationChannelIdForFolderUpload, notificationChannelNameForFolderUpload);
         }
     }
 
@@ -796,10 +811,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             if (isTransferBelongsToFolderTransfer(transfer)) {
                 if (!transfer.isFolderTransfer()) {
-                    if (error.getErrorCode() == MegaError.API_OK) {
-                        childUploadSucceeded++;
-                    } else {
+                    if (error.getErrorCode() != MegaError.API_OK) {
                         childUploadFailed++;
+                    } else if (transfer.getTransferredBytes() == 0) {
+                        childrenAlreadyUploaded++;
+                    } else {
+                        childUploadSucceeded++;
                     }
                 }
                 return;
@@ -831,13 +848,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				if (error.getErrorCode() == MegaError.API_OK) {
                     if (transfer.isFolderTransfer()) {
                         totalFolderUploadsCompletedSuccessfully++;
+                    } else if (transfer.getTransferredBytes() == 0) {
+                        filesAlreadyUploaded++;
                     } else {
                         totalFileUploadsCompletedSuccessfully++;
-
-                        if (transfer.getTransferredBytes() == 0) {
-                            logDebug("File already uploaded");
-                            filesAlreadyUploaded++;
-                        }
                     }
 
 					if (isVideoFile(transfer.getPath())) {
@@ -1211,6 +1225,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         filesAlreadyUploaded = 0;
         childUploadFailed = 0;
         childUploadSucceeded = 0;
+        childrenAlreadyUploaded = 0;
         uploadCount = 0;
         currentUpload = 0;
     }
