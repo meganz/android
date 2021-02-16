@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorar</string>
     <string name="contact_decline" context="option to decline a contact invitation">Negado</string>
     <string name="contact_accept" context="option to accept a contact invitation">Aceitar</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Informações do contato</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Informações do contato</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -1596,7 +1596,7 @@
     <string name="attachment_upload_panel_contact">Contato</string>
     <string name="attachment_upload_panel_photo">Do seu dispositivo</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Cancelar conta</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Excluir conta</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Se você cancelar sua conta, já não será possível acessar os dados da sua conta, nem os seus contatos ou os chats no MEGA.\nVocê não poderá desfazer esta ação.</string>
     <string name="delete_button" context="menu item">Deletar</string>
 

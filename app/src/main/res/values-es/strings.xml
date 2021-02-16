@@ -229,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contactos</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contactos [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]No hay [/B][A]solicitudes enviadas[/A][B].[/B]</string>
-    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]No hay [/B][A]solicitudes recibidas[/A][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]No hay [/B][A]solicitudes enviadas[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]No hay [/B][A]solicitudes recibidas[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferencias</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Mi cuenta</string>
@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignorar</string>
     <string name="contact_decline" context="option to decline a contact invitation">Rechazar</string>
     <string name="contact_accept" context="option to accept a contact invitation">Aceptar</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Info</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Info</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -321,7 +321,7 @@
 
     <plurals name="download_finish">
         <item context="Message when a download finishes. Singular 1 file" quantity="one">La descarga ha finalizado</item>
-        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">Han finalizado%1$d descargas</item>
+        <item context="Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime." quantity="other">Han finalizado %1$d descargas</item>
     </plurals>
 
     <plurals name="upload_began">
@@ -687,7 +687,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Eliminar archivos sin conexión</string>
 
     <string name="settings_auto_play_label" context="description of switch ‘Open file when download is completed’">Abrir archivo después de descargarlo</string>
-    <string name="settings_delete_account" context="Settings preference title for delete account">Cancelar cuenta</string>
+    <string name="settings_delete_account" context="Settings preference title for delete account">Eliminar cuenta</string>
 
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actualmente en uso %s</string>
     <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando</string>
@@ -1596,8 +1596,8 @@
     <string name="attachment_upload_panel_contact">Contacto</string>
     <string name="attachment_upload_panel_photo">Desde el dispositivo</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Cancelar cuenta</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Si cancelas tu cuenta, no podrás volver a acceder a tus datos, a tus contactos o conversaciones en MEGA.\nEstá acción no se podrá deshacer.</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Eliminar cuenta</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Si eliminas tu cuenta, no podrás volver a acceder a tus datos, a tus contactos o conversaciones en MEGA.\nEstá acción no se podrá deshacer.</string>
     <string name="delete_button" context="menu item">Eliminar</string>
 
     <string name="file_properties_info_info_file">Información</string>
@@ -1826,21 +1826,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Buscar por periodo de tiempo</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invita a tus amigos al [/B][A]Chat[/A][B] y disfruta de nuestra plataforma cifrada de manera privada y segura.[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invita a tus amigos al [/B][A]Chat[/A][B] y disfruta de nuestra plataforma cifrada de manera privada y segura[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No hay fotos/vídeos en [/B][A]Subidas de la cámara[/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Papelera [/A][B]vacía[/B][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]No hay fotos/vídeos en [/B][A]Subidas de la cámara[/A]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Papelera [/A][B]vacía[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No hay archivos en la [/B][A]bandeja de entrada[/A][B].[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No hay archivos en tu [/B][A]Nube[/A][B].[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]No hay archivos en la [/B][A]bandeja de entrada[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]No hay archivos en tu [/B][A]nube[/A]</string>
     <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]No hay archivos [/B][A]sin conexión[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]No hay [/B][A]contactos[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]No hay[/A] [B]conversaciones[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]Cargando[/A] [B]conversaciones&#8230;[/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]No hay [/B][A]carpetas compartidas entrantes[/A][B].[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]No hay [/B][A]carpetas compartidas salientes[/A][B].[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]No hay [/B][A]carpetas compartidas entrantes[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]No hay [/B][A]carpetas compartidas salientes[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]No hay [/B][A]enlaces públicos[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">Solicitudes enviadas</string>
@@ -2048,9 +2048,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nueva solicitud de contacto</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Escribir mensaje a "%s"&#8230;</string>
-    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]No hay[/B][A] transferencias activas[/A][B].[/B]</string>
-    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]No hay[/B][A] transferencias completadas[/A][B].[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]Carpeta[/B][A] vacía[/A][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]No hay[/B][A] transferencias activas[/A]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]No hay[/B][A] transferencias completadas[/A]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Carpeta[/A][B] vacía[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Escribir mensaje a "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">Escribir mensaje a %s&#8230;</string>
@@ -2412,8 +2412,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">Comprimiendo videos %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">Has seleccionado una carpeta no válida</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 carpeta. 1 archivo</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 carpeta. %1$d archivos</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 carpeta · 1 archivo</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1 carpeta · %1$d archivos</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d archivo</item>
@@ -2426,8 +2426,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d carpetas. 1 archivo</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d carpetas. %2$d archivos</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d carpetas · 1 archivo</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d carpetas · %2$d archivos</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B] ha añadido %2$s y %3$s[/B]</string>
@@ -2466,7 +2466,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">Error clave SSL</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA no puede conectarse de forma segura a través de SSL. Es posible que estés conectado a una Wi-Fi pública con requisitos adicionales.</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No hay [/B][A]notificaciones[/A][B].[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]No hay [/B][A]notificaciones[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">Configurar MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA necesita acceder a tus fotos, archivos multimedia y archivos para que puedas compartirlos con amigos, intercambiar mensajes cifrados y hacer llamadas seguras.</string>
@@ -2509,7 +2509,7 @@
     <string name="label_yesterday" context="label yesterday">Ayer</string>
     <string name="label_tomorrow" context="label tomorrow">Mañana</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No hay [/B][A]archivos compartidos[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]No hay [/B][A]archivos compartidos[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s se ha unido a la llamada</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s ha abandonado la llamada</string>

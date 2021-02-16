@@ -229,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">联系人</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">联系人[A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]无 [/B][A]发送请求[/A][B]。[/B]</string>
-    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]无 [/B][A]收到请求[/A][B]。[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]无 [/B][A]发送请求[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]无 [/B][A]接收请求[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">传输</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">我的账号</string>
@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">忽略</string>
     <string name="contact_decline" context="option to decline a contact invitation">拒绝</string>
     <string name="contact_accept" context="option to accept a contact invitation">接受</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">联系人信息</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">联系人信息</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -854,7 +854,7 @@
 
     <string name="sortby_type" context="Title of sort by media type options">媒体类型</string>
     <string name="sortby_type_photo_first" context="sort option, sort media files by photos first">照片</string>
-    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">影片</string>
+    <string name="sortby_type_video_first" context="sort option, sort media files by videos first">视频</string>
 
     <string name="sort_by_newest_date" context="sort files by date newest first">最新日期</string>
     <string name="sort_by_oldest_date" context="sort files by date oldest first">最早日期</string>
@@ -1596,8 +1596,8 @@
     <string name="attachment_upload_panel_contact">联系人</string>
     <string name="attachment_upload_panel_photo">从设备</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">取消帐户</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">如果您取消账户，您将无法访问您的账户数据，MEGA联系人以及对话。\n您将无法撤消此操作。</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">删除帐户</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">如果删除帐户，则将无法访问您的帐户数据，MEGA联系人以及聊天对话。\n您将无法撤消此操作。</string>
     <string name="delete_button" context="menu item">删除</string>
 
     <string name="file_properties_info_info_file">信息</string>
@@ -1826,21 +1826,21 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">设定期限</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]邀请朋友[/B][A]聊天[/A][B]并享受我们隐私又安全的加密平台。[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]邀请朋友加入[/B][A]聊天[/A][B]享受我们私密安全的加密服务[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B][/B][A]没有媒体在[/A]相机上传[B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]清空[/B][A]垃圾桶[/A][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[A]相机上传[/A]中[B]无文件[/B]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]垃圾桶[/A]中[B]无文件[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]无文件在您的 [/B][A]收件箱[/A][B]。[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]无文件在您的 [/B][A]云盘[/A][B]。[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]无文件[/B][A]离线[/A]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[A]收件箱[/A]中[B]无文件[/B]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[A]云盘[/A]中[B]无文件[/B]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[A]离线[/A]中[B]无文件[/B]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]无[/B][A]联系人[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]无[/A] [B]对话[/B]</string>
     <string name="recent_chat_loading_conversations" context="Message shown when the chat is section is loading the conversations">[A]加载[/A] [B]对话&#8230; [/B]</string>
 
-    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]无 [/B][A]传入的共享文件夹[/A][B]。[/B]</string>
-    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]无 [/B][A]传出的共享文件夹[/A][B]。[/B]</string>
+    <string name="context_empty_incoming" context="Text of the empty screen when there are not elements in Incoming">[B]无 [/B][A]传入的共享文件夹[/A]</string>
+    <string name="context_empty_outgoing" context="Text of the empty screen when there are not elements in Outgoing">[B]无 [/B][A]传出的共享文件夹[/A]</string>
     <string name="context_empty_links" context="Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string">[B]无[/B][A]公共链接[/A][B][/B]</string>
 
     <string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">送出邀请</string>
@@ -2048,9 +2048,9 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">新的联系人请求</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
-    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]没有[/B][A] 传输[/A][B].[/B]</string>
-    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]没有已完成[/B][A] 传输[/A][B].[/B]</string>
-    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[B]空白[/B][A] 文件夹[/A][B].[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]无[/B][A]正在传输[/A]的文件</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]无已完成的[/B][A]传输[/A]</string>
+    <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]文件夹[/A]当前为[B]空[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">写信息给 "%s"&#8230;</string>
     <string name="type_message_hint_with_default_title" context="Hint shown in the field to write a message in the chat screen (chat with default title)">写信息给 "%s"&#8230;</string>
@@ -2412,8 +2412,8 @@
 	<string name="title_compress_video" context="notification title when compressing video">正在压缩视频 %1$d/%2$d</string>
 	<string name="error_invalid_folder_selected" context="error message pops up when user selected an invalid folder for camera upload">选择的文件夹无效</string>
 
-    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1个文件夹，1个文件</string>
-    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1个文件夹，%1$d个文件</string>
+    <string name="one_folder_one_file" context="Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1个文件夹 · 1个文件</string>
+    <string name="one_folder_several_files" context="Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark.">1个文件夹 · %1$d个文件</string>
 
     <plurals name="num_files_with_parameter">
         <item context="on the section notifications indicates the number of files added to a shared folder, Singular of file. 1 file" quantity="one">%d 个文件</item>
@@ -2426,8 +2426,8 @@
     </plurals>
 
     <plurals name="num_folders_num_files">
-        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d个文件夹，1个文件</item>
-        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d个文件夹，%2$d个文件</item>
+        <item context="Indicates the content of a folder is some folders and 1 file. Singular of file. e.g. 7 folders · 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="one">%1$d个文件夹 · 1个文件</item>
+        <item context="Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark." quantity="other">%1$d个文件夹 · %2$d个文件</item>
     </plurals>
 
     <string name="subtitle_notification_added_folders_and_files" context="Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added">[A]%1$s[/A][B]添加了%2$s和%3$s[/B]</string>
@@ -2466,7 +2466,7 @@
     <string name="ssl_error_dialog_title" context="Title of the dialog to inform about a SSL error">SSL密钥错误</string>
     <string name="ssl_error_dialog_text" context="Text of the dialog to inform about a SSL error">MEGA无法通过SSL进行安全连接。您可能正在使用受限制的公共网络。</string>
 
-    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]无 [/B][A]通知[/A][B]。[/B]</string>
+    <string name="context_empty_notifications" context="Text of the empty screen for the notifications section">[B]无 [/B][A]通知[/A]</string>
 
     <string name="general_setup_mega" context="Permissions screen title">设置MEGA</string>
     <string name="setup_mega_explanation" context="Permissions screen explanation">MEGA需要访问您的照片，媒体内容和文件，方便您与朋友进行分享，交换加密信息和安全通话。</string>
@@ -2509,7 +2509,7 @@
     <string name="label_yesterday" context="label yesterday">昨天</string>
     <string name="label_tomorrow" context="label tomorrow">明天</string>
 
-    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]无[/B][A]分享文件[/A][B].[/B]</string>
+    <string name="context_empty_shared_files" context="Text of the empty screen for the chat shared files">[B]无 [/B][A]共享文件[/A]</string>
 
     <string name="contact_joined_the_call" context="Text to indicate that a contact has joined a group call">%1$s已加入通话</string>
     <string name="contact_left_the_call" context="Text to indicate that a contact has left a group call">%1$s已离开通话</string>
@@ -2880,7 +2880,7 @@
     <string name="category_documents" context="The label under the button of opening all-documents screen">文档</string>
     <string name="section_documents" context="The label under the button of opening all-documents screen">文档</string>
 
-    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">新建聊天</string>
+    <string name="fab_label_new_chat" context="Label of the floating action button of opening the new chat conversation">创建新的聊天对话</string>
 
     <string name="homepage_empty_hint_photos" context="Text that indicates that there’s no photo to show">无照片</string>
     <string name="homepage_empty_hint_documents" context="Text that indicates that there’s no document to show">无文档</string>
@@ -2957,7 +2957,7 @@
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">选择传输</string>
 
-    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">传输\'%1$s\'的优先级更改失败。</string>
+    <string name="change_of_transfer_priority_failed" context="Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed.">传输”%1$s”的优先级更改失败。</string>
 
     <string name="option_send_decryption_key_separately" context="Title option to send separated the link and decryption key">单独发送解密密钥</string>
     <string name="explanation_send_decryption_key_separately" context="Explanation option to send separated the link and decryption key">分别导出链接和解密密钥</string>

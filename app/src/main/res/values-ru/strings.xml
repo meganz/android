@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Игнорировать</string>
     <string name="contact_decline" context="option to decline a contact invitation">Отклонить</string>
     <string name="contact_accept" context="option to accept a contact invitation">Принять</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">О контакте</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">О контакте</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -1597,7 +1597,7 @@
     <string name="attachment_upload_panel_photo">Из устройства</string>
 
     <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Удалить аккаунт</string>
-    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Закрыв учётную запись, вы потеряете доступ к своим данным, контактам MEGA и разговорам.\nЭто действие нельзя отменить.</string>
+    <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Удалив аккаунт, вы потеряете доступ к своим данным, контактам MEGA и разговорам.\nЭто действие нельзя отменить.</string>
     <string name="delete_button" context="menu item">Удалить</string>
 
     <string name="file_properties_info_info_file">Информация</string>
@@ -1831,9 +1831,9 @@
     <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Нет медиа в [/B][A]загрузках камеры[/A]</string>
     <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[A]Корзина [/A][B]пуста[/B]</string>
 
-    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Во [/B][A]«Входящих»[/A][B] нет файлов.[/B]</string>
-    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]В [/B][A]облачном диске[/A][B] нет файлов.[/B]</string>
-    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Нет [A]локальных[/A] файлов[/B]</string>
+    <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Нет файлов во [/B][A]«Входящих»[/A]</string>
+    <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Нет файлов на [/B][A]облачнов диске[/A]</string>
+    <string name="context_empty_offline" context="Text of the empty screen when there are not elements in Saved for Offline">[B]Нет файлов, [/B][A]сохранённых локально[/A]</string>
     <string name="context_empty_contacts" context="Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors.">[B]Нет [/B][A]контактов[/A]</string>
 
     <string name="recent_chat_empty" context="Message shown when the user has no chats">[A]Нет[/A] [B]разговоров[/B]</string>

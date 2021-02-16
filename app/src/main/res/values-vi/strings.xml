@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Bỏ Qua</string>
     <string name="contact_decline" context="option to decline a contact invitation">Từ chối</string>
     <string name="contact_accept" context="option to accept a contact invitation">Nhận</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">Thông tin liên lạc</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Thông tin liên lạc</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->

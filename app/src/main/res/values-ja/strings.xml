@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">無視する</string>
     <string name="contact_decline" context="option to decline a contact invitation">拒否</string>
     <string name="contact_accept" context="option to accept a contact invitation">受け入れる</string>
-    <string name="contact_properties_activity" context="title of the contact properties screen">知り合いに関する情報</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">知り合いに関する情報</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
