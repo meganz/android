@@ -244,6 +244,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             noContacts();
         }
+        checkScroll();
     }
 
     private void expandContainer() {
