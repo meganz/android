@@ -1037,27 +1037,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_SYNC_FP_ORI + " ='" + encrypt(originalFingerprint) + "' AND "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "' AND "
                 + KEY_SYNC_COPYONLY + " = '" + encrypt(String.valueOf(isCopyOnly)) + "'";
-        Cursor cursor = db.rawQuery(selectQuery,null );
-        if (cursor != null && cursor.moveToFirst()) {
-            SyncRecord exist = extractSyncRecord(cursor);
-            cursor.close();
-            return exist;
-        }
+		Cursor cursor = null;
+		try {
+			cursor = db.rawQuery(selectQuery, null);
+			if (cursor != null && cursor.moveToFirst()) {
+				SyncRecord exist = extractSyncRecord(cursor);
+				cursor.close();
+				return exist;
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return null;
     }
 
     public List<SyncRecord> findAllPendingSyncRecords() {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + SyncRecord.STATUS_PENDING;
-        Cursor cursor = db.rawQuery(selectQuery,null);
-        List<SyncRecord> records = new ArrayList<>();
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                SyncRecord record = extractSyncRecord(cursor);
-                records.add(record);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
+		List<SyncRecord> records = new ArrayList<>();
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				do {
+					SyncRecord record = extractSyncRecord(cursor);
+					records.add(record);
+				} while (cursor.moveToNext());
+
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return records;
     }
 
@@ -1065,16 +1073,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_STATE + " = " + state + " AND "
                 + KEY_SYNC_TYPE + " = " + SyncRecord.TYPE_VIDEO ;
-        Cursor cursor = db.rawQuery(selectQuery,null);
-
-        List<SyncRecord> records = new ArrayList<>();
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                SyncRecord record = extractSyncRecord(cursor);
-                records.add(record);
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
+		List<SyncRecord> records = new ArrayList<>();
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				do {
+					SyncRecord record = extractSyncRecord(cursor);
+					records.add(record);
+				} while (cursor.moveToNext());
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return records;
     }
 
@@ -1144,12 +1153,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILEPATH_ORI + " ='" + encrypt(localPath) + "' AND "
                 + KEY_SYNC_SECONDARY + " ='" + encrypt(String.valueOf(isSecondary)) + "'";
-        Cursor cursor = db.rawQuery(selectQuery,null);
-        if (cursor != null && cursor.moveToFirst()) {
-            SyncRecord record = extractSyncRecord(cursor);
-            cursor.close();
-            return record;
-        }
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				SyncRecord record = extractSyncRecord(cursor);
+				return record;
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return null;
     }
 
@@ -1198,27 +1209,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public SyncRecord findSyncRecordByNewPath(String newPath) {
         String selectQuery = "SELECT * FROM " + TABLE_SYNC_RECORDS + " WHERE "
                 + KEY_SYNC_FILEPATH_NEW + " ='" + encrypt(newPath) + "'";
-        Cursor cursor = db.rawQuery(selectQuery,null);
-        if (cursor != null && cursor.moveToFirst()) {
-            SyncRecord record = extractSyncRecord(cursor);
-            cursor.close();
-            return record;
-        }
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				SyncRecord record = extractSyncRecord(cursor);
+				return record;
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return null;
     }
 
     public boolean shouldClearCamsyncRecords() {
         String selectQuery = "SELECT " + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " FROM " + TABLE_PREFERENCES;
-        Cursor cursor = db.rawQuery(selectQuery,null);
-        if (cursor != null && cursor.moveToFirst()) {
-            String should = cursor.getString(cursor.getColumnIndex(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS));
-            should = decrypt(should);
-            if(TextUtils.isEmpty(should)) {
-                return false;
-            } else {
-                return Boolean.valueOf(should);
-            }
-        }
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				String should = cursor.getString(cursor.getColumnIndex(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS));
+				should = decrypt(should);
+				if (TextUtils.isEmpty(should)) {
+					return false;
+				} else {
+					return Boolean.valueOf(should);
+				}
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return false;
     }
 
@@ -1231,43 +1247,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT " + KEY_SYNC_TIMESTAMP + " FROM " + TABLE_SYNC_RECORDS + "  WHERE "
                 + KEY_SYNC_SECONDARY + " = '" + encrypt(String.valueOf(isSecondary)) + "' AND "
                 + KEY_SYNC_TYPE + " = " + type;
-        Cursor cursor = db.rawQuery(selectQuery,null);
-        if (cursor != null && cursor.moveToFirst()) {
-            List<Long> timestamps = new ArrayList<>(cursor.getCount());
-            do {
-                String timestamp = decrypt(cursor.getString(0));
-                if(timestamp == null) {
-                    timestamps.add(0L);
-                }else{
-                    timestamps.add(Long.valueOf(timestamp));
-                }
-            } while (cursor.moveToNext());
-            cursor.close();
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				List<Long> timestamps = new ArrayList<>(cursor.getCount());
+				do {
+					String timestamp = decrypt(cursor.getString(0));
+					if (timestamp == null) {
+						timestamps.add(0L);
+					} else {
+						timestamps.add(Long.valueOf(timestamp));
+					}
+				} while (cursor.moveToNext());
 
-            if(timestamps.isEmpty()) {
-                return null;
-            }
-            Collections.sort(timestamps,new Comparator<Long>() {
+				if (timestamps.isEmpty()) {
+					return null;
+				}
+				Collections.sort(timestamps, new Comparator<Long>() {
 
-                @Override
-                public int compare(Long o1,Long o2) {
-                    if(o1.equals(o2)) {
-                        return 0;
-                    }
-                    return (o1 > o2) ? -1 : 1;
-                }
-            });
-            return timestamps.get(0);
-        }
+					@Override
+					public int compare(Long o1, Long o2) {
+						if (o1.equals(o2)) {
+							return 0;
+						}
+						return (o1 > o2) ? -1 : 1;
+					}
+				});
+				return timestamps.get(0);
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
         return null;
     }
 
     public void setCameraUploadVideoQuality(int quality){
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_UPLOAD_VIDEO_QUALITY + "= '" + encrypt(String.valueOf(quality)) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -1275,19 +1291,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(String.valueOf(quality)));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
     public void setConversionOnCharging (boolean onCharging){
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CONVERSION_ON_CHARGING + "= '" + encrypt(String.valueOf(onCharging)) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -1295,19 +1307,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CONVERSION_ON_CHARGING, encrypt(String.valueOf(onCharging)));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
     public void setChargingOnSize (int size){
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CHARGING_ON_SIZE + "= '" + encrypt(String.valueOf(size)) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -1315,19 +1323,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CHARGING_ON_SIZE, encrypt(String.valueOf(size)));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
     public void setRemoveGPS (boolean removeGPS){
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_REMOVE_GPS + "= '" + encrypt(String.valueOf(removeGPS)) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -1335,10 +1339,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_REMOVE_GPS, encrypt(String.valueOf(removeGPS)));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
@@ -1366,9 +1368,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("saveEmail: " + email);
 		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_CREDENTIALS_TABLE = "UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_EMAIL + "= '" + encrypt(email) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_CREDENTIALS_TABLE);
@@ -1376,10 +1376,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_EMAIL, encrypt(email));
 				db.insert(TABLE_CREDENTIALS, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -1387,9 +1385,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_CREDENTIALS_TABLE = "UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_FIRST_NAME + "= '" + encrypt(firstName) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_CREDENTIALS_TABLE);
@@ -1397,19 +1393,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_FIRST_NAME, encrypt(firstName));
 				db.insert(TABLE_CREDENTIALS, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void saveMyLastName(String lastName) {
 		String selectQuery = "SELECT * FROM " + TABLE_CREDENTIALS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_CREDENTIALS_TABLE = "UPDATE " + TABLE_CREDENTIALS + " SET " + KEY_LAST_NAME + "= '" + encrypt(lastName) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_CREDENTIALS_TABLE);
@@ -1417,27 +1409,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_LAST_NAME, encrypt(lastName));
 				db.insert(TABLE_CREDENTIALS, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public String getMyEmail() {
 		String selectQuery = "SELECT "+KEY_EMAIL+" FROM " + TABLE_CREDENTIALS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
 		String email = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				email = decrypt(cursor.getString(0));
 			}
-		} finally{
-			if(cursor != null){
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return email;
 	}
@@ -1533,8 +1519,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     contacts.add(contact);
                 }
-            } finally {
-                cursor.close();
+            } catch (Exception e) {
+				logError("Exception opening or managing DB cursor", e);
+			} finally {
+            	if(cursor != null) {
+					cursor.close();
+				}
             }
         }
         return contacts;
@@ -1548,26 +1538,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public EphemeralCredentials getEphemeral(){
         EphemeralCredentials ephemeralCredentials = null;
         String selectQuery = "SELECT  * FROM " + TABLE_EPHEMERAL;
-		Cursor cursor = null;
-        try{
-        	cursor = db.rawQuery(selectQuery, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                int id = Integer.parseInt(cursor.getString(0));
-                String email = decrypt(cursor.getString(1));
-                String password = decrypt(cursor.getString(2));
-                String session = decrypt(cursor.getString(3));
-                String firstName = decrypt(cursor.getString(4));
-                String lastName = decrypt(cursor.getString(5));
-                ephemeralCredentials = new EphemeralCredentials(email, password, session, firstName, lastName);
-            }
-        } catch (SQLiteException e){
-            if (db != null){
-                onCreate(db);
-            }
-        } finally{
-			if (cursor != null) {
-				cursor.close();
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				int id = Integer.parseInt(cursor.getString(0));
+				String email = decrypt(cursor.getString(1));
+				String password = decrypt(cursor.getString(2));
+				String session = decrypt(cursor.getString(3));
+				String firstName = decrypt(cursor.getString(4));
+				String lastName = decrypt(cursor.getString(5));
+				ephemeralCredentials = new EphemeralCredentials(email, password, session, firstName, lastName);
 			}
+		} catch (SQLiteException e) {
+			if (db != null) {
+				onCreate(db);
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
         return ephemeralCredentials;
     }
@@ -1627,9 +1613,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		MegaPreferences prefs = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				int id = Integer.parseInt(cursor.getString(0));
 				String firstTime = decrypt(cursor.getString(1));
@@ -1680,10 +1664,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging, chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
 						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return prefs;
 	}
@@ -1698,9 +1680,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ChatSettings chatSettings = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				int id = Integer.parseInt(cursor.getString(0));
 				String enabled = decrypt(cursor.getString(1));
@@ -1710,10 +1690,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String sendOriginalAttachments = decrypt(cursor.getString(6));
 				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return chatSettings;
 	}
@@ -1727,19 +1705,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ChatSettings chatSettings = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String notificationSound = decrypt(cursor.getString(2));
 				String vibrationEnabled = decrypt(cursor.getString(3));
 				String sendOriginalAttachments = decrypt(cursor.getString(4));
 				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return chatSettings;
 	}
@@ -1779,9 +1753,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + "= '" + encrypt(originalAttachments) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_CHAT_TABLE);
@@ -1789,19 +1761,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(originalAttachments));
 				db.insert(TABLE_CHAT_SETTINGS, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setNotificationSoundChat(String sound){
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SOUND_NOTIFICATIONS + "= '" + encrypt(sound) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -1810,19 +1778,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(sound));
 				db.insert(TABLE_CHAT_SETTINGS, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setVibrationEnabledChat(String enabled){
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_VIBRATION_ENABLED + "= '" + encrypt(enabled) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -1831,10 +1795,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(enabled));
 				db.insert(TABLE_CHAT_SETTINGS, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -1865,9 +1827,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
         logDebug("QUERY: " + selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null)) {
 				if (cursor.moveToFirst()) {
@@ -1882,10 +1842,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					return prefs;
 				}
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return null;
 	}
@@ -1894,16 +1852,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CHAT_ITEMS + " WHERE " + KEY_CHAT_HANDLE + " = '" + encrypt(handle) + "'";
 		String result = NOTIFICATIONS_ENABLED;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				result = decrypt(cursor.getString(2));
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return result;
 	}
@@ -1935,18 +1889,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	public AndroidCompletedTransfer getcompletedTransfer(long id) {
 		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " WHERE " + KEY_ID + " = '" + id + "'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (cursor != null && cursor.moveToFirst()) {
 				AndroidCompletedTransfer transfer = extractAndroidCompletedTransfer(cursor);
 				return transfer;
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return null;
 	}
@@ -2080,19 +2030,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
 	public ArrayList<AndroidCompletedTransfer> getCompletedTransfers(String selectQuery) {
 		ArrayList<AndroidCompletedTransfer> cTs = new ArrayList<AndroidCompletedTransfer>();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (cursor != null && cursor.moveToLast()) {
 				do {
 					cTs.add(extractAndroidCompletedTransfer(cursor));
 				} while (cursor.moveToPrevious());
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return cTs;
 	}
@@ -2105,9 +2051,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String pinLockEnabled = null;
 		boolean result = false;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				//get pinLockEnabled
 				pinLockEnabled = decrypt(cursor.getString(7));
@@ -2121,10 +2065,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					}
 				}
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return result;
 	}
@@ -2136,9 +2078,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + "='" + encrypt(smallGridCamera + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -2146,10 +2086,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_SMALL_GRID_CAMERA, encrypt(smallGridCamera + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -2159,9 +2097,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT " + KEY_SMALL_GRID_CAMERA + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
 		boolean result = false;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 
 				String smallGrid = decrypt(cursor.getString(0));
@@ -2175,10 +2111,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					}
 				}
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return result;
 	}
@@ -2215,9 +2149,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		MegaAttributes attr = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				int id = Integer.parseInt(cursor.getString(0));
 				String online = decrypt(cursor.getString(1));
@@ -2252,10 +2184,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
 						myChatFilesFolderHandle, transferQueueStatus);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return attr;
 	}
@@ -2331,9 +2261,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_NON_CONTACTS + " WHERE " + KEY_NONCONTACT_HANDLE + " = '" + encrypt(handle)+ "'";
         logDebug("QUERY: " + selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				int _id = Integer.parseInt(cursor.getString(0));
@@ -2346,10 +2274,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				noncontact = new NonContactInfo(handle, _fullName, _firstName, _lastName, _email);
 				return noncontact;
 			}
-		} finally {
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return null;
 	}
@@ -2384,21 +2310,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	public int getContactsSize(){
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null) {
 				int mCount = cursor.getCount();
-
 				return mCount;
 			} else {
 				return 0;
 			}
-		}finally {
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
+		return 0;
 	}
 
 	public int setContactMail (long handle, String mail){
@@ -2415,9 +2337,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_HANDLE + " = '" + encrypt(handle) + "'";
         logDebug("QUERY: " + selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 
 				int _id = -1;
@@ -2437,10 +2357,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				contacts = new MegaContactDB(handle, _mail, _name, _lastName, _nickname);
 				return contacts;
 			}
-		} finally{
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return null;
 	}
@@ -2451,9 +2369,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS + " WHERE " + KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'";
         logDebug("QUERY: " + selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				int _id = -1;
@@ -2474,10 +2390,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				return contacts;
 			}
-		} finally {
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return null;
 	}
@@ -2587,9 +2501,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				do {
 
@@ -2605,10 +2517,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					listOffline.add(offline);
 				} while (cursor.moveToNext());
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return listOffline;
 	}
@@ -2618,9 +2528,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				do {
 
@@ -2636,10 +2544,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					listOffline.add(offline);
 				} while (cursor.moveToNext());
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return listOffline;
 	}
@@ -2672,9 +2578,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '"
 				+ encrypt(handle) + "'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null) {
 				if (cursor.moveToFirst()) {
 					int id = Integer.parseInt(cursor.getString(0));
@@ -2689,10 +2593,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 							handleIncoming);
 				}
 			}
-		} finally{
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return null;
 	}
@@ -2703,9 +2605,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PARENT + " = '" + parentId + "'";
 
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				do {
@@ -2730,10 +2630,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					listOffline.add(new MegaOffline(_id, _handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
 			}
-		} finally{
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return listOffline;
 	}
@@ -2742,9 +2640,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_ID + " = '" + id + "'";
 		MegaOffline mOffline = null;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				do {
@@ -2770,10 +2666,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				} while (cursor.moveToNext());
 			}
-		} finally{
-			if(cursor != null){
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return mOffline;
 	}
@@ -2789,9 +2683,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
 		//Get the foreign key of the node
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + encrypt(path) + "'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				do {
 					int _id = -1;
@@ -2815,10 +2707,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					listOffline.add(new MegaOffline(_id, _handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
 			}
-		} finally{
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return listOffline;
 	}
@@ -2828,9 +2718,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + encrypt(path) + "'" + "AND " + KEY_OFF_NAME + " = '" + encrypt(name) + "'"  ;
 
 		MegaOffline mOffline = null;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				do {
@@ -2856,10 +2744,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				} while (cursor.moveToNext());
 			}
-		} finally{
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return mOffline;
 	}
@@ -2937,9 +2823,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setFirstTime (boolean firstTime){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FIRST_LOGIN + "= '" + encrypt(firstTime + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -2948,10 +2832,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_FIRST_LOGIN, encrypt(firstTime + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -2975,9 +2857,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setCamSyncWifi (boolean wifi){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_WIFI + "= '" + encrypt(wifi + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -2986,10 +2866,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CAM_SYNC_WIFI, encrypt(wifi + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -2998,9 +2876,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST + "= '" + encrypt(list + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3009,10 +2885,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PREFERRED_VIEW_LIST, encrypt(list + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3021,9 +2895,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST_CAMERA + "= '" + encrypt(list + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3032,10 +2904,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(list + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3044,9 +2914,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CLOUD + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3055,10 +2923,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(order));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3067,9 +2933,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3078,10 +2942,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(order));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3097,9 +2959,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_OTHERS + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3108,19 +2968,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(order));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setLastUploadFolder (String folderPath){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_LAST_UPLOAD_FOLDER + "= '" + encrypt(folderPath + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3129,19 +2985,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_LAST_UPLOAD_FOLDER, encrypt(folderPath + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setLastCloudFolder (String folderHandle){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_LAST_CLOUD_FOLDER_HANDLE + "= '" + encrypt(folderHandle + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3150,10 +3002,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(folderHandle + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3177,9 +3027,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setKeepFileNames (boolean charging){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_KEEP_FILE_NAMES + "= '" + encrypt(charging + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3188,10 +3036,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_KEEP_FILE_NAMES, encrypt(charging + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3199,9 +3045,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("setCamSyncEnabled: " + enabled);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_ENABLED + "= '" + encrypt(enabled + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3215,10 +3059,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			} else {
 				CuSyncManager.INSTANCE.removePrimaryBackup();
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3226,9 +3068,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("setSecondaryUploadEnabled: " + enabled);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_FOLDER_ENABLED + "= '" + encrypt(enabled + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3242,19 +3082,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			} else {
 				CuSyncManager.INSTANCE.removeSecondaryBackup();
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setCamSyncHandle (long handle){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_HANDLE + "= '" + encrypt(handle + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3266,10 +3102,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			logDebug("Set new primary handle: " + handle);
 			//Update CU backup when CU target folder changed.
 			CuSyncManager.INSTANCE.updatePrimaryTargetNode(handle);
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3277,9 +3111,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("setSecondaryFolderHandle: " + handle);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_FOLDER_HANDLE + "= '" + encrypt(handle + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3291,19 +3123,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			logDebug("Set new secondary handle: " + handle);
 			//Update MU backup when MU target folder changed.
 			CuSyncManager.INSTANCE.updateSecondaryTargetNode(handle);
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setCamSyncLocalPath (String localPath){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_LOCAL_PATH + "= '" + encrypt(localPath + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3312,19 +3140,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(localPath + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setUriExternalSDCard (String uriExternalSDCard){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_URI_EXTERNAL_SD_CARD + "= '" + encrypt(uriExternalSDCard) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3333,10 +3157,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_URI_EXTERNAL_SD_CARD, encrypt(uriExternalSDCard));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3365,9 +3187,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setCameraFolderExternalSDCard (boolean cameraFolderExternalSDCard){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD + "= '" + encrypt(cameraFolderExternalSDCard + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3376,10 +3196,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD, encrypt(cameraFolderExternalSDCard + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3405,9 +3223,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("setPinLockType");
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_TYPE + "= '" + encrypt(pinLockType) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3416,10 +3232,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PIN_LOCK_TYPE, encrypt(pinLockType));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3427,9 +3241,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         logDebug("setSecondaryFolderPath: " + localPath);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_FOLDER_LOCAL_PATH + "= '" + encrypt(localPath + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3438,19 +3250,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(localPath + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setCamSyncFileUpload (int fileUpload){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_FILE_UPLOAD + "= '" + encrypt(fileUpload + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3459,10 +3267,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(fileUpload + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3479,9 +3285,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ACCOUNT_DETAILS_TIMESTAMP + "= '" + encrypt(accountDetailsTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTE_TABLE);
@@ -3490,10 +3294,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(accountDetailsTimeStamp + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3503,9 +3305,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PAYMENT_METHODS_TIMESTAMP + "= '" + encrypt(paymentMethodsTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTE_TABLE);
@@ -3514,10 +3314,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(paymentMethodsTimeStamp + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3527,9 +3325,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_PRICING_TIMESTAMP + "= '" + encrypt(creditCardTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTE_TABLE);
@@ -3538,10 +3334,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PRICING_TIMESTAMP, encrypt(creditCardTimestamp + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3551,9 +3345,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + "= '" + encrypt(extendedAccountDetailsTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTE_TABLE);
@@ -3562,10 +3354,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(extendedAccountDetailsTimestamp + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3575,9 +3365,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP + "= '" + encrypt(extendedAccountDetailsTimestamp + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTE_TABLE);
@@ -3586,10 +3374,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP, encrypt(extendedAccountDetailsTimestamp + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3686,9 +3472,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	private void setStringValue(String tableName, String columnName, String value) {
 		String selectQuery = "SELECT * FROM " + tableName;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_TABLE = "UPDATE " + tableName + " SET " + columnName + "= '" + encrypt(value) + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_TABLE);
@@ -3697,10 +3481,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(columnName, encrypt(value));
 				db.insert(tableName, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3715,9 +3497,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private String getStringValue(String tableName, String columnName, String defaultValue) {
 		String value = defaultValue;
 		String selectQuery = "SELECT " + columnName + " FROM " + tableName + " WHERE " + KEY_ID + " = '1'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				value = decrypt(cursor.getString(0));
 				logDebug(columnName + " value: " + value);
@@ -3728,10 +3508,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				db.insert(tableName, null, values);
 				logDebug("Default value: " + defaultValue);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return value;
 	}
@@ -3760,9 +3538,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setPinLockEnabled (boolean pinLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_ENABLED + "= '" + encrypt(pinLockEnabled + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3771,19 +3547,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PIN_LOCK_ENABLED, encrypt(pinLockEnabled + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setPinLockCode (String pinLockCode){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_CODE + "= '" + encrypt(pinLockCode + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3792,10 +3564,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_PIN_LOCK_CODE, encrypt(pinLockCode + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3824,9 +3594,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setStorageDownloadLocation (String storageDownloadLocation){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_DOWNLOAD_LOCATION + "= '" + encrypt(storageDownloadLocation + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_PREFERENCES_TABLE);
@@ -3835,10 +3603,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(storageDownloadLocation + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3860,9 +3626,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setAttrAskSizeDownload (String askSizeDownload){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_SIZE_DOWNLOAD + "='" + encrypt(askSizeDownload) + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -3871,19 +3635,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(askSizeDownload));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setAttrAskNoAppDownload (String askNoAppDownload){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ASK_NOAPP_DOWNLOAD + "='" + encrypt(askNoAppDownload) + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -3892,19 +3652,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(askNoAppDownload));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setAttrAttemps (int attemp){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + "='" + encrypt(Integer.toString(attemp) + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -3913,19 +3669,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attemp) + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setFileLoggerSDK (boolean fileLoggerSDK){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_SDK + "='" + encrypt(fileLoggerSDK + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -3934,19 +3686,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_FILE_LOGGER_SDK, encrypt(fileLoggerSDK + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setFileLoggerKarere (boolean fileLoggerKarere){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_FILE_LOGGER_KARERE + "='" + encrypt(fileLoggerKarere + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -3955,19 +3703,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_FILE_LOGGER_KARERE, encrypt(fileLoggerKarere + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setUseHttpsOnly (boolean useHttpsOnly){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_USE_HTTPS_ONLY + "='" + encrypt(useHttpsOnly + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -3976,10 +3720,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_USE_HTTPS_ONLY, encrypt(useHttpsOnly + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -3987,17 +3729,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public String getUseHttpsOnly(){
 
 		String selectQuery = "SELECT " + KEY_USE_HTTPS_ONLY + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String useHttpsOnly = decrypt(cursor.getString(0));
 				return useHttpsOnly;
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return "false";
 	}
@@ -4005,9 +3743,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setShowCopyright (boolean showCopyright){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_COPYRIGHT + "='" + encrypt(showCopyright + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4015,10 +3751,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_SHOW_COPYRIGHT, encrypt(showCopyright + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -4026,17 +3760,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public String getShowCopyright (){
 
 		String selectQuery = "SELECT " + KEY_SHOW_COPYRIGHT + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String show = decrypt(cursor.getString(0));
 				return show;
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return "true";
 	}
@@ -4044,9 +3774,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setShowNotifOff (boolean showNotifOff){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_NOTIF_OFF + "='" + encrypt(showNotifOff + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4054,19 +3782,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_SHOW_NOTIF_OFF, encrypt(showNotifOff + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setLastPublicHandle (long handle){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE + "= '" + encrypt(handle + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4075,19 +3799,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(handle + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public void setLastPublicHandleTimeStamp(long lastPublicHandleTimeStamp){
         String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTE_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + "= '" + encrypt(lastPublicHandleTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
 				db.execSQL(UPDATE_ATTRIBUTE_TABLE);
@@ -4096,10 +3816,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(lastPublicHandleTimeStamp + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
@@ -4193,17 +3911,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public String getShowNotifOff (){
 
 		String selectQuery = "SELECT " + KEY_SHOW_NOTIF_OFF + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String show = decrypt(cursor.getString(0));
 				return show;
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return "true";
 	}
@@ -4211,9 +3925,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setStaging (boolean staging){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + "='" + encrypt(staging + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4221,28 +3933,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_STAGING, encrypt(staging + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
 	public String getStaging (){
 
 		String selectQuery = "SELECT " + KEY_STAGING + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 
 				String staging = decrypt(cursor.getString(0));
 				return staging;
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return "false";
 	}
@@ -4250,9 +3956,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setInvalidateSdkCache(boolean invalidateSdkCache){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_INVALIDATE_SDK_CACHE + "='" + encrypt(invalidateSdkCache + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4261,10 +3965,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(invalidateSdkCache + ""));
 				db.insert(TABLE_ATTRIBUTES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 	}
 
@@ -4401,9 +4103,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		PendingMessageSingle pendMsg = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " +KEY_ID + " ='"+ messageId+"'";
         logDebug("QUERY: " + selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 //				long id = Integer.parseInt(cursor.getString(0));
@@ -4429,10 +4129,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				pendMsg = new PendingMessageSingle(messageId, chatId, timestamp, idTempKarere, filePath, fingerPrint, name, nodeHandle, transferTag, state);
 			}
-		} finally{
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return pendMsg;
 	}
@@ -4478,9 +4176,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_STATE + " < " + PendingMessageSingle.STATE_SENT + " AND " + KEY_ID_CHAT + " ='" + encrypt(chat) + "'";
         logDebug("QUERY: " + selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (!cursor.equals(null) && cursor.moveToFirst()) {
 				do {
 					long id = cursor.getLong(0);
@@ -4511,10 +4207,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 				} while (cursor.moveToNext());
 			}
-		} finally {
-			if(cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
         logDebug("Found: " + pendMsgs.size());
 		return pendMsgs;
@@ -4527,18 +4221,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
 		logDebug("QUERY: "+selectQuery);
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (!cursor.equals(null)) {
 				if (cursor.moveToFirst()) {
 					id = cursor.getLong(0);
 				}
 			}
-		} finally {
-			if(cursor != null){
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return id;
 	}
@@ -4560,17 +4250,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public String getAutoPlayEnabled(){
 
         String selectQuery = "SELECT " + KEY_AUTO_PLAY + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String enabled = decrypt(cursor.getString(0));
 				return enabled;
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
         return "false";
     }
@@ -4584,9 +4270,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_AUTO_PLAY + "='" + encrypt(enabled + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4594,10 +4278,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_AUTO_PLAY, encrypt(enabled + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
@@ -4606,9 +4288,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SHOW_INVITE_BANNER + "='" + encrypt(show + "") + "' WHERE " + KEY_ID + " ='1'";
 				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
@@ -4616,19 +4296,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				values.put(KEY_SHOW_INVITE_BANNER, encrypt(show + ""));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
     }
 
 	public ArrayList<SDTransfer> getSDTransfers() {
 		ArrayList<SDTransfer> sdTransfers = new ArrayList<>();
 		String selectQuery = "SELECT * FROM " + TABLE_SD_TRANSFERS;
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToLast()) {
 				do {
 					int tag = Integer.parseInt(cursor.getString(1));
@@ -4641,10 +4317,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					sdTransfers.add(new SDTransfer(tag, name, size, nodeHandle, path, appData));
 				} while (cursor.moveToPrevious());
 			}
-		} finally {
-			if (cursor != null) {
-				cursor.close();
-			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
 		}
 		return sdTransfers;
 	}
