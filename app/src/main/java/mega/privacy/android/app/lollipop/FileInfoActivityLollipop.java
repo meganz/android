@@ -924,7 +924,56 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS);
         registerReceiver(contactUpdateReceiver, contactUpdateFilter);
+
+        getActionBarDrawables();
 	}
+
+    private void getActionBarDrawables() {
+        drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
+        if (drawableDots != null) {
+            drawableDots = drawableDots.mutate();
+        }
+
+        upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
+        if (upArrow != null) {
+            upArrow = upArrow.mutate();
+        }
+
+        drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link_w);
+        if (drawableRemoveLink != null) {
+            drawableRemoveLink = drawableRemoveLink.mutate();
+        }
+
+        drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
+        if (drawableLink != null) {
+            drawableLink = drawableLink.mutate();
+        }
+
+        drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
+        if (drawableShare != null) {
+            drawableShare = drawableShare.mutate();
+        }
+
+        drawableDownload = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_download_white);
+        if (drawableDownload != null) {
+            drawableDownload = drawableDownload.mutate();
+        }
+
+        drawableLeave = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_leave_share_w);
+        if (drawableLeave != null) {
+            drawableLeave = drawableLeave.mutate();
+        }
+
+        drawableCopy = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_copy_white);
+        if (drawableCopy != null) {
+            drawableCopy.mutate();
+        }
+
+        drawableChat = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
+        if (drawableChat != null) {
+            drawableChat.mutate();
+        }
+    }
 	
 	private String getTranslatedNameForParentNodes(long parentHandle){
         String translated;
@@ -947,27 +996,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-        drawableDots = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_dots_vertical_white);
-        drawableDots = drawableDots.mutate();
-        upArrow = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_back_white);
-        upArrow = upArrow.mutate();
-
-        drawableRemoveLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_remove_link_w);
-        drawableRemoveLink = drawableRemoveLink.mutate();
-        drawableLink = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_link_white);
-        drawableLink = drawableLink.mutate();
-        drawableShare = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_share_white);
-        drawableShare = drawableShare.mutate();
-        drawableDownload = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_download_white);
-        drawableDownload = drawableDownload.mutate();
-        drawableLeave = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_leave_share_w);
-        drawableLeave = drawableLeave.mutate();
-        drawableCopy = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_copy_white);
-        drawableCopy.mutate();
-        drawableChat = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_send_to_contact);
-        drawableChat.mutate();
-
-        // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_info_action, menu);
 
@@ -986,7 +1014,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
 
         if (adapterType == OFFLINE_ADAPTER) {
-            setColorFilterBlack();
+            setActionBarDrawablesColorFilter(Color.BLACK);
         } else {
             MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
@@ -1036,19 +1064,19 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     appBarLayout.addOnOffsetChangedListener((appBarLayout, offset) -> {
                         if (offset < 0 && Math.abs(offset) >= appBarLayout.getTotalScrollRange() / 2) {
                             // Collapsed
-                            setColorFilterBlack();
+                            setActionBarDrawablesColorFilter(Color.BLACK);
                         } else {
-                            setColorFilterWhite();
+                            setActionBarDrawablesColorFilter(Color.WHITE);
                         }
                     });
 
                     collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.primary_text));
-                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white));
+                    collapsingToolbar.setExpandedTitleColor(Color.WHITE);
                     collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
                 } else {
                     /*Folder*/
                     getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
-                    setColorFilterBlack();
+                    setActionBarDrawablesColorFilter(Color.BLACK);
                 }
             }
         }
@@ -1056,76 +1084,49 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	void setColorFilterBlack () {
-        upArrow.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
-        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+    /**
+     * Changes the drawables color in ActionBar depending on the color received.
+     *
+     * @param color Can be Color.WHITE or Color.WHITE.
+     */
+    private void setActionBarDrawablesColorFilter(int color) {
+        ActionBar aB = getSupportActionBar();
+        if (aB == null) {
+            return;
+        }
 
-        drawableDots.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+        upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        aB.setHomeAsUpIndicator(upArrow);
+
+        drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         toolbar.setOverflowIcon(drawableDots);
 
         if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             removeLinkMenuItem.setIcon(drawableRemoveLink);
         }
         if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             getLinkMenuItem.setIcon(drawableLink);
         }
         if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             downloadMenuItem.setIcon(drawableDownload);
         }
         if (shareMenuItem != null) {
-            drawableShare.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             shareMenuItem.setIcon(drawableShare);
         }
         if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             leaveMenuItem.setIcon(drawableLeave);
         }
         if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             copyMenuItem.setIcon(drawableCopy);
         }
         if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
-            sendToChatMenuItem.setIcon(drawableChat);
-        }
-    }
-
-    void setColorFilterWhite () {
-        upArrow.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-        drawableDots.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        toolbar.setOverflowIcon(drawableDots);
-
-        if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            removeLinkMenuItem.setIcon(drawableRemoveLink);
-        }
-        if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            getLinkMenuItem.setIcon(drawableLink);
-        }
-        if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            downloadMenuItem.setIcon(drawableDownload);
-        }
-        if (shareMenuItem != null) {
-            drawableShare.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            shareMenuItem.setIcon(drawableShare);
-        }
-        if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            leaveMenuItem.setIcon(drawableLeave);
-        }
-        if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-            copyMenuItem.setIcon(drawableCopy);
-        }
-        if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+            drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             sendToChatMenuItem.setIcon(drawableChat);
         }
     }
