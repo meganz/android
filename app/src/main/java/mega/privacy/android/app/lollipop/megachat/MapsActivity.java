@@ -51,6 +51,7 @@ import static mega.privacy.android.app.utils.Util.*;
 @SuppressLint("MissingPermission")
 public class MapsActivity extends PinActivityLollipop implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, LocationListener {
 
+    public static final int REQUEST_INTERVAL = 3000;
     public static final int ICONS_ALPHA = 143;
     public static final String SNAPSHOT = "snapshot";
     public static final String LATITUDE = "latitude";

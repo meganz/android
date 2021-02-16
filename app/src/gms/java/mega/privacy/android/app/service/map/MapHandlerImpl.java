@@ -41,13 +41,12 @@ import mega.privacy.android.app.lollipop.megachat.MapsActivity;
 import mega.privacy.android.app.middlelayer.map.AbstractMapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 
+import static mega.privacy.android.app.lollipop.megachat.MapsActivity.REQUEST_INTERVAL;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 @SuppressLint("MissingPermission")
 public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCallback, OnMyLocationClickListener, OnMyLocationButtonClickListener, OnCameraMoveStartedListener, OnCameraIdleListener, OnMarkerClickListener, OnInfoWindowClickListener {
-
-    private static final int REQUEST_INTERVAL = 3000;
 
     private GoogleMap mMap;
 
@@ -89,7 +88,9 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
                         onGetLastLocation(location.getLatitude(), location.getLongitude());
 
                         if (!activity.isFullScreenEnabled()) {
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(location.getLatitude(), location.getLongitude()),
+                                    DEFAULT_ZOOM));
                         }
 
                         break;
@@ -270,7 +271,8 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public void enableCurrentLocationUpdates() {
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback,
+                Looper.getMainLooper());
     }
 
     @Override
@@ -281,7 +283,9 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
         }
 
         if (animateCamera) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()), DEFAULT_ZOOM));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()),
+                    DEFAULT_ZOOM));
         }
     }
 
