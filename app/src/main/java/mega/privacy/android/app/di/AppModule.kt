@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import nz.mega.sdk.MegaApiAndroid
@@ -29,7 +30,7 @@ class AppModule {
             e.printStackTrace()
         }
 
-        return MegaApiAndroid(MegaApplication.APP_KEY, MegaApplication.USER_AGENT, path)
+        return MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path)
     }
 
     @Singleton
