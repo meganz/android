@@ -82,6 +82,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
+import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -6370,10 +6371,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 logDebug("Checking with Msg ID: " + messageToCheck.getMessage().getMsgId()
                         + " and Msg TEMP ID: " + messageToCheck.getMessage().getTempId());
 
-                if (checkTempId && messageToCheck.getMessage().getTempId() == msg.getMessage().getTempId()) {
+                if (checkTempId && msg.getMessage().getTempId() != MEGACHAT_INVALID_HANDLE
+                        && msg.getMessage().getTempId() == messageToCheck.getMessage().getTempId()) {
                     logDebug("Modify received message with idTemp");
                     return itr.nextIndex();
-                } else if (messageToCheck.getMessage().getMsgId() == msg.getMessage().getMsgId()) {
+                } else if (msg.getMessage().getMsgId() != MEGACHAT_INVALID_HANDLE
+                        && msg.getMessage().getMsgId() == messageToCheck.getMessage().getMsgId()) {
                     logDebug("modifyMessageReceived");
                     return itr.nextIndex();
                 }
@@ -9077,7 +9080,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
             e.printStackTrace();
         }
 
-        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, MegaApplication.USER_AGENT, path);
+        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path);
 
         megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
         megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);

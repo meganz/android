@@ -24,11 +24,13 @@ class PasswordLinkListener(context: Context) : BaseListener(context) {
 
             if (context is GetLinkActivity) {
                 (context as GetLinkActivity).setLinkWithPassword(request.text)
-            } else if (context is OpenPasswordLinkActivity) {
-                (context as OpenPasswordLinkActivity).managePasswordLinkRequest(e, request.text)
             }
         } else {
             logError("Error encrypting link: " + getTranslatedErrorString(e))
+        }
+
+        if (context is OpenPasswordLinkActivity) {
+            (context as OpenPasswordLinkActivity).managePasswordLinkRequest(e, request.text)
         }
     }
 }

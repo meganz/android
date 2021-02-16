@@ -125,9 +125,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/4.0.0_352";
-
-    private static PushNotificationSettingManagement pushNotificationSettingManagement;
+	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
 	private static ChatManagement chatManagement;
 
@@ -924,7 +922,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			
 			Log.d(TAG, "Database path: " + path);
 			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
-					MegaApplication.USER_AGENT, path);
+					BuildConfig.USER_AGENT, path);
 
 			megaApiFolder.retrySSLerrors(true);
 

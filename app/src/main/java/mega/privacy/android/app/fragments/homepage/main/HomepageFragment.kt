@@ -12,8 +12,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
-import android.view.ViewGroup
-import android.view.Window
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -37,6 +35,7 @@ import kotlinx.android.synthetic.main.homepage_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.homepage_fabs.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.search.FloatingSearchView
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
@@ -119,7 +118,7 @@ class HomepageFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent == null) return
 
-            when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
+            when (intent.getIntExtra(ACTION_TYPE, -1)) {
                 GO_OFFLINE -> showOfflineMode()
                 GO_ONLINE -> showOnlineMode()
             }
