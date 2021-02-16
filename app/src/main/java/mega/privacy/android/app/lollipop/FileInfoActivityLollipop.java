@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -329,6 +328,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
     private FileContactsListBottomSheetDialogFragment bottomSheetDialogFragment;
 
+    private int currentColorFilter;
+
     private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -579,17 +580,16 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
 
         fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_info_fragment_container);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         aB = getSupportActionBar();
 
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.file_info_collapse_toolbar);
+        collapsingToolbar = findViewById(R.id.file_info_collapse_toolbar);
 
         nestedScrollView = (NestedScrollView) findViewById(R.id.nested_layout);
         nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE, outMetrics));
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
+        aB.setDisplayShowTitleEnabled(false);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
@@ -897,9 +897,8 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             listView.setAdapter(adapter);
 
             refreshProperties();
-            supportInvalidateOptionsMenu();
-
         }
+
         setIconResource();
 
         if(savedInstanceState != null){
@@ -926,6 +925,25 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         registerReceiver(contactUpdateReceiver, contactUpdateFilter);
 
         getActionBarDrawables();
+
+        if (node.hasPreview() || node.hasThumbnail()) {
+            appBarLayout.addOnOffsetChangedListener((appBarLayout, offset) -> {
+                if (offset < 0 && Math.abs(offset) >= appBarLayout.getTotalScrollRange() / 2) {
+                    // Collapsed
+                    setActionBarDrawablesColorFilter(Color.BLACK);
+                } else {
+                    setActionBarDrawablesColorFilter(Color.WHITE);
+                }
+            });
+
+            collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.primary_text));
+            collapsingToolbar.setExpandedTitleColor(Color.WHITE);
+            collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
+        } else {
+            /*Folder*/
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
+            setActionBarDrawablesColorFilter(Color.BLACK);
+        }
 	}
 
     private void getActionBarDrawables() {
@@ -994,10 +1012,9 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         setContactStatus(megaChatApi.getUserOnlineStatus(userHandle), ownerState);
     }
 
-	@Override
+    @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.file_info_action, menu);
+        getMenuInflater().inflate(R.menu.file_info_action, menu);
 
         downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download);
         shareMenuItem = menu.findItem(R.id.cab_menu_file_info_share_folder);
@@ -1012,10 +1029,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave);
         sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat);
 
-
-        if (adapterType == OFFLINE_ADAPTER) {
-            setActionBarDrawablesColorFilter(Color.BLACK);
-        } else {
+        if (adapterType != OFFLINE_ADAPTER) {
             MegaNode parent = megaApi.getNodeByHandle(node.getHandle());
 
             if (parent != null) {
@@ -1059,25 +1073,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                         copyMenuItem.setVisible(true);
                     }
                 }
-
-                if (node.hasPreview() || node.hasThumbnail()) {
-                    appBarLayout.addOnOffsetChangedListener((appBarLayout, offset) -> {
-                        if (offset < 0 && Math.abs(offset) >= appBarLayout.getTotalScrollRange() / 2) {
-                            // Collapsed
-                            setActionBarDrawablesColorFilter(Color.BLACK);
-                        } else {
-                            setActionBarDrawablesColorFilter(Color.WHITE);
-                        }
-                    });
-
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.primary_text));
-                    collapsingToolbar.setExpandedTitleColor(Color.WHITE);
-                    collapsingToolbar.setStatusBarScrimColor(ContextCompat.getColor(this, R.color.status_bar_search));
-                } else {
-                    /*Folder*/
-                    getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.status_bar_search));
-                    setActionBarDrawablesColorFilter(Color.BLACK);
-                }
             }
         }
 
@@ -1090,8 +1085,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
      * @param color Can be Color.WHITE or Color.WHITE.
      */
     private void setActionBarDrawablesColorFilter(int color) {
-        ActionBar aB = getSupportActionBar();
-        if (aB == null) {
+        if (currentColorFilter == color || aB == null) {
             return;
         }
 
@@ -1101,34 +1095,34 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
         drawableDots.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         toolbar.setOverflowIcon(drawableDots);
 
-        if (removeLinkMenuItem != null) {
-            drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            removeLinkMenuItem.setIcon(drawableRemoveLink);
+        if (removeLinkMenuItem == null || getLinkMenuItem == null || downloadMenuItem == null
+                || shareMenuItem == null || leaveMenuItem == null || copyMenuItem == null
+                || sendToChatMenuItem == null) {
+            return;
         }
-        if (getLinkMenuItem != null) {
-            drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            getLinkMenuItem.setIcon(drawableLink);
-        }
-        if (downloadMenuItem != null) {
-            drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            downloadMenuItem.setIcon(drawableDownload);
-        }
-        if (shareMenuItem != null) {
-            drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            shareMenuItem.setIcon(drawableShare);
-        }
-        if (leaveMenuItem != null) {
-            drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            leaveMenuItem.setIcon(drawableLeave);
-        }
-        if (copyMenuItem != null) {
-            drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            copyMenuItem.setIcon(drawableCopy);
-        }
-        if (sendToChatMenuItem != null) {
-            drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            sendToChatMenuItem.setIcon(drawableChat);
-        }
+
+        currentColorFilter = color;
+
+        drawableRemoveLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        removeLinkMenuItem.setIcon(drawableRemoveLink);
+
+        drawableLink.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        getLinkMenuItem.setIcon(drawableLink);
+
+        drawableDownload.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        downloadMenuItem.setIcon(drawableDownload);
+
+        drawableShare.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        shareMenuItem.setIcon(drawableShare);
+
+        drawableLeave.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        leaveMenuItem.setIcon(drawableLeave);
+
+        drawableCopy.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        copyMenuItem.setIcon(drawableCopy);
+
+        drawableChat.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        sendToChatMenuItem.setIcon(drawableChat);
     }
 
 	@Override

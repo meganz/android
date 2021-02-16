@@ -23,17 +23,17 @@
                 android:layout_height="match_parent"
                 android:background="@color/white"
                 android:fitsSystemWindows="true"
-                app:contentScrim="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 android:theme="@style/Theme.Megaactionbar.InfoScreens"
                 app:collapsedTitleTextAppearance="@style/ToolbarTitle"
-                app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
+                app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleGravity="start|top"
-                app:expandedTitleMarginTop="65dp"
-                app:expandedTitleMarginStart="72dp"
                 app:expandedTitleMarginBottom="14dp"
-                app:maxLines="3"
-                app:lineSpacingMultiplier="1.2">
+                app:expandedTitleMarginStart="72dp"
+                app:expandedTitleMarginTop="65dp"
+                app:expandedTitleTextAppearance="@style/ToolbarTitle.CollapsingToolbar"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:lineSpacingMultiplier="1.2"
+                app:maxLines="3">
 
                 <RelativeLayout
                     android:id="@+id/file_info_icon_layout"
