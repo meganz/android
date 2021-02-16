@@ -17,6 +17,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -32,8 +33,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -51,12 +54,12 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaUser;
 
-import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -83,11 +86,13 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     String contactLink = null;
 
     private ActionBar aB;
+    private AppBarLayout abL;
 
     private RelativeLayout relativeContainerQRCode;
     private ImageView qrcode;
     private TextView qrcode_link;
     private Button qrcode_copy_link;
+    private ScrollView scrollView;
     private View v;
 
     private Context context;
@@ -186,6 +191,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             aB.setDisplayHomeAsUpEnabled(true);
         }
 
+        abL = requireActivity().findViewById(R.id.app_bar_layout);
+        scrollView = v.findViewById(R.id.my_code_scrollview);
         relativeContainerQRCode = (RelativeLayout) v.findViewById(R.id.qr_code_relative_container);
         qrcode = (ImageView) v.findViewById(R.id.qr_code_image);
         qrcode_link = (TextView) v.findViewById(R.id.qr_code_link);
@@ -200,6 +207,8 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
             qrcode_link.setText(contactLink);
             qrcode_copy_link.setEnabled(true);
         }
+
+        new ListenScrollChangesHelper().addViewToListen(scrollView, (v, scrollX, scrollY, oldScrollX, oldScrollY) -> checkScroll());
 
         Configuration configuration = getResources().getConfiguration();
         int width = getDP(RELATIVE_WIDTH);
@@ -222,6 +231,17 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         return v;
     }
 
+    public void checkScroll() {
+        if (scrollView != null) {
+            if (scrollView.canScrollVertically(-1)) {
+                float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+                abL.setElevation(elevation);
+            } else {
+                abL.setElevation(0);
+            }
+        }
+    }
+
     int getDP(int value){
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, getResources().getDisplayMetrics());
     }
@@ -234,7 +254,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         Canvas c = new Canvas(qrCode);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(WHITE);
+        paint.setColor(ContextCompat.getColor(context, R.color.white_dark_grey));
 
         avatar = Bitmap.createScaledBitmap(avatar, width, width, false);
         c.drawBitmap(qr, 0f, 0f, null);
@@ -261,20 +281,20 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         int w = bitMatrix.getWidth();
         int h = bitMatrix.getHeight();
         int[] pixels = new int[w * h];
-        int color = ContextCompat.getColor(context, R.color.red_600_red_300);
+        int color = ContextCompat.getColor(context, R.color.dark_grey_white);
 
         Bitmap bitmap = Bitmap.createBitmap(WIDTH, WIDTH, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setColor(WHITE);
+        paint.setColor(ContextCompat.getColor(context, R.color.white_dark_grey));
         c.drawRect(0, 0, WIDTH, WIDTH, paint);
         paint.setColor(color);
 
         for (int y = 0; y < h; y++) {
             int offset = y * w;
             for (int x = 0; x < w; x++) {
-                pixels[offset + x] = bitMatrix.get(x, y) ? color : WHITE;
+                pixels[offset + x] = bitMatrix.get(x, y) ? color : ContextCompat.getColor(context, R.color.white_dark_grey);
             }
         }
 

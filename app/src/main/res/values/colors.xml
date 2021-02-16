@@ -255,7 +255,7 @@
     <!-- Business account management container-->
     <color name="grey_020_white_012">@color/grey_020</color>
 
-    <!-- Background color of Achievements screen -->
+    <!-- Background color of Achievements screen and bottom navigation bar -->
     <color name="grey_020_dark_grey">@color/grey_020</color>
 
     <!-- SMSVerificationActivity background and status bar -->
@@ -369,4 +369,6 @@
     <color name="amber_600_amber_300">@color/amber_600</color>
     <!-- Same as progress bar trackColor -->
     <color name="grey_012_white_023">@color/grey_alpha_012</color>
+    <!-- For drawing QR code -->
+    <color name="dark_grey_white">@color/dark_grey</color>
 </resources>

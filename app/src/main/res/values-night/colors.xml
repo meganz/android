@@ -211,4 +211,6 @@
     <color name="amber_600_amber_300">@color/amber_300</color>
     <!-- Same as progress bar trackColor -->
     <color name="grey_012_white_023">@color/white_alpha_023</color>
+    <!-- For drawing QR code -->
+    <color name="dark_grey_white">@color/white</color>
 </resources>
