@@ -18,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -168,14 +167,12 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         ft.commitNow();
     }
 
-    public void changeActionBarElevation(boolean whitElevation){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (whitElevation) {
-                abL.setElevation(dp2px(4, outMetrics));
-            }
-            else {
-                abL.setElevation(0);
-            }
+    public void changeActionBarElevation(boolean whitElevation) {
+        if (whitElevation) {
+            float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+            abL.setElevation(dp2px(elevation, outMetrics));
+        } else {
+            abL.setElevation(0);
         }
     }
 
