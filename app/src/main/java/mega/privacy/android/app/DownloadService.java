@@ -1767,9 +1767,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		} else if (!transfersManagement.isTransferOverQuotaNotificationShown()){
 			transfersManagement.setTransferOverQuotaNotificationShown(true);
+			isForeground = false;
 			stopForeground(true);
-			new TransferOverQuotaNotification().show();
 			mNotificationManager.cancel(NOTIFICATION_DOWNLOAD);
+			new TransferOverQuotaNotification().show();
 		}
 	}
 
@@ -1782,13 +1783,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		logDebug("onRequestFinish");
 
-		if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
-			logDebug("TYPE_PAUSE_TRANSFERS finished");
-			if (e.getErrorCode() == MegaError.API_OK){
-				cancel();
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			logDebug("TYPE_CANCEL_TRANSFERS finished");
 			if (e.getErrorCode() == MegaError.API_OK){
 				cancel();

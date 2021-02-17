@@ -644,10 +644,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         String actionString = isOverquota == NOT_OVERQUOTA_STATE ? getString(R.string.download_touch_to_show) : getString(R.string.general_show_info);
         String info = getProgressSize(UploadService.this,inProgress,total);
 
-        if(isFolderTransfer){
-            notifyProgressNotification(progressPercent,message,info,actionString,NOTIFICATION_UPLOAD_FOLDER,NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER,NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
-        }else{
-            notifyProgressNotification(progressPercent,message,info,actionString,NOTIFICATION_UPLOAD,NOTIFICATION_CHANNEL_UPLOAD_ID,NOTIFICATION_CHANNEL_UPLOAD_NAME);
+        if (isFolderTransfer) {
+            notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
+        } else {
+            notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD, NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME);
         }
     }
 
