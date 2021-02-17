@@ -135,6 +135,7 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
                             ((ChatActivityLollipop) context).hideBottomSheet();
                             Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                             i.putExtra(NAME, email);
+                            i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                             context.startActivity(i);
                         }
                     } else {

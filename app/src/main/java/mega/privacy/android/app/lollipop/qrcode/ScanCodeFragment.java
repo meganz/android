@@ -440,6 +440,7 @@ public class ScanCodeFragment extends Fragment implements /*ZXingScannerView.Res
                 }
                 Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                 intent.putExtra(NAME, myEmail);
+                intent.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                 startActivity(intent);
                 ((QRCodeActivity) context).finish();
                 break;

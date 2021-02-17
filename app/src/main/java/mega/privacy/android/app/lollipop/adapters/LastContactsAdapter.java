@@ -105,6 +105,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
     private void toContactInfo(MegaUser contact) {
         Intent i = new Intent(context,ContactInfoActivityLollipop.class);
         i.putExtra(NAME, contact.getEmail());
+        i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
         context.startActivity(i);
     }
     

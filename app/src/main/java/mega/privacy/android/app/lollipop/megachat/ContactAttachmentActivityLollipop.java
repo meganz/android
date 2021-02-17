@@ -341,8 +341,16 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 			if(contact!=null) {
 				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
+					MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
+					long contactHandle = Long.parseLong(c.getHandle());
+
 					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
 					i.putExtra(NAME, c.getMail());
+					if(chat!=null && !chat.isGroup() && contactHandle == chat.getPeerHandle(0)){
+						i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
+					}else{
+						i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
+					}
 					this.startActivity(i);
 				}
 				else{

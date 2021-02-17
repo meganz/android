@@ -20,7 +20,6 @@ import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
-
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -147,6 +146,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
             case R.id.contact_list_info_contact_layout:
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, contact.getMegaUser().getEmail());
+                i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                 context.startActivity(i);
                 break;
 

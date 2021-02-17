@@ -559,6 +559,10 @@ public class Constants {
     public static final String SHOW_MESSAGE_UPLOAD_STARTED = "SHOW_MESSAGE_UPLOAD_STARTED";
     public static final String NUMBER_UPLOADS = "NUMBER_UPLOADS";
 
+    public static final String TYPE_FROM = "TYPE_FROM";
+    public static final String TYPE_FROM_CHAT = "TYPE_FROM_CHAT";
+    public static final String TYPE_FROM_CONTACT = "TYPE_FROM_CONTACT";
+
     public static final String REGISTER_BUSINESS_ACCOUNT = "registerb";
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;

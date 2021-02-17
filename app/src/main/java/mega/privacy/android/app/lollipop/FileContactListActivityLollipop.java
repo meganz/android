@@ -588,6 +588,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if(contact!=null && contact.getVisibility()==MegaUser.VISIBILITY_VISIBLE){
 				Intent i = new Intent(this, ContactInfoActivityLollipop.class);
 				i.putExtra(NAME, listContacts.get(position).getUser());
+				i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
 				startActivity(i);
 			}
 

@@ -792,6 +792,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }else{
             Intent i = new Intent(this, ContactInfoActivityLollipop.class);
             i.putExtra("handle", chatRoom.getChatId());
+            i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
             this.startActivity(i);
         }
     }
@@ -1515,7 +1516,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         megaChatApi.closeChatRoom(idChat, this);
-
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
             return true;
@@ -2459,6 +2459,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
                 else{
                     Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                     i.putExtra("handle", chatRoom.getChatId());
+                    i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
                     this.startActivity(i);
                 }
                 break;

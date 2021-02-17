@@ -265,6 +265,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 } else {
                     Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                     i.putExtra(HANDLE, chat.getChatId());
+                    i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                     context.startActivity(i);
                 }
 

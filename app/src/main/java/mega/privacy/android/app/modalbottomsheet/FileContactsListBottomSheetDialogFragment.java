@@ -150,6 +150,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             case R.id.file_contact_list_option_info_layout:
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, share.getUser());
+                i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                 context.startActivity(i);
                 break;
         }
