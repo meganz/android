@@ -92,6 +92,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
@@ -194,19 +195,17 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            chatHandle = extras.getLong(HANDLE, -1);
-            if (chatHandle == INVALID_HANDLE) {
+            chatHandle = extras.getLong(HANDLE, MEGACHAT_INVALID_HANDLE);
+            if (chatHandle == MEGACHAT_INVALID_HANDLE) {
                 finish();
                 return;
             }
 
-            /**
-             * isChatOpen is True when the megaChatApi.openChatRoom() method has already been called from ChatActivityLollipop
-             * and the changes related to history clearing will be listened from there.
-             *
-             * isChatOpen is False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
-             * This will happen when GroupChatInfoActivityLollipop is opened from other parts of the app than the Chat room.
-             */
+            //isChatOpen is:
+            //- True when the megaChatApi.openChatRoom() method has already been called from ChatActivityLollipop
+            //  and the changes related to history clearing will be listened from there.
+            //- False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
+            //  This will happen when GroupChatInfoActivityLollipop is opened from other parts of the app than the Chat room.
             isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
             chat = megaChatApi.getChatRoom(chatHandle);
             if (chat == null) {
