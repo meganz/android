@@ -113,6 +113,10 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         titleNameContactChatPanel.setText(getTitleChat(chat));
 
+        if (!shouldMuteOrUnmuteOptionsBeShown(context, megaChatApi.getChatRoom(chat.getChatId()))) {
+            optionMuteChat.setVisibility(View.GONE);
+        }
+
         if (chat.isPreview()) {
             titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
             iconStateChatPanel.setVisibility(View.GONE);
@@ -128,7 +132,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 separatorInfo.setVisibility(View.GONE);
             }
 
-            optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.VISIBLE);
             optionLeaveText.setText("Remove preview");
             optionClearHistory.setVisibility(View.GONE);
