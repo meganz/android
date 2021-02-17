@@ -103,7 +103,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private long chatHandle;
     private long selectedHandleParticipant;
     private long participantsCount;
-    private boolean isFromChat;
+    private boolean isChatOpen;
 
     private GroupChatInfoActivityLollipop groupChatInfoActivity;
     private MegaChatRoom chat;
@@ -200,7 +200,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 return;
             }
 
-            isFromChat = extras.getBoolean(TYPE_FROM, false);
+            /**
+             * isChatOpen is True when the megaChatApi.openChatRoom() method has already been called from ChatActivityLollipop
+             * and the changes related to history clearing will be listened from there.
+             *
+             * isChatOpen is False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
+             * This will happen when GroupChatInfoActivityLollipop is opened from other parts of the app than the Chat room.
+             */
+            isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
             chat = megaChatApi.getChatRoom(chatHandle);
             if (chat == null) {
                 logError("Chatroom NULL cannot be recovered");
@@ -1401,7 +1408,12 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         setParticipants();
     }
 
-    public boolean isFromChat() {
-        return isFromChat;
+    /**
+     * Method to knowing if the openChatRoom() method has already been called from this chat room.
+     *
+     * @return True, if it has already been called. False otherwise.
+     */
+    public boolean isChatOpen() {
+        return isChatOpen;
     }
 }

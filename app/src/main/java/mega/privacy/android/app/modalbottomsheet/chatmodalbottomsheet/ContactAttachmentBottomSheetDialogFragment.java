@@ -288,8 +288,8 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 }
 
                 MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                if (chatRoom != null && contactHandle == chatRoom.getPeerHandle(0)) {
-                    i.putExtra(TYPE_FROM, true);
+                if (chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0)) {
+                    i.putExtra(ACTION_CHAT_OPEN, true);
                 }
                 context.startActivity(i);
                 break;
