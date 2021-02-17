@@ -1,33 +1,42 @@
---- ares_android.c	2018-10-23 15:49:22.000000000 +0200
-+++ ares_android_c.patch	2021-02-17 08:35:10.390325273 +0100
+--- ares_android.c	2018-10-10 23:20:12.000000000 +0200
++++ ares_android_patched.c	2021-02-17 19:39:33.643601031 +0100
 @@ -234,6 +234,8 @@
      (*android_jvm)->DetachCurrentThread(android_jvm);
  }
  
-+#include "../../mega/sdk/third_party/crashlytics.h"
++#include "../../mega/sdk/third_party/crashlyticsC.h"
 +
  char **ares_get_android_server_list(size_t max_servers,
                                      size_t *num_servers)
  {
-@@ -271,7 +273,12 @@
+@@ -263,6 +265,8 @@
+     return NULL;
+   }
+ 
++  crashlytics_context_t* context = crashlytics_init();
++
+   res = (*android_jvm)->GetEnv(android_jvm, (void **)&env, JNI_VERSION_1_6);
+   if (res == JNI_EDETACHED)
+   {
+@@ -271,7 +275,12 @@
      need_detatch = 1;
    }
    if (res != JNI_OK || env == NULL)
 +  {
-+    std::string errMsg("ares_get_android_server_list: failed to get environment. Error: ");
-+    errMsm.append(std::to_string(res)).append(" Env: ").append(env ? "not-null" : "null");
-+    firebase::crashlytics::Log(errMsg.c_str());
++    char buff[130];
++    sprintf(buff, "ares_get_android_server_list: failed to get environment. Error: %d Env: %s", res, (env ? "not-null" : "null"));
++    context->log(context, buff);
      goto done;
 +  }
  
    /* JNI below is equivalent to this Java code.
       import android.content.Context;
-@@ -297,24 +304,36 @@
+@@ -297,24 +306,36 @@
    active_network = (*env)->CallObjectMethod(env, android_connectivity_manager,
                                              android_cm_active_net_mid);
    if (active_network == NULL)
 +  {
-+    firebase::crashlytics::Log("ares_get_android_server_list: failed to get active_network.");
++    context->log(context, "ares_get_android_server_list: failed to get active_network.");
      goto done;
 +  }
  
@@ -36,7 +45,7 @@
                                 android_cm_link_props_mid, active_network);
    if (link_properties == NULL)
 +  {
-+    firebase::crashlytics::Log("ares_get_android_server_list: failed to get link_properties");
++    context->log(context, "ares_get_android_server_list: failed to get link_properties"); 
      goto done;
 +  }
  
@@ -44,7 +53,7 @@
                                           android_lp_dns_servers_mid);
    if (server_list == NULL)
 +  {
-+    firebase::crashlytics::Log("ares_get_android_server_list: failed to get server_list");
++    context->log(context, "ares_get_android_server_list: failed to get server_list");
      goto done;
 +  }
  
@@ -53,9 +62,19 @@
      nserv = (jint)max_servers;
    if (nserv <= 0)
 +  {
-+    firebase::crashlytics::Log("ares_get_android_server_list: failed to get nserv");
++    context->log(context, "ares_get_android_server_list: failed to get nserv");
      goto done;
 +  }
    *num_servers = (size_t)nserv;
  
    dns_list = ares_malloc(sizeof(*dns_list)*(*num_servers));
+@@ -349,6 +370,9 @@
+ 
+   if (need_detatch)
+     (*android_jvm)->DetachCurrentThread(android_jvm);
++
++  crashlytics_free(&context);
++
+   return dns_list;
+ }
+ 
