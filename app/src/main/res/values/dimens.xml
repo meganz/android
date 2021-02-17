@@ -104,4 +104,7 @@
 
     <dimen name="bottom_sheet_drawable_padding">32dp</dimen>
     <dimen name="divider_width">72dp</dimen>
+
+    <!-- My account page button padding -->
+    <dimen name="btn_padding_horizontal_my_account">21dp</dimen>
 </resources>

@@ -5,9 +5,17 @@
         <item name="strokeColor">@color/white</item>
         <item name="android:textColor">@color/grey_alpha_087</item>
         <item name="backgroundTint">@color/white</item>
+        <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
+        <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
     </style>
 
-    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton" />
+    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
+        <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
+    </style>
 
-    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton" />
+    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="android:paddingLeft">@dimen/btn_padding_horizontal_my_account</item>
+        <item name="android:paddingRight">@dimen/btn_padding_horizontal_my_account</item>
+    </style>
 </resources>
