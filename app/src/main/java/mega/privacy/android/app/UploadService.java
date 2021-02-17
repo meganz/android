@@ -220,6 +220,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         unregisterReceiver(pauseBroadcastReceiver);
         rxSubscriptions.clear();
+        stopForeground();
 
 		super.onDestroy();
 	}
@@ -450,6 +451,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
@@ -459,6 +461,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else {
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setColor(ContextCompat.getColor(MegaApplication.getInstance(), R.color.mega))
                     .setContentIntent(PendingIntent.getActivity(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT))
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)

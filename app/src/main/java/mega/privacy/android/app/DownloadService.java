@@ -187,9 +187,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		lock = wifiManager.createWifiLock(wifiLockMode, "MegaDownloadServiceWifiLock");
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaDownloadServicePowerLock");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
-			mBuilder = new Notification.Builder(DownloadService.this);
-		}
+		mBuilder = new Notification.Builder(DownloadService.this);
 		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -262,6 +260,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
         unregisterReceiver(pauseBroadcastReceiver);
 		rxSubscriptions.clear();
+		stopForeground();
 
 		super.onDestroy();
 	}
