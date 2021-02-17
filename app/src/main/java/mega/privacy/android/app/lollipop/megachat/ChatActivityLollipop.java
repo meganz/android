@@ -785,15 +785,11 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
     public void showGroupInfoActivity(){
         logDebug("showGroupInfoActivity");
-        if(chatRoom.isGroup()){
-            Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
-            this.startActivity(i);
-        }else{
-            Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
-            this.startActivity(i);
-        }
+        Intent i = new Intent(this,
+                chatRoom.isGroup() ? GroupChatInfoActivityLollipop.class : ContactInfoActivityLollipop.class);
+        i.putExtra(HANDLE, chatRoom.getChatId());
+        i.putExtra(ACTION_CHAT_OPEN, true);
+        this.startActivity(i);
     }
 
     @Override
@@ -1515,7 +1511,6 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         }
 
         megaChatApi.closeChatRoom(idChat, this);
-
         if (megaChatApi.openChatRoom(idChat, this)) {
             MegaApplication.setClosedChat(false);
             return true;
@@ -2450,17 +2445,7 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
             case R.id.cab_menu_contact_info_chat:{
                 if(recordView.isRecordingNow()) break;
-
-                if(chatRoom.isGroup()){
-                    Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
-                    this.startActivity(i);
-                }
-                else{
-                    Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
-                    this.startActivity(i);
-                }
+                showGroupInfoActivity();
                 break;
             }
             case R.id.cab_menu_clear_history_chat:{

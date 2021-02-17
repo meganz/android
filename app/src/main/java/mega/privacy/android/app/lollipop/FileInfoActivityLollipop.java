@@ -3034,7 +3034,7 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             String megaUser = listContacts.get(position).getUser();
             MegaUser contact = megaApi.getContact(megaUser);
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                Intent i = new Intent(this,ContactInfoActivityLollipop.class);
+                Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, megaUser);
                 startActivity(i);
             }
