@@ -146,7 +146,6 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
             case R.id.contact_list_info_contact_layout:
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, contact.getMegaUser().getEmail());
-                i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                 context.startActivity(i);
                 break;
 

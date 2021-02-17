@@ -103,6 +103,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private long chatHandle;
     private long selectedHandleParticipant;
     private long participantsCount;
+    private boolean isFromChat;
 
     private GroupChatInfoActivityLollipop groupChatInfoActivity;
     private MegaChatRoom chat;
@@ -193,12 +194,13 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            chatHandle = extras.getLong("handle", -1);
+            chatHandle = extras.getLong(HANDLE, -1);
             if (chatHandle == INVALID_HANDLE) {
                 finish();
                 return;
             }
 
+            isFromChat = extras.getBoolean(TYPE_FROM, false);
             chat = megaChatApi.getChatRoom(chatHandle);
             if (chat == null) {
                 logError("Chatroom NULL cannot be recovered");
@@ -1397,5 +1399,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         chat = chatRoomUpdated;
         participants.clear();
         setParticipants();
+    }
+
+    public boolean isFromChat() {
+        return isFromChat;
     }
 }

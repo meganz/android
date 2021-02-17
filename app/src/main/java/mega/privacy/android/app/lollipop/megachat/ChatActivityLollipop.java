@@ -787,12 +787,13 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
         logDebug("showGroupInfoActivity");
         if(chatRoom.isGroup()){
             Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-            i.putExtra("handle", chatRoom.getChatId());
+            i.putExtra(HANDLE, chatRoom.getChatId());
+            i.putExtra(TYPE_FROM, true);
             this.startActivity(i);
         }else{
             Intent i = new Intent(this, ContactInfoActivityLollipop.class);
             i.putExtra("handle", chatRoom.getChatId());
-            i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
+            i.putExtra(TYPE_FROM, true);
             this.startActivity(i);
         }
     }
@@ -2453,13 +2454,14 @@ public class ChatActivityLollipop extends PinActivityLollipop implements MegaCha
 
                 if(chatRoom.isGroup()){
                     Intent i = new Intent(this, GroupChatInfoActivityLollipop.class);
-                    i.putExtra("handle", chatRoom.getChatId());
+                    i.putExtra(HANDLE, chatRoom.getChatId());
+                    i.putExtra(TYPE_FROM, true);
                     this.startActivity(i);
                 }
                 else{
                     Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                     i.putExtra("handle", chatRoom.getChatId());
-                    i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
+                    i.putExtra(TYPE_FROM, true);
                     this.startActivity(i);
                 }
                 break;

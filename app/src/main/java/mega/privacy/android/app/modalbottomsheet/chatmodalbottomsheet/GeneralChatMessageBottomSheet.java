@@ -400,9 +400,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, message.getMessage().getUserEmail(0));
                 if (chatRoom != null && !chatRoom.isGroup() && message.getMessage().getUserHandle(0) == chatRoom.getPeerHandle(0)) {
-                    i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
+                    i.putExtra(TYPE_FROM, true);
                 } else {
-                    i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
+                    i.putExtra(TYPE_FROM, false);
                 }
                 context.startActivity(i);
                 break;

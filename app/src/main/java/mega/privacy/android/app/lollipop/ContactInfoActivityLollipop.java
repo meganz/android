@@ -582,7 +582,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 
 			chatHandle = extras.getLong("handle",-1);
 			userEmailExtra = extras.getString(NAME);
-			String previousActivity = extras.getString(TYPE_FROM);
+			Boolean isFromChat = extras.getBoolean(TYPE_FROM, false);
 
 			if (megaChatApi == null) {
 				megaChatApi = MegaApplication.getInstance().getMegaChatApi();
@@ -639,7 +639,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 			}
 
 			if (chat != null) {
-				if(previousActivity.equals(TYPE_FROM_CONTACT)) {
+				if(!isFromChat) {
 					MegaApplication.getChatManagement().openChatRoom(chat.getChatId());
 				}
 

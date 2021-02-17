@@ -261,7 +261,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     logDebug("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                     intent.putExtra(NAME, notif.getEmail());
-                    intent.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                     startActivity(intent);
                 }
                 else{ ArrayList<MegaContactRequest> contacts = megaApi.getIncomingContactRequests();
@@ -286,7 +285,6 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                     logDebug("Go to contact info");
                     Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
                     intent.putExtra(NAME, notif.getEmail());
-                    intent.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                     startActivity(intent);
                 }
                 break;

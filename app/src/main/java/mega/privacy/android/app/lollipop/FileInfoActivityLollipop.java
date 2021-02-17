@@ -3036,7 +3036,6 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
             if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 Intent i = new Intent(this, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, megaUser);
-                i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                 startActivity(i);
             }
 

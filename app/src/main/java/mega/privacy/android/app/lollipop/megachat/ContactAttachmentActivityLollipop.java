@@ -347,9 +347,9 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
 					i.putExtra(NAME, c.getMail());
 					if(chat!=null && !chat.isGroup() && contactHandle == chat.getPeerHandle(0)){
-						i.putExtra(TYPE_FROM, TYPE_FROM_CHAT);
+						i.putExtra(TYPE_FROM, true);
 					}else{
-						i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
+						i.putExtra(TYPE_FROM, false);
 					}
 					this.startActivity(i);
 				}

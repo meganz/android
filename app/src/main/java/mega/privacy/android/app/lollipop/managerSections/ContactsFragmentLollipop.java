@@ -581,7 +581,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				}
 				Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
 				intent.putExtra(NAME, myEmail);
-				intent.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
 				startActivity(intent);
 				break;
 			}
@@ -1102,7 +1101,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		else{
 			Intent i = new Intent(context, ContactInfoActivityLollipop.class);
 			i.putExtra(NAME, visibleContacts.get(position).getMegaUser().getEmail());
-			i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
 			startActivity(i);
 		}
     }

@@ -223,7 +223,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.contact_info_group_participants_chat_layout:
                 Intent i = new Intent(context, ContactInfoActivityLollipop.class);
                 i.putExtra(NAME, chatC.getParticipantEmail(participantHandle));
-                i.putExtra(TYPE_FROM, TYPE_FROM_CONTACT);
                 context.startActivity(i);
                 dismissAllowingStateLoss();
                 break;
