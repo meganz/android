@@ -36,7 +36,7 @@ public class ChatNotificationsPreferencesActivity extends PreferencesBaseActivit
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        aB.setTitle(getString(R.string.title_properties_chat_notifications_contact).toUpperCase());
+        setTitle(getString(R.string.title_properties_chat_notifications_contact));
 
         sttChatNotifications = new SettingsChatNotificationsFragment();
         replaceFragment(sttChatNotifications);

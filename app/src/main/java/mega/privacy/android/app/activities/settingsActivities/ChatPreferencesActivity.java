@@ -84,7 +84,7 @@ public class ChatPreferencesActivity extends PreferencesBaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        aB.setTitle(getString(R.string.section_chat).toUpperCase());
+        binding.toolbarSettings.setTitle(getString(R.string.section_chat).toUpperCase());
         sttChat = new SettingsChatFragment();
         replaceFragment(sttChat);
 

@@ -23,7 +23,7 @@ public class PasscodePreferencesActivity extends PreferencesBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        aB.setTitle(getString(R.string.settings_pin_lock_switch).toUpperCase());
+        setTitle(getString(R.string.settings_pin_lock_switch));
         sttPasscodeLock = new SettingsPasscodeLockFragment();
         replaceFragment(sttPasscodeLock);
     }

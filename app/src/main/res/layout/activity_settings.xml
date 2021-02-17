@@ -1,32 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_settings"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/Theme.Megaactionbar"
-        app:titleTextAppearance="@style/ToolbarTitle"
         app:subtitleTextAppearance="@style/ToolbarSubtitle"
         app:theme="@style/Theme.Megaactionbar"
+        app:titleTextAppearance="@style/ToolbarTitle"
         tools:context=".ManagerActivityLollipop" />
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator_layout"
-        android:background="@color/white"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar_settings">
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/background_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_settings" />
 
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</RelativeLayout>
+    <View
+        android:id="@+id/background_bottom"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save"
+        style="@style/Widget.Mega.Button.Save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:text="@string/save_action"
+        android:theme="@style/Theme.MaterialComponents.Bridge"
+        app:layout_constraintBottom_toBottomOf="@id/background_bottom"
+        app:layout_constraintEnd_toEndOf="@id/background_bottom"
+        app:layout_constraintTop_toTopOf="@id/background_bottom" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_save_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:constraint_referenced_ids="background_bottom, btn_save"
+        tools:visibility="visible" />
+</androidx.constraintlayout.widget.ConstraintLayout>
