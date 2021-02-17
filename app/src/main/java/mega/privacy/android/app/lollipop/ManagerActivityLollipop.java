@@ -15189,12 +15189,17 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		if (mElevationCause > 0) {
 			if (onlySetToolbar) {
 				toolbar.setBackgroundColor(toolbarElevationColor);
+				getWindow().setStatusBarColor(toolbarElevationColor);
 			} else {
 				toolbar.setBackgroundColor(android.R.color.transparent);
 				abL.setElevation(elevation);
+				if (Util.isDarkMode(this)) {
+					getWindow().setStatusBarColor(toolbarElevationColor);
+				}
 			}
 		} else {
 			toolbar.setBackgroundColor(android.R.color.transparent);
+			getWindow().setStatusBarColor(android.R.color.transparent);
 			abL.setElevation(0);
 		}
 	}
