@@ -1490,7 +1490,7 @@ public class MegaNotificationsAdapter extends RecyclerView.Adapter<MegaNotificat
 		}
 		else{
 			holder.newText.setVisibility(View.GONE);
-			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_020_white_012	));
+			holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_020_grey_800));
 
 			LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)holder.separator.getLayoutParams();
 			textParams.setMargins(scaleWidthPx(16, outMetrics), 0, scaleWidthPx(16, outMetrics), 0);
