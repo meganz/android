@@ -462,7 +462,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if (fileName != null) {
 				megaApi.startUploadWithTopPriority(uploadPath, parentNode, appData, false, fileName);
 			} else {
-				megaApi.startUploadWithTopPriority(uploadPath, parentNode, appData, false);
+				megaApi.startUploadForChat(uploadPath, parentNode, appData, false);
 			}
 		} else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
 			logDebug("DATA connection is Mp4Video");
@@ -510,7 +510,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                     if (fileName != null) {
                         megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
                     } else {
-                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, appData, false);
+                        megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false);
                     }
 				}
 				else{
@@ -536,7 +536,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
                 if (fileName != null) {
                     megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
                 } else {
-                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, appData, false);
+                    megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false);
                 }
 				logError("EXCEPTION: Video cannot be downsampled", throwable);
 			}
@@ -556,7 +556,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
             if (fileName != null) {
                 megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false, fileName);
             } else {
-                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false);
+                megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, data, false);
             }
 		}
 
@@ -698,7 +698,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if (fileName != null) {
 				megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, appData, false, fileName);
 			} else {
-				megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, appData, false);
+				megaApi.startUploadForChat(downFile.getPath(), parentNode, appData, false);
 			}
 		}
 	}
