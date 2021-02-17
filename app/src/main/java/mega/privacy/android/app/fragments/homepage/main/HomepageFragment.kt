@@ -92,7 +92,7 @@ class HomepageFragment : Fragment() {
 
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
         if (it) {
-            post { setBottomSheetHeight() }
+            post { setBottomSheetMaxHeight() }
         }
     }
     private val psaVisibilityChangeObserver = androidx.lifecycle.Observer<Int> {
@@ -275,7 +275,7 @@ class HomepageFragment : Fragment() {
         viewDataBinding.backgroundMask.alpha = 1F
         bottomSheetRoot.elevation = 0F
 
-        setBottomSheetHeight(true)
+        setBottomSheetMaxHeight()
     }
 
     /**
@@ -483,11 +483,11 @@ class HomepageFragment : Fragment() {
      * Set the initial height of the bottom sheet. The top is just below the banner view.
      */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver?.addOnPreDrawListener(object :
-            ViewTreeObserver.OnPreDrawListener {
-            override fun onPreDraw(): Boolean {
+        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
+            OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
                 if (category == null) {
-                    return true
+                    return
                 }
 
                 if (bannerViewPager.data.isNotEmpty()) {
@@ -496,11 +496,7 @@ class HomepageFragment : Fragment() {
                     bottomSheetBehavior.peekHeight = rootView.height - category.bottom
                 }
 
-                if (bottomSheetBehavior.peekHeight > 0) {
-                    rootView.viewTreeObserver?.removeOnPreDrawListener(this)
-                }
-
-                return true
+                setBottomSheetMaxHeight()
             }
         })
     }
@@ -520,7 +516,7 @@ class HomepageFragment : Fragment() {
             val maxElevation = bottomSheet.root.elevation
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                setBottomSheetHeight()
+                setBottomSheetMaxHeight()
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -544,12 +540,12 @@ class HomepageFragment : Fragment() {
         })
     }
 
-    private fun setBottomSheetHeight(forceMaxHeight: Boolean = false) {
+    private fun setBottomSheetMaxHeight() {
         val bottomSheet = viewDataBinding.homepageBottomSheet.root
         val maxHeight = rootView.measuredHeight - searchInputView.bottom
+        val layoutParams = bottomSheet.layoutParams
 
-        if (bottomSheet.measuredHeight > maxHeight || forceMaxHeight) {
-            val layoutParams = bottomSheet.layoutParams
+        if (layoutParams.height != maxHeight) {
             layoutParams.height = maxHeight
             bottomSheet.layoutParams = layoutParams
         }
