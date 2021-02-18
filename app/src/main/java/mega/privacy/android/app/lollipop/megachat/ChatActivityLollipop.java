@@ -4364,7 +4364,12 @@ public class ChatActivityLollipop extends PinActivityLollipop
             recoveredSelectedPositions = null;
             clearSelections();
 
-            ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, listView.canScrollVertically(-1));
+            // No App bar in this activity, control tool bar instead.
+            boolean withElevation = listView.canScrollVertically(-1);
+            ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, withElevation);
+            if(!withElevation) {
+                tB.setElevation(0);
+            }
         }
 
         @Override
