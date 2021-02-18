@@ -186,6 +186,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         } else if (((ManagerActivityLollipop) context).openSettingsQR) {
             goToCategoryQR();
         }
+        initQrCodeSetting();
         if (listView != null) {
             listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
@@ -194,6 +195,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                     checkScroll();
                 }
             });
+        }
+    }
+
+    private void initQrCodeSetting() {
+        if(megaApi != null) {
+            megaApi.getContactLinksOption((ManagerActivityLollipop) context);
         }
     }
 
