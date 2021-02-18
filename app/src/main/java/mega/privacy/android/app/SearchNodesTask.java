@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
@@ -226,14 +227,16 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      */
     private void getOutShares() {
         if (isTextEmpty(query)) {
+            nodes.clear();
+
             ArrayList<MegaShare> outShares = megaApi.getOutShares();
-            long lastHandle = INVALID_HANDLE;
+            List<Long> addedHandles = new ArrayList<>();
 
             for (MegaShare outShare : outShares) {
                 MegaNode node = megaApi.getNodeByHandle(outShare.getNodeHandle());
 
-                if (node != null && lastHandle != node.getHandle()) {
-                    lastHandle = node.getHandle();
+                if (node != null && !addedHandles.contains(node.getHandle())) {
+                    addedHandles.add(node.getHandle());
                     nodes.add(node);
                 }
             }
