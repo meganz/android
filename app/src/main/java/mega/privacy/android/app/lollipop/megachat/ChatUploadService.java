@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
@@ -22,8 +21,6 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-
-import android.widget.RemoteViews;
 
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
@@ -134,15 +131,6 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private NotificationCompat.Builder mBuilderCompat;
 	private NotificationManager mNotificationManager;
 
-	Object syncObject = new Object();
-
-	MegaRequestListenerInterface megaRequestListener;
-	MegaTransferListenerInterface megaTransferListener;
-
-	private int notificationId = NOTIFICATION_CHAT_UPLOAD;
-	private String notificationChannelId = NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID;
-	private String notificationChannelName = NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME;
-
 	private static boolean fileExplorerUpload;
 	private static long snackbarChatHandle = MEGACHAT_INVALID_HANDLE;
 
@@ -171,19 +159,15 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		mapVideoDownsampling = new HashMap<>();
 		mapProgressTransfers = new HashMap<>();
 
-		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-        }
+		int wifiLockMode = WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
         WifiManager wifiManager = (WifiManager) getApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		lock = wifiManager.createWifiLock(wifiLockMode, "MegaUploadServiceWifiLock");
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MegaUploadServicePowerLock");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-			mBuilder = new Notification.Builder(ChatUploadService.this);
-		mBuilderCompat = new NotificationCompat.Builder(ChatUploadService.this);
+		mBuilder = new Notification.Builder(ChatUploadService.this);
+		mBuilderCompat = new NotificationCompat.Builder(ChatUploadService.this, NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID);
 
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -207,9 +191,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		try {
-			startForeground(notificationId, createInitialServiceNotification(notificationChannelId,
-					notificationChannelName, mNotificationManager,
-					new NotificationCompat.Builder(ChatUploadService.this, notificationChannelId),
+			startForeground(NOTIFICATION_CHAT_UPLOAD, createInitialServiceNotification(NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
+					NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME, mNotificationManager,
+					new NotificationCompat.Builder(ChatUploadService.this, NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID),
 					mBuilder));
 			isForeground = true;
 		} catch (Exception e) {
@@ -221,7 +205,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	private void stopForeground() {
 		isForeground = false;
 		stopForeground(true);
-		mNotificationManager.cancel(notificationId);
+		mNotificationManager.cancel(NOTIFICATION_CHAT_UPLOAD);
 		stopSelf();
 	}
 
@@ -821,12 +805,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		Notification notification;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID, NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setShowBadge(true);
 			channel.setSound(null, null);
 			mNotificationManager.createNotificationChannel(channel);
-
-			NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
 
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
@@ -838,7 +820,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setColor(ContextCompat.getColor(this, R.color.mega));
 
 			notification = mBuilderCompat.build();
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+		} else {
 			mBuilder
 					.setSmallIcon(R.drawable.ic_stat_notify)
 					.setProgress(100, (int) progressPercent, false)
@@ -849,27 +831,19 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					.setColor(ContextCompat.getColor(this, R.color.mega));
 
 			notification = mBuilder.build();
-		} else {
-			notification = new Notification();
-			notification.flags |= Notification.FLAG_ONGOING_EVENT;
-			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-			notification.contentIntent = pendingIntent;
-			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify);
-			notification.contentView.setTextViewText(R.id.status_text, message);
-			notification.contentView.setProgressBar(R.id.status_progress, 100, (int) progressPercent, false);
 		}
 
 		if (!isForeground) {
 			logDebug("Starting foreground");
 			try {
-				startForeground(notificationId, notification);
+				startForeground(NOTIFICATION_CHAT_UPLOAD, notification);
 				isForeground = true;
 			} catch (Exception e) {
 				logError("startForeground EXCEPTION", e);
 				isForeground = false;
 			}
 		} else {
-			mNotificationManager.notify(notificationId, notification);
+			mNotificationManager.notify(NOTIFICATION_CHAT_UPLOAD, notification);
 		}
 	}
 
@@ -1541,44 +1515,41 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 		Intent intent = new Intent(this, ManagerActivityLollipop.class);
 
-		if(isOverquota==1){
-			intent.setAction(ACTION_OVERQUOTA_STORAGE);
-		}
-		else{
-			intent.setAction(ACTION_PRE_OVERQUOTA_STORAGE);
-		}
+		intent.setAction(isOverquota == OVERQUOTA_STORAGE_STATE
+				? ACTION_OVERQUOTA_STORAGE
+				: ACTION_PRE_OVERQUOTA_STORAGE);
+
+		Notification notification;
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+			NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID, NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME, NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setShowBadge(true);
 			channel.setSound(null, null);
 			mNotificationManager.createNotificationChannel(channel);
 
-			NotificationCompat.Builder mBuilderCompatO = new NotificationCompat.Builder(getApplicationContext(), notificationChannelId);
-
-			mBuilderCompatO
-					.setSmallIcon(R.drawable.ic_stat_notify)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-					.setAutoCancel(true).setTicker(contentText)
-					.setContentTitle(message).setContentText(contentText)
-					.setOngoing(false);
-
-			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompatO.build());
-		}
-		else {
 			mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setColor(ContextCompat.getColor(this,R.color.mega))
 					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
 					.setAutoCancel(true).setTicker(contentText)
 					.setContentTitle(message).setContentText(contentText)
 					.setOngoing(false);
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-				mBuilderCompat.setColor(ContextCompat.getColor(this,R.color.mega));
-			}
-
-			mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, mBuilderCompat.build());
+			notification = mBuilderCompat.build();
 		}
+		else {
+			mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify)
+					.setColor(ContextCompat.getColor(this,R.color.mega))
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(contentText)
+					.setContentTitle(message).setContentText(contentText)
+					.setOngoing(false);
+
+			notification = mBuilder.build();
+		}
+
+		mNotificationManager.notify(NOTIFICATION_STORAGE_OVERQUOTA, notification);
 	}
 
 	private boolean isVoiceClip(String appData) {
