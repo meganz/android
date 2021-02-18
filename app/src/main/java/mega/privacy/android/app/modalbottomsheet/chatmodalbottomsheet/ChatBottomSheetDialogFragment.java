@@ -221,6 +221,10 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 archiveChatText.setText(getString(R.string.archive_chat_option));
                 archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
             }
+
+            if (optionInfoChat.getVisibility() == View.GONE) {
+                separatorInfo.setVisibility(View.GONE);
+            }
         }
 
         dialog.setContentView(contentView);
