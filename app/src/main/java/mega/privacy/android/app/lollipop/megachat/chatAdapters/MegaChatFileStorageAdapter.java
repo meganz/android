@@ -38,10 +38,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     DatabaseHandler dbH;
     private SparseBooleanArray selectedItems;
     private int dimPhotos;
+    private RecyclerView recyclerViewFragment;
 
-    public MegaChatFileStorageAdapter(Context _context, Object fragment, ActionBar aB, ArrayList<String> _uriImages, int dimPhotos) {
+    public MegaChatFileStorageAdapter(Context _context, Object fragment, RecyclerView recyclerView, ActionBar aB, ArrayList<String> _uriImages, int dimPhotos) {
         this.context = _context;
         this.fragment = fragment;
+        this.recyclerViewFragment = recyclerView;
         this.uriImages = _uriImages;
         this.dimPhotos = dimPhotos;
         dbH = DatabaseHandler.getDbHandler(context);
@@ -56,12 +58,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
             selectedItems.put(pos, true);
             ((ChatFileStorageFragment) fragment).addPosition(pos);
         }
-        notifyItemChanged(pos);
+
+        updateSelectedItem(pos);
 
         if (selectedItems.size() <= 0) {
             ((ChatFileStorageFragment) fragment).hideMultipleSelect();
         }
-        notifyDataSetChanged();
 
     }
 
@@ -91,7 +93,6 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
             }
         }
         notifyDataSetChanged();
-
     }
 
     private boolean isItemChecked(int position) {
@@ -254,6 +255,26 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
         if (this.multipleSelect) {
             selectedItems = new SparseBooleanArray();
         }
+    }
+
+    /**
+     * Method to update the selected or deselected item.
+     *
+     * @param position int with the position of the item to be updated.
+     */
+    public void updateSelectedItem(int position) {
+        ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+        if (holderGrid == null) {
+            notifyItemChanged(position);
+            return;
+        }
+        if (!multipleSelect || !this.isItemChecked(position)) {
+            holderGrid.photoSelectedIcon.setVisibility(View.GONE);
+            holderGrid.photoSelectedStroke.setVisibility(View.GONE);
+            return;
+        }
+        holderGrid.photoSelectedIcon.setVisibility(View.VISIBLE);
+        holderGrid.photoSelectedStroke.setVisibility(View.VISIBLE);
     }
 
     /* public static view holder class */
