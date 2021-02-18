@@ -25,6 +25,7 @@ import static mega.privacy.android.app.fragments.managerFragments.LinksFragment.
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.SortUtil.*;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
@@ -195,7 +196,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
         }
 
         if (parent != null) {
-            if (query.isEmpty() || parentHandleSearch != INVALID_HANDLE) {
+            if (isTextEmpty(query) || parentHandleSearch != INVALID_HANDLE) {
                 nodes = megaApi.getChildren(parent);
             } else {
                 megaCancelToken = MegaCancelToken.createInstance();
@@ -208,7 +209,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      * Gets search result nodes of Incoming section, root navigation level.
      */
     private void getInShares() {
-        if (query.isEmpty()) {
+        if (isTextEmpty(query)) {
             nodes = megaApi.getInShares();
 
             if (orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
@@ -224,7 +225,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      * Gets search result nodes of Outgoing section, root navigation level.
      */
     private void getOutShares() {
-        if (query.isEmpty()) {
+        if (isTextEmpty(query)) {
             ArrayList<MegaShare> outShares = megaApi.getOutShares();
             long lastHandle = INVALID_HANDLE;
 
@@ -252,7 +253,7 @@ public class SearchNodesTask extends AsyncTask<Void, Void, Void> {
      * Gets search result nodes of Links section, root navigation level.
      */
     private void getLinks() {
-        if (query.isEmpty()) {
+        if (isTextEmpty(query)) {
             nodes = megaApi.getPublicLinks(getLinksOrderCloud(managerA.orderCloud, managerA.isFirstNavigationLevel()));
         } else {
             megaCancelToken = MegaCancelToken.createInstance();
