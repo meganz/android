@@ -260,7 +260,7 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
     /**
      * Method to update the selected or deselected item.
      *
-     * @param position int with the position of the item to be updated.
+     * @param position The Int with the position of the item to be updated.
      */
     public void updateSelectedItem(int position) {
         ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) recyclerViewFragment.findViewHolderForAdapterPosition(position);
