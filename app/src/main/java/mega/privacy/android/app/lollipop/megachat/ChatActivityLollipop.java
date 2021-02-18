@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -140,6 +141,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttach
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StatusBarColorHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1235,6 +1237,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                checkScroll();
+
                 // Get the first visible item
 
                 if(!messages.isEmpty()){
@@ -1335,6 +1339,31 @@ public class ChatActivityLollipop extends PinActivityLollipop
         separatorOptions.setVisibility(View.GONE);
         voiceClipLayout.setVisibility(View.VISIBLE);
 
+    }
+
+    public void checkScroll() {
+        if (listView == null) return;
+
+        boolean canScroll = listView.canScrollVertically(-1);
+        changeActionBarElevation(canScroll);
+    }
+
+    public void changeActionBarElevation(boolean elevate) {
+        StatusBarColorHelper.changeStatusBarColorForElevation(this, elevate);
+
+        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (Util.isDarkMode(this)) {
+            if (elevate) {
+                int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+                tB.setBackgroundColor(toolbarElevationColor);
+            } else {
+                tB.setBackgroundColor(android.R.color.transparent);
+            }
+        } else {
+            tB.setBackgroundColor(Color.WHITE);
+            tB.setElevation(elevate ? elevation : 0);
+        }
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
