@@ -27,7 +27,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.adapters.CountryListAdapter;
-import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.app.utils.ColorUtils;
 
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -76,11 +76,7 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if(recyclerView.canScrollVertically(-1)) {
-                    changeActionBarElevation(true);
-                } else {
-                    changeActionBarElevation(false);
-                }
+                changeActionBarElevation(recyclerView.canScrollVertically(-1));
             }
         });
         adapter = new CountryListAdapter(countries);
@@ -103,23 +99,13 @@ public class CountryCodePickerActivityLollipop extends PinActivityLollipop imple
     }
 
     public void changeActionBarElevation(boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+
         if(withElevation) {
-            final float elevation = Util.dp2px(4,outMetrics);
-            abL.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    abL.setElevation(elevation);
-                }
-            },100);
+            float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+            abL.setElevation(elevation);
         } else {
-            abL.postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    abL.setElevation(0);
-                }
-            },100);
+            abL.setElevation(0);
         }
     }
 

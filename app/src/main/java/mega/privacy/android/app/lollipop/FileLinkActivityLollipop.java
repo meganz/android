@@ -306,8 +306,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 			return;
 		}
 
+        int statusBarColor = ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation));
         if (isDarkMode(this)) {
-            collapsingToolbar.setContentScrimColor(ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation)));
+            collapsingToolbar.setContentScrimColor(statusBarColor);
         }
 
 		if (preview != null) {
@@ -327,9 +328,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 			collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
 			collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white_alpha_087));
-			collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
+			collapsingToolbar.setStatusBarScrimColor(statusBarColor);
 		} else {
-			collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
+			collapsingToolbar.setStatusBarScrimColor(statusBarColor);
 			setColorFilterBlack();
 		}
 	}

@@ -205,4 +205,15 @@ object ColorUtils {
             RunOnUIThreadUtils.post { activity.window.statusBarColor = android.R.color.transparent }
         }
     }
+
+    /**
+     * Under dark mode, status bar's color should be change along with app bar layout's background color.
+     *
+     * @param activity Current activity.
+     * @param resId The id of the color res.
+     */
+    @JvmStatic
+    fun changeStatusBarColor(activity: Activity, resId: Int) {
+        RunOnUIThreadUtils.post { activity.window.statusBarColor = ContextCompat.getColor(activity, resId) }
+    }
 }

@@ -73,6 +73,8 @@ public class SMSVerificationActivity extends PinActivityLollipop implements View
         MegaApplication.smsVerifyShowed(true);
         setContentView(R.layout.activity_sms_verification);
         // For this page, designer requires to change status bar color to match the background color.
+        ColorUtils.changeStatusBarColor(this, R.color.blue_400_blue_200);
+
         container = findViewById(R.id.scroller_container);
         Intent intent = getIntent();
         if (intent != null) {

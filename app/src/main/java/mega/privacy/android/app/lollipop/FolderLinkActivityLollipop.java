@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -40,6 +41,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
@@ -76,9 +78,11 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.SDCardOperator;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -277,8 +281,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
+            MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.folder_link_action, menu);
+
+            ColorUtils.changeStatusBarColorForElevation(FolderLinkActivityLollipop.this, true);
+            // No App bar in this activity, control tool bar instead.
+            tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+
 			return true;
 		}
 
@@ -288,6 +297,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			adapterList.setMultipleSelect(false);
 			optionsBar.setVisibility(View.VISIBLE);
 			separator.setVisibility(View.VISIBLE);
+
+			// No App bar in this activity, control tool bar instead.
+			boolean withElevation = listView.canScrollVertically(-1);
+            ColorUtils.changeStatusBarColorForElevation(FolderLinkActivityLollipop.this, withElevation);
+            if(!withElevation) {
+                tB.setElevation(0);
+            }
 		}
 
 		@Override
@@ -528,6 +544,15 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
 		separator = (View) findViewById(R.id.separator_3);
@@ -661,6 +686,31 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		}
 
 		fragmentContainer.post(() -> cookieDialogFactory.showDialogIfNeeded(this));
+    }
+
+    public void checkScroll() {
+        if (listView == null) return;
+
+        boolean canScroll = listView.canScrollVertically(-1);
+        changeActionBarElevation(canScroll);
+    }
+
+    public void changeActionBarElevation(boolean elevate) {
+        ColorUtils.changeStatusBarColorForElevation(this, elevate || adapterList.isMultipleSelect());
+
+        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (Util.isDarkMode(this)) {
+            if (elevate) {
+                int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+                tB.setBackgroundColor(toolbarElevationColor);
+            } else {
+                tB.setBackgroundColor(android.R.color.transparent);
+            }
+        } else {
+            tB.setBackgroundColor(Color.WHITE);
+            tB.setElevation(elevate ? elevation : 0);
+        }
     }
 	
 	public void askForDecryptionKeyDialog(){

@@ -4344,12 +4344,15 @@ public class ChatActivityLollipop extends PinActivityLollipop
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             logDebug("onCreateActionMode");
-            ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, true);
-
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
 
             importIcon = menu.findItem(R.id.chat_cab_menu_import);
+
+            ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, true);
+            // No App bar in this activity, control tool bar instead.
+            tB.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+
             return true;
         }
 

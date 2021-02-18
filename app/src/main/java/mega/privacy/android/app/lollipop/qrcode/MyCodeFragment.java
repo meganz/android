@@ -55,6 +55,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -233,12 +234,15 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
 
     public void checkScroll() {
         if (scrollView != null) {
-            if (scrollView.canScrollVertically(-1)) {
+            boolean withElevation = scrollView.canScrollVertically(-1);
+            if (withElevation) {
                 float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
                 abL.setElevation(elevation);
             } else {
                 abL.setElevation(0);
             }
+
+            ColorUtils.changeStatusBarColorForElevation(requireActivity(), withElevation);
         }
     }
 

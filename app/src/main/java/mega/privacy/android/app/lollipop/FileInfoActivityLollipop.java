@@ -1143,9 +1143,13 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                     }
                 }
 
+                int statusBarColor = ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation));
                 if(isDarkMode(this)) {
-                    collapsingToolbar.setContentScrimColor(ColorUtils.getColorForElevation(this, getResources().getDimension(R.dimen.toolbar_elevation)));
+                    collapsingToolbar.setContentScrimColor(statusBarColor);
                 }
+                collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
+                collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white_alpha_087));
+                collapsingToolbar.setStatusBarScrimColor(statusBarColor);
 
                 if (node.hasPreview() || node.hasThumbnail()) {
                     appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -1166,14 +1170,10 @@ public class FileInfoActivityLollipop extends PinActivityLollipop implements OnC
                             }
                         }
                     });
-
-                    collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.grey_087_white_087));
-                    collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(this, R.color.white_alpha_087));
-                    collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
                 }
 			/*Folder*/
                 else {
-                    collapsingToolbar.setStatusBarScrimColor(ColorUtils.getThemeColor(this, R.attr.colorPrimaryVariant));
+                    collapsingToolbar.setStatusBarScrimColor(statusBarColor);
                     setColorFilterBlack();
                 }
             }
