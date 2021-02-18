@@ -19,7 +19,7 @@
                 android:id="@+id/toolbar_chat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:elevation="4dp"
+                android:background="@android:color/transparent"
                 android:minHeight="?attr/actionBarSize">
 
                 <LinearLayout

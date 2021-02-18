@@ -141,7 +141,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttach
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StatusBarColorHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1349,7 +1348,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     }
 
     public void changeActionBarElevation(boolean elevate) {
-        StatusBarColorHelper.changeStatusBarColorForElevation(this, elevate);
+        ColorUtils.changeStatusBarColorForElevation(this, elevate || adapter.isMultipleSelect());
 
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
@@ -4345,6 +4344,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             logDebug("onCreateActionMode");
+            ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, true);
 
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.messages_chat_action, menu);
@@ -4360,6 +4360,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
             editingMessage = false;
             recoveredSelectedPositions = null;
             clearSelections();
+
+            ColorUtils.changeStatusBarColorForElevation(ChatActivityLollipop.this, listView.canScrollVertically(-1));
         }
 
         @Override

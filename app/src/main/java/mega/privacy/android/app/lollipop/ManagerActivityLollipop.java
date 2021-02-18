@@ -238,7 +238,6 @@ import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.LinksUtil;
-import mega.privacy.android.app.utils.StatusBarColorHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -15199,7 +15198,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			abL.setElevation(0);
 		}
 
-        StatusBarColorHelper.changeStatusBarColorForElevation(this, withElevation);
+		ColorUtils.changeStatusBarColorForElevation(this, withElevation);
 	}
 
 	public long getParentHandleInbox() {

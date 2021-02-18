@@ -27,7 +27,6 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StatusBarColorHelper;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -266,7 +265,7 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
     }
 
     public void changeActionBarElevation(boolean elevate) {
-        StatusBarColorHelper.changeStatusBarColorForElevation(this, elevate);
+        ColorUtils.changeStatusBarColorForElevation(this, elevate);
 
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 

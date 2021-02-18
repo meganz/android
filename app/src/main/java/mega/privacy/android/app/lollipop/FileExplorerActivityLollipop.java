@@ -79,7 +79,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StatusBarColorHelper;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -853,7 +852,7 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
     public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
         if (!isCurrentFragment(fragmentIndex)) return;
 
-        StatusBarColorHelper.changeStatusBarColorForElevation(this, elevate);
+		ColorUtils.changeStatusBarColorForElevation(this, elevate);
 
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
