@@ -1267,7 +1267,7 @@ public class ChatUtil {
      */
     public static boolean shouldMuteOrUnmuteOptionsBeShown(Context context, MegaChatRoom chatRoom) {
         return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
-                (!chatRoom.isGroup() || chatRoom.isActive()) &&
-                (chatRoom.isGroup() || chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RO);
+                ((chatRoom.isGroup() && chatRoom.isActive()) ||
+                        (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() != MegaChatRoom.PRIV_RO));
     }
 }
