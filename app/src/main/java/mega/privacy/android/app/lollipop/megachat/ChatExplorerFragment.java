@@ -45,6 +45,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -279,15 +280,28 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         boolean canScroll = listView.canScrollVertically(-1);
         boolean addLayoutVisible = (addLayout != null && addLayout.getVisibility() == View.VISIBLE);
+        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
         if (context instanceof FileExplorerActivityLollipop) {
-            if (addLayoutVisible) {
-                addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
+            if (addLayoutVisible && canScroll) {
+                if (Util.isDarkMode(context)) {
+                    int toolbarElevationColor = ColorUtils.getColorForElevation(context, elevation);
+                    addLayout.setBackgroundColor(toolbarElevationColor);
+                } else {
+                    addLayout.setElevation(elevation);
+                }
+            } else {
+                if (Util.isDarkMode(context)) {
+                    addLayout.setBackgroundColor(android.R.color.transparent);
+                } else {
+                    addLayout.setElevation(0);
+                }
             }
-            ((FileExplorerActivityLollipop) context).changeActionBarElevation(
-                    canScroll && !addLayoutVisible, CHAT_FRAGMENT);
+
+            ((FileExplorerActivityLollipop) context).changeActionBarElevation(canScroll, CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
             addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
+            ((ChatExplorerActivity) context).changeActionBarElevation(canScroll);
         }
     }
 

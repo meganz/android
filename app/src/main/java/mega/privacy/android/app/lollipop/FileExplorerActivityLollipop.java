@@ -79,6 +79,8 @@ import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StatusBarColorHelper;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -848,11 +850,36 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 	}
 
-	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
-		if (!isCurrentFragment(fragmentIndex)) return;
+    public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
+        if (!isCurrentFragment(fragmentIndex)) return;
 
-		abL.setElevation(elevate ? dp2px(4, outMetrics) : 0);
-	}
+        StatusBarColorHelper.changeStatusBarColorForElevation(this, elevate);
+
+        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (fragmentIndex == CHAT_FRAGMENT) {
+            if (Util.isDarkMode(this)) {
+                if (tabShown == NO_TABS) {
+                    if (elevate) {
+                        int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+                        tB.setBackgroundColor(toolbarElevationColor);
+                    } else {
+                        tB.setBackgroundColor(android.R.color.transparent);
+                    }
+                } else {
+                    if (elevate){
+                        tB.setBackgroundColor(android.R.color.transparent);
+                        abL.setElevation(elevation);
+                    } else {
+                        tB.setBackgroundColor(android.R.color.transparent);
+                        abL.setElevation(0);
+                    }
+                }
+            }
+        } else {
+            abL.setElevation(elevate ? elevation : 0);
+        }
+    }
 
 	private boolean isCurrentFragment(int index) {
 		if (tabShown == NO_TABS) return true;  // only one fragment
@@ -3523,6 +3550,8 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		}
 
 		viewPagerExplorer.disableSwipe(hide);
-		tabLayoutExplorer.setVisibility(hide ? View.GONE : View.VISIBLE);
+
+		// If no tab should be shown, keep hide.
+		tabLayoutExplorer.setVisibility(hide || (tabShown == NO_TABS) ? View.GONE : View.VISIBLE);
 	}
 }

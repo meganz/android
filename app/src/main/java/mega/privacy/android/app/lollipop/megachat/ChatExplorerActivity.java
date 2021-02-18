@@ -26,6 +26,9 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink;
+import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StatusBarColorHelper;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -259,6 +262,23 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
             searchMenuItem.expandActionView();
             searchView.setQuery(query, false);
             pendingToOpenSearchView = false;
+        }
+    }
+
+    public void changeActionBarElevation(boolean elevate) {
+        StatusBarColorHelper.changeStatusBarColorForElevation(this, elevate);
+
+        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (Util.isDarkMode(this)) {
+            if (elevate) {
+                int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+                tB.setBackgroundColor(toolbarElevationColor);
+            } else {
+                tB.setBackgroundColor(android.R.color.transparent);
+            }
+        } else {
+            findViewById(R.id.app_bar_layout_chat_explorer).setElevation(elevate ? elevation : 0);
         }
     }
 
