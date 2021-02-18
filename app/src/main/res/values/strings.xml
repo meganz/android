@@ -285,7 +285,7 @@
     <string name="contact_ignore" context="The text of the notification button that is displayed when there is a call in progress, another call is received and ignored.">Ignore</string>
     <string name="contact_decline" context="option to decline a contact invitation">Decline</string>
     <string name="contact_accept" context="option to accept a contact invitation">Accept</string>
-    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Contact Info</string>
+    <string name="contact_properties_activity" context="Label for the option of the sliding panel to show the contact info">Contact info</string>
     <!--
     <string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
     -->
@@ -2905,9 +2905,9 @@
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">This message has reached the maximum limit of %d reactions.</string>
 
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
-    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear chat history</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
     <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
@@ -3016,7 +3016,7 @@
     <string name="preference_cookies_advertising_title" context="Preference screen item title">Advertising Cookies</string>
     <string name="preference_cookies_advertising_summary" context="Preference screen item summary">Used by us and our approved advertising partners to customise the adverts you see on our services and on other websites based on your browsing history. Not accepting these Cookies means we may show advertisements that are less relevant.</string>
     <string name="preference_cookies_thirdparty_title" context="Preference screen item title">Third Party Cookies</string>
-    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on ‘More Information’ below for details on all the third party Cookies we use.</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Click on “More Information” below for details on all the third party Cookies we use.</string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">Privacy Policy</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">Cookie Policy</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>

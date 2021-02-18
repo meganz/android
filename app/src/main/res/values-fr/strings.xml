@@ -3,7 +3,7 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l\'utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n\'importe quand, de n\'importe quel appareil, n\'importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l\'accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l\'utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50 Go à tous les utilisateurs inscrits, avec des primes d\'objectif, et propose des abonnements payants avec des limites beaucoup plus élevées : \n\n\nAbonnement Pro Léger : 4,99 € (4,99 USD) par mois ou 49,99 € (49,99 USD) par an vous donne 400 Go d\'espace de stockage et 1 To de quota de transfert par mois.\nAbonnement Pro I : 9,99 € (9,99 USD) par mois ou 99,99 € (99,99 USD) par an vous donne 2 To d\'espace de stockage et 2 To de quota de transfert par mois.\nAbonnement Pro II : 19,99 € (19,99 USD) par mois ou 199,99 € (199,99 USD) par an vous donne 8 To d\'espace de stockage et 8 To de quota de transfert par mois.\nAbonnement Pro III : 29,99 € (29,99 USD) par mois ou 299,99 € (299,99 USD) par an vous donne 16 To d\'espace de stockage et 16 To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d\'abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l\'icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n\'est pas déjà fait) et cliquez sur l\'appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l\'appli : \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -> Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -> Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -> Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -> MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur : https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web : \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
 
-    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro léger</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">Visualiseur de PDF MEGA</string>
 
@@ -2048,8 +2048,8 @@
     <string name="title_new_contact_request_notification" context="title of the notification for a new incoming contact request">Nouvelle demande de contact</string>
 
     <string name="type_message_hint_with_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Rédigez un message pour « %s »&#8230;</string>
-    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Aucun[/B] [A]transfert[/A] [B]actif.[/B]</string>
-    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Aucun[/B] [A]transfert[/A] [B]terminé.[/B]</string>
+    <string name="transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Aucun[/B][A] transfert actif[/A]</string>
+    <string name="completed_transfers_empty_new" context="Empty state message shown in the screen when there are not any active transfer">[B]Aucun[/B][A] transfert terminé[/A]</string>
     <string name="file_browser_empty_folder_new" context="Empty state text that indicates that a folder is currently empty">[A]Le dossier[/A] [B]est vide[/B]</string>
 
     <string name="type_message_hint_with_customized_title" context="Hint shown in the field to write a message in the chat screen (chat with customized title)">Rédigez un message pour « %s »&#8230;</string>
@@ -2905,44 +2905,44 @@
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Ce message a atteint la limite maximale de %d réactions.</string>
 
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
-    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Effacer l\'historique de la conversation</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
-    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Désactivé</string>
     <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
     <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
     <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
     <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
     <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
-    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than:</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Supprimer automatiquement les messages de plus de :</string>
     <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
 
-    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 an</string>
 
     <plurals name="retention_time_picker_hours">
-        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
-        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">heure</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">heures</item>
     </plurals>
 
     <plurals name="retention_time_picker_days">
-        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
-        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">jour</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">jours</item>
     </plurals>
 
     <plurals name="retention_time_picker_weeks">
-        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
-        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">semaine</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">semaines</item>
     </plurals>
 
     <plurals name="retention_time_picker_months">
-        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
-        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">mois</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">mois</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 heure</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
     </plurals>
 
@@ -2952,7 +2952,7 @@
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 mois</item>
         <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Sélectionner des transferts</string>

@@ -229,8 +229,8 @@
     <string name="section_contacts" context="Section name for the “Contacts” section.Preferably one word. There is little space for this word.">Contatti</string>
 
     <string name="section_contacts_with_notification" context="Item of the navigation title for the contacts section when there is any pending incoming request">Contatti [A](%1$d)[/A]</string>
-    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Nessuna[/B] [A]richiesta inviata[/A][B].[/B]</string>
-    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Nessuna[/B] [A]richiesta ricevuta[/A][B].[/B]</string>
+    <string name="sent_requests_empty" context="Empty state when the user has not sent any contact request to other users">[B]Nessuna[/B] [A]richiesta inviata[/A]</string>
+    <string name="received_requests_empty" context="Empty state when the user has not received any contact request from other users">[B]Nessuna[/B] [A]richiesta ricevuta[/A]</string>
     <string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Trasferimenti</string>
 
     <string name="section_account" context="Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this.">Account</string>
@@ -1596,7 +1596,7 @@
     <string name="attachment_upload_panel_contact">Contatto</string>
     <string name="attachment_upload_panel_photo">Dal dispositivo</string>
 
-    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Cancella account</string>
+    <string name="delete_account" context="Button and title of dialog shown when the user wants to delete permanently their account.">Elimina account</string>
     <string name="delete_account_text" context="Text shown in the alert dialog to confirm the deletion of an account">Se cancelli il tuo account non ti sarà più permesso accedere ai dati del tuo account, i tuoi contatti MEGA o le tue conversazioni.\nNon potrai annullare questa azione.</string>
     <string name="delete_button" context="menu item">Cancella</string>
 
@@ -1826,10 +1826,10 @@
 
     <string name="label_set_period" context="title of a tag to search for a specific period within the search by date option in Camera upload">Imposta periodo</string>
 
-    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invita amici nella [/B][A]Chat[/A][B] d apprezza la nostra piattaforma criptata con privacy e sicurezza.[/B]</string>
+    <string name="context_empty_chat_recent" context="Text of the empty screen when there are not chat conversations">[B]Invita amici nella [/B][A]Chat[/A][B] e apprezza la nostra piattaforma criptata con privacy e sicurezza[/B]</string>
 
-    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Nessun media nei [/B][A] Caricamenti della fotocamera [/A][B].[/B]</string>
-    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Svuota il [/B][A]Cestino[/A][B].[/B]</string>
+    <string name="context_empty_camera_uploads" context="Text of the empty screen when there are not elements in Camera Uploads">[B]Nessun media nei [/B][A] Caricamenti della fotocamera [/A]</string>
+    <string name="context_empty_rubbish_bin" context="Text of the empty screen when there are not elements in the Rubbish Bin">[B]Svuota il [/B][A]Cestino[/A]</string>
 
     <string name="context_empty_inbox" context="Text of the empty screen when there are not elements in  Inbox">[B]Nessun file nel tuo[/B] [A]Inbox[/A][B].[/B]</string>
     <string name="context_empty_cloud_drive" context="Text of the empty screen when there are not elements in Cloud Drive">[B]Nessun file nel tuo[/B] [A]Cloud Drive[/A][B].[/B]</string>
@@ -2905,44 +2905,44 @@
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">Questo messaggio ha raggiunto il limite massimo di %d reazioni.</string>
 
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
-    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Pulisci la chat</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
-    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disattivato</string>
     <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
     <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
     <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
     <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
     <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
-    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than:</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Elimina automaticamente i messaggi più vecchi di:</string>
     <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
 
-    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 anno</string>
 
     <plurals name="retention_time_picker_hours">
-        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
-        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">ora</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">ore</item>
     </plurals>
 
     <plurals name="retention_time_picker_days">
-        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
-        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">giorno</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">giorni</item>
     </plurals>
 
     <plurals name="retention_time_picker_weeks">
-        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
-        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">settimana</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">settimane</item>
     </plurals>
 
     <plurals name="retention_time_picker_months">
-        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
-        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">mese</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">mesi</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 ora</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
     </plurals>
 
@@ -2952,7 +2952,7 @@
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 mese</item>
         <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">Seleziona trasferimenti</string>

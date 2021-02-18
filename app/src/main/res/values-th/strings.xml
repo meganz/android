@@ -1149,19 +1149,19 @@
 
     <string name="success_muting_a_chat_for_specific_time" context="Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour">การแจ้งเตือนแชทจะถูกปิดเสียงเป็นเวลา %s</string>
     <plurals name="success_muting_chat_until_specific_time">
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">Chat notifications will be muted until %1$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">Chat notifications will be muted until %1$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Singular, only used for 01:XX format." quantity="one">แจ้งเตือนแชทจะถูกปิดจนถึง %1$s น.</item>
+        <item context="Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15" quantity="other">แจ้งเตือนแชทจะถูกปิดจนถึง %1$s น.</item>
     </plurals>
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">Chat notifications will be muted until %1$s at %2$s</item>
-        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">Chat notifications will be muted until %1$s at %2$s</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Singular, only used for 01:XX format, e.g. Chat notifications will be muted until tomorrow at 01:00" quantity="one">แจ้งเตือนแชทจะถูกปิดจนถึง%1$sเวลา %2$s น.</item>
+        <item context="Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00" quantity="other">แจ้งเตือนแชทจะถูกปิดจนถึง%1$sเวลา %2$s น.</item>
     </plurals>
     <string name="notifications_are_already_muted" context="Message when select the option Do not disturb but the notifications are already muted">ปิดเสียงแจ้งเตือนแชท</string>
 
     <string name="success_unmuting_a_chat" context="Message when a chat has been unmuted successfully.">เปิดใช้งานแจ้งเตือนแชท</string>
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">Muted until %1$s</item>
-        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">Muted until %1$s</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Singular, only used for 1:XX format." quantity="one">ปิดเสียงจนถึง %1$s น.</item>
+        <item context="String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15" quantity="other">ปิดเสียงจนถึง %1$s น.</item>
     </plurals>
 
     <string name="title_properties_chat_contact_notifications" context="Title of the section to enable notifications in the Contact Properties screen">การแจ้งเตือน</string>
@@ -1949,7 +1949,7 @@
     <string name="turn_on_notifications_second_step" context="Second step to turn on notifications">เปิด[A]แอปและการแจ้งเตือน[/A]</string>
     <string name="turn_on_notifications_third_step" context="Third step to turn on notifications">เลือก [A]MEGA[/A]</string>
     <string name="turn_on_notifications_fourth_step" context="Fourth step to turn on notifications">เปิด[A]การแจ้งเตือนแอป[/A]</string>
-    <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">เปลี่ยนเป็นเปิดและเลือกค่ากำหนดของคุณ</string>
+    <string name="turn_on_notifications_fifth_step" context="Fifth step to turn on notifications">เปลี่ยนเป็นเปิดและเลือกค่ากำหนดลักษณะของคุณ</string>
 
     <plurals name="files_send_to_chat_success">
         <item context="Alert message after sending to chat one or several messages to several chats, version item" quantity="one">ส่งไฟล์แล้ว</item>
@@ -2904,56 +2904,56 @@
     <string name="limit_reaction_per_user" context="Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime.">คุณแสดงความรู้ถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
 
-    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
-    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
-    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
-    <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
-    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
-    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
-    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
-    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
-    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
-    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
-    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
-    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than:</string>
-    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
+    <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น[/B][A] %2$s[/A][B][/B]</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">ล้างประวัติการแชท</string>
+    <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] ปิดใช้งานการล้างข้อความ[/B]</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">ลบข้อความและไฟล์ทั้งหมดที่แชร์ในการสนทนานี้จากทั้งสองฝ่าย การกระทำนี้ไม่สามารถย้อนกลับได้</string>
+    <string name="title_properties_history_retention" context="Title of the history retention option">ล้างประวัติแชท</string>
+    <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">ลบข้อความที่เก่ากว่าในระยะเวลาหนึ่งโดยอัตโนมัติ</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">ปิดใช้งาน</string>
+    <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">หนึ่งวัน</string>
+    <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">หนึ่งสัปดาห์</string>
+    <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">หนึ่งเดือน</string>
+    <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">กำหนดเอง</string>
+    <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">จัดการประวัติแชท</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">ลบข้อความที่เก่ากว่าโดยอัตโนมัติ:</string>
+    <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">ล้างประวัติข้อความทั้งหมดสำหรับการสนทนานี้หรือไม่</string>
 
-    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 ปี</string>
 
     <plurals name="retention_time_picker_hours">
-        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
-        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">ชั่วโมง</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">ชั่วโมง</item>
     </plurals>
 
     <plurals name="retention_time_picker_days">
-        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
-        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">วัน</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">วัน</item>
     </plurals>
 
     <plurals name="retention_time_picker_weeks">
-        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
-        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">สัปดาห์</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">สัปดาห์</item>
     </plurals>
 
     <plurals name="retention_time_picker_months">
-        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
-        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">เดือน</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">เดือน</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
-        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 ชั่วโมง</item>
+        <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d ชั่วโมง</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_weeks" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 week</item>
-        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d weeks</item>
+        <item context="Text on the label indicating that the oldest messages of a week will be automatically deleted." quantity="one">1 สัปดาห์</item>
+        <item context="Text on the label indicating that That the oldest messages of several weeks will be automatically deleted." quantity="other">%1$d สัปดาห์</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
-        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 เดือน</item>
+        <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d เดือน</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">เลือกการถ่ายโอน</string>
 
@@ -3016,7 +3016,7 @@
     <string name="preference_cookies_advertising_title" context="Preference screen item title">คุกกี้สำหรับโฆษณา</string>
     <string name="preference_cookies_advertising_summary" context="Preference screen item summary">ดำเนินการโดยเราและพันธมิตรโฆษณาที่ได้รับอนุมัติของเราเท่านั้น เพื่อปรับแต่งโฆษณาที่คุณเห็นในบริการของเราและบนเว็บไซต์อื่น ๆ ตามประวัติการเข้าชมของคุณ การไม่ยอมรับคุกกี้เหล่านี้หมายความว่าเราอาจแสดงโฆษณาที่มีความเกี่ยวข้องกับคุณน้อยลง</string>
     <string name="preference_cookies_thirdparty_title" context="Preference screen item title">คุกกี้จากที่อื่น</string>
-    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">คุกกี้เหล่านี้ถูกควบคุมโดยบุคคลอื่นที่ไม่ใช่เรา เราใช้คุกกี้เหล่านี้เพื่อจัดหาประเภทของฟังก์ชันที่อธิบายไว้ข้างต้นแล้ว การไม่ยอมรับคุกกี้เหล่านี้จะมีผลกระทบที่แตกต่างกันไป ขึ้นอยู่กับประเภทของคุกกี้แต่ละคุกกี้จากที่อื่น คลิกที่ \'ข้อมูลเพิ่มเติม\' ด้านล่างเพื่อดูรายละเอียดเกี่ยวกับคุกกี้จากที่อื่นทั้งหมดที่เราใช้</string>
+    <string name="preference_cookies_thirdparty_summary" context="Preference screen item summary. Please, keep the placeholders to format the string.">คุกกี้เหล่านี้ถูกควบคุมโดยบุคคลอื่นที่ไม่ใช่เรา เราใช้คุกกี้เหล่านี้เพื่อจัดหาประเภทของฟังก์ชันที่อธิบายไว้ข้างต้นแล้ว การไม่ยอมรับคุกกี้เหล่านี้จะมีผลกระทบที่แตกต่างกันไป ขึ้นอยู่กับประเภทของคุกกี้แต่ละคุกกี้จากที่อื่น คลิกที่ “ข้อมูลเพิ่มเติม” ด้านล่างเพื่อดูรายละเอียดเกี่ยวกับคุกกี้จากที่อื่นทั้งหมดที่เราใช้</string>
     <string name="preference_cookies_policies_privacy" context="Preference screen item action button">นโยบายสิทธิส่วนบุคคล</string>
     <string name="preference_cookies_policies_cookie" context="Preference screen item action button">นโยบายคุกกี้</string>
     <string name="preference_cookies_always_on" context="Preference screen item state description">เปิดไว้เสมอ</string>

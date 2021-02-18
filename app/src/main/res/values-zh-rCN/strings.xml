@@ -3,7 +3,7 @@
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app (character limit 4000)">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - >将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - >拍照并将照片上传至MEGA\nREAD_CONTACTS - >从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - > MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android\n\n若了解更多内容，请查看我们的网站：\n参见https://mega.nz/terms \n\n\n网页客户端 - https://mega.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app (character limit 80)">MEGA是全面专注隐私保护的云端存储平台。</string>
 
-    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro Lite</string>
+    <string name="prolite_account" context="PRO Lite account" translatable="false">Pro精简版</string>
 
     <string name="pdf_app_name" context="Name of the MEGA PDF Viewer. Keep uppercase.">MEGA PDF 查看器</string>
 
@@ -2905,44 +2905,44 @@
     <string name="limit_reaction_per_message" context="Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime.">此消息已达到%d个态度的最大上限。</string>
 
     <string name="retention_history_changed_by" context="System message displayed to all chat participants when one of them enables retention history">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
-    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">Clear all chat history</string>
+    <string name="title_properties_clear_chat_history" context="Title of the section to clear the chat content in the Manage chat history screen">清除聊天记录</string>
     <string name="retention_history_disabled" context="System message that is shown to all chat participants upon disabling the Retention history">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
-    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">This will delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
+    <string name="subtitle_properties_chat_clear" context="Subtitle of the section to clear the chat content in the Manage chat history screen">Delete all messages and files shared in this conversation from both parties. This action is irreversible.</string>
     <string name="title_properties_history_retention" context="Title of the history retention option">History clearing</string>
     <string name="subtitle_properties_history_retention" context="Subtitle of the history retention option when history retention is disabled">Automatically delete messages older than a certain amount of time.</string>
-    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">Disabled</string>
+    <string name="history_retention_option_disabled" context="Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled">停用</string>
     <string name="history_retention_option_one_day" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day">One day</string>
     <string name="history_retention_option_one_week" context="SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week">One week</string>
     <string name="history_retention_option_one_month" context="Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month">One month</string>
     <string name="history_retention_option_custom" context="Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted">Custom</string>
     <string name="title_properties_manage_chat" context="Title of the Manage chat history screen">Manage chat history</string>
-    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">Automatically delete messages older than:</string>
+    <string name="subtitle_properties_manage_chat" context="Subtitle of the dialogue to select a retention time">自动删除早于以下时间的信息：</string>
     <string name="confirmation_clear_chat_history" context="Text of the confirmation dialog to clear the chat history from Manage chat history section">Clear the full message history for this conversation?</string>
 
-    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">1 year</string>
+    <string name="subtitle_properties_manage_chat_label_year" context="Text on the label indicating that the oldest messages of a year will be automatically deleted.">一年</string>
 
     <plurals name="retention_time_picker_hours">
-        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">hour</item>
-        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">hours</item>
+        <item context="Picker text to choose custom retention time. This option indicates a hour" quantity="one">小时</item>
+        <item context="Picker text to choose custom retention time. This option indicates several hours" quantity="other">小时</item>
     </plurals>
 
     <plurals name="retention_time_picker_days">
-        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">day</item>
-        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">days</item>
+        <item context="Picker text to choose custom retention time. This option indicates a day" quantity="one">日</item>
+        <item context="Picker text to choose custom retention time. This option indicates several days" quantity="other">天</item>
     </plurals>
 
     <plurals name="retention_time_picker_weeks">
-        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">week</item>
-        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">weeks</item>
+        <item context="Picker text to choose custom retention time. This option indicates a week" quantity="one">周</item>
+        <item context="Picker text to choose custom retention time. This option indicates several weeks" quantity="other">周</item>
     </plurals>
 
     <plurals name="retention_time_picker_months">
-        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">month</item>
-        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">months</item>
+        <item context="Picker text to choose custom retention time. This option indicates a month" quantity="one">月</item>
+        <item context="Picker text to choose custom retention time. This option indicates several months" quantity="other">个月</item>
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_hours" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1 hour</item>
+        <item context="Text on the label indicating that the oldest messages of a hour will be automatically deleted." quantity="one">1小时</item>
         <item context="Text on the label indicating that That the oldest messages of several hours will be automatically deleted." quantity="other">%1$d hours</item>
     </plurals>
 
@@ -2952,7 +2952,7 @@
     </plurals>
 
     <plurals name="subtitle_properties_manage_chat_label_months" formatted="false">
-        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">1 month</item>
+        <item context="Text on the label indicating that the oldest messages of a month will be automatically deleted." quantity="one">一个月</item>
         <item context="Text on the label indicating that That the oldest messages of several months will be automatically deleted." quantity="other">%1$d months</item>
     </plurals>
     <string name="title_select_transfers" context="Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab">选择传输</string>
