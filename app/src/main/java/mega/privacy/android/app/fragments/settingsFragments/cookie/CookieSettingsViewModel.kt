@@ -72,8 +72,6 @@ class CookieSettingsViewModel @ViewModelInject constructor(
      * Save cookie settings to SDK
      */
     fun saveCookieSettings() {
-        composite.clear()
-
         updateCookieSettingsUseCase.update(enabledCookies.value)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -87,7 +85,7 @@ class CookieSettingsViewModel @ViewModelInject constructor(
                     updateResult.value = false
                     getCookieSettings()
                 }
-            ).addTo(composite)
+            )
     }
 
     /**

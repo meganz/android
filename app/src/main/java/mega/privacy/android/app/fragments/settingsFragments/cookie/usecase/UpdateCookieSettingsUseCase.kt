@@ -1,7 +1,11 @@
 package mega.privacy.android.app.fragments.settingsFragments.cookie.usecase
 
+import android.content.Intent
+import android.content.IntentFilter
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.Disposable
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_COOKIE_SETTINGS_SAVED
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.*
@@ -77,6 +81,9 @@ class UpdateCookieSettingsUseCase @Inject constructor(
             emitter.setDisposable(Disposable.fromAction {
                 megaApi.removeRequestListener(listener)
             })
+        }.doOnComplete {
+            val intent = Intent(BROADCAST_ACTION_COOKIE_SETTINGS_SAVED)
+            MegaApplication.getInstance()?.sendBroadcast(intent)
         }
 
     /**

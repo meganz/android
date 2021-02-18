@@ -16,12 +16,15 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        unregisterReceiver(cookieSettingsReceiver) // Don't need to show the confirmation snackbar here
+
         setTitle(getString(R.string.settings_about_cookie_settings))
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
         replaceFragment(CookieSettingsFragment())
 
         showSaveButton {
-            viewModel.saveCookieSettings()
+            saveCookieSettings()
         }
     }
 
@@ -37,11 +40,15 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
         MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
             .setMessage(R.string.dialog_cookie_alert_unsaved)
             .setPositiveButton(R.string.save_action) { _: DialogInterface, _: Int ->
-                viewModel.saveCookieSettings()
-                finish()
+                saveCookieSettings()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()
             .show()
+    }
+
+    private fun saveCookieSettings() {
+        viewModel.saveCookieSettings()
+        finish()
     }
 }
