@@ -418,37 +418,29 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		PendingMessageSingle pendingMsg = pendingMsgs.get(0);
 		File file = new File(pendingMsg.getFilePath());
 
-		if(MimeTypeList.typeForName(file.getName()).isImage() && !MimeTypeList.typeForName(file.getName()).isGIF() && isOnMobileData(this)){
+		if (MimeTypeList.typeForName(file.getName()).isImage() && !MimeTypeList.typeForName(file.getName()).isGIF() && isOnMobileData(this)) {
 			String uploadPath;
 			File compressedFile = checkImageBeforeUpload(file);
 
 			if (isFileAvailable(compressedFile)) {
 				String fingerprint = megaApi.getFingerprint(compressedFile.getAbsolutePath());
+
 				for (PendingMessageSingle pendMsg : pendingMsgs) {
 					if (fingerprint != null) {
 						pendMsg.setFingerprint(fingerprint);
 					}
+
 					pendingMessages.add(pendMsg);
 				}
 
 				uploadPath = compressedFile.getAbsolutePath();
 			} else {
-				for (PendingMessageSingle pendMsg : pendingMsgs) {
-					pendingMessages.add(pendMsg);
-				}
-
+				pendingMessages.addAll(pendingMsgs);
 				uploadPath = pendingMsg.getFilePath();
 			}
 
-			String fileName = fileNames.get(pendingMsg.name);
-			String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
-
-			if (fileName != null) {
-				megaApi.startUploadForChat(uploadPath, parentNode, appData, false, fileName);
-			} else {
-				megaApi.startUploadForChat(uploadPath, parentNode, appData, false);
-			}
-		} else if(MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)){
+			startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), uploadPath);
+		} else if (MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)) {
 			logDebug("DATA connection is Mp4Video");
 
 			try {
@@ -457,96 +449,89 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				File chatTempFolder = getCacheFolder(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
 				File outFile = buildChatTempFile(getApplicationContext(), file.getName());
 				int index = 0;
-				if(outFile!=null){
-					while(outFile.exists()){
-						if(index>0){
+
+				if (outFile != null) {
+					while (outFile.exists()) {
+						if (index > 0) {
 							outFile = new File(chatTempFolder.getAbsolutePath(), file.getName());
 						}
 
 						index++;
 						String outFilePath = outFile.getAbsolutePath();
 						String[] splitByDot = outFilePath.split("\\.");
-						String ext="";
-						if(splitByDot!=null && splitByDot.length>1)
-							ext = splitByDot[splitByDot.length-1];
-						String fileName = outFilePath.substring(outFilePath.lastIndexOf(File.separator)+1, outFilePath.length());
-						if(ext.length()>0)
-							fileName=fileName.replace("."+ext, "_"+index+".mp4");
-						else
-							fileName=fileName.concat("_"+index+".mp4");
+						String ext = "";
+
+						if (splitByDot != null && splitByDot.length > 1) {
+							ext = splitByDot[splitByDot.length - 1];
+						}
+
+						String fileName = outFilePath.substring(outFilePath.lastIndexOf(File.separator) + 1);
+
+						fileName = ext.length() > 0
+								? fileName.replace("." + ext, "_" + index + MP4_EXTENSION)
+								: fileName.concat("_" + index + MP4_EXTENSION);
 
 						outFile = new File(chatTempFolder.getAbsolutePath(), fileName);
 					}
+
+					outFile.createNewFile();
 				}
 
-				outFile.createNewFile();
-
-				if(outFile==null){
+				if (outFile == null) {
 					numberVideosPending--;
 					totalVideos--;
-					for (PendingMessageSingle pendMsg : pendingMsgs) {
-						pendingMessages.add(pendMsg);
-					}
-
-                    String fileName = fileNames.get(pendingMsg.name);
-					String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
-
-                    if (fileName != null) {
-                        megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
-                    } else {
-                        megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false);
-                    }
-				}
-				else{
+					pendingMessages.addAll(pendingMsgs);
+					startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+				} else {
 					for (PendingMessageSingle pendMsg : pendingMsgs) {
 						pendMsg.setVideoDownSampled(outFile.getAbsolutePath());
 						pendingMessages.add(pendMsg);
 					}
+
 					mapVideoDownsampling.put(outFile.getAbsolutePath(), 0);
-					if(videoDownsampling==null){
+
+					if (videoDownsampling == null) {
 						videoDownsampling = new VideoDownsampling(this);
 					}
+
 					videoDownsampling.changeResolution(file, outFile.getAbsolutePath(), pendingMsg.getId());
 				}
 
 			} catch (Throwable throwable) {
-				for (PendingMessageSingle pendMsg : pendingMsgs) {
-					pendingMessages.add(pendMsg);
-				}
-
-                String fileName = fileNames.get(pendingMsg.name);
-				String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
-
-                if (fileName != null) {
-                    megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
-                } else {
-                    megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false);
-                }
 				logError("EXCEPTION: Video cannot be downsampled", throwable);
+				pendingMessages.addAll(pendingMsgs);
+				startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
 			}
-		}
-		else{
-			for (PendingMessageSingle pendMsg : pendingMsgs) {
-				pendingMessages.add(pendMsg);
-			}
-
-			String data = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
-
-			if (type != null && type.equals(APP_DATA_VOICE_CLIP)) {
-				data = APP_DATA_VOICE_CLIP + APP_DATA_SEPARATOR + data;
-			}
-
-            String fileName = fileNames.get(pendingMsg.name);
-            if (fileName != null) {
-                megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, data, false, fileName);
-            } else {
-                megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, data, false);
-            }
+		} else {
+			pendingMessages.addAll(pendingMsgs);
+			startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
 		}
 
 		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
 				&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
 			sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
+		}
+	}
+
+	/**
+	 * Starts the upload.
+	 *
+	 * @param idPendingMessage Identifier of pending message.
+	 * @param type             Type of upload file.
+	 * @param fileName         Name of the file if set, null otherwise.
+	 * @param localPath        Local path of the file to upload.
+	 */
+	private void startUpload(long idPendingMessage, String type, String fileName, String localPath) {
+		String data = APP_DATA_CHAT + APP_DATA_INDICATOR + idPendingMessage;
+
+		if (type != null && type.equals(APP_DATA_VOICE_CLIP)) {
+			data = APP_DATA_VOICE_CLIP + APP_DATA_SEPARATOR + data;
+		}
+
+		if (!isTextEmpty(fileName)) {
+			megaApi.startUploadForChat(localPath, parentNode, data, false, fileName);
+		} else {
+			megaApi.startUploadForChat(localPath, parentNode, data, false);
 		}
 	}
 
@@ -677,13 +662,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		if (downFile != null) {
-			String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + idPendingMessage;
-
-			if (fileName != null) {
-				megaApi.startUploadForChat(downFile.getPath(), parentNode, appData, false, fileName);
-			} else {
-				megaApi.startUploadForChat(downFile.getPath(), parentNode, appData, false);
-			}
+			startUpload(idPendingMessage, null, fileName, downFile.getPath());
 		}
 	}
 
