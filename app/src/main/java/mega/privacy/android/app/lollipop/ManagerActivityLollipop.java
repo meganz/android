@@ -15177,6 +15177,9 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			mElevationCause ^= cause;
 		}
 
+		// In landscape mode, if no call in progress layout ("Tap to return call"), then don't show elevation
+		if (mElevationCause == ELEVATION_CALL_IN_PROGRESS && callInProgressLayout.getVisibility() != View.VISIBLE) return;
+
 		// If any Tablayout is visible, set the background of the toolbar to transparent (or its elevation
 		// overlay won't be correctly set via AppBarLayout) and then set the elevation of AppBarLayout,
 		// in this way, both Toolbar and TabLayout would have expected elevation overlay.
@@ -15198,7 +15201,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 			abL.setElevation(0);
 		}
 
-		ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+		ColorUtils.changeStatusBarColorForElevation(this, mElevationCause > 0);
 	}
 
 	public long getParentHandleInbox() {
