@@ -460,7 +460,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
 
 			if (fileName != null) {
-				megaApi.startUploadWithTopPriority(uploadPath, parentNode, appData, false, fileName);
+				megaApi.startUploadForChat(uploadPath, parentNode, appData, false, fileName);
 			} else {
 				megaApi.startUploadForChat(uploadPath, parentNode, appData, false);
 			}
@@ -508,7 +508,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
 
                     if (fileName != null) {
-                        megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
+                        megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
                     } else {
                         megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false);
                     }
@@ -534,7 +534,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + pendingMsg.getId();
 
                 if (fileName != null) {
-                    megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
+                    megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false, fileName);
                 } else {
                     megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, appData, false);
                 }
@@ -554,7 +554,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
             String fileName = fileNames.get(pendingMsg.name);
             if (fileName != null) {
-                megaApi.startUploadWithTopPriority(pendingMsg.getFilePath(), parentNode, data, false, fileName);
+                megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, data, false, fileName);
             } else {
                 megaApi.startUploadForChat(pendingMsg.getFilePath(), parentNode, data, false);
             }
@@ -696,7 +696,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			String appData = APP_DATA_CHAT + APP_DATA_INDICATOR + idPendingMessage;
 
 			if (fileName != null) {
-				megaApi.startUploadWithTopPriority(downFile.getPath(), parentNode, appData, false, fileName);
+				megaApi.startUploadForChat(downFile.getPath(), parentNode, appData, false, fileName);
 			} else {
 				megaApi.startUploadForChat(downFile.getPath(), parentNode, appData, false);
 			}
