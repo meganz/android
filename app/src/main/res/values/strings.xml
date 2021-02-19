@@ -3024,4 +3024,7 @@
     <string name="preference_cookies_always_on" context="Preference screen item state description">Always On</string>
 
     <string name="menu_scan_document" context="Menu option that allows the user to scan document and upload it directly to MEGA.">Scan document</string>
+
+    <string name="user_is_not_contact" context="Message displayed when clicking on a contact attached to the chat that is not my contact">%s is not on your contacts list</string>
+
 </resources>

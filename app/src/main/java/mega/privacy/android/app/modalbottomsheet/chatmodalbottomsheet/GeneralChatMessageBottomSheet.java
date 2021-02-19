@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
@@ -385,10 +386,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_view_layout:
                 logDebug("View option");
-                i = new Intent(context, ContactAttachmentActivityLollipop.class);
-                i.putExtra("chatId", chatId);
-                i.putExtra(MESSAGE_ID, messageId);
-                context.startActivity(i);
+                ContactUtil.openContactAttachmentActivity(context, chatId, messageId);
                 break;
 
             case R.id.option_info_layout:
@@ -396,10 +394,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                     ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
-
-                i = new Intent(context, ContactInfoActivityLollipop.class);
-                i.putExtra(NAME, message.getMessage().getUserEmail(0));
-                context.startActivity(i);
+                ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0));
                 break;
 
             case R.id.option_invite_layout:

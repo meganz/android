@@ -32,6 +32,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNotificationsAdapter;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -259,9 +260,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Go to contact info");
-                    Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                    intent.putExtra(NAME, notif.getEmail());
-                    startActivity(intent);
+                    ContactUtil.openContactInfoActivity(context, notif.getEmail());
                 }
                 else{ ArrayList<MegaContactRequest> contacts = megaApi.getIncomingContactRequests();
                     if(contacts!=null){
@@ -283,9 +282,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                 MegaUser contact = megaApi.getContact(notif.getEmail());
                 if(contact!=null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE){
                     logDebug("Go to contact info");
-                    Intent intent = new Intent(context, ContactInfoActivityLollipop.class);
-                    intent.putExtra(NAME, notif.getEmail());
-                    startActivity(intent);
+                    ContactUtil.openContactInfoActivity(context, notif.getEmail());
                 }
                 break;
             }

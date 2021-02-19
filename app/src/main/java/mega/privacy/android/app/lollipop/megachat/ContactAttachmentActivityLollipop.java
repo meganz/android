@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaContactsAttachedLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -60,6 +61,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
 
@@ -148,8 +150,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 		Intent intent = getIntent();
 		if (intent != null) {
-			chatId = intent.getLongExtra("chatId", -1);
-			messageId = intent.getLongExtra("messageId", -1);
+			chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+			messageId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
 			logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
 			MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
 			if(messageMega!=null){
@@ -341,9 +343,7 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 
 			if(contact!=null) {
 				if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-					Intent i = new Intent(this, ContactInfoActivityLollipop.class);
-					i.putExtra(NAME, c.getMail());
-					this.startActivity(i);
+					ContactUtil.openContactInfoActivity(this, c.getMail());
 				}
 				else{
 					logDebug("The user is not contact");

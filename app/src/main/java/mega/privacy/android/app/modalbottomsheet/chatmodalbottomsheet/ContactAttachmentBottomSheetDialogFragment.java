@@ -20,6 +20,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -264,7 +265,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
-        Intent i;
         long numUsers = message.getMessage().getUsersCount();
 
         switch (v.getId()) {
@@ -274,24 +274,18 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                     return;
                 }
 
-                i = new Intent(context, ContactInfoActivityLollipop.class);
                 if (context instanceof ChatActivityLollipop) {
-                    i.putExtra(NAME, message.getMessage().getUserEmail(0));
+                    ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(0));
                 } else if (position != -1) {
-                    i.putExtra(NAME, message.getMessage().getUserEmail(position));
+                    ContactUtil.openContactInfoActivity(context, message.getMessage().getUserEmail(position));
                 } else {
                     logWarning("Error - position -1");
                 }
-
-                context.startActivity(i);
                 break;
 
             case R.id.option_view_layout:
                 logDebug("View option");
-                i = new Intent(context, ContactAttachmentActivityLollipop.class);
-                i.putExtra("chatId", chatId);
-                i.putExtra(MESSAGE_ID, messageId);
-                context.startActivity(i);
+                ContactUtil.openContactAttachmentActivity(context, chatId, messageId);
                 break;
 
             case R.id.option_invite_layout:
