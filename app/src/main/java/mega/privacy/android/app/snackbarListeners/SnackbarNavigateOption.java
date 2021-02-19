@@ -75,7 +75,7 @@ public class SnackbarNavigateOption implements View.OnClickListener {
             intent.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra(CHAT_ID, idChat);
-            intent.putExtra("moveToChatSection", true);
+            intent.putExtra(EXTRA_MOVE_TO_CHAT_SECTION, true);
         } else {
             intent.setAction(Constants.ACTION_SHOW_SETTINGS_STORAGE);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
