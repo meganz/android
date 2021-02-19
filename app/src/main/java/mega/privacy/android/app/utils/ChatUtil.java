@@ -1259,6 +1259,21 @@ public class ChatUtil {
     }
 
     /**
+     * Method to compare if the current message is the same message that needs to be updated.     *
+     *
+     * @param messageToUpdate The message to be updated.
+     * @param currentMessage  The current message.
+     * @return True, if it is the same. False, if not.
+     */
+    public static boolean isItSameMsg(MegaChatMessage messageToUpdate, MegaChatMessage currentMessage) {
+        if (messageToUpdate.getMsgId() != MEGACHAT_INVALID_HANDLE) {
+            return messageToUpdate.getMsgId() == currentMessage.getMsgId();
+        } else {
+            return messageToUpdate.getTempId() == currentMessage.getTempId();
+        }
+    }
+
+    /**
      * Method to know whether to show mute or unmute options.
      *
      * @param context  The Activity context.
