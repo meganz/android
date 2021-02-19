@@ -903,7 +903,7 @@ public class ContactInfoActivityLollipop extends PinActivityLollipop implements 
 					visibilityStateIcon();
 				} else if (stateToolbar == State.COLLAPSED) {
 					firstLineTextToolbar.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.grey_087_white_087));
-					secondLineTextToolbar.setTextColor(ContextCompat.getColor(ContactInfoActivityLollipop.this, R.color.grey_087_white_087));
+					secondLineTextToolbar.setTextColor(ColorUtils.getThemeColor(ContactInfoActivityLollipop.this, android.R.attr.textColorSecondary));
 					setColorFilterBlack();
 					visibilityStateIcon();
 				}

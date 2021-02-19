@@ -90,7 +90,7 @@
                     android:ellipsize="none"
                     android:paddingBottom="9dp"
                     android:singleLine="true"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
                     android:textSize="14sp" />
             </RelativeLayout>
 
