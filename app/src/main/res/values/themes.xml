@@ -112,4 +112,14 @@
         <!-- In material design, TextInputLayout hint,error,helper text, BNV item text, etc. -->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
     </style>
+
+    <style name="Theme.Dark.FullScreen.Draggable" parent="Theme.Mega">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
 </resources>
