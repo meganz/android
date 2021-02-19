@@ -881,7 +881,7 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 			inflater.inflate(R.menu.messages_node_history_action, menu);
 
 			importIcon = menu.findItem(R.id.chat_cab_menu_import);
-			changeViewElevation(aB, true, outMetrics);
+            checkScroll();
 			return true;
 		}
 
@@ -1574,11 +1574,11 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 		downloadConfirmationDialog.show();
 	}
 
-	public void checkScroll () {
-		if (listView != null) {
-			changeViewElevation(aB, listView.canScrollVertically(-1) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
-		}
-	}
+    public void checkScroll() {
+        boolean withElevation = (listView != null && listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect());
+        new Handler().post(() -> findViewById(R.id.app_bar_layout).setElevation(withElevation ? getResources().getDimension(R.dimen.toolbar_elevation) : 0));
+        ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+    }
 
 	public MegaChatRoom getChatRoom () {
 		return chatRoom;

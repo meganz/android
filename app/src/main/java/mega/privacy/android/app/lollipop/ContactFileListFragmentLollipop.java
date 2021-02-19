@@ -293,6 +293,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 			parentHandleStack = (Stack<Long>) savedInstanceState.getSerializable(PARENT_HANDLE_STACK);
 		}
 	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -407,11 +408,11 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 		return v;
 	}
 
-	public void checkScroll() {
-		if (listView != null && aB != null) {
-			changeViewElevation(aB, (listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect()), outMetrics);
-		}
-	}
+    public void checkScroll() {
+        boolean withElevation = (listView != null && listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect());
+        new Handler().post(() -> requireActivity().findViewById(R.id.app_bar_layout).setElevation(withElevation ? getResources().getDimension(R.dimen.toolbar_elevation) : 0));
+        ColorUtils.changeStatusBarColorForElevation(requireActivity(), withElevation);
+    }
 
 	public void showOptionsPanel(MegaNode sNode){
 		logDebug("Node handle: " + sNode.getHandle());
