@@ -238,8 +238,8 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
-    <!-- Regular, 14sp, 0px, textColorPrimary, AllCaps=true -->
-    <style name="TextAppearance.Mega.Body2.Variant.AllCaps">
+    <!-- Regular, 14sp, 0px, textColorSecondary, AllCaps=true -->
+    <style name="TextAppearance.Mega.Body2.Secondary.Variant.AllCaps">
         <item name="android:textAllCaps">true</item>
     </style>
 

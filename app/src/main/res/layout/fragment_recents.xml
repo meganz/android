@@ -30,7 +30,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginRight="20dp"
-                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
         </RelativeLayout>
 
         <FrameLayout

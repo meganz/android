@@ -46,7 +46,7 @@
                 android:id="@+id/file_storage_empty_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
         </LinearLayout>
     </RelativeLayout>
 

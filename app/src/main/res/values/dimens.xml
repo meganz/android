@@ -74,7 +74,7 @@
 
     <dimen name="homepage_node_grid_round_corner_radius">5dp</dimen>
 
-    <dimen name="empty_data_font_size">18sp</dimen>
+    <dimen name="empty_data_font_size">14sp</dimen>
 
     <dimen name="cu_fragment_ic_selected_size_large">23dp</dimen>
     <dimen name="cu_fragment_ic_selected_margin_large">8dp</dimen>
