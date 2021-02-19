@@ -163,8 +163,8 @@ public class MapHandlerImpl extends AbstractMapHandler implements OnMapReadyCall
 
     @Override
     public void setMyLocation(boolean animateCamera) {
-        if (lastLocation == null) {
-            logWarning("lastLocation is null");
+        if (mMap == null || lastLocation == null) {
+            logWarning("mMap or lastLocation is null");
             return;
         }
 
