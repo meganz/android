@@ -5091,7 +5091,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                 if (!isOnline(this)) {
                                     //No shown - is not possible to know is it already contact or not - megaApi not working
                                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
-                                } else if (!chatC.isInAnonymousMode() && m != null) {
+                                } else if (!chatC.isInAnonymousMode()) {
                                     if (m.getMessage().getUsersCount() < 1)
                                         return;
 
@@ -5103,6 +5103,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
                                     if (m.getMessage().getUserHandle(0) != megaChatApi.getMyUserHandle()) {
                                         String email = m.getMessage().getUserEmail(0);
                                         MegaUser contact = megaApi.getContact(email);
+
                                         if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                             ContactUtil.openContactInfoActivity(this, email);
                                         } else {
