@@ -83,6 +83,8 @@ public class Constants {
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
+    public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
+
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;

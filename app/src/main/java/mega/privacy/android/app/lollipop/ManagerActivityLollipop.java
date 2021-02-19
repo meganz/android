@@ -555,7 +555,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 
 	private int searchSharedTab = -1;
 	private DrawerItem searchDrawerItem = null;
-	static DrawerItem drawerItem = null;
+	private DrawerItem drawerItem;
 	DrawerItem drawerItemPreUpgradeAccount = null;
 	int accountFragmentPreUpgradeAccount = -1;
 	static MenuItem drawerMenuItem = null;
@@ -2936,7 +2936,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-						if (getIntent().getBooleanExtra("moveToChatSection", false)){
+						if (getIntent().getBooleanExtra(EXTRA_MOVE_TO_CHAT_SECTION, false)){
 							moveToChatSection(chatId);
 						}
 						else {
@@ -4000,7 +4000,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
 
 					long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-					if (getIntent().getBooleanExtra("moveToChatSection", false)){
+					if (getIntent().getBooleanExtra(EXTRA_MOVE_TO_CHAT_SECTION, false)){
 						moveToChatSection(chatId);
 					}
 					else {
@@ -10913,9 +10913,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		logDebug("navigateToAchievements");
 		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
 		getProLayout.setVisibility(View.GONE);
-		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = MY_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
 		selectDrawerItemLollipop(drawerItem);
@@ -10934,9 +10932,7 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		logDebug("navigateToMyAccount");
 		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-
 		getProLayout.setVisibility(View.GONE);
-		drawerItem = DrawerItem.ACCOUNT;
 		accountFragment = MY_ACCOUNT_FRAGMENT;
 		displayedAccountType = -1;
 		comesFromNotifications = true;
@@ -14678,12 +14674,12 @@ public class ManagerActivityLollipop extends SorterContentActivity
 		deepBrowserTreeLinks--;
 	}
 
-	public static DrawerItem getDrawerItem() {
+	public DrawerItem getDrawerItem() {
 		return drawerItem;
 	}
 
-	public static void setDrawerItem(DrawerItem drawerItem) {
-		ManagerActivityLollipop.drawerItem = drawerItem;
+	public void setDrawerItem(DrawerItem drawerItem) {
+		this.drawerItem = drawerItem;
 	}
 
 	public int getTabItemShares(){

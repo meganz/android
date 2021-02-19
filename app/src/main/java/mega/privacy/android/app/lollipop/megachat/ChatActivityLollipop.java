@@ -6470,7 +6470,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
 
         AndroidMegaChatMessage messageToUpdate = messages.get(indexToChange);
-        if(messageToUpdate.getMessage().getMsgIndex()==msg.getMessage().getMsgIndex()){
+        if (isItSameMsg(messageToUpdate.getMessage(), msg.getMessage())) {
             logDebug("The internal index not change");
 
             if(msg.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL){
