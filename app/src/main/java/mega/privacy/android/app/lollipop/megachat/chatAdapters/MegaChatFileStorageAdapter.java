@@ -264,10 +264,12 @@ public class MegaChatFileStorageAdapter extends RecyclerView.Adapter<MegaChatFil
      */
     public void updateSelectedItem(int position) {
         ViewHolderBrowserGrid holderGrid = (ViewHolderBrowserGrid) recyclerViewFragment.findViewHolderForAdapterPosition(position);
+
         if (holderGrid == null) {
             notifyItemChanged(position);
             return;
         }
+
         int visibility = !multipleSelect || !isItemChecked(position) ? View.GONE : View.VISIBLE;
         holderGrid.photoSelectedIcon.setVisibility(visibility);
         holderGrid.photoSelectedStroke.setVisibility(visibility);
