@@ -429,12 +429,7 @@ class HomepageFragment : Fragment() {
             .create()
 
         viewModel.bannerList.observe(viewLifecycleOwner) {
-            if (it == null || it.isEmpty()) {
-                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
-            } else {
-                bannerViewPager.refreshData(it)
-                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-            }
+            bannerViewPager.refreshData(it)
         }
     }
 
