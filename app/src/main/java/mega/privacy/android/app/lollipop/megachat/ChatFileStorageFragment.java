@@ -147,7 +147,7 @@ public class ChatFileStorageFragment extends BottomSheetDialogFragment{
             });
 
             if (adapter == null) {
-                adapter = new MegaChatFileStorageAdapter(context, this, aB, mPhotoUris, dimImages);
+                adapter = new MegaChatFileStorageAdapter(context, this, recyclerView, aB, mPhotoUris, dimImages);
                 adapter.setHasStableIds(true);
 
             }else{
