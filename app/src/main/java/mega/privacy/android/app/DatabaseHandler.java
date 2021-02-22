@@ -1439,8 +1439,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public UserCredentials getCredentials(){
 		UserCredentials userCredentials = null;
 		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
-		try{
-			Cursor cursor = db.rawQuery(selectQuery, null);
+		try (Cursor cursor = db.rawQuery(selectQuery, null)){
 			//get the credential of last login
 			if (cursor != null && cursor.moveToLast()) {
 				int id = Integer.parseInt(cursor.getString(0));
@@ -1451,16 +1450,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String myHandle = decrypt(cursor.getString(5));
 				userCredentials = new UserCredentials(email, session, firstName, lastName, myHandle);
 			}
-			if (cursor != null) {
-				cursor.close();
-			}
-		}
-		catch (SQLiteException e){
+		} catch (SQLiteException e){
 			if (db != null){
 				onCreate(db);
 			}
+		} catch (Exception e) {
+			logError("Error decrypting DB field", e);
 		}
-
         return userCredentials;
 	}
 
@@ -4259,14 +4255,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private Backup getBackupByType(int type) {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_TYPE + " = " + type +
                 " AND " + KEY_BACKUP_OUTDATED + " = '" + encrypt(Boolean.FALSE.toString()) + "' ORDER BY " + KEY_ID + " DESC";
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            Backup backup = getBackupFromCursor(cursor);
-            cursor.close();
-            return backup;
-        } else {
-            return null;
-        }
+        try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				return getBackupFromCursor(cursor);
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
+		return null;
     }
 
     public void setBackupAsOutdated(long id) {
@@ -4298,7 +4294,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				while (cursor.moveToNext()) {
 					list.add(getBackupFromCursor(cursor));
 				}
-				cursor.close();
 			}
 			return list;
 		} catch (Exception e) {
