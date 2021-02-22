@@ -67,7 +67,6 @@
             android:padding="3dp"
             android:background="@null"
             android:src="@drawable/ic_emoji_add"
-            app:tint="?attr/textColorHint" />
+            app:tint="@color/grey_026_white_038" />
     </RelativeLayout>
 </RelativeLayout>
-

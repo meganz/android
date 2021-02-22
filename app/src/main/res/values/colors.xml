@@ -315,6 +315,9 @@
     <!-- Chat contact reaction emoji count text color -->
     <color name="teal_300_white">@color/teal_300</color>
 
+    <!-- Chat reaction add icon tint color -->
+    <color name="grey_026_white_038">@color/grey_alpha_026</color>
+
     <!-- chat own text message background -->
     <color name="teal_500_teal_400_090">@color/teal_500</color>
     <!-- chat own text message background, sending -->
