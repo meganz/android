@@ -77,7 +77,7 @@ CRASHLYTICS_DOWNLOAD_URL=https://raw.githubusercontent.com/firebase/firebase-and
 CRASHLYTICS_DOWNLOAD_URL_C=https://raw.githubusercontent.com/firebase/firebase-android-sdk/8f02834e94f8b24a7cf0f777562cad73c6b9a40f/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
 CRASHLYTICS_SOURCE_FILE=crashlytics.h
 CRASHLYTICS_SOURCE_FILE_C=crashlyticsC.h
-CRASHLYTICS_DEST_PATH=mega/sdk/third_party/
+CRASHLYTICS_DEST_PATH=mega/sdk/third_party
 
 SODIUM=sodium
 SODIUM_VERSION=1.0.18
