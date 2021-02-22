@@ -847,11 +847,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					return;
 				}
 
-				String[] parts = appData.split(APP_DATA_INDICATOR);
-				int last = parts.length-1;
-				String idFound = parts[last];
-
-				int id = Integer.parseInt(idFound);
+				long id = getPendingMessageIdFromAppData(appData);
 				//Update status and tag on db
 				dbH.updatePendingMessageOnTransferStart(id, transfer.getTag());
 				mapProgressTransfers.put(transfer.getTag(), transfer);
@@ -1107,11 +1103,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 								isOverquota = 2;
 							}
 
-							String[] parts = appData.split(APP_DATA_INDICATOR);
-							int last = parts.length-1;
-							String idFound = parts[last];
-
-							int id = Integer.parseInt(idFound);
+							long id = getPendingMessageIdFromAppData(appData);
 							//Update status and tag on db
 							dbH.updatePendingMessageOnTransferFinish(id, "-1", PendingMessageSingle.STATE_ERROR_UPLOADING);
 							launchErrorToChat(id);
@@ -1154,7 +1146,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	 * @param transfer Current MegaTransfer.
 	 * @return True if the list is empty, false otherwise.
 	 */
-	private boolean arePendingMessagesEmpty(int id, MegaTransfer transfer) {
+	private boolean arePendingMessagesEmpty(long id, MegaTransfer transfer) {
 		if (pendingMessages != null && !pendingMessages.isEmpty()) {
 			return false;
 		}
@@ -1170,7 +1162,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	 * @param id       Identifier of PendingMessageSingle.
 	 * @param transfer Current MegaTransfer.
 	 */
-	private void attachMessageFromDB(int id, MegaTransfer transfer) {
+	private void attachMessageFromDB(long id, MegaTransfer transfer) {
 		PendingMessageSingle pendingMessage = dbH.findPendingMessageById(id);
 		if (pendingMessage != null) {
 			pendingMessages.add(pendingMessage);
@@ -1184,11 +1176,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		logDebug("attachNodes()");
 		//Find the pending message
 		String appData = transfer.getAppData();
-		String[] parts = appData.split(APP_DATA_INDICATOR);
-		int last = parts.length-1;
-		String idFound = parts[last];
-
-		int id = Integer.parseInt(idFound);
+		long id = getPendingMessageIdFromAppData(appData);
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
 
@@ -1239,12 +1227,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void attachVoiceClips(MegaTransfer transfer){
 		logDebug("attachVoiceClips()");
 		//Find the pending message
-		String appData = transfer.getAppData();
-		String[] parts = appData.split(APP_DATA_INDICATOR);
-		int last = parts.length-1;
-		String idFound = parts[last];
-
-		int id = Integer.parseInt(idFound);
+		long id = getPendingMessageIdFromAppData(transfer.getAppData());
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
 
@@ -1285,12 +1268,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		//Upadate node handle in db
-		String appData = transfer.getAppData();
-		String[] parts = appData.split(APP_DATA_INDICATOR);
-		int last = parts.length-1;
-		String idFound = parts[last];
-
-		int id = Integer.parseInt(idFound);
+		long id = getPendingMessageIdFromAppData(transfer.getAppData());
 		//Update status and nodeHandle on db
 		dbH.updatePendingMessageOnTransferFinish(id, transfer.getNodeHandle()+"", PendingMessageSingle.STATE_ATTACHING);
 
@@ -1533,5 +1511,18 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 
 	private boolean isVoiceClip(String appData) {
 		return !isTextEmpty(appData) && appData.contains(APP_DATA_VOICE_CLIP);
+	}
+
+	/**
+	 * Gets the identifier of a pending message from the appData of its transfer.
+	 *
+	 * @param appData AppData of the transfer in question.
+	 * @return The identifier of the pending message.
+	 */
+	private long getPendingMessageIdFromAppData(String appData) {
+		String[] parts = appData.split(APP_DATA_INDICATOR);
+		String idFound = parts[parts.length - 1];
+
+		return Long.parseLong(idFound);
 	}
 }
