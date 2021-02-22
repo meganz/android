@@ -1,10 +1,13 @@
 package mega.privacy.android.app.psa
 
+import android.content.Context
 import androidx.lifecycle.*
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.Consumer
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RxUtil
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -15,6 +18,9 @@ import java.util.concurrent.TimeUnit
  * The ViewModel for PSA logic.
  */
 object PsaManager : LifecycleObserver {
+
+    private const val LAST_PSA_CHECK_TIME_FILE = "last_psa_check_time"
+    private const val LAST_PSA_CHECK_TIME_KEY = "last_psa_check_time"
 
     /**
      * The minimum interval in milliseconds that we should keep between two calls to
@@ -27,7 +33,9 @@ object PsaManager : LifecycleObserver {
 
     private var getPsaDisposable: Disposable? = null
     private var processLifecycleObserved = false
-    private var startCheckingOnForeground = false
+
+    private var appInBackground = false
+    private var rescheduleOnForeground = false
 
     /**
      * LiveData for PSA, mutable, used to emit value.
@@ -44,7 +52,6 @@ object PsaManager : LifecycleObserver {
      */
     fun startChecking() {
         doStartChecking()
-        startCheckingOnForeground = true
 
         if (!processLifecycleObserved) {
             processLifecycleObserved = true
@@ -56,8 +63,12 @@ object PsaManager : LifecycleObserver {
      * Stop checking PSA periodically.
      */
     fun stopChecking() {
-        startCheckingOnForeground = false
+        rescheduleOnForeground = false
         doStopChecking()
+
+        MegaApplication.getInstance().getSharedPreferences(
+            LAST_PSA_CHECK_TIME_FILE, Context.MODE_PRIVATE
+        ).edit().clear().apply()
     }
 
     private fun doStartChecking() {
@@ -65,8 +76,35 @@ object PsaManager : LifecycleObserver {
             return
         }
 
-        getPsaDisposable = Observable.interval(0L, GET_PSA_INTERVAL_MS, TimeUnit.MILLISECONDS)
-            .subscribe({
+        val preferences = MegaApplication.getInstance().getSharedPreferences(
+            LAST_PSA_CHECK_TIME_FILE, Context.MODE_PRIVATE
+        )
+
+        val timeSinceLastCheck =
+            System.currentTimeMillis() - preferences.getLong(LAST_PSA_CHECK_TIME_KEY, 0L)
+
+        logDebug("doStartChecking timeSinceLastCheck $timeSinceLastCheck")
+
+        getPsaDisposable = Observable.interval(
+            // minus initial delay will be treated as 0
+            GET_PSA_INTERVAL_MS - timeSinceLastCheck,
+            GET_PSA_INTERVAL_MS, TimeUnit.MILLISECONDS
+        )
+            .subscribe(Consumer {
+                if (appInBackground) {
+                    logDebug("skip getPSAWithUrl")
+
+                    rescheduleOnForeground = true
+
+                    return@Consumer
+                }
+
+                preferences.edit()
+                    .putLong(LAST_PSA_CHECK_TIME_KEY, System.currentTimeMillis())
+                    .apply()
+
+                logDebug("getPSAWithUrl ${System.currentTimeMillis()}")
+
                 megaApi.getPSAWithUrl(object : BaseListener(application) {
                     override fun onRequestFinish(
                         api: MegaApiJava,
@@ -121,13 +159,20 @@ object PsaManager : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
-        if (startCheckingOnForeground) {
+        appInBackground = false
+
+        // When we skipped a checking in background, to avoid redundant waiting,
+        // we should check immediately and reschedule future checking.
+        if (rescheduleOnForeground) {
+            rescheduleOnForeground = false
+
+            doStopChecking()
             doStartChecking()
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
-        doStopChecking()
+        appInBackground = true
     }
 }
