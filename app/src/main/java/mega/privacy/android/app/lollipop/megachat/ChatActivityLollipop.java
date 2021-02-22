@@ -763,6 +763,25 @@ public class ChatActivityLollipop extends PinActivityLollipop
         }
     };
 
+    private final BroadcastReceiver chatUploadStartedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || !BROADCAST_ACTION_CHAT_TRANSFER_START.equals(intent.getAction())) {
+                return;
+            }
+
+            long pendingMessageId = intent.getLongExtra(PENDING_MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
+            if (pendingMessageId != MEGACHAT_INVALID_HANDLE) {
+                PendingMessageSingle pendingMessage = dbH.findPendingMessageById(pendingMessageId);
+                if (pendingMessage == null) {
+                    return;
+                }
+
+
+            }
+        }
+    };
+
     ArrayList<UserTyping> usersTyping;
     List<UserTyping> usersTypingSync;
 
@@ -884,6 +903,9 @@ public class ChatActivityLollipop extends PinActivityLollipop
         IntentFilter closeChatFilter = new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT);
         closeChatFilter.addAction(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS);
         registerReceiver(closeChatReceiver, closeChatFilter);
+
+        registerReceiver(chatUploadStartedReceiver,
+                new IntentFilter(BROADCAST_ACTION_CHAT_TRANSFER_START));
 
         changeStatusBarColor(this, getWindow(), R.color.lollipop_dark_primary_color);
 
@@ -7829,6 +7851,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         unregisterReceiver(chatSessionUpdateReceiver);
         unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
+        unregisterReceiver(chatUploadStartedReceiver);
 
         if(megaApi != null) {
             megaApi.removeRequestListener(this);

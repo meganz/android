@@ -60,9 +60,11 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
+import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_MESSAGE_ID;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -857,6 +859,10 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 
 				long id = getPendingMessageIdFromAppData(appData);
+
+				sendBroadcast(new Intent(BROADCAST_ACTION_CHAT_TRANSFER_START)
+						.putExtra(PENDING_MESSAGE_ID, id));
+
 				//Update status and tag on db
 				dbH.updatePendingMessageOnTransferStart(id, transfer.getTag());
 				mapProgressTransfers.put(transfer.getTag(), transfer);
