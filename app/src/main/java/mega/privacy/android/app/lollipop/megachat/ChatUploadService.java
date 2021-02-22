@@ -39,6 +39,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -745,18 +746,27 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String message;
 		if (isOverquota != 0) {
 			message = getString(R.string.overquota_alert_title);
-		} else if (totalUploadsCompleted == totalUploads) {
-			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-				message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalUploads, totalUploadsCompleted, totalUploads);
-			} else {
-				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, totalUploadsCompleted, totalUploads);
-			}
 		} else {
-			int inProgress = totalUploadsCompleted + 1;
+			int inProgress = totalUploadsCompleted == totalUploads
+					? totalUploadsCompleted
+					: totalUploadsCompleted + 1;
+
 			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-				message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalUploads, inProgress, totalUploads);
+				message = StringResourcesUtils.getQuantityString(R.plurals.upload_service_paused_notification,
+						totalUploads, inProgress, totalUploads);
+			} else if (thereAreChatUploads()) {
+				message = StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification,
+						totalUploads, inProgress, totalUploads);
 			} else {
-				message = getResources().getQuantityString(R.plurals.upload_service_notification, totalUploads, inProgress, totalUploads);
+				inProgress = 1;
+
+				for (Integer percentage : mapVideoDownsampling.values()) {
+					if (percentage == 100) {
+						inProgress++;
+					}
+				}
+
+				message = StringResourcesUtils.getString(R.string.title_compress_video, inProgress, mapVideoDownsampling.size());
 			}
 		}
 
@@ -1524,5 +1534,32 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		String idFound = parts[parts.length - 1];
 
 		return Long.parseLong(idFound);
+	}
+
+	/**
+	 * Checks if there are chat uploads in progress, regardless of the voice clips.
+	 * @return True if there are chat uploads in progress, false otherwise.
+	 */
+	private boolean thereAreChatUploads() {
+		if (megaApi.getNumPendingUploads() > 0) {
+			MegaTransferData transferData = megaApi.getTransferData(null);
+			if (transferData == null) {
+				return false;
+			}
+
+			for (int i = 0; i < transferData.getNumUploads(); i++) {
+				MegaTransfer transfer = megaApi.getTransferByTag(transferData.getUploadTag(i));
+				if (transfer == null) {
+					continue;
+				}
+
+				String data = transfer.getAppData();
+				if (!isTextEmpty(data) && data.contains(APP_DATA_CHAT) && !isVoiceClip(data)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
