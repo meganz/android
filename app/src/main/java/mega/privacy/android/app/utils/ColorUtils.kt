@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.view.Window
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.annotation.AttrRes
@@ -143,8 +144,20 @@ object ColorUtils {
      */
     @JvmStatic
     fun setStatusBarTextColor(activity: Activity) {
-        val decor: View = activity.window.decorView
-        if (Util.isDarkMode(activity)) {
+        setStatusBarTextColor(activity, activity.window)
+    }
+
+    /**
+     * Set status & navigation bar text & icon colours for good visibility in light/dark mode
+     * accordingly.
+     *
+     * @param context context
+     * @param window window of activity/dialog
+     */
+    @JvmStatic
+    fun setStatusBarTextColor(context: Context, window: Window?) {
+        val decor: View = window?.decorView ?: return
+        if (Util.isDarkMode(context)) {
             decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         } else {
             // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
