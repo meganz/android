@@ -440,13 +440,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				uploadPath = pendingMsg.getFilePath();
 			}
 
-			startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), uploadPath);
+			startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), uploadPath);
 		} else if (MimeTypeList.typeForName(file.getName()).isMp4Video() && (!sendOriginalAttachments)) {
 			logDebug("DATA connection is Mp4Video");
 
 			try {
-				totalVideos++;
-				numberVideosPending++;
 				File chatTempFolder = getCacheFolder(getApplicationContext(), CHAT_TEMPORAL_FOLDER);
 				File outFile = buildChatTempFile(getApplicationContext(), file.getName());
 				int index = 0;
@@ -479,11 +477,12 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				}
 
 				if (outFile == null) {
-					numberVideosPending--;
-					totalVideos--;
 					pendingMessages.addAll(pendingMsgs);
-					startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+					startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
 				} else {
+					totalVideos++;
+					numberVideosPending++;
+
 					for (PendingMessageSingle pendMsg : pendingMsgs) {
 						pendMsg.setVideoDownSampled(outFile.getAbsolutePath());
 						pendingMessages.add(pendMsg);
@@ -501,11 +500,11 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			} catch (Throwable throwable) {
 				logError("EXCEPTION: Video cannot be downsampled", throwable);
 				pendingMessages.addAll(pendingMsgs);
-				startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+				startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
 			}
 		} else {
 			pendingMessages.addAll(pendingMsgs);
-			startUpload(pendingMsg.chatId, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
+			startUpload(pendingMsg.id, type, fileNames.get(pendingMsg.name), pendingMsg.filePath);
 		}
 
 		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)

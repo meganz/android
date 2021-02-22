@@ -100,6 +100,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.shouldAddCompressingState;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -1545,6 +1546,11 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 		pMsgSingle.setFilePath(info.getFileAbsolutePath());
 		pMsgSingle.setName(info.getTitle());
 		pMsgSingle.setFingerprint(fingerprint);
+
+		if (shouldAddCompressingState(info.getTitle())) {
+			pMsgSingle.setState(PendingMessageSingle.STATE_COMPRESSING);
+		}
+
 		long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
 		pMsgSingle.setId(idMessage);
 

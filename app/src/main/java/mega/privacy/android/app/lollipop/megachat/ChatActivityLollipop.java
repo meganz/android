@@ -170,6 +170,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.shouldAddCompressingState;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.AudioVideoPlayerLollipop.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
@@ -3507,6 +3508,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 pMsgSingle.setFilePath(f.getAbsolutePath());
                 pMsgSingle.setName(f.getName());
                 pMsgSingle.setFingerprint(fingerprint);
+
+                if (shouldAddCompressingState(f.getName())) {
+                    pMsgSingle.setState(PendingMessageSingle.STATE_COMPRESSING);
+                }
 
                 long idMessageDb = dbH.addPendingMessage(pMsgSingle);
                 pMsgSingle.setId(idMessageDb);
@@ -8209,6 +8214,10 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 pMsgSingle.setFilePath(info.getFileAbsolutePath());
                 pMsgSingle.setName(info.getTitle());
                 pMsgSingle.setFingerprint(fingerprint);
+
+                if (shouldAddCompressingState(info.getTitle())) {
+                    pMsgSingle.setState(PendingMessageSingle.STATE_COMPRESSING);
+                }
 
                 long idMessage = dbH.addPendingMessage(pMsgSingle);
                 pMsgSingle.setId(idMessage);
