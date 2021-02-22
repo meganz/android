@@ -33,6 +33,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
@@ -78,7 +79,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             ) {
                 val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
 
-                when (intent.getIntExtra(INTENT_EXTRA_KEY_ACTION_TYPE, -1)) {
+                when (intent.getIntExtra(ACTION_TYPE, -1)) {
                     SCROLL_TO_POSITION -> {
                         scrollToNode(handle)
                     }

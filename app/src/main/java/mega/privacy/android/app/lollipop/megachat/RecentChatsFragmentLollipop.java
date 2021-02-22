@@ -1703,9 +1703,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 }
                 case R.id.chat_list_leave_chat_layout: {
                     //Leave group chat
-                    ((ManagerActivityLollipop) context).showConfirmationLeaveChats(chats);
-                    clearSelections();
-                    hideMultipleSelect();
+                    showConfirmationLeaveChats(context, chats, ((ManagerActivityLollipop) context));
                     break;
                 }
             }
@@ -1796,7 +1794,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     boolean allChatAreUnmuted = true;
                     for (MegaChatListItem chat : selected) {
                         if (chat != null) {
-                            if (isEnableChatNotifications(chat.getChatId())) {
+                            if (!shouldMuteOrUnmuteOptionsBeShown(context, megaChatApi.getChatRoom(chat.getChatId()))) {
+                                allChatsAreMuted = false;
+                                allChatAreUnmuted = false;
+                            } else if (isEnableChatNotifications(chat.getChatId())) {
                                 allChatsAreMuted = false;
                             } else {
                                 allChatAreUnmuted = false;

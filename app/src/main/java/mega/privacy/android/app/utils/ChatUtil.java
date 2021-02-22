@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,6 +31,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiRange;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.listeners.SetRetentionTimeListener;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.components.twemoji.emoji.Emoji;
@@ -70,6 +73,7 @@ import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1232,5 +1236,53 @@ public class ChatUtil {
             retentionTimeText.setText(subtitleText);
             retentionTimeText.setVisibility(View.VISIBLE);
         }
+    }
+
+    public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+                        -> chatManagementCallback.confirmLeaveChat(chatId))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
+    }
+
+    public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.MaterialAlertDialogStyle);
+        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+                        -> chatManagementCallback.confirmLeaveChats(chats))
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .show();
+    }
+
+    /**
+     * Method to compare if the current message is the same message that needs to be updated.     *
+     *
+     * @param messageToUpdate The message to be updated.
+     * @param currentMessage  The current message.
+     * @return True, if it is the same. False, if not.
+     */
+    public static boolean isItSameMsg(MegaChatMessage messageToUpdate, MegaChatMessage currentMessage) {
+        if (messageToUpdate.getMsgId() != MEGACHAT_INVALID_HANDLE) {
+            return messageToUpdate.getMsgId() == currentMessage.getMsgId();
+        } else {
+            return messageToUpdate.getTempId() == currentMessage.getTempId();
+        }
+    }
+
+    /**
+     * Method to know whether to show mute or unmute options.
+     *
+     * @param context  The Activity context.
+     * @param chatRoom The chat room.
+     * @return True, if it should be shown. False, if not.
+     */
+    public static boolean shouldMuteOrUnmuteOptionsBeShown(Context context, MegaChatRoom chatRoom) {
+        return chatRoom != null && !chatRoom.isPreview() && isStatusConnected(context, chatRoom.getChatId()) &&
+                ((chatRoom.isGroup() && chatRoom.isActive()) ||
+                        (!chatRoom.isGroup() && chatRoom.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR));
     }
 }

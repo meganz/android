@@ -5,17 +5,18 @@ import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 
-class TransfersActionBarCallBack(private val transfersActionInterface: TransfersActionInterface) :
+class TransfersActionBarCallBack(private val transfersActionCallback: TransfersActionCallback) :
     ActionMode.Callback {
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         mode.menuInflater.inflate(R.menu.transfers_action, menu)
-        transfersActionInterface.onCreateActionMode()
+        transfersActionCallback.onCreateActionMode()
+        transfersActionCallback.hideTabs(true)
         return true
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-        val selected = transfersActionInterface.getSelectedTransfers()
+        val selected = transfersActionCallback.getSelectedTransfers()
 
         if (selected == 0) {
             menu.findItem(R.id.cab_menu_cancel_transfer).isVisible = false
@@ -26,7 +27,7 @@ class TransfersActionBarCallBack(private val transfersActionInterface: Transfers
         } else if (selected > 0) {
             menu.findItem(R.id.cab_menu_cancel_transfer).isVisible = true
             menu.findItem(R.id.cab_menu_select_all).isVisible =
-                !transfersActionInterface.areAllTransfersSelected()
+                !transfersActionCallback.areAllTransfersSelected()
             menu.findItem(R.id.cab_menu_clear_selection).isVisible = true
 
             return true
@@ -38,15 +39,15 @@ class TransfersActionBarCallBack(private val transfersActionInterface: Transfers
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.cab_menu_cancel_transfer -> {
-                transfersActionInterface.cancelTransfers()
+                transfersActionCallback.cancelTransfers()
                 return true
             }
             R.id.cab_menu_select_all -> {
-                transfersActionInterface.selectAll()
+                transfersActionCallback.selectAll()
                 return true
             }
             R.id.cab_menu_clear_selection -> {
-                transfersActionInterface.clearSelections()
+                transfersActionCallback.clearSelections()
                 return true
             }
         }
@@ -55,10 +56,11 @@ class TransfersActionBarCallBack(private val transfersActionInterface: Transfers
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
-        transfersActionInterface.onDestroyActionMode()
+        transfersActionCallback.onDestroyActionMode()
+        transfersActionCallback.hideTabs(false)
     }
 
-    interface TransfersActionInterface {
+    interface TransfersActionCallback {
         fun onCreateActionMode()
         fun onDestroyActionMode()
         fun cancelTransfers()
@@ -66,5 +68,6 @@ class TransfersActionBarCallBack(private val transfersActionInterface: Transfers
         fun clearSelections()
         fun getSelectedTransfers(): Int
         fun areAllTransfersSelected(): Boolean
+        fun hideTabs(hide: Boolean)
     }
 }
