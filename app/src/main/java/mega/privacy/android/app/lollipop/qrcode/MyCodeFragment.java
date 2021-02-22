@@ -235,13 +235,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     public void checkScroll() {
         if (scrollView != null) {
             boolean withElevation = scrollView.canScrollVertically(-1);
-            if (withElevation) {
-                float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
-                abL.setElevation(elevation);
-            } else {
-                abL.setElevation(0);
-            }
-
+            abL.setElevation(withElevation ? getResources().getDimension(R.dimen.toolbar_elevation) : 0);
             ColorUtils.changeStatusBarColorForElevation(requireActivity(), withElevation);
         }
     }

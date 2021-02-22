@@ -1343,8 +1343,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
     public void checkScroll() {
         if (listView == null) return;
 
-        boolean canScroll = listView.canScrollVertically(-1);
-        Util.changeToolBarElevation(this, tB, canScroll || adapter.isMultipleSelect());
+        Util.changeToolBarElevation(this, tB, listView.canScrollVertically(-1) || adapter.isMultipleSelect());
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){

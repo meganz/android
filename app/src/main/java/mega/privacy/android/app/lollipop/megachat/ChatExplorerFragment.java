@@ -286,8 +286,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (context instanceof FileExplorerActivityLollipop) {
             if (addLayoutVisible && canScroll) {
                 if (Util.isDarkMode(context)) {
-                    int toolbarElevationColor = ColorUtils.getColorForElevation(context, elevation);
-                    addLayout.setBackgroundColor(toolbarElevationColor);
+                    addLayout.setBackgroundColor(ColorUtils.getColorForElevation(context, elevation));
                 } else {
                     addLayout.setElevation(elevation);
                 }
