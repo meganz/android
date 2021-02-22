@@ -378,10 +378,9 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 							contactEmails.add(contact.getMail());
 						}
 					}
-					if(contactEmails!=null){
-						if(!contactEmails.isEmpty()){
-							contactControllerC.inviteMultipleContacts(contactEmails);
-						}
+
+					if(!contactEmails.isEmpty()){
+						contactControllerC.inviteMultipleContacts(contactEmails);
 					}
 				}
 				else{

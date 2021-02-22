@@ -113,6 +113,10 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
         titleNameContactChatPanel.setText(getTitleChat(chat));
 
+        if (!shouldMuteOrUnmuteOptionsBeShown(context, megaChatApi.getChatRoom(chat.getChatId()))) {
+            optionMuteChat.setVisibility(View.GONE);
+        }
+
         if (chat.isPreview()) {
             titleMailContactChatPanel.setText(getString(R.string.group_chat_label));
             iconStateChatPanel.setVisibility(View.GONE);
@@ -128,7 +132,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 separatorInfo.setVisibility(View.GONE);
             }
 
-            optionMuteChat.setVisibility(View.GONE);
             optionLeaveChat.setVisibility(View.VISIBLE);
             optionLeaveText.setText("Remove preview");
             optionClearHistory.setVisibility(View.GONE);
@@ -218,6 +221,10 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 archiveChatText.setText(getString(R.string.archive_chat_option));
                 archiveChatIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_b_archive));
             }
+
+            if (optionInfoChat.getVisibility() == View.GONE) {
+                separatorInfo.setVisibility(View.GONE);
+            }
         }
 
         dialog.setContentView(contentView);
@@ -272,7 +279,10 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
             case R.id.chat_list_leave_chat_layout:
                 logDebug("Leave chat - Chat ID: " + chat.getChatId());
-                ((ManagerActivityLollipop) context).showConfirmationLeaveChat(chat);
+
+                if (context instanceof ManagerActivityLollipop) {
+                    showConfirmationLeaveChat(context, chat.getChatId(), ((ManagerActivityLollipop) context));
+                }
                 break;
 
             case R.id.chat_list_clear_history_chat_layout:

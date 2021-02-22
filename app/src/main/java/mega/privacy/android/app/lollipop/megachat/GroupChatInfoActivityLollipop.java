@@ -705,9 +705,20 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         builder.setTitle(getResources().getString(R.string.title_confirmation_leave_group_chat));
         String message = getResources().getString(R.string.confirmation_leave_group_chat);
         builder.setMessage(message)
-                .setPositiveButton(R.string.general_leave, (dialog, which) -> chatC.leaveChat(chat))
+                .setPositiveButton(R.string.general_leave, (dialog, which) -> notifyShouldLeaveChat())
                 .setNegativeButton(R.string.general_cancel, null)
                 .show();
+    }
+
+    /**
+     * Sends a broadcast to leave the chat from Chat activity and finishes.
+     */
+    private void notifyShouldLeaveChat() {
+        sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_LEFT_CHAT)
+                .setAction(ACTION_LEFT_CHAT)
+                .putExtra(CHAT_ID, chat.getChatId()));
+
+        finish();
     }
 
     public void inviteContact(String email) {
