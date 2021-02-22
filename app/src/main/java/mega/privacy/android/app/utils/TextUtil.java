@@ -94,6 +94,6 @@ public class TextUtil {
      * @return Text with separator.
      */
     public static String addStringSeparator(String text) {
-        return isTextEmpty(text) ? text : (text += STRING_SEPARATOR);
+        return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
     }
 }

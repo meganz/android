@@ -510,13 +510,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
 
                 if (filesAlreadyUploaded > 0) {
-                    addStringSeparator(notificationTitle);
+                    notificationTitle = addStringSeparator(notificationTitle);
                     notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
                             filesAlreadyUploaded, filesAlreadyUploaded);
                 }
 
                 if (errorCount > 0) {
-                    addStringSeparator(notificationTitle);
+                    notificationTitle = addStringSeparator(notificationTitle);
                     notificationTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_failed,
                             errorCount, errorCount);
                 }
@@ -546,13 +546,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }
 
             if (childrenAlreadyUploaded > 0) {
-                addStringSeparator(notificationTitle);
+                notificationSubTitle = addStringSeparator(notificationTitle);
                 notificationSubTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_notification_already_uploaded,
                         childrenAlreadyUploaded, childrenAlreadyUploaded);
             }
 
             if (childUploadFailed > 0) {
-                addStringSeparator(notificationTitle);
+                notificationSubTitle = addStringSeparator(notificationTitle);
                 notificationSubTitle += StringResourcesUtils.getQuantityString(R.plurals.upload_service_failed,
                         childUploadFailed, childUploadFailed);
             }
