@@ -2292,6 +2292,11 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 unMuteMenuItem.setVisible(true);
             }
 
+            if(!shouldMuteOrUnmuteOptionsBeShown(this, chatRoom)){
+                unMuteMenuItem.setVisible(false);
+                muteMenuItem.setVisible(false);
+            }
+
             checkSelectOption();
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_054_white_054));
@@ -2303,8 +2308,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
             }
 
             if(chatRoom.isPreview() || !isStatusConnected(this, idChat)) {
-                muteMenuItem.setVisible(false);
-                unMuteMenuItem.setVisible(false);
                 leaveMenuItem.setVisible(false);
                 clearHistoryMenuItem.setVisible(false);
                 inviteMenuItem.setVisible(false);
@@ -2337,7 +2340,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
                 int permission = chatRoom.getOwnPrivilege();
                 logDebug("Permission in the chat: " + permission);
                 if (chatRoom.isGroup()) {
-
                     if (permission == MegaChatRoom.PRIV_MODERATOR) {
 
                         inviteMenuItem.setVisible(true);

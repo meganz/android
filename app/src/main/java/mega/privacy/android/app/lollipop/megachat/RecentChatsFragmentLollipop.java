@@ -1777,7 +1777,10 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     boolean allChatAreUnmuted = true;
                     for (MegaChatListItem chat : selected) {
                         if (chat != null) {
-                            if (isEnableChatNotifications(chat.getChatId())) {
+                            if (!shouldMuteOrUnmuteOptionsBeShown(context, megaChatApi.getChatRoom(chat.getChatId()))) {
+                                allChatsAreMuted = false;
+                                allChatAreUnmuted = false;
+                            } else if (isEnableChatNotifications(chat.getChatId())) {
                                 allChatsAreMuted = false;
                             } else {
                                 allChatAreUnmuted = false;
