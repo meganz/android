@@ -1,7 +1,7 @@
 package mega.privacy.android.app.psa
 
-import android.content.Context
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit
  */
 object PsaManager : LifecycleObserver {
 
-    private const val LAST_PSA_CHECK_TIME_FILE = "last_psa_check_time"
     private const val LAST_PSA_CHECK_TIME_KEY = "last_psa_check_time"
 
     /**
@@ -35,6 +34,12 @@ object PsaManager : LifecycleObserver {
     private var processLifecycleObserved = false
 
     private var appInBackground = false
+
+    /**
+     * When we skipped a checking in background, to avoid redundant waiting,
+     * we should check immediately and reschedule future checking,
+     * rescheduleOnForeground is whether we should do that.
+     */
     private var rescheduleOnForeground = false
 
     /**
@@ -66,9 +71,10 @@ object PsaManager : LifecycleObserver {
         rescheduleOnForeground = false
         doStopChecking()
 
-        MegaApplication.getInstance().getSharedPreferences(
-            LAST_PSA_CHECK_TIME_FILE, Context.MODE_PRIVATE
-        ).edit().clear().apply()
+        PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance())
+            .edit()
+            .remove(LAST_PSA_CHECK_TIME_KEY)
+            .apply()
     }
 
     private fun doStartChecking() {
@@ -76,9 +82,8 @@ object PsaManager : LifecycleObserver {
             return
         }
 
-        val preferences = MegaApplication.getInstance().getSharedPreferences(
-            LAST_PSA_CHECK_TIME_FILE, Context.MODE_PRIVATE
-        )
+        val preferences =
+            PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance())
 
         val timeSinceLastCheck =
             System.currentTimeMillis() - preferences.getLong(LAST_PSA_CHECK_TIME_KEY, 0L)
