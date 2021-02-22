@@ -340,6 +340,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionInfo.setVisibility(View.VISIBLE);
 
                 //Hide
+                counterOpen--;
+                optionOpenWith.setVisibility(View.GONE);
                 counterModify--;
                 optionMove.setVisibility(View.GONE);
                 counterModify--;
@@ -350,6 +352,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionClearShares.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
                 optionRubbishBin.setVisibility(View.GONE);
+                counterShares--;
+                optionShare.setVisibility(View.GONE);
                 counterShares--;
                 optionShareFolder.setVisibility(View.GONE);
                 counterShares--;
