@@ -52,6 +52,7 @@ import java.util.Locale;
 
 import dagger.hilt.android.HiltAndroidApp;
 import me.leolin.shortcutbadger.ShortcutBadger;
+import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
@@ -59,6 +60,7 @@ import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
+import mega.privacy.android.app.listeners.ChatRoomListener;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GlobalListener;
 import mega.privacy.android.app.listeners.CallListener;
@@ -73,6 +75,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.service.ads.AdsLibInitializer;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -121,10 +124,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	final String TAG = "MegaApplication";
 
-	static final public String USER_AGENT = "MEGAAndroid/4.0.0_352";
+	static final public String USER_AGENT = "MEGAAndroid/4.0.1_355";
 
     private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
+	private static ChatManagement chatManagement;
 
 	@Inject
 	MegaApiAndroid megaApi;
@@ -741,6 +745,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
+        chatManagement = new ChatManagement();
 
 		//Logout transfers resumption
 		TransfersManagement.enableTransfersResumption();
@@ -830,6 +835,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
+
+		AdsLibInitializer.INSTANCE.init(this);
 	}
 
 	public void askForFullAccountInfo(){
@@ -1939,6 +1946,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static TransfersManagement getTransfersManagement() {
 		return transfersManagement;
+	}
+
+	public static ChatManagement getChatManagement() {
+		return chatManagement;
 	}
 
 	public static void setVerifyingCredentials(boolean verifyingCredentials) {

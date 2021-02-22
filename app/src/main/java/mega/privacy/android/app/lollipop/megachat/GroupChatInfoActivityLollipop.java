@@ -92,6 +92,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class GroupChatInfoActivityLollipop extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
@@ -103,6 +104,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
     private long chatHandle;
     private long selectedHandleParticipant;
     private long participantsCount;
+    private boolean isChatOpen;
 
     private GroupChatInfoActivityLollipop groupChatInfoActivity;
     private MegaChatRoom chat;
@@ -159,6 +161,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     };
 
+    private BroadcastReceiver retentionTimeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null || adapter == null ||
+                    !intent.getAction().equals(ACTION_UPDATE_RETENTION_TIME))
+                return;
+
+            long seconds = intent.getLongExtra(RETENTION_TIME, DISABLED_RETENTION_TIME);
+            adapter.updateRetentionTimeUI(seconds);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -181,12 +195,18 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            chatHandle = extras.getLong("handle", -1);
-            if (chatHandle == INVALID_HANDLE) {
+            chatHandle = extras.getLong(HANDLE, MEGACHAT_INVALID_HANDLE);
+            if (chatHandle == MEGACHAT_INVALID_HANDLE) {
                 finish();
                 return;
             }
 
+            //isChatOpen is:
+            //- True when the megaChatApi.openChatRoom() method has already been called from ChatActivityLollipop
+            //  and the changes related to history clearing will be listened from there.
+            //- False when it is necessary to call megaChatApi.openChatRoom() method to listen for changes related to history clearing.
+            //  This will happen when GroupChatInfoActivityLollipop is opened from other parts of the app than the Chat room.
+            isChatOpen = extras.getBoolean(ACTION_CHAT_OPEN, false);
             chat = megaChatApi.getChatRoom(chatHandle);
             if (chat == null) {
                 logError("Chatroom NULL cannot be recovered");
@@ -239,6 +259,9 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
 
             registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
+            registerReceiver(retentionTimeReceiver,
+                    new IntentFilter(ACTION_UPDATE_RETENTION_TIME));
+
             IntentFilter contactUpdateFilter = new IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
             contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME);
             contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
@@ -263,6 +286,7 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
 
         unregisterReceiver(chatRoomMuteUpdateReceiver);
+        unregisterReceiver(retentionTimeReceiver);
         unregisterReceiver(contactUpdateReceiver);
     }
 
@@ -674,16 +698,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         }
     }
 
-    public void showConfirmationClearChat() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        String message = getResources().getString(R.string.confirmation_clear_group_chat);
-        builder.setTitle(R.string.title_confirmation_clear_group_chat);
-        builder.setMessage(message)
-                .setPositiveButton(R.string.general_clear, (dialog, which) -> chatC.clearHistory(chat))
-                .setNegativeButton(R.string.general_cancel, null)
-                .show();
-    }
-
     public void showConfirmationLeaveChat() {
         logDebug("Chat ID: " + chat.getChatId());
 
@@ -801,15 +815,6 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
                 }
             } else {
                 logError("ERROR WHEN TYPE_EDIT_CHATROOM_NAME " + e.getErrorString());
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_TRUNCATE_HISTORY) {
-            logDebug("Truncate history request finish!!!");
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Ok. Clear history done");
-                showSnackbar(getString(R.string.clear_history_success));
-            } else {
-                logError("Error clearing history: " + e.getErrorString());
-                showSnackbar(getString(R.string.clear_history_error));
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM) {
             logDebug("Create chat request finish!!!");
@@ -1400,5 +1405,14 @@ public class GroupChatInfoActivityLollipop extends PinActivityLollipop implement
         chat = chatRoomUpdated;
         participants.clear();
         setParticipants();
+    }
+
+    /**
+     * Method to knowing if the openChatRoom() method has already been called from this chat room.
+     *
+     * @return True, if it has already been called. False otherwise.
+     */
+    public boolean isChatOpen() {
+        return isChatOpen;
     }
 }
