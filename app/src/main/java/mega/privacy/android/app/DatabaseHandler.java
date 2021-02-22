@@ -1864,8 +1864,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_COMPLETED_TRANSFERS + " WHERE " + KEY_ID + " = '" + id + "'";
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				AndroidCompletedTransfer transfer = extractAndroidCompletedTransfer(cursor);
-				return transfer;
+				return extractAndroidCompletedTransfer(cursor);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -2266,8 +2265,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_CONTACTS;
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null) {
-				int mCount = cursor.getCount();
-				return mCount;
+				return cursor.getCount();
 			} else {
 				return 0;
 			}
@@ -2434,7 +2432,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
 				do {
-
 					int id = Integer.parseInt(cursor.getString(0));
 					String handle = decrypt(cursor.getString(1));
 					String path = decrypt(cursor.getString(2));
@@ -2484,8 +2481,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + encrypt(Long.toString(handle)) + "'";
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null){
-				boolean r = cursor.moveToFirst();
-				return r;
+				return cursor.moveToFirst();
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -2566,7 +2562,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _type = decrypt(cursor.getString(5));
 					int _incoming = cursor.getInt(6);
 					String _handleIncoming = decrypt(cursor.getString(7));
-
 					mOffline = new MegaOffline(_id, _handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 
 				} while (cursor.moveToNext());
@@ -2599,7 +2594,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _type = decrypt(cursor.getString(5));
 					int _incoming = cursor.getInt(6);
 					String _handleIncoming = decrypt(cursor.getString(7));
-
 					listOffline.add(new MegaOffline(_id, _handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
 			}
@@ -2626,7 +2620,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _type = decrypt(cursor.getString(5));
 					int _incoming = cursor.getInt(6);
 					String _handleIncoming = decrypt(cursor.getString(7));
-
 					mOffline = new MegaOffline(_id, _handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 
 				} while (cursor.moveToNext());
@@ -2683,7 +2676,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						_type = decrypt(cursor.getString(5));
 						_incoming = cursor.getInt(6);
 						_handleIncoming = cursor.getString(7);
-
 						MegaOffline offline = new MegaOffline(_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 						listOffline.add(offline);
 					} while (cursor.moveToNext());
@@ -4098,10 +4090,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_PENDING_MSG_SINGLE + " WHERE " + KEY_PENDING_MSG_TEMP_KARERE + " = '" + encrypt(idPend) + "'";
 		logDebug("QUERY: "+selectQuery);
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null) {
-				if (cursor.moveToFirst()) {
-					id = cursor.getLong(0);
-				}
+			if (cursor != null && cursor.moveToFirst()) {
+				id = cursor.getLong(0);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -4276,8 +4266,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_BACKUPS + " WHERE " + KEY_BACKUP_ID + " = '" + encrypt(Long.toString(id)) + "'";
         try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				Backup pair = getBackupFromCursor(cursor);
-				return pair;
+				return getBackupFromCursor(cursor);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
