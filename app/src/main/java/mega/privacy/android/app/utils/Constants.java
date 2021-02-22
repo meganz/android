@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
     public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
+    public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -81,6 +82,8 @@ public class Constants {
     public static final String EXTRA_LINK = "EXTRA_LINK";
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
+
+    public static final String EXTRA_MOVE_TO_CHAT_SECTION = "EXTRA_MOVE_TO_CHAT_SECTION";
 
     //MultipleRequestListener options
     public static final int MULTIPLE_MOVE = 0;
