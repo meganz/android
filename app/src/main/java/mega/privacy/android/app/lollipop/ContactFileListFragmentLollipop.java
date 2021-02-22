@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,6 +51,7 @@ import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -410,8 +413,8 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 
     public void checkScroll() {
         boolean withElevation = (listView != null && listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect());
-        new Handler().post(() -> requireActivity().findViewById(R.id.app_bar_layout).setElevation(withElevation ? getResources().getDimension(R.dimen.toolbar_elevation) : 0));
-        ColorUtils.changeStatusBarColorForElevation(requireActivity(), withElevation);
+		AppBarLayout abL = requireActivity().findViewById(R.id.app_bar_layout);
+		Util.changeActionBarElevation(requireActivity(), abL, withElevation);
     }
 
 	public void showOptionsPanel(MegaNode sNode){

@@ -264,23 +264,6 @@ public class ChatExplorerActivity extends PinActivityLollipop implements View.On
         }
     }
 
-    public void changeActionBarElevation(boolean elevate) {
-        ColorUtils.changeStatusBarColorForElevation(this, elevate);
-
-        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
-
-        if (Util.isDarkMode(this)) {
-            if (elevate) {
-                int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
-                tB.setBackgroundColor(toolbarElevationColor);
-            } else {
-                tB.setBackgroundColor(android.R.color.transparent);
-            }
-        } else {
-            findViewById(R.id.app_bar_layout_chat_explorer).setElevation(elevate ? elevation : 0);
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         logDebug("onOptionsItemSelected");

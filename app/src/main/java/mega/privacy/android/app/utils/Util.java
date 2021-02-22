@@ -37,10 +37,12 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import android.telephony.PhoneNumberUtils;
@@ -1882,4 +1884,79 @@ public class Util {
 		itemAnimator.setSupportsChangeAnimations(false);
 		return itemAnimator;
 	}
+
+    /**
+     * Apply elevation effect by controlling AppBarLayout's elevation only, regardless of whether on dark mode.
+     *
+     * @param activity Current activity.
+     * @param abL AppBarLayout in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeActionBarElevation(Activity activity, AppBarLayout abL, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        if (withElevation) {
+            float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+            abL.setElevation(elevation);
+        } else {
+            abL.setElevation(0);
+        }
+    }
+
+    /**
+     * For some pages that have a layout below AppBarLayout, also need to apply elevation effect on the additional layout.
+     * It's done by changing ToolBar's background color on dark mode.
+     * On light mode, no need to do anything here, the elevation effect is applied on the AppBarLayout.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeToolBarElevationForDarkMode(Activity activity, Toolbar tB, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        if (Util.isDarkMode(activity)) {
+            float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+            changeToolBarElevationOnDarkMode(activity, tB, elevation, withElevation);
+        }
+        // On light mode, do nothing.
+    }
+
+    /**
+     * For some pages don't have AppBarLayout, apply elevation effect by controlling AppBarLayout's elevation.
+     * On dark mode, it's done by changing ToolBar's background.
+     * On light mode, it's done by setting elevation on ToolBar.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    public static void changeToolBarElevation(Activity activity, Toolbar tB, boolean withElevation) {
+        ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
+
+        float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
+
+        if (Util.isDarkMode(activity)) {
+            changeToolBarElevationOnDarkMode(activity, tB, elevation, withElevation);
+        } else {
+            tB.setElevation(withElevation ? elevation : 0);
+        }
+    }
+
+    /**
+     * Apply elevation effect for ToolBar on dark mode by setting its background.
+     *
+     * @param activity Current activity.
+     * @param tB Toolbar in the activity.
+     * @param elevation Elevation height.
+     * @param withElevation true should show elevation, false otherwise.
+     */
+    private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
+        if (withElevation) {
+            int toolbarElevationColor = ColorUtils.getColorForElevation(activity, elevation);
+            tB.setBackgroundColor(toolbarElevationColor);
+        } else {
+            tB.setBackgroundColor(android.R.color.transparent);
+        }
+    }
 }

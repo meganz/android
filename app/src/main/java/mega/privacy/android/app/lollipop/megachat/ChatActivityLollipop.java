@@ -1344,25 +1344,7 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if (listView == null) return;
 
         boolean canScroll = listView.canScrollVertically(-1);
-        changeActionBarElevation(canScroll);
-    }
-
-    public void changeActionBarElevation(boolean elevate) {
-        ColorUtils.changeStatusBarColorForElevation(this, elevate || adapter.isMultipleSelect());
-
-        float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
-
-        if (Util.isDarkMode(this)) {
-            if (elevate) {
-                int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
-                tB.setBackgroundColor(toolbarElevationColor);
-            } else {
-                tB.setBackgroundColor(android.R.color.transparent);
-            }
-        } else {
-            tB.setBackgroundColor(Color.WHITE);
-            tB.setElevation(elevate ? elevation : 0);
-        }
+        Util.changeToolBarElevation(this, tB, canScroll || adapter.isMultipleSelect());
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){

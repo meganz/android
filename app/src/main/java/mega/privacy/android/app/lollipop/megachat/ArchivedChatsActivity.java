@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -26,7 +25,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.PinActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -54,7 +52,6 @@ import static mega.privacy.android.app.utils.Util.*;
 
 public class ArchivedChatsActivity extends PinActivityLollipop implements MegaChatRequestListenerInterface, MegaChatListenerInterface, MegaRequestListenerInterface {
 
-    AppBarLayout abL;
     Toolbar tB;
     ActionBar aB;
     FrameLayout fragmentContainer;
@@ -131,7 +128,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         fab.setVisibility(View.GONE);
 
         //Set toolbar
-        abL = (AppBarLayout) findViewById(R.id.app_bar_layout_chat_explorer);
         tB = (Toolbar) findViewById(R.id.toolbar_chat_explorer);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
@@ -165,17 +161,6 @@ public class ArchivedChatsActivity extends PinActivityLollipop implements MegaCh
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container_chat_explorer, archivedChatsFragment, "archivedChatsFragment");
         ft.commitNow();
-    }
-
-    public void changeActionBarElevation(boolean whitElevation) {
-        ColorUtils.changeStatusBarColorForElevation(this, whitElevation);
-
-        if (whitElevation) {
-            float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
-            abL.setElevation(elevation);
-        } else {
-            abL.setElevation(0);
-        }
     }
 
     @Override

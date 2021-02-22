@@ -33,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -61,6 +62,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1576,8 +1578,8 @@ public class NodeAttachmentHistoryActivity extends PinActivityLollipop implement
 
     public void checkScroll() {
         boolean withElevation = (listView != null && listView.canScrollVertically(-1) && listView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect());
-        new Handler().post(() -> findViewById(R.id.app_bar_layout).setElevation(withElevation ? getResources().getDimension(R.dimen.toolbar_elevation) : 0));
-        ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+		AppBarLayout abL = findViewById(R.id.app_bar_layout);
+		Util.changeActionBarElevation(this, abL, withElevation);
     }
 
 	public MegaChatRoom getChatRoom () {

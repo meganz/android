@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -310,6 +311,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
                 if (isDarkMode(context)) {
                     ((ManagerActivityLollipop) context).changeAppBarElevation(true);
+                } else {
+                    ((ManagerActivityLollipop) context).changeAppBarElevation(false);
                 }
             } else {
                 appBarLayout.setElevation(0);
@@ -317,9 +320,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 ((ManagerActivityLollipop) context).changeAppBarElevation(false);
             }
         } else if (context instanceof ArchivedChatsActivity) {
-            ((ArchivedChatsActivity) context).changeActionBarElevation(
-                    listView.canScrollVertically(-1)
-                            || (adapterList != null && adapterList.isMultipleSelect()));
+            boolean withElevation = listView.canScrollVertically(-1) || (adapterList != null && adapterList.isMultipleSelect());
+            Util.changeActionBarElevation((ArchivedChatsActivity) context, ((ArchivedChatsActivity) context).findViewById(R.id.app_bar_layout_chat_explorer), withElevation);
         }
     }
 
@@ -1705,8 +1707,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context).hideFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(true);
-                checkScroll();
             }
+            checkScroll();
             return true;
         }
 
@@ -1717,8 +1719,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (context instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) context).showFabButton();
                 ((ManagerActivityLollipop) context).showHideBottomNavigationView(false);
-                checkScroll();
             }
+            checkScroll();
 
             if(showInviteBanner()) {
                 bannerContainer.setVisibility(View.VISIBLE);

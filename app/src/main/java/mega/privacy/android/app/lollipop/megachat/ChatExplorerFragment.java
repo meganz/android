@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.ActionBar;
@@ -300,8 +301,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
             ((FileExplorerActivityLollipop) context).changeActionBarElevation(canScroll, CHAT_FRAGMENT);
         } else if (context instanceof ChatExplorerActivity && addLayoutVisible) {
-            addLayout.setElevation(canScroll ? dp2px(4, outMetrics) : 0);
-            ((ChatExplorerActivity) context).changeActionBarElevation(canScroll);
+            addLayout.setElevation(canScroll ? getResources().getDimension(R.dimen.toolbar_elevation) : 0);
+
+            Toolbar tB = ((ChatExplorerActivity) context).findViewById(R.id.toolbar_chat_explorer);
+            Util.changeToolBarElevationForDarkMode((ChatExplorerActivity) context, tB, canScroll);
         }
     }
 
