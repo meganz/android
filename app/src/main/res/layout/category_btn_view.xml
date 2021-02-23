@@ -14,12 +14,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:srcCompat="@drawable/ic_photos" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView_category"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceCaption"
         android:layout_marginBottom="@dimen/text_photo_span"
+        android:layout_marginHorizontal="2dp"
+        android:gravity="center"
+        android:singleLine="false"
+        android:maxLines="1"
+        app:autoSizeMaxTextSize="12sp"
+        app:autoSizeMinTextSize="10sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
+        android:ellipsize="end"
         app:layout_constraintEnd_toEndOf="@+id/imageView_category"
         app:layout_constraintStart_toStartOf="@+id/imageView_category"
         app:layout_constraintBottom_toBottomOf="@+id/imageView_category"

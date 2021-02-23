@@ -367,6 +367,9 @@ public class MegaParticipantsChatLollipopAdapter extends RecyclerView.Adapter<Me
                             }
                         }
 
+                        if (!groupChatInfoActivity.isChatOpen()) {
+                            MegaApplication.getChatManagement().openChatRoom(getChat().getChatId());
+                        }
                         updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()));
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);

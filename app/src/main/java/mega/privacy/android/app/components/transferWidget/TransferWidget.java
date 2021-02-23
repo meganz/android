@@ -92,7 +92,7 @@ public class TransferWidget {
         if (getPendingTransfers() > 0 && !transfersManagement.shouldShowNetWorkWarning()) {
             setProgress(getProgress(), transferType);
             updateState();
-        } else if (transfersManagement.shouldShowNetWorkWarning()
+        } else if ((getPendingTransfers() > 0 && transfersManagement.shouldShowNetWorkWarning())
                 || transfersManagement.thereAreFailedTransfers()) {
             setFailedTransfers();
         } else {

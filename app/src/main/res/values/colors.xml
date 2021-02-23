@@ -341,11 +341,6 @@
     <!-- "Contact" title in Notifications Screen -->
     <color name="jade_600_jade_300">@color/jade_600</color>
 
-    <!-- For fast scroller -->
-    <color name="scroll_bubble">#90727272</color>
-
-    <color name="scroll_handle">#90d90007</color>
-
     <!--    Mask color for current plan-->
     <color name="white_054_dark_grey_054">@color/white_alpha_054</color>
 
@@ -377,4 +372,12 @@
 
     <!-- For action mode under dark mode only, same as getColorForElevation() with 4dp elevation -->
     <color name="action_mode_background">#282828</color>
+
+    <!-- For fast scroller -->
+    <color name="scroll_bubble">#90727272</color>
+
+    <color name="scroll_handle">#90d90007</color>
+
+    <!-- notification -->
+    <color name="mega">#d90007</color>
 </resources>
