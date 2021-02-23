@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.media.AudioFocusRequest;
@@ -1020,7 +1021,6 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
         fileStorageLayout = findViewById(R.id.fragment_container_file_storage);
         fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_select_image);
 
         chatRelativeLayout  = findViewById(R.id.relative_chat_layout);
 
@@ -1306,7 +1306,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
         if ((!fileStorageLayout.isShown())) return;
         showInputText();
         fileStorageLayout.setVisibility(View.GONE);
-        pickFileStorageButton.setImageResource(R.drawable.ic_select_image);
+        pickFileStorageButton.setColorFilter(ContextCompat.getColor(this, R.color.grey_054_white_054),
+                PorterDuff.Mode.SRC_IN);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
         if (fileStorageF == null) return;
         fileStorageF.clearSelections();
@@ -3909,7 +3910,8 @@ public class ChatActivityLollipop extends PinActivityLollipop
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_file_storage, fileStorageF,"fileStorageF").commitNowAllowingStateLoss();
         hideInputText();
         fileStorageLayout.setVisibility(View.VISIBLE);
-//        pickFileStorageButton.setImageResource(R.drawable.ic_g_select_image);
+        pickFileStorageButton.setColorFilter(ContextCompat.getColor(this, R.color.teal_300_teal_200),
+                PorterDuff.Mode.SRC_IN);
         placeRecordButton(RECORD_BUTTON_DEACTIVATED);
     }
 
