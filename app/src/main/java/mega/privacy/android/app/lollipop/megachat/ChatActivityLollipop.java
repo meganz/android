@@ -7268,10 +7268,14 @@ public class ChatActivityLollipop extends PinActivityLollipop
 
     public void showUploadingAttachmentBottomSheet(AndroidMegaChatMessage message, int position){
         logDebug("showUploadingAttachmentBottomSheet: "+position);
+
+        if (message == null || message.getPendingMessage() == null
+                || message.getPendingMessage().getState() == PendingMessageSingle.STATE_COMPRESSING
+                || isBottomSheetDialogShown(bottomSheetDialogFragment)) {
+            return;
+        }
+
         selectedPosition = position;
-
-        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
         selectedMessageId = message.getPendingMessage().getId();
 
         bottomSheetDialogFragment = new PendingMessageBottomSheetDialogFragment();
