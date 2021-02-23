@@ -1137,7 +1137,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 					return true;
 				}
 			});
-
+		} else {
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
 		}
