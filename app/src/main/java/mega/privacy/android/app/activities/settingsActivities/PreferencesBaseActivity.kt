@@ -50,7 +50,7 @@ open class PreferencesBaseActivity : PinActivityLollipop() {
     }
 
     protected fun showSaveButton(callback: () -> Unit) {
-        binding.groupSaveButton.isVisible = true
+        binding.viewSave.isVisible = true
         binding.btnSave.setOnClickListener { callback.invoke() }
     }
 }
