@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -60,6 +61,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -75,6 +77,7 @@ import nz.mega.sdk.MegaStringList;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.*;
@@ -1255,5 +1258,39 @@ public class ChatUtil {
                         -> chatManagementCallback.confirmLeaveChats(chats))
                 .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                 .show();
+    }
+
+    /**
+     * Creates a pending message representing an attachment message.
+     *
+     * @param idChat       Identifier of the chat where the message has to be sent.
+     * @param filePath     Path of the file which will be attached to the chat.
+     * @param fileName     Name of the file which will be attached to the chat.
+     * @param fromExplorer True if the file comes from File Explorer, false otherwise.
+     * @return The pending message after add it to the DB.
+     */
+    public static PendingMessageSingle createAttachmentPendingMessage(long idChat, String filePath, String fileName, boolean fromExplorer) {
+        long idPendingMessage;
+        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
+
+        PendingMessageSingle pendingMsg = new PendingMessageSingle();
+        pendingMsg.setChatId(idChat);
+        pendingMsg.setUploadTimestamp(System.currentTimeMillis() / 1000);
+        pendingMsg.setFilePath(filePath);
+        pendingMsg.setName(fileName);
+        pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
+
+        if (MimeTypeList.typeForName(fileName).isMp4Video() && !isSendOriginalAttachments()) {
+            idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
+            pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
+        } else if (fromExplorer) {
+            idPendingMessage = dbH.addPendingMessageFromExplorer(pendingMsg);
+        } else {
+            idPendingMessage = dbH.addPendingMessage(pendingMsg);
+        }
+
+        pendingMsg.setId(idPendingMessage);
+
+        return pendingMsg;
     }
 }

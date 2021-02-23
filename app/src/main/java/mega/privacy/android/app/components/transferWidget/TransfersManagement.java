@@ -342,16 +342,6 @@ public class TransfersManagement {
     }
 
     /**
-     * Checks if should add compressing state for chat video uploads.
-     *
-     * @param fileName Name of the file to upload.
-     * @return True if should add compressing state, false otherwise.
-     */
-    public static boolean shouldAddCompressingState(String fileName) {
-        return MimeTypeList.typeForName(fileName).isMp4Video() && !isSendOriginalAttachments();
-    }
-
-    /**
      * Checks if the transfer over quota has occurred at this moment
      * or it occurred in other past moment.
      *

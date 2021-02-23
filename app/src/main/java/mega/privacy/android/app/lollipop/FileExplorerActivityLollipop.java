@@ -100,8 +100,8 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.shouldAddCompressingState;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChatUtil.createAttachmentPendingMessage;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1537,32 +1537,6 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 				|| (importFileF && importFragmentSelected == INCOMING_FRAGMENT));
 	}
 
-	private long createPendingMessageDBH (long idChat, long timestamp, String fingerprint, ShareInfo info) {
-		logDebug("Chat ID: "+ idChat +", Fingerprint: " + fingerprint);
-
-		PendingMessageSingle pMsgSingle = new PendingMessageSingle();
-		pMsgSingle.setChatId(idChat);
-		pMsgSingle.setUploadTimestamp(timestamp);
-		pMsgSingle.setFilePath(info.getFileAbsolutePath());
-		pMsgSingle.setName(info.getTitle());
-		pMsgSingle.setFingerprint(fingerprint);
-
-		if (shouldAddCompressingState(info.getTitle())) {
-			pMsgSingle.setState(PendingMessageSingle.STATE_COMPRESSING);
-		}
-
-		long idMessage = dbH.addPendingMessageFromExplorer(pMsgSingle);
-		pMsgSingle.setId(idMessage);
-
-		if(idMessage!=-1){
-			logDebug("File: " + info.getTitle() + ", Size: " + info.getSize());
-		}
-		else{
-			logWarning("Error when adding pending msg to the database");
-		}
-		return idMessage;
-	}
-
 	/**
 	 * Checks if should start ChatUploadService to share the content or only attach it.
 	 * If the ChatUploadService has to start, it also checks if the content is already
@@ -1629,7 +1603,10 @@ public class FileExplorerActivityLollipop extends SorterContentActivity implemen
 			filesToUploadFingerPrint.put(fingerprint, info.getFileAbsolutePath());
 
 			for (MegaChatRoom item : chatListItems) {
-				idPendMsgs[pos] = createPendingMessageDBH(item.getChatId(), timestamp, fingerprint, info);
+				PendingMessageSingle pendingMsg = createAttachmentPendingMessage(item.getChatId(),
+						info.getFileAbsolutePath(), info.getTitle(), true);
+
+				idPendMsgs[pos] = pendingMsg.getId();
 				pos++;
 			}
 		}

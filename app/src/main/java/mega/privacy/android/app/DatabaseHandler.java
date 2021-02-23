@@ -3982,44 +3982,44 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	//New management of pending messages
-	public long addPendingMessage(String idChat, String timestamp, String filePath, String fingerprint, String name){
-		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(idChat));
-		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(timestamp));
-		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(filePath));
-		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(fingerprint));
-		values.put(KEY_PENDING_MSG_NAME, encrypt(name));
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING);
-
-		long id = db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
-		return id;
+	/**
+	 * Adds a pending message.
+	 *
+	 * @param message Pending message to add.
+	 * @return The identifier of the pending message.
+	 */
+	public long addPendingMessage(PendingMessageSingle message) {
+		return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING);
 	}
 
-	public long addPendingMessage(PendingMessageSingle message){
+	/**
+	 * Adds a pending message from File Explorer.
+	 *
+	 * @param message Pending message to add.
+	 * @return The identifier of the pending message.
+	 */
+	public long addPendingMessageFromExplorer(PendingMessageSingle message) {
+		return addPendingMessage(message, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER);
+	}
+
+	/**
+	 * Adds a pending message.
+	 *
+	 * @param message Pending message to add.
+	 * @param state	  State of the pending message.
+	 * @return The identifier of the pending message.
+	 */
+	public long addPendingMessage(PendingMessageSingle message, int state) {
 		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId()+""));
-		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp()+""));
+		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId() + ""));
+		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp() + ""));
 		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.getFilePath()));
 		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.getFingerprint()));
 		values.put(KEY_PENDING_MSG_NAME, encrypt(message.getName()));
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING);
+		values.put(KEY_PENDING_MSG_TRANSFER_TAG, INVALID_ID);
+		values.put(KEY_PENDING_MSG_STATE, state);
 
-		long id = db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
-		return id;
-	}
-
-	public long addPendingMessageFromExplorer(PendingMessageSingle message){
-		ContentValues values = new ContentValues();
-		values.put(KEY_PENDING_MSG_ID_CHAT, encrypt(message.getChatId()+""));
-		values.put(KEY_PENDING_MSG_TIMESTAMP, encrypt(message.getUploadTimestamp()+""));
-		values.put(KEY_PENDING_MSG_FILE_PATH, encrypt(message.getFilePath()));
-		values.put(KEY_PENDING_MSG_FINGERPRINT, encrypt(message.getFingerprint()));
-		values.put(KEY_PENDING_MSG_NAME, encrypt(message.getName()));
-		values.put(KEY_PENDING_MSG_STATE, PendingMessageSingle.STATE_PREPARING_FROM_EXPLORER);
-
-		long id = db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
-		return id;
+		return db.insert(TABLE_PENDING_MSG_SINGLE, null, values);
 	}
 
 	public PendingMessageSingle findPendingMessageById(long messageId){
