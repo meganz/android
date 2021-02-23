@@ -309,11 +309,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     || contactsListLayout.getVisibility() == View.VISIBLE) {
                 appBarLayout.setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
 
-                if (isDarkMode(context)) {
-                    ((ManagerActivityLollipop) context).changeAppBarElevation(true);
-                } else {
-                    ((ManagerActivityLollipop) context).changeAppBarElevation(false);
-                }
+                ((ManagerActivityLollipop) context).changeAppBarElevation(isDarkMode(context));
             } else {
                 appBarLayout.setElevation(0);
                 // Reset the AppBar elevation whatever in the light and dark mode

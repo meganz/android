@@ -1895,12 +1895,9 @@ public class Util {
     public static void changeActionBarElevation(Activity activity, AppBarLayout abL, boolean withElevation) {
         ColorUtils.changeStatusBarColorForElevation(activity, withElevation);
 
-        if (withElevation) {
-            float elevation = activity.getResources().getDimension(R.dimen.toolbar_elevation);
-            abL.setElevation(elevation);
-        } else {
-            abL.setElevation(0);
-        }
+		abL.setElevation(withElevation
+				? activity.getResources().getDimension(R.dimen.toolbar_elevation)
+				: 0);
     }
 
     /**
