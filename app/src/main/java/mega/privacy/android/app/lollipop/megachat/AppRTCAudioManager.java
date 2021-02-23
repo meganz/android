@@ -328,16 +328,22 @@ public class AppRTCAudioManager {
     }
 
     private void startVibration() {
-        if (vibrator != null)
-            return;
+        if (vibrator == null) {
+            vibrator = (Vibrator) apprtcContext.getSystemService(Context.VIBRATOR_SERVICE);
+        }
 
-        vibrator = (Vibrator) apprtcContext.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator == null || !vibrator.hasVibrator())
             return;
 
-        logDebug("Vibration begins");
         long[] pattern = {0, 1000, 500, 500, 1000};
-        vibrator.vibrate(pattern, 0);
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build();
+
+        logDebug("Vibration begins");
+        vibrator.vibrate(pattern, 2, audioAttributes);
     }
 
     /**
